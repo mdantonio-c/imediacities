@@ -11,7 +11,7 @@
 	ng-include="main.templateDir + 'loader.html'">
 </div>
 
-<div ng-if='!ctrl.videos'>
+<div ng-if='!ctrl.videos || ctrl.videos.length == 0'>
 	No video found
 </div>
 
@@ -28,6 +28,10 @@
 
 	<span class="md-subhead">
 		{{data.description}}
+	</span>
+
+	<span class="md-subhead">
+		Duration: {{data.duration}} minutes
 	</span>
 
 </md-card-title-text>

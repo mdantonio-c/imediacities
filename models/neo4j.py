@@ -9,7 +9,7 @@ Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
 from __future__ import absolute_import
-from neomodel import StringProperty, \
+from neomodel import StringProperty, IntegerProperty, \
     StructuredNode, StructuredRel, RelationshipTo, RelationshipFrom
 import logging
 
@@ -21,9 +21,19 @@ logger.setLevel(logging.DEBUG)
 # MODELS
 ##############################################################################
 
-class Person(StructuredNode):
-    name = StringProperty(unique_index=True)
-    ownership = RelationshipFrom('DataObject', 'IS_OWNED_BY')
+class Video(StructuredNode):
+    id = StringProperty(required=True, unique_index=True)
+    title = StringProperty(unique_index=True)
+    description = StringProperty()
+    duration = IntegerProperty()
+    annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
+
+
+class Annotation(StructuredNode):
+    id = StringProperty(required=True, unique_index=True)
+    key = StringProperty(equired=True)
+    value = StringProperty(equired=True)
+    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
 
 
 # class Zone(StructuredNode):
