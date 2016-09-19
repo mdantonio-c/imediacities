@@ -6,6 +6,11 @@
 
 <h4>List of videos</h4>
 
+<div 
+	ng-if="datactrl.loading" 
+	ng-include="main.templateDir + 'loader.html'">
+</div>
+
 <div ng-if='!ctrl.videos'>
 	No video found
 </div>
