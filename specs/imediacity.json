@@ -52,10 +52,10 @@
     },
 
     "apis": {
-        "foo": {
-            "GraphEndPoint": [
-                "graph",
-                "graph/<string:id>"
+        "videos": {
+            "Videos": [
+                "video",
+                "video/<string:video_id>/annotations"
             ]
         }
     },

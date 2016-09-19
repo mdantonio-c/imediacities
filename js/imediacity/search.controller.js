@@ -7,9 +7,7 @@ function SearchController($scope, $log, DataService, noty)
 {
 	var self = this;
 
-	self.videos = [
-		{"title": "test", "description": "This is a video test"}
-	]
+	self.videos = []
 
 	self.loading = true;
 	DataService.getVideos().then(
