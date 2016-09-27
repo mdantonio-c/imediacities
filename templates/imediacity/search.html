@@ -1,44 +1,48 @@
-<div ng-controller='SearchController as ctrl'>
-
-<md-content class="md-padding" layout="row" layout-wrap layout-align="center start" layout-xs="column">
-
-<div flex="70" layout="column">
-
-<h4>List of videos</h4>
-
 <div 
 	ng-if="datactrl.loading" 
 	ng-include="main.templateDir + 'loader.html'">
 </div>
 
-<div ng-if='!ctrl.videos || ctrl.videos.length == 0'>
-	No video found
+<div ng-controller='SearchController as ctrl'>
+
+<div class='row'>
+<div class='col-xs-8 col-xs-offset-2'>
+<div class='panel panel-default'>
+
+<div class='panel-heading'>
+	<h4 class='panel-title'>List of videos</h4>
 </div>
 
+<div class='panel-body'>
 
-<md-card ng-repeat="(key, data) in ctrl.videos">
+	<div ng-if='!ctrl.videos || ctrl.videos.length == 0'>
+		No video found
+	</div>
 
-<md-card-title>
+	<div class='table-responsive'>
+	<table class='table table-hover'>
 
-<md-card-title-text>
+	<tr ng-repeat="(key, data) in ctrl.videos">
 
-	<span class="md-headline valign-wrapper">
-		{{data.title}}
-	</span>
+		<td>
+			{{data.title}}
+		</td>
 
-	<span class="md-subhead">
-		{{data.description}}
-	</span>
+		<td>
+			{{data.description}}
+		</td>
 
-	<span class="md-subhead">
-		Duration: {{data.duration}} minutes
-	</span>
+		<td>
+			Duration: {{data.duration}} minutes
+		</td>
+	</div>
 
-</md-card-title-text>
-</md-card-title>
-</md-card>
+	</table>
+	</div>
 
 </div>
 
-</md-content>
+<div class='panel-footer'>
+</div>
+
 </div>
