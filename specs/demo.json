@@ -1,4 +1,3 @@
-// Configuration
 {
     "project": {
         "title": "My project",
@@ -24,11 +23,13 @@
             },
 
             "authentication": {
-                "service": "relationaldb",
+                "service": "neo4j",
+                // "service": "relationaldb",
                 "username": "user@nomail.org",
                 "password": "test"
             },
-            //"authentication_service": "neo4j",
+
+            "authentication_service": "neo4j",
 
             "services": {
                 // "relationaldb": {
@@ -53,8 +54,9 @@
 
     "apis": {
         "foo": {
-            "JustATest": [
-                "my"
+            "GraphEndPoint": [
+                "graph",
+                "graph/<string:id>"
             ]
         }
     },

@@ -1,27 +1,10 @@
 (function() {
 'use strict';
 
-// Customized logged page (default is public.welcome)
-// loggedLandingPage = "logged";
-
 angular.module('web').constant('customRoutes',
  {
 // JUST A TEST
 // Note: this will automatically check api online as not subchild of 'logged'
-
-    // Ovveride public.welcome state
-    // "public.welcome": {
-    //     url: "/welcome",
-    //     views: {
-    //         "unlogged": {
-    //             dir: "blueprint",
-    //             templateUrl: 'welcome.html',
-    //         }
-    //     }
-    // },
-
-
-
     'test': {
         url: "/test",
         views: {

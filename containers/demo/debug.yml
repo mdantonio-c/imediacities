@@ -1,14 +1,22 @@
 
-# NOTE:
-# VOLUMES MUST BE CALLED WITH 'restangulask_' + FILEPREFIX + '_' + YOURNAME
-# e.g.
-# restangulask_demo_myvolume
-
 #######################
 # Define here your services
 
-myservice:
-    image: busybox
+# searchindex:
+#   image: elasticsearch
+#   hostname: elastic
+#   volumes:
+#       - restangulask_graphbased_elasticdata:/usr/share/elasticsearch/data
+
+gdb:
+    # image: neo4j  # 3.0 has some bugs with neomodel...
+    image: neo4j:2.3.3
+    ports:
+      - 9090:7474
+    volumes:
+        - restangulask_graphbased_graphdata:/data
+    environment:
+        NEO4J_AUTH: neo4j/chooseapassword
 
 #######################
 # Link services inside API
@@ -16,11 +24,11 @@ myservice:
 backend:
     ports:
         - 8081:5000
-    volumes:
-        # Sql lite database
-        - restangulask_demo_apilitedb:/dbs
-    # links:
-    #     - myservice:rdb
+    environment:
+      BACKEND_AUTH_SERVICE: graphdb
+    links:
+        # - searchindex:el
+        - gdb:gdb
 
 #######################
 # Frontend links only API
@@ -29,11 +37,3 @@ backend:
 frontend:
     links:
         - backend:myapi
-
-#######################
-# EXTRA
-
-sqladmin:
-    image: clue/adminer
-    volumes:
-        - restangulask_demo_apilitedb:/dbs
