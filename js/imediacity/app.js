@@ -1,15 +1,11 @@
 (function() {
   'use strict';
 
-/* Define another module?
-console.log('PRE');
-angular.module('blueprint', ['ui.router']);
-console.log('POST');
-*/
-
   angular
     .module('web', [
         'ngSanitize',
+        'ngAnimate',
+        'ngMessages',
         'ui.router',
         'ui.bootstrap',
         'satellizer',
