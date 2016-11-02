@@ -8,9 +8,9 @@ backend:
   links:
     - gdb:gdb
 
-frontend:
-  ports:
-    - 80:5000
+# proxy:
+#   links:
+#     - gdb:gdb
 
 gdb:
   ports:
