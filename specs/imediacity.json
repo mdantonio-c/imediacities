@@ -57,14 +57,18 @@
                 "video",
                 "video/<string:video_id>/annotations"
             ]
+        },
+        "upload": {
+            "Upload": [
+                "upload"
+            ]
         }
     },
 
     "bower_components": {
-        // "lib-name": [
-        //     "file.js",
-        //     "file.css"
-        // ]
+        "ng-flow": [
+            "dist/ng-flow-standalone.min.js"
+        ]
     },
 
     "css": [

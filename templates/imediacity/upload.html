@@ -1,0 +1,74 @@
+<div 
+	ng-if="datactrl.loading" 
+	ng-include="main.templateDir + 'loader.html'">
+</div>
+
+<div ng-controller='UploadController as ctrl'>
+
+<div class='row'>
+<div class='col-xs-8 col-xs-offset-2'>
+<div class='panel panel-default'>
+
+<div class='panel-heading'>
+	<h4 class='panel-title'>Upload new videos</h4>
+</div>
+
+<div class='panel-body'>
+
+<div flow-init="{target: 'http://localhost:8081/api/upload'}"
+     flow-files-submitted="$flow.upload()"
+     flow-file-success="$file.msg = $message">
+
+  <input type="file" flow-btn/>
+  <span class="btn" flow-btn>Upload File</span>
+
+  <div class="well">
+    <a class="btn btn-small btn-success" ng-click="$flow.resume()">Resume all</a>
+    <a class="btn btn-small btn-danger" ng-click="$flow.pause()">Pause all</a>
+    <a class="btn btn-small btn-info" ng-click="$flow.cancel()">Cancel all</a>
+    <span ng-if='$flow.getSize() > 0' class="label label-info">Total Size: {{$flow.getSize() | bytes}}</span>
+  </div>
+
+  <div class='table-responsive'>
+  <table class='table table-hover'>
+  		<tr>
+  			<th>#</th>
+			<th>name</th>
+			<th>size</th>
+			<!-- <th>relativePath</th> -->
+			<!-- <th>uniqueIdentifier</th> -->
+			<!-- <th>chunks.length</th> -->
+			<th>progress</th>
+  		</tr>
+    <tr ng-repeat="file in $flow.files">
+		<td>{{$index+1}}</td>
+		<td>{{file.name}}</td>
+		<td>{{file.size | bytes}}</td>
+		<!-- <td>{{file.relativePath}}</td> -->
+		<!-- <td>{{file.uniqueIdentifier}}</td> -->
+		<!-- <td>{{file.chunks.length}}</td> -->
+		<td>
+
+			<uib-progressbar ng-if='file.paused && !file.isComplete()' animate="true" max="1" value="file.progress()" type="warning">
+				<label style='color:#444;'>paused</label>
+			</uib-progressbar>
+
+			<uib-progressbar ng-if='file.isUploading()' animate="true" max="1" value="file.progress()" type="info">
+				<label style='color:#444;'>{{file.progress() | percentage:2}}</label>
+			</uib-progressbar>
+
+			<uib-progressbar ng-if='file.isComplete()' animate="true" max="1" value="file.progress()" type="success">
+				<b>completed</b>
+			</uib-progressbar>
+		</td>
+    </tr>
+  </table>
+  </div>
+</div>
+
+</div>
+
+<div class='panel-footer'>
+</div>
+
+</div>

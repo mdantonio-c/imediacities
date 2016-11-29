@@ -11,7 +11,8 @@
         'satellizer',
         'cfp.hotkeys',
         'formly',
-        'formlyBootstrap'
+        'formlyBootstrap',
+        'flow'
     ]);
 
 })();
