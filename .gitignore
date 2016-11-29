@@ -14,7 +14,7 @@ specs/blueprint.json
 frontend/config/angular/blueprint.json
 
 # data
-uploads
+imediastuff
 
 # bower
 libs/bower_components
