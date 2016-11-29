@@ -19,7 +19,6 @@ logger = get_logger(__name__)
 class Upload(ExtendedApiResource):
 
     @authentication.authorization_required
-    @decorate.add_endpoint_parameter('file')
     # @decorate.add_endpoint_parameter('flowChunkSize')
     # @decorate.add_endpoint_parameter('flowCurrentChunkSize')
     # @decorate.add_endpoint_parameter('flowTotalSize')
@@ -30,8 +29,6 @@ class Upload(ExtendedApiResource):
     @decorate.apimethod
     def post(self):
 
-        data = self.get_input()
-        logger.critical(data)
         # params = self.get_input()
         filename = self.get_input(single_parameter='flowFilename')
         with open(filename, "a") as f:
