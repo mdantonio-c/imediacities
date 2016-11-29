@@ -70,7 +70,9 @@ if [ "$1" != "help" ]; then
     backendyaml="backend/docker-compose.yml"
     frontendyaml="frontend/docker-compose.yml"
 
-    if [ -z $3 ]; then
+    if [ "$2" == "bower" ]; then
+        mode="debug"
+    elif [ -z $3 ]; then
         mode="debug"
     else
         mode="$3"
