@@ -4,6 +4,7 @@
 An endpoint example
 """
 
+import os
 from commons.logs import get_logger
 from ..base import ExtendedApiResource
 from .. import decorators as decorate
@@ -31,7 +32,9 @@ class Upload(ExtendedApiResource):
 
         # params = self.get_input()
         filename = self.get_input(single_parameter='flowFilename')
-        with open(filename, "a") as f:
+        abs_fname = os.path.join("/uploads", filename)
+
+        with open(abs_fname, "a") as f:
             f.write(".")
 
         return self.force_response("received")

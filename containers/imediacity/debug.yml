@@ -1,6 +1,8 @@
 backend:
   environment:
     BACKEND_AUTH_SERVICE: graphdb
+  volumes:
+    - ../uploads:/uploads
   links:
     - gdb:gdb
 
