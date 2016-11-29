@@ -1,3 +1,11 @@
+
+gdb:
+  ports:
+  - 9090:7474
+
+#######################
+# Link services inside API
+
 backend:
   environment:
     BACKEND_AUTH_SERVICE: graphdb
@@ -5,11 +13,3 @@ backend:
     - ../imediastuff:/uploads
   links:
     - gdb:gdb
-
-frontend:
-  ports:
-    - 80:5000
-
-gdb:
-  ports:
-  - 9090:7474
