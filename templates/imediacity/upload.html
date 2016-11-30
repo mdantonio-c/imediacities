@@ -19,13 +19,17 @@
      flow-files-submitted="$flow.upload()"
      flow-file-success="$file.msg = $message">
 
-  <input type="file" flow-btn/>
-  <span class="btn" flow-btn>Upload File</span>
+  <span class="btn btn-small btn-info" flow-btn><i class="icon icon-file"></i>Upload a file</span>
+  <span class="btn btn-small btn-info" flow-btn flow-directory><i class="icon icon-folder-open"></i>
+    Upload a folder
+  </span>
+
+  <br><br>
 
   <div class="well">
     <a class="btn btn-small btn-success" ng-click="$flow.resume()">Resume all</a>
-    <a class="btn btn-small btn-danger" ng-click="$flow.pause()">Pause all</a>
-    <a class="btn btn-small btn-info" ng-click="$flow.cancel()">Cancel all</a>
+    <a class="btn btn-small btn-warning" ng-click="$flow.pause()">Pause all</a>
+    <a class="btn btn-small btn-danger" ng-click="$flow.cancel()">Cancel all</a>
     <span ng-if='$flow.getSize() > 0' class="label label-info">Total Size: {{$flow.getSize() | bytes}}</span>
   </div>
 
