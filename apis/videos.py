@@ -27,22 +27,17 @@ class Videos(ExtendedApiResource):
 
         if video_id is not None:
             v = self.graph.Video.nodes.get(id=video_id)
+            videos = [v]
+        else:
+            videos = self.graph.Video.nodes.all()
+
+        for v in videos:
 
             video = {}
             video["title"] = v.title
             video["description"] = v.description
             video["duration"] = v.duration
             data.append(video)
-
-        else:
-
-            for v in self.graph.Video.nodes.all():
-
-                video = {}
-                video["title"] = v.title
-                video["description"] = v.description
-                video["duration"] = v.duration
-                data.append(video)
 
         return self.force_response(data)
 
