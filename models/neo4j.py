@@ -37,7 +37,7 @@ class Video(StructuredNode):
     modified = DateTimeProperty(required=True)
     filename = StringProperty(required=True)
 
-    title = StringProperty(unique_index=True)
+    title = StringProperty()
     description = StringProperty()
     duration = IntegerProperty()
     ownership = RelationshipTo('User', 'IS_OWNED_BY', cardinality=ZeroOrMore)
