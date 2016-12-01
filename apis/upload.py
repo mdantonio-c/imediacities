@@ -10,7 +10,8 @@ from ..base import ExtendedApiResource
 from .. import decorators as decorate
 from ...auth import authentication
 from commons import htmlcodes as hcodes
-# from flask_restful import request
+from flask_restful import request
+from werkzeug import secure_filename
 # from commons.services.uuid import getUUID
 
 logger = get_logger(__name__)
@@ -42,19 +43,20 @@ class Upload(ExtendedApiResource):
         chunk_number = self.get_input(single_parameter='flowChunkNumber')
         chunk_total = self.get_input(single_parameter='flowTotalChunks')
         filename = self.get_input(single_parameter='flowFilename')
+        sec_filename = secure_filename(filename)
         root_dir = os.path.join("/uploads", user_node.uuid)
-        abs_fname = os.path.join(root_dir, filename)
+        abs_fname = os.path.join(root_dir, sec_filename)
 
         if not os.path.exists(root_dir):
             os.mkdir(root_dir)
 
-        with open(abs_fname, "a") as f:
-            f.write(".")
+        with open(abs_fname, "ab") as f:
+            request.files['file'].save(f)
 
         if chunk_number == chunk_total:
 
             properties = {}
-            properties["filename"] = filename
+            properties["filename"] = sec_filename
             properties["title"] = filename
             video = self.graph.createNode(self.graph.Video, properties)
             if user_node is not None:
