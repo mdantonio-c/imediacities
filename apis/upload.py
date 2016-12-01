@@ -50,8 +50,13 @@ class Upload(ExtendedApiResource):
         if not os.path.exists(root_dir):
             os.mkdir(root_dir)
 
+        if chunk_number == "1":
+            if os.path.exists(abs_fname):
+                os.remove(abs_fname)
+
         with open(abs_fname, "ab") as f:
             request.files['file'].save(f)
+            f.close()
 
         if chunk_number == chunk_total:
 
