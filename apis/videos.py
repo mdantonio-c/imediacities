@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 class Videos(ExtendedApiResource):
 
     @authentication.authorization_required
-    @decorate.apimethod
+    # @decorate.apimethod
     def get(self, video_id=None):
 
         self.graph = self.global_get_service('neo4j')
@@ -42,7 +42,7 @@ class Videos(ExtendedApiResource):
         return self.force_response(data)
 
     @authentication.authorization_required
-    @decorate.apimethod
+    # @decorate.apimethod
     def post(self, video_id=None):
 
         self.graph = self.global_get_service('neo4j')
