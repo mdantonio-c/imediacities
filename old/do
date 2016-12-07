@@ -13,7 +13,8 @@ fronted_container="frontend"
 backend_container="backend"
 backend_repo="backend"
 frontend_repo="frontend"
-backend_git="https://github.com/mdantonio/http-api-base"
+# backend_git="https://github.com/mdantonio/http-api-base"
+backend_git="https://github.com/EUDAT-B2STAGE/http-api-base"
 frontend_git="https://github.com/mdantonio/angularjs-on-flask"
 services="$backend_container $fronted_container"
 submodule_tracking="submodules.current.commit"
@@ -170,7 +171,7 @@ fi
 
 #############################
 # Run services
-bcom="$compose_com -f frontend/docker-compose.yml run --rm $webbuild bower install"
+bcom="$compose_com -f backend/docker-compose.yml -f frontend/docker-compose.yml run --rm $webbuild bower install"
 
 # First time install
 if [ "$2" == "init" ]; then
