@@ -72,6 +72,7 @@
     },
 
     "css": [
+        "custom/imediacity/search.css"
     ]
 
 }
