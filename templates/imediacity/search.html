@@ -7,42 +7,34 @@
 
 <div class='row'>
 <div class='col-xs-8 col-xs-offset-2'>
-<div class='panel panel-default'>
+<!-- <div class='panel panel-default'>
 
 <div class='panel-heading'>
 	<h4 class='panel-title'>List of videos</h4>
-</div>
+</div> 
 
-<div class='panel-body'>
+<div class='panel-body'> -->
 
-	<div ng-if='!ctrl.videos || ctrl.videos.length == 0'>
+	<div ng-if='ctrl.videos.length == 0'>
 		No video found
 	</div>
+	<div ng-if="ctrl.videos.length > 0">
+		<div class="bar">
+			<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
+		</div>
 
-	<div class='table-responsive'>
-	<table class='table table-hover'>
-
-	<tr ng-repeat="(key, data) in ctrl.videos">
-
-		<td>
-			{{data.title}}
-		</td>
-
-		<td>
-			{{data.description}}
-		</td>
-
-		<td>
-			Duration: {{data.duration}} minutes
-		</td>
-	</div>
-
-	</table>
+		<ul>
+			<li ng-repeat="v in ctrl.videos | searchFor:searchString">
+				<a href="{{v.movieurl}}"><img ng-src="{{v.moviesposter}}" /></a>
+				<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
+				<p>{{v.description}}</p>
+			</li>
+		</ul>
 	</div>
 
 </div>
 
-<div class='panel-footer'>
-</div>
+<!-- <div class='panel-footer'>
+</div> -->
 
 </div>
