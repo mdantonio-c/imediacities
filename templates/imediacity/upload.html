@@ -33,7 +33,7 @@
     <span ng-if='$flow.getSize() > 0' class="label label-info">Total Size: {{$flow.getSize() | bytes}}</span>
   </div>
 
-  <div class='table-responsive'>
+  <div class='table-responsive' ng-if='$flow.files.length'>
   <table class='table table-hover'>
   		<tr>
   			<th>#</th>
