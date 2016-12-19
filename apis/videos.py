@@ -48,46 +48,46 @@ class Videos(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
-    @catch_graph_exceptions
-    @graph_transactions
-    @authentication.authorization_required
-    # @decorate.apimethod
-    def post(self, video_id=None):
+    # @decorate.catch_error(
+    #     exception=Exception, exception_label=None, catch_generic=False)
+    # @catch_graph_exceptions
+    # @graph_transactions
+    # @authentication.authorization_required
+    # # @decorate.apimethod
+    # def post(self, video_id=None):
 
-        self.initGraph()
+    #     self.initGraph()
 
-        try:
-            data = request.get_json(force=True)
-        except:
-            data = {}
+    #     try:
+    #         data = request.get_json(force=True)
+    #     except:
+    #         data = {}
 
-        logger.critical(data)
+    #     logger.critical(data)
 
-        if 'title' not in data:
-            return self.force_response(
-                errors=[{"Bad Request": "Missing title"}],
-                code=hcodes.HTTP_BAD_REQUEST
-            )
+    #     if 'title' not in data:
+    #         return self.force_response(
+    #             errors=[{"Bad Request": "Missing title"}],
+    #             code=hcodes.HTTP_BAD_REQUEST
+    #         )
 
-        if 'description' not in data:
-            return self.force_response(
-                errors=[{"Bad Request": "Missing description"}],
-                code=hcodes.HTTP_BAD_REQUEST
-            )
+    #     if 'description' not in data:
+    #         return self.force_response(
+    #             errors=[{"Bad Request": "Missing description"}],
+    #             code=hcodes.HTTP_BAD_REQUEST
+    #         )
 
-        if 'duration' not in data:
-            return self.force_response(
-                errors=[{"Bad Request": "Missing duration"}],
-                code=hcodes.HTTP_BAD_REQUEST
-            )
+    #     if 'duration' not in data:
+    #         return self.force_response(
+    #             errors=[{"Bad Request": "Missing duration"}],
+    #             code=hcodes.HTTP_BAD_REQUEST
+    #         )
 
-        video = self.graph.Video()
-        video.id = getUUID()
-        video.title = data["title"]
-        video.description = data["description"]
-        video.duration = data["duration"]
-        video.save()
+    #     video = self.graph.Video()
+    #     video.id = getUUID()
+    #     video.title = data["title"]
+    #     video.description = data["description"]
+    #     video.duration = data["duration"]
+    #     video.save()
 
-        return self.force_response(video.id)
+    #     return self.force_response(video.id)

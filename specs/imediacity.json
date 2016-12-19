@@ -58,6 +58,11 @@
                 "video/<string:video_id>/annotations"
             ]
         },
+        "search": {
+            "Search": [
+                "search"
+            ]
+        },
         "upload": {
             "Upload": [
                 "upload"

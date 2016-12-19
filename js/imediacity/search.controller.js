@@ -32,7 +32,7 @@ function SearchController($scope, $log, DataService, noty)
 /*	self.videos = []
 
 	self.loading = true;
-	DataService.getVideos().then(
+	DataService.searchVideos().then(
 		function(out_data) {
 			self.videos = out_data.data;
 			self.loading = false;

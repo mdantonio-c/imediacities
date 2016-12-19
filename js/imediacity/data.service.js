@@ -7,6 +7,9 @@ function DataService($log, api, $q, jsonapi_parser) {
 
 	var self = this;
 
+    self.searchVideos = function() {
+        return api.apiCall('search', 'POST');    }
+
     self.getVideos = function() {
         return api.apiCall('video', 'GET');
     }
