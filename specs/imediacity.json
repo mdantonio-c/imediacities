@@ -62,6 +62,18 @@
             "Upload": [
                 "upload"
             ]
+        },
+        "admin_users": {
+            "AdminUsers": [
+                "admin/users",
+                "admin/users/<user_id>"
+            ]
+        },
+        "admin_groups": {
+            "AdminGroups": [
+                "admin/groups",
+                "admin/groups/<group_id>"
+            ]
         }
     },
 
