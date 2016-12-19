@@ -5,10 +5,14 @@ An endpoint example
 """
 
 from commons.logs import get_logger
-from ..base import ExtendedApiResource
 from .. import decorators as decorate
 from ...auth import authentication
 from flask_restful import request
+from ..services.neo4j.graph_endpoints import GraphBaseOperations
+# from ..services.neo4j.graph_endpoints import myGraphError
+# from ..services.neo4j.graph_endpoints import returnError
+from ..services.neo4j.graph_endpoints import graph_transactions
+from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons import htmlcodes as hcodes
 from commons.services.uuid import getUUID
 
@@ -16,13 +20,16 @@ logger = get_logger(__name__)
 
 
 #####################################
-class Videos(ExtendedApiResource):
+class Videos(GraphBaseOperations):
 
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=False)
+    @catch_graph_exceptions
     @authentication.authorization_required
     # @decorate.apimethod
     def get(self, video_id=None):
 
-        self.graph = self.global_get_service('neo4j')
+        self.initGraph()
         data = []
 
         if video_id is not None:
@@ -41,11 +48,15 @@ class Videos(ExtendedApiResource):
 
         return self.force_response(data)
 
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=False)
+    @catch_graph_exceptions
+    @graph_transactions
     @authentication.authorization_required
     # @decorate.apimethod
     def post(self, video_id=None):
 
-        self.graph = self.global_get_service('neo4j')
+        self.initGraph()
 
         try:
             data = request.get_json(force=True)

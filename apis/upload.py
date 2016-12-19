@@ -6,20 +6,28 @@ An endpoint example
 
 import os
 from commons.logs import get_logger
-from ..base import ExtendedApiResource
 from .. import decorators as decorate
 from ...auth import authentication
 from commons import htmlcodes as hcodes
 from flask_restful import request
 from ..services.uploader import Uploader
+from ..services.neo4j.graph_endpoints import GraphBaseOperations
+# from ..services.neo4j.graph_endpoints import myGraphError
+# from ..services.neo4j.graph_endpoints import returnError
+from ..services.neo4j.graph_endpoints import graph_transactions
+from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 # from commons.services.uuid import getUUID
 
 logger = get_logger(__name__)
 
 
 #####################################
-class Upload(Uploader, ExtendedApiResource):
+class Upload(Uploader, GraphBaseOperations):
 
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=False)
+    @catch_graph_exceptions
+    @graph_transactions
     @authentication.authorization_required
     @decorate.add_endpoint_parameter('flowFilename')
     @decorate.add_endpoint_parameter('flowChunkNumber')
@@ -28,14 +36,9 @@ class Upload(Uploader, ExtendedApiResource):
     @decorate.apimethod
     def post(self):
 
-        self.graph = self.global_get_service('neo4j')
-        user = self.get_current_user()
-        try:
-            user_node = self.graph.User.nodes.get(email=user.email)
-        except self.graph.User.DoesNotExist:
-            user_node = None
+        self.initGraph()
 
-        root_dir = os.path.join("/uploads", user_node.uuid)
+        root_dir = os.path.join("/uploads", self._current_user.uuid)
         if not os.path.exists(root_dir):
             os.mkdir(root_dir)
 
@@ -57,8 +60,8 @@ class Upload(Uploader, ExtendedApiResource):
             properties["filename"] = abs_fname
             properties["title"] = filename
             video = self.graph.createNode(self.graph.Video, properties)
-            if user_node is not None:
-                video.ownership.connect(user_node)
+            if self._current_user is not None:
+                video.ownership.connect(self._current_user)
 
             return self.force_response(video.uuid)
 
