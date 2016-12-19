@@ -34,7 +34,7 @@ class User(UserBase):
 
     videos = RelationshipFrom('Video', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO')
-    pi = RelationshipTo(
+    coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore)
 
     _fields_to_show = [
@@ -94,14 +94,14 @@ class Group(StructuredNode):
 
     members = RelationshipFrom(
         'User', 'BELONGS_TO', cardinality=ZeroOrMore)
-    pi = RelationshipFrom(
+    coordinator = RelationshipFrom(
         'User', 'PI_FOR', cardinality=ZeroOrMore)
 
     _fields_to_show = [
         "shortname", "fullname"
     ]
     _relationships_to_follow = [
-        'pi', 'members'
+        'coordinator', 'members'
     ]
 
     _input_schema = [
@@ -120,15 +120,14 @@ class Group(StructuredNode):
             "description": "Full name"
         },
         {
-            "key": "pi",
+            "key": "coordinator",
             "type": "select",
             "required": "true",
-            "label": "Principal Investigator",
-            "description": "Select a PI",
+            "label": "Group coordinator",
+            "description": "Select a coordinator",
             "islink": "true",
-            "model_key": "_pi",
+            "model_key": "_coordinator",
             "select_id": "id",
-            # "select_label": "email",
             "options": []
         }
     ]
