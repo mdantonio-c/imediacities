@@ -25,10 +25,113 @@ logger.setLevel(logging.DEBUG)
 # MODELS
 ##############################################################################
 
-
-# Extension of User model
+# Extension of User model for accounting in API login/logout
 class User(UserBase):
+    id = StringProperty(required=True, unique_index=True)
+    name = StringProperty(required=True)
+    surname = StringProperty(required=True)
+    name_surname = StringProperty(required=True, unique_index=True)
+
     videos = RelationshipFrom('Video', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    belongs_to = RelationshipTo('Group', 'BELONGS_TO')
+    pi = RelationshipTo(
+        'Group', 'PI_FOR', cardinality=ZeroOrMore)
+
+    _fields_to_show = [
+        "email", "name", "surname"
+    ]
+    _relationships_to_follow = [
+        'belongs_to', 'roles'
+    ]
+
+    _input_schema = [
+        {
+            "key": "email",
+            "type": "text",
+            "required": "true",
+            "label": "Email",
+            "description": "Email",
+        },
+        {
+            "key": "password",
+            "type": "text",
+            "required": "false",
+            "label": "Password",
+            "description": "Password",
+        },
+        {
+            "key": "name",
+            "type": "text",
+            "required": "true",
+            "label": "Name",
+            "description": "Name",
+        },
+        {
+            "key": "surname",
+            "type": "text",
+            "required": "true",
+            "label": "Surname",
+            "description": "Surname",
+        },
+        {
+            "key": "group",
+            "type": "autocomplete",
+            "required": "true",
+            "label": "Group",
+            "description": "Select a group",
+            "islink": "true",
+            "model_key": "_belongs_to",
+            "select_label": "shortname",
+            "select_id": "id"
+        },
+    ]
+
+
+class Group(StructuredNode):
+    id = StringProperty(required=True, unique_index=True)
+    fullname = StringProperty(required=True, unique_index=True)
+    shortname = StringProperty(required=True, unique_index=True)
+
+    members = RelationshipFrom(
+        'User', 'BELONGS_TO', cardinality=ZeroOrMore)
+    pi = RelationshipFrom(
+        'User', 'PI_FOR', cardinality=ZeroOrMore)
+
+    _fields_to_show = [
+        "shortname", "fullname"
+    ]
+    _relationships_to_follow = [
+        'pi', 'members'
+    ]
+
+    _input_schema = [
+        {
+            "key": "shortname",
+            "type": "text",
+            "required": "true",
+            "label": "Short name",
+            "description": "Short name"
+        },
+        {
+            "key": "fullname",
+            "type": "text",
+            "required": "true",
+            "label": "Full name",
+            "description": "Full name"
+        },
+        {
+            "key": "pi",
+            "type": "select",
+            "required": "true",
+            "label": "Principal Investigator",
+            "description": "Select a PI",
+            "islink": "true",
+            "model_key": "_pi",
+            "select_id": "id",
+            # "select_label": "email",
+            "options": []
+        }
+    ]
 
 
 class Video(StructuredNode):
