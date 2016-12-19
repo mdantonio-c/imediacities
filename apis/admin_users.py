@@ -65,7 +65,7 @@ class AdminUsers(GraphBaseOperations):
 
         group_id = groups.pop()
 
-        group = self.getNode(self.graph.Group, group_id, field='id')
+        group = self.getNode(self.graph.Group, group_id, field='uuid')
 
         if group is None:
             raise myGraphError(
@@ -79,7 +79,7 @@ class AdminUsers(GraphBaseOperations):
             cert_pass += rand.choice(charset)
 
         # GRAPH #
-        properties["uuid"] = getUUID()
+        # properties["uuid"] = getUUID()
         properties["authmethod"] = "credentials"
         # if "password" in properties:
         properties["password"] = \
@@ -89,7 +89,7 @@ class AdminUsers(GraphBaseOperations):
         user = self.graph.createNode(self.graph.User, properties)
         user.belongs_to.connect(group)
 
-        return self.force_response(user.id)
+        return self.force_response(user.uuid)
 
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
@@ -124,12 +124,12 @@ class AdminUsers(GraphBaseOperations):
         user.name_surname = self.createUniqueIndex(user.name, user.surname)
         user.save()
 
-        groups = self.parseAutocomplete(v, 'group', id_key='id')
+        groups = self.parseAutocomplete(v, 'group', id_key='uuid')
 
         if groups is not None:
             group_id = groups.pop()
 
-            group = self.getNode(self.graph.Group, group_id, field='id')
+            group = self.getNode(self.graph.Group, group_id, field='uuid')
 
             for p in user.belongs_to.all():
                 if p == group:
@@ -157,7 +157,7 @@ class AdminUsers(GraphBaseOperations):
 
         self.initGraph()
 
-        user = self.getNode(self.graph.User, user_id, field='id')
+        user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise myGraphError(self.USER_NOT_FOUND)
 

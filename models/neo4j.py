@@ -27,7 +27,7 @@ logger.setLevel(logging.DEBUG)
 
 # Extension of User model for accounting in API login/logout
 class User(UserBase):
-    id = StringProperty(required=True, unique_index=True)
+    uuid = StringProperty(required=True, unique_index=True)
     name = StringProperty(required=True)
     surname = StringProperty(required=True)
     name_surname = StringProperty(required=True, unique_index=True)
@@ -88,7 +88,7 @@ class User(UserBase):
 
 
 class Group(StructuredNode):
-    id = StringProperty(required=True, unique_index=True)
+    uuid = StringProperty(required=True, unique_index=True)
     fullname = StringProperty(required=True, unique_index=True)
     shortname = StringProperty(required=True, unique_index=True)
 

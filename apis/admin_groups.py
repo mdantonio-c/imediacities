@@ -49,6 +49,17 @@ class AdminGroups(GraphBaseOperations):
         v = self.get_input()
         if len(v) == 0:
             schema = self.graph.Group._input_schema.copy()
+            users = self.graph.User.nodes
+            for idx, val in enumerate(schema):
+                if val["key"] == "coordinator":
+                    for n in users.all():
+                        schema[idx]["options"].append(
+                            {
+                                "id": n.uuid,
+                                "value": n.email
+                            }
+                        )
+
             return self.force_response(schema)
 
         # INIT #
@@ -59,7 +70,7 @@ class AdminGroups(GraphBaseOperations):
                 'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         coordinator = self.getNode(
-            self.graph.User, v['coordinator'], field='id')
+            self.graph.User, v['coordinator'], field='uuid')
 
         if coordinator is None:
             raise myGraphError(
@@ -67,9 +78,9 @@ class AdminGroups(GraphBaseOperations):
 
         # GRAPH #
         group = self.graph.createNode(self.graph.Group, properties)
-        group.coordinator.connect(coordinator)
+        # group.coordinator.connect(coordinator)
 
-        return self.force_response(group.id)
+        return self.force_response(group.uuid)
 
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
@@ -91,9 +102,9 @@ class AdminGroups(GraphBaseOperations):
 
         v = self.get_input()
 
-        group = self.getNode(self.graph.Group, group_id, field='id')
+        group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
-            raise myGraphError(self.GROUP_NOT_FOUND)
+            raise myGraphError("Group not found")
 
         self.updateProperties(group, self.graph.Group._input_schema, v)
         group.save()
@@ -101,7 +112,7 @@ class AdminGroups(GraphBaseOperations):
         if 'coordinator' in v:
 
             coordinator = self.getNode(
-                self.graph.User, v['coordinator'], field='id')
+                self.graph.User, v['coordinator'], field='uuid')
 
             p = None
             for p in group.coordinator.all():
@@ -133,10 +144,39 @@ class AdminGroups(GraphBaseOperations):
 
         self.initGraph()
 
-        group = self.getNode(self.graph.Group, group_id, field='id')
+        group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
-            raise myGraphError(self.GROUP_NOT_FOUND)
+            raise myGraphError("Group not found")
 
         group.delete()
 
         return self.empty_response()
+
+
+class UserGroup(GraphBaseOperations):
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=False)
+    @catch_graph_exceptions
+    @authentication.authorization_required
+    # @decorate.apimethod
+    def get(self, query=None):
+
+        self.initGraph()
+
+        data = []
+        cypher = "MATCH (g:Group)"
+
+        if query is not None:
+            cypher += " WHERE g.shortname =~ '(?i).*%s.*'" % query
+
+        cypher += " RETURN g ORDER BY g.shortname ASC"
+
+        if query is None:
+            cypher += " LIMIT 20"
+
+        result = self.graph.cypher(cypher)
+        for row in result:
+            g = self.graph.Group.inflate(row[0])
+            data.append({"id": g.uuid, "shortname": g.shortname})
+
+        return self.force_response(data)
