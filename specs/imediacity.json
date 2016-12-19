@@ -89,6 +89,10 @@
     "bower_components": {
         "ng-flow": [
             "dist/ng-flow-standalone.min.js"
+        ],
+        "angular-tablesort": [
+            "js/angular-tablesort.js",
+            "tablesort.css"
         ]
     },
 

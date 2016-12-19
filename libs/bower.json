@@ -27,7 +27,8 @@
     "google-material-icons": "^2.2.0",
     "angular-messages": "^1.5.8",
     "angular-aria": "^1.5.8",
-    "angular-chips": "mdantonio/angular-chips#v2.0"
+    "angular-chips": "mdantonio/angular-chips#v2.0",
+    "angular-tablesort": "^1.4.0"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.5"

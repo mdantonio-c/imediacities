@@ -12,7 +12,8 @@
         'cfp.hotkeys',
         'formly',
         'formlyBootstrap',
-        'flow'
+        'flow',
+        'tableSort'
     ]);
 
 })();
