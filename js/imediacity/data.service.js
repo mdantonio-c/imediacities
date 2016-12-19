@@ -11,7 +11,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('search', 'POST');    }
 
     self.getVideos = function() {
-        return api.apiCall('video', 'GET');
+        return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     }
     self.getVideoInfo = function(video) {
         return api.apiCall('video/'+video+'annotations', 'GET');

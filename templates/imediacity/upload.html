@@ -62,3 +62,52 @@
 </div>
 
 </div>
+
+
+
+<div ng-controller='VideosController as ctrl'>
+
+<div class='row'>
+<div class='col-xs-12'>
+<div class='panel panel-default'>
+
+<div class='panel-heading'>
+  <h4 class='panel-title'>Your videos</h4>
+</div>
+
+<div class='panel-body'>
+
+<div class="table-responsive">
+  <table ng-show="ctrl.videos" class='table table-hover table-condensed table-borderless' ts-wrapper>
+
+  <thead>
+    <tr class='active'>
+      <th ts-criteria="id" ts-default="descending">ID</th>
+      <th ts-criteria="filename">Filename</th>
+      <th ts-criteria="_ownership[0].email">Owner</th>
+      <th ts-criteria="created">Created</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="(key, data) in ctrl.videos" ts-repeat>
+
+      <td>
+        {{data.id}} 
+      </td>
+
+      <td>{{data.filename}}</td>
+      <td>{{data._ownership[0].email}}</td>
+      <td>{{data.created  | moment: 'fromNow'}}</td>
+
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</div>
+
+<div class='panel-footer'>
+</div>
+
+</div>

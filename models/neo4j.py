@@ -145,6 +145,13 @@ class Video(StructuredNode):
     ownership = RelationshipTo('User', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
 
+    _fields_to_show = [
+        "filename", "created"
+    ]
+    _relationships_to_follow = [
+        'ownership'
+    ]
+
 
 class Annotation(StructuredNode):
     uuid = StringProperty(required=True, unique_index=True)

@@ -39,11 +39,7 @@ class Videos(GraphBaseOperations):
             videos = self.graph.Video.nodes.all()
 
         for v in videos:
-
-            video = {}
-            video["title"] = v.title
-            video["description"] = v.description
-            video["duration"] = v.duration
+            video = self.getJsonResponse(v)
             data.append(video)
 
         return self.force_response(data)
