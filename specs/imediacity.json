@@ -73,6 +73,10 @@
             "AdminGroups": [
                 "admin/groups",
                 "admin/groups/<group_id>"
+            ],
+            "UserGroup": [
+                "group/",
+                "group/<query>"
             ]
         }
     },

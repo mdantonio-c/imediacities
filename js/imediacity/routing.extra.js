@@ -22,7 +22,38 @@ angular.module('web').constant('customRoutes',
                 templateUrl: 'upload.html',
             }
         }
-    }
+    },
+
+    'logged.admin': {
+        url: "/admin",
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'admin.html'
+            }
+        }
+    },
+
+    'logged.admin.users': {
+        url: "/users",
+        views: {
+            "admin@logged.admin": {
+                dir: 'blueprint',
+                templateUrl: 'admin.users.html'
+            }
+        }
+    },
+
+    'logged.admin.groups': {
+        url: "/groups",
+        views: {
+            "admin@logged.admin": {
+                dir: 'blueprint',
+                templateUrl: 'admin.groups.html'
+            }
+        }
+    },
+
 });
 
 })();

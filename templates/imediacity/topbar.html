@@ -10,7 +10,7 @@
       </h3>
     </div>
 
-  <div class="collapse navbar-collapse">
+  <div id="navbar" class="navbar-collapse collapse">
 
     <ul class="nav navbar-nav navbar-left">
 
@@ -26,34 +26,17 @@
         </a>
       </li>
 
-      <li class="dropdown" ng-if="profile.isAdmin">
-        <a 
-          href="#" class="dropdown-toggle" 
-          data-toggle="dropdown" role="button"
-          aria-haspopup="true" aria-expanded="false"
-        >
-          Admin<span class="caret"></span>
+
+      <li ng-if="profile.isAdmin">
+        <a href ui-sref="logged.admin.users" >
+          Users
         </a>
-
-        <ul class="dropdown-menu">
-          <li ng-if="profile.isAdmin">
-            <a href ui-sref="logged.admin.users" >
-              Users
-            </a>
-          </li>
-          <li ng-if="profile.isAdmin">
-            <a href ui-sref="logged.admin.groups">
-              Groups
-            </a>
-          </li>
-          <li ng-if="profile.isAdmin">
-            <a href ui-sref="logged.admin.institutes">
-              Institutes
-            </a>
-          </li>
-        </ul>
       </li>
-
+      <li ng-if="profile.isAdmin">
+        <a href ui-sref="logged.admin.groups">
+          Groups
+        </a>
+      </li>
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
