@@ -11,7 +11,7 @@ from ..services.neo4j.graph_endpoints import returnError
 from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons import htmlcodes as hcodes
-from commons.services.uuid import getUUID
+# from commons.services.uuid import getUUID
 from restapi.confs import config
 from restapi.resources.services.authentication import BaseAuthentication
 
@@ -111,7 +111,7 @@ class AdminUsers(GraphBaseOperations):
 
         v = self.get_input()
 
-        user = self.getNode(self.graph.User, user_id, field='id')
+        user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise myGraphError(self.USER_NOT_FOUND)
 
@@ -124,18 +124,22 @@ class AdminUsers(GraphBaseOperations):
         user.name_surname = self.createUniqueIndex(user.name, user.surname)
         user.save()
 
-        groups = self.parseAutocomplete(v, 'group', id_key='uuid')
+        groups = self.parseAutocomplete(v, 'group', id_key='id')
 
         if groups is not None:
             group_id = groups.pop()
 
             group = self.getNode(self.graph.Group, group_id, field='uuid')
 
+            p = None
             for p in user.belongs_to.all():
                 if p == group:
                     continue
 
-            user.belongs_to.reconnect(p, group)
+            if p is not None:
+                user.belongs_to.reconnect(p, group)
+            else:
+                user.belongs_to.connect(group)
 
         return self.empty_response()
 
