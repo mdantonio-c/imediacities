@@ -12,6 +12,7 @@
         'cfp.hotkeys',
         'formly',
         'formlyBootstrap',
+        'angular.chips',
         'flow',
         'tableSort'
     ]);
