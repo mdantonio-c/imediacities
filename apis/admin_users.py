@@ -202,7 +202,8 @@ class UserRole(GraphBaseOperations):
         cypher = "MATCH (r:Role)"
 
         if query is not None:
-            cypher += " WHERE r.name =~ '(?i).*%s.*'" % query
+            cypher += " WHERE r.description <> 'automatic'"
+            cypher += " AND r.name =~ '(?i).*%s.*'" % query
 
         cypher += " RETURN r ORDER BY r.name ASC"
 
