@@ -56,7 +56,7 @@ class Upload(Uploader, GraphBaseOperations):
         chunk_size = int(self.get_input(single_parameter='flowChunkSize'))
         filename = self.get_input(single_parameter='flowFilename')
 
-        abs_fname = self.ngflow_upload(
+        abs_fname, secure_name = self.ngflow_upload(
             filename, root_dir, request.files['file'],
             chunk_number, chunk_size, chunk_total,
             overwrite=True
@@ -66,7 +66,7 @@ class Upload(Uploader, GraphBaseOperations):
         if chunk_number == chunk_total:
 
             properties = {}
-            properties["filename"] = abs_fname
+            properties["filename"] = secure_name
             properties["title"] = filename
             video = self.graph.createNode(self.graph.Video, properties)
             if self._current_user is not None:
