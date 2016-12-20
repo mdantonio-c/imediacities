@@ -11,7 +11,7 @@ function UsersController($scope, $log, DataService, noty, FormDialogService)
 
 	self.loadUsers = function() {
 		self.loading = true
-		self.users = {}
+		self.users = []
 		DataService.getUsers().then(
 			function(out_data) {
 				self.loading = false

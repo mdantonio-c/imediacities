@@ -10,7 +10,7 @@ function GroupsController($scope, $log, DataService, noty, FormDialogService)
 
 	self.loadGroups = function() {
 		self.loading = true
-		self.groups = {}
+		self.groups = []
 		DataService.getGroups().then(
 			function(out_data) {
 				self.loading = false

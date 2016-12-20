@@ -17,21 +17,21 @@
 <!-- PANEL BODY + TABLE START -->
 <div class='panel-body'>
 <div class="table-responsive">
-	<table ng-show="ctrl.users && ctrl.users.length" class='table table-hover table-condensed'>
+	<table ng-show="ctrl.users && ctrl.users.length" class='table table-hover table-condensed' ts-wrapper>
 
 		<thead>
 	        <tr>
-	        	<th>Email</th>
-	            <th>Name</th>
-	            <th>Surname</th>
-				<th>Group</th>
+	        	<th ts-criteria='email'>Email</th>
+	            <th ts-criteria='name'>Name</th>
+	            <th ts-criteria='surname'>Surname</th>
+				<th ts-criteria='_belongs_to[0].shortname'>Group</th>
 				<th>Roles</th>
 	            <th colspan=2 style='width:1%;'></th>
 	        </tr>
 	    </thead>
 
 		<tbody>
-			<tr ng-repeat="(key, data) in ctrl.users">
+			<tr ng-repeat="(key, data) in ctrl.users" ts-repeat>
 
 					<td>{{data.email}}</td>
 					<td>{{data.name}}</td>
