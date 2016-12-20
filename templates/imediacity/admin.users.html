@@ -25,6 +25,7 @@
 	            <th>Name</th>
 	            <th>Surname</th>
 				<th>Group</th>
+				<th>Roles</th>
 	            <th colspan=2 style='width:1%;'></th>
 	        </tr>
 	    </thead>
@@ -36,7 +37,9 @@
 					<td>{{data.name}}</td>
 					<td>{{data.surname}}</td>
 					<td>{{data._belongs_to[0].shortname}}</td>
-
+					<td>
+						<label ng-repeat="value in data._roles" uib-tooltip='{{value.description}}'>{{value.name}}</label>
+					</td>
 					<td 
 						ng-click='ctrl.updateUser(key)'>
 						<i class='material-icons'>edit</i>

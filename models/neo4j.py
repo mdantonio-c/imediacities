@@ -84,6 +84,18 @@ class User(UserBase):
             "select_label": "shortname",
             "select_id": "id"
         },
+        {
+            "key": "roles",
+            "type": "autocomplete",
+            "multiple": "true",
+            "required": "false",
+            "label": "Roles",
+            "description": "",
+            "islink": "true",
+            "model_key": "_roles",
+            "select_label": "name",
+            "select_id": "name"
+        }
     ]
 
 

@@ -23,6 +23,24 @@ __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 class AdminUsers(GraphBaseOperations):
 
+    def link_role(self, user, properties):
+        ids = self.parseAutocomplete(
+            properties, 'roles', id_key='name', split_char=',')
+        logger.critical(ids)
+
+        if ids is None:
+            return
+
+        for p in user.roles.all():
+            user.roles.disconnect(p)
+
+        for id in ids:
+            try:
+                role = self.graph.Role.nodes.get(name=id)
+                user.roles.connect(role)
+            except self.graph.Role.DoesNotExist:
+                pass
+
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
@@ -88,6 +106,7 @@ class AdminUsers(GraphBaseOperations):
             self.createUniqueIndex(properties["name"], properties["surname"])
         user = self.graph.createNode(self.graph.User, properties)
         user.belongs_to.connect(group)
+        self.link_role(user, v)
 
         return self.force_response(user.uuid)
 
@@ -113,7 +132,7 @@ class AdminUsers(GraphBaseOperations):
 
         user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
-            raise myGraphError(self.USER_NOT_FOUND)
+            raise myGraphError("User not found")
 
         if "password" in v and v["password"] == "":
             del v["password"]
@@ -123,7 +142,6 @@ class AdminUsers(GraphBaseOperations):
         self.updateProperties(user, self.graph.User._input_schema, v)
         user.name_surname = self.createUniqueIndex(user.name, user.surname)
         user.save()
-
         groups = self.parseAutocomplete(v, 'group', id_key='id')
 
         if groups is not None:
@@ -140,6 +158,7 @@ class AdminUsers(GraphBaseOperations):
                 user.belongs_to.reconnect(p, group)
             else:
                 user.belongs_to.connect(group)
+        self.link_role(user, v)
 
         return self.empty_response()
 
@@ -168,3 +187,31 @@ class AdminUsers(GraphBaseOperations):
         user.delete()
 
         return self.empty_response()
+
+
+class UserRole(GraphBaseOperations):
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=True)
+    @catch_graph_exceptions
+    @authentication.authorization_required
+    def get(self, query=None):
+
+        self.initGraph()
+
+        data = []
+        cypher = "MATCH (r:Role)"
+
+        if query is not None:
+            cypher += " WHERE r.name =~ '(?i).*%s.*'" % query
+
+        cypher += " RETURN r ORDER BY r.name ASC"
+
+        if query is None:
+            cypher += " LIMIT 20"
+
+        result = self.graph.cypher(cypher)
+        for row in result:
+            r = self.graph.Role.inflate(row[0])
+            data.append({"name": r.name, "description": r.description})
+
+        return self.force_response(data)

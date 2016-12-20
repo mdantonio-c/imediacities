@@ -57,7 +57,11 @@ function DataService($log, api, $q, jsonapi_parser) {
         var endpoint = 'group/'+query
         return api.apiCall(endpoint, 'GET');
     }
-    
+    self.getUserRoles = function(query) {
+        var endpoint = 'role/'+query
+        return api.apiCall(endpoint, 'GET');
+    }
+
 }
 
 })();

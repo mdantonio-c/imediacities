@@ -80,16 +80,26 @@ function AutocompleteUserController($scope, $log, DataService)
 	self.querySearch = function(type, query) {
 		if (type == "group")
 			return self.group_querySearch(query);
-		else {
-			$log.error("Type not found in AutocompleteUserController")
-		}
+		if (type == "roles")
+			return self.roles_querySearch(query);
+		$log.error("Type not found in AutocompleteUserController")
 	}
 
 	self.group_querySearch = function( query) {
 		if (!query) query = "" 
 	 	return DataService.getUserGroups(query).then(
 			function(out_data) {
-				console.log(out_data.data);
+				return out_data.data;
+	  		},
+			function(out_data) {
+				return []
+			}
+	  	);
+	}
+	self.roles_querySearch = function( query) {
+		if (!query) query = "" 
+	 	return DataService.getUserRoles(query).then(
+			function(out_data) {
 				return out_data.data;
 	  		},
 			function(out_data) {

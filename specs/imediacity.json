@@ -72,6 +72,10 @@
             "AdminUsers": [
                 "admin/users",
                 "admin/users/<user_id>"
+            ],
+            "UserRole": [
+                "role/",
+                "role/<query>"
             ]
         },
         "admin_groups": {
