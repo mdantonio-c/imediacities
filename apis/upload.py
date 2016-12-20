@@ -28,7 +28,7 @@ class Upload(Uploader, GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required
+    @authentication.authorization_required(roles=['Archive'])
     @decorate.add_endpoint_parameter('flowFilename')
     @decorate.add_endpoint_parameter('flowChunkNumber')
     @decorate.add_endpoint_parameter('flowTotalChunks')

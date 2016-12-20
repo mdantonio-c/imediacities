@@ -14,7 +14,7 @@
 
     <ul class="nav navbar-nav navbar-left">
 
-      <li ng-if="logged">
+      <li ng-if="logged && profile.roles['Archive']">
         <a href ui-sref="logged.upload">
           Upload
         </a>
