@@ -38,7 +38,12 @@
 					<td>{{data.surname}}</td>
 					<td>{{data._belongs_to[0].shortname}}</td>
 					<td>
-						<label ng-repeat="value in data._roles" uib-tooltip='{{value.description}}'>{{value.name}}</label>
+						<label 
+							class='label label-default' style='margin-right:3px;'
+							ng-repeat="value in data._roles" 
+							uib-tooltip='{{value.description}}'>
+							{{value.name}}
+						</label>
 					</td>
 					<td 
 						ng-click='ctrl.updateUser(key)'>
