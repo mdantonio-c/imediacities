@@ -1,17 +1,17 @@
 (function() {
   'use strict';
 
-var app = angular.module('web').controller('VideosController', VideosController);
+var app = angular.module('web').controller('StageController', StageController);
 
 // The controller
-function VideosController($scope, $log, DataService, noty)
+function StageController($scope, $log, DataService, noty)
 {
 	var self = this;
 
 	self.videos = []
 
 	self.loading = true;
-	DataService.getVideos().then(
+	DataService.getStageFiles().then(
 		function(out_data) {
 			self.videos = out_data.data;
 			self.loading = false;

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-An endpoint example
+Upload a file
 """
 
 import os
@@ -62,16 +62,16 @@ class Upload(Uploader, GraphBaseOperations):
             overwrite=True
         )
 
-# TO FIX: what happens if last chunk doesn't arrive as last?
-        if chunk_number == chunk_total:
+# TO FIX: upload should creare a temporary file and only at the end rename to the real name? 
+        # if chunk_number == chunk_total:
 
-            properties = {}
-            properties["filename"] = secure_name
-            properties["title"] = filename
-            video = self.graph.createNode(self.graph.Video, properties)
-            if self._current_user is not None:
-                video.ownership.connect(self._current_user)
+        #     properties = {}
+        #     properties["filename"] = secure_name
+        #     properties["title"] = filename
+        #     video = self.graph.createNode(self.graph.Video, properties)
+        #     if self._current_user is not None:
+        #         video.ownership.connect(self._current_user)
 
-            return self.force_response(video.uuid)
+        #     return self.force_response(video.uuid)
 
         return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)

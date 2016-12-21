@@ -22,10 +22,8 @@
 
 </div>
 </div>
-</div>
 
 <div ng-controller='UploadController as ctrl' ng-if='profile.roles["Archive"]'>
-
 <div class='row'>
 <div class='col-xs-8 col-xs-offset-2'>
 <div class='panel panel-default'>
@@ -73,6 +71,7 @@
 		<!-- <td>{{file.uniqueIdentifier}}</td> -->
 		<!-- <td>{{file.chunks.length}}</td> -->
 		<td ng-include="main.templateDir + 'ngflow.progressbar.html'"></td>
+    </tr>
   </table>
   </div>
 </div>
@@ -83,11 +82,14 @@
 </div>
 
 </div>
+</div>
+</div>
+</div>
 
 
 
-<div ng-controller='VideosController as ctrl'>
 
+<div ng-controller='StageController as ctrl'>
 <div class='row'>
 <div class='col-xs-12'>
 <div class='panel panel-default'>
@@ -97,7 +99,6 @@
 </div>
 
 <div class='panel-body'>
-
 <div class="table-responsive">
   <table ng-show="ctrl.videos" class='table table-hover table-condensed table-borderless' ts-wrapper>
 
@@ -125,10 +126,12 @@
   </tbody>
 </table>
 </div>
-
 </div>
 
 <div class='panel-footer'>
 </div>
 
+</div>
+</div>
+</div>
 </div>

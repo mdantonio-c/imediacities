@@ -10,6 +10,10 @@ function DataService($log, api, $q, jsonapi_parser) {
     self.searchVideos = function() {
         return api.apiCall('search', 'POST');    }
 
+    self.getStageFiles = function() {
+        return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
+    }
+
     self.getVideos = function() {
         return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     }
