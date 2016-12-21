@@ -47,9 +47,9 @@ class Upload(Uploader, GraphBaseOperations):
                 error="No group defined for this user",
                 code=hcodes.HTTP_BAD_REQUEST)
 
-        root_dir = os.path.join("/uploads", group.uuid)
-        if not os.path.exists(root_dir):
-            os.mkdir(root_dir)
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            os.mkdir(upload_dir)
 
         chunk_number = int(self.get_input(single_parameter='flowChunkNumber'))
         chunk_total = int(self.get_input(single_parameter='flowTotalChunks'))
@@ -57,7 +57,7 @@ class Upload(Uploader, GraphBaseOperations):
         filename = self.get_input(single_parameter='flowFilename')
 
         abs_fname, secure_name = self.ngflow_upload(
-            filename, root_dir, request.files['file'],
+            filename, upload_dir, request.files['file'],
             chunk_number, chunk_size, chunk_total,
             overwrite=True
         )

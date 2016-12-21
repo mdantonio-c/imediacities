@@ -13,6 +13,10 @@ function DataService($log, api, $q, jsonapi_parser) {
     self.getStageFiles = function() {
         return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
     }
+    self.deleteStageFile = function(file) {
+        var data = {"filename": file}
+        return api.apiCall('stage', 'DELETE', data);
+    }
 
     self.getVideos = function() {
         return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
