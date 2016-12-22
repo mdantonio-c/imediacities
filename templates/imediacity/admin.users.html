@@ -17,7 +17,11 @@
 <!-- PANEL BODY + TABLE START -->
 <div class='panel-body'>
 <div class="table-responsive">
-	<table ng-show="ctrl.users && ctrl.users.length" class='table table-hover table-condensed' ts-wrapper>
+	<table 
+		ng-show="ctrl.users && ctrl.users.length" 
+		class='table table-hover table-condensed'
+		ts-filter-fields="email,name,surname,_belongs_to[0].shortname"
+		ts-wrapper>
 
 		<thead>
 	        <tr>

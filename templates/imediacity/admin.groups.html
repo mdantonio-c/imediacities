@@ -17,7 +17,11 @@
 <!-- PANEL BODY + TABLE START -->
 <div class='panel-body'>
 <div class="table-responsive">
-	<table ng-show="ctrl.groups && ctrl.groups.length" class='table table-hover table-condensed' ts-wrapper>
+	<table 
+		ng-show="ctrl.groups && ctrl.groups.length" 
+		class='table table-hover table-condensed' 
+		ts-filter-fields="shortname,fullname,_coordinator[0].email"
+		ts-wrapper>
 		<thead>
 	        <tr>
 	        	<th ts-criteria='shortname'>Short name</th>

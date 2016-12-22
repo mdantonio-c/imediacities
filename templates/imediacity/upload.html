@@ -99,7 +99,11 @@
 
 <div class='panel-body'>
 <div class="table-responsive">
-  <table ng-show="ctrl.files" class='table table-hover table-condensed table-borderless' ts-wrapper>
+  <table 
+    ng-show="ctrl.files"
+    class='table table-hover table-condensed table-borderless' 
+    ts-filter-fields="name,type"
+    ts-wrapper>
 
   <thead>
     <tr class='active'>
