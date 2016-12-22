@@ -22,14 +22,18 @@ app.filter('searchFor', function() {
 
 		return result;
 	}
+}).filter('trustUrl', function($sce) {
+	return function(url) {
+		return $sce.trustAsResourceUrl(url);
+	};
 });
 
 // The controller
-function SearchController($scope, $log, DataService, noty)
+function SearchController($scope, $log, DataService, noty, NgMap)
 {
 	var self = this;
 
-/*	self.videos = []
+	/*self.videos = []
 
 	self.loading = true;
 	DataService.searchVideos().then(
@@ -45,6 +49,23 @@ function SearchController($scope, $log, DataService, noty)
             noty.extractErrors(out_data, noty.ERROR);
 		});*/
 	self.videos = loadSampleVideos();
+
+	self.selectedVideo = false;
+	self.setectedVideoId = -1;
+	self.video = {};
+	self.videoMap = {};
+	self.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI";
+
+	$scope.loadVideoContent = function(video) {
+		self.video = video;
+		self.selectedVideo = true;
+		self.selectedVideoId = video.id;
+
+		NgMap.getMap({id:'videomap'}).then(function(map) {
+      		google.maps.event.trigger(map,'resize');
+    	});
+	};
+
 }
 
 function loadSampleVideos() {

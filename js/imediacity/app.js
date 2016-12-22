@@ -13,7 +13,8 @@
         'formly',
         'formlyBootstrap',
         'flow',
-        'tableSort'
+        'tableSort',
+        'ngMap'
     ]);
 
 })();
