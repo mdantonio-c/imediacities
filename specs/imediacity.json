@@ -97,6 +97,9 @@
         "angular-tablesort": [
             "js/angular-tablesort.js",
             "tablesort.css"
+        ],
+        "ngmap": [
+            "build/scripts/ng-map.min.js"
         ]
     },
 

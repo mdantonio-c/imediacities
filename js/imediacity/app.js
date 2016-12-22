@@ -14,7 +14,8 @@
         'formlyBootstrap',
         'angular.chips',
         'flow',
-        'tableSort'
+        'tableSort',
+        'ngMap'
     ]);
 
 })();

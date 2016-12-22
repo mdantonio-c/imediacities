@@ -6,35 +6,80 @@
 <div ng-controller='SearchController as ctrl'>
 
 <div class='row'>
-<div class='col-xs-8 col-xs-offset-2'>
-<!-- <div class='panel panel-default'>
+	<!--
+	<div class='col-xs-8 col-xs-offset-2'>
 
-<div class='panel-heading'>
-	<h4 class='panel-title'>List of videos</h4>
-</div> 
+		<div ng-if='ctrl.videos.length == 0'>
+			No video found
+		</div>
+		<div ng-if="ctrl.videos.length > 0">
+			<div class="bar">
+				<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
+			</div>
 
-<div class='panel-body'> -->
-
-	<div ng-if='ctrl.videos.length == 0'>
-		No video found
-	</div>
-	<div ng-if="ctrl.videos.length > 0">
-		<div class="bar">
-			<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
+			<ul>
+				<li ng-repeat="v in ctrl.videos | searchFor:searchString">
+					<a href="{{v.movieurl}}"><img ng-src="{{v.moviesposter}}" /></a>
+					<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
+					<p>{{v.description}}</p>
+				</li>
+			</ul>
 		</div>
 
-		<ul>
-			<li ng-repeat="v in ctrl.videos | searchFor:searchString">
-				<a href="{{v.movieurl}}"><img ng-src="{{v.moviesposter}}" /></a>
-				<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
-				<p>{{v.description}}</p>
-			</li>
-		</ul>
 	</div>
+	-->
+	<div id="wrapper" data-spy="scroll" data-target="#spy" ng-class="{active: ctrl.selectedVideo === false}">
+		<!-- Result content -->
+		<div id="sidebar-wrapper" class="">
+			<nav id="spy">
+				<ul class="sidebar-nav nav">
+					<li class="sidebar-brand active"><a href="#home" class=""><span
+							class="fa fa-home solo">Movie Player</span></a></li>
+				</ul>
+			</nav>
+			<div class="row">
+				<video id="videoarea" ng-src="{{ctrl.video.movieurl | trustUrl }}" controls></video>
+			</div>
+			<div class="row">
+				<div id="timeline-graph"></div>
+			</div>
+			<div class="row">
+				<div map-lazy-load="https://maps.google.com/maps/api/js"
+					map-lazy-load-params="{{ctrl.googleMapsUrl}}">
+  					<ng-map id="videomap" center="{{ctrl.video.location[0].lat}}, {{ctrl.video.location[0].lng}}" zoom="4">
+  						<marker position="[{{ctrl.video.location[0].lat}}, {{ctrl.video.location[0].lng}}]"  title="{{ctrl.video.locname}}" animation="Animation.BOUNCE"/>
+  					</ng-map>
+				</div>
+			</div>
+		</div>
+		<!-- Result list -->
+		<div id="page-content-wrapper" class="">
+			<div class="page-content inset">
+					<div ng-if='ctrl.videos.length == 0'>
+						No video found
+					</div>
+					<div ng-if="ctrl.videos.length > 0">
+						<div class="bar">
+							<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
+						</div>
 
+						<ul>
+							<li ng-repeat="v in ctrl.videos | searchFor:searchString">
+								<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.moviesposter}}" /></a>
+								<div class="primary-description">
+									<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
+									<p>{{v.description}}</p>
+								</div>
+								<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
+									<p><b>Year</b>: {{v.year}}</p>
+									<p><b>Location</b>: {{v.locname}}</p>
+									<p><b>Segmentation</b>: {{}}</p>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+		</div>
+	</div>
 </div>
-
-<!-- <div class='panel-footer'>
-</div> -->
-
 </div>
