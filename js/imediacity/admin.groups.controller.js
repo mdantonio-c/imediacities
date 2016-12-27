@@ -25,8 +25,8 @@ function GroupsController($scope, $log, DataService, noty, FormDialogService)
 
 	self.loadGroups();
 
-	self.updateGroup = function(key, $event) {
-		FormDialogService.showFormlyDialog(self.groups[key], GroupDialogController).then(
+	self.updateGroup = function(data) {
+		FormDialogService.showFormlyDialog(data, GroupDialogController).then(
 			function(answer) {
 				noty.showSuccess("Group successfully updated.");
 				self.loadGroups();

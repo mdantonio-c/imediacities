@@ -125,7 +125,7 @@
   </thead>
 
   <tbody>
-    <tr ng-repeat="(key, data) in ctrl.files" ts-repeat>
+    <tr ng-repeat="data in ctrl.files" ts-repeat>
 
       <td ng-click='listctrl.selectElement(data)'>
         <i ng-if="!data.isSelected" class='material-icons'>check_box_outline_blank</i>

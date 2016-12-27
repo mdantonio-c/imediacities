@@ -35,7 +35,7 @@
 	    </thead>
 
 		<tbody>
-			<tr ng-repeat="(key, data) in ctrl.users" ts-repeat>
+			<tr ng-repeat="data in ctrl.users" ts-repeat>
 
 					<td>{{data.email}}</td>
 					<td>{{data.name}}</td>
@@ -50,7 +50,7 @@
 						</label>
 					</td>
 					<td 
-						ng-click='ctrl.updateUser(key)'>
+						ng-click='ctrl.updateUser(data)'>
 						<i class='material-icons'>edit</i>
 					</td>
 					<td 
