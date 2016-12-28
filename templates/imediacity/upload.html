@@ -22,10 +22,8 @@
 
 </div>
 </div>
-</div>
 
-<div ng-controller='UploadController as ctrl' ng-if='profile.roles["Archive"]'>
-
+<div ng-controller='StageController as ctrl' ng-if='profile.roles["Archive"]'>
 <div class='row'>
 <div class='col-xs-8 col-xs-offset-2'>
 <div class='panel panel-default'>
@@ -37,6 +35,8 @@
 <div class='panel-body'>
 
 <div flow-init="flowOptions"
+     flow-complete='ctrl.uploadComplete(event, $flow, flowFile)'
+     flow-file-error='ctrl.uploadError($file, $message, $flow)'
      flow-files-submitted="$flow.upload()"
      flow-file-success="$file.msg = $message">
 
@@ -73,6 +73,7 @@
 		<!-- <td>{{file.uniqueIdentifier}}</td> -->
 		<!-- <td>{{file.chunks.length}}</td> -->
 		<td ng-include="main.templateDir + 'ngflow.progressbar.html'"></td>
+    </tr>
   </table>
   </div>
 </div>
@@ -83,52 +84,115 @@
 </div>
 
 </div>
+</div>
+</div>
 
 
-
-<div ng-controller='VideosController as ctrl'>
-
+<div ng-controller='ListsController as listctrl'>
 <div class='row'>
 <div class='col-xs-12'>
 <div class='panel panel-default'>
 
 <div class='panel-heading'>
-  <h4 class='panel-title'>Your videos</h4>
+  <h4 class='panel-title'>Your files</h4>
 </div>
 
 <div class='panel-body'>
-
 <div class="table-responsive">
-  <table ng-show="ctrl.videos" class='table table-hover table-condensed table-borderless' ts-wrapper>
+  <table 
+    ng-show="ctrl.files"
+    class='table table-hover table-condensed table-borderless' 
+    ts-filter-fields="name,type"
+    ts-wrapper>
 
   <thead>
     <tr class='active'>
-      <th ts-criteria="id" ts-default="descending">ID</th>
-      <th ts-criteria="filename">Filename</th>
-      <th ts-criteria="_ownership[0].email">Owner</th>
-      <th ts-criteria="created">Created</th>
+      <th>
+        <a href='#' ng-click="listctrl.selectAll(ctrl.files)"> 
+              <i uib-tooltip='Select all' class='material-icons palette-Grey-500 text'>
+                check_box
+              </i>
+        </a>
+      </th>
+
+      <th ts-criteria="name">Filename</th>
+      <th ts-criteria="type">Type</th>
+      <th ts-criteria="size | parseInt">Size</th>
+      <th ts-criteria="creation | parseInt">Created</th>
+      <th ts-criteria="modification | parseInt">Modified</th>
+      <th></th>
     </tr>
   </thead>
 
   <tbody>
-    <tr ng-repeat="(key, data) in ctrl.videos" ts-repeat>
+    <tr ng-repeat="data in ctrl.files" ts-repeat>
 
-      <td>
-        {{data.id}} 
+      <td ng-click='listctrl.selectElement(data)'>
+        <i ng-if="!data.isSelected" class='material-icons'>check_box_outline_blank</i>
+        <i ng-if="data.isSelected" class='material-icons'>check_box</i>
       </td>
 
-      <td>{{data.filename}}</td>
-      <td>{{data._ownership[0].email}}</td>
-      <td>{{data.created  | moment: 'fromNow'}}</td>
+      <td><b>{{data.name}}</b></td>
+      <td>
+        {{data.type}}
+        <button 
+          class='btn btn-success btn-xs'
+          ng-if="data.type == 'metadata'">
+          IMPORT
+        </button>
+      </td>
+      <td>{{data.size | bytes}}</td>
+
+      <td>
+        <span uib-tooltip='{{data.creation | unix_date}}'>
+          {{data.creation | moment_unix: 'fromNow'}}
+        </span>
+      </td>
+
+      <td>
+        <span uib-tooltip='{{data.modification | unix_date}}'>
+          {{data.modification | moment_unix: 'fromNow'}}
+        </span>
+      </td>
+
+      <td 
+        ng-click='ctrl.deleteFile(data.name)'>
+          <i class='material-icons palette-Red-500 text'>delete</i>
+      </td>
 
     </tr>
   </tbody>
 </table>
 </div>
-
 </div>
 
 <div class='panel-footer'>
+  <button 
+    ng-if='listctrl.selectedElements' 
+    class='btn btn-danger'
+    ng-click='ctrl.deleteFiles(listctrl)'>
+    Delete selected files
+  </button>
+
+  <button 
+    ng-if='listctrl.selectedElements' 
+    class='btn btn-normal'
+    ng-click='listctrl.deselectAll(ctrl.files)'>
+    Unselect files
+  </button>
+
+  <button 
+    ng-if='listctrl.selectedElements' 
+    class='btn btn-normal'
+
+    ng-click='listctrl.invertSelection(ctrl.files)'>
+    Invert selection
+  </button>
+
 </div>
 
+</div>
+</div>
+</div>
+</div>
 </div>

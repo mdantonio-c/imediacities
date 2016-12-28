@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 """
-An endpoint example
+Handle your videos
 """
 
 from commons.logs import get_logger
 from .. import decorators as decorate
 from ...auth import authentication
-from flask_restful import request
+# from flask_restful import request
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 # from ..services.neo4j.graph_endpoints import myGraphError
 # from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
+# from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons import htmlcodes as hcodes
-from commons.services.uuid import getUUID
+# from commons import htmlcodes as hcodes
+# from commons.services.uuid import getUUID
 
 logger = get_logger(__name__)
 
