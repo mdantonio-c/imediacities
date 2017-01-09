@@ -2,13 +2,14 @@
 
 import random
 import string
+from neomodel import db
+
 from .. import decorators as decorate
 from ...auth import authentication
 
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 from ..services.neo4j.graph_endpoints import myGraphError
 from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons import htmlcodes as hcodes
 # from commons.services.uuid import getUUID
@@ -61,9 +62,8 @@ class AdminUsers(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @graph_transactions
+    @db.transaction
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
-    # @decorate.apimethod
     def post(self):
 
         self.initGraph()
@@ -113,9 +113,8 @@ class AdminUsers(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @graph_transactions
+    @db.transaction
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
-    # @decorate.apimethod
     def put(self, user_id=None):
 
         if user_id is None:
@@ -165,9 +164,8 @@ class AdminUsers(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @graph_transactions
+    @db.transaction
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
-    # @decorate.apimethod
     def delete(self, user_id=None):
 
         if user_id is None:

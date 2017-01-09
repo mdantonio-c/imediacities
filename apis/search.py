@@ -11,7 +11,6 @@ from ...auth import authentication
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 # from ..services.neo4j.graph_endpoints import myGraphError
 # from ..services.neo4j.graph_endpoints import returnError
-# from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 # from commons import htmlcodes as hcodes
 
