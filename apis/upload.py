@@ -5,7 +5,6 @@ Upload a file
 """
 
 import os
-from neomodel import db
 from commons.logs import get_logger
 from .. import decorators as decorate
 from ...auth import authentication
@@ -15,6 +14,7 @@ from ..services.uploader import Uploader
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 # from ..services.neo4j.graph_endpoints import myGraphError
 from ..services.neo4j.graph_endpoints import returnError
+from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 # from commons.services.uuid import getUUID
 
@@ -27,7 +27,7 @@ class Upload(Uploader, GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @db.transaction
+    @graph_transactions
     @authentication.authorization_required(roles=['Archive'])
     @decorate.add_endpoint_parameter('flowFilename')
     @decorate.add_endpoint_parameter('flowChunkNumber')

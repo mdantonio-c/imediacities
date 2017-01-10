@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from neomodel import db
-
 from .. import decorators as decorate
 from ...auth import authentication
 
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 from ..services.neo4j.graph_endpoints import myGraphError
 from ..services.neo4j.graph_endpoints import returnError
+from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons import htmlcodes as hcodes
 from restapi.confs import config
@@ -40,8 +39,9 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @db.transaction
+    @graph_transactions
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @decorate.apimethod
     def post(self):
 
         self.initGraph()
@@ -85,8 +85,9 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @db.transaction
+    @graph_transactions
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @decorate.apimethod
     def put(self, group_id=None):
 
         if group_id is None:
@@ -128,8 +129,9 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @db.transaction
+    @graph_transactions
     @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @decorate.apimethod
     def delete(self, group_id=None):
 
         if group_id is None:
