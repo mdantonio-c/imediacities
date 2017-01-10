@@ -12,6 +12,8 @@ function StageController($scope, $log, $auth, $q, DataService, FormDialogService
 
 	$scope.flowOptions = {
         target: apiUrl + '/upload',
+        chunkSize: 10*1024*1024,
+        simultaneousUploads: 1,
         testChunks: false,
         permanentErrors: [ 401, 405, 500, 501 ],
         headers: {Authorization : 'Bearer ' + $auth.getToken()}
