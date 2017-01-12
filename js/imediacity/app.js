@@ -15,7 +15,8 @@
         'angular.chips',
         'flow',
         'tableSort',
-        'ngMap'
+        'ngMap',
+        'googlechart'
     ]);
 
 })();

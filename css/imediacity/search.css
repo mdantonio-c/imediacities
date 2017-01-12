@@ -49,13 +49,13 @@
 	padding-left: 10px;
 }
 
-.timeline-graph {
+/*.timeline-graph {
 	list-style: none;
 	position: relative;
 	padding: 60px 0px 0px 0px;
 	display: inline-block;
 	background-color: #fff;
-}
+}*/
 
 .carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
 	{

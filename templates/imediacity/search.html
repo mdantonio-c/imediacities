@@ -40,8 +40,11 @@
 			<div class="row">
 				<video id="videoarea" ng-src="{{ctrl.video.movieurl | trustUrl }}" controls></video>
 			</div>
+
 			<div class="row">
-				<div id="timeline-graph"></div>
+				<div id="timeline-graph">
+					<div google-chart chart="videoTimeline" style="{{videoTimeline.cssStyle}}"/>
+				</div>
 			</div>
 			<div class="row">
 				<div map-lazy-load="https://maps.google.com/maps/api/js"

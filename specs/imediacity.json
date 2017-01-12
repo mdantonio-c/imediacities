@@ -100,6 +100,9 @@
         ],
         "ngmap": [
             "build/scripts/ng-map.min.js"
+        ],
+        "angular-google-chart": [
+            "ng-google-chart.min.js"
         ]
     },
 

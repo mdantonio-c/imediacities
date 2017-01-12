@@ -56,6 +56,22 @@ function SearchController($scope, $log, DataService, noty, NgMap)
 	self.videoMap = {};
 	self.googleMapsUrl="https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI";
 
+	// timeline
+	self.mainchar = '';
+	self.outside = '';
+
+	var videoTimeline = {
+		"type": "Timeline",
+		"cssStyle": "height: 100%; padding-left: 10px;",
+		//"displayed": false,
+		"options" : {
+			timeline: { showRowLabels: false },
+			avoidOverlappingGridLines: false
+        }
+	};
+
+	$scope.videoTimeline = videoTimeline;
+
 	$scope.loadVideoContent = function(video) {
 		self.video = video;
 		self.selectedVideo = true;
@@ -64,6 +80,39 @@ function SearchController($scope, $log, DataService, noty, NgMap)
 		NgMap.getMap({id:'videomap'}).then(function(map) {
       		google.maps.event.trigger(map,'resize');
     	});
+
+    	self.mainchar = self.video.frames[0].mainchar;
+    	self.outside = self.video.frames[1].outside;
+
+    	// add data to the timeline
+		$scope.videoTimeline.data = {
+    		"cols": [
+    			{id: "category", label: "Category", type: "string"},
+    			{id: "tag", label: "Tag", type: "string"},
+    			{id: "start", label: "Start", type: "date"},
+    			{id: "end", label: "End", type: "date"}
+    		], "rows": [
+    			{c: [
+		            {v: "Video"},
+		            {v: "Duration"},
+		            {v: new Date(0,0,0,0,0,0)},
+		            {v: new Date(0,0,0,0,0,self.video.duration)}
+		        ]},
+		        {c: [
+		            {v: "Video"},
+		            {v: "Main Char"},
+		            {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
+		            {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
+		        ]},
+		        {c: [
+		            {v: "Video"},
+		            {v: "Outside"},
+		            {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
+		            {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
+
+		        ]}
+    		]
+    	}
 	};
 
 }
