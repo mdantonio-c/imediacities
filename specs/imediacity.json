@@ -58,6 +58,11 @@
                 "video/<string:video_id>/annotations"
             ]
         },
+        "stage_files": {
+            "Stage": [
+                "stage"
+            ]
+        },
         "search": {
             "Search": [
                 "search"

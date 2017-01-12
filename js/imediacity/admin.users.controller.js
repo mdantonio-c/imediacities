@@ -26,8 +26,8 @@ function UsersController($scope, $log, DataService, noty, FormDialogService)
 
 	self.loadUsers();
 
-	self.updateUser = function(key, $event) {
-		FormDialogService.showFormlyDialog(self.users[key], UserDialogController).then(
+	self.updateUser = function(data) {
+		FormDialogService.showFormlyDialog(data, UserDialogController).then(
 			function(answer) {
 				noty.showSuccess("User successfully updated.");
 				self.loadUsers();
