@@ -1,0 +1,31 @@
+
+all:
+  summary: List of existing groups
+  # description: -
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: List of groups successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+
+query:
+  summary: List of existing groups matching a substring query
+  # description: -
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Matching groups successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+

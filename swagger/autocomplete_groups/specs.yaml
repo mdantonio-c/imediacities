@@ -1,0 +1,8 @@
+file: admin_groups 
+class: UserGroup 
+# baseuri: "/api"
+mapping:
+  all: "/group"
+  query: "/group/<query>"
+labels:
+  - miscellaneous 

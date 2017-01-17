@@ -6,7 +6,7 @@ List content from upload dir and import of data and metadata
 import os
 from commons.logs import get_logger
 from .. import decorators as decorate
-from ...auth import authentication
+# from ...auth import authentication
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 # from ..services.neo4j.graph_endpoints import myGraphError
 from ..services.neo4j.graph_endpoints import returnError
@@ -39,7 +39,7 @@ class Stage(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @authentication.authorization_required
+    # @authentication.authorization_required
     def get(self):
 
         self.initGraph()
@@ -81,7 +81,7 @@ class Stage(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @authentication.authorization_required
+    # @authentication.authorization_required
     def delete(self):
 
         self.initGraph()

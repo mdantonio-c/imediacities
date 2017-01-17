@@ -12,7 +12,18 @@
         },
 
         "python": {
-
+            "backend": {
+                "credentials":{
+                    "username": "user@nomail.org",
+                    "password": "test",
+                    "roles": {
+                        "user": "normal_user",
+                        "internal": "staff_user",
+                        "admin": "admin_root",
+                        "default": "normal_user"
+                    }
+                }
+            }
         },
 
         "containers": {
@@ -52,47 +63,17 @@
     },
 
     "apis": {
-        "videos": {
-            "Videos": [
-                "video",
-                "video/<string:video_id>/annotations"
-            ]
-        },
-        "stage_files": {
-            "Stage": [
-                "stage"
-            ]
-        },
-        "search": {
-            "Search": [
-                "search"
-            ]
-        },
-        "upload": {
-            "Upload": [
-                "upload"
-            ]
-        },
-        "admin_users": {
-            "AdminUsers": [
-                "admin/users",
-                "admin/users/<user_id>"
-            ],
-            "UserRole": [
-                "role/",
-                "role/<query>"
-            ]
-        },
-        "admin_groups": {
-            "AdminGroups": [
-                "admin/groups",
-                "admin/groups/<group_id>"
-            ],
-            "UserGroup": [
-                "group/",
-                "group/<query>"
-            ]
-        }
+        // "videos": {
+        //     "Videos": [
+        //         "video",
+        //         "video/<string:video_id>/annotations"
+        //     ]
+        // },
+        // "search": {
+        //     "Search": [
+        //         "search"
+        //     ]
+        // }
     },
 
     "bower_components": {

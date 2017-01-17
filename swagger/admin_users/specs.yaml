@@ -1,0 +1,8 @@
+file: admin_users
+class: AdminUsers
+# baseuri: "/api"
+mapping:
+  users: "/admin/users"
+  user: "/admin/users/<user_id>"
+labels:
+  - admin 

@@ -1,0 +1,16 @@
+
+stage:
+  summary: List of files and directories contained in the stage area
+  # description: -
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: List of files and directories successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+

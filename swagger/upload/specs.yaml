@@ -1,0 +1,7 @@
+file: upload 
+class: Upload 
+# baseuri: "/api"
+mapping:
+  upload: "/upload"
+labels:
+  - file 

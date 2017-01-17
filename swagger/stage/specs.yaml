@@ -1,0 +1,7 @@
+file: stage_files 
+class: Stage 
+# baseuri: "/api"
+mapping:
+  stage: "/stage"
+labels:
+  - file

@@ -7,7 +7,7 @@ Upload a file
 import os
 from commons.logs import get_logger
 from .. import decorators as decorate
-from ...auth import authentication
+# from ...auth import authentication
 from commons import htmlcodes as hcodes
 from flask_restful import request
 from ..services.uploader import Uploader
@@ -28,12 +28,12 @@ class Upload(Uploader, GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required(roles=['Archive'])
-    @decorate.add_endpoint_parameter('flowFilename')
-    @decorate.add_endpoint_parameter('flowChunkNumber')
-    @decorate.add_endpoint_parameter('flowTotalChunks')
-    @decorate.add_endpoint_parameter('flowChunkSize')
-    @decorate.apimethod
+    # @authentication.authorization_required(roles=['Archive'])
+    # @decorate.add_endpoint_parameter('flowFilename')
+    # @decorate.add_endpoint_parameter('flowChunkNumber')
+    # @decorate.add_endpoint_parameter('flowTotalChunks')
+    # @decorate.add_endpoint_parameter('flowChunkSize')
+    # @decorate.apimethod
     def post(self):
 
         self.initGraph()

@@ -1,0 +1,18 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+group:
+  summary: Delete a group 
+  # description: -
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Group successfully deleted
+    '401':
+      description: This endpoint requires a valid authorization token 

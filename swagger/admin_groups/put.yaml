@@ -1,0 +1,15 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+group:
+  summary: Modify a group
+  # description: -
+  responses:
+    '200':
+      description: Group successfully modified
+    '401':
+      description: This endpoint requires a valid authorization token 

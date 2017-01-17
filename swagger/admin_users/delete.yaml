@@ -1,0 +1,15 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+user:
+  summary: Delete a user
+  # description: -
+  responses:
+    '200':
+      description: User successfully deleted
+    '401':
+      description: This endpoint requires a valid authorization token 

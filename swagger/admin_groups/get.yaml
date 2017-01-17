@@ -1,0 +1,25 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+groups:
+  summary: List of groups 
+  # description: -
+  responses:
+    '200':
+      description: List of groups successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+
+group:
+  summary: Obtain information on a single group 
+  # description: -
+  responses:
+    '200':
+      description: Group information successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+

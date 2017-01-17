@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .. import decorators as decorate
-from ...auth import authentication
+# from ...auth import authentication
 
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
 from ..services.neo4j.graph_endpoints import myGraphError
@@ -9,7 +9,7 @@ from ..services.neo4j.graph_endpoints import returnError
 from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons import htmlcodes as hcodes
-from restapi.confs import config
+# from restapi.confs import config
 
 from commons.logs import get_logger
 logger = get_logger(__name__)
@@ -22,7 +22,7 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @authentication.authorization_required(roles=[config.ROLE_ADMIN])
     # @decorate.apimethod
     def get(self, id=None):
 
@@ -40,7 +40,7 @@ class AdminGroups(GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @authentication.authorization_required(roles=[config.ROLE_ADMIN])
     # @decorate.apimethod
     def post(self):
 
@@ -86,7 +86,7 @@ class AdminGroups(GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @authentication.authorization_required(roles=[config.ROLE_ADMIN])
     # @decorate.apimethod
     def put(self, group_id=None):
 
@@ -130,7 +130,7 @@ class AdminGroups(GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required(roles=[config.ROLE_ADMIN])
+    # @authentication.authorization_required(roles=[config.ROLE_ADMIN])
     # @decorate.apimethod
     def delete(self, group_id=None):
 
@@ -157,7 +157,7 @@ class UserGroup(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @authentication.authorization_required
+    # @authentication.authorization_required
     # @decorate.apimethod
     def get(self, query=None):
 

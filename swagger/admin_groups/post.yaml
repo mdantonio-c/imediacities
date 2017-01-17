@@ -1,0 +1,16 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+
+groups:
+  summary: Create a new group
+  # description: -
+  responses:
+    '200':
+      description: The uuid of the new group is returned
+    '401':
+      description: This endpoint requires a valid authorization token 
