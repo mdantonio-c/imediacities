@@ -3,6 +3,11 @@
         "title": "iMediaCity Repository",
         "description": "..."
     },
+    "tags": {
+        "file": "All endpoints to handle files",
+        "admin": "Operations only allowed for admin users",
+        "miscellaneous": "Endpoints not classified in other specific sections"
+    },
     "variables": {
 
         "js": {
