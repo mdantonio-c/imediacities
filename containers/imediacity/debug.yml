@@ -5,6 +5,7 @@ backend:
     - ../imediastuff:/uploads
   links:
     - gdb:gdb
+    - swagger:swagger
 
 frontend:
   ports:
