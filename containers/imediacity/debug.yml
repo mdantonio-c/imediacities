@@ -1,5 +1,6 @@
 backend:
   environment:
+    DEBUG_LEVEL: DEBUG
     BACKEND_AUTH_SERVICE: graphdb
   volumes:
     - ../imediastuff:/uploads
