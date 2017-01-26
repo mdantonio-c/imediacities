@@ -2,7 +2,7 @@
 
 #############################
 # Defaults
-blueprintconf="specs/blueprint.json"
+blueprintconf="specs/blueprint.init"
 
 #############################
 # Other variables
@@ -150,7 +150,7 @@ fi
 # DEFAULTS FILES
 
 # Backend
-file="$1.json"
+file="$1.yaml"
 check="specs/$file"
 if [ ! -s "$check" ]; then
     echo "File '$check' not found or empty..."
@@ -158,7 +158,8 @@ if [ ! -s "$check" ]; then
     exit 1
 fi
 # echo "{ \"$1\": \"$file\" }" > $blueprintconf
-echo "{ \"blueprint\": \"$1\" }" > $blueprintconf
+# echo "{ \"blueprint\": \"$1\" }" > $blueprintconf
+echo "$1" > $blueprintconf
 
 # Frontend
 check="js/$1"
