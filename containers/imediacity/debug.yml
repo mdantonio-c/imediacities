@@ -13,5 +13,11 @@ frontend:
     - 80:5000
 
 gdb:
+  # command: sleep 9999999
   ports:
   - 9090:7474
+  - 7687:7687
+  # environment:
+    # NEO4J_dbms_memory_pagecache_size: 2048M
+    # NEO4J_dbms_memory_heap_maxSize: 4096M
+    # NEO4J_dbms_allowFormatMigration: "true"
