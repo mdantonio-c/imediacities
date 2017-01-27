@@ -70,10 +70,13 @@ class AdminUsers(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            return self.graph.User._input_schema
+            raise myGraphError(
+                'Empty input',
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
+        schema = self.get_endpoint_custom_definition()
         # INIT #
-        properties = self.readProperty(self.graph.User._input_schema, v)
+        properties = self.read_properties(schema, v))
 
         groups = self.parseAutocomplete(v, 'group', id_key='id')
 
@@ -126,6 +129,7 @@ class AdminUsers(GraphBaseOperations):
                 error="Please specify a user id",
                 code=hcodes.HTTP_BAD_REQUEST)
 
+        schema = self.get_endpoint_custom_definition()
         self.initGraph()
 
         v = self.get_input()
@@ -139,7 +143,7 @@ class AdminUsers(GraphBaseOperations):
         else:
             v["password"] = BaseAuthentication.hash_password(v["password"])
 
-        self.updateProperties(user, self.graph.User._input_schema, v)
+        self.update_properties(user, schema, v)
         user.name_surname = self.createUniqueIndex(user.name, user.surname)
         user.save()
         groups = self.parseAutocomplete(v, 'group', id_key='id')

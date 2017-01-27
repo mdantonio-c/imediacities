@@ -5,6 +5,40 @@ common:
     authorized:
       - admin_root
 
+ parameters:
+
+    - name: shortname
+      in: formData
+      type: string
+      required: true
+      description: Short name
+      custom:
+        label: Short name
+
+    - name: fullname
+      in: formData
+      type: string
+      required: true
+      description: Full name
+      custom:
+        label: Full name
+
+    - name: coordinator
+      in: formData
+      type: string
+      required: true
+      description: Select a coordinator
+      # default: 0
+      # enum:
+        # - 
+      custom:
+        htmltype: select
+        label: Group coordinator
+        model_key: _coordinator
+        select_id: id
+        islink: true
+
+
 
 groups:
   summary: Create a new group

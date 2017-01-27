@@ -1,6 +1,7 @@
 file: admin_groups
 class: AdminGroups
-# baseuri: "/api"
+schema:
+  expose: true
 mapping:
   groups: "/admin/groups"
   group: "/admin/groups/<group_id>"

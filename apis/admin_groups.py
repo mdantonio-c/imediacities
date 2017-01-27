@@ -48,22 +48,28 @@ class AdminGroups(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            schema = self.graph.Group._input_schema.copy()
+            raise myGraphError(
+                'Empty input',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        schema = self.get_endpoint_custom_definition()
+
+        if 'get_schema' in v:
             users = self.graph.User.nodes
             for idx, val in enumerate(schema):
-                if val["key"] == "coordinator":
+                if val["name"] == "coordinator":
+                    schema[idx]["enum"] = []
                     for n in users.all():
-                        schema[idx]["options"].append(
+                        schema[idx]["enum"].append(
                             {
-                                "id": n.uuid,
-                                "value": n.email
+                                n.uuid: n.email
                             }
                         )
 
             return self.force_response(schema)
 
         # INIT #
-        properties = self.readProperty(self.graph.Group._input_schema, v)
+        properties = self.read_properties(schema, v)
 
         if 'coordinator' not in v:
             raise myGraphError(
@@ -98,6 +104,7 @@ class AdminGroups(GraphBaseOperations):
                 error="Please specify a group id",
                 code=hcodes.HTTP_BAD_REQUEST)
 
+        schema = self.get_endpoint_custom_definition()
         self.initGraph()
 
         v = self.get_input()
@@ -106,7 +113,7 @@ class AdminGroups(GraphBaseOperations):
         if group is None:
             raise myGraphError("Group not found")
 
-        self.updateProperties(group, self.graph.Group._input_schema, v)
+        self.update_properties(group, schema, v)
         group.save()
 
         if 'coordinator' in v:

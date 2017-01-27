@@ -44,60 +44,6 @@ class User(UserBase):
         'belongs_to', 'roles'
     ]
 
-    _input_schema = [
-        {
-            "key": "email",
-            "type": "text",
-            "required": "true",
-            "label": "Email",
-            "description": "Email",
-        },
-        {
-            "key": "password",
-            "type": "text",
-            "required": "false",
-            "label": "Password",
-            "description": "Password",
-        },
-        {
-            "key": "name",
-            "type": "text",
-            "required": "true",
-            "label": "Name",
-            "description": "Name",
-        },
-        {
-            "key": "surname",
-            "type": "text",
-            "required": "true",
-            "label": "Surname",
-            "description": "Surname",
-        },
-        {
-            "key": "group",
-            "type": "autocomplete",
-            "required": "true",
-            "label": "Group",
-            "description": "Select a group",
-            "islink": "true",
-            "model_key": "_belongs_to",
-            "select_label": "shortname",
-            "select_id": "id"
-        },
-        {
-            "key": "roles",
-            "type": "autocomplete",
-            "multiple": "true",
-            "required": "false",
-            "label": "Roles",
-            "description": "",
-            "islink": "true",
-            "model_key": "_roles",
-            "select_label": "name",
-            "select_id": "name"
-        }
-    ]
-
 
 class Group(StructuredNode):
     uuid = StringProperty(required=True, unique_index=True)
@@ -114,34 +60,6 @@ class Group(StructuredNode):
     ]
     _relationships_to_follow = [
         'coordinator', 'members'
-    ]
-
-    _input_schema = [
-        {
-            "key": "shortname",
-            "type": "text",
-            "required": "true",
-            "label": "Short name",
-            "description": "Short name"
-        },
-        {
-            "key": "fullname",
-            "type": "text",
-            "required": "true",
-            "label": "Full name",
-            "description": "Full name"
-        },
-        {
-            "key": "coordinator",
-            "type": "select",
-            "required": "true",
-            "label": "Group coordinator",
-            "description": "Select a coordinator",
-            "islink": "true",
-            "model_key": "_coordinator",
-            "select_id": "id",
-            "options": []
-        }
     ]
 
 
