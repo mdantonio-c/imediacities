@@ -5,7 +5,7 @@ common:
     authorized:
       - admin_root
 
- parameters:
+  parameters:
 
     - name: shortname
       in: formData

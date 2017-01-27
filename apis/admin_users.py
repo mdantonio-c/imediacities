@@ -76,7 +76,7 @@ class AdminUsers(GraphBaseOperations):
 
         schema = self.get_endpoint_custom_definition()
         # INIT #
-        properties = self.read_properties(schema, v))
+        properties = self.read_properties(schema, v)
 
         groups = self.parseAutocomplete(v, 'group', id_key='id')
 
