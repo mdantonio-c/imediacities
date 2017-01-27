@@ -26,11 +26,11 @@ class Stage(GraphBaseOperations):
         if file_extension is None:
             return "unknown"
 
-        metadata_exts = ['xml', 'xls']
+        metadata_exts = ['.xml', '.xls']
         if file_extension in metadata_exts:
             return "metadata"
 
-        video_exts = ['mov', 'avi', 'mp4', 'wmv']
+        video_exts = ['.mov', '.avi', '.mp4', '.wmv']
         if file_extension in video_exts:
             return "video"
 
@@ -67,13 +67,13 @@ class Stage(GraphBaseOperations):
             if f[0] == '.':
                 continue
             stat = os.stat(path)
+
             row = {}
             row['name'] = f
             row['size'] = stat.st_size
             row['creation'] = stat.st_ctime
             row['modification'] = stat.st_mtime
             row['type'] = self.getType(f)
-
             data.append(row)
 
         return self.force_response(data)
