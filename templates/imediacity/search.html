@@ -43,7 +43,7 @@
 
 			<div class="row">
 				<div id="timeline-graph">
-					<div google-chart chart="videoTimeline" style="{{videoTimeline.cssStyle}}"/>
+					<div google-chart chart="videoTimeline" agc-on-select="jumpToShot(selectedItem)" style="{{videoTimeline.cssStyle}}"/>
 				</div>
 			</div>
 			<div class="row">
@@ -76,7 +76,15 @@
 								<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 									<p><b>Year</b>: {{v.year}}</p>
 									<p><b>Location</b>: {{v.locname}}</p>
-									<p><b>Segmentation</b>: {{}}</p>
+									<p><b>Segmentation</b>:
+									<span style="display:block; padding-left: 0.8em;">
+										<span ng-repeat="frame in v.frames">
+											<span ng-repeat="(key, value) in frame" >
+											   <i>{{key}}</i>: {{value}}
+											</span><br/>
+										</span>
+									</span>
+									</p>
 								</div>
 							</li>
 						</ul>
