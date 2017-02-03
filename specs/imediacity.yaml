@@ -1,5 +1,5 @@
 project:
-    title: "iMediaCity Repository"
+    title: "iMediaCities Repository"
     description": "..."
 tags:
     file: "All endpoints to handle files"
