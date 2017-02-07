@@ -16,7 +16,7 @@ frontend_repo="frontend"
 # backend_git="https://github.com/mdantonio/http-api-base"
 backend_git="https://github.com/EUDAT-B2STAGE/http-api-base"
 frontend_git="https://github.com/mdantonio/angularjs-on-flask"
-services="$backend_container $fronted_container"
+services="$backend_container $fronted_container worker"
 submodule_tracking="submodules.current.commit"
 
 export VOLUMES_PREFIX=$volume_prefix

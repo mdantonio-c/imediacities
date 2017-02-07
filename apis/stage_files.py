@@ -12,6 +12,7 @@ from ..services.neo4j.graph_endpoints import GraphBaseOperations
 from ..services.neo4j.graph_endpoints import returnError
 # from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
+from commons.tasks.custom.imc_tasks import import_file
 from commons import htmlcodes as hcodes
 
 logger = get_logger(__name__)
@@ -123,7 +124,15 @@ class Stage(GraphBaseOperations):
         # os.remove(path)
         # return self.empty_response()
 
-        return self.force_response(path)
+        task = import_file.apply_async(
+            args=[path],
+            countdown=60
+        )
+        # node.task_id = task.id
+        # node.status = "importing"
+        # node.save()
+
+        return self.force_response(task.id)
 
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)

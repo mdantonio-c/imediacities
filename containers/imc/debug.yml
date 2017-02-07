@@ -6,11 +6,24 @@ backend:
     - ../imediastuff:/uploads
   links:
     - gdb:gdb
+    - redqueue:queue
     - swagger:swagger
 
 frontend:
   ports:
     - 80:5000
+
+worker:
+  # command: sleep infinity
+  links:
+    # Note: VERY IMPORTANT to keep the same redis name
+    # between worker and rest
+    - gdb:gdb
+    - redqueue:queue
+  volumes:
+    - ../imediastuff:/uploads
+  environment:
+    BACKEND_AUTH_SERVICE: graphdb
 
 gdb:
   # command: sleep 9999999
