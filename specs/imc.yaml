@@ -44,4 +44,4 @@ bower_components:
         - "ng-google-chart.min.js"
 
 css: 
-    - "custom/imediacity/search.css"
+    - "custom/imc/search.css"

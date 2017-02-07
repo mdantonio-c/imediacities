@@ -15,8 +15,12 @@ frontend:
 gdb:
   # command: sleep 9999999
   ports:
-  - 9090:7474
-  - 7687:7687
+    - 9090:7474
+    - 7687:7687
+
+  # VERY TEMP... TO AVOID VOLUME RENAMING; NOT YET SUPPORTED
+  volumes:
+    - rapydo_imediacity_graphdata:/data
   # environment:
     # NEO4J_dbms_memory_pagecache_size: 2048M
     # NEO4J_dbms_memory_heap_maxSize: 4096M
