@@ -39,7 +39,6 @@ class Stage(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    # @authentication.authorization_required
     def get(self):
 
         self.initGraph()
@@ -81,7 +80,54 @@ class Stage(GraphBaseOperations):
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    # @authentication.authorization_required
+    def post(self):
+
+        self.initGraph()
+
+        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+
+        if group is None:
+            return returnError(
+                self,
+                label="Invalid request",
+                error="No group defined for this user",
+                code=hcodes.HTTP_BAD_REQUEST)
+
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            return returnError(
+                self,
+                label="Error",
+                error="Upload dir not found",
+                code=hcodes.HTTP_BAD_REQUEST)
+
+        input_parameters = self.get_input()
+
+        if 'filename' not in input_parameters:
+            return returnError(
+                self,
+                label="Missing parameter",
+                error="Filename not found",
+                code=hcodes.HTTP_BAD_REQUEST)
+
+        filename = input_parameters['filename']
+
+        path = os.path.join(upload_dir, filename)
+        if not os.path.isfile(path):
+            return returnError(
+                self,
+                label="File not found",
+                error="%s" % filename,
+                code=hcodes.HTTP_BAD_REQUEST)
+
+        # os.remove(path)
+        # return self.empty_response()
+
+        return self.force_response(path)
+
+    @decorate.catch_error(
+        exception=Exception, exception_label=None, catch_generic=False)
+    @catch_graph_exceptions
     def delete(self):
 
         self.initGraph()

@@ -19,6 +19,18 @@ function StageController($scope, $log, $auth, $q, DataService, FormDialogService
         headers: {Authorization : 'Bearer ' + $auth.getToken()}
     }
 
+    self.importStageFiles = function(file) {
+		DataService.importStageFiles(file).then(
+			function(out_data) {
+		    	console.log(out_data)
+
+	            noty.extractErrors(out_data, noty.WARNING);
+			}, function(out_data) {
+		    	console.log("error...");
+
+	            noty.extractErrors(out_data, noty.ERROR);
+			});
+	}
     // flowFile is always undefined, some errors here o in flow-init?
     self.uploadComplete = function (event, $flow, flowFile) {
     	self.loadFiles();
