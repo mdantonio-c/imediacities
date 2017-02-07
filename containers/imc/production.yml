@@ -1,0 +1,37 @@
+backend:
+  environment:
+    DEBUG_LEVEL: INFO
+    BACKEND_AUTH_SERVICE: graphdb
+  volumes:
+    - ../imediastuff:/uploads
+  links:
+    - gdb:gdb
+    - redqueue:queue
+    - swagger:swagger
+
+worker:
+  # command: sleep infinity
+  links:
+    # Note: VERY IMPORTANT to keep the same redis name
+    # between worker and rest
+    - gdb:gdb
+    - redqueue:queue
+  volumes:
+    - ../imediastuff:/uploads
+  environment:
+    BACKEND_AUTH_SERVICE: graphdb
+
+
+gdb:
+  ports:
+  - 9090:7474
+  - 7687:7687
+  # VERY TEMP... TO AVOID VOLUME RENAMING; NOT YET SUPPORTED
+  volumes:
+    - rapydo_imediacity_graphdata:/data
+  environment:
+    NEO4J_dbms_memory_pagecache_size: 2048M
+    NEO4J_dbms_memory_heap_maxSize: 4096M
+    # NEO4J_dbms_allowFormatMigration: "true"
+#######################
+# Link services inside API

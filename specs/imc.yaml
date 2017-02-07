@@ -1,5 +1,5 @@
 project:
-    title: "iMediaCity Repository"
+    title: "iMediaCities Repository"
     description": "..."
 tags:
     file: "All endpoints to handle files"
@@ -44,4 +44,4 @@ bower_components:
         - "ng-google-chart.min.js"
 
 css: 
-    - "custom/imediacity/search.css"
+    - "custom/imc/search.css"

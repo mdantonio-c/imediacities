@@ -7,11 +7,19 @@ function DataService($log, api, $q, jsonapi_parser) {
 
 	var self = this;
 
+    self.getParametersSchema = function(endpoint) {
+        return api.apiCall("schemas/"+endpoint, 'GET');
+    }
+
     // self.searchVideos = function() {
     //     return api.apiCall('search', 'POST');    }
 
     self.getStageFiles = function() {
         return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
+    }
+    self.importStageFiles = function(file) {
+        var data = {"filename": file}
+        return api.apiCall('stage', 'POST', data);
     }
     self.deleteStageFile = function(file) {
         var data = {"filename": file}
@@ -27,7 +35,8 @@ function DataService($log, api, $q, jsonapi_parser) {
 
 
     self.getUserSchema = function(study) {
-        return api.apiCall('admin/users', 'POST');
+        // return api.apiCall('admin/users', 'POST');
+        return self.getParametersSchema('admin/users');
     }
     self.getUsers = function() {
         var endpoint = 'admin/users'
@@ -45,7 +54,8 @@ function DataService($log, api, $q, jsonapi_parser) {
 
 
     self.getGroupSchema = function(study) {
-        return api.apiCall('admin/groups', 'POST');
+        // return api.apiCall('admin/groups', 'POST');
+        return self.getParametersSchema('admin/groups');
     }
     self.getGroups = function() {
         var endpoint = 'admin/groups'
