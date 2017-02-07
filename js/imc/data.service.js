@@ -54,8 +54,8 @@ function DataService($log, api, $q, jsonapi_parser) {
 
 
     self.getGroupSchema = function(study) {
-        // return api.apiCall('admin/groups', 'POST');
-        return self.getParametersSchema('admin/groups');
+        var data = {'get_schema': true}
+        return api.apiCall('admin/groups', 'POST', data);
     }
     self.getGroups = function() {
         var endpoint = 'admin/groups'
