@@ -68,7 +68,7 @@ class Upload(Uploader, GraphBaseOperations):
         #     properties = {}
         #     properties["filename"] = secure_name
         #     properties["title"] = filename
-        #     video = self.graph.createNode(self.graph.Video, properties)
+        #     video = self.graph.Video(**properties).save()
         #     if self._current_user is not None:
         #         video.ownership.connect(self._current_user)
 

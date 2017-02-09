@@ -107,7 +107,7 @@ class AdminUsers(GraphBaseOperations):
             BaseAuthentication.hash_password(properties["password"])
         properties["name_surname"] = \
             self.createUniqueIndex(properties["name"], properties["surname"])
-        user = self.graph.createNode(self.graph.User, properties)
+        user = self.graph.User(**properties).save()
         user.belongs_to.connect(group)
         self.link_role(user, v)
 

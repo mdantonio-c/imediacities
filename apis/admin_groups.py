@@ -83,7 +83,7 @@ class AdminGroups(GraphBaseOperations):
                 'User not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         # GRAPH #
-        group = self.graph.createNode(self.graph.Group, properties)
+        group = self.graph.Group(**properties).save()
         # group.coordinator.connect(coordinator)
 
         return self.force_response(group.uuid)
