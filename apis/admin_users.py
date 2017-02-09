@@ -100,13 +100,12 @@ class AdminUsers(GraphBaseOperations):
             cert_pass += rand.choice(charset)
 
         # GRAPH #
-        # properties["uuid"] = getUUID()
         properties["authmethod"] = "credentials"
         # if "password" in properties:
         properties["password"] = \
             BaseAuthentication.hash_password(properties["password"])
-        properties["name_surname"] = \
-            self.createUniqueIndex(properties["name"], properties["surname"])
+        # properties["name_surname"] = \
+        #     self.createUniqueIndex(properties["name"], properties["surname"])
         user = self.graph.User(**properties).save()
         user.belongs_to.connect(group)
         self.link_role(user, v)

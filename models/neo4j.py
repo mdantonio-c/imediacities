@@ -9,16 +9,17 @@ Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
 from __future__ import absolute_import
-from neomodel import StringProperty, IntegerProperty, DateTimeProperty, \
-    StructuredNode, RelationshipTo, RelationshipFrom, \
-    ZeroOrMore
+from ...neo4j.models import \
+    StringProperty, IntegerProperty, \
+    IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
+from neomodel import ZeroOrMore
 
 from ..neo4j import User as UserBase
 
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 
 ##############################################################################
@@ -27,64 +28,36 @@ logger.setLevel(logging.DEBUG)
 
 # Extension of User model for accounting in API login/logout
 class User(UserBase):
-    uuid = StringProperty(required=True, unique_index=True)
-    name = StringProperty(required=True)
-    surname = StringProperty(required=True)
-    name_surname = StringProperty(required=True, unique_index=True)
+    # name_surname = StringProperty(required=True, unique_index=True)
 
     videos = RelationshipFrom('Video', 'IS_OWNED_BY', cardinality=ZeroOrMore)
-    belongs_to = RelationshipTo('Group', 'BELONGS_TO')
+    belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore)
 
-    _fields_to_show = [
-        "email", "name", "surname"
-    ]
-    _relationships_to_follow = [
-        'belongs_to', 'roles'
-    ]
 
-
-class Group(StructuredNode):
-    uuid = StringProperty(required=True, unique_index=True)
-    fullname = StringProperty(required=True, unique_index=True)
-    shortname = StringProperty(required=True, unique_index=True)
+class Group(IdentifiedNode):
+    fullname = StringProperty(required=True, unique_index=True, show=True)
+    shortname = StringProperty(required=True, unique_index=True, show=True)
 
     members = RelationshipFrom(
-        'User', 'BELONGS_TO', cardinality=ZeroOrMore)
+        'User', 'BELONGS_TO', cardinality=ZeroOrMore, show=True)
     coordinator = RelationshipFrom(
-        'User', 'PI_FOR', cardinality=ZeroOrMore)
-
-    _fields_to_show = [
-        "shortname", "fullname"
-    ]
-    _relationships_to_follow = [
-        'coordinator', 'members'
-    ]
+        'User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
 
 
-class Video(StructuredNode):
-    uuid = StringProperty(required=True, unique_index=True)
-    created = DateTimeProperty(required=True)
-    modified = DateTimeProperty(required=True)
-    filename = StringProperty(required=True)
+class Video(TimestampedNode):
+    filename = StringProperty(required=True, show=True)
 
     title = StringProperty()
     description = StringProperty()
     duration = IntegerProperty()
-    ownership = RelationshipTo('User', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    ownership = RelationshipTo(
+        'User', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
 
-    _fields_to_show = [
-        "filename", "created"
-    ]
-    _relationships_to_follow = [
-        'ownership'
-    ]
 
-
-class Annotation(StructuredNode):
-    uuid = StringProperty(required=True, unique_index=True)
-    key = StringProperty(equired=True)
-    value = StringProperty(equired=True)
+class Annotation(IdentifiedNode):
+    key = StringProperty(required=True)
+    value = StringProperty(required=True)
     video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
