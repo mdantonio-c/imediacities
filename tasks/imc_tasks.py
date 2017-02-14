@@ -23,7 +23,7 @@ def import_file(self, path):
 
         progress(self, 'Starting import', path)
 
-        # self.graph = celery_app.get_service('neo4j')
+        self.graph = celery_app.get_service('neo4j')
 
         try:
 
@@ -36,10 +36,15 @@ def import_file(self, path):
                 file_extension = file_extension[1:]
 
             progress(self, 'Extracting metadata', path)
-            with open(path, 'r') as f:
+            import codecs
+            # with codecs.open(path, 'r', encoding='utf8') as f:
+            with codecs.open(path, 'r', encoding='latin-1') as f:
                 while True:
                     line = f.readline()
-                    log.info(line)
+                    if not line:
+                        break
+                    # print(line)
+                    log.info(line.strip())
 
             # SAVE METADATA
             # self.fileNode.status = 'completed'
@@ -48,9 +53,12 @@ def import_file(self, path):
 
             progress(self, 'Completed', path)
 
-        except self.graph.File.DoesNotExist:
+        # except self.graph.File.DoesNotExist:
+        #     progress(self, 'Import error', None)
+        #     log.error("Task error, path %s not found" % path)
+        except Exception as e:
             progress(self, 'Import error', None)
-            log.error("Task error, path %s not found" % path)
+            log.error("Task error, %s" % e)
+            raise e
 
         return 1
-

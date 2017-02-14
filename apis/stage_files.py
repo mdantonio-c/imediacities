@@ -126,7 +126,7 @@ class Stage(GraphBaseOperations):
 
         task = import_file.apply_async(
             args=[path],
-            countdown=60
+            countdown=20
         )
         # node.task_id = task.id
         # node.status = "importing"
