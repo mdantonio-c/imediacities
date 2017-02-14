@@ -54,6 +54,16 @@ angular.module('web').constant('customRoutes',
         }
     },
 
+    'logged.admin.queue': {
+        url: "/queue",
+        views: {
+            "admin@logged.admin": {
+                dir: 'base',
+                templateUrl: 'admin.queue.html'
+            }
+        }
+    }
+
 });
 
 })();

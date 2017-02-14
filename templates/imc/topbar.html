@@ -32,11 +32,19 @@
           Users
         </a>
       </li>
+
       <li ng-if="profile.isAdmin">
         <a href ui-sref="logged.admin.groups">
           Groups
         </a>
       </li>
+
+      <li ng-if="profile.isAdmin">
+        <a href ui-sref="logged.admin.queue">
+          Queue
+        </a>
+      </li>
+
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
