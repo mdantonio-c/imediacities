@@ -6,7 +6,7 @@ backend:
     - ../imediastuff:/uploads
   links:
     - gdb:gdb
-    - redqueue:queue
+    - rabbit:queue
     - swagger:swagger
 
 frontend:
@@ -16,10 +16,8 @@ frontend:
 worker:
   # command: sleep infinity
   links:
-    # Note: VERY IMPORTANT to keep the same redis name
-    # between worker and rest
     - gdb:gdb
-    - redqueue:queue
+    - rabbit:queue
   volumes:
     - ../imediastuff:/uploads
   environment:
