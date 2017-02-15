@@ -44,6 +44,19 @@ class Group(IdentifiedNode):
         'User', 'BELONGS_TO', cardinality=ZeroOrMore, show=True)
     coordinator = RelationshipFrom(
         'User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    stage_files = RelationshipFrom(
+        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+
+
+class Stage(TimestampedNode):
+    filename = StringProperty(required=True, show=True)
+    path = StringProperty(required=True, unique_index=True, show=True)
+    status = StringProperty(show=True)
+    status_message = StringProperty(show=True)
+    task_id = StringProperty(show=True)
+
+    ownership = RelationshipTo(
+        'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
 
 
 class Video(TimestampedNode):

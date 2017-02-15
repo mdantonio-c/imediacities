@@ -15,7 +15,7 @@ from ..services.neo4j.graph_endpoints import catch_graph_exceptions
 from commons.tasks.custom.imc_tasks import import_file
 from commons import htmlcodes as hcodes
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
 
 #####################################
@@ -59,6 +59,8 @@ class Stage(GraphBaseOperations):
                 [], errors=[{"Warning": "Upload dir not found"}]
             )
 
+        resources = group.stage_files.all()
+
         data = []
         for f in os.listdir(upload_dir):
             path = os.path.join(upload_dir, f)
@@ -74,6 +76,14 @@ class Stage(GraphBaseOperations):
             row['creation'] = stat.st_ctime
             row['modification'] = stat.st_mtime
             row['type'] = self.getType(f)
+            row['status'] = "-"
+
+            for res in resources:
+                if res.path != path:
+                    continue
+                row['status'] = res.status
+                row['status_message'] = res.status_message
+                row['task_id'] = res.task_id
             data.append(row)
 
         return self.force_response(data)
@@ -121,16 +131,26 @@ class Stage(GraphBaseOperations):
                 error="%s" % filename,
                 code=hcodes.HTTP_BAD_REQUEST)
 
-        # os.remove(path)
-        # return self.empty_response()
+        properties = {}
+        properties['filename'] = filename
+        properties['path'] = path
+
+        try:
+            resource = self.graph.Stage.nodes.get(**properties)
+            log.debug("Resource already exist for %s" % path)
+        except self.graph.Stage.DoesNotExist:
+            resource = self.graph.Stage(**properties).save()
+            resource.ownership.connect(group)
+            log.debug("Resource created for %s" % path)
 
         task = import_file.apply_async(
-            args=[path],
+            args=[path, resource.uuid],
             countdown=20
         )
-        # node.task_id = task.id
-        # node.status = "importing"
-        # node.save()
+
+        resource.status = "IMPORTING"
+        resource.task_id = task.id
+        resource.save()
 
         return self.force_response(task.id)
 

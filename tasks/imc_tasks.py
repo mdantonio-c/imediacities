@@ -18,7 +18,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-def import_file(self, path):
+def import_file(self, path, resource_id):
     with celery_app.app.app_context():
 
         progress(self, 'Starting import', path)
@@ -27,7 +27,7 @@ def import_file(self, path):
 
         try:
 
-            # self.fileNode = self.graph.File.nodes.get(accession=accession)
+            resource = self.graph.Stage.nodes.get(uuid=resource_id)
 
             # METADATA EXTRACTION
             filename, file_extension = os.path.splitext(path)
@@ -43,15 +43,17 @@ def import_file(self, path):
                     line = f.readline()
                     if not line:
                         break
-                    # print(line)
                     log.info(line.strip())
 
+            a = 1 / 0
+
             # SAVE METADATA
-            # self.fileNode.status = 'completed'
-            # self.fileNode.metadata = metadata
-            # self.fileNode.save()
+            resource.status = 'COMPLETED'
+            resource.status_message = 'Nothing to declare'
+            resource.save()
 
             progress(self, 'Completed', path)
+            # os.remove(path)
 
         # except self.graph.File.DoesNotExist:
         #     progress(self, 'Import error', None)
@@ -59,6 +61,9 @@ def import_file(self, path):
         except Exception as e:
             progress(self, 'Import error', None)
             log.error("Task error, %s" % e)
+            resource.status = 'ERROR'
+            resource.status_message = str(e)
+            resource.save()
             raise e
 
         return 1
