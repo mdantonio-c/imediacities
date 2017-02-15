@@ -22,7 +22,8 @@ function StageController($scope, $log, $auth, $q, DataService, FormDialogService
     self.importStageFiles = function(file) {
 		DataService.importStageFiles(file).then(
 			function(out_data) {
-		    	console.log(out_data)
+		    	// console.log(out_data)
+		    	self.loadFiles();
 
 	            noty.extractErrors(out_data, noty.WARNING);
 			}, function(out_data) {

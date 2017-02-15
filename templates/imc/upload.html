@@ -94,7 +94,21 @@
 <div class='panel panel-default'>
 
 <div class='panel-heading'>
-  <h4 class='panel-title'>Your files</h4>
+
+  <div class='row'>
+    <div class='col-xs-11'>
+      <h4 class='panel-title'>Your files
+    </div>
+
+  <div class='col-xs-1'>
+  <a ng-click="ctrl.loadFiles()">
+    <h4 class='text-right'>
+      <span class="glyphicon glyphicon-refresh" aria-hidden="true" uib-tooltip='Refresh'></span>
+    </h4>
+  </a>
+  </div>
+  </div>
+
 </div>
 
 <div class='panel-body'>
@@ -120,6 +134,7 @@
       <th ts-criteria="size | parseInt">Size</th>
       <th ts-criteria="creation | parseInt">Created</th>
       <th ts-criteria="modification | parseInt">Modified</th>
+      <th ts-criteria="status">Status</th>
       <th></th>
     </tr>
   </thead>
@@ -138,7 +153,7 @@
         <button 
           class='btn btn-success btn-xs'
           ng-click="ctrl.importStageFiles(data.name)"
-          ng-if="data.type == 'metadata'">
+          ng-if="data.type == 'metadata' && data.status != 'IMPORTING'">
           IMPORT
         </button>
       </td>
@@ -156,10 +171,35 @@
         </span>
       </td>
 
+
+      <td ng-if='data.status_message'>
+        <span uib-tooltip='{{data.status_message}}' 
+          class="label label-info"
+          ng-class="{
+            'label-success': data.status == 'COMPLETED',
+            'label-danger': data.status == 'ERROR',
+            'label-info': data.status == 'IMPORTING',
+          }">
+          {{data.status}}
+        </span>
+      </td>
+
+      <td ng-if='!data.status_message'>
+        {{data.status}}
+      </td>
+
       <td 
+        ng-if='data.status != "IMPORTING"'
         ng-click='ctrl.deleteFile(data.name)'>
           <i class='material-icons palette-Red-500 text'>delete</i>
       </td>
+
+      <td 
+        ng-if='data.status == "IMPORTING"'
+        uib-tooltip='Unable to delete a file during the import'>
+          <i class='material-icons palette-Grey-500 text'>delete</i>
+      </td>
+
 
     </tr>
   </tbody>
