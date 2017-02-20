@@ -35,12 +35,12 @@ class Stage(GraphBaseOperations):
         if file_extension in video_exts:
             return "video"
 
-        autio_exts = ['.aac', '.mp2', '.mp3', '.wav']
-        if file_extension in autio_exts:
+        audio_exts = ['.aac', '.mp2', '.mp3', '.wav']
+        if file_extension in audio_exts:
             return "audio"
 
-        foto_exts = ['.tif', '.jpg', '.tiff', '.jpeg']
-        if file_extension in foto_exts:
+        image_exts = ['.tif', '.jpg', '.tiff', '.jpeg']
+        if file_extension in image_exts:
             return "image"
 
         text_exts = ['.pdf', '.doc', '.docx']
