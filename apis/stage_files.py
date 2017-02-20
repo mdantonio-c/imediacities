@@ -31,9 +31,21 @@ class Stage(GraphBaseOperations):
         if file_extension in metadata_exts:
             return "metadata"
 
-        video_exts = ['.mov', '.avi', '.mp4', '.wmv']
+        video_exts = ['.mp4', '.ts', 'mpg', 'mpeg', 'mkv']
         if file_extension in video_exts:
             return "video"
+
+        autio_exts = ['.aac', '.mp2', '.mp3', '.wav']
+        if file_extension in autio_exts:
+            return "audio"
+
+        foto_exts = ['.tif', '.jpg', '.tiff', '.jpeg']
+        if file_extension in foto_exts:
+            return "image"
+
+        text_exts = ['.pdf', '.doc', '.docx']
+        if file_extension in text_exts:
+            return "text"
 
         return "unknown"
 
