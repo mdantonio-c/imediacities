@@ -40,7 +40,11 @@
 					<td>{{data.email}}</td>
 					<td>{{data.name}}</td>
 					<td>{{data.surname}}</td>
-					<td>{{data._belongs_to[0].shortname}}</td>
+										<td 
+						uib-tooltip='{{data._belongs_to[0]._belongs_to[0].fullname}}'
+					>
+						{{data._belongs_to[0]._belongs_to[0].shortname}}
+					</td>
 					<td>
 						<label 
 							class='label label-default' style='margin-right:3px;'
