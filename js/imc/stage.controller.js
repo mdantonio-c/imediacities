@@ -36,11 +36,6 @@ function StageController($scope, $log, $auth, $q, DataService, FormDialogService
     self.uploadComplete = function (event, $flow, flowFile) {
     	self.loadFiles();
     }
-    self.uploadError = function( $file, $message, $flow ) {
-    	$log.error("Upload error");
-    	$log.error($file)
-    	$log.error($message)
-    }
 
 	self.loading = true;
 	self.loadFiles = function() {

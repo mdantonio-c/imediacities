@@ -35,8 +35,9 @@
 <div class='panel-body'>
 
 <div flow-init="flowOptions"
+     ng-controller='NgFlowController'
      flow-complete='ctrl.uploadComplete(event, $flow, flowFile)'
-     flow-file-error='ctrl.uploadError($file, $message, $flow)'
+     flow-file-error='showNgUploadErrors($file, $message, $flow)'
      flow-files-submitted="$flow.upload()"
      flow-file-success="$file.msg = $message">
 
