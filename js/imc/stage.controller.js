@@ -4,7 +4,7 @@
 var app = angular.module('web').controller('StageController', StageController);
 
 // The controller
-function StageController($scope, $log, $auth, $q, DataService, FormDialogService, noty)
+function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormDialogService, noty)
 {
 	var self = this;
 
@@ -34,9 +34,13 @@ function StageController($scope, $log, $auth, $q, DataService, FormDialogService
 	}
     // flowFile is always undefined, some errors here o in flow-init?
     self.uploadComplete = function (event, $flow, flowFile) {
+    	$rootScope.transitionConfirmationRequested = false;
     	self.loadFiles();
     }
-
+    self.uploadStart = function (event, $flow, flowFile) {
+    	$rootScope.transitionConfirmationRequested = true;
+    	$rootScope.transitionConfirmationMessage = "Are you sure want to leave this page? This may interrupt your uploads";
+    }
 	self.loading = true;
 	self.loadFiles = function() {
 		DataService.getStageFiles().then(

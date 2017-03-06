@@ -36,6 +36,7 @@
 
 <div flow-init="flowOptions"
      ng-controller='NgFlowController'
+     flow-upload-started='ctrl.uploadStart(event, $flow, $flowFile)'
      flow-complete='ctrl.uploadComplete(event, $flow, flowFile)'
      flow-file-error='showNgUploadErrors($file, $message, $flow)'
      flow-files-submitted="$flow.upload()"

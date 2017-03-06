@@ -31,7 +31,7 @@ class Stage(GraphBaseOperations):
         if file_extension in metadata_exts:
             return "metadata"
 
-        video_exts = ['.mp4', '.ts', 'mpg', 'mpeg', 'mkv']
+        video_exts = ['.mp4', '.ts', '.mpg', '.mpeg', '.mkv']
         if file_extension in video_exts:
             return "video"
 
