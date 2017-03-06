@@ -1,2 +1,2 @@
-# iMediaCity Repository 
+# iMediaCities Repository 
 
