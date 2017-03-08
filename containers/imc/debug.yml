@@ -8,6 +8,7 @@ backend:
     - gdb:gdb
     - rabbit:queue
     - swagger:swagger
+    - ftp:ftp
 
 frontend:
   ports:
@@ -36,3 +37,26 @@ gdb:
     # NEO4J_dbms_memory_pagecache_size: 2048M
     # NEO4J_dbms_memory_heap_maxSize: 4096M
     # NEO4J_dbms_allowFormatMigration: "true"
+
+ftp:
+  image: stilliard/pure-ftpd:latest
+  ports:
+    - "21:21"
+    - 30000:30000
+    - 30001:30001
+    - 30002:30002
+    - 30003:30003
+    - 30004:30004
+    - 30005:30005
+    - 30006:30006
+    - 30007:30007
+    - 30008:30008
+    - 30009:30009
+  volumes:
+    - ${VOLUMES_PREFIX}_pureftpd:/etc/pure-ftpd/passwd
+    - ../imediastuff:/home/ftpusers/
+# /etc/ssl/private/ A directory containing a single pure-ftpd.pem file
+# with the server's SSL certificates for TLS support. Optional TLS is
+# automatically enabled when the container finds this file on startup.
+  environment:
+    PUBLICHOST: localhost
