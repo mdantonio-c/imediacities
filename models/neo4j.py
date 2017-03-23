@@ -10,9 +10,9 @@ Imports and models have to be defined/used AFTER normal Graphdb connection.
 
 from __future__ import absolute_import
 from ...neo4j.models import \
-    StringProperty, IntegerProperty, \
-    IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
-from neomodel import ZeroOrMore
+    StringProperty, IntegerProperty, FloatProperty, DateTimeProperty, \
+    StructuredNode, IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
+from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
 from ..neo4j import User as UserBase
 
@@ -57,20 +57,90 @@ class Stage(TimestampedNode):
 
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+    video = RelationshipFrom('Video', 'VIDEO', cardinality=One)
 
 
 class Video(TimestampedNode):
-    filename = StringProperty(required=True, show=True)
-
     title = StringProperty()
     description = StringProperty()
     duration = IntegerProperty()
     ownership = RelationshipTo(
-        'User', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+        'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+    item = RelationshipTo(
+        'Stage', 'ITEM', cardinality=One ,show=True)
     annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
 
+## Annotation data model
+
+#class Annotation(IdentifiedNode):
+#    key = StringProperty(required=True)
+#    value = StringProperty(required=True)
+#    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
 
 class Annotation(IdentifiedNode):
-    key = StringProperty(required=True)
-    value = StringProperty(required=True)
-    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
+    """Annotation class"""
+    ANNOTATION_TYPES = (
+        ('OD', 'object detection'),
+        ('OR', 'object recognition'),
+        ('VQ', 'video quality'),
+        ('TVS', 'temporal video segmentation')
+    )
+    AUTOMATIC_GENERATOR_TOOLS = (
+        ('FHG', 'Fraunhofer tool'),
+        ('VIS', 'Google Vision API'),
+        ('AWS', 'Amazon Rekognition API')
+    )
+    type = StringProperty(required=True, choices=ANNOTATION_TYPES)
+    creation_datetime = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    source = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
+    creator = RelationshipTo(
+        'User', 'IS_CREATED_BY', cardinality=ZeroOrOne)
+    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
+    bodies = RelationshipTo('AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
+    targets = RelationshipTo('AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
+
+class AnnotationBody(StructuredNode):
+    __abstract_node__ = True
+
+class TextBody(AnnotationBody):
+    # TODO
+    pass
+
+class ImageBody(AnnotationBody):
+    # TODO
+    pass
+
+class AudioBody(AnnotationBody):
+    # TODO
+    pass
+
+class VQBody(AnnotationBody):
+    """Class for Video Quality Annotation"""
+    module = StringProperty(required=True)
+    frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
+
+class VQFrame(StructuredNode):
+    idx = IntegerProperty(required=True)
+    quality = FloatProperty(required=True)
+
+class TVSBody(AnnotationBody):
+    shots = RelationshipTo('Shot', 'SHOT', cardinality=OneOrMore)
+
+class Shot(StructuredNode):
+    """Shot class"""
+    start_frame_idx = IntegerProperty()
+    end_frame_idx = IntegerProperty()
+    duration = IntegerProperty()
+
+class ODBody(StructuredNode):
+    """Object Detection"""
+    #OBJECT_TYPES = ('FACE', 'LEFT_EYE', 'RIGHT_EYE')
+    object_id = StringProperty(required=True)
+    object_type = StringProperty(required=True)
+    # FIXME add object attribute relationship
+    #object_attributes = RelationshipTo('ObjectAttribute', 'HAS_ATTRIBUTE', cardinality=ZeroOrMore)
+
+
+class TargetBody(StructuredNode):
+    __abstract_node__ = True
+
