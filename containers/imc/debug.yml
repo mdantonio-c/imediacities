@@ -13,6 +13,8 @@ backend:
 frontend:
   ports:
     - 80:5000
+  volumes:
+    - ../assets/imc:/data/frontend/felask/static/assets
 
 worker:
   # command: sleep infinity
