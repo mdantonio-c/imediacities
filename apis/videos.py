@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Handle your videos
+Handle your video metadata
 """
 
 from commons.logs import get_logger
@@ -9,11 +9,11 @@ from .. import decorators as decorate
 from ...auth import authentication
 # from flask_restful import request
 from ..services.neo4j.graph_endpoints import GraphBaseOperations
-# from ..services.neo4j.graph_endpoints import myGraphError
-# from ..services.neo4j.graph_endpoints import returnError
+from ..services.neo4j.graph_endpoints import myGraphError
+from ..services.neo4j.graph_endpoints import returnError
 from ..services.neo4j.graph_endpoints import graph_transactions
 from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-# from commons import htmlcodes as hcodes
+from commons import htmlcodes as hcodes
 # from commons.services.uuid import getUUID
 
 logger = get_logger(__name__)
@@ -21,19 +21,30 @@ logger = get_logger(__name__)
 
 #####################################
 class Videos(GraphBaseOperations):
-
+    """
+    Get a video if its id is passed as an argument. Else return all videos in the repository.
+    """
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @authentication.authorization_required
     # @decorate.apimethod
     def get(self, video_id=None):
-
+        logger.debug("getting video id: %s", video_id)
         self.initGraph()
         data = []
 
         if video_id is not None:
-            v = self.graph.Video.nodes.get(id=video_id)
+            # check if the video exists
+            try:
+                v = self.graph.Video.nodes.get(uuid=video_id)
+            except self.graph.Video.DoesNotExist:
+                logger.debug("Video with uuid %s does not exist" % video_id)
+                return returnError(
+                    self,
+                    label="Invalid request",
+                    error="Please specify a valid video id",
+                    code=hcodes.HTTP_BAD_NOTFOUND)  
             videos = [v]
         else:
             videos = self.graph.Video.nodes.all()
@@ -44,6 +55,9 @@ class Videos(GraphBaseOperations):
 
         return self.force_response(data)
 
+    """
+    Create a new video description.
+    """
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
@@ -114,15 +128,18 @@ class Videos(GraphBaseOperations):
 
     #     return self.force_response(video.id)
 
+class VideoAnnotations(GraphBaseOperations):
+    """
+        Get all video annotations for a given video.
+    """
     @decorate.catch_error(
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
-    @authentication.authorization_required
+    # @authentication.authorization_required
     # @decorate.apimethod
-    def get_annotations(self, video_id=None):
-
-        if user_id is None:
-
+    def get(self, video_id):
+        logger.info("get annotations for video id: %s", video_id)
+        if video_id is None:
             return returnError(
                 self,
                 label="Invalid request",
@@ -132,49 +149,20 @@ class Videos(GraphBaseOperations):
         self.initGraph()
         data = []
 
-        video = self.getNode(self.graph.Video, video_id, field='uuid')
-        if video is None:
-            raise myGraphError("Video not found")
+        try:
+            v = self.graph.Video.nodes.get(uuid=video_id)
+        except self.graph.Video.DoesNotExist:
+            logger.debug("Video with uuid %s does not exist" % video_id)
+            return returnError(
+                self,
+                label="Invalid request",
+                error="Please specify a valid video id",
+                code=hcodes.HTTP_BAD_NOTFOUND)  
 
-        # if video_id is not None:
-        #     v = self.graph.Video.nodes.get(id=video_id)
-        #     videos = [v]
-        # else:
-        #     videos = self.graph.Video.nodes.all()
+        # video = self.graph.Video.nodes.get(uuid=video_id)
+        # if video is None:
+        #     raise myGraphError("Video not found")
 
-        # for v in videos:
-        #     video = self.getJsonResponse(v)
-        #     data.append(video)
+        # TODO 
 
         return self.force_response(data)
-        
-
-
-
-# class VideoAnnotation(GraphBaseOperations):
-#     @decorate.catch_error(
-#         exception=Exception, exception_label=None, catch_generic=False)
-#     @catch_graph_exceptions
-#     # @authentication.authorization_required
-#     # @decorate.apimethod
-#     def get(self, query=None):
-
-#         self.initGraph()
-
-#         data = []
-#         cypher = "MATCH (g:Group)"
-
-#         if query is not None:
-#             cypher += " WHERE g.shortname =~ '(?i).*%s.*'" % query
-
-#         cypher += " RETURN g ORDER BY g.shortname ASC"
-
-#         if query is None:
-#             cypher += " LIMIT 20"
-
-#         result = self.graph.cypher(cypher)
-#         for row in result:
-#             g = self.graph.Group.inflate(row[0])
-#             data.append({"id": g.uuid, "shortname": g.shortname})
-
-#         return self.force_response(data)
