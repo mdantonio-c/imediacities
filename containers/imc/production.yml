@@ -12,7 +12,7 @@ backend:
 
 proxy:
   volumes:
-    - ../assets/imc:/static/assets
+    - ../assets/imc:/data/frontend/felask/static/assets
 
 
 worker:
