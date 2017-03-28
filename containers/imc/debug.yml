@@ -16,6 +16,8 @@ frontend:
 
 worker:
   # command: sleep infinity
+  build: ../builds/celery
+
   links:
     - gdb:gdb
     - rabbit:queue
