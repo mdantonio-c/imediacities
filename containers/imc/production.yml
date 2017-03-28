@@ -10,9 +10,9 @@ backend:
     - swagger:swagger
     - ftp:ftp
 
-frontend:
+proxy:
   volumes:
-    - ../assets/imc:/data/frontend/felask/static/assets
+    - ../assets/imc:/static/assets
 
 
 worker:
