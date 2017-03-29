@@ -48,7 +48,17 @@ def import_file(self, path, resource_id):
             params = []
             params.append("/imedia-pipeline-cin/analyze.py")
             bash = BashCommands()
-            bash.execute_command("python3", params)
+            try:
+                output = bash.execute_command(
+                    "python3",
+                    params,
+                    parseException=True
+                )
+
+                log.info(output)
+            except BaseException as e:
+                log.error(e)
+                raise(e)
 
             # SAVE METADATA
             resource.status = 'COMPLETED'
