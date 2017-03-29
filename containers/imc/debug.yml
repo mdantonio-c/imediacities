@@ -19,12 +19,13 @@ frontend:
 worker:
   # command: sleep infinity
   build: ../builds/celery
-
   links:
     - gdb:gdb
     - rabbit:queue
   volumes:
     - ../imediastuff:/uploads
+    - ../imedia-pipeline:/imedia-pipeline
+    - ../imedia-pipeline-cin:/imedia-pipeline-cin
   environment:
     BACKEND_AUTH_SERVICE: graphdb
 
