@@ -46,7 +46,7 @@ def import_file(self, path, resource_id):
                     log.info(line.strip())
 
             params = []
-            params.append("imedia-pipeline-cin/analyze.py")
+            params.append("/imedia-pipeline-cin/analyze.py")
             bash = BashCommands()
             bash.execute_command("python3", params)
 
