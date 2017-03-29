@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from restapi.resources.bash import BashCommands
+from restapi.resources.basher import BashCommands
 from ...services.celery import celery_app
 from commons.logs import get_logger
 import os
