@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
+from restapi.resources.bash import BashCommands
 from ...services.celery import celery_app
 from commons.logs import get_logger
 import os
@@ -45,7 +45,10 @@ def import_file(self, path, resource_id):
                         break
                     log.info(line.strip())
 
-            a = 1 / 0
+            params = []
+            params.append("imedia-pipeline-cin/analyze.py")
+            bash = BashCommands()
+            bash.execute_command("python3", params)
 
             # SAVE METADATA
             resource.status = 'COMPLETED'
