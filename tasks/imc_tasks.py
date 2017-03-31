@@ -25,6 +25,7 @@ def import_file(self, path, resource_id):
 
         self.graph = celery_app.get_service('neo4j')
 
+        resource = None
         try:
 
             resource = self.graph.Stage.nodes.get(uuid=resource_id)
@@ -74,9 +75,10 @@ def import_file(self, path, resource_id):
         except Exception as e:
             progress(self, 'Import error', None)
             log.error("Task error, %s" % e)
-            resource.status = 'ERROR'
-            resource.status_message = str(e)
-            resource.save()
+            if resource is not None:
+                resource.status = 'ERROR'
+                resource.status_message = str(e)
+                resource.save()
             raise e
 
         return 1
