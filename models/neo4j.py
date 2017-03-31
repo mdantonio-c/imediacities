@@ -8,7 +8,6 @@ VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
-from __future__ import absolute_import
 from ...neo4j.models import \
     StringProperty, IntegerProperty, FloatProperty, DateTimeProperty, \
     StructuredNode, IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom

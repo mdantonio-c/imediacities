@@ -83,7 +83,7 @@ if [ "$1" != "help" ]; then
     echo "### SELECTED MODE: [$mode]"
     export SELECTED_APP_MODE=$mode
     if [ "$mode" == "production" ]; then
-        services="proxy"
+        services="proxy worker"
     fi
 
     filebase="containers/$mode.yml"
