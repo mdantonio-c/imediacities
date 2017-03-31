@@ -58,7 +58,7 @@ class Videos(GraphBaseOperations):
         exception=Exception, exception_label=None, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    @authentication.authorization_required
+    #@authentication.authorization_required
     # @decorate.apimethod
     def post(self):
         self.initGraph()

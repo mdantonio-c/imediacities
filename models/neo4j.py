@@ -58,6 +58,8 @@ class Stage(TimestampedNode):
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     video = RelationshipFrom('Video', 'VIDEO', cardinality=One)
 
+## Descriptive data model
+
 
 class Video(TimestampedNode):
     title = StringProperty()
