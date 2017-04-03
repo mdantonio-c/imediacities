@@ -15,8 +15,7 @@ logger = get_logger(__name__)
 #####################################
 class Search(GraphBaseOperations):
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def post(self, video_id=None):
 
