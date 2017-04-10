@@ -3,6 +3,8 @@
 from restapi.resources.basher import BashCommands
 from ...services.celery import celery_app
 from commons.logs import get_logger
+from restapi.resources.services.neo4j.graph_endpoints import \
+    GraphBaseOperations
 import os
 #from lxml import etree
 from .services.EFG_XMLParser import EFG_XMLParser
@@ -33,7 +35,7 @@ def import_file(self, path, resource_id):
 
             xml_resource = self.graph.Stage.nodes.get(uuid=resource_id)
 
-            group = self.getSingleLinkedNode(xml_resource.ownership)
+            group = GraphBaseOperations.getSingleLinkedNode(xml_resource.ownership)
 
             # METADATA EXTRACTION
             filename, file_extension = os.path.splitext(path)
