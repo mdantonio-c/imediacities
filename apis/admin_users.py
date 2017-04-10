@@ -38,8 +38,7 @@ class AdminUsers(GraphBaseOperations):
             except self.graph.Role.DoesNotExist:
                 pass
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self, id=None):
 
@@ -53,8 +52,7 @@ class AdminUsers(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
@@ -105,8 +103,7 @@ class AdminUsers(GraphBaseOperations):
 
         return self.force_response(user.uuid)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def put(self, user_id=None):
@@ -156,8 +153,7 @@ class AdminUsers(GraphBaseOperations):
 
         return self.empty_response()
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def delete(self, user_id=None):
@@ -182,8 +178,7 @@ class AdminUsers(GraphBaseOperations):
 
 
 class UserRole(GraphBaseOperations):
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=True)
+    @decorate.catch_error(exception=Exception, catch_generic=True)
     @catch_graph_exceptions
     def get(self, query=None):
 

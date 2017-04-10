@@ -17,8 +17,7 @@ __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 class AdminGroups(GraphBaseOperations):
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self, id=None):
 
@@ -32,8 +31,7 @@ class AdminGroups(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
@@ -82,8 +80,7 @@ class AdminGroups(GraphBaseOperations):
 
         return self.force_response(group.uuid)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def put(self, group_id=None):
@@ -125,8 +122,7 @@ class AdminGroups(GraphBaseOperations):
 
         return self.empty_response()
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def delete(self, group_id=None):
@@ -151,8 +147,7 @@ class AdminGroups(GraphBaseOperations):
 
 
 class UserGroup(GraphBaseOperations):
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self, query=None):
 

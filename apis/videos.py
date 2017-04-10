@@ -15,8 +15,7 @@ logger = get_logger(__name__)
 #####################################
 class Videos(GraphBaseOperations):
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self, video_id=None):
 
@@ -35,8 +34,7 @@ class Videos(GraphBaseOperations):
 
         return self.force_response(data)
 
-    # @decorate.catch_error(
-    #     exception=Exception, exception_label=None, catch_generic=False)
+    # @decorate.catch_error(exception=Exception, catch_generic=False)
     # @catch_graph_exceptions
     # @graph_transactions
     # def post(self, video_id=None):

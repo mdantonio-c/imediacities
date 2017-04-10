@@ -21,8 +21,7 @@ logger = get_logger(__name__)
 #####################################
 class Upload(Uploader, GraphBaseOperations):
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
