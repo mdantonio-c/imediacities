@@ -1,0 +1,11 @@
+videos:
+  summary: Create a new video description
+  description: Simple method to attach descriptive metadata to a previously uploaded video (item).
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Video description successfully created 
+    '401':
+      description: This endpoint requires a valid authorization token 
