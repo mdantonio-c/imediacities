@@ -9,8 +9,8 @@ Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
 from ...neo4j.models import \
-    StringProperty, IntegerProperty, FloatProperty, DateTimeProperty, \
-    StructuredNode, IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
+    StringProperty, ArrayProperty, IntegerProperty, FloatProperty, DateTimeProperty, \
+    StructuredNode, StructuredRel, IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
 from ..neo4j import User as UserBase
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 class User(UserBase):
     # name_surname = StringProperty(required=True, unique_index=True)
 
-    videos = RelationshipFrom('Video', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore)
@@ -56,22 +56,338 @@ class Stage(TimestampedNode):
 
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
-    video = RelationshipFrom('Video', 'VIDEO', cardinality=One)
+    item = RelationshipFrom('Item', 'ITEM', cardinality=One)
 
-## Descriptive data model
+## CREATION: descriptive data model
+##############################################################################
 
-
-class Video(TimestampedNode):
-    title = StringProperty()
-    description = StringProperty()
-    duration = IntegerProperty()
+class Item(TimestampedNode):
+    #title = StringProperty()
+    #description = StringProperty()
+    #duration = IntegerProperty()
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
-    item = RelationshipTo(
-        'Stage', 'ITEM', cardinality=One ,show=True)
+    stage = RelationshipTo(
+        'Stage', 'STAGE', cardinality=One ,show=True)
+    creation = RelationshipTo(
+        'Creation', 'CREATION', cardinality=One, show=True)
     annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
 
-## Annotation data model
+class ContributionRel(StructuredRel):
+    """ 
+    Attributes:
+        activities  One or more film-related activities of the person taken from 
+                    relationship records or from secondary sources.
+    """
+    activities = ArrayProperty(StringProperty(), required=False)
+
+class Creation(IdentifiedNode):
+    """
+    It stores descriptive metadata on IMC objects provided by the archives with the initial ingest.
+    It is an abstraction for both 'audiovisual' and 'non audiovisual' works.
+
+    Attributes:
+        identifiers:        TODO
+        record_sources      List of sources from which the record comes.
+        titles              List of titles. Titles can be a word, phrase or character, naming the work or a group of works, a particular manifestation or an individual item.
+        keywords            Set of vocabulary terms describing the content of a creation.
+        descriptions        Textual descriptions.
+        languages           The languages of the spoken, sung or written content.
+        coverages           The spatial or temporal topics of the creation object.
+        provenance          Organisation which owns or has custody of the item.
+        rights_status       Specifies the copyright status of the digital item.
+        rightholders        Right holders.
+        collection_title    A textual title of the archival collection of which the creation is part.
+        contributors        Agents which are involved in the creation of the objects.
+    """
+    __abstract_node__ = True
+    record_sources = RelationshipTo(
+        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    titles = RelationshipTo(
+        'Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
+    keywords = RelationshipTo(
+        'Keyword', 'HAS_KEYWORD', cardinality=ZeroOrMore, show=True)
+    descriptions = RelationshipTo(
+        'Description', 'HAS_DESCRIPTION', cardinality=OneOrMore, show=True)
+    languages = RelationshipTo(
+        'CreationLanguage', 'LANGUAGE', cardinality=ZeroOrMore, show=True)
+    coverages = RelationshipTo(
+        'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
+    provenance = RelationshipTo(
+        'Group', 'PROVENENCE', cardinality=ZeroOrOne ,show=True) # NOT mandatory????
+    rights_status = StringProperty(required=True) # FIXME controlled vocabulary
+    rightholders = RelationshipTo(
+        'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True) # FIXME: 1..N from specifications???
+    collection_title = StringProperty()
+    contributors = RelationshipTo(
+        'Agent', 'CONTRIBUTED BY', cardinality=ZeroOrMore, show=True, model=ContributionRel)
+    item = RelationshipFrom(
+        'Item', 'ITEM', cardinality=One, show=True)
+
+class Title(StructuredNode):
+    """Wrapper class for title.
+
+    Attributes:
+        text                The textual expression of the title.
+        language            The language of the title.
+        part_designations   TODO
+        relationship        The type of relationship between the title and the entity to which it is assigned (e.g. "Original title", "Distribution title", "Translated title" etc).
+    """
+    TITLE_RELASHIONSHIPS = (
+        ('00', 'unspecified'),
+        ('01', 'original'),
+        ('02', 'working'),
+        ('03', 'former'),
+        ('04', 'distribution'),
+        ('05', 'abbreviated'),
+        ('06', 'translated'),
+        ('07', 'alternative'),
+        ('08', 'explanatory'),
+        ('09', 'uniform'),
+        ('10', 'other')
+    )
+    text         = StringProperty(required=True)
+    language     = StringProperty() # FIXME - controlled vocabulary from ISO-639-1
+    relationship = StringProperty(required=True, choices=TITLE_RELASHIONSHIPS)
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class Keyword(StructuredNode):
+    """A term or set of vocabulary terms describing the content of a creation.
+    This can be keywords or other vocabularies to describe subjects. Controlled
+    and uncontrolled terms can be used together, but not within a single set of
+    terms. Likewise, if more than one controlled vocabulary is used, then terms
+    from each of these must be contained in a separate instance of this element.
+    A separate instance is also required for each language if terms in more than
+    one language are taken from a multilingual vocabulary.
+
+    Attributes:
+        term            The term value. This can be the textual value of the term. For non-textual terms the classification codes, preferably a combination of the code and the verbal class description should be indicated.
+        termID          A non-text identifier that can be combined with the scheme ID from a unique resource identifier for the term within a controlled vocabulary.
+        keyword_type    Type of information described by the keywords.
+        language        The language of the content of each subject.
+        scheme          A unique identifier denoting the controlled vocabulary (preferably URI). If the subject terms are not from a controlled vocabulary, the value of this element should be set to “uncontrolled”.
+    """
+    KEYWORD_TYPES = (
+        ('00', 'building'),
+        ('01', 'person'),
+        ('02', 'subject'),
+        ('03', 'genre'),
+        ('04', 'georeference')
+        # FIXME just an example here
+    )
+    term         = StringProperty(required=True)
+    termID       = IntegerProperty()
+    keyword_type = StringProperty(choices=KEYWORD_TYPES)
+    language     = StringProperty() # FIXME - controlled vocabulary from ISO-639-1
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class Description(StructuredNode):
+    """Wrapper for the description of a creation.
+
+    Attributes:
+        text              Textual descriptions include synopses, plot summaries, reviews, 
+                          transcripts or shot lists. They can occur in more than one language
+                          and they can have statements of authorship or references to external resources.
+        language          The language of the description text.
+        description_type  A keyword denoting the type of description.
+        source            Either the name of the institution, or an URI identifying the source directly 
+                          or via a reference system such as an on-line catalogue.
+    """
+    DESCRIPTION_TYPES = (
+        ('01', 'synopsis'),
+        ('02', 'short list'),
+        ('03', 'review')
+        # FIXME just an example here
+    )
+    text             = StringProperty(required=True)
+    language         = StringProperty() # FIXME - controlled vocabulary from ISO-639-1
+    description_type = StringProperty(choices=DESCRIPTION_TYPES)
+    source           = StringProperty()
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class CreationLanguage(StructuredNode):
+    """The language of the spoken, sung or written content.
+
+    Attributes:
+        value   The language code.
+        usage   This indicates the relationship between the language and the creation.
+    """
+    LANGUAGE_USAGES = (
+        ('01', 'original spoken dialogue'),
+        ('02', 'dubbing'),
+        ('03', 'subtitles'),
+        ('04', 'voice over commentary'),
+        # FIXME just an example here
+    )
+    value = StringProperty(required=True) # FIXME - controlled vocabulary from ISO-639-1
+    usage = StringProperty(choices=LANGUAGE_USAGES)
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class Coverage(StructuredNode):
+    """ The spatial or temporal topic of the creation object.
+
+    Attributes:
+        spatial     This may be a named place, a location, a spatial coordinate, a named 
+                    administrative entity or an URI to a LOD-service.
+        temporal    This may be a period, date or range date.
+    """
+    spatial  = StringProperty()
+    temporal = StringProperty()
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class Rightholder(IdentifiedNode):
+    """ Rightholder.
+
+    Attributes:
+        name    Name of the copyright holder.
+        url     If available, URL to the homepage of the copyright holder.
+    """
+    name = StringProperty(required=True),
+    url  = StringProperty()
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+class Agent(IdentifiedNode):
+    """It refers mostly to agents which are involved in the creation of the objects.
+    
+    Attributes:
+        record_sources      List of sources from which the record comes.
+        agent_type          Defines the type of the Agent (person, corporate body, family etc.).
+        names               Name(s) by which the entity is (or was) known.
+        birth_date          Date of birth ("“"CCYY-MM-DD" or "CCYY").
+        death_date          Date of death ("CCYY-MM-DD" or "CCYY").
+        biographical_note   Short biographical note about a person or organisation.
+        biography_views     Unambiguous URL references to a full biographical entry in an external 
+                            database or on content provider's website.   
+    """
+    AGENT_TYPES = (
+        ('P', 'person'),
+        ('C', 'corporate')
+    )
+    SEXES = (
+        ('M', 'Male'),
+        ('F', 'Female')
+    )
+    # any other identifiers? (from different schemes different from the internal uuid)
+    # identifiers = RelationshipTo(
+    #     'Identifier', 'IS_IDENTIFIED_BY', cardinality=OneOrMore, show=True)
+    record_sources      = RelationshipTo('RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    agent_type          = StringProperty(required=True, choices=AGENT_TYPES)
+    names               = ArrayProperty(StringProperty(), required=True)
+    birth_date          = StringProperty()
+    death_date          = StringProperty()
+    biographical_note   = StringProperty()
+    sex                 = StringProperty(choices=SEXES)
+    biography_views     = ArrayProperty(StringProperty(), required=False)
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=ZeroOrMore, show=True)
+
+
+# class Identifier(StructuredNode):
+#     """Identifier generated by the system (GUID or ID chosen from an external naming schema)."""
+#     IDENTIFIER_SCHEME = (
+#         ('UUID', '')
+#     )
+#     scheme = StringProperty(required=True, choices=IDENTIFIER_SCHEME)
+#     value = StringProperty(required=True)
+
+
+class RecordSource(StructuredNode):
+    """ A reference to the IMC content provider and the local ID.
+
+    Attributes:
+        sourceID        The local identifier of the record. If this does not exist in the content provider´s database the value is “undefined”.
+        provider_name   The name of the archive supplying the record.
+        providerID      An unambiguous reference to the archive supplying the record.
+        provider_scheme Name of the registration scheme encoding the institution name ("ISIL code" or "Institution acronym").
+    """
+    sourceID        = StringProperty(required=True)
+    provider_name   = StringProperty(required=True)
+    providerID      = StringProperty(required=True)
+    provider_scheme = StringProperty(required=True)
+    creation = RelationshipFrom(
+        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+
+
+class AVEntity(Creation):
+    """ The AVEntity is designed to store descripticve metadata on 
+        IMC audiovisual objects provided by the archives with the initial ingest.
+        This entity extends Creation class that wraps common metadata.
+
+    Attributes:
+        identifying_title           A short phrase for identifying the audiovisual creation, 
+                                    to be used e.g. in human-readable result lists from database queries.
+        identifying_title_origin    Acronym or other identifier indicating the origin of the element content.
+        production_countries        The geographic origin of an audiovisual creation. This should be the 
+                                    country or countries where the production facilities are located.
+        production_years            The year or time span associated with the production of the audiovisual 
+                                    creation (e.g. CCYY, CCYY-CCYY).
+        video_format                The description of the physical artefact or digital file on which an
+                                    audiovisual manifestation is fixed.
+        view_filmography            An unambiguous URL reference to the full filmographic entry of a film on 
+                                    the content provider web site.
+    """
+    identifying_title        = StringProperty(required=True)
+    identifying_title_origin = StringProperty()
+    production_countries     = ArrayProperty(StringProperty())
+    production_years         = ArrayProperty(StringProperty(), required=True)
+    video_format             = RelationshipTo('VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
+    view_filmography         = StringProperty()
+
+class VideoFormat(StructuredNode):
+    """ The description of the physical artefact or digital file on which an audiovisual manifestation is fixed.
+
+    Attributes:
+        gauge           The width of the film stock or other carrier (such as magnetic tape) used for the manifestation.
+        aspect_ratio    The ratio between width and height of the image (e.g. "full frame", "cinemascope", "1:1,33").
+        sound           Element from values list.
+        colour          Element from values list.
+    """
+    VIDEO_SOUND = (
+        ('NO_SOUND', 'without sound'),
+        ('WITH_SOUND', 'with sound')
+    )
+    gauge           = StringProperty()
+    aspect_ratio    = StringProperty()
+    sound           = StringProperty(choices=VIDEO_SOUND)
+    colour          = StringProperty()
+    creation        = RelationshipFrom('AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
+
+
+class NonAVEntity(Creation):
+    """ Non-audiovisual objects in IMC can be pictures, photos, correspondence, books, periodicals etc.
+    
+    Attributes:
+        date_created            The point or period of time associated with the creation of the non-audiovisual creation 
+                                (“CCYY-MM-DD”, “CCYY”, CCYY-CCYY). If the production year is unknown, the term “unknown” 
+                                should be added to indicate that research regarding the production time has been unsuccessful.
+        non_av_entity_type      The general type of the non-audiovisual manifestation (“image” or “text”).
+        specific_type           This element further specifies the type of the non-audiovisual entity.
+        phisical_format_size    The dimensions of the physical object.
+        colour                  This element can be used to indicate the colour of a non-audiovisual object (e.g. "black and white", "colour", "mixed").
+    """
+    NON_AV_ENTITY_TYPES = (
+        ('01', 'image'),
+        ('02', 'text')
+    )
+    NON_AV_ENTITY_SPECIFIC_TYPES = (
+        ('01', 'photograph'),
+        ('02', 'poster'),
+        ('03', 'letter')
+    ) # FIXME just an example here: Based on the values of IMC content providers
+    date_created = ArrayProperty(StringProperty(), required=True)
+    non_av_entity_type = StringProperty(required=True, choices=NON_AV_ENTITY_TYPES)
+    specific_type = StringProperty(required=True, choices=NON_AV_ENTITY_SPECIFIC_TYPES)
+    phisical_format_size = StringProperty()
+    colour = StringProperty() # FIXME controlled terms
+
+## ANNOTATION
+##############################################################################
 
 #class Annotation(IdentifiedNode):
 #    key = StringProperty(required=True)
@@ -91,14 +407,14 @@ class Annotation(IdentifiedNode):
         ('VIS', 'Google Vision API'),
         ('AWS', 'Amazon Rekognition API')
     )
-    type = StringProperty(required=True, choices=ANNOTATION_TYPES)
-    creation_datetime = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
-    source = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
-    creator = RelationshipTo(
-        'User', 'IS_CREATED_BY', cardinality=ZeroOrOne)
-    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
-    bodies = RelationshipTo('AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
-    targets = RelationshipTo('AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
+    type                = StringProperty(required=True, choices=ANNOTATION_TYPES)
+    creation_datetime   = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    source              = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
+    creator             = RelationshipTo(
+                            'User', 'IS_CREATED_BY', cardinality=ZeroOrOne)
+    generator           = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
+    bodies              = RelationshipTo('AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
+    targets             = RelationshipTo('AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
 
 class AnnotationBody(StructuredNode):
     __abstract_node__ = True
