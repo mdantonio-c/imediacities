@@ -202,7 +202,7 @@
 	The search input
 --------------------------*/
 
-.bar{
+/*.bar{
 	background-color:#5c9bb7;
 
 	background-image:-webkit-linear-gradient(top, #5c9bb7, #5392ad);
@@ -215,6 +215,19 @@
 	padding: 8px;
 	margin: 45px auto 20px;
 	position:relative;
+}*/
+
+.bar {
+    background-color: #fffff;
+    background-image: nonoe;
+    background-image: -moz-linear-gradient(top, #5c9bb7, #5392ad);
+    background-image: linear-gradient(top, #5c9bb7, #5392ad);
+    box-shadow: 0 0px 0px #fff;
+    border-radius: 0px;
+    width: 400px;
+    padding: 8px;
+    margin: 45px auto 20px;
+    position: relative;
 }
 
 .bar input{
