@@ -5,15 +5,16 @@ Upload a file
 """
 
 import os
-from commons.logs import get_logger
-from .. import decorators as decorate
-from commons import htmlcodes as hcodes
 from flask_restful import request
-from ..services.uploader import Uploader
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
+
+from rapydo import decorators as decorate
+from rapydo.utils.logs import get_logger
+from rapydo.utils import htmlcodes as hcodes
+from rapydo.services.uploader import Uploader
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import returnError
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
 
 logger = get_logger(__name__)
 

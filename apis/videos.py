@@ -4,15 +4,14 @@
 Handle your video metadata
 """
 
-from commons.logs import get_logger
-from .. import decorators as decorate
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import myGraphError
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons import htmlcodes as hcodes
-# from commons.services.uuid import getUUID
+from rapydo.utils.logs import get_logger
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import myGraphError
+from rapydo.services.neo4j.graph_endpoints import returnError
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.utils import htmlcodes as hcodes
 
 logger = get_logger(__name__)
 
@@ -21,10 +20,10 @@ logger = get_logger(__name__)
 class Videos(GraphBaseOperations):
 
     """
-    Get a video if its id is passed as an argument. Else return all videos in the repository.
+    Get a video if its id is passed as an argument.
+    Else return all videos in the repository.
     """
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self, video_id=None):
         logger.debug("getting video id: %s", video_id)
@@ -41,7 +40,7 @@ class Videos(GraphBaseOperations):
                     self,
                     label="Invalid request",
                     error="Please specify a valid video id",
-                    code=hcodes.HTTP_BAD_NOTFOUND)  
+                    code=hcodes.HTTP_BAD_NOTFOUND)
             videos = [v]
         else:
             videos = self.graph.Video.nodes.all()
@@ -55,12 +54,9 @@ class Videos(GraphBaseOperations):
     """
     Create a new video description.
     """
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     @graph_transactions
-    #@authentication.authorization_required
-    # @decorate.apimethod
     def post(self):
         self.initGraph()
 
@@ -74,15 +70,14 @@ class Videos(GraphBaseOperations):
 
         try:
             data = request.get_json(force=True)
-        except:
+        except BaseException:
             data = {}
 
         logger.critical(data)
 
         return self.empty_response()
 
-    # @decorate.catch_error(
-    #     exception=Exception, exception_label=None, catch_generic=False)
+    # @decorate.catch_error(exception=Exception, catch_generic=False)
     # @catch_graph_exceptions
     # @graph_transactions
     # def post(self, video_id=None):

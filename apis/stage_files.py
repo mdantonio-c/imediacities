@@ -4,13 +4,14 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from commons.logs import get_logger
-from .. import decorators as decorate
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons.tasks.custom.imc_tasks import import_file
-from commons import htmlcodes as hcodes
+from rapydo.utils.logs import get_logger
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import returnError
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.utils import htmlcodes as hcodes
+
+from flask_ext.flask_celery import CeleryExt
 
 log = get_logger(__name__)
 
@@ -150,7 +151,7 @@ class Stage(GraphBaseOperations):
             resource.ownership.connect(group)
             log.debug("Resource created for %s" % path)
 
-        task = import_file.apply_async(
+        task = CeleryExt.import_file.apply_async(
             args=[path, resource.uuid],
             countdown=20
         )

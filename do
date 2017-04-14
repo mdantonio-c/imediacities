@@ -19,7 +19,7 @@ frontend_repo="frontend"
 # backend_git="https://github.com/mdantonio/http-api-base"
 backend_git="https://github.com/EUDAT-B2STAGE/http-api-base"
 frontend_git="https://github.com/mdantonio/angularjs-on-flask"
-services="$backend_container $fronted_container"
+services="$backend_container $fronted_container worker"
 submodule_tracking="submodules.current.commit"
 
 export VOLUMES_PREFIX=$volume_prefix
@@ -68,7 +68,7 @@ if [ "$1" != "help" ]; then
     echo "### SELECTED MODE: [$mode]"
     export SELECTED_APP_MODE=$mode
     if [ "$mode" == "production" ]; then
-        services="proxy"
+        services="proxy worker"
     fi
 
     filebase="containers/$mode.yml"

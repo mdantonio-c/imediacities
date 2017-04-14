@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from restapi.resources.basher import BashCommands
-from ...services.celery import celery_app
-from commons.logs import get_logger
-from restapi.resources.services.neo4j.graph_endpoints import \
-    GraphBaseOperations
 import os
-#from lxml import etree
-from .services.EFG_XMLParser import EFG_XMLParser
+# from lxml import etree
 import xml.etree.ElementTree as ET
+
+from rapydo.basher import BashCommands
+from rapydo.utils.logs import get_logger
+from rapydo.resources.services.neo4j.graph_endpoints import \
+    GraphBaseOperations
+from imc.tasks.services.EFG_XMLParser import EFG_XMLParser
+
+from flask_ext.flask_celery import CeleryExt
+
+celery_app = CeleryExt.celery_app
 
 log = get_logger(__name__)
 

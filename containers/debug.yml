@@ -19,6 +19,12 @@ backend:
     GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
     GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
+    CELERY_ENABLE: 1
+    CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+    CELERY_BROKER: ${CELERY_BROKER}
+    CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+    CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+
   ports:
     - 8081:5000
 
@@ -43,11 +49,33 @@ worker:
     - gdb:gdb
     - rabbit:queue
   volumes:
+    - ..:/code/${COMPOSE_PROJECT_NAME}
     - ../imediastuff:/uploads
     - ../imedia-pipeline:/imedia-pipeline
     - ../imedia-pipeline-cin:/imedia-pipeline-cin
   environment:
-    BACKEND_AUTH_SERVICE: graphdb
+    APP_MODE: debug
+    DEBUG_LEVEL: VERBOSE
+    VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
+
+    # base the user/role mechanism on some database
+    AUTH_ENABLE: 1
+    # putting this here because it should not be configurable in .env
+    AUTH_SERVICE: neo4j
+
+    # # neo connection
+    GRAPHDB_ENABLE: 1
+    GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+    GRAPHDB_HOST: ${GRAPHDB_HOST}
+    GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+    GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+    CELERY_ENABLE: 1
+    CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+    CELERY_BROKER: ${CELERY_BROKER}
+    CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+    CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+    
 
 gdb:
   # command: sleep 9999999

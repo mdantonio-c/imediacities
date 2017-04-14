@@ -24,11 +24,51 @@ backend:
     GRAPHDB_HOST: ${GRAPHDB_HOST}
     GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
     GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+    CELERY_ENABLE: 1
+    CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+    CELERY_BROKER: ${CELERY_BROKER}
+    CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+    CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
   links:
     - gdb:gdb
     - rabbit:queue
     - swagger:swagger
     - ftp:ftp
+
+worker:
+  # command: sleep infinity
+  build: ../builds/celery
+  links:
+    - gdb:gdb
+    - rabbit:queue
+  volumes:
+    - ..:/code/${COMPOSE_PROJECT_NAME}
+    - ../imediastuff:/uploads
+    - ../imedia-pipeline:/imedia-pipeline
+    - ../imedia-pipeline-cin:/imedia-pipeline-cin
+  environment:
+    APP_MODE: production
+    DEBUG_LEVEL: INFO
+    VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
+
+    # base the user/role mechanism on some database
+    AUTH_ENABLE: 1
+    # putting this here because it should not be configurable in .env
+    AUTH_SERVICE: neo4j
+
+    # # neo connection
+    GRAPHDB_ENABLE: 1
+    GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+    GRAPHDB_HOST: ${GRAPHDB_HOST}
+    GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+    GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+    CELERY_ENABLE: 1
+    CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+    CELERY_BROKER: ${CELERY_BROKER}
+    CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+    CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
 proxy:
   volumes:
@@ -41,19 +81,6 @@ proxy:
   ports:
     - 80:80
     - 443:443
-
-worker:
-  # command: sleep infinity
-  build: ../builds/celery
-  links:
-    - gdb:gdb
-    - rabbit:queue
-  volumes:
-    - ../imediastuff:/uploads
-    - ../imedia-pipeline:/imedia-pipeline
-    - ../imedia-pipeline-cin:/imedia-pipeline-cin
-  environment:
-    BACKEND_AUTH_SERVICE: graphdb
 
 
 gdb:

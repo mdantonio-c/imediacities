@@ -2,17 +2,17 @@
 
 import random
 import string
-from .. import decorators as decorate
 
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import myGraphError
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons import htmlcodes as hcodes
-from restapi.resources.services.authentication import BaseAuthentication
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import myGraphError
+from rapydo.services.neo4j.graph_endpoints import returnError
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.resources.services.authentication import BaseAuthentication
+from rapydo.utils import htmlcodes as hcodes
 
-from commons.logs import get_logger
+from rapydo.utils.logs import get_logger
 logger = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
