@@ -2,6 +2,7 @@ pip
 
 attrs
 beeprint
+better_exceptions
 bravado-core
 celery
 Flask
@@ -14,6 +15,7 @@ httpie
 ipython
 neomodel
 plumbum
+PyJWT
 requests
 swagger-spec-validator
 urllib3

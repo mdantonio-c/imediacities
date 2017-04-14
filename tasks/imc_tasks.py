@@ -6,8 +6,7 @@ import xml.etree.ElementTree as ET
 
 from rapydo.basher import BashCommands
 from rapydo.utils.logs import get_logger
-from rapydo.resources.services.neo4j.graph_endpoints import \
-    GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
 from imc.tasks.services.EFG_XMLParser import EFG_XMLParser
 
 from flask_ext.flask_celery import CeleryExt

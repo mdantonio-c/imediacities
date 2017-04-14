@@ -9,7 +9,7 @@ from rapydo.services.neo4j.graph_endpoints import myGraphError
 from rapydo.services.neo4j.graph_endpoints import returnError
 from rapydo.services.neo4j.graph_endpoints import graph_transactions
 from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
-from rapydo.resources.services.authentication import BaseAuthentication
+from rapydo.services.authentication import BaseAuthentication
 from rapydo.utils import htmlcodes as hcodes
 
 from rapydo.utils.logs import get_logger
