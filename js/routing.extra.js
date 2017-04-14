@@ -1,47 +1,69 @@
 (function() {
 'use strict';
 
-angular.module('web').constant('customRoutes',
- {
-// JUST A TEST
-// Note: this will automatically check api online as not subchild of 'logged'
-    'test': {
-        url: "/test",
-        views: {
-            "main": {
-                dir: 'blueprint',
-                // OR
-                //dir: 'base',
-                templateUrl: 'test.html',
-            }
-        }
-    },
-///////////////
-// LOGGED TEST
-// Note: this will automatically check auth since is subchild of 'logged'
-    'logged.test': {
-        url: "/yes",
-        views: {
-            "loggedview": {
-                dir: 'blueprint',
-                templateUrl: 'test.html',
-            }
-        }
-    },
-    'logged.test.sub': {
-        url: "/:id",
-        views: {
+loggedLandingPage = "logged.search";
 
-// ADD SUBVIEW IN PARENT AND USE IT
-            "sub": {
-// OVERWRITING A PARENT VIEW
-            //"loggedview@logged": {
+angular.module('web').constant('customRoutes',
+{
+    'logged.search': {
+        url: "/search",
+        views: {
+            "loggedview@logged": {
                 dir: 'blueprint',
-                templateUrl: 'sub.html',
+                templateUrl: 'search.html',
+            }
+        }
+    },
+    'logged.upload': {
+        url: "/upload",
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'upload.html',
+            }
+        }
+    },
+
+    'logged.admin': {
+        url: "/admin",
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'admin.html'
+            }
+        }
+    },
+
+    'logged.admin.users': {
+        url: "/users",
+        views: {
+            "admin@logged.admin": {
+                dir: 'blueprint',
+                templateUrl: 'admin.users.html'
+            }
+        }
+    },
+
+    'logged.admin.groups': {
+        url: "/groups",
+        views: {
+            "admin@logged.admin": {
+                dir: 'blueprint',
+                templateUrl: 'admin.groups.html'
+            }
+        }
+    },
+
+    'logged.admin.queue': {
+        url: "/queue",
+        views: {
+            "admin@logged.admin": {
+                dir: 'base',
+                templateUrl: 'admin.queue.html'
             }
         }
     }
-///////////////
- });
+
+});
 
 })();

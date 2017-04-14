@@ -1,53 +1,47 @@
----
 project:
-  title: My project
-  description: Title of my project
+    title: "iMediaCities Repository"
+    description": "..."
+tags:
+    file: "All endpoints to handle files"
+    admin: "Operations only allowed for admin users"
+    miscellaneous: "Endpoints not classified in other specific sections"
 variables:
-    js:
-        # index_state_name: "welcome"
-        # index_template": "welcome.html"
-        load_timeout": "800"
 
-    python: 
-        backend: 
-            credentials: 
+    js:
+        load_timeout: "800"
+
+    python:
+        backend:
+            credentials:
                 username: "user@nomail.org"
                 password: "test"
                 roles:
-                  user: normal_user
-                  internal: staff_user
-                  admin: admin_root
-                  default: normal_user
-    containers: 
+                    user: "normal_user"
+                    internal: "staff_user"
+                    admin: "admin_root"
+                    default: "normal_user"
+    containers:
         users:
             backend: "root"
             # backend: "irods"
+
         authentication:
             service: "neo4j"
-            # service: "relationaldb"
             username: "user@nomail.org"
             password: "test"
 
         authentication_service: "neo4j"
 
-        # services:
-        #     relationaldb:
-        #         remove_data_at_init_time: "false"
-        #     neo4j:
-        #         password: "chooseapassword"
+bower_components:
+    ng-flow:
+        - "dist/ng-flow-standalone.min.js"
+    angular-tablesort:
+        - js/angular-tablesort.js
+        - tablesort.css
+    ngmap:
+        - build/scripts/ng-map.min.js
+    angular-google-chart:
+        - "ng-google-chart.min.js"
 
-        # external_services:
-        #     irods:
-        #         host: "irods.host.com"
-        #         port: "1247"
-        #         username: "irods_user"
-        #         password: "irods_pwd"
-
-    # bower_components:
-    #     lib-name:
-    #         - file.js
-    #         - file.css
-    # css:
-    #     - file
-    # js:
-    #     - file
+css: 
+    - "custom/imc/search.css"
