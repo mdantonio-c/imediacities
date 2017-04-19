@@ -4,13 +4,14 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from commons.logs import get_logger
-from .. import decorators as decorate
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons.tasks.custom.imc_tasks import import_file
-from commons import htmlcodes as hcodes
+from rapydo.utils.logs import get_logger
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.exceptions import RestApiException
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.utils import htmlcodes as hcodes
+
+from flask_ext.flask_celery import CeleryExt
 
 log = get_logger(__name__)
 
@@ -46,7 +47,7 @@ class Stage(GraphBaseOperations):
 
         return "unknown"
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def get(self):
 
@@ -55,11 +56,9 @@ class Stage(GraphBaseOperations):
         group = self.getSingleLinkedNode(self._current_user.belongs_to)
 
         if group is None:
-            return returnError(
-                self,
-                label="Invalid request",
-                error="No group defined for this user",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "No group defined for this user",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
@@ -96,7 +95,7 @@ class Stage(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def post(self):
 
@@ -105,38 +104,30 @@ class Stage(GraphBaseOperations):
         group = self.getSingleLinkedNode(self._current_user.belongs_to)
 
         if group is None:
-            return returnError(
-                self,
-                label="Invalid request",
-                error="No group defined for this user",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "No group defined for this user",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            return returnError(
-                self,
-                label="Error",
-                error="Upload dir not found",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Upload dir not found",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         input_parameters = self.get_input()
 
         if 'filename' not in input_parameters:
-            return returnError(
-                self,
-                label="Missing parameter",
-                error="Filename not found",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Filename not found",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            return returnError(
-                self,
-                label="File not found",
-                error="%s" % filename,
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "File not found: %s" % filename,
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         properties = {}
         properties['filename'] = filename
@@ -150,7 +141,7 @@ class Stage(GraphBaseOperations):
             resource.ownership.connect(group)
             log.debug("Resource created for %s" % path)
 
-        task = import_file.apply_async(
+        task = CeleryExt.import_file.apply_async(
             args=[path, resource.uuid],
             countdown=20
         )
@@ -161,7 +152,7 @@ class Stage(GraphBaseOperations):
 
         return self.force_response(task.id)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def delete(self):
 
@@ -170,38 +161,30 @@ class Stage(GraphBaseOperations):
         group = self.getSingleLinkedNode(self._current_user.belongs_to)
 
         if group is None:
-            return returnError(
-                self,
-                label="Invalid request",
-                error="No group defined for this user",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "No group defined for this user",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            return returnError(
-                self,
-                label="Error",
-                error="Upload dir not found",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Upload dir not found",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         input_parameters = self.get_input()
 
         if 'filename' not in input_parameters:
-            return returnError(
-                self,
-                label="Missing parameter",
-                error="Filename not found",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Filename not found",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            return returnError(
-                self,
-                label="File not found",
-                error="%s" % filename,
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "File not found: %s" % filename,
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         os.remove(path)
         return self.empty_response()

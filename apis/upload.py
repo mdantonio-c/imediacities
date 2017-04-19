@@ -5,15 +5,16 @@ Upload a file
 """
 
 import os
-from commons.logs import get_logger
-from .. import decorators as decorate
-from commons import htmlcodes as hcodes
 from flask_restful import request
-from ..services.uploader import Uploader
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
+
+from rapydo import decorators as decorate
+from rapydo.utils.logs import get_logger
+from rapydo.utils import htmlcodes as hcodes
+from rapydo.services.uploader import Uploader
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.exceptions import RestApiException
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
 
 logger = get_logger(__name__)
 
@@ -21,7 +22,7 @@ logger = get_logger(__name__)
 #####################################
 class Upload(Uploader, GraphBaseOperations):
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
@@ -31,11 +32,9 @@ class Upload(Uploader, GraphBaseOperations):
         group = self.getSingleLinkedNode(self._current_user.belongs_to)
 
         if group is None:
-            return returnError(
-                self,
-                label="Invalid request",
-                error="No group defined for this user",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "No group defined for this user",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
@@ -52,7 +51,6 @@ class Upload(Uploader, GraphBaseOperations):
             overwrite=True
         )
 
-# TO FIX: upload should creare a temporary file and only at the end rename to the real name? 
         # if chunk_number == chunk_total:
 
         #     properties = {}

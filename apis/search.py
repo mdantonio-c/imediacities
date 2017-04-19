@@ -4,10 +4,10 @@
 An endpoint example
 """
 
-from commons.logs import get_logger
-from .. import decorators as decorate
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.utils.logs import get_logger
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
 
 logger = get_logger(__name__)
 
@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 #####################################
 class Search(GraphBaseOperations):
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def post(self, video_id=None):
 

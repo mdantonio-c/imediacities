@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from .. import decorators as decorate
+from rapydo import decorators as decorate
 
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import myGraphError
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons import htmlcodes as hcodes
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.exceptions import RestApiException
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.utils import htmlcodes as hcodes
 
-from commons.logs import get_logger
+from rapydo.utils.logs import get_logger
 logger = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
@@ -17,7 +16,7 @@ __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 class AdminGroups(GraphBaseOperations):
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, id=None):
 
@@ -31,7 +30,7 @@ class AdminGroups(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
@@ -40,7 +39,7 @@ class AdminGroups(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            raise myGraphError(
+            raise RestApiException(
                 'Empty input',
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
@@ -64,14 +63,14 @@ class AdminGroups(GraphBaseOperations):
         properties = self.read_properties(schema, v)
 
         if 'coordinator' not in v:
-            raise myGraphError(
+            raise RestApiException(
                 'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         coordinator = self.getNode(
             self.graph.User, v['coordinator'], field='uuid')
 
         if coordinator is None:
-            raise myGraphError(
+            raise RestApiException(
                 'User not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         # GRAPH #
@@ -80,18 +79,16 @@ class AdminGroups(GraphBaseOperations):
 
         return self.force_response(group.uuid)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def put(self, group_id=None):
 
         if group_id is None:
 
-            return returnError(
-                self,
-                label="Invalid request",
-                error="Please specify a group id",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Please specify a group id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
         self.initGraph()
@@ -100,7 +97,7 @@ class AdminGroups(GraphBaseOperations):
 
         group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
-            raise myGraphError("Group not found")
+            raise RestApiException("Group not found")
 
         self.update_properties(group, schema, v)
         group.save()
@@ -122,24 +119,22 @@ class AdminGroups(GraphBaseOperations):
 
         return self.empty_response()
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def delete(self, group_id=None):
 
         if group_id is None:
 
-            return returnError(
-                self,
-                label="Invalid request",
-                error="Please specify a group id",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Please specify a group id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         self.initGraph()
 
         group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
-            raise myGraphError("Group not found")
+            raise RestApiException("Group not found")
 
         group.delete()
 
@@ -147,7 +142,8 @@ class AdminGroups(GraphBaseOperations):
 
 
 class UserGroup(GraphBaseOperations):
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+
+    @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, query=None):
 

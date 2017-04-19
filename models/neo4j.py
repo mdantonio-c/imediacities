@@ -8,17 +8,19 @@ VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
-from ...neo4j.models import \
-    StringProperty, ArrayProperty, IntegerProperty, FloatProperty, DateTimeProperty, \
-    StructuredNode, StructuredRel, IdentifiedNode, TimestampedNode, RelationshipTo, RelationshipFrom
+from rapydo.services.neo4j.models import (
+    StringProperty, ArrayProperty, IntegerProperty,
+    FloatProperty, DateTimeProperty,
+    StructuredNode, StructuredRel, IdentifiedNode,
+    TimestampedNode, RelationshipTo, RelationshipFrom,
+)
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
-from ..neo4j import User as UserBase
+from rapydo.models.neo4j import User as UserBase
 
 import logging
 
-logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+log = logging.getLogger(__name__)
 
 
 ##############################################################################

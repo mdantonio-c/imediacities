@@ -1,29 +1,120 @@
-
 backend:
   user: root
-  command: init
-  # command: sleep infinity
+  # command: httpapi
+  command: python run.py
+  volumes:
+    - ..:/code/${COMPOSE_PROJECT_NAME}
+    - ../imediastuff:/uploads
+    - ../containers/wsgi:/tmp/uwsgi
+    - ../containers/nginx_internal:/etc/nginx/conf.d
   environment:
+    - APP_MODE=production
+    - DEBUG_LEVEL=INFO
+    - VANILLA_PACKAGE=${COMPOSE_PROJECT_NAME}
     - UWSGI_MASTER=/tmp/uwsgi/starter.ini
     - NGINX_ACTIVE=true
-  volumes:
-    - ../containers/wsgi:/tmp/uwsgi
-    # - nginx_empty_sites:/etc/nginx/sites-enabled
-    - ../containers/nginx_internal:/etc/nginx/conf.d
-    # - ./app:/code
 
-frontend:
-  # command: sleep infinity
+    # base the user/role mechanism on some database
+    - AUTH_ENABLE=1
+    # putting this here because it should not be configurable in .env
+    - AUTH_SERVICE=neo4j
+
+    # # neo connection
+    - GRAPHDB_ENABLE=1
+    - GRAPHDB_EXTERNAL=${GRAPHDB_EXTERNAL}
+    - GRAPHDB_HOST=${GRAPHDB_HOST}
+    - GRAPHDB_PORT=${GRAPHDB_BOLT_PORT}
+    - GRAPHDB_PASSWORD=${GRAPHDB_PASSWORD}
+ 
+    - CELERY_ENABLE=1
+    - CELERY_EXTERNAL=${CELERY_EXTERNAL}
+    - CELERY_BROKER=${CELERY_BROKER}
+    - CELERY_BROKER_HOST=${CELERY_BROKER_HOST}
+    - CELERY_BROKER_PORT=${CELERY_BROKER_PORT}
   links:
-    - backend:myapi
+    - gdb:gdb
+    - rabbit:queue
+    - swagger:swagger
+    - ftp:ftp
+
+worker:
+  # command: sleep infinity
+  build: ../builds/celery
+  links:
+    - gdb:gdb
+    - rabbit:queue
+  volumes:
+    - ..:/code/${COMPOSE_PROJECT_NAME}
+    - ../imediastuff:/uploads
+    - ../imedia-pipeline:/imedia-pipeline
+    - ../imedia-pipeline-cin:/imedia-pipeline-cin
+  environment:
+    APP_MODE: production
+    DEBUG_LEVEL: INFO
+    VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
+
+    # base the user/role mechanism on some database
+    AUTH_ENABLE: 1
+    # putting this here because it should not be configurable in .env
+    AUTH_SERVICE: neo4j
+
+    # # neo connection
+    GRAPHDB_ENABLE: 1
+    GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+    GRAPHDB_HOST: ${GRAPHDB_HOST}
+    GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+    GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+    CELERY_ENABLE: 1
+    CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+    CELERY_BROKER: ${CELERY_BROKER}
+    CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+    CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
 proxy:
   volumes:
     - letsencrypt_certs:/etc/letsencrypt
     - ssl_dhparam:/etc/nginx/ssl/
+    - ../assets/imc:/data/frontend/felask/static/assets
   links:
     - backend:api
     - frontend:html
   ports:
     - 80:80
     - 443:443
+
+
+gdb:
+  ports:
+  - 9090:7474
+  - 7687:7687
+  # VERY TEMP... TO AVOID VOLUME RENAMING; NOT YET SUPPORTED
+  volumes:
+    - rapydo_imediacity_graphdata:/data
+  # environment:
+    # NEO4J_dbms_memory_pagecache_size: 2048M
+    # NEO4J_dbms_memory_heap_maxSize: 4096M
+    # NEO4J_dbms_allowFormatMigration: "true"
+
+ftp:
+  image: stilliard/pure-ftpd:latest
+  ports:
+    - "21:21"
+    - 30000:30000
+    - 30001:30001
+    - 30002:30002
+    - 30003:30003
+    - 30004:30004
+    - 30005:30005
+    - 30006:30006
+    - 30007:30007
+    - 30008:30008
+    - 30009:30009
+  volumes:
+    - ${VOLUMES_PREFIX}_pureftpd:/etc/pure-ftpd/passwd
+    - ../imediastuff:/home/ftpusers/
+# /etc/ssl/private/ A directory containing a single pure-ftpd.pem file
+# with the server's SSL certificates for TLS support. Optional TLS is
+# automatically enabled when the container finds this file on startup.
+  environment:
+    PUBLICHOST: localhost

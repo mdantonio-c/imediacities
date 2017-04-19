@@ -2,17 +2,16 @@
 
 import random
 import string
-from .. import decorators as decorate
 
-from ..services.neo4j.graph_endpoints import GraphBaseOperations
-from ..services.neo4j.graph_endpoints import myGraphError
-from ..services.neo4j.graph_endpoints import returnError
-from ..services.neo4j.graph_endpoints import graph_transactions
-from ..services.neo4j.graph_endpoints import catch_graph_exceptions
-from commons import htmlcodes as hcodes
-from restapi.resources.services.authentication import BaseAuthentication
+from rapydo import decorators as decorate
+from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from rapydo.exceptions import RestApiException
+from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from rapydo.services.authentication import BaseAuthentication
+from rapydo.utils import htmlcodes as hcodes
 
-from commons.logs import get_logger
+from rapydo.utils.logs import get_logger
 logger = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
@@ -38,7 +37,7 @@ class AdminUsers(GraphBaseOperations):
             except self.graph.Role.DoesNotExist:
                 pass
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, id=None):
 
@@ -52,7 +51,7 @@ class AdminUsers(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
@@ -61,7 +60,7 @@ class AdminUsers(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            raise myGraphError(
+            raise RestApiException(
                 'Empty input',
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
@@ -72,7 +71,7 @@ class AdminUsers(GraphBaseOperations):
         groups = self.parseAutocomplete(v, 'group', id_key='id')
 
         if groups is None:
-            raise myGraphError(
+            raise RestApiException(
                 'Group not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         group_id = groups.pop()
@@ -80,7 +79,7 @@ class AdminUsers(GraphBaseOperations):
         group = self.getNode(self.graph.Group, group_id, field='uuid')
 
         if group is None:
-            raise myGraphError(
+            raise RestApiException(
                 'Group not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
         rand = random.SystemRandom()
@@ -103,18 +102,16 @@ class AdminUsers(GraphBaseOperations):
 
         return self.force_response(user.uuid)
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def put(self, user_id=None):
 
         if user_id is None:
 
-            return returnError(
-                self,
-                label="Invalid request",
-                error="Please specify a user id",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Please specify a user id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
         self.initGraph()
@@ -123,7 +120,7 @@ class AdminUsers(GraphBaseOperations):
 
         user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
-            raise myGraphError("User not found")
+            raise RestApiException("User not found")
 
         if "password" in v and v["password"] == "":
             del v["password"]
@@ -153,24 +150,22 @@ class AdminUsers(GraphBaseOperations):
 
         return self.empty_response()
 
-    @decorate.catch_error(exception=Exception, catch_generic=False)
+    @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def delete(self, user_id=None):
 
         if user_id is None:
 
-            return returnError(
-                self,
-                label="Invalid request",
-                error="Please specify a user id",
-                code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                "Please specify a user id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         self.initGraph()
 
         user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
-            raise myGraphError(self.USER_NOT_FOUND)
+            raise RestApiException(self.USER_NOT_FOUND)
 
         user.delete()
 
