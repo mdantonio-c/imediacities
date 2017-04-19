@@ -1,0 +1,97 @@
+<efgEntity>
+     <avcreation>
+          <avManifestation>
+               <identifier scheme="CP_CATEGORY_ID">FN_avManifestation_71e4d1e6-b606-4721-aca7-2bdfb4934aca</identifier>
+               <recordSource>
+                    <sourceID>71e4d1e6-b606-4721-aca7-2bdfb4934aca</sourceID>
+                    <provider schemeID="Institution acronym" id="FN">Filmoteka Narodowa</provider>
+               </recordSource>
+               <relPublicationEvent>
+                    <identifier scheme="CP_CATEGORY_ID">FN_publicationEvent_414e55bc5300ee04e90d1cc8966ddb36</identifier>
+                    <name>Public Release</name>
+               </relPublicationEvent>
+               <coverage>
+                    <spatial>Bologna</spatial>
+               </coverage>
+               <rightsHolder>Cineteca</rightsHolder>
+               <rightsStatus>In Copyright</rightsStatus>
+               <format>
+                    <colour hasColor="false">Black &amp; White</colour>
+                    <digital>
+                         <container>video/mpg4</container>
+                         <originalstatus>Digitised</originalstatus>
+                    </digital>
+                    <aspectRatio>4:3</aspectRatio>
+                    <sound hasSound="no">Without sound</sound>
+               </format>
+               <item>
+                    <identifier scheme="CP_CATEGORY_ID">CINETECA_item_1</identifier>
+                    <provider>Cineteca</provider>
+                    <type>Video</type>
+                    <aggregator>Digital Repository della Cineteca Nazionale</aggregator>
+                    <fileFormat>video/mpg4</fileFormat>
+<!--
+                    <isShownAt>http://repozytorium.fn.org.pl/?q=node/8198</isShownAt>
+                    <isShownBy>http://repozytorium.fn.org.pl/sites/default/files/video/PL71e4d1e6-b606-4721-aca7-2bdfb4934aca/2.mp4</isShownBy>
+-->
+               </item>
+               <!-- <thumbnail>http://repozytorium.fn.org.pl/sites/default/files/video/PL71e4d1e6-b606-4721-aca7-2bdfb4934aca/8254_KEYFRAMES_00_00_25_15.jpg</thumbnail> -->
+               <duration frameRate="25">0:02:13</duration>
+               <title lang="PL">
+                    <geographicScope />
+                    <text>PAT MF.27 02</text>
+                    <relation>Archive title</relation>
+                    <partDesignation>
+                         <unit>Part</unit>
+                         <value>02</value>
+                    </partDesignation>
+               </title>
+          </avManifestation>
+          <identifier scheme="CP_CATEGORY_ID">FN_avCreation_71e4d1e6-b606-4721-aca7-2bdfb4934aca</identifier>
+          <recordSource>
+               <sourceID>71e4d1e6-b606-4721-aca7-2bdfb4934aca</sourceID>
+               <provider schemeID="Institution acronym" id="FN">Filmoteka Narodowa</provider>
+          </recordSource>
+          <relCollection>
+               <identifier scheme="CP_CATEGORY_ID">FN_collection_a997eb307c9ac1172f7d915e259d12a5</identifier>
+               <title>Przedwojenne kroniki filmowe Polskiej Agencji Telegraficznej</title>
+               <type>is part of</type>
+          </relCollection>
+          <keywords type="Place" lang="IT">
+               <term>Bologna</term>
+          </keywords>
+          <keywords type="Subject" lang="IT">
+               <term>1938</term>
+          </keywords>
+          <keywords type="Subject" lang="IT">
+               <term>vita quotidiana</term>
+          </keywords>
+          <keywords type="Subject" lang="IT">
+               <term>folclore</term>
+          </keywords>
+          <countryOfReference reference="Country of Production">IT</countryOfReference>
+          <keywords type="Form" lang="EN">
+               <term>Newsreel</term>
+          </keywords>
+          <title lang="IT">
+               <geographicScope />
+               <text>Bologna monumentale</text>
+               <relation>Archive title</relation>
+          </title>
+          <keywords type="Subject" lang="IT">
+               <term>monumenti a Bologna</term>
+          </keywords>
+          <productionYear>1938</productionYear>
+          <keywords type="Genre" lang="IT">
+               <term>documentario</term>
+          </keywords>
+          <description type="Broadcast commentary" lang="IT" source="Cineteca">Scene di vita quotidiana nella Bologna di inizio secolo</description>
+          <description type="Synopsis" lang="IT" source="Cineteca">Porte storiche. Piazza Maggiore. Canali.</description>
+          <keywords type="Subject" lang="IT">
+               <term>carrozze</term>
+          </keywords>
+          <keywords type="Subject" lang="IT">
+               <term>piazza Maggiore</term>
+          </keywords>
+     </avcreation>
+</efgEntity>

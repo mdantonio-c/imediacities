@@ -1,0 +1,30 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+videos:
+  summary: List of videos
+  # description: -
+  responses:
+    '200':
+      description: List of videos successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+
+video:
+  summary: Gets information about a video
+  # description: -
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Video information successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token

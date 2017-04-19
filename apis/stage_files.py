@@ -46,8 +46,7 @@ class Stage(GraphBaseOperations):
 
         return "unknown"
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def get(self):
 
@@ -97,8 +96,7 @@ class Stage(GraphBaseOperations):
 
         return self.force_response(data)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def post(self):
 
@@ -163,8 +161,7 @@ class Stage(GraphBaseOperations):
 
         return self.force_response(task.id)
 
-    @decorate.catch_error(
-        exception=Exception, exception_label=None, catch_generic=False)
+    @decorate.catch_error(exception=Exception, catch_generic=False)
     @catch_graph_exceptions
     def delete(self):
 
