@@ -44,6 +44,11 @@
 	padding-left: 10px;
 }
 
+#summary-graph {
+        height: 80px;
+        padding-left: 10px;
+}
+
 #timeline-graph {
 	height: 100%;
 	padding-left: 10px;

@@ -132,6 +132,40 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 function loadSampleVideos() {
 	var videos = [
 		{
+                        "id": "1",
+                        "title": "Bologna Ieri e Oggi",
+                        "duration": "433",
+                        "movieurl": "http://130.186.13.19/static/assets/videos/BolognaIeriEOggi.mp4",
+                        "moviesposter": "http://www.cinetecadibologna.it/imageserver/lightboxenlarge/files/festival/CinemaRitrovato/2012/1912/Bologna.jpg",
+                        "year": "1921",
+                        "description": "Dopo aver fatto il giro del mondo torniamo nel nostro paese, cento anni fa. ‘Un paese antico, moderno, anzi pittoresco’: nel 1911 viene fondata a Milano la società cinematografica Panorami Italici, costituita, come da statuto, per realizzare e promuovere “cinematografie delle bellezze italiane all’estero”. Nel 1912 l’Ambrosio inaugura la serie Bellezze italiche che si impegna a filmare gli scorci più suggestivi del paesaggio italiano. Le riproduzioni filmate delle meraviglie naturali, delle rovine storiche, delle città monumentali italiane sono particolarmente apprezzate dagli spettatori stranieri che possono godere di un Grand Tour virtuale a basso costo. ",
+                        "locname": "Bologna",
+                        "location": [
+                                {"lat": "44.5019603", "lng": "11.2855505"}
+                        ],
+                        "frames": [
+                                {"mainchar": "100-200"},
+                                {"outside": "300-400"}
+                        ]
+                },
+                {
+                        "id": "2",
+                        "title": "L'Italia negli anni 60",
+                        "duration": "414",
+                        "movieurl": "http://130.186.13.19/static/assets/videos/ItaliaAnni60.mp4",
+                        "moviesposter": "http://www.panoramio.com/photos/original/7143296.jpg",
+                        "year": "1960",
+                        "description": "Documentario sull'Italia negli anni del boom economico, con immagini di repertorio dell'epoca...",
+                        "locname": "Italy",
+                        "location":[
+                                {"lat": "44.7", "lng": "12.9"}
+                        ],
+                        "frames": [
+                                {"mainchar": "50-80"},
+                                {"outside": "200-300"}
+                        ]
+                }
+		/*{
 			"id": "1",
 			"title": "Happy Feet",
 			"duration": "82",
@@ -181,7 +215,7 @@ function loadSampleVideos() {
 				{"mainchar": "30-40"},
 				{"outside": "5-10"}
 			]
-		}];
+		}*/];
 	return videos;
 }
 
