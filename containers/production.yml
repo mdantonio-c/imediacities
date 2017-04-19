@@ -1,6 +1,6 @@
 backend:
   user: root
-  command: init
+  command: httpapi
   volumes:
     - ..:/code/${COMPOSE_PROJECT_NAME}
     - ../imediastuff:/uploads
