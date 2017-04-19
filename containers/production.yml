@@ -1,6 +1,7 @@
 backend:
   user: root
-  command: httpapi
+  # command: httpapi
+  command: python run.py
   volumes:
     - ..:/code/${COMPOSE_PROJECT_NAME}
     - ../imediastuff:/uploads
