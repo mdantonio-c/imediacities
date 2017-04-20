@@ -104,19 +104,11 @@ swagger:
     - 7777:80
 
 ftp:
-  image: stilliard/pure-ftpd:latest
+  # image: stilliard/pure-ftpd:latest
+  build: ../builds/ftp
   ports:
     - "21:21"
-    - 30000:30000
-    - 30001:30001
-    - 30002:30002
-    - 30003:30003
-    - 30004:30004
-    - 30005:30005
-    - 30006:30006
-    - 30007:30007
-    - 30008:30008
-    - 30009:30009
+    - "30000-30019:30000-30019"
   volumes:
     - ${VOLUMES_PREFIX}_pureftpd:/etc/pure-ftpd/passwd
     - ../imediastuff:/home/ftpusers/
