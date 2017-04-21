@@ -3,6 +3,7 @@ backend:
     - ..:/code/${COMPOSE_PROJECT_NAME}
     - ../imediastuff:/uploads
   environment:
+    FLASK_DEBUG: 1
     APP_MODE: debug
     DEBUG_LEVEL: VERBOSE
     VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
