@@ -134,8 +134,8 @@
       <th ts-criteria="name">Filename</th>
       <th ts-criteria="type">Type</th>
       <th ts-criteria="size | parseInt">Size</th>
-      <th ts-criteria="creation | parseInt">Created</th>
-      <th ts-criteria="modification | parseInt">Modified</th>
+      <th ts-criteria="creation | parseInt">Uploaded</th>
+      <!-- <th ts-criteria="modification | parseInt">Modified</th> -->
       <th ts-criteria="status">Status</th>
       <th></th>
     </tr>
@@ -167,11 +167,11 @@
         </span>
       </td>
 
-      <td>
+<!--       <td>
         <span uib-tooltip='{{data.modification | unix_date}}'>
           {{data.modification | moment_unix: 'fromNow'}}
         </span>
-      </td>
+      </td> -->
 
 
       <td ng-if='data.status_message'>
