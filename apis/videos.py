@@ -123,6 +123,7 @@ class Videos(GraphBaseOperations):
 
     #     return self.force_response(video.id)
 
+
 class VideoAnnotations(GraphBaseOperations):
     """
         Get all video annotations for a given video.
@@ -152,12 +153,11 @@ class VideoAnnotations(GraphBaseOperations):
                 self,
                 label="Invalid request",
                 error="Please specify a valid video id",
-                code=hcodes.HTTP_BAD_NOTFOUND)  
+                code=hcodes.HTTP_BAD_NOTFOUND)
 
         # video = self.graph.Video.nodes.get(uuid=video_id)
         # if video is None:
         #     raise myGraphError("Video not found")
 
-        # TODO 
-
+        # TODO
         return self.force_response(data)
