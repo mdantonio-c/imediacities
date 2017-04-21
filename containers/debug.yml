@@ -118,3 +118,4 @@ ftp:
 # automatically enabled when the container finds this file on startup.
   environment:
     PUBLICHOST: localhost
+    ADDED_FLAGS: -d -d
