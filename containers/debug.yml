@@ -105,17 +105,10 @@ swagger:
     - 7777:80
 
 ftp:
-  # image: stilliard/pure-ftpd:latest
-  build: ../builds/ftp
   ports:
     - "21:21"
     - "30000-30019:30000-30019"
   volumes:
-    - ${VOLUMES_PREFIX}_pureftpd:/etc/pure-ftpd/passwd
     - ../imediastuff:/home/ftpusers/
-# /etc/ssl/private/ A directory containing a single pure-ftpd.pem file
-# with the server's SSL certificates for TLS support. Optional TLS is
-# automatically enabled when the container finds this file on startup.
   environment:
     PUBLICHOST: localhost
-    ADDED_FLAGS: -d -d
