@@ -120,5 +120,5 @@ ftp:
 # with the server's SSL certificates for TLS support. Optional TLS is
 # automatically enabled when the container finds this file on startup.
   environment:
-    PUBLICHOST: localhost
+    PUBLICHOST: ${PROJECT_DOMAIN}
     ADDED_FLAGS: -d -d
