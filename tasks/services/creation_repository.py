@@ -1,5 +1,5 @@
 
-from commons.logs import get_logger
+from rapydo.utils.logs import get_logger
 
 log = get_logger(__name__)
 
