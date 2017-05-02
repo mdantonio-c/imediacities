@@ -114,7 +114,7 @@ class Item(TimestampedNode):
     meta_source = RelationshipTo(
         'Stage', 'META_SOURCE', cardinality=One, show=True)
     creation = RelationshipTo(
-        'Creation', 'CREATION', cardinality=One, show=True)
+        'Creation', 'CREATION', cardinality=ZeroOrOne, show=True)
     annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
 
 
@@ -154,7 +154,8 @@ class Creation(IdentifiedNode):
         contributors        Agents which are involved in the creation of the
                             objects.
     """
-    __abstract_node__ = True
+    # __abstract_node__ = True
+    __label__ = 'AVEntity:NonAVEntity'
     record_sources = RelationshipTo(
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     titles = RelationshipTo(

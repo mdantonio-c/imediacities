@@ -119,25 +119,25 @@ def import_file(self, path, resource_id):
                     self, path, video_filename, item_node)
 
                 # EXECUTE AUTOMATC TOOLS
-                progress(self, 'Executing automatic tools', path)
-                params = []
-                params.append("/imedia-pipeline-cin/analyze.py")
-                params.append(video_filename)
-                bash = BashCommands()
-                try:
-                    output = bash.execute_command(
-                        "python3",
-                        params,
-                        parseException=True
-                    )
-                    log.info(output)
+                # progress(self, 'Executing automatic tools', path)
+                # params = []
+                # params.append("/imedia-pipeline-cin/analyze.py")
+                # params.append(video_filename)
+                # bash = BashCommands()
+                # try:
+                #     output = bash.execute_command(
+                #         "python3",
+                #         params,
+                #         parseException=True
+                #     )
+                #     log.info(output)
 
-                except BaseException as e:
-                    log.error(e)
-                    video_node.status = 'ERROR'
-                    video_node.status_message = str(e)
-                    video_node.save()
-                    raise(e)
+                # except BaseException as e:
+                #     log.error(e)
+                #     video_node.status = 'ERROR'
+                #     video_node.status_message = str(e)
+                #     video_node.save()
+                #     raise(e)
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
@@ -229,6 +229,17 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     # Creating AV_Entity
     av_creation = parser.parse_av_creation(record)
     repo = CreationRepository(self.graph)
+    # check if a creation already exists and delete it
+    # creation_node = item_node.creation.single()
+    # if creation_node:
+    creation_node = item_node.creation.single()
+    if creation_node:
+        log.debug("Creation already exists for current Item")
+        creation_id = creation_node.id
+        repo.delete_av_entity(item_node.creation.single())
+        log.info(
+            "Existing creation [ID:%s] deleted" % creation_id)
+
     repo.create_av_entity(
         av_creation['properties'],
         item_node,

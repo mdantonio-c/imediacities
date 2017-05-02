@@ -18,7 +18,7 @@ class CreationRepository():
 
         av_entity_node = self.graph.AVEntity(**properties).save()
         # connect to item
-        av_entity_node.item.connect(item)
+        item.creation.connect(av_entity_node)
         # connect to tiles
         for title in titles:
             title_node = self.create_title(title)
@@ -34,13 +34,31 @@ class CreationRepository():
 
         return av_entity_node
 
+    def delete_av_entity(self, node):
+        for title in node.titles.all():
+            self.delete_title(title)
+        for description in node.descriptions.all():
+            self.delete_description(description)
+        for keyword in node.keywords.all():
+            self.delete_keyword(keyword)
+        node.delete()
+
     def create_title(self, properties):
         # FIXME
         properties['relationship'] = '00'
         return self.graph.Title(**properties).save()
 
+    def delete_title(self, node):
+        node.delete()
+
     def create_keyword(self, properties):
         return self.graph.Keyword(**properties).save()
 
+    def delete_keyword(self, node):
+        node.delete()
+
     def create_description(self, properties):
         return self.graph.Description(**properties).save()
+
+    def delete_description(self, node):
+        node.delete()
