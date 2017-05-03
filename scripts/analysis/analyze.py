@@ -24,6 +24,7 @@ idmt_scripts = root_dir + '/imedia-pipeline/scripts'
 idmt_py      = root_dir + '/imedia-pipeline/scripts/idmt'
 
 default_movie    = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
+default_movie    = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
 default_filename = os.path.join( stage_area, default_movie )
 
 #-----------------------------------------------------
@@ -156,11 +157,16 @@ def tvs(filename, out_folder):
     prg_filename = os.path.join( idmt_bin,   'idmtvideoanalysis' )
     out_filename = os.path.join( out_folder, 'tvs.xml')
     cmd_filename = os.path.join( out_folder, 'tvs.sh' )
+    sht_filename = os.path.join( out_folder, 'tvs_s_%05d.jpg' )
+    key_filename = os.path.join( out_folder, 'tvs_k_%05d.jpg' )
 
     f = open( cmd_filename, 'w' )
+    f.write( 'export LC_ALL="en_US.UTF-8"\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
+    f.write( '-s ' +sht_filename+ ' \\\n' )
+    f.write( '-k ' +key_filename+ ' \\\n' ) 
     f.write( '-t tvs \n' )
     f.close()
 
@@ -174,8 +180,10 @@ def quality(filename, out_folder):
     prg_filename = os.path.join( idmt_bin,   'idmtvideoanalysis' )
     out_filename = os.path.join( out_folder, 'quality.xml')
     cmd_filename = os.path.join( out_folder, 'quality.sh' )
+       
 
     f = open( cmd_filename, 'w' )
+    f.write( 'export LC_ALL="en_US.UTF-8"\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
@@ -194,10 +202,11 @@ def vimotion(filename, out_folder):
     cmd_filename = os.path.join( out_folder, 'vimotion.sh' )
 
     f = open( cmd_filename, 'w' )
+    f.write( 'export LC_ALL="en_US.UTF-8"\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
-    f.write( '-s 0.2 \\\n' )
+    f.write( '-c 0.1 \\\n' )
     f.write( '-t vimotion \n' )
     f.close()
 
@@ -214,6 +223,7 @@ def summary(filename, out_folder):
     cmd_filename = os.path.join( out_folder,   'summary.sh' )
 
     f = open( cmd_filename, 'w' )
+    f.write( 'export LC_ALL="en_US.UTF-8"\\\n')
     f.write( 'export IDMT_PY='+idmt_py+'\n' )
     f.write( 'export PYTHONPATH=$IDMT_PY:$PYTHONPATH\n' )
     f.write( '/usr/bin/python3 ' +scr_filename+ ' \\\n' )
@@ -244,7 +254,7 @@ def analize( filename ):
         return False
     print( 'origin_tech_info --- ok ')
 
-    if host == 'imc_vm': # TODO: Restore
+    if False and host == 'imc_vm': # TODO: Restore
         print( 'transcode ---------- begin ')
         if not transcode( filename, out_folder ) :
             return False
@@ -256,7 +266,6 @@ def analize( filename ):
     if not transcoded_tech_info( tr_movie, out_folder ) :
         return False
     print( 'transcoded_info ---- ok ')
-
 
     print( 'tvs ---------------- begin ')
     if not tvs( tr_movie, out_folder ) :
