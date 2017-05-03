@@ -1,0 +1,11 @@
+
+search:
+  summary: Search video files previously staged in the area
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: File successfully retrieved 
+    '401':
+      description: This endpoint requires a valid authorization token 
