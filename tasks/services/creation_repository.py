@@ -1,5 +1,6 @@
 
 from rapydo.utils.logs import get_logger
+from neomodel import db
 
 log = get_logger(__name__)
 
@@ -10,6 +11,7 @@ class CreationRepository():
     def __init__(self, graph):
         self.graph = graph
 
+    @db.transaction
     def create_av_entity(
             self, properties, item, titles, keywords, descriptions):
 
@@ -34,6 +36,7 @@ class CreationRepository():
 
         return av_entity_node
 
+    @db.transaction
     def delete_av_entity(self, node):
         for title in node.titles.all():
             self.delete_title(title)
