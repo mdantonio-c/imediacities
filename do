@@ -11,7 +11,7 @@ source .env
 
 compose_com="docker-compose"
 webbuild="bower"
-volume_prefix="rapydo_${COMPOSE_PROJECT_NAME}"
+volume_prefix="${COMPOSE_PROJECT_NAME}"
 fronted_container="frontend"
 backend_container="backend"
 backend_repo="backend"
@@ -21,8 +21,6 @@ backend_git="https://github.com/EUDAT-B2STAGE/http-api-base"
 frontend_git="https://github.com/mdantonio/angularjs-on-flask"
 services="$backend_container $fronted_container worker"
 submodule_tracking="submodules.current.commit"
-
-export VOLUMES_PREFIX=$volume_prefix
 
 #############################
 echo "# ############################################ #"
