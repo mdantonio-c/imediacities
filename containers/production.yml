@@ -133,6 +133,10 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
+  # swagger:
+  #   ports:
+  #     - 7777:80
+
   ftp:
     ports:
       - "21:21"
