@@ -17,23 +17,24 @@ class Search(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    def post(self, video_id=None):
+    def post(self, term=None):
 
         self.initGraph()
         data = []
 
-        if video_id is not None:
-            v = self.graph.Video.nodes.get(id=video_id)
+        if term is not None:
+            v = self.graph.AVEntity.nodes.get(
+                identifying_title__contains=term)
             videos = [v]
         else:
-            videos = self.graph.Video.nodes.all()
+            videos = self.graph.AVEntity.nodes.all()
 
         for v in videos:
 
             video = {}
-            video["title"] = v.title
-            video["description"] = v.description
-            video["duration"] = v.duration
+            video["title"] = v.identifying_title
+            video["description"] = ''
+            video["production_years"] = v.production_years
             data.append(video)
 
         return self.force_response(data)
