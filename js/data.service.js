@@ -11,8 +11,9 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall("schemas/"+endpoint, 'GET');
     }
 
-    // self.searchVideos = function() {
-    //     return api.apiCall('search', 'POST');    }
+    self.searchVideos = function() {
+        return api.apiCall('search', 'POST');
+    }
 
     self.getStageFiles = function() {
         return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));

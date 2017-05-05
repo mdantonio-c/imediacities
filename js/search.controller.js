@@ -33,7 +33,7 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 {
 	var self = this;
 
-	/*self.videos = []
+	self.videos = []
 
 	self.loading = true;
 	DataService.searchVideos().then(
@@ -47,8 +47,8 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 			self.studyCount = 0;
 
             noty.extractErrors(out_data, noty.ERROR);
-		});*/
-	self.videos = loadSampleVideos();
+		});
+	//self.videos = loadSampleVideos();
 
 	self.selectedVideo = false;
 	self.setectedVideoId = -1;
@@ -129,7 +129,7 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 
 }
 
-function loadSampleVideos() {
+/*function loadSampleVideos() {
 	var videos = [
 		{
                         "id": "1",
@@ -215,8 +215,8 @@ function loadSampleVideos() {
 				{"mainchar": "30-40"},
 				{"outside": "5-10"}
 			]
-		}*/];
+		}];
 	return videos;
-}
+}*/
 
 })();

@@ -40,11 +40,9 @@
 			<div class="row">
 				<video id="videoarea" ng-src="{{ctrl.video.movieurl | trustUrl }}" controls></video>
 			</div>
-                        <div class="row">
-                                <div id="summary-graph">
-                                        <img ng-src="static/assets/images/summary.jpg">
-                                </div>
-                        </div>
+            <!-- <div class="row">
+                    add summary image
+            </div> -->
 			<div class="row">
 				<div id="timeline-graph">
 					<div google-chart chart="videoTimeline" agc-on-select="jumpToShot(selectedItem)" style="{{videoTimeline.cssStyle}}"/>
@@ -78,7 +76,7 @@
 									<p>{{v.description}}</p>
 								</div>
 								<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-									<p><b>Year</b>: {{v.year}}</p>
+									<p><b>Production Year(s)</b>: {{v.production_years}}</p>
 									<p><b>Location</b>: {{v.locname}}</p>
 									<p><b>Segmentation</b>:
 									<span style="display:block; padding-left: 0.8em;">
