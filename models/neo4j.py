@@ -240,11 +240,13 @@ class Keyword(StructuredNode):
                         be set to "uncontrolled".
     """
     KEYWORD_TYPES = (
-        ('00', 'building'),
-        ('01', 'person'),
-        ('02', 'subject'),
-        ('03', 'genre'),
-        ('04', 'georeference')
+        ('00', 'Building'),
+        ('01', 'Person'),
+        ('02', 'Subject'),
+        ('03', 'Genre'),
+        ('04', 'Place'),
+        ('05', 'Form'),
+        ('06', 'Georeference')
         # FIXME just an example here
     )
     term = StringProperty(required=True)
