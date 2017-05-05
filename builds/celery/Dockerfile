@@ -56,26 +56,6 @@ RUN useradd -r -M -d $CERTDIR/home -s /bin/bash -p ! $APIUSER
 ###################
 # Closing entrypoint
 
-RUN mkdir -p /code
-WORKDIR /code
-RUN mkdir /docker-entrypoint.d/
-RUN echo "Entrylevel" && \
-    echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
-    echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
-    >> /root/.bashrc
-
-COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
-ENTRYPOINT ["docker-entrypoint"]
-CMD ["rest"]
-ENV PAGER less
-ENV TERM=xterm-256color
-ENV PYTHONIOENCODING="utf-8"
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-# Flask port
-EXPOSE 5000
-
 
 ##################################
 # FROM Fraunhofer
@@ -95,7 +75,35 @@ COPY ./test_python_installation.py /
 RUN python3 /test_python_installation.py
 ##################################
 
+
+RUN mkdir -p /code
+WORKDIR /code
+RUN mkdir /docker-entrypoint.d/
 RUN echo "Entrylevel" && \
     echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
     echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
     >> /root/.bashrc
+
+# Run Celery as developer
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A flask_ext.flask_celery.worker.celery_app '" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
+
+RUN echo "Entrylevel" && \
+    echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
+    echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
+    >> /root/.bashrc
+
+ENV PAGER less
+ENV TERM=xterm-256color
+ENV PYTHONIOENCODING="utf-8"
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["mycelery"]
+
+# Flask port
+EXPOSE 5000
+
+
