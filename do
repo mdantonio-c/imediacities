@@ -194,6 +194,7 @@ if [ "$1" == "init" ]; then
 
     cd imedia-pipeline/tools/ 
     tag=`git tag | grep tools | tail -1`
+    echo "Selected tag: $tag"
     git checkout $tag
 
     echo "Please provide the Fraunhofer password"
