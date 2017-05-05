@@ -28,10 +28,42 @@ app.filter('searchFor', function() {
 	};
 });
 
+app.directive('scrollOnClick', function() {
+  return {
+    restrict: 'A',
+    link: function($scope, $elm) {
+      $elm.on('click', function() {
+        $(".scrollmenu").animate({scrollLeft: $elm.offset().left}, "slow");
+      });
+    }
+  }
+});
+
+function getElement(event) {
+	return angular.element(event.srcElement || event.target);
+}
+
 // The controller
 function SearchController($scope, $log, $document, DataService, noty, NgMap)
 {
 	var self = this;
+
+	/*filling the scrolling bar with the image shots*/
+	$scope.items = [];
+  	for (var i=1; i<9; i++) { $scope.items.push(i); }
+
+	/*$scope.overMouseEvent = function(event) {
+
+	var elm = getElement(event);
+
+        switch (event.type) {
+          case "mouseover":
+			$(".scrollmenu").animate({scrollLeft: elm.offset().left}, "slow");
+	  default:
+			break;
+        	}
+    	}*/
+	/*---*/
 
 	/*self.videos = []
 
