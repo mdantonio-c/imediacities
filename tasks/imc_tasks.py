@@ -119,25 +119,31 @@ def import_file(self, path, resource_id):
                     self, path, video_filename, item_node)
 
                 # EXECUTE AUTOMATC TOOLS
-                progress(self, 'Executing automatic tools', path)
-                params = []
-                params.append("/code/imc/scripts/analysis/analyze.py")
-                params.append(video_path)
-                bash = BashCommands()
-                try:
-                    output = bash.execute_command(
-                        "python3",
-                        params,
-                        parseException=True
-                    )
-                    log.info(output)
+                analyze_path = '/uploads/Analize/' + \
+                    group.uuid + '/' + video_filename.split('.')[0]
+                log.debug('analyze path: {0}'.format(analyze_path))
+                if os.path.exists(analyze_path):
+                    log.info('analyze skipped: previously done!')
+                else:
+                    progress(self, 'Executing automatic tools', path)
+                    params = []
+                    params.append("/code/imc/scripts/analysis/analyze.py")
+                    params.append(video_path)
+                    bash = BashCommands()
+                    try:
+                        output = bash.execute_command(
+                            "python3",
+                            params,
+                            parseException=True
+                        )
+                        log.info(output)
 
-                except BaseException as e:
-                    log.error(e)
-                    video_node.status = 'ERROR'
-                    video_node.status_message = str(e)
-                    video_node.save()
-                    raise(e)
+                    except BaseException as e:
+                        log.error(e)
+                        video_node.status = 'ERROR'
+                        video_node.status_message = str(e)
+                        video_node.save()
+                        raise(e)
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
