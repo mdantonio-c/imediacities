@@ -14,17 +14,24 @@ else:
 if host=='sil_pc':    
     root_dir = '/home/simboden/Desktop/IMC/DEVEL'
 else:
-    root_dir = '/home/ubuntu/imediacities'
+    #root_dir = '/home/ubuntu/imediacities'
+    root_dir = '/'
 
-stage_area   = root_dir + '/imediastuff'
-analize_area = root_dir + '/imediastuff/Analize' 
-idmt_bin     = root_dir + '/imedia-pipeline/tools'
-#idmt_libs    = root_dir + '/imedia-pipeline-cin/idmt/lib'
-idmt_scripts = root_dir + '/imedia-pipeline/scripts'
-idmt_py      = root_dir + '/imedia-pipeline/scripts/idmt'
+#stage_area   = root_dir + '/imediastuff'
+#analize_area = root_dir + '/imediastuff/Analize' 
+#idmt_bin     = root_dir + '/imedia-pipeline/tools'
+#idmt_scripts = root_dir + '/imedia-pipeline/scripts'
+#idmt_py      = root_dir + '/imedia-pipeline/scripts/idmt'
 
-default_movie    = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
-default_movie    = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
+stage_area   = root_dir + 'uploads'
+analize_area = root_dir + 'uploads/Analize' 
+idmt_bin     = root_dir + 'code/imc/imedia-pipeline/tools'
+idmt_scripts = root_dir + 'code/imc/imedia-pipeline/scripts'
+idmt_py      = root_dir + 'code/imc/imedia-pipeline/scripts/idmt'
+
+#default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
+#default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
+default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
 default_filename = os.path.join( stage_area, default_movie )
 
 #-----------------------------------------------------
@@ -161,7 +168,8 @@ def tvs(filename, out_folder):
     key_filename = os.path.join( out_folder, 'tvs_k_%05d.jpg' )
 
     f = open( cmd_filename, 'w' )
-    f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    #f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    f.write( 'export LC_ALL=\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
@@ -183,7 +191,9 @@ def quality(filename, out_folder):
        
 
     f = open( cmd_filename, 'w' )
-    f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    #f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    f.write( 'export LC_ALL=\n')
+    f.write( 'export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH\n\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
@@ -202,7 +212,9 @@ def vimotion(filename, out_folder):
     cmd_filename = os.path.join( out_folder, 'vimotion.sh' )
 
     f = open( cmd_filename, 'w' )
-    f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    #f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    f.write( 'export LC_ALL=\n')
+    f.write( 'export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH\n\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )
@@ -223,7 +235,9 @@ def summary(filename, out_folder):
     cmd_filename = os.path.join( out_folder,   'summary.sh' )
 
     f = open( cmd_filename, 'w' )
-    f.write( 'export LC_ALL="en_US.UTF-8"\\\n')
+    #f.write( 'export LC_ALL="en_US.UTF-8"\n')
+    f.write( 'export LC_ALL=\n')
+    f.write( 'export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH\n\n')
     f.write( 'export IDMT_PY='+idmt_py+'\n' )
     f.write( 'export PYTHONPATH=$IDMT_PY:$PYTHONPATH\n' )
     f.write( '/usr/bin/python3 ' +scr_filename+ ' \\\n' )
@@ -254,19 +268,17 @@ def analize( filename ):
         return False
     print( 'origin_tech_info --- ok ')
 
-    if False and host == 'imc_vm': # TODO: Restore
-        print( 'transcode ---------- begin ')
-        if not transcode( filename, out_folder ) :
-            return False
-        print( 'transcode ---------- ok ')
-
+    print( 'transcode ---------- begin ')
+    if not transcode( filename, out_folder ) :
+        return False
+    print( 'transcode ---------- ok ')
     tr_movie = os.path.join( out_folder, 'transcoded.mp4' )        
 
     print( 'transcoded_info ---- begin ')
     if not transcoded_tech_info( tr_movie, out_folder ) :
         return False
     print( 'transcoded_info ---- ok ')
-
+    
     print( 'tvs ---------------- begin ')
     if not tvs( tr_movie, out_folder ) :
         return False
