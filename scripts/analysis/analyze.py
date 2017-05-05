@@ -170,6 +170,7 @@ def tvs(filename, out_folder):
     f = open( cmd_filename, 'w' )
     #f.write( 'export LC_ALL="en_US.UTF-8"\n')
     f.write( 'export LC_ALL=\n')
+    f.write( 'export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH\n\n')
     f.write( prg_filename+' \\\n' )
     f.write( '-f '+filename+   ' \\\n' )
     f.write( '-o ' +out_filename+ ' \\\n' )

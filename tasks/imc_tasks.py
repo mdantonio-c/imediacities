@@ -119,25 +119,25 @@ def import_file(self, path, resource_id):
                     self, path, video_filename, item_node)
 
                 # EXECUTE AUTOMATC TOOLS
-                # progress(self, 'Executing automatic tools', path)
-                # params = []
-                # params.append("/imedia-pipeline-cin/analyze.py")
-                # params.append(video_filename)
-                # bash = BashCommands()
-                # try:
-                #     output = bash.execute_command(
-                #         "python3",
-                #         params,
-                #         parseException=True
-                #     )
-                #     log.info(output)
+                progress(self, 'Executing automatic tools', path)
+                params = []
+                params.append("/code/imc/scripts/analysis/analyze.py")
+                params.append(video_path)
+                bash = BashCommands()
+                try:
+                    output = bash.execute_command(
+                        "python3",
+                        params,
+                        parseException=True
+                    )
+                    log.info(output)
 
-                # except BaseException as e:
-                #     log.error(e)
-                #     video_node.status = 'ERROR'
-                #     video_node.status_message = str(e)
-                #     video_node.save()
-                #     raise(e)
+                except BaseException as e:
+                    log.error(e)
+                    video_node.status = 'ERROR'
+                    video_node.status_message = str(e)
+                    video_node.save()
+                    raise(e)
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
