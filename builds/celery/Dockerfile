@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     # Fraunhofer libraries
     python3 \
     ffmpeg \
+    libavcodec-extra \
     libv4l-0 \
     ##################################
     # latest python
@@ -70,6 +71,8 @@ CMD ["rest"]
 ENV PAGER less
 ENV TERM=xterm-256color
 ENV PYTHONIOENCODING="utf-8"
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
 # Flask port
 EXPOSE 5000
 
