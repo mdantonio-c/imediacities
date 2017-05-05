@@ -71,7 +71,7 @@ for f in `ls $dedir`; do
 done
 
 # Completed
-echo "REST API backend server is ready"
+echo "Worker is ready"
 sleep infinity
 # sleep 10000d
 # whoami

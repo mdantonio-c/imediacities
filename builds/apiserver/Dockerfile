@@ -79,6 +79,9 @@ RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; flask ru
 RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; FLASK_DEBUG=0 ./manage.py init'" > /usr/local/bin/initialize && chmod +x /usr/local/bin/initialize
 RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; FLASK_DEBUG=0 ./manage.py destroy'" > /usr/local/bin/demolition && chmod +x /usr/local/bin/demolition
 
+# Run Celery as developer
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A flask_ext.flask_celery.worker.celery_app '" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
+
 ######################
 # instructions
 RUN echo "Entrylevel" && \
@@ -95,4 +98,4 @@ WORKDIR /code
 RUN mkdir /docker-entrypoint.d/
 COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["rest"]
+CMD ["mycelery"]
