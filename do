@@ -181,10 +181,13 @@ if [ "$1" == "init" ]; then
     echo "**********************************"
     echo "* INSTALLING FRAUNHOFER SOFTWARE *"
     echo "**********************************"
-    if [ ! -d "imedia-pipeline" ]; then
-        echo "Clone imedia-pipeline repository, please provide your CINECA gitlab credentials"
-        git clone https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline.git
-    fi
+
+    echo "Removing previous installation, if any"
+    rm -rf imedia-pipeline
+
+    echo "Cloning imedia-pipeline repository, please provide your CINECA gitlab credentials"
+    git clone https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline.git
+
     cd imedia-pipeline/tools/ 
     tag=`git tag | grep tools | tail -1`
     git checkout $tag
