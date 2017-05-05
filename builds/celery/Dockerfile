@@ -49,31 +49,24 @@ RUN pip3 install --upgrade \
     --force-reinstall --no-cache-dir -r requirements.txt
 
 ###################
-# TODO: decide about a main user recipe for containers
 ENV APIUSER developer
 # main user for launching the apis
 RUN useradd -r -M -d $CERTDIR/home -s /bin/bash -p ! $APIUSER
 ###################
-# Closing entrypoint
 
 
 ##################################
 # FROM Fraunhofer
 # download and install pre-compiled python opencv wrapper
-# Fraunhofer version:
 ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
-# Mattia version:
-# ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/local/lib/python3.6/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so 
-##################################
-
-
-##################################
-# FROM Fraunhofer
 # copy test script
-COPY ./test_python_installation.py /
+# COPY ./test_python_installation.py /
 # run the test script - if that fails, something went wrong
-RUN python3 /test_python_installation.py
+# RUN python3 /test_python_installation.py
 ##################################
+
+RUN export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH
+
 
 
 RUN mkdir -p /code
