@@ -88,8 +88,9 @@ services:
     volumes:
       - ..:/code/${COMPOSE_PROJECT_NAME}
       - ../imediastuff:/uploads
-      - ../imedia-pipeline:/imedia-pipeline
-      - ../imedia-pipeline-cin:/imedia-pipeline-cin
+      # - ../imedia-pipeline:/imedia-pipeline
+      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
+      - /opt/idmt:/opt/idmt
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE

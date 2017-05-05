@@ -170,13 +170,30 @@ if [ "$1" == "init" ]; then
         git clone $backend_git $backend_repo
     fi
     if [ ! -d "$frontend_repo" ]; then
-        echo "Clone frontned"
+        echo "Clone frontend"
         git clone $frontend_git $frontend_repo
     fi
 
     echo "Build bower packages (Javascript libraries)"
     $bcom
-    echo "Completed"
+
+
+    echo "**********************************"
+    echo "* INSTALLING FRAUNHOFER SOFTWARE *"
+    echo "**********************************"
+    if [ ! -d "imedia-pipeline" ]; then
+        echo "Clone imedia-pipeline repository, please provide your CINECA gitlab credentials"
+        git clone https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline.git
+    fi
+    cd imedia-pipeline/tools/ 
+    tag=`git tag | grep tools | tail -1`
+    git checkout $tag
+
+    echo "Please provide the Fraunhofer password"
+    read -s fraunhofer_password
+    sudo ./setup_idmt_tools.sh -m install -p $fraunhofer_password 
+
+    echo "Init completed"
 # Logs
 elif [ "$1" == "logs" ]; then
 
