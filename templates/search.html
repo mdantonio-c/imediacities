@@ -40,6 +40,24 @@
 			<div class="row">
 				<video id="videoarea" ng-src="{{ctrl.video.movieurl | trustUrl }}" controls></video>
 			</div>
+                        <!--<div class="row">
+                                <div id="summary-graph">
+                                        <img ng-src="static/assets/images/summary.jpg">
+                                </div>
+                        </div>-->
+            		<!--<div class="scrollmenu">
+  				<a href="#home"><img ng-src="static/assets/images/shot1.png"></a>
+  				<a href="#news"><img ng-src="static/assets/images/shot2.png"></a>
+  				<a href="#contact"><img ng-src="static/assets/images/shot3.png"></a>
+  				<a href="#about"><img ng-src="static/assets/images/shot4.png"></a>
+			</div>-->
+  			<div class="row">
+    				<div class="scrollmenu">
+      				<a ng-repeat="i in items" style="width: 30%;" scroll-on-click> <!-- ng-mouseover="overMouseEvent($event)"> -->
+        				<img ng-src="static/assets/images/shot{{i}}.png">
+      				</a>
+    				</div>
+  			</div>
             <!-- <div class="row">
                     add summary image
             </div> -->
