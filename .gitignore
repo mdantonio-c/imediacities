@@ -77,3 +77,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Hide analize.py undesired output
+scripts/analysis/shot-output.xml
+

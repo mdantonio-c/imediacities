@@ -65,7 +65,7 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
     	}*/
 	/*---*/
 
-	/*self.videos = []
+	self.videos = []
 
 	self.loading = true;
 	DataService.searchVideos().then(
