@@ -33,8 +33,18 @@ class Search(GraphBaseOperations):
 
             video = {}
             video["title"] = v.identifying_title
-            video["description"] = ''
+            descriptions = []
             video["production_years"] = v.production_years
+            for d in v.descriptions:
+                descriptions.append(d.text)
+            video["description"] = descriptions
+            keywords = []
+            for k in v.keywords:
+                term = {}
+                term['term'] = k.term
+                term['type'] = k.keyword_type
+                keywords.append(term)
+            video["keywords"] = keywords
             data.append(video)
 
         return self.force_response(data)
