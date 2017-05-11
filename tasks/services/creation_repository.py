@@ -63,8 +63,17 @@ class CreationRepository():
     def delete_keyword(self, node):
         node.delete()
 
-    def create_description(self, properties):
-        return self.graph.Description(**properties).save()
+    def create_description(self, description):
+        description.save()
+        return description
 
     def delete_description(self, node):
         node.delete()
+
+    def search_item_by_term(self, term, item_type):
+        """
+        Search all types of items and see whether some attributes matches the
+        value provided by the user.
+        """
+        log.debug("Searching for Items with term = " % term)
+        pass

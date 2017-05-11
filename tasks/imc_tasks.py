@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
+import random
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
@@ -120,7 +122,7 @@ def import_file(self, path, resource_id):
 
                 # EXECUTE AUTOMATC TOOLS
                 analyze_path = '/uploads/Analize/' + \
-                    group.uuid + '/' + video_filename.split('.')[0]
+                    group.uuid + '/' + video_filename.split('.')[0] + '/'
                 log.debug('analyze path: {0}'.format(analyze_path))
                 if os.path.exists(analyze_path):
                     log.info('analyze skipped: previously done!')
@@ -147,6 +149,11 @@ def import_file(self, path, resource_id):
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
+
+                extract_tech_info(self, item_node, analyze_path)
+
+                extract_automatic_annotation(self, item_node, analyze_path)
+
                 # TODO
                 video_node.status = 'COMPLETED'
                 video_node.status_message = 'Nothing to declare'
@@ -255,7 +262,63 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
 
 
-def extract_automatic_annotation(self, path):
+def extract_tech_info(self, item_node, analyze_dir_path):
+    """ """
+    if not os.path.exists(analyze_dir_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", analyze_dir_path)
+    # check for info result
+    tech_info_filename = 'origin_info.json'
+    tech_info_path = os.path.join(
+        os.path.dirname(analyze_dir_path), tech_info_filename)
+    if not os.path.exists(tech_info_path):
+        log.warning("Info tech CANNOT be extracted: [%s] does not exist",
+                    tech_info_path)
+        return
+
+    # load info from json
+    with open(tech_info_path) as data_file:
+        data = json.load(data_file)
+
+    # thumbnail FIXME
+    item_node.thumbnail = get_thumbnail(analyze_dir_path)
+
+    # duration
+    item_node.duration = data["streams"][0]["duration"]
+
+    # framerate
+    item_node.framerate = data["streams"][0]["avg_frame_rate"]
+
+    # dimension
+    item_node.dimension = data["format"]["size"]
+
+    # format
+    item_node.digital_format = [None for _ in range(4)]
+    # container: e.g."AVI", "MP4", "3GP"
+    item_node.digital_format[0] = data["format"]["format_name"]
+    # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
+    item_node.digital_format[1] = data["streams"][0]["codec_long_name"]
+    # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
+    item_node.digital_format[2] = data["format"]["format_long_name"]
+    # resolution: The degree of sharpness of the digital object expressed in
+    # lines or pixel
+    item_node.digital_format[3] = data["format"]["bit_rate"]
+
+    item_node.uri = data["format"]["filename"]
+    item_node.save()
+
+
+def get_thumbnail(path):
+    """
+    Returns a random filename, chosen among the jpg files of the given path.
+    """
+    jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
+    index = random.randrange(0, len(jpg_files))
+    return os.path.join(
+        os.path.dirname(path), jpg_files[index])
+
+
+def extract_automatic_annotation(self, item_node, path):
     """ """
     # tree = etree.parse(path)
     # log.debug(etree.tostring(tree, pretty_print=True))

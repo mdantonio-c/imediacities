@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    Title, Keyword
+    Title, Keyword, Description
 )
 from rapydo.utils.logs import get_logger
 
@@ -72,7 +72,6 @@ class EFG_XMLParser():
         keywords = []
         for node in record.findall("keywords"):
             for term in node.iter('term'):
-                log.debug('-----------------------------------------')
                 keyword = Keyword()
                 # FIXME
                 # keyword.keyword_type = node.get('type')
@@ -84,23 +83,23 @@ class EFG_XMLParser():
                 keyword.termID = term.get('id')
                 if keyword.termID is not None:
                     log.debug('keyword [term-id]: %s' % keyword.termID)
-                log.debug('-----------------------------------------')
                 keywords.append(keyword)
         return keywords
 
     def parse_descriptions(self, record):
         descriptions = []
-        for description in record.findall("description"):
-            properties = {}
-            properties['type'] = description.get('type')
-            log.debug('description [type]: %s' % properties['type'])
-            properties['lang'] = description.get('lang')
-            log.debug('description [lang]: %s' % properties['lang'])
-            properties['source'] = description.get('source')
-            log.debug('description [source]: %s' % properties['source'])
-            properties['text'] = description.text
-            log.debug('description [text]: %s' % properties['text'])
-            descriptions.append(properties)
+        for node in record.findall("description"):
+            description = Description()
+            # FIXME
+            description.description_type = node.get('type')
+            log.debug('description [type]: %s' % description.description_type)
+            description.language = node.get('lang')
+            log.debug('description [lang]: %s' % description.language)
+            description.source = node.get('source')
+            log.debug('description [source]: %s' % description.source)
+            description.text = node.text
+            log.debug('description [text]: %s' % description.text)
+            descriptions.append(description)
         return descriptions
 
     def parse_av_creation(self, record):

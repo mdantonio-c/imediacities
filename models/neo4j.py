@@ -8,9 +8,12 @@ VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
+from datetime import datetime
+import pytz
+
 from rapydo.services.neo4j.models import (
     StringProperty, ArrayProperty, IntegerProperty,
-    FloatProperty, DateTimeProperty,
+    FloatProperty, DateTimeProperty, DateProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
 )
@@ -101,8 +104,8 @@ class Item(TimestampedNode):
                         item.
     """
     thumbnail = StringProperty()
-    duration = IntegerProperty()
-    framerate = FloatProperty()
+    duration = FloatProperty()
+    framerate = StringProperty()  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False)
     uri = StringProperty()
     item_type = StringProperty(required=True)
@@ -249,7 +252,7 @@ class Keyword(StructuredNode):
         ('06', 'Georeference')
         # FIXME just an example here
     )
-    term = StringProperty(required=True)
+    term = StringProperty(index=True, required=True)
     termID = IntegerProperty()
     keyword_type = StringProperty(choices=KEYWORD_TYPES)
     language = StringProperty()  # FIXME - controlled vocab from ISO-639-1
@@ -279,7 +282,7 @@ class Description(StructuredNode):
         ('03', 'review')
         # FIXME just an example here
     )
-    text = StringProperty(required=True)
+    text = StringProperty(index=True, required=True)
     language = StringProperty()  # FIXME - controlled vocab ISO-639-1
     description_type = StringProperty(choices=DESCRIPTION_TYPES)
     source = StringProperty()
@@ -332,7 +335,7 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(required=True),
+    name = StringProperty(index=True, required=True),
     url = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
@@ -372,8 +375,8 @@ class Agent(IdentifiedNode):
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     agent_type = StringProperty(required=True, choices=AGENT_TYPES)
     names = ArrayProperty(StringProperty(), required=True)
-    birth_date = StringProperty()
-    death_date = StringProperty()
+    birth_date = DateProperty()
+    death_date = DateProperty(default=None)
     biographical_note = StringProperty()
     sex = StringProperty(choices=SEXES)
     biography_views = ArrayProperty(StringProperty(), required=False)
@@ -407,7 +410,7 @@ class RecordSource(StructuredNode):
                         institution name ("ISIL code" or "Institution acronym")
     """
     sourceID = StringProperty(required=True)
-    provider_name = StringProperty(required=True)
+    provider_name = StringProperty(index=True, required=True)
     providerID = StringProperty(required=True)
     provider_scheme = StringProperty(required=True)
     creation = RelationshipFrom(
@@ -441,8 +444,8 @@ class AVEntity(Creation):
                                     filmographic entry of a film on the content
                                     provider web site.
     """
-    identifying_title = StringProperty(required=True)
-    identifying_title_origin = StringProperty()
+    identifying_title = StringProperty(index=True, required=True)
+    identifying_title_origin = StringProperty(index=True, )
     production_countries = ArrayProperty(StringProperty())
     production_years = ArrayProperty(StringProperty(), required=True)
     video_format = RelationshipTo(
