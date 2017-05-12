@@ -5,7 +5,9 @@ import json
 import random
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
+from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
 # import xml.etree.ElementTree as ET
 
 from rapydo.basher import BashCommands
@@ -152,7 +154,7 @@ def import_file(self, path, resource_id):
 
                 extract_tech_info(self, item_node, analyze_path)
 
-                extract_automatic_annotation(self, item_node, analyze_path)
+                extract_tvs_annotation(self, item_node, analyze_path)
 
                 # TODO
                 video_node.status = 'COMPLETED'
@@ -263,7 +265,10 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
 
 
 def extract_tech_info(self, item_node, analyze_dir_path):
-    """ """
+    """
+    Extract technical information about the given content from result file
+    origin_info.json and save them as Item properties in the database.
+    """
     if not os.path.exists(analyze_dir_path):
         raise IOError(
             "Analyze results does not exist in the path %s", analyze_dir_path)
@@ -282,16 +287,12 @@ def extract_tech_info(self, item_node, analyze_dir_path):
 
     # thumbnail FIXME
     item_node.thumbnail = get_thumbnail(analyze_dir_path)
-
     # duration
     item_node.duration = data["streams"][0]["duration"]
-
     # framerate
     item_node.framerate = data["streams"][0]["avg_frame_rate"]
-
     # dimension
     item_node.dimension = data["format"]["size"]
-
     # format
     item_node.digital_format = [None for _ in range(4)]
     # container: e.g."AVI", "MP4", "3GP"
@@ -307,6 +308,8 @@ def extract_tech_info(self, item_node, analyze_dir_path):
     item_node.uri = data["format"]["filename"]
     item_node.save()
 
+    log.info('Extraction of techincal info completed')
+
 
 def get_thumbnail(path):
     """
@@ -318,8 +321,32 @@ def get_thumbnail(path):
         os.path.dirname(path), jpg_files[index])
 
 
-def extract_automatic_annotation(self, item_node, path):
-    """ """
-    # tree = etree.parse(path)
-    # log.debug(etree.tostring(tree, pretty_print=True))
-    pass
+def extract_tvs_annotation(self, item_node, analyze_dir_path):
+    """
+    Extract temporal video segmentation result from the file tvs.xml and save
+    them as Annotation in the database.
+    """
+    if not os.path.exists(analyze_dir_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", analyze_dir_path)
+    # check for info result
+    tvs_filename = 'tvs.xml'
+    tvs_path = os.path.join(
+        os.path.dirname(analyze_dir_path), tvs_filename)
+    if not os.path.exists(tvs_path):
+        log.warning("Shots CANNOT be extracted: [%s] does not exist",
+                    tvs_path)
+        return
+
+    parser = FHG_XMLParser()
+    log.debug('get shots from file [%s]' % tvs_path)
+    shots = parser.get_shots(tvs_path)
+    if shots is None:
+        log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
+        return
+
+    # Save Shots in the database
+    repo = AnnotationRepository(self.graph)
+    repo.create_tvs_annotation(item_node, shots)
+
+    log.info('Extraction of TVS info completed')

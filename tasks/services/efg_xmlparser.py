@@ -92,7 +92,8 @@ class EFG_XMLParser():
             description = Description()
             # FIXME
             # description.description_type = node.get('type')
-            # log.debug('description [type]: %s' % description.description_type)
+            # log.debug(
+            #     'description [type]: %s' % description.description_type)
             description.language = node.get('lang')
             log.debug('description [lang]: %s' % description.language)
             description.source = node.get('source')

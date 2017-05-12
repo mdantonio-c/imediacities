@@ -35,6 +35,8 @@ class User(UserBase):
     # name_surname = StringProperty(required=True, unique_index=True)
 
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    annotations = RelationshipFrom(
+        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore)
@@ -67,7 +69,12 @@ class Stage(TimestampedNode):
 ##############################################################################
 
 
-class Item(TimestampedNode):
+class AnnotationTarget(StructuredNode):
+    # __abstract_node__ = True
+    __label__ = 'Item'
+
+
+class Item(TimestampedNode, AnnotationTarget):
     """
     The Item Entity points to the digital file held in the IMC repository.
     The item functions as a logical wrapper for the digital object displayed in
@@ -113,12 +120,17 @@ class Item(TimestampedNode):
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
-        'Stage', 'CONTENT_SOURCE', cardinality=One, show=True)
+        'Stage', 'CONTENT_SOURCE', cardinality=One)
     meta_source = RelationshipTo(
-        'Stage', 'META_SOURCE', cardinality=One, show=True)
+        'Stage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
-        'Creation', 'CREATION', cardinality=ZeroOrOne, show=True)
-    annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
+        'Creation', 'CREATION', cardinality=ZeroOrOne)
+    annotations = RelationshipFrom(
+        'Annotation', 'SOURCE', cardinality=ZeroOrMore)
+    targets = RelationshipFrom(
+        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
+    shots = RelationshipTo(
+        'Shot', 'SHOT', cardinality=ZeroOrMore)
 
 
 class ContributionRel(StructuredRel):
@@ -526,6 +538,10 @@ class NonAVEntity(Creation):
 #    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
 
 
+class AnnotationCreatorRel(StructuredRel):
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+
+
 class Annotation(IdentifiedNode):
     """Annotation class"""
     ANNOTATION_TYPES = (
@@ -539,12 +555,13 @@ class Annotation(IdentifiedNode):
         ('VIS', 'Google Vision API'),
         ('AWS', 'Amazon Rekognition API')
     )
-    type = StringProperty(required=True, choices=ANNOTATION_TYPES)
+    annotation_type = StringProperty(required=True, choices=ANNOTATION_TYPES)
     creation_datetime = DateTimeProperty(
         default=lambda: datetime.now(pytz.utc))
-    source = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
+    source = RelationshipTo('Item', 'SOURCE', cardinality=One)
     creator = RelationshipTo(
-        'User', 'IS_CREATED_BY', cardinality=ZeroOrOne)
+        'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
+        model=AnnotationCreatorRel)
     generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
     bodies = RelationshipTo(
         'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
@@ -553,7 +570,9 @@ class Annotation(IdentifiedNode):
 
 
 class AnnotationBody(StructuredNode):
-    __abstract_node__ = True
+    # __abstract_node__ = True
+    __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
+    annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 
 
 class TextBody(AnnotationBody):
@@ -567,8 +586,9 @@ class ImageBody(AnnotationBody):
 
 
 class AudioBody(AnnotationBody):
+    audio_format = StringProperty()
+    language = StringProperty()
     # TODO
-    pass
 
 
 class VQBody(AnnotationBody):
@@ -583,14 +603,17 @@ class VQFrame(StructuredNode):
 
 
 class TVSBody(AnnotationBody):
-    shots = RelationshipTo('Shot', 'SHOT', cardinality=OneOrMore)
+    segments = RelationshipTo('Shot', 'SEGMENT', cardinality=OneOrMore)
 
 
 class Shot(StructuredNode):
     """Shot class"""
-    start_frame_idx = IntegerProperty()
-    end_frame_idx = IntegerProperty()
-    duration = IntegerProperty()
+    start_frame_idx = IntegerProperty(required=True)
+    end_frame_idx = IntegerProperty(required=True)
+    frame_uri = StringProperty()
+    annotation_body = RelationshipFrom(
+        'Annotation', 'SEGMENT', cardinality=One)
+    item = RelationshipFrom('Item', 'SHOT', cardinality=One)
 
 
 class ODBody(StructuredNode):
@@ -601,7 +624,3 @@ class ODBody(StructuredNode):
     # FIXME add object attribute relationship
     # object_attributes = RelationshipTo(
     #              'ObjectAttribute', 'HAS_ATTRIBUTE', cardinality=ZeroOrMore)
-
-
-class TargetBody(StructuredNode):
-    __abstract_node__ = True
