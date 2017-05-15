@@ -172,11 +172,11 @@ class Item(TimestampedNode, AnnotationTarget):
         license         A reference to the license that applies to the digital
                         item.
     """
-    thumbnail = StringProperty()
-    duration = FloatProperty()
-    framerate = StringProperty()  # FloatProperty()
+    thumbnail = StringProperty(show=True)
+    duration = FloatProperty(show=True)
+    framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False)
-    uri = StringProperty()
+    uri = StringProperty(show=True)
     item_type = StringProperty(required=True)
     # TODO add license reference
     ownership = RelationshipTo(
@@ -519,7 +519,7 @@ class AVEntity(Creation):
                                     filmographic entry of a film on the content
                                     provider web site.
     """
-    identifying_title = StringProperty(index=True, required=True)
+    identifying_title = StringProperty(index=True, required=True, show=True)
     identifying_title_origin = StringProperty(index=True, )
     production_countries = ArrayProperty(StringProperty())
     production_years = ArrayProperty(StringProperty(), required=True)
@@ -618,18 +618,19 @@ class Annotation(IdentifiedNode):
         ('VIS', 'Google Vision API'),
         ('AWS', 'Amazon Rekognition API')
     )
-    annotation_type = StringProperty(required=True, choices=ANNOTATION_TYPES)
+    annotation_type = StringProperty(
+        required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
-        default=lambda: datetime.now(pytz.utc))
-    source = RelationshipTo('Item', 'SOURCE', cardinality=One)
+        default=lambda: datetime.now(pytz.utc), show=True)
+    source = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
         'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
-        model=AnnotationCreatorRel)
-    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
+        model=AnnotationCreatorRel, show=True)
+    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS, show=True)
     bodies = RelationshipTo(
         'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
     targets = RelationshipTo(
-        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
+        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
 
 
 class AnnotationBody(HeritableStructuredNode):
@@ -649,8 +650,8 @@ class ImageBody(AnnotationBody):
 
 
 class AudioBody(AnnotationBody):
-    audio_format = StringProperty()
-    language = StringProperty()
+    audio_format = StringProperty(show=True)
+    language = StringProperty(show=True)
     # TODO
 
 
@@ -666,14 +667,15 @@ class AudioBody(AnnotationBody):
 
 
 class TVSBody(AnnotationBody):
-    segments = RelationshipTo('Shot', 'SEGMENT', cardinality=OneOrMore)
+    segments = RelationshipTo(
+        'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
 class Shot(StructuredNode):
     """Shot class"""
-    start_frame_idx = IntegerProperty(required=True)
-    end_frame_idx = IntegerProperty(required=True)
-    frame_uri = StringProperty()
+    start_frame_idx = IntegerProperty(required=True, show=True)
+    end_frame_idx = IntegerProperty(required=True, show=True)
+    frame_uri = StringProperty(show=True)
     annotation_body = RelationshipFrom(
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)

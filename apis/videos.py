@@ -147,3 +147,36 @@ class VideoAnnotations(GraphBaseOperations):
             data.append(annotation)
 
         return self.force_response(data)
+
+
+class VideoShots(GraphBaseOperations):
+    """
+        Get the list of shots for a given video.
+    """
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self, video_id):
+        logger.info("get shots for AVEntity id: %s", video_id)
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.initGraph()
+        data = []
+
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        item = video.item.single()
+        for s in item.shots:
+            shot = self.getJsonResponse(s)
+            data.append(shot)
+
+        return self.force_response(data)

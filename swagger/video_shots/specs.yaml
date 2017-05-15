@@ -1,0 +1,8 @@
+file: videos
+class: VideoShots
+schema:
+  expose: true
+mapping:
+  video_annoations: "/videos/<video_id>/shots"
+labels:
+  - video_shots
