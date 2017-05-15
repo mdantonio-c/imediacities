@@ -34,3 +34,16 @@ class AnnotationRepository():
             shot.save()
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
+
+    @db.transaction
+    def delete_tvs_annotation(self, annotation):
+        # item = annotation.targets[0]
+        # annotation.source.disconnect(item)
+        # annotation.targets.disconnect(item)
+
+        tvs_body = annotation.bodies[0]
+        if tvs_body:
+            for segment in tvs_body.segments:
+                segment.delete()
+            tvs_body.delete()
+        annotation.delete()

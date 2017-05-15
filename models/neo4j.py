@@ -8,6 +8,7 @@ VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
+import sys
 from datetime import datetime
 import pytz
 
@@ -26,11 +27,72 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class HeritableStructuredNode(StructuredNode):
+
+    # noqa see: http://stackoverflow.com/questions/35744456/relationship-to-multiple-types-polymorphism-in-neomodel
+
+    """
+    Useful to manage polymorphic relationships providing downcasting.
+
+    Extends :class:`neomodel.StructuredNode` to provide the :meth:`.downcast`
+    method.
+    """
+
+    __abstract_node__ = True
+
+    def downcast(self, target_class=None):
+        """
+        Re-instantiate this node as an instance its most derived derived class.
+        """
+        # TODO: there is probably a far more robust way to do this.
+        _get_class = lambda cname: getattr(sys.modules[__name__], cname)
+
+        # inherited_labels() only returns the labels for the current class and
+        #  any super-classes, whereas labels() will return all labels on the
+        #  node.
+        classes = list(set(self.labels()) - set(self.inherited_labels()))
+
+        if len(classes) == 0:
+            # The most derivative class is already instantiated.
+            return self
+        cls = None
+
+        if target_class is None:    # Caller has not specified the target.
+            if len(classes) == 1:    # Only one option, so this must be it.
+                target_class = classes[0]
+            else:
+                # Infer the most derivative class by looking for the one
+                # with the longest method resolution order.
+                class_objs = map(_get_class, classes)
+                _, cls = sorted(
+                    zip(
+                        map(lambda cls: len(cls.mro()), class_objs),
+                        class_objs),
+                    key=lambda size, cls: size)[-1]
+        else:    # Caller has specified a target class.
+            if not isinstance(target_class, str):
+                # In the spirit of neomodel, we might as well support both
+                #  class (type) objects and class names as targets.
+                target_class = target_class.__name__
+
+            if target_class not in classes:
+                raise ValueError('%s is not a sub-class of %s'
+                                 % (target_class, self.__class__.__name__))
+        if cls is None:
+            cls = getattr(sys.modules[__name__], target_class)
+        instance = cls.inflate(self.id)
+
+        # TODO: Can we re-instatiate without hitting the database again?
+        instance.refresh()
+        return instance
+
 ##############################################################################
 # MODELS
 ##############################################################################
 
 # Extension of User model for accounting in API login/logout
+
+
 class User(UserBase):
     # name_surname = StringProperty(required=True, unique_index=True)
 
@@ -125,9 +187,9 @@ class Item(TimestampedNode, AnnotationTarget):
         'Stage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
         'Creation', 'CREATION', cardinality=ZeroOrOne)
-    annotations = RelationshipFrom(
+    sourcing_annotations = RelationshipFrom(
         'Annotation', 'SOURCE', cardinality=ZeroOrMore)
-    targets = RelationshipFrom(
+    targeting_annotations = RelationshipFrom(
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
     shots = RelationshipTo(
         'Shot', 'SHOT', cardinality=ZeroOrMore)
@@ -171,8 +233,8 @@ class Creation(IdentifiedNode):
     """
     # __abstract_node__ = True
     __label__ = 'AVEntity:NonAVEntity'
-    record_sources = RelationshipTo(
-        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    # record_sources = RelationshipTo(
+    #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     titles = RelationshipTo(
         'Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
     keywords = RelationshipTo(
@@ -222,9 +284,10 @@ class Title(StructuredNode):
         ('09', 'uniform'),
         ('10', 'other')
     )
-    text = StringProperty(required=True)
-    language = StringProperty()  # FIXME - controlled vocab from ISO-639-1
-    relationship = StringProperty(required=True, choices=TITLE_RELASHIONSHIPS)
+    text = StringProperty(required=True, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    relationship = StringProperty(
+        required=True, choices=TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_TITLE', cardinality=One, show=True)
 
@@ -264,10 +327,10 @@ class Keyword(StructuredNode):
         ('06', 'Georeference')
         # FIXME just an example here
     )
-    term = StringProperty(index=True, required=True)
+    term = StringProperty(index=True, required=True, show=True)
     termID = IntegerProperty()
-    keyword_type = StringProperty(choices=KEYWORD_TYPES)
-    language = StringProperty()  # FIXME - controlled vocab from ISO-639-1
+    keyword_type = StringProperty(choices=KEYWORD_TYPES, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -294,9 +357,9 @@ class Description(StructuredNode):
         ('03', 'review')
         # FIXME just an example here
     )
-    text = StringProperty(index=True, required=True)
-    language = StringProperty()  # FIXME - controlled vocab ISO-639-1
-    description_type = StringProperty(choices=DESCRIPTION_TYPES)
+    text = StringProperty(index=True, required=True, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    description_type = StringProperty(choices=DESCRIPTION_TYPES, show=True)
     source = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
@@ -569,9 +632,9 @@ class Annotation(IdentifiedNode):
         'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
 
 
-class AnnotationBody(StructuredNode):
-    # __abstract_node__ = True
-    __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
+class AnnotationBody(HeritableStructuredNode):
+    __abstract_node__ = True
+    # __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
     annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 
 
@@ -591,15 +654,15 @@ class AudioBody(AnnotationBody):
     # TODO
 
 
-class VQBody(AnnotationBody):
-    """Class for Video Quality Annotation."""
-    module = StringProperty(required=True)
-    frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
+# class VQBody(AnnotationBody):
+#     """Class for Video Quality Annotation."""
+#     module = StringProperty(required=True)
+#     frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
 
 
-class VQFrame(StructuredNode):
-    idx = IntegerProperty(required=True)
-    quality = FloatProperty(required=True)
+# class VQFrame(StructuredNode):
+#     idx = IntegerProperty(required=True)
+#     quality = FloatProperty(required=True)
 
 
 class TVSBody(AnnotationBody):

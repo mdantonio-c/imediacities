@@ -154,6 +154,20 @@ def import_file(self, path, resource_id):
 
                 extract_tech_info(self, item_node, analyze_path)
 
+                # FIXME naive filter
+                # find TVS annotations with this item as target
+                annotations = item_node.targeting_annotations.all()
+                if annotations:
+                    repo = AnnotationRepository(self.graph)
+                    # here we expect ONLY one anno if present
+                    for anno in annotations:
+                        if anno.annotation_type == 'TVS':
+                            log.debug(anno)
+                            repo.delete_tvs_annotation(anno)
+                            log.info(
+                                "Deleted existing TVS annotation [%S]"
+                                % anno.id)
+
                 extract_tvs_annotation(self, item_node, analyze_path)
 
                 # TODO
@@ -264,7 +278,7 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
 
 
-def extract_tech_info(self, item_node, analyze_dir_path):
+def extract_tech_info(self, item, analyze_dir_path):
     """
     Extract technical information about the given content from result file
     origin_info.json and save them as Item properties in the database.
@@ -286,27 +300,27 @@ def extract_tech_info(self, item_node, analyze_dir_path):
         data = json.load(data_file)
 
     # thumbnail FIXME
-    item_node.thumbnail = get_thumbnail(analyze_dir_path)
+    item.thumbnail = get_thumbnail(analyze_dir_path)
     # duration
-    item_node.duration = data["streams"][0]["duration"]
+    item.duration = data["streams"][0]["duration"]
     # framerate
-    item_node.framerate = data["streams"][0]["avg_frame_rate"]
+    item.framerate = data["streams"][0]["avg_frame_rate"]
     # dimension
-    item_node.dimension = data["format"]["size"]
+    item.dimension = data["format"]["size"]
     # format
-    item_node.digital_format = [None for _ in range(4)]
+    item.digital_format = [None for _ in range(4)]
     # container: e.g."AVI", "MP4", "3GP"
-    item_node.digital_format[0] = data["format"]["format_name"]
+    item.digital_format[0] = data["format"]["format_name"]
     # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
-    item_node.digital_format[1] = data["streams"][0]["codec_long_name"]
+    item.digital_format[1] = data["streams"][0]["codec_long_name"]
     # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
-    item_node.digital_format[2] = data["format"]["format_long_name"]
+    item.digital_format[2] = data["format"]["format_long_name"]
     # resolution: The degree of sharpness of the digital object expressed in
     # lines or pixel
-    item_node.digital_format[3] = data["format"]["bit_rate"]
+    item.digital_format[3] = data["format"]["bit_rate"]
 
-    item_node.uri = data["format"]["filename"]
-    item_node.save()
+    item.uri = data["format"]["filename"]
+    item.save()
 
     log.info('Extraction of techincal info completed')
 
@@ -321,9 +335,9 @@ def get_thumbnail(path):
         os.path.dirname(path), jpg_files[index])
 
 
-def extract_tvs_annotation(self, item_node, analyze_dir_path):
+def extract_tvs_annotation(self, item, analyze_dir_path):
     """
-    Extract temporal video segmentation result from the file tvs.xml and save
+    Extract temporal video segmentation results from tvs.xml file and save
     them as Annotation in the database.
     """
     if not os.path.exists(analyze_dir_path):
@@ -347,6 +361,6 @@ def extract_tvs_annotation(self, item_node, analyze_dir_path):
 
     # Save Shots in the database
     repo = AnnotationRepository(self.graph)
-    repo.create_tvs_annotation(item_node, shots)
+    repo.create_tvs_annotation(item, shots)
 
     log.info('Extraction of TVS info completed')
