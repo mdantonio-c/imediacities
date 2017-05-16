@@ -3,6 +3,7 @@ import os
 import os.path
 import getpass
 import json
+from PIL import Image
 from subprocess import *
 
 
@@ -35,13 +36,30 @@ default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
 default_filename = os.path.join( stage_area, default_movie )
 
 #-----------------------------------------------------
-def mkdir(path):
+def mkdir(path, clean = False):
+    if clean:
+        if os.path.isdir(path):
+           shutil.rmtree(path) 
     if not os.path.isdir(path):
         os.mkdir(path)
     if not os.path.isdir(path):
         print( "ERROR failed to create", path )
         return False
     return True
+#-----------------------------------------------------
+def filename_to_frame(f):
+    substr = os.path.basename(f).replace('tvs_s_','').replace('.jpg','')
+    return int(substr)
+
+#-----------------------------------------------------
+def frame_to_timecode(f, fps=25):
+    f = int(f)
+    t_hour  =  int( f / ( 3600*fps ) )
+    t_min   =  int( ( f - t_hour*3600*fps ) / ( 60*fps ) )
+    t_sec   =  int( ( f - t_hour*3600*fps - t_min*60*fps ) / fps )
+    t_frame =  int( ( f - t_hour*3600*fps - t_min*60*fps - t_sec*fps ) )
+    timecode = '{0:02d}:{1:02d}:{2:02d}-f{3:02d}'.format( t_hour, t_min, t_sec, t_frame)
+    return timecode
 
 #-----------------------------------------------------
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
@@ -251,6 +269,103 @@ def summary(filename, out_folder):
     return os.path.exists( out_filename ) 
 
 #-----------------------------------------------------
+def thumbs_index_storyboard(filename, out_folder):
+
+    movie_name = os.path.basename(out_folder)
+
+    # retrieve shot frames
+    lst = glob.glob( out_folder + '/tvs_s_*.jpg')
+    lst.sort()
+    num_shot = len(lst)
+    if num_shot == 0:
+        print("thumbs_index_storyboard: no shots!")
+        return False
+    
+    im = Image.open(lst[0])
+    ar = float(im.height / im.width)
+    th_sz = ( 100, int( 100*ar ) )
+
+    # prepare thumbnails
+    th_folder = os.path.join( out_folder, 'thumbs')
+    if not mkdir(th_folder, True):
+        return False
+
+    for fn in lst:
+        im = Image.open(fn)
+        im_small = im.resize( th_sz, Image.BILINEAR )
+        im_small.save( fn.replace(out_folder,th_folder), quality=90 )
+
+    # prepare index
+    idx_folder = os.path.join( out_folder, 'index')
+    if not mkdir(idx_folder, True):
+        return False
+
+    num_col  = 5
+    num_row  = num_shot // num_col
+    if num_shot % num_col:
+        num_row += 1
+    idx_sz = ( 100*num_col, int(100*ar*num_row) )    
+    idx_img = Image.new( "RGB", idx_sz, '#ffffff' )
+
+    for i, fn in enumerate(lst):
+        x = (i % num_col) * 100
+        y = (i // num_col) * int(100*ar)
+        im = Image.open(fn)
+        im_small = im.resize( th_sz, Image.BILINEAR )
+        im_cp = im_small.copy()
+        idx_img.paste( im_cp, (x,y) )
+
+    idx_img.save( idx_folder + '/index.jpg' , quality=90 )    
+        
+    d = {}
+    d['thumb_w'] = 100
+    d['thumb_h'] = int(100*ar)
+    d['num_row'] = num_row
+    d['num_col'] = num_col
+    d['help'] = 'determine shot index from mouse pos as: index = x/thumb_w + (y/thumb_h)*num_col'
+    str = json.dumps( d, indent=4 )
+    f = open( idx_folder + "/index.json", 'w')
+    f.write( str )
+    f.close()
+
+    # prepare storyboard
+    sb_folder = os.path.join( out_folder, 'storyboard')
+    if not mkdir(sb_folder, True):
+        return False
+
+    sb = {}
+    sb["movie"] = movie_name
+    sb["shots"] = []
+    
+    for i, fn in enumerate(lst):
+
+        im = Image.open(fn)
+        w1,h1 = 200,  int( 200.0* im.height / im.width  )
+        im_small = im.resize( (w1,h1), Image.BILINEAR )
+        im_name = 'shot_{0:04d}.jpg'.format(i)
+        im_small.save( sb_folder+'/'+im_name, quality=90 )
+                
+        frame = filename_to_frame(fn)
+        shot_len = ""
+        if i != len(lst)-1:
+            nextframe = filename_to_frame( lst[i+1] )
+            shot_len = ( nextframe - frame ) / 25
+
+        d = {}
+        d['shot_num'] = i
+        d['img']      = im_name
+        d['timecode'] = frame_to_timecode(frame)
+        d['frame']    = frame
+        d['len']      = shot_len 
+        sb["shots"].append( d )        
+
+    str = json.dumps( sb, indent=4 )
+    f = open( sb_folder + "/storyboard.json", 'w')
+    f.write( str )
+    f.close()
+
+
+#-----------------------------------------------------
 def analize( filename ):
 
     if not os.path.exists( filename ):
@@ -298,6 +413,16 @@ def analize( filename ):
     if not summary( tr_movie, out_folder ) :
         return False
     print( 'summary ------------ ok ')
+
+    print( 'summary ------------ begin ')
+    if not summary( tr_movie, out_folder ) :
+        return False
+    print( 'summary ------------ ok ')
+
+    print( 'index/storyboard---- begin ')
+    if not thumbs_index_storyboard( tr_movie, out_folder ) :
+        return False
+    print( 'index/storyboard---- ok ')
 
     return True
 
