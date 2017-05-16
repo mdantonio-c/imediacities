@@ -3,6 +3,10 @@ import os
 import os.path
 import getpass
 import json
+import datetime
+import glob
+import shutil
+
 from PIL import Image
 from subprocess import *
 
@@ -13,16 +17,9 @@ else:
     host = 'imc_vm'    
 
 if host=='sil_pc':    
-    root_dir = '/home/simboden/Desktop/IMC/DEVEL'
+    root_dir = '/home/simboden/Desktop/IMC/worker_env/'
 else:
-    #root_dir = '/home/ubuntu/imediacities'
     root_dir = '/'
-
-#stage_area   = root_dir + '/imediastuff'
-#analize_area = root_dir + '/imediastuff/Analize' 
-#idmt_bin     = root_dir + '/imedia-pipeline/tools'
-#idmt_scripts = root_dir + '/imedia-pipeline/scripts'
-#idmt_py      = root_dir + '/imedia-pipeline/scripts/idmt'
 
 stage_area   = root_dir + 'uploads'
 analize_area = root_dir + 'uploads/Analize' 
@@ -34,6 +31,16 @@ idmt_py      = root_dir + 'code/imc/imedia-pipeline/scripts/idmt'
 #default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
 default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
 default_filename = os.path.join( stage_area, default_movie )
+
+logfile = None
+#-----------------------------------------------------
+def log( msg ):
+    global logfile
+    print(msg)
+    sys.stdout.flush()
+    time = datetime.datetime.now().strftime("[%d%b%y %H:%M:%S] ")
+    logfile.write( time + msg + '\n')
+    logfile.flush()
 
 #-----------------------------------------------------
 def mkdir(path, clean = False):
@@ -65,7 +72,7 @@ def frame_to_timecode(f, fps=25):
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
 # and link the givel filename as  movie_analize_folder/origin + movie_ext
 
-def make_movie_analize_folder(filename):
+def make_movie_analize_folder(filename, clean=False):
 
     if( not mkdir(analize_area) ) : return ""
 
@@ -75,12 +82,15 @@ def make_movie_analize_folder(filename):
 
     m_name, m_ext = os.path.splitext( os.path.basename( filename ) )
     movie_analize_folder = os.path.join( user_analyze_folder, m_name )
-    if( not mkdir(movie_analize_folder) ) : return ""
+    if( not mkdir(movie_analize_folder, clean) ) : return ""
 
     origin_link = os.path.join( movie_analize_folder, 'origin' )
-    if os.path.exists(origin_link):
+    try:
+        os.symlink( filename, origin_link )
+    except :
         os.remove(origin_link)
-    os.symlink( filename, origin_link )
+        print('forcing origin link')
+        os.symlink( filename, origin_link )
 
     return movie_analize_folder
 
@@ -365,86 +375,126 @@ def thumbs_index_storyboard(filename, out_folder):
     f.write( str )
     f.close()
 
+    return True
+
 
 #-----------------------------------------------------
-def analize( filename ):
+def analize( filename, out_folder, fast=False ):
 
-    if not os.path.exists( filename ):
-        print( 'aborting: bad input file',filename )
-        return False
-
-    print( 'make_out_folder ---- begin')
-    out_folder = make_movie_analize_folder( filename )
-    if  out_folder == ""  :
-        return False
-    print( 'make_out_folder ---- ok')
-
-    print( 'origin_tech_info --- begin')
+    log( 'origin_tech_info --- begin')
     if not origin_tech_info( filename, out_folder ) :
         return False
-    print( 'origin_tech_info --- ok ')
+    log( 'origin_tech_info --- ok ')
 
-    print( 'transcode ---------- begin ')
-    if not transcode( filename, out_folder ) :
-        return False
-    print( 'transcode ---------- ok ')
-    tr_movie = os.path.join( out_folder, 'transcoded.mp4' )        
+    tr_movie = os.path.join( out_folder, 'transcoded.mp4' )
+    got_tr_movie = os.path.exists( tr_movie )
 
-    print( 'transcoded_info ---- begin ')
+    if  fast and  got_tr_movie  :
+        log( 'transcode ---------- skipped' )
+    else:
+        log( 'transcode ---------- begin ')
+        if not transcode( filename, out_folder ) :
+            return False
+        log( 'transcode ---------- ok ')
+
+    log( 'transcoded_info ---- begin ')
     if not transcoded_tech_info( tr_movie, out_folder ) :
         return False
-    print( 'transcoded_info ---- ok ')
+    log( 'transcoded_info ---- ok ')
     
-    print( 'tvs ---------------- begin ')
-    if not tvs( tr_movie, out_folder ) :
-        return False
-    print( 'tvs ---------------- ok ')
+    tvs_out = os.path.join( out_folder, 'tvs.xml')
+    got_tvs = os.path.exists( tvs_out )
 
-    print( 'quality ------------ begin ')
-    if not quality( tr_movie, out_folder ) :
-        return False
-    print( 'quality ------------ ok ')
+    if  fast and  got_tvs  :
+        log( 'tvs ---------------- skipped' )
+    else:
+        log( 'tvs ---------------- begin ')
+        if not tvs( tr_movie, out_folder ) :
+            return False
+        log( 'tvs ---------------- ok ')
 
-    print( 'vimotion ----------- begin ')
-    if not vimotion( tr_movie, out_folder ) :
-        return False
-    print( 'vimotion ----------- ok ')
 
-    print( 'summary ------------ begin ')
+    if  fast  :
+        log( 'quality ------------ skipped ')
+    else:
+        log( 'quality ------------ begin ')
+        if not quality( tr_movie, out_folder ) :
+            return False
+        log( 'quality ------------ ok ')
+
+    if  fast  :
+        log( 'vimotion ----------- skipped ')
+    else:
+        log( 'vimotion ----------- begin ')
+        if not vimotion( tr_movie, out_folder ) :
+            return False
+        log( 'vimotion ----------- ok ')
+
+    log( 'summary ------------ begin ')
     if not summary( tr_movie, out_folder ) :
         return False
-    print( 'summary ------------ ok ')
+    log( 'summary ------------ ok ')
 
-    print( 'summary ------------ begin ')
-    if not summary( tr_movie, out_folder ) :
-        return False
-    print( 'summary ------------ ok ')
-
-    print( 'index/storyboard---- begin ')
+    log( 'index/storyboard---- begin ')
     if not thumbs_index_storyboard( tr_movie, out_folder ) :
         return False
-    print( 'index/storyboard---- ok ')
+    log( 'index/storyboard---- ok ')
 
     return True
 
 #-----------------------------------------------------
+help = ''' usage:  python3 analyze.py [options] [filename]
+options:
+[-fast  ]       skip transcoding ( if transcoded.mp4 is ready ), skip tvs ( if tvs.xml is ready ) skip quality, skip vimotion 
+[-clean ]       clean any previous data before analize 
+[filename ]     if omitted use the default movie 
+'''
+#-----------------------------------------------------
+def main( args ):
+    global logfile
+    
+    clean = False
+    fast  = False
+    movie = default_filename
+
+    args = sys.argv[1:]
+    num_args = len(args)
+    for i,a in enumerate(args):
+        if a == '--help' or a == '-help' or a == '-h':
+            print( help )
+            return            
+        elif a == '-clean':
+            clean = True
+        elif a == '-fast':
+            fast = True
+            clean = False # fast is stronger than clean
+        else: 
+            movie = a    
+        
+    filename = os.path.join( stage_area, movie )
+    if not os.path.exists( filename ):
+        print( 'aborting: bad input file', filename )
+        return
+
+    out_folder = make_movie_analize_folder( filename )
+    if out_folder == "":
+       print( 'aborting: failed to create out_folder')
+       return
+            
+    logfile = open(  os.path.join( out_folder, "log.txt"), "w" ) 
+    log( "Analize "+movie )
+    
+    if analize( filename, out_folder, fast ):
+        log( 'Analize done')
+    else:
+        log( 'Analize terminated with errors')
+
+#-----------------------------------------------------
+
 if __name__ == "__main__":
-    if len( sys.argv ) > 1 :
-        filename = sys.argv[1]
-    else:
-        filename = default_filename
-
-    print( 'Analize', filename )
-    if analize(filename):
-        print( 'Analize done')
-    else:
-        print( 'Analize terminated with errors')
-                                                                  
-# TODO: -- decidere quando serve il transcoding, e il deinterallacciamento
-# TODO: -- registrare il timing
-# TODO: -- trattare i sottotitoli
-# TODO: -- prevedere diverse modalita' di esecuzione : clean, preserve, ...
-# TODO: -- VALIDATE ANALISIS -- vedere che ci sono tutti i file, e sono validi
+    main( sys.argv[1:] )
 
 
 
+
+    
