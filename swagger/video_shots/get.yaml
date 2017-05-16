@@ -1,0 +1,12 @@
+video_annoations:
+  summary: Gets video shots
+  description: Returns a list of shots belonging to the given video item.
+  custom:
+    authentication: true
+  responses:
+    '200':
+      description: An list of shots.
+    '401':
+        description: This endpoint requires a valid authorzation token.
+    '404':
+        description: Video does not exist.

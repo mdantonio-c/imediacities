@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
-An endpoint example
+Search endpoint
+
+@author: Giuseppe Trotta <g.trotta@cineca.it>
 """
+from flask import request
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -17,24 +20,31 @@ class Search(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    def post(self, term=None):
+    def post(self):
 
         self.initGraph()
         data = []
 
-        if term is not None:
-            v = self.graph.AVEntity.nodes.get(
-                identifying_title__contains=term)
-            videos = [v]
+        # Retrieve the JSON data from the Request and store it in local
+        # variable
+        jsonData = request.get_json(cache=False)
+        attr = {}
+        # Iterate over the JSON Data and print the data on console
+        for key in jsonData:
+            attr[key] = jsonData[key]
+            logger.debug("%s = %s" % (key, jsonData[key]))
+
+        input_parameters = self.get_input()
+        logger.debug(input_parameters)
+
+        if attr['term']:
+            videos = self.graph.AVEntity.nodes.filter(
+                identifying_title__icontains=attr['term'])
         else:
             videos = self.graph.AVEntity.nodes.all()
 
         for v in videos:
-
-            video = {}
-            video["title"] = v.identifying_title
-            video["description"] = ''
-            video["production_years"] = v.production_years
+            video = self.getJsonResponse(v)
             data.append(video)
 
         return self.force_response(data)

@@ -14,6 +14,7 @@ webbuild="bower"
 volume_prefix="${COMPOSE_PROJECT_NAME}"
 fronted_container="frontend"
 backend_container="backend"
+proxycontainer="proxy"
 backend_repo="backend"
 frontend_repo="frontend"
 # backend_git="https://github.com/mdantonio/http-api-base"
@@ -177,6 +178,9 @@ if [ "$1" == "init" ]; then
     echo "Build bower packages (Javascript libraries)"
     $bcom
 
+    echo "Copying example video"
+
+    cp -r scripts/analysis/test_data/00000000-0000-0000-00000000000000000 imediastuff/ 
 
     echo "**********************************"
     echo "* INSTALLING FRAUNHOFER SOFTWARE *"
@@ -190,6 +194,7 @@ if [ "$1" == "init" ]; then
 
     cd imedia-pipeline/tools/ 
     tag=`git tag | grep tools | tail -1`
+    echo "Selected tag: $tag"
     git checkout $tag
 
     echo "Please provide the Fraunhofer password"

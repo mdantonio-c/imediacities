@@ -92,6 +92,7 @@
 								<div class="primary-description">
 									<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
 									<p>{{v.description}}</p>
+									<p><span ng-repeat="key in v.keywords">{{key.term}}{{$last ? '' : ', '}}</span></p>
 								</div>
 								<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 									<p><b>Production Year(s)</b>: {{v.production_years}}</p>
