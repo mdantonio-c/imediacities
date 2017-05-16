@@ -3,6 +3,9 @@
 """
 Handle your video metadata
 """
+import os
+from flask import send_file
+from flask_restful import request
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -44,6 +47,9 @@ class Videos(GraphBaseOperations):
 
         for v in videos:
             video = self.getJsonResponse(v)
+            logger.info("links %s " % video['links'])
+            video['links']['content'] = request.url + '/content'
+            video['links']['thumbnail'] = request.url + '/thumbnail'
             data.append(video)
 
         return self.force_response(data)
@@ -180,3 +186,33 @@ class VideoShots(GraphBaseOperations):
             data.append(shot)
 
         return self.force_response(data)
+
+
+class VideoContent(GraphBaseOperations):
+    """
+    """
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self, video_id):
+        logger.info("get video content for id %s" % video_id)
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        self.initGraph()
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        item = video.item.single()
+        logger.debug("video content uri: %s" % item.uri)
+
+        return send_file(item.uri,
+                         mimetype=item.digital_format[2],
+                         attachment_filename=os.path.basename(item.uri),
+                         as_attachment=True)

@@ -38,7 +38,7 @@
 				</ul>
 			</nav>
 			<div class="row">
-				<video id="videoarea" ng-src="{{ctrl.video.movieurl | trustUrl }}" controls></video>
+				<video id="videoarea" ng-src="{{ctrl.video.links.content | trustUrl }}" controls></video>
 			</div>
                         <!--<div class="row">
                                 <div id="summary-graph">
@@ -53,9 +53,9 @@
 			</div>-->
   			<div class="row">
     				<div class="scrollmenu">
-      				<a ng-repeat="i in items" style="width: 30%;" scroll-on-click> <!-- ng-mouseover="overMouseEvent($event)"> -->
+      				<!-- <a ng-repeat="i in items" style="width: 30%;" scroll-on-click>
         				<img ng-src="static/assets/images/shot{{i}}.png">
-      				</a>
+      				</a> -->
     				</div>
   			</div>
             <!-- <div class="row">
@@ -90,9 +90,11 @@
 							<li ng-repeat="v in ctrl.videos | searchFor:searchString">
 								<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.moviesposter}}" /></a>
 								<div class="primary-description">
-									<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
-									<p>{{v.description}}</p>
-									<p><span ng-repeat="key in v.keywords">{{key.term}}{{$last ? '' : ', '}}</span></p>
+									<span class="title">{{v.attributes.identifying_title}}</span><i>({{v.relationships.item[0].attributes.duration}} sec)</i>
+									<p><span ng-repeat="description in v.relationships.descriptions">
+									{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
+									<p><span ng-repeat="keyword in v.relationships.keywords">
+									{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 								</div>
 								<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 									<p><b>Production Year(s)</b>: {{v.production_years}}</p>
