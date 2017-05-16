@@ -24,3 +24,5 @@ swagger-spec-validator
 urllib3
 numpy
 flower
+Pillow     
+
