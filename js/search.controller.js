@@ -68,7 +68,11 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 	self.videos = []
 
 	self.loading = true;
-	DataService.searchVideos().then(
+	var request_data = {
+		"type": "video",
+		"term": "bologna"
+	};
+	DataService.searchVideos(request_data).then(
 		function(out_data) {
 			self.videos = out_data.data;
 			self.loading = false;
@@ -80,7 +84,7 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 
             noty.extractErrors(out_data, noty.ERROR);
 		});
-	//self.videos = loadSampleVideos();
+	// self.videos = [];//loadSampleVideos();
 
 	self.selectedVideo = false;
 	self.setectedVideoId = -1;
