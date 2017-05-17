@@ -11,6 +11,10 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall("schemas/"+endpoint, 'GET');
     }
 
+    self.getToken = function() {
+        return api.checkToken();
+    }
+
     self.searchVideos = function(data) {
         return api.apiCall('search', 'POST', data);
     }
@@ -30,9 +34,16 @@ function DataService($log, api, $q, jsonapi_parser) {
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }
-    // self.getVideoInfo = function(video) {
-    //     return api.apiCall('video/'+video+'annotations', 'GET');
+    // self.getVideoAnnotations = function(videoId) {
+    //     return api.apiCall('video/'+videoId+'/annotations', 'GET');
     // }
+    self.getVideoContent = function(videoId) {
+        return api.apiCall('videos/'+videoId+'/content', 'GET', {}, undefined, true)
+    }
+
+    self.getVideoThumbnail = function(videoId) {
+        return api.apiCall('videos/'+videoId+'/thumbnail', 'GET')
+    }
 
 
     self.getUserSchema = function(study) {

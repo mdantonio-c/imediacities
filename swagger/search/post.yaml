@@ -1,11 +1,32 @@
 
 search:
-  summary: Search video files previously staged in the area
+  summary: Search some videos
+  description: Search videos previously staged in the area.
   custom:
     # publish: true
     authentication: true
+  parameters:
+    - name: criteria
+      in: body
+      description: Criteria for the search.
+      schema:
+        required:
+          - term
+        properties:
+          type:
+            type: string
+          term:
+            type: string
+    - name: pageSize
+      in: query
+      description: Number of videos returned
+      type: integer
+    - name: pageNumber
+      in: query
+      description: Page number
+      type: integer
   responses:
     '200':
-      description: File successfully retrieved 
+      description: A list of videos matching search criteria.
     '401':
       description: This endpoint requires a valid authorization token 
