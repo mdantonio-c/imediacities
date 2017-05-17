@@ -37,13 +37,11 @@ class AnnotationRepository():
 
     @db.transaction
     def delete_tvs_annotation(self, annotation):
-        # item = annotation.targets[0]
-        # annotation.source.disconnect(item)
-        # annotation.targets.disconnect(item)
-
-        tvs_body = annotation.bodies[0]
+        tvs_body = annotation.bodies.single()
         if tvs_body:
-            for segment in tvs_body.segments:
+            original_tvs_body = tvs_body.downcast()
+            log.info(original_tvs_body.__class__)
+            for segment in original_tvs_body.segments:
                 segment.delete()
-            tvs_body.delete()
+            original_tvs_body.delete()
         annotation.delete()
