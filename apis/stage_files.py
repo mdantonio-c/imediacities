@@ -49,11 +49,14 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    def get(self):
+    def get(self, group=None):
 
         self.initGraph()
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        if group is None:
+            group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        else:
+            group = self.getNode(self.graph.Group, group, field='uuid')
 
         if group is None:
             raise RestApiException(
@@ -70,6 +73,7 @@ class Stage(GraphBaseOperations):
 
         data = []
         for f in os.listdir(upload_dir):
+
             path = os.path.join(upload_dir, f)
             if not os.path.isfile(path):
                 continue

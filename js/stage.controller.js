@@ -51,7 +51,6 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 	            noty.extractErrors(out_data, noty.WARNING);
 			}, function(out_data) {
 				self.loading = false;
-				self.studyCount = 0;
 
 	            noty.extractErrors(out_data, noty.ERROR);
 			});

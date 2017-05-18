@@ -15,7 +15,12 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('search', 'POST', data);
     }
 
-    self.getStageFiles = function() {
+    self.getStageFiles = function(group) {
+
+        if (typeof group !== 'undefined') { 
+            return jsonapi_parser.parseResponse(api.apiCall('stage/'+group, 'GET'));
+        }
+
         return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
     }
     self.importStageFiles = function(file) {

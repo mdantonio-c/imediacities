@@ -3,7 +3,7 @@ search:
   summary: Search video files previously staged in the area
   custom:
     # publish: true
-    authentication: true
+    authentication: false
   responses:
     '200':
       description: File successfully retrieved 

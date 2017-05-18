@@ -27,24 +27,25 @@ class Search(GraphBaseOperations):
 
         # Retrieve the JSON data from the Request and store it in local
         # variable
-        jsonData = request.get_json(cache=False)
-        attr = {}
-        # Iterate over the JSON Data and print the data on console
-        for key in jsonData:
-            attr[key] = jsonData[key]
-            logger.debug("%s = %s" % (key, jsonData[key]))
+        jsonData = request.get_json()
+        # logger.critical(jsonData)
+        # attr = {}
+        # # Iterate over the JSON Data and print the data on console
+        # for key in jsonData:
+        #     attr[key] = jsonData[key]
+        #     logger.debug("%s = %s" % (key, jsonData[key]))
 
         input_parameters = self.get_input()
-        logger.debug(input_parameters)
+        logger.critical(input_parameters)
 
-        if attr['term']:
-            videos = self.graph.AVEntity.nodes.filter(
-                identifying_title__icontains=attr['term'])
-        else:
-            videos = self.graph.AVEntity.nodes.all()
+        # if attr['term']:
+        #     videos = self.graph.AVEntity.nodes.filter(
+        #         identifying_title__icontains=attr['term'])
+        # else:
+        #     videos = self.graph.AVEntity.nodes.all()
 
-        for v in videos:
-            video = self.getJsonResponse(v)
-            data.append(video)
+        # for v in videos:
+        #     video = self.getJsonResponse(v)
+        #     data.append(video)
 
         return self.force_response(data)
