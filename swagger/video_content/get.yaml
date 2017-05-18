@@ -1,7 +1,7 @@
 common:
   custom:
     # publish: true
-    authentication: true
+    authentication: false
     authorized:
       - admin_root
 
@@ -13,9 +13,17 @@ video_content:
   #   - authentication
   custom:
     # publish: true
-    authentication: true
+    authentication: false
+  parameters:
+    - name: type
+      in: query
+      required: true
+      description: content type (e.g. video, thumbnail)
+      type: string
   responses:
     '200':
       description: Video content successfully retrieved
     '401':
       description: This endpoint requires a valid authorization token
+    '404':
+      description: The video content does not exists.

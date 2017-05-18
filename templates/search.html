@@ -88,7 +88,7 @@
 
 						<ul>
 							<li ng-repeat="v in ctrl.videos | searchFor:searchString">
-								<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.moviesposter}}" /></a>
+								<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.links['thumbnail']}}" /></a>
 								<div class="primary-description">
 									<span class="title">{{v.attributes.identifying_title}}</span><i>({{v.relationships.item[0].attributes.duration}} sec)</i>
 									<p><span ng-repeat="description in v.relationships.descriptions">
