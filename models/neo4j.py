@@ -634,7 +634,7 @@ class Annotation(IdentifiedNode):
 
 
 class AnnotationBody(HeritableStructuredNode):
-    __abstract_node__ = True
+    # __abstract_node__ = True
     # __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
     annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 

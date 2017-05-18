@@ -3,9 +3,8 @@
 """
 Handle your video metadata
 """
-import os
-from flask import send_file
-from flask_restful import request
+from flask import stream_with_context, Response
+from rapydo.confs import get_api_url
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -45,11 +44,15 @@ class Videos(GraphBaseOperations):
         else:
             videos = self.graph.AVEntity.nodes.all()
 
+        api_url = get_api_url()
         for v in videos:
             video = self.getJsonResponse(v)
-            logger.info("links %s " % video['links'])
-            video['links']['content'] = request.url + '/content'
-            video['links']['thumbnail'] = request.url + '/thumbnail'
+            video['links']['self'] = api_url + \
+                'api/videos/' + v.uuid
+            video['links']['content'] = api_url + \
+                'api/videos/' + v.uuid + '/content'
+            video['links']['thumbnail'] = api_url + \
+                'api/videos/' + v.uuid + '/thumbnail'
             data.append(video)
 
         return self.force_response(data)
@@ -212,7 +215,18 @@ class VideoContent(GraphBaseOperations):
         item = video.item.single()
         logger.debug("video content uri: %s" % item.uri)
 
-        return send_file(item.uri,
-                         mimetype=item.digital_format[2],
-                         attachment_filename=os.path.basename(item.uri),
-                         as_attachment=True)
+        f = open(item.uri, "rb")
+        return Response(
+            stream_with_context(self.read_in_chunks(f)),
+            mimetype=item.digital_format[2])
+
+    def read_in_chunks(self, file_object, chunk_size=1024):
+        """
+        Lazy function (generator) to read a file piece by piece.
+        Default chunk size: 1k.
+        """
+        while True:
+            data = file_object.read(chunk_size)
+            if not data:
+                break
+            yield data

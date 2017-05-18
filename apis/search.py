@@ -5,7 +5,8 @@ Search endpoint
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-from flask import request
+
+from rapydo.confs import get_api_url
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -25,27 +26,25 @@ class Search(GraphBaseOperations):
         self.initGraph()
         data = []
 
-        # Retrieve the JSON data from the Request and store it in local
-        # variable
-        jsonData = request.get_json()
-        # logger.critical(jsonData)
-        # attr = {}
-        # # Iterate over the JSON Data and print the data on console
-        # for key in jsonData:
-        #     attr[key] = jsonData[key]
-        #     logger.debug("%s = %s" % (key, jsonData[key]))
-
         input_parameters = self.get_input()
-        logger.critical(input_parameters)
+        logger.debug(input_parameters)
 
-        # if attr['term']:
-        #     videos = self.graph.AVEntity.nodes.filter(
-        #         identifying_title__icontains=attr['term'])
-        # else:
-        #     videos = self.graph.AVEntity.nodes.all()
+        if input_parameters['term']:
+            videos = self.graph.AVEntity.nodes.filter(
+                identifying_title__icontains=input_parameters['term'])
+        else:
+            videos = self.graph.AVEntity.nodes.all()
 
-        # for v in videos:
-        #     video = self.getJsonResponse(v)
-        #     data.append(video)
+        api_url = get_api_url()
+        for v in videos:
+            video = self.getJsonResponse(v)
+            logger.info("links %s " % video['links'])
+            video['links']['self'] = api_url + \
+                'api/videos/' + v.uuid
+            video['links']['content'] = api_url + \
+                'api/videos/' + v.uuid + '/content'
+            video['links']['thumbnail'] = api_url + \
+                'api/videos/' + v.uuid + '/thumbnail'
+            data.append(video)
 
         return self.force_response(data)

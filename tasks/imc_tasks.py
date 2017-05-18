@@ -31,7 +31,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-def import_file(self, path, resource_id):
+def import_file(self, path, resource_id, mode):
     with celery_app.app.app_context():
 
         progress(self, 'Starting import', path)
@@ -126,28 +126,29 @@ def import_file(self, path, resource_id):
                 analyze_path = '/uploads/Analize/' + \
                     group.uuid + '/' + video_filename.split('.')[0] + '/'
                 log.debug('analyze path: {0}'.format(analyze_path))
-                if os.path.exists(analyze_path):
-                    log.info('analyze skipped: previously done!')
-                else:
-                    progress(self, 'Executing automatic tools', path)
-                    params = []
-                    params.append("/code/imc/scripts/analysis/analyze.py")
-                    params.append(video_path)
-                    bash = BashCommands()
-                    try:
-                        output = bash.execute_command(
-                            "python3",
-                            params,
-                            parseException=True
-                        )
-                        log.info(output)
 
-                    except BaseException as e:
-                        log.error(e)
-                        video_node.status = 'ERROR'
-                        video_node.status_message = str(e)
-                        video_node.save()
-                        raise(e)
+                progress(self, 'Executing automatic tools', path)
+                params = []
+                params.append("/code/imc/scripts/analysis/analyze.py")
+                if mode is not None:
+                    log.info('Analyze with mode [%s]' % mode)
+                    params.append('-' + mode)
+                params.append(video_path)
+                bash = BashCommands()
+                try:
+                    output = bash.execute_command(
+                        "python3",
+                        params,
+                        parseException=True
+                    )
+                    log.info(output)
+
+                except BaseException as e:
+                    log.error(e)
+                    video_node.status = 'ERROR'
+                    video_node.status_message = str(e)
+                    video_node.save()
+                    raise(e)
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
@@ -157,16 +158,17 @@ def import_file(self, path, resource_id):
                 # FIXME naive filter
                 # find TVS annotations with this item as target
                 annotations = item_node.targeting_annotations.all()
-                if annotations:
+                if annotations is not None:
                     repo = AnnotationRepository(self.graph)
                     # here we expect ONLY one anno if present
                     for anno in annotations:
                         if anno.annotation_type == 'TVS':
+                            anno_id = anno.id
                             log.debug(anno)
                             repo.delete_tvs_annotation(anno)
                             log.info(
-                                "Deleted existing TVS annotation [%S]"
-                                % anno.id)
+                                "Deleted existing TVS annotation [%s]"
+                                % anno_id)
 
                 extract_tvs_annotation(self, item_node, analyze_path)
 

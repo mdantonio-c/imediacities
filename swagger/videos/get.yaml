@@ -7,7 +7,16 @@ common:
 
 videos:
   summary: List of videos
-  # description: -
+  description: Returns a list containing all videos. The list supports paging.
+  parameters:
+    - name: pageSize
+      in: query
+      description: Number of videos returned
+      type: integer
+    - name: pageNumber
+      in: query
+      description: Page number
+      type: integer
   responses:
     '200':
       description: List of videos successfully retrieved
@@ -16,7 +25,7 @@ videos:
 
 video:
   summary: Gets information about a video
-  # description: -
+  description: Returns a single video for its uuid
   # tags:
   #   # - logout
   #   - authentication
@@ -28,3 +37,6 @@ video:
       description: Video information successfully retrieved
     '401':
       description: This endpoint requires a valid authorization token
+    '404':
+      description: The video does not exists.
+
