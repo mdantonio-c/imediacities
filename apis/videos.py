@@ -51,9 +51,9 @@ class Videos(GraphBaseOperations):
             video['links']['self'] = api_url + \
                 'api/videos/' + v.uuid
             video['links']['content'] = api_url + \
-                'api/videos/' + v.uuid + '/content'
+                'api/videos/' + v.uuid + '/content?type=video'
             video['links']['thumbnail'] = api_url + \
-                'api/videos/' + v.uuid + '/thumbnail'
+                'api/videos/' + v.uuid + '/content?type=thumbnail'
             data.append(video)
 
         return self.force_response(data)
@@ -185,8 +185,13 @@ class VideoShots(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         item = video.item.single()
+        api_url = get_api_url()
         for s in item.shots:
             shot = self.getJsonResponse(s)
+            shot['links']['self'] = api_url + \
+                'api/shots/' + s.uuid
+            shot['links']['thumbnail'] = api_url + \
+                'api/shots/' + s.uuid + '?content=thumbnail'
             data.append(shot)
 
         return self.force_response(data)

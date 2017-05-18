@@ -42,9 +42,9 @@ class Search(GraphBaseOperations):
             video['links']['self'] = api_url + \
                 'api/videos/' + v.uuid
             video['links']['content'] = api_url + \
-                'api/videos/' + v.uuid + '/content'
+                'api/videos/' + v.uuid + '/content?type=video'
             video['links']['thumbnail'] = api_url + \
-                'api/videos/' + v.uuid + '/thumbnail'
+                'api/videos/' + v.uuid + '/content?type=thumbnail'
             data.append(video)
 
         return self.force_response(data)
