@@ -111,7 +111,7 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 	$scope.getVideoService = function (videoId) {
 		var apiUrl =  'http://localhost:8081/api/videos/'+videoId+'/content';
 		return $http.get(apiUrl, {
-            	responseType: 'arraybuffer',
+            	responseType: 'blob',
             	headers: { 
             		'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + DataService.getToken()
