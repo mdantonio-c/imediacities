@@ -671,11 +671,12 @@ class TVSBody(AnnotationBody):
         'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
-class Shot(StructuredNode):
+class Shot(IdentifiedNode):
     """Shot class"""
     start_frame_idx = IntegerProperty(required=True, show=True)
-    end_frame_idx = IntegerProperty(required=True, show=True)
-    frame_uri = StringProperty(show=True)
+    end_frame_idx = IntegerProperty(show=True)
+    frame_uri = StringProperty()
+    thumbnail_uri = StringProperty()
     annotation_body = RelationshipFrom(
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)

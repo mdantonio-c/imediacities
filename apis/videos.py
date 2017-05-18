@@ -4,6 +4,7 @@
 Handle your video metadata
 """
 from flask import stream_with_context, Response
+from flask import send_file
 from rapydo.confs import get_api_url
 
 from rapydo.utils.logs import get_logger
@@ -50,9 +51,9 @@ class Videos(GraphBaseOperations):
             video['links']['self'] = api_url + \
                 'api/videos/' + v.uuid
             video['links']['content'] = api_url + \
-                'api/videos/' + v.uuid + '/content'
+                'api/videos/' + v.uuid + '/content?type=video'
             video['links']['thumbnail'] = api_url + \
-                'api/videos/' + v.uuid + '/thumbnail'
+                'api/videos/' + v.uuid + '/content?type=thumbnail'
             data.append(video)
 
         return self.force_response(data)
@@ -184,8 +185,13 @@ class VideoShots(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         item = video.item.single()
+        api_url = get_api_url()
         for s in item.shots:
             shot = self.getJsonResponse(s)
+            shot['links']['self'] = api_url + \
+                'api/shots/' + s.uuid
+            shot['links']['thumbnail'] = api_url + \
+                'api/shots/' + s.uuid + '?content=thumbnail'
             data.append(shot)
 
         return self.force_response(data)
@@ -193,6 +199,7 @@ class VideoShots(GraphBaseOperations):
 
 class VideoContent(GraphBaseOperations):
     """
+    Gets video content such as video strem and thumbnail
     """
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -202,6 +209,15 @@ class VideoContent(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
+
+        input_parameters = self.get_input()
+        content_type = input_parameters['type']
+        if content_type is None or (content_type != 'video' and
+                                    content_type != 'thumbnail'):
+            raise RestApiException(
+                "Bad type parameter: expected 'video' or 'thumbnail'",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
         self.initGraph()
         video = None
         try:
@@ -213,12 +229,30 @@ class VideoContent(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         item = video.item.single()
-        logger.debug("video content uri: %s" % item.uri)
-
-        f = open(item.uri, "rb")
-        return Response(
-            stream_with_context(self.read_in_chunks(f)),
-            mimetype=item.digital_format[2])
+        if content_type == 'video':
+            video_uri = item.uri
+            logger.debug("video content uri: %s" % video_uri)
+            if video_uri is None:
+                raise RestApiException(
+                    "Video not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            f = open(video_uri, "rb")
+            return Response(
+                stream_with_context(self.read_in_chunks(f)),
+                mimetype=item.digital_format[2])
+        elif content_type == 'thumbnail':
+            thumbnail_uri = item.thumbnail
+            logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            if thumbnail_uri is None:
+                raise RestApiException(
+                    "Thumbnail not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            return send_file(thumbnail_uri, mimetype='image/jpeg')
+        else:
+            # it should never be reached
+            raise RestApiException(
+                "Invalid content type {1}".format(content_type),
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
     def read_in_chunks(self, file_object, chunk_size=1024):
         """
