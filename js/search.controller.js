@@ -109,7 +109,7 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 
 	self.videoUrl = '';
 	$scope.getVideoService = function (videoId) {
-		var apiUrl =  'http://localhost:8081/api/videos/'+videoId+'/content';
+		var apiUrl =  'http://localhost:8081/api/videos/'+videoId+'/content?type=video';
 		return $http.get(apiUrl, {
             	responseType: 'blob',
             	headers: { 
@@ -170,7 +170,7 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 		        ]}
     		]
     	}*/
-    	$scope.loadVideo(video.id);
+    	//$scope.loadVideo(video.id);
 	};
 
 	$scope.jumpToShot = function(selectedShot) {
