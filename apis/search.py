@@ -26,23 +26,16 @@ class Search(GraphBaseOperations):
     def post(self):
 
         self.initGraph()
-        data = []
 
         input_parameters = self.get_input()
-
         offset, limit = self.get_paging()
-        # FIXME why get_paging doen't work with defaults
-        offset = (1 if offset is None else offset)
-        limit = (10 if limit is None else limit)
-        logger.debug("page offset: {0}, page limit: {1}".format(
-            offset, limit))
 
-        term = input_parameters['term']
-        if not term or not term.strip():
-            raise RestApiException(
-                'Term input cannot be empty',
-                status_code=hcodes.HTTP_BAD_REQUEST)
-        term = term.strip()
+        logger.debug("page offset: {0}, page limit: {1}".format(offset, limit))
+
+        term = input_parameters.get('term', '').strip()
+        if not term:
+            raise RestApiException('Term input cannot be empty',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
         if term == '*':
             # videos = self.graph.AVEntity.nodes.all()
             query = "MATCH (v:AVEntity) \
@@ -59,21 +52,19 @@ class Search(GraphBaseOperations):
                 offset=offset - 1,
                 limit=limit)
 
+        data = []
         result = self.graph.cypher(query)
-        videos = []
-        for row in result:
-            videos.append(self.graph.AVEntity.inflate(row[0]))
-
         api_url = get_api_url()
-        for v in videos:
+        for row in result:
+            v = self.graph.AVEntity.inflate(row[0])
+
+            video_url = api_url + 'api/videos/' + v.uuid
+
             video = self.getJsonResponse(v)
-            logger.info("links %s " % video['links'])
-            video['links']['self'] = api_url + \
-                'api/videos/' + v.uuid
-            video['links']['content'] = api_url + \
-                'api/videos/' + v.uuid + '/content?type=video'
-            video['links']['thumbnail'] = api_url + \
-                'api/videos/' + v.uuid + '/content?type=thumbnail'
+            logger.info("links %s" % video['links'])
+            video['links']['self'] = video_url
+            video['links']['content'] = video_url + '/content?type=video'
+            video['links']['thumbnail'] = video_url + '/content?type=thumbnail'
             data.append(video)
 
         return self.force_response(data)
