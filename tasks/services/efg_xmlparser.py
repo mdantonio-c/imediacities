@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-
+from imc.models.neo4j import (
+    Title, Keyword, Description
+)
 from rapydo.utils.logs import get_logger
 
 log = get_logger(__name__)
@@ -56,45 +58,49 @@ class EFG_XMLParser():
 
     def parse_titles(self, record):
         titles = []
-        for title in record.findall("title"):
-            properties = {}
-            properties['lang'] = title.get('lang')
-            log.debug('title [lang]: %s' % properties['lang'])
+        for node in record.findall("title"):
+            title = Title()
+            title.language = node.get('lang')
+            log.debug('title [lang]: %s' % title.language)
 
-            properties['text'] = title.find('text').text
-            log.debug('title [text]: %s' % properties['text'])
-            titles.append(properties)
+            title.text = node.find('text').text
+            log.debug('title [text]: %s' % title.text)
+            titles.append(title)
         return titles
 
     def parse_keywords(self, record):
         keywords = []
-        for keyword in record.findall("keywords"):
-            properties = {}
-            properties['type'] = keyword.get('type')
-            log.debug('keywork [type]: %s' % properties['type'])
-            properties['lang'] = keyword.get('lang')
-            log.debug('keyword [lang]: %s' % properties['lang'])
-            terms = []
-            for term in keyword.iter('term'):
-                log.debug('term: %s' % term.text)
-                terms.append(term.text)
-            properties['term'] = terms
-            keywords.append(properties)
+        for node in record.findall("keywords"):
+            for term in node.iter('term'):
+                keyword = Keyword()
+                # FIXME
+                # keyword.keyword_type = node.get('type')
+                # log.debug('keyword [type]: %s' % keyword.keyword_type)
+                keyword.language = node.get('lang')
+                log.debug('keyword [lang]: %s' % keyword.language)
+                keyword.term = term.text
+                log.debug('keyword [term]: %s' % keyword.term)
+                keyword.termID = term.get('id')
+                if keyword.termID is not None:
+                    log.debug('keyword [term-id]: %s' % keyword.termID)
+                keywords.append(keyword)
         return keywords
 
     def parse_descriptions(self, record):
         descriptions = []
-        for description in record.findall("description"):
-            properties = {}
-            properties['type'] = description.get('type')
-            log.debug('description [type]: %s' % properties['type'])
-            properties['lang'] = description.get('lang')
-            log.debug('description [lang]: %s' % properties['lang'])
-            properties['source'] = description.get('source')
-            log.debug('description [source]: %s' % properties['source'])
-            properties['text'] = description.text
-            log.debug('description [text]: %s' % properties['text'])
-            descriptions.append(properties)
+        for node in record.findall("description"):
+            description = Description()
+            # FIXME
+            # description.description_type = node.get('type')
+            # log.debug(
+            #     'description [type]: %s' % description.description_type)
+            description.language = node.get('lang')
+            log.debug('description [lang]: %s' % description.language)
+            description.source = node.get('source')
+            log.debug('description [source]: %s' % description.source)
+            description.text = node.text
+            log.debug('description [text]: %s' % description.text)
+            descriptions.append(description)
         return descriptions
 
     def parse_av_creation(self, record):

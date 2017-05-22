@@ -4,6 +4,18 @@ stage:
   custom:
     # publish: true
     authentication: true
+  parameters:
+    - name: criteria
+      in: body
+      description: Criteria for the import.
+      schema:
+        required:
+          - filename
+        properties:
+          filename:
+            type: string
+          mode:
+            type: string
   responses:
     '200':
       description: File successfully deleted 

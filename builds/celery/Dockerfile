@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     # Fraunhofer libraries
     python3 \
     ffmpeg \
+    libavcodec-extra \
     libv4l-0 \
     ##################################
     # latest python
@@ -48,50 +49,56 @@ RUN pip3 install --upgrade \
     --force-reinstall --no-cache-dir -r requirements.txt
 
 ###################
-# TODO: decide about a main user recipe for containers
 ENV APIUSER developer
-
+# main user for launching the apis
+RUN useradd -r -M -d $CERTDIR/home -s /bin/bash -p ! $APIUSER
 ###################
-# Closing entrypoint
-
-RUN mkdir /code
-WORKDIR /code
-RUN mkdir /docker-entrypoint.d/
-RUN echo "alias httpapi=\"su -p \$APIUSER -c 'cd /code; python run.py'\"" >> /root/.bash_aliases
-
-COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
-ENTRYPOINT ["docker-entrypoint"]
-CMD ["rest"]
-ENV PAGER less
-ENV TERM=xterm-256color
-ENV PYTHONIOENCODING="utf-8"
-# Flask port
-EXPOSE 5000
-
-
 
 
 ##################################
 # FROM Fraunhofer
 # download and install pre-compiled python opencv wrapper
-# Fraunhofer version:
 ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
-# Mattia version:
-# ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/local/lib/python3.6/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so 
-##################################
+RUN chmod a+r /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
 
-
-##################################
-# FROM Fraunhofer
 # copy test script
-COPY ./test_python_installation.py /
+# COPY ./test_python_installation.py /
 # run the test script - if that fails, something went wrong
-RUN python3 /test_python_installation.py
+# RUN python3 /test_python_installation.py
 ##################################
 
+RUN export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH
+
+
+
+RUN mkdir -p /code
+WORKDIR /code
+RUN mkdir /docker-entrypoint.d/
+RUN echo "Entrylevel" && \
+    echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
+    echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
+    >> /root/.bashrc
+
+# Run Celery as developer
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A flask_ext.flask_celery.worker.celery_app '" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
 
 RUN echo "Entrylevel" && \
     echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
     echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
     >> /root/.bashrc
+
+ENV PAGER less
+ENV TERM=xterm-256color
+ENV PYTHONIOENCODING="utf-8"
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["mycelery"]
+
+# Flask port
+EXPOSE 5000
+
+

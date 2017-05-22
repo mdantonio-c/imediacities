@@ -8,9 +8,13 @@ VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
 
+import sys
+from datetime import datetime
+import pytz
+
 from rapydo.services.neo4j.models import (
     StringProperty, ArrayProperty, IntegerProperty,
-    FloatProperty, DateTimeProperty,
+    FloatProperty, DateTimeProperty, DateProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
 )
@@ -23,15 +27,78 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class HeritableStructuredNode(StructuredNode):
+
+    # noqa see: http://stackoverflow.com/questions/35744456/relationship-to-multiple-types-polymorphism-in-neomodel
+
+    """
+    Useful to manage polymorphic relationships providing downcasting.
+
+    Extends :class:`neomodel.StructuredNode` to provide the :meth:`.downcast`
+    method.
+    """
+
+    __abstract_node__ = True
+
+    def downcast(self, target_class=None):
+        """
+        Re-instantiate this node as an instance its most derived derived class.
+        """
+        # TODO: there is probably a far more robust way to do this.
+        _get_class = lambda cname: getattr(sys.modules[__name__], cname)
+
+        # inherited_labels() only returns the labels for the current class and
+        #  any super-classes, whereas labels() will return all labels on the
+        #  node.
+        classes = list(set(self.labels()) - set(self.inherited_labels()))
+
+        if len(classes) == 0:
+            # The most derivative class is already instantiated.
+            return self
+        cls = None
+
+        if target_class is None:    # Caller has not specified the target.
+            if len(classes) == 1:    # Only one option, so this must be it.
+                target_class = classes[0]
+            else:
+                # Infer the most derivative class by looking for the one
+                # with the longest method resolution order.
+                class_objs = map(_get_class, classes)
+                _, cls = sorted(
+                    zip(
+                        map(lambda cls: len(cls.mro()), class_objs),
+                        class_objs),
+                    key=lambda size, cls: size)[-1]
+        else:    # Caller has specified a target class.
+            if not isinstance(target_class, str):
+                # In the spirit of neomodel, we might as well support both
+                #  class (type) objects and class names as targets.
+                target_class = target_class.__name__
+
+            if target_class not in classes:
+                raise ValueError('%s is not a sub-class of %s'
+                                 % (target_class, self.__class__.__name__))
+        if cls is None:
+            cls = getattr(sys.modules[__name__], target_class)
+        instance = cls.inflate(self.id)
+
+        # TODO: Can we re-instatiate without hitting the database again?
+        instance.refresh()
+        return instance
+
 ##############################################################################
 # MODELS
 ##############################################################################
 
 # Extension of User model for accounting in API login/logout
+
+
 class User(UserBase):
     # name_surname = StringProperty(required=True, unique_index=True)
 
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    annotations = RelationshipFrom(
+        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore)
@@ -64,7 +131,12 @@ class Stage(TimestampedNode):
 ##############################################################################
 
 
-class Item(TimestampedNode):
+class AnnotationTarget(StructuredNode):
+    # __abstract_node__ = True
+    __label__ = 'Item'
+
+
+class Item(TimestampedNode, AnnotationTarget):
     """
     The Item Entity points to the digital file held in the IMC repository.
     The item functions as a logical wrapper for the digital object displayed in
@@ -100,22 +172,27 @@ class Item(TimestampedNode):
         license         A reference to the license that applies to the digital
                         item.
     """
-    thumbnail = StringProperty()
-    duration = IntegerProperty()
-    framerate = FloatProperty()
+    thumbnail = StringProperty(show=True)
+    duration = FloatProperty(show=True)
+    framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False)
-    uri = StringProperty()
+    uri = StringProperty(show=True)
     item_type = StringProperty(required=True)
     # TODO add license reference
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
-        'Stage', 'CONTENT_SOURCE', cardinality=One, show=True)
+        'Stage', 'CONTENT_SOURCE', cardinality=One)
     meta_source = RelationshipTo(
-        'Stage', 'META_SOURCE', cardinality=One, show=True)
+        'Stage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
-        'Creation', 'CREATION', cardinality=ZeroOrOne, show=True)
-    annotation = RelationshipTo('Annotation', 'IS_ANNOTATED_BY')
+        'Creation', 'CREATION', cardinality=ZeroOrOne)
+    sourcing_annotations = RelationshipFrom(
+        'Annotation', 'SOURCE', cardinality=ZeroOrMore)
+    targeting_annotations = RelationshipFrom(
+        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
+    shots = RelationshipTo(
+        'Shot', 'SHOT', cardinality=ZeroOrMore)
 
 
 class ContributionRel(StructuredRel):
@@ -156,8 +233,8 @@ class Creation(IdentifiedNode):
     """
     # __abstract_node__ = True
     __label__ = 'AVEntity:NonAVEntity'
-    record_sources = RelationshipTo(
-        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    # record_sources = RelationshipTo(
+    #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     titles = RelationshipTo(
         'Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
     keywords = RelationshipTo(
@@ -207,9 +284,10 @@ class Title(StructuredNode):
         ('09', 'uniform'),
         ('10', 'other')
     )
-    text = StringProperty(required=True)
-    language = StringProperty()  # FIXME - controlled vocab from ISO-639-1
-    relationship = StringProperty(required=True, choices=TITLE_RELASHIONSHIPS)
+    text = StringProperty(required=True, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    relationship = StringProperty(
+        required=True, choices=TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_TITLE', cardinality=One, show=True)
 
@@ -240,17 +318,19 @@ class Keyword(StructuredNode):
                         be set to "uncontrolled".
     """
     KEYWORD_TYPES = (
-        ('00', 'building'),
-        ('01', 'person'),
-        ('02', 'subject'),
-        ('03', 'genre'),
-        ('04', 'georeference')
+        ('00', 'Building'),
+        ('01', 'Person'),
+        ('02', 'Subject'),
+        ('03', 'Genre'),
+        ('04', 'Place'),
+        ('05', 'Form'),
+        ('06', 'Georeference')
         # FIXME just an example here
     )
-    term = StringProperty(required=True)
+    term = StringProperty(index=True, required=True, show=True)
     termID = IntegerProperty()
-    keyword_type = StringProperty(choices=KEYWORD_TYPES)
-    language = StringProperty()  # FIXME - controlled vocab from ISO-639-1
+    keyword_type = StringProperty(choices=KEYWORD_TYPES, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -277,9 +357,9 @@ class Description(StructuredNode):
         ('03', 'review')
         # FIXME just an example here
     )
-    text = StringProperty(required=True)
-    language = StringProperty()  # FIXME - controlled vocab ISO-639-1
-    description_type = StringProperty(choices=DESCRIPTION_TYPES)
+    text = StringProperty(index=True, required=True, show=True)
+    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    description_type = StringProperty(choices=DESCRIPTION_TYPES, show=True)
     source = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
@@ -330,7 +410,7 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(required=True),
+    name = StringProperty(index=True, required=True),
     url = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
@@ -370,8 +450,8 @@ class Agent(IdentifiedNode):
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     agent_type = StringProperty(required=True, choices=AGENT_TYPES)
     names = ArrayProperty(StringProperty(), required=True)
-    birth_date = StringProperty()
-    death_date = StringProperty()
+    birth_date = DateProperty()
+    death_date = DateProperty(default=None)
     biographical_note = StringProperty()
     sex = StringProperty(choices=SEXES)
     biography_views = ArrayProperty(StringProperty(), required=False)
@@ -405,7 +485,7 @@ class RecordSource(StructuredNode):
                         institution name ("ISIL code" or "Institution acronym")
     """
     sourceID = StringProperty(required=True)
-    provider_name = StringProperty(required=True)
+    provider_name = StringProperty(index=True, required=True)
     providerID = StringProperty(required=True)
     provider_scheme = StringProperty(required=True)
     creation = RelationshipFrom(
@@ -439,8 +519,8 @@ class AVEntity(Creation):
                                     filmographic entry of a film on the content
                                     provider web site.
     """
-    identifying_title = StringProperty(required=True)
-    identifying_title_origin = StringProperty()
+    identifying_title = StringProperty(index=True, required=True, show=True)
+    identifying_title_origin = StringProperty(index=True, )
     production_countries = ArrayProperty(StringProperty())
     production_years = ArrayProperty(StringProperty(), required=True)
     video_format = RelationshipTo(
@@ -521,6 +601,10 @@ class NonAVEntity(Creation):
 #    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
 
 
+class AnnotationCreatorRel(StructuredRel):
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+
+
 class Annotation(IdentifiedNode):
     """Annotation class"""
     ANNOTATION_TYPES = (
@@ -534,21 +618,25 @@ class Annotation(IdentifiedNode):
         ('VIS', 'Google Vision API'),
         ('AWS', 'Amazon Rekognition API')
     )
-    type = StringProperty(required=True, choices=ANNOTATION_TYPES)
+    annotation_type = StringProperty(
+        required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
-        default=lambda: datetime.now(pytz.utc))
-    source = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
+        default=lambda: datetime.now(pytz.utc), show=True)
+    source = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
-        'User', 'IS_CREATED_BY', cardinality=ZeroOrOne)
-    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS)
+        'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
+        model=AnnotationCreatorRel, show=True)
+    generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS, show=True)
     bodies = RelationshipTo(
         'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
     targets = RelationshipTo(
-        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore)
+        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
 
 
-class AnnotationBody(StructuredNode):
-    __abstract_node__ = True
+class AnnotationBody(HeritableStructuredNode):
+    # __abstract_node__ = True
+    # __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
+    annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 
 
 class TextBody(AnnotationBody):
@@ -562,30 +650,36 @@ class ImageBody(AnnotationBody):
 
 
 class AudioBody(AnnotationBody):
+    audio_format = StringProperty(show=True)
+    language = StringProperty(show=True)
     # TODO
-    pass
 
 
-class VQBody(AnnotationBody):
-    """Class for Video Quality Annotation."""
-    module = StringProperty(required=True)
-    frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
+# class VQBody(AnnotationBody):
+#     """Class for Video Quality Annotation."""
+#     module = StringProperty(required=True)
+#     frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
 
 
-class VQFrame(StructuredNode):
-    idx = IntegerProperty(required=True)
-    quality = FloatProperty(required=True)
+# class VQFrame(StructuredNode):
+#     idx = IntegerProperty(required=True)
+#     quality = FloatProperty(required=True)
 
 
 class TVSBody(AnnotationBody):
-    shots = RelationshipTo('Shot', 'SHOT', cardinality=OneOrMore)
+    segments = RelationshipTo(
+        'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
-class Shot(StructuredNode):
+class Shot(IdentifiedNode):
     """Shot class"""
-    start_frame_idx = IntegerProperty()
-    end_frame_idx = IntegerProperty()
-    duration = IntegerProperty()
+    start_frame_idx = IntegerProperty(required=True, show=True)
+    end_frame_idx = IntegerProperty(show=True)
+    frame_uri = StringProperty()
+    thumbnail_uri = StringProperty()
+    annotation_body = RelationshipFrom(
+        'Annotation', 'SEGMENT', cardinality=One)
+    item = RelationshipFrom('Item', 'SHOT', cardinality=One)
 
 
 class ODBody(StructuredNode):
@@ -596,7 +690,3 @@ class ODBody(StructuredNode):
     # FIXME add object attribute relationship
     # object_attributes = RelationshipTo(
     #              'ObjectAttribute', 'HAS_ATTRIBUTE', cardinality=ZeroOrMore)
-
-
-class TargetBody(StructuredNode):
-    __abstract_node__ = True

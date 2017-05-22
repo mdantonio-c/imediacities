@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
+import random
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
+from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
 # import xml.etree.ElementTree as ET
 
 from rapydo.basher import BashCommands
@@ -27,7 +31,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-def import_file(self, path, resource_id):
+def import_file(self, path, resource_id, mode):
     with celery_app.app.app_context():
 
         progress(self, 'Starting import', path)
@@ -119,28 +123,55 @@ def import_file(self, path, resource_id):
                     self, path, video_filename, item_node)
 
                 # EXECUTE AUTOMATC TOOLS
-                # progress(self, 'Executing automatic tools', path)
-                # params = []
-                # params.append("/imedia-pipeline-cin/analyze.py")
-                # params.append(video_filename)
-                # bash = BashCommands()
-                # try:
-                #     output = bash.execute_command(
-                #         "python3",
-                #         params,
-                #         parseException=True
-                #     )
-                #     log.info(output)
+                analyze_path = '/uploads/Analize/' + \
+                    group.uuid + '/' + video_filename.split('.')[0] + '/'
+                log.debug('analyze path: {0}'.format(analyze_path))
 
-                # except BaseException as e:
-                #     log.error(e)
-                #     video_node.status = 'ERROR'
-                #     video_node.status_message = str(e)
-                #     video_node.save()
-                #     raise(e)
+                progress(self, 'Executing automatic tools', path)
+                params = []
+                params.append("/code/imc/scripts/analysis/analyze.py")
+                if mode is not None:
+                    log.info('Analyze with mode [%s]' % mode)
+                    params.append('-' + mode)
+                params.append(video_path)
+                bash = BashCommands()
+                try:
+                    output = bash.execute_command(
+                        "python3",
+                        params,
+                        parseException=True
+                    )
+                    log.info(output)
+
+                except BaseException as e:
+                    log.error(e)
+                    video_node.status = 'ERROR'
+                    video_node.status_message = str(e)
+                    video_node.save()
+                    raise(e)
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
+
+                extract_tech_info(self, item_node, analyze_path)
+
+                # FIXME naive filter
+                # find TVS annotations with this item as target
+                annotations = item_node.targeting_annotations.all()
+                if annotations is not None:
+                    repo = AnnotationRepository(self.graph)
+                    # here we expect ONLY one anno if present
+                    for anno in annotations:
+                        if anno.annotation_type == 'TVS':
+                            anno_id = anno.id
+                            log.debug(anno)
+                            repo.delete_tvs_annotation(anno)
+                            log.info(
+                                "Deleted existing TVS annotation [%s]"
+                                % anno_id)
+
+                extract_tvs_annotation(self, item_node, analyze_path)
+
                 # TODO
                 video_node.status = 'COMPLETED'
                 video_node.status_message = 'Nothing to declare'
@@ -229,17 +260,6 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     # Creating AV_Entity
     av_creation = parser.parse_av_creation(record)
     repo = CreationRepository(self.graph)
-    # check if a creation already exists and delete it
-    # creation_node = item_node.creation.single()
-    # if creation_node:
-    creation_node = item_node.creation.single()
-    if creation_node:
-        log.debug("Creation already exists for current Item")
-        creation_id = creation_node.id
-        repo.delete_av_entity(item_node.creation.single())
-        log.info(
-            "Existing creation [ID:%s] deleted" % creation_id)
-
     repo.create_av_entity(
         av_creation['properties'],
         item_node,
@@ -249,8 +269,89 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
 
 
-def extract_automatic_annotation(self, path):
-    """ """
-    # tree = etree.parse(path)
-    # log.debug(etree.tostring(tree, pretty_print=True))
-    pass
+def extract_tech_info(self, item, analyze_dir_path):
+    """
+    Extract technical information about the given content from result file
+    origin_info.json and save them as Item properties in the database.
+    """
+    if not os.path.exists(analyze_dir_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", analyze_dir_path)
+    # check for info result
+    tech_info_filename = 'origin_info.json'
+    tech_info_path = os.path.join(
+        os.path.dirname(analyze_dir_path), tech_info_filename)
+    if not os.path.exists(tech_info_path):
+        log.warning("Info tech CANNOT be extracted: [%s] does not exist",
+                    tech_info_path)
+        return
+
+    # load info from json
+    with open(tech_info_path) as data_file:
+        data = json.load(data_file)
+
+    # thumbnail FIXME
+    item.thumbnail = get_thumbnail(analyze_dir_path)
+    # duration
+    item.duration = data["streams"][0]["duration"]
+    # framerate
+    item.framerate = data["streams"][0]["avg_frame_rate"]
+    # dimension
+    item.dimension = data["format"]["size"]
+    # format
+    item.digital_format = [None for _ in range(4)]
+    # container: e.g."AVI", "MP4", "3GP"
+    item.digital_format[0] = data["format"]["format_name"]
+    # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
+    item.digital_format[1] = data["streams"][0]["codec_long_name"]
+    # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
+    item.digital_format[2] = data["format"]["format_long_name"]
+    # resolution: The degree of sharpness of the digital object expressed in
+    # lines or pixel
+    item.digital_format[3] = data["format"]["bit_rate"]
+
+    item.uri = data["format"]["filename"]
+    item.save()
+
+    log.info('Extraction of techincal info completed')
+
+
+def get_thumbnail(path):
+    """
+    Returns a random filename, chosen among the jpg files of the given path.
+    """
+    jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
+    index = random.randrange(0, len(jpg_files))
+    return os.path.join(
+        os.path.dirname(path), jpg_files[index])
+
+
+def extract_tvs_annotation(self, item, analyze_dir_path):
+    """
+    Extract temporal video segmentation results from tvs.xml file and save
+    them as Annotation in the database.
+    """
+    if not os.path.exists(analyze_dir_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", analyze_dir_path)
+    # check for info result
+    tvs_filename = 'tvs.xml'
+    tvs_path = os.path.join(
+        os.path.dirname(analyze_dir_path), tvs_filename)
+    if not os.path.exists(tvs_path):
+        log.warning("Shots CANNOT be extracted: [%s] does not exist",
+                    tvs_path)
+        return
+
+    parser = FHG_XMLParser()
+    log.debug('get shots from file [%s]' % tvs_path)
+    shots = parser.get_shots(tvs_path)
+    if shots is None:
+        log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
+        return
+
+    # Save Shots in the database
+    repo = AnnotationRepository(self.graph)
+    repo.create_tvs_annotation(item, shots)
+
+    log.info('Extraction of TVS info completed')

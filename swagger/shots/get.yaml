@@ -1,0 +1,30 @@
+common:
+  custom:
+    # publish: true
+    # fixme auth = true
+    authentication: false
+    authorized:
+      - admin_root
+
+video:
+  summary: Gets information about a shot
+  description: Returns a single shot for its id
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    # fixme auth = true
+    authentication: false
+  parameters:
+    - name: content
+      in: query
+      description: content type (ONLY thumbnail at the moment)
+      type: string
+  responses:
+    '200':
+      description: Shot information successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token
+    '404':
+      description: The video does not exists.

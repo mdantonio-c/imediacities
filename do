@@ -11,9 +11,10 @@ source .env
 
 compose_com="docker-compose"
 webbuild="bower"
-volume_prefix="rapydo_${COMPOSE_PROJECT_NAME}"
+volume_prefix="${COMPOSE_PROJECT_NAME}"
 fronted_container="frontend"
 backend_container="backend"
+proxycontainer="proxy"
 backend_repo="backend"
 frontend_repo="frontend"
 # backend_git="https://github.com/mdantonio/http-api-base"
@@ -21,8 +22,6 @@ backend_git="https://github.com/EUDAT-B2STAGE/http-api-base"
 frontend_git="https://github.com/mdantonio/angularjs-on-flask"
 services="$backend_container $fronted_container worker"
 submodule_tracking="submodules.current.commit"
-
-export VOLUMES_PREFIX=$volume_prefix
 
 #############################
 echo "# ############################################ #"
@@ -172,18 +171,64 @@ if [ "$1" == "init" ]; then
         git clone $backend_git $backend_repo
     fi
     if [ ! -d "$frontend_repo" ]; then
-        echo "Clone frontned"
+        echo "Clone frontend"
         git clone $frontend_git $frontend_repo
     fi
 
     echo "Build bower packages (Javascript libraries)"
     $bcom
-    echo "Completed"
+
+    echo "Copying example video"
+
+    cp -r scripts/analysis/test_data/00000000-0000-0000-00000000000000000 imediastuff/ 
+
+    echo "**********************************"
+    echo "* INSTALLING FRAUNHOFER SOFTWARE *"
+    echo "**********************************"
+
+    echo "Removing previous installation, if any"
+    rm -rf imedia-pipeline
+
+    echo "Cloning imedia-pipeline repository, please provide your CINECA gitlab credentials"
+    git clone https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline.git
+
+    cd imedia-pipeline/tools/ 
+    tag=`git tag | grep tools | tail -1`
+    echo "Selected tag: $tag"
+    git checkout $tag
+
+    echo "Please provide the Fraunhofer password"
+    read -s fraunhofer_password
+    sudo ./setup_idmt_tools.sh -m install -p $fraunhofer_password 
+
+    echo "Init completed"
 # Logs
 elif [ "$1" == "logs" ]; then
 
     $compose_com $files logs -f
 
+# SSL certificates in production with letsencrypt
+elif [ "$1" == "letsencrypt" ]; then
+    echo "Creating new letsencrypt certificates"
+    $compose_com $files exec $proxycontainer /bin/bash -c "updatecertificates"
+    exit 0
+
+elif [ "$1" == "check_certificate" ]; then
+    $compose_com $files exec $proxycontainer /bin/bash -c "openssl x509 -in \$CERTCHAIN  -noout -subject"
+    exit 0
+
+elif [ "$1" == "buildall" ]; then
+    $compose_com $files build --pull
+    exit 0
+
+elif [ "$1" == "build4test" ]; then
+    $compose_com $files build --pull sql icat rest
+    exit 0
+
+elif [ "$1" == "buildone" ]; then
+    $compose_com $files build $3
+    exit 0
+ 
 elif [ "$1" == "status" ]; then
     echo -e "ACTION: Status check\n"
 

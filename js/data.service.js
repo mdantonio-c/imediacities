@@ -11,11 +11,20 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall("schemas/"+endpoint, 'GET');
     }
 
-    self.searchVideos = function() {
-        return api.apiCall('search', 'POST');
+    self.getToken = function() {
+        return api.checkToken();
     }
 
-    self.getStageFiles = function() {
+    self.searchVideos = function(data) {
+        return api.apiCall('search', 'POST', data);
+    }
+
+    self.getStageFiles = function(group) {
+
+        if (typeof group !== 'undefined') { 
+            return jsonapi_parser.parseResponse(api.apiCall('stage/'+group, 'GET'));
+        }
+
         return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
     }
     self.importStageFiles = function(file) {
@@ -30,9 +39,16 @@ function DataService($log, api, $q, jsonapi_parser) {
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }
-    // self.getVideoInfo = function(video) {
-    //     return api.apiCall('video/'+video+'annotations', 'GET');
+    // self.getVideoAnnotations = function(videoId) {
+    //     return api.apiCall('video/'+videoId+'/annotations', 'GET');
     // }
+    self.getVideoContent = function(videoId) {
+        return api.apiCall('videos/'+videoId+'/content', 'GET', {}, undefined, true)
+    }
+
+    self.getVideoThumbnail = function(videoId) {
+        return api.apiCall('videos/'+videoId+'/thumbnail', 'GET')
+    }
 
 
     self.getUserSchema = function(study) {

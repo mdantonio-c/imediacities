@@ -18,10 +18,10 @@ fi
 if [ "$DOMAIN" != "" ]; then
     echo "Production mode"
 
-#    if [ ! -f "$CERTCHAIN" ]; then
-#        echo "First time access"
-#        selfsign
-#    fi
+    if [ ! -f "$CERTCHAIN" ]; then
+        echo "First time access"
+        selfsign
+    fi
 fi
 
 #####################

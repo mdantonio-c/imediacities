@@ -49,11 +49,14 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    def get(self):
+    def get(self, group=None):
 
         self.initGraph()
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        if group is None:
+            group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        else:
+            group = self.getNode(self.graph.Group, group, field='uuid')
 
         if group is None:
             raise RestApiException(
@@ -70,6 +73,7 @@ class Stage(GraphBaseOperations):
 
         data = []
         for f in os.listdir(upload_dir):
+
             path = os.path.join(upload_dir, f)
             if not os.path.isfile(path):
                 continue
@@ -122,6 +126,11 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
+        mode = input_parameters['mode']
+        if mode is not None and mode != 'clean' and mode != 'fast':
+            raise RestApiException(
+                "Bad mode parameter: expected 'fast' or 'clean'",
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
@@ -142,7 +151,7 @@ class Stage(GraphBaseOperations):
             log.debug("Resource created for %s" % path)
 
         task = CeleryExt.import_file.apply_async(
-            args=[path, resource.uuid],
+            args=[path, resource.uuid, mode],
             countdown=20
         )
 

@@ -1,0 +1,9 @@
+file: videos
+class: VideoContent
+# baseuri: "/api"
+schema:
+  expose: true
+mapping:
+  video_content: "/videos/<video_id>/content"
+labels:
+  - video

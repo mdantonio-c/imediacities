@@ -3,5 +3,6 @@ class: Stage
 # baseuri: "/api"
 mapping:
   stage: "/stage"
+  archive: "/stage/<group>"
 labels:
   - file

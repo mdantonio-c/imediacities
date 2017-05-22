@@ -44,7 +44,7 @@ function getElement(event) {
 }
 
 // The controller
-function SearchController($scope, $log, $document, DataService, noty, NgMap)
+function SearchController($scope, $log, $document, $http, $auth, DataService, noty, NgMap)
 {
 	var self = this;
 
@@ -65,10 +65,14 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
     	}*/
 	/*---*/
 
-	/*self.videos = []
+	self.videos = []
 
 	self.loading = true;
-	DataService.searchVideos().then(
+	var request_data = {
+		"type": "video",
+		"term": "bologna"
+	};
+	DataService.searchVideos(request_data).then(
 		function(out_data) {
 			self.videos = out_data.data;
 			self.loading = false;
@@ -80,7 +84,6 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 
             noty.extractErrors(out_data, noty.ERROR);
 		});
-	//self.videos = loadSampleVideos();
 
 	self.selectedVideo = false;
 	self.setectedVideoId = -1;
@@ -104,6 +107,29 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 
 	$scope.videoTimeline = videoTimeline;
 
+	self.videoUrl = '';
+	$scope.getVideoService = function (videoId) {
+		var apiUrl =  'http://localhost:8081/api/videos/'+videoId+'/content?type=video';
+		return $http.get(apiUrl, {
+            	responseType: 'blob',
+            	headers: { 
+            		'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + DataService.getToken()
+                }
+        	});
+    };
+
+	$scope.loadVideo = function(videoId) {
+		console.log('loading video ' + videoId)
+		//DataService.getVideoContent(videoId).then(function(response){
+		$scope.getVideoService(videoId).then(function(response){
+			var videoBlob = new Blob([response.data], { type: response.headers('Content-Type') });
+			console.log(videoBlob.size);
+			console.log(videoBlob.type);
+			self.videoUrl = (window.URL || window.webkitURL).createObjectURL(videoBlob);
+		});
+	};
+
 	$scope.loadVideoContent = function(video) {
 		self.video = video;
 		self.selectedVideo = true;
@@ -113,7 +139,7 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
       		google.maps.event.trigger(map,'resize');
     	});
 
-    	self.mainchar = self.video.frames[0].mainchar;
+    	/*self.mainchar = self.video.frames[0].mainchar;
     	self.outside = self.video.frames[1].outside;
 
     	// add data to the timeline
@@ -143,7 +169,8 @@ function SearchController($scope, $log, $document, DataService, noty, NgMap)
 		            {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 		        ]}
     		]
-    	}
+    	}*/
+    	//$scope.loadVideo(video.id);
 	};
 
 	$scope.jumpToShot = function(selectedShot) {
