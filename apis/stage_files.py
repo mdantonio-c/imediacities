@@ -127,8 +127,8 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
-        mode = input_parameters['mode']
-        if mode is not None and mode != 'clean' and mode != 'fast':
+        mode = input_parameters.get('mode', 'clean').strip()
+        if mode != 'clean' and mode != 'fast':
             raise RestApiException(
                 "Bad mode parameter: expected 'fast' or 'clean'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
