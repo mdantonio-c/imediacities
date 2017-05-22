@@ -17,11 +17,11 @@ search:
             type: string
           term:
             type: string
-    - name: pageSize
+    - name: perpage
       in: query
       description: Number of videos returned
       type: integer
-    - name: pageNumber
+    - name: currentpage
       in: query
       description: Page number
       type: integer
