@@ -76,7 +76,7 @@ echo "REST API backend server is ready"
 
 if [ "$APP_MODE" == 'production' ]; then
     echo "launching uwsgi"
-    sleep 10
+    sleep 20
     myuwsgi
 elif [ "$APP_MODE" == 'development' ]; then
     echo "launching flask"
