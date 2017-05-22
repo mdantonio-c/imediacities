@@ -65,9 +65,10 @@ class Stage(GraphBaseOperations):
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            return self.force_response(
-                [], errors=[{"Warning": "Upload dir not found"}]
-            )
+            os.mkdir(upload_dir)
+            if not os.path.exists(upload_dir):
+                return self.force_response(
+                    [], errors=["Upload dir not found"])
 
         resources = group.stage_files.all()
 

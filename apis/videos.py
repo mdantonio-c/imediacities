@@ -97,19 +97,19 @@ class Videos(GraphBaseOperations):
 
     #     if 'title' not in data:
     #         return self.force_response(
-    #             errors=[{"Bad Request": "Missing title"}],
+    #             errors=["Missing title"],
     #             code=hcodes.HTTP_BAD_REQUEST
     #         )
 
     #     if 'description' not in data:
     #         return self.force_response(
-    #             errors=[{"Bad Request": "Missing description"}],
+    #             errors=["Missing description"],
     #             code=hcodes.HTTP_BAD_REQUEST
     #         )
 
     #     if 'duration' not in data:
     #         return self.force_response(
-    #             errors=[{"Bad Request": "Missing duration"}],
+    #             errors=["Missing duration"],
     #             code=hcodes.HTTP_BAD_REQUEST
     #         )
 
