@@ -1,7 +1,24 @@
 (function() {
   'use strict';
 
-var app = angular.module('web').controller('SearchController', SearchController);
+
+var app = angular.module('web').controller('SearchController', SearchController).factory('modalFactory', function($uibModal) {
+    return {
+      open: function(size, template, params) {
+        return $uibModal.open({
+          animation: true,
+          templateUrl: template || 'myModalContent.html',
+          controller: 'ModalResultInstanceCtrl',
+          size: size,
+          resolve: {
+            params: function() {
+              return params;
+            }
+          }
+        });
+      }
+    };
+  });
 
 // create a simple search filter
 app.filter('searchFor', function() {
@@ -40,7 +57,7 @@ app.directive('scrollOnClick', function() {
 		var nshots = $elm[0].firstElementChild.attributes.nshots.value;
 		var progr = $elm[0].firstElementChild.attributes.progr.value;
 		var myVid = angular.element(window.document.querySelector('#videoarea'));
-		var currtime = (duration/nshots)*progr;
+		var currtime = Math.floor((duration/nshots)*progr);
 		myVid[0].currentTime = currtime;
 		myVid[0].play();
       });
@@ -53,7 +70,7 @@ function getElement(event) {
 }
 
 // The controller
-function SearchController($scope, $log, $document, $http, $auth, DataService, noty, NgMap)
+function SearchController($scope, $log, $document, $http, $auth, DataService, noty, NgMap, $uibModal)
 {
 	var self = this;
 
@@ -90,6 +107,30 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 
             noty.extractErrors(out_data, noty.ERROR);
 		});
+
+/*modal creation*/
+	var modalInstance;
+
+  $scope.open = function(size, template) {
+      modalInstance = $uibModal.open({
+          animation: $scope.animationsEnabled,
+          templateUrl: template || 'myModalContent.html',
+          controller: 'ModalInstanceCtrl',
+          size: size
+        });
+
+      /*modalInstance.result.then(function(selectedItem) {
+        $scope.selected = selectedItem;
+      }, function() {
+        $log.info('Modal dismissed at: ' + new Date());
+      });*/
+    };
+
+    /*---*/
+
+    $scope.toggleAnimation = function() {
+      $scope.animationsEnabled = !$scope.animationsEnabled;
+    };
 
 	self.selectedVideo = false;
 	self.setectedVideoId = -1;
@@ -237,5 +278,85 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 	};
 
 }
+
+// storyboard modal view
+// Please note that $modalInstance represents a modal window (instance) dependency.
+// It is not the same as the $uibModal service used above.
+
+angular.module('web').controller('ModalInstanceCtrl', function($scope, $uibModalInstance, modalFactory) {
+
+  //$scope.searchTerm = term;
+
+    /*storyboard definition*/
+				  $scope.companies = [
+                    { 'thumb':'shot1.png',
+                    	'number': '001',
+                    	'duration': '50',
+                    	  'camera': 'zoom in'},
+                    	{ 'thumb':'shot2.png',
+	                    	'number': '002',
+	                    	'duration': '60',
+                    	  		'camera': 'zoom in'},
+	                    	{ 'thumb':'shot3.png',
+		                    	'number': '003',
+		                    	'duration': '60',
+                    	  			'camera': 'zoom in'},
+		                    	{ 'thumb':'shot4.png',
+			                    	'number': '004',
+			                    	'duration': '48',
+                    	  				'camera': 'zoom in'},
+			                    	{ 'thumb':'shot5.png',
+				                    	'number': '005',
+				                    	'duration': '89',
+                    	  					'camera': 'zoom in'},
+				                    	];
+
+
+$scope.addRow = function(){		
+	$scope.companies.push({ 'name':$scope.name, 'employees': $scope.employees, 'headoffice':$scope.headoffice });
+	$scope.name='';
+	$scope.employees='';
+	$scope.headoffice='';
+};
+$scope.removeRow = function(name){				
+		var index = -1;		
+		var comArr = eval( $scope.companies );
+		for( var i = 0; i < comArr.length; i++ ) {
+			if( comArr[i].name === name ) {
+				index = i;
+				break;
+			}
+		}
+		if( index === -1 ) {
+			alert( "Something gone wrong" );
+		}
+		$scope.companies.splice( index, 1 );		
+	};
+/*---*/
+
+  $scope.ok = function() {
+    modalFactory.open('lg', 'result.html', {searchTerm: $scope.searchTerm});
+    //$uibModalInstance.close($scope.searchTerm);
+  };
+
+  $scope.cancel = function() {
+    $uibModalInstance.dismiss('cancel');
+  };
+});
+
+angular.module('web').controller('ModalResultInstanceCtrl', function($scope, $uibModalInstance, params) {
+
+  $scope.searchTerm = params.searchTerm;
+
+  $scope.ok = function() {
+    $uibModalInstance.close($scope.searchTerm);
+  };
+
+  $scope.cancel = function() {
+    $uibModalInstance.dismiss('cancel');
+  };
+})
+
+//modal view storyboard management
 
 })();
