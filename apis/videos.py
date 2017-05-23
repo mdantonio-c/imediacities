@@ -48,8 +48,8 @@ class Videos(GraphBaseOperations):
         api_url = get_api_url()
         for v in videos:
             video = self.getJsonResponse(v)
-            video['links']['self'] = api_url + \
-                'api/videos/' + v.uuid
+            # video['links']['self'] = api_url + \
+            #     'api/videos/' + v.uuid
             video['links']['content'] = api_url + \
                 'api/videos/' + v.uuid + '/content?type=video'
             video['links']['thumbnail'] = api_url + \
