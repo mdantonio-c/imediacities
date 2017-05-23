@@ -39,9 +39,11 @@ function DataService($log, api, $q, jsonapi_parser) {
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }
-    // self.getVideoAnnotations = function(videoId) {
-    //     return api.apiCall('video/'+videoId+'/annotations', 'GET');
-    // }
+
+    self.getVideoAnnotations = function(videoId) {
+         return api.apiCall('video/'+videoId+'/annotations', 'GET');
+     }
+
     self.getVideoContent = function(videoId) {
         return api.apiCall('videos/'+videoId+'/content', 'GET', {}, undefined, true)
     }
@@ -50,6 +52,9 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('videos/'+videoId+'/thumbnail', 'GET')
     }
 
+    self.getVideoShots = function(videoId) {
+        return api.apiCall('videos/'+videoId+'/shots', 'GET')
+    }
 
     self.getUserSchema = function(study) {
         // return api.apiCall('admin/users', 'POST');
