@@ -39,6 +39,18 @@ app.directive('scrollOnClick', function() {
   }
 });
 
+app.directive('scrollOnClick', function() {
+  return {
+    //restrict: 'A',
+    link: function($scope, $elm) {
+      $elm.on('click', function() {
+      	//alert($elm[0].parentNode.className);
+        $(".scrollmenu").animate({scrollLeft: $elm.offset().left}, "slow");
+      });
+    }
+  }
+});
+
 function getElement(event) {
 	return angular.element(event.srcElement || event.target);
 }
@@ -47,10 +59,6 @@ function getElement(event) {
 function SearchController($scope, $log, $document, $http, $auth, DataService, noty, NgMap)
 {
 	var self = this;
-
-	/*filling the scrolling bar with the image shots*/
-	$scope.items = [];
-  	for (var i=1; i<9; i++) { $scope.items.push(i); }
 
 	/*$scope.overMouseEvent = function(event) {
 
@@ -72,6 +80,7 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
 		"type": "video",
 		"term": "bologna"
 	};
+	
 	DataService.searchVideos(request_data).then(
 		function(out_data) {
 			self.videos = out_data.data;
@@ -139,6 +148,44 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
       		google.maps.event.trigger(map,'resize');
     	});
 
+
+	/*filling the scrolling bar with the image shots*/
+	$scope.items = [];
+  	//for (var i=1; i<9; i++) { $scope.items.push(i); }
+
+
+  		DataService.getVideoShots(self.selectedVideoId).then(
+		function(out_data) {
+			self.shots = out_data.data;
+			for (var i=0; i<self.shots.length; i++) { 
+			    var thumblink = self.shots[i].links.thumbnail;
+				$scope.items.push(thumblink); 
+			}
+		});
+
+  		DataService.getVideoShots(self.selectedVideoId).then(
+		function(out_data) {
+			self.shots = out_data.data;
+			for (var i=0; i<self.shots.length; i++) { 
+			    var thumblink = self.shots[i].links.thumbnail;
+				$scope.items.push(thumblink); 
+			}
+		});
+
+  	/*----*/
+
+
+  	/*get annotations*/
+
+  	  	/*DataService.getVideoAnnotations(self.selectedVideoId).then(
+		function(out_data) {
+			self.annotations = out_data.data;
+			for (var i=0; i<self.annotations.length; i++) {}
+		});*/
+
+  	 /*--*/
+
+
     	/*self.mainchar = self.video.frames[0].mainchar;
     	self.outside = self.video.frames[1].outside;
 
@@ -172,6 +219,14 @@ function SearchController($scope, $log, $document, $http, $auth, DataService, no
     	}*/
     	//$scope.loadVideo(video.id);
 	};
+
+	  /*$scope.videoTimeline.data.rows.push({c: [
+		            {v: "Video"},
+		            {v: "Outside 3"},
+		            {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
+		            {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
+		        ]});*/
+
 
 	$scope.jumpToShot = function(selectedShot) {
 		var row = selectedShot.row;
