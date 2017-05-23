@@ -14,8 +14,6 @@ archive:
   custom:
     # publish: true
     authentication: true
-    authorized:
-      - admin_root
   responses:
     '200':
       description: List of files and directories successfully retrieved

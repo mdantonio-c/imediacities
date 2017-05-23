@@ -53,6 +53,10 @@ class Stage(GraphBaseOperations):
 
         self.initGraph()
 
+        if not self.auth.verify_admin():
+            # Only admins can specify a different group to be inspected
+            group = None
+
         if group is None:
             group = self.getSingleLinkedNode(self._current_user.belongs_to)
         else:
