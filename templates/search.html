@@ -53,8 +53,8 @@
 			</div>-->
   			<div class="row">
     		<div class="scrollmenu">
-      			<a ng-repeat="link in items" style="width: 30%;" scroll-on-click>
-       				 <img ng-src="{{link}}">
+      			<a ng-repeat="item in items" style="width: 30%;" scroll-on-click>
+       				 <img id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" progr="{{item[3]}}" ng-src="{{item[4]}}">
       			</a>
    			</div>
   			</div>
