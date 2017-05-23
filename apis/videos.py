@@ -186,12 +186,11 @@ class VideoShots(GraphBaseOperations):
 
         item = video.item.single()
         api_url = get_api_url()
-        for s in item.shots:
+        for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
-            shot['links']['self'] = api_url + \
-                'api/shots/' + s.uuid
-            shot['links']['thumbnail'] = api_url + \
-                'api/shots/' + s.uuid + '?content=thumbnail'
+            shot_url = api_url + 'api/shots/' + s.uuid
+            shot['links']['self'] = shot_url
+            shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
             data.append(shot)
 
         return self.force_response(data)
