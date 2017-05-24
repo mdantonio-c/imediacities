@@ -111,8 +111,8 @@
 									</div>
                					 <button type="button" class="btn btn-default pull-right" ng-click="open()">
                   					Storyboard <span class="glyphicon glyphicon-book"></span> 
-               					 </button>								
-               					 </li>
+               					 </button>
+                				</li>
 							</ul>
 						</div>
 					</div>
@@ -133,7 +133,7 @@
 
 	    <table class="table">
 	    <tr>
-	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="static/assets/images/summary.jpg"></th>
+	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{v.summary}}"></th>
 		</tr>
 		</table>
 
@@ -153,7 +153,7 @@
 		<div class="storyboard" >
 		<tr ng-repeat="company in companies  | filter: searchKeyword ">
 	       <td data-title="'Shot'" >
-	           <!--{{company.name}}--><img style="width: 40%;" ng-src="static/assets/images/{{company.thumb}}">
+	           <!--{{company.name}}--><img style="width: 40%;" ng-src="{{company.thumb}}">
 	       </td>
 	       <td data-title="'Shot number'" >
 	           {{company.number}}
@@ -161,7 +161,7 @@
 	       <td data-title="'Duration'" >
 	           {{company.duration}}
 	       </td>     
-	       <td data-title="'Camera motion'" >
+	       <td data-title="'Camera motion'">
 	           {{company.camera}}
 	       </td>   
 	       <!-- <td data-title="'Category'" align="center">
