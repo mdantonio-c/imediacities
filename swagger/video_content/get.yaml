@@ -18,7 +18,7 @@ video_content:
     - name: type
       in: query
       required: true
-      description: content type (e.g. video, thumbnail)
+      description: content type (e.g. video, thumbnail, summary)
       type: string
   responses:
     '200':

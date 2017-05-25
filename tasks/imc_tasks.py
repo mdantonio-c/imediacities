@@ -290,8 +290,19 @@ def extract_tech_info(self, item, analyze_dir_path):
     with open(tech_info_path) as data_file:
         data = json.load(data_file)
 
-    # thumbnail FIXME
-    item.thumbnail = get_thumbnail(analyze_dir_path)
+    # FIXME to get the thumbnail assigned to a given AV digital object?
+    # thumbnail
+    thumbnails_uri = os.path.join(analyze_dir_path, 'thumbs/')
+    item.thumbnail = get_thumbnail(thumbnails_uri)
+    # summary
+    summary_filename = 'summary.jpg'
+    summary_path = os.path.join(
+        os.path.dirname(analyze_dir_path), summary_filename)
+    if not os.path.exists(summary_path):
+        log.warning("{0} CANNOT be found in the path: [{1}]".format(
+                    summary_filename, analyze_dir_path))
+    else:
+        item.summary = summary_path
     # duration
     item.duration = data["streams"][0]["duration"]
     # framerate
@@ -318,7 +329,7 @@ def extract_tech_info(self, item, analyze_dir_path):
 
 def get_thumbnail(path):
     """
-    Returns a random filename, chosen among the jpg files of the given path.
+    Returns a random filename, chosen among the jpg files of the given pat.h
     """
     jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
     index = random.randrange(0, len(jpg_files))
