@@ -179,7 +179,7 @@ class Item(TimestampedNode, AnnotationTarget):
     duration = FloatProperty(show=True)
     framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False)
-    uri = StringProperty(show=True)
+    uri = StringProperty()
     item_type = StringProperty(required=True)
     # TODO add license reference
     ownership = RelationshipTo(
