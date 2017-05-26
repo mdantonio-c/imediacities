@@ -71,6 +71,7 @@ for f in `ls $dedir`; do
 done
 
 # Completed
+sleep 20
 echo "Worker is ready"
 sleep infinity
 # sleep 10000d
