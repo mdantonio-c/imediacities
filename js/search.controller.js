@@ -62,8 +62,11 @@
 						var progr = $elm[0].firstElementChild.attributes.progr.value;
 						var myVid = angular.element(window.document.querySelector('#videoarea'));
 						var currtime = Math.floor((duration/nshots)*progr);
+
+						myVid[0].pause();
 						myVid[0].currentTime = currtime;
 						myVid[0].play();
+
 				      });
 				    }
 				  }
