@@ -278,7 +278,7 @@ def extract_tech_info(self, item, analyze_dir_path):
         raise IOError(
             "Analyze results does not exist in the path %s", analyze_dir_path)
     # check for info result
-    tech_info_filename = 'origin_info.json'
+    tech_info_filename = 'transcoded_info.json'  # 'origin_info.json'
     tech_info_path = os.path.join(
         os.path.dirname(analyze_dir_path), tech_info_filename)
     if not os.path.exists(tech_info_path):
@@ -290,8 +290,10 @@ def extract_tech_info(self, item, analyze_dir_path):
     with open(tech_info_path) as data_file:
         data = json.load(data_file)
 
-    # thumbnail FIXME
-    item.thumbnail = get_thumbnail(analyze_dir_path)
+    # FIXME to get the thumbnail assigned to a given AV digital object?
+    # thumbnail
+    thumbnails_uri = os.path.join(analyze_dir_path, 'thumbs/')
+    item.thumbnail = get_thumbnail(thumbnails_uri)
     # duration
     item.duration = data["streams"][0]["duration"]
     # framerate
@@ -311,6 +313,16 @@ def extract_tech_info(self, item, analyze_dir_path):
     item.digital_format[3] = data["format"]["bit_rate"]
 
     item.uri = data["format"]["filename"]
+    if item.item_type == 'Video':
+        # summary
+        summary_filename = 'summary.jpg'
+        summary_path = os.path.join(
+            os.path.dirname(analyze_dir_path), summary_filename)
+        if not os.path.exists(summary_path):
+            log.warning("{0} CANNOT be found in the path: [{1}]".format(
+                        summary_filename, analyze_dir_path))
+        else:
+            item.summary = summary_path
     item.save()
 
     log.info('Extraction of techincal info completed')
@@ -318,7 +330,7 @@ def extract_tech_info(self, item, analyze_dir_path):
 
 def get_thumbnail(path):
     """
-    Returns a random filename, chosen among the jpg files of the given path.
+    Returns a random filename, chosen among the jpg files of the given pat.h
     """
     jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
     index = random.randrange(0, len(jpg_files))

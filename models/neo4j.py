@@ -150,6 +150,8 @@ class Item(TimestampedNode, AnnotationTarget):
                         site in its full information context.
         thumbnail       Link to the reduced-size image of the AV or NonAV
                         digital object.
+        summary         Link to the summary image of the AV digital object (not
+                        available for NonAV digital object)
         duration        The running time of the digitised audiovisual
                         manifestation measured in minutes and seconds.
         framerate       Optional value for the projection speed, given in
@@ -172,11 +174,12 @@ class Item(TimestampedNode, AnnotationTarget):
         license         A reference to the license that applies to the digital
                         item.
     """
-    thumbnail = StringProperty(show=True)
+    thumbnail = StringProperty()
+    summary = StringProperty()
     duration = FloatProperty(show=True)
     framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False)
-    uri = StringProperty(show=True)
+    uri = StringProperty()
     item_type = StringProperty(required=True)
     # TODO add license reference
     ownership = RelationshipTo(

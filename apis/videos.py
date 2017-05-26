@@ -54,6 +54,8 @@ class Videos(GraphBaseOperations):
                 'api/videos/' + v.uuid + '/content?type=video'
             video['links']['thumbnail'] = api_url + \
                 'api/videos/' + v.uuid + '/content?type=thumbnail'
+            video['links']['summary'] = api_url + \
+                'api/videos/' + v.uuid + '/content?type=summary'
             data.append(video)
 
         return self.force_response(data)
@@ -186,12 +188,12 @@ class VideoShots(GraphBaseOperations):
 
         item = video.item.single()
         api_url = get_api_url()
-        for s in item.shots:
+        for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
-            shot['links']['self'] = api_url + \
-                'api/shots/' + s.uuid
-            shot['links']['thumbnail'] = api_url + \
-                'api/shots/' + s.uuid + '?content=thumbnail'
+            shot_url = api_url + 'api/shots/' + s.uuid
+            shot['links']['self'] = shot_url
+            shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
+            shot['links']['summary'] = shot_url + '?content=summary'
             data.append(shot)
 
         return self.force_response(data)
@@ -213,7 +215,8 @@ class VideoContent(GraphBaseOperations):
         input_parameters = self.get_input()
         content_type = input_parameters['type']
         if content_type is None or (content_type != 'video' and
-                                    content_type != 'thumbnail'):
+                                    content_type != 'thumbnail' and
+                                    content_type != 'summary'):
             raise RestApiException(
                 "Bad type parameter: expected 'video' or 'thumbnail'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
@@ -248,10 +251,18 @@ class VideoContent(GraphBaseOperations):
                     "Thumbnail not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             return send_file(thumbnail_uri, mimetype='image/jpeg')
+        elif content_type == 'summary':
+            summary_uri = item.summary
+            logger.debug("summary content uri: %s" % summary_uri)
+            if summary_uri is None:
+                raise RestApiException(
+                    "Summary not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            return send_file(summary_uri, mimetype='image/jpeg')
         else:
             # it should never be reached
             raise RestApiException(
-                "Invalid content type {1}".format(content_type),
+                "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
     def read_in_chunks(self, file_object, chunk_size=1024):
