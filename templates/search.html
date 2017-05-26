@@ -134,7 +134,7 @@
 
 	    <table class="table">
 	    <tr>
-	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{v.links['summary']}}"></th>
+	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{summary}}"></th>
 		</tr>
 		</table>
 
@@ -152,24 +152,24 @@
 			</th><th></th> -->
 		</tr>
 		<div class="storyboard" >
-		<tr ng-repeat="company in companies  | filter: searchKeyword ">
+		<tr ng-repeat="shot in shots  | filter: searchKeyword ">
 	       <td data-title="'Shot'" >
-	           <!--{{company.name}}--><img style="width: 40%;" ng-src="{{company.thumb}}" scroll-on-click>
+	           <!--{{shot.name}}--><img style="width: 40%;" ng-src="{{shot.thumb}}">
 	       </td>
 	       <td data-title="'Shot number'" >
-	           {{company.number}}
+	           {{shot.number}}
 	       </td>   
 	       <td data-title="'Duration'" >
-	           {{company.duration}}
+	           {{shot.duration}}
 	       </td>     
 	       <td data-title="'Camera motion'">
-	           {{company.camera}}
+	           {{shot.camera}}
 	       </td>   
 	       <!-- <td data-title="'Category'" align="center">
 	           ?
 	       </td>    
 			<td>
-			<input type="button" value="Tag" class="btn btn-primary" ng-click="ok()"/> <!-- ng-click="removeRow(company.name)"/> -->
+			<input type="button" value="Tag" class="btn btn-primary" ng-click="ok()"/> <!-- ng-click="removeRow(shot.name)"/> -->
 			<!-- </td> -->
 		</tr>
 		</div>
