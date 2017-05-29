@@ -87,8 +87,8 @@ services:
     ports:
       - 9090:7474
       - 7687:7687
-    # volumes:
-    #   - rapydo_imediacity_graphdata:/data
+    volumes:
+      - ../confs/neo4j:/var/lib/neo4j/conf
     networks:
       db_net:
         aliases:
