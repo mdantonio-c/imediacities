@@ -8,7 +8,7 @@
 				    return {
 				      open: function(size, template, params) {
 				        return $uibModal.open({
-				          animation: true,
+				          animation: false,
 				          templateUrl: template || 'myModalContent.html',
 				          controller: 'ModalResultInstanceCtrl',
 				          size: size,
@@ -359,7 +359,7 @@
 				/*---*/
 
 				  $scope.showsummary = function() {
-				    modalFactory.open('lg', 'result.html', {summary: $scope.summary});
+				    modalFactory.open('lg', 'result.html', {animation: false, summary: $scope.summary});
 				    //$uibModalInstance.close($scope.summary);
 				  };
 
@@ -368,7 +368,7 @@
 				angular.module('web').controller('ModalResultInstanceCtrl', function($scope, $uibModalInstance, params) {
 
 				  $scope.summary = params.summary;
-				  
+
 				})
 
 				//modal view storyboard management
