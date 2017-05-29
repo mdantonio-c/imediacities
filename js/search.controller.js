@@ -198,12 +198,14 @@
 					};
 
 
+					$scope.loadVideoContent = function(video) {
+						self.video = video;
+						self.selectedVideo = true;
+						self.selectedVideoId = video.id;
 
+						$scope.geocoder = new google.maps.Geocoder();
 
-					$scope.geoCode = function (video, $scope) {
-
-			  		$scope.geocoder = new google.maps.Geocoder();
-
+					/*start geocoding and get video coordinates*/
 			  		$scope.geocoder.geocode({ 'address': 'Bologna, It' }, function (results, status) {
 					if (status === google.maps.GeocoderStatus.OK) {
 		   				 if (results[0]) {
@@ -215,28 +217,7 @@
 			      			$scope.videolat = Lat;
 							$scope.videolng  = Lng;
 							$scope.locname = $scope.address[0].long_name;
-		 
-		   	 	} else {
-		        	console.log('Location not found');
-		        	$scope.firstExecution = false;
-		    	}
-				} else {
-		       		console.log('Geocoder failed due to: ' + status);
-		       	$scope.firstExecution = false;
-				}
-				});
 
-				};
-
-
-
-					$scope.loadVideoContent = function(video) {
-						self.video = video;
-						self.selectedVideo = true;
-						self.selectedVideoId = video.id;
-
-
-						$scope.geoCode(self.video, $scope);
 
 					NgMap.getMap({id:'videomap'}).then(function(map) {
 				      		google.maps.event.trigger(map,'resize');
@@ -279,6 +260,18 @@
 						});*/
 
 				  	 /*--*/
+
+
+ 				} else {
+		        	console.log('Location not found');
+		        	$scope.firstExecution = false;
+		    	}
+				} else {
+		       		console.log('Geocoder failed due to: ' + status);
+		       	$scope.firstExecution = false;
+				}
+				});
+
 
 					};
 
