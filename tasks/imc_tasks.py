@@ -5,10 +5,12 @@ import json
 import random
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
-from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
+# from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
-# import xml.etree.ElementTree as ET
+from imc.models.neo4j import (
+    Shot
+)
 
 from rapydo.basher import BashCommands
 from rapydo.utils.logs import get_logger
@@ -340,25 +342,38 @@ def get_thumbnail(path):
 
 def extract_tvs_annotation(self, item, analyze_dir_path):
     """
-    Extract temporal video segmentation results from tvs.xml file and save
-    them as Annotation in the database.
+    Extract temporal video segmentation results from storyboard.json file and
+    save them as Annotation in the database.
     """
-    if not os.path.exists(analyze_dir_path):
+    tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
+    if not os.path.exists(tvs_dir_path):
         raise IOError(
-            "Analyze results does not exist in the path %s", analyze_dir_path)
+            "Storyboard directory does not exist in the path %s", tvs_dir_path)
     # check for info result
-    tvs_filename = 'tvs.xml'
+    tvs_filename = 'storyboard.json'
     tvs_path = os.path.join(
-        os.path.dirname(analyze_dir_path), tvs_filename)
+        os.path.dirname(tvs_dir_path), tvs_filename)
     if not os.path.exists(tvs_path):
-        log.warning("Shots CANNOT be extracted: [%s] does not exist",
-                    tvs_path)
-        return
+        raise IOError(
+            "Shots CANNOT be extracted: [%s] does not exist", tvs_path)
 
-    parser = FHG_XMLParser()
     log.debug('get shots from file [%s]' % tvs_path)
-    shots = parser.get_shots(tvs_path)
-    if shots is None:
+
+    # load info from json
+    with open(tvs_path) as data_file:
+        data = json.load(data_file)
+
+    shots = []
+    for s in data['shots']:
+        shot = Shot()
+        shot.shot_num = s['shot_num']
+        shot.start_frame_idx = s['frame']
+        shot.timestamp = s['timecode']
+        shot.duration = s['len']
+        shot.thumbnail_uri = os.path.join(tvs_dir_path, s['img'])
+        shots.append(shot)
+
+    if len(shots) == 0:
         log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
         return
 

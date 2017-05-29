@@ -31,7 +31,10 @@ class AnnotationRepository():
 
         # foreach shot create a node and connect it properly
         for shot in shots:
+            log.pp(shot)
             shot.save()
+            test = self.graph.Shot.nodes.get(uuid=shot.uuid)
+            log.pp(test)
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
 
