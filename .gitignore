@@ -6,6 +6,8 @@
 
 ################
 
+confs/neo4j/neo4j.conf
+
 # notebooks
 .ipynb_checkpoints
 
