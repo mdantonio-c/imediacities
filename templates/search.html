@@ -6,28 +6,6 @@
 	<div ng-controller='SearchController as ctrl'>
 
 	<div class='row'>
-		<!--
-		<div class='col-xs-8 col-xs-offset-2'>
-
-			<div ng-if='ctrl.videos.length == 0'>
-				No video found
-			</div>
-			<div ng-if="ctrl.videos.length > 0">
-				<div class="bar">
-					<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
-				</div>
-
-				<ul>
-					<li ng-repeat="v in ctrl.videos | searchFor:searchString">
-						<a href="{{v.movieurl}}"><img ng-src="{{v.moviesposter}}" /></a>
-						<span class="title">{{v.title}}</span><i>({{v.duration}} min)</i>
-						<p>{{v.description}}</p>
-					</li>
-				</ul>
-			</div>
-
-		</div>
-		-->
 		<div id="wrapper" data-spy="scroll" data-target="#spy" ng-class="{active: ctrl.selectedVideo === false}">
 			<!-- Result content -->
 			<div id="sidebar-wrapper" class="">
@@ -40,21 +18,10 @@
 				<div class="row">
 					<video id="videoarea" ng-src="{{ctrl.video.links['content'] | trustUrl }}" controls></video>
 				</div>
-	                        <!--<div class="row">
-	                                <div id="summary-graph">
-	                                        <img ng-src="static/assets/images/summary.jpg">
-	                                </div>
-	                        </div>-->
-	            		<!--<div class="scrollmenu">
-	  				<a href="#home"><img ng-src="static/assets/images/shot1.png"></a>
-	  				<a href="#news"><img ng-src="static/assets/images/shot2.png"></a>
-	  				<a href="#contact"><img ng-src="static/assets/images/shot3.png"></a>
-	  				<a href="#about"><img ng-src="static/assets/images/shot4.png"></a>
-				</div>-->
 	  			<div class="row">
 	    		<div class="scrollmenu">
-	      			<a ng-repeat="item in items" style="width: 20%;" scroll-on-click>
-	       				 <img id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" progr="{{item[3]}}" ng-src="{{item[4]}}">
+	      			<a ng-repeat="item in items" style="width: 13%;" scroll-on-click>
+	       				 <img style="width: 90%; height: 90%" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" progr="{{item[3]}}" ng-src="{{item[4]}}">
 	      			</a>
 	   			</div>
 	  			</div>
@@ -97,7 +64,7 @@
 										{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 									</div>
 									<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-										<p><b>Production Year(s)</b>: {{v.production_years}}</p>
+										<p><b>Production Year(s)</b>: {{v.attributes.production_years[0]}}</p>
 										<p><b>Location</b>: {{locname}}</p>
 										<!-- <p><b>Segmentation</b>: 
 										<span style="display:block; padding-left: 0.8em;">
@@ -134,7 +101,7 @@
 
 	    <table class="table">
 	    <tr>
-	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{v.links['summary']}}"></th>
+	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{summary}}"></th>
 		</tr>
 		</table>
 
@@ -152,24 +119,24 @@
 			</th><th></th> -->
 		</tr>
 		<div class="storyboard" >
-		<tr ng-repeat="company in companies  | filter: searchKeyword ">
+		<tr ng-repeat="shot in shots  | filter: searchKeyword ">
 	       <td data-title="'Shot'" >
-	           <!--{{company.name}}--><img style="width: 40%;" ng-src="{{company.thumb}}" scroll-on-click>
+	           <!--{{shot.name}}--><img style="width: 40%;" ng-src="{{shot.thumb}}">
 	       </td>
 	       <td data-title="'Shot number'" >
-	           {{company.number}}
+	           {{shot.number}}
 	       </td>   
 	       <td data-title="'Duration'" >
-	           {{company.duration}}
+	           {{shot.duration}}
 	       </td>     
 	       <td data-title="'Camera motion'">
-	           {{company.camera}}
+	           {{shot.camera}}
 	       </td>   
 	       <!-- <td data-title="'Category'" align="center">
 	           ?
 	       </td>    
 			<td>
-			<input type="button" value="Tag" class="btn btn-primary" ng-click="ok()"/> <!-- ng-click="removeRow(company.name)"/> -->
+			<input type="button" value="Tag" class="btn btn-primary" ng-click="ok()"/> <!-- ng-click="removeRow(shot.name)"/> -->
 			<!-- </td> -->
 		</tr>
 		</div>
