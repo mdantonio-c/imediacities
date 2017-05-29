@@ -101,7 +101,7 @@
 
 	    <table class="table">
 	    <tr>
-	    <th>Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{summary}}"></th>
+	    <th>Video Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{summary}}" ng-click="showsummary()"></th>
 		</tr>
 		</table>
 
@@ -115,13 +115,12 @@
 			</th>
 			<th>Camera motion
 			</th>
-			<!-- <th>Category
-			</th><th></th> -->
+
 		</tr>
 		<div class="storyboard" >
 		<tr ng-repeat="shot in shots  | filter: searchKeyword ">
 	       <td data-title="'Shot'" >
-	           <!--{{shot.name}}--><img style="width: 40%;" ng-src="{{shot.thumb}}">
+	           <img style="width: 40%;" ng-src="{{shot.thumb}}">
 	       </td>
 	       <td data-title="'Shot number'" >
 	           {{shot.number}}
@@ -132,12 +131,6 @@
 	       <td data-title="'Camera motion'">
 	           {{shot.camera}}
 	       </td>   
-	       <!-- <td data-title="'Category'" align="center">
-	           ?
-	       </td>    
-			<td>
-			<input type="button" value="Tag" class="btn btn-primary" ng-click="ok()"/> <!-- ng-click="removeRow(shot.name)"/> -->
-			<!-- </td> -->
 		</tr>
 		</div>
 		</table>
@@ -147,33 +140,21 @@
 	      </div>
 
 	      <div class="modal-footer">
-	        <!-- <button class="btn btn-primary" type="button" ng-click="ok()">OK</button> -->
 	        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 	      </div>
 	    </script>
 
 	    <script type="text/ng-template" id="result.html">
 	    	<div class="modal-header">
-	        <h3 class="modal-title">Tag shot</h3>
+	        <h3 class="modal-title">Video Summary</h3>
 	      </div>
-	      <div class="modal-body">
-	        <br/>
-	        <form ng-submit="ok()">
-	          <div class="input-group animated fadeIn">
-	            <input type="text" class="form-control finderBar" ng-model="searchTerm" placeholder="Human figure, Church, Male, Female,..." autofocus>
-	            <span class="input-group-btn">
-	            <button class="btn btn-default" type="button" ng-click="ok()">Tag!</button>
-	        </span>
-	          </div>
-	                <div class="modal-footer">
-	        <button class="btn btn-primary" type="button" ng-click="cancel()">Close</button>
+	      <div class="modal-body" style="height: 150px;">
+	      <form><div>
+	       	<img style="width: 100%; height: 100%; float: right;" ng-src="{{summary}}">
+	       </div></form>
 	      </div>
-	        </form>
-	        </div>
-
-
 	    </script>
-	    <!--<button type="button" class="btn btn-default" ng-click="toggleAnimation()">Toggle Animation ({{ animationsEnabled }})</button>-->
+
 	    <div ng-show="searchTerm">searchTerm from a modal: {{ searchTerm }}</div>
 	  </div>
 
