@@ -365,11 +365,18 @@ def extract_tvs_annotation(self, item, analyze_dir_path):
 
     shots = []
     for s in data['shots']:
+        log.debug(s)
         shot = Shot()
         shot.shot_num = s['shot_num']
         shot.start_frame_idx = s['frame']
         shot.timestamp = s['timecode']
-        shot.duration = s['len']
+        try:
+            shot.duration = s['len']
+        except ValueError:
+            log.warning("Invalid duration in the shot {0} \
+                for value '{1}'".format(shot.shot_num, s['len']))
+            shot.duration = None
+
         shot.thumbnail_uri = os.path.join(tvs_dir_path, s['img'])
         shots.append(shot)
 
