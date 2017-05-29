@@ -358,27 +358,17 @@
 					};
 				/*---*/
 
-				  $scope.ok = function() {
-				    modalFactory.open('lg', 'result.html', {searchTerm: $scope.searchTerm});
-				    //$uibModalInstance.close($scope.searchTerm);
+				  $scope.showsummary = function() {
+				    modalFactory.open('lg', 'result.html', {summary: $scope.summary});
+				    //$uibModalInstance.close($scope.summary);
 				  };
 
-				  $scope.cancel = function() {
-				    $uibModalInstance.dismiss('cancel');
-				  };
 				});
 
 				angular.module('web').controller('ModalResultInstanceCtrl', function($scope, $uibModalInstance, params) {
 
-				  $scope.searchTerm = params.searchTerm;
-
-				  $scope.ok = function() {
-				    $uibModalInstance.close($scope.searchTerm);
-				  };
-
-				  $scope.cancel = function() {
-				    $uibModalInstance.dismiss('cancel');
-				  };
+				  $scope.summary = params.summary;
+				  
 				})
 
 				//modal view storyboard management
