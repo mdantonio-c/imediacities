@@ -201,15 +201,16 @@ div.scrollmenu a:hover {
 		padding-left: 0;
 	}
 	#sidebar-wrapper {
-		left: 0;
+		margin-top: 70%;
+		width: 100%;
 	}
 	#wrapper.active {
 		position: relative;
 		left: 50%;
 	}
 	#wrapper.active #sidebar-wrapper {
-		left: 50%;
-		width: 50%;
+		left: 10%;
+		width: 10%;
 		transition: all 0.4s ease 0s;
 	}
 	#menu-toggle {
