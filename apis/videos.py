@@ -193,7 +193,6 @@ class VideoShots(GraphBaseOperations):
             shot_url = api_url + 'api/shots/' + s.uuid
             shot['links']['self'] = shot_url
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
-            shot['links']['summary'] = shot_url + '?content=summary'
             data.append(shot)
 
         return self.force_response(data)
