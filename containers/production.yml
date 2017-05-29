@@ -40,7 +40,7 @@ services:
       - CELERY_BROKER_HOST=${CELERY_BROKER_HOST}
       - CELERY_BROKER_PORT=${CELERY_BROKER_PORT}
     networks:
-      graph_net:
+      db_net:
       worker_net:
       proxy_net:
         aliases:
@@ -90,7 +90,7 @@ services:
     # volumes:
     #   - rapydo_imediacity_graphdata:/data
     networks:
-      graph_net:
+      db_net:
         aliases:
           - ${GRAPHDB_HOST}
 
@@ -98,7 +98,7 @@ services:
     # command: sleep infinity
     build: ../builds/celery
     networks:
-      graph_net:
+      db_net:
       worker_net:
     depends_on:
       - rabbit
@@ -151,7 +151,6 @@ volumes:
     driver: local
 
 networks:
-    graph_net:
     proxy_net:
     worker_net:
     ftp_net:

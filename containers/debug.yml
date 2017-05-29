@@ -43,7 +43,7 @@ services:
       - 8081:5000
 
     networks:
-      graph_net:
+      db_net:
       worker_net:
       ftp_net:
     depends_on:
@@ -73,7 +73,7 @@ services:
     # volumes:
     #   - rapydo_imediacity_graphdata:/data
     networks:
-      graph_net:
+      db_net:
         aliases:
           - ${GRAPHDB_HOST}
 
@@ -81,7 +81,7 @@ services:
     # command: sleep infinity
     build: ../builds/celery
     networks:
-      graph_net:
+      db_net:
       worker_net:
     depends_on:
       - rabbit
@@ -131,7 +131,6 @@ services:
       - 7777:80
 
 networks:
-    graph_net:
     worker_net:
     ftp_net:
 
