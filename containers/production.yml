@@ -47,9 +47,9 @@ services:
           - ${API_HOST}
       ftp_net:
     depends_on:
-      - gdb
+      - neo4j
       - ftp
-      - swagger
+      - swaggerui
     expose:
       - 8080
 
@@ -83,7 +83,7 @@ services:
       MODE: ${LETSENCRYPT_MODE}
 
 
-  gdb:
+  neo4j:
     ports:
       - 9090:7474
       - 7687:7687
@@ -131,7 +131,7 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
-  # swagger:
+  # swaggerui:
   #   ports:
   #     - 7777:80
 

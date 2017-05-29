@@ -47,9 +47,9 @@ services:
       worker_net:
       ftp_net:
     depends_on:
-      - gdb
+      - neo4j
       - ftp
-      - swagger
+      - swaggerui
 
   frontend:
     ports:
@@ -66,7 +66,7 @@ services:
         aliases:
           - ${CELERY_BROKER_HOST}
 
-  gdb:
+  neo4j:
     ports:
     - 9090:7474
     - 7687:7687
@@ -126,7 +126,7 @@ services:
       ftp_net:
 
 
-  swagger:
+  swaggerui:
     ports:
       - 7777:80
 
