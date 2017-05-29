@@ -1,10 +1,8 @@
-################
-# submodules
-
 /backend
 /frontend
 /imedia-pipeline
 /imedia-pipeline-cin
+/builds_base
 
 ################
 
@@ -13,6 +11,8 @@
 
 # data
 imediastuff
+uploads
+tmp_files
 
 # bower
 libs/bower_components

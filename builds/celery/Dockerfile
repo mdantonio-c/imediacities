@@ -101,4 +101,3 @@ CMD ["mycelery"]
 # Flask port
 EXPOSE 5000
 
-
