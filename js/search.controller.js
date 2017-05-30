@@ -61,10 +61,16 @@
 						var nshots = $elm[0].firstElementChild.attributes.nshots.value;
 						var progr = $elm[0].firstElementChild.attributes.progr.value;
 						var myVid = angular.element(window.document.querySelector('#videoarea'));
-						var currtime = Math.floor((duration/nshots)*progr);
+						var currtime = $elm[0].firstElementChild.attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0,0,0,hours,mins,secs);
+						var times =  (secs*1)+(mins*60)+(hours*3600);//convert to seconds
 
 						myVid[0].pause();
-						myVid[0].currentTime = currtime;
+						myVid[0].currentTime = times;
 						myVid[0].play();
 
 				      });
@@ -235,12 +241,16 @@
 							for (var i=0; i<self.shots.length; i++) { 
 							    var thumblink = self.shots[i].links.thumbnail;
 							    var start_frame = self.shots[i].attributes.start_frame_idx;
-							    var frameshot = [2];
+							    var timestamp = self.shots[i].attributes.timestamp;
+							    var frameshot = [];
 							    frameshot[0] = start_frame;
 								frameshot[1] = self.video.relationships.item[0].attributes.duration;
-								frameshot[2] = self.shots.length;
-								frameshot[3] = i;
-							    frameshot[4] = thumblink;
+								frameshot[2] = parseInt(self.shots[i].attributes.duration);
+								frameshot[3] = self.shots.length;
+								frameshot[4] = i;
+								frameshot[5] = timestamp;
+							    frameshot[6] = thumblink;
+
 								$scope.items.push(frameshot); 
 
 								$scope.showmesb = true; //enable storyboard button
@@ -328,8 +338,10 @@
 							for (var i=0; i<self.shots.length; i++) { 
 							    var thumblink = self.shots[i].links.thumbnail;
 							    var start_frame = self.shots[i].attributes.start_frame_idx;
-							    var frameshot = [2];
-								$scope.shots.push({ 'thumb': thumblink, 'number': i, 'duration': start_frame, 'camera': 'zoom out' }); 
+							    var shot_duration = parseInt(self.shots[i].attributes.duration);
+							    var timestamp = self.shots[i].attributes.timestamp;
+							    var frameshot = [];
+								$scope.shots.push({ 'thumb': thumblink, 'number': start_frame, 'timestamp': timestamp, 'duration': shot_duration, 'camera': 'unknown' }); 
 							}
 						});
 
@@ -363,11 +375,19 @@
 				    //$uibModalInstance.close($scope.summary);
 				  };
 
+				  $scope.cancel = function() {
+				    $uibModalInstance.dismiss('cancel');
+				  };
+
 				});
 
 				angular.module('web').controller('ModalResultInstanceCtrl', function($scope, $uibModalInstance, params) {
 
 				  $scope.summary = params.summary;
+
+				  $scope.cancel = function() {
+				    $uibModalInstance.dismiss('cancel');
+				  };
 
 				})
 
