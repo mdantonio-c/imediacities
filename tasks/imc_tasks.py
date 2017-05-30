@@ -265,6 +265,7 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     repo.create_av_entity(
         av_creation['properties'],
         item_node,
+        av_creation['relationships']['record_sources'],
         av_creation['relationships']['titles'],
         av_creation['relationships']['keywords'],
         av_creation['relationships']['descriptions'])
@@ -365,7 +366,6 @@ def extract_tvs_annotation(self, item, analyze_dir_path):
 
     shots = []
     for s in data['shots']:
-        log.debug(s)
         shot = Shot()
         shot.shot_num = s['shot_num']
         shot.start_frame_idx = s['frame']
