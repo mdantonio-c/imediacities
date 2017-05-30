@@ -1,8 +1,9 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    Title, Keyword, Description
+    RecordSource, Title, Keyword, Description
 )
+from imc.models import codelists
 from rapydo.utils.logs import get_logger
 
 log = get_logger(__name__)
@@ -55,6 +56,41 @@ class EFG_XMLParser():
         for n in nodes:
             production_years.append(n.text)
         return production_years
+
+    def get_rights_status(self, record):
+        node = record.find("./avManifestation/rightsStatus")
+        if node is not None:
+            return node.text
+
+    def parse_record_sources(self, record):
+        record_sources = []
+        for node in record.findall("recordSource"):
+            rs = RecordSource()
+            rs.source_id = node.find('sourceID').text
+            log.debug('record source [ID]: %s' % rs.source_id)
+            provider = node.find('provider')
+            rs.provider_name = provider.text
+            log.debug('record source [provider name]: %s' % rs.provider_name)
+            rs.provider_id = provider.get('id')
+            log.debug('record source [provider id]: %s' % rs.provider_id)
+            p_scheme = provider.get('schemeID')
+            for schemes in codelists.PROVIDER_SCHEMES:
+                if schemes[1] == p_scheme:
+                    rs.provider_scheme = schemes[0]
+            log.debug('record source [provider scheme]: %s' %
+                      rs.provider_scheme)
+            if rs.provider_scheme is None:
+                raise ValueError(
+                    'Invalid provider scheme value for [%s]' % p_scheme)
+            record_sources.append(rs)
+        return record_sources
+
+    def get_record_source(self, record):
+        '''
+        Naive implementation to get always the first record source as the
+        archive one.
+        '''
+        return self.parse_record_sources(record)[0]
 
     def parse_titles(self, record):
         titles = []
@@ -111,9 +147,14 @@ class EFG_XMLParser():
         properties = {}
         properties['identifying_title'] = self.get_identifying_title(record)
         properties['production_years'] = self.get_production_years(record)
+        status = self.get_rights_status(record)
+        if status is not None and status in codelists.IPR_STATUS:
+            properties['rights_status'] = status
+        properties['rights_status'] = self.get_rights_status(record)
         av_creation['properties'] = properties
 
         relationships = {}
+        relationships['record_sources'] = self.parse_record_sources(record)
         relationships['titles'] = self.parse_titles(record)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
