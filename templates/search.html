@@ -21,7 +21,7 @@
 	  			<div class="row">
 	    		<div class="scrollmenu">
 	      			<a ng-repeat="item in items" style="width: 13%;" scroll-on-click>
-	       				 <img style="width: 90%; height: 90%" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" progr="{{item[3]}}" ng-src="{{item[4]}}">
+	       				 <img style="width: 90%; height: 90%" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" shotd="{{item[3]}}" progr="{{item[4]}}" timestamp="{{item[5]}}" ng-src="{{item[6]}}">
 	      			</a>
 	   			</div>
 	  			</div>
@@ -111,6 +111,8 @@
 			</th>
 			<th>Shot number
 			</th>
+			<th>Shot timestamp
+			</th>
 			<th>Shot duration
 			</th>
 			<th>Camera motion
@@ -122,13 +124,16 @@
 	       <td data-title="'Shot'" >
 	           <img style="width: 40%;" ng-src="{{shot.thumb}}">
 	       </td>
-	       <td data-title="'Shot number'" >
+	       <td data-title="'Number'" align="center">
 	           {{shot.number}}
 	       </td>   
-	       <td data-title="'Duration'" >
+	       <td data-title="'Timestamp'" align="center">
+	           {{shot.timestamp}}
+	       </td>   
+	       <td data-title="'Duration'" align="center">
 	           {{shot.duration}}
 	       </td>     
-	       <td data-title="'Camera motion'">
+	       <td data-title="'Camera motion'" align="center">
 	           {{shot.camera}}
 	       </td>   
 		</tr>
