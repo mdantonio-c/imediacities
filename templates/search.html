@@ -68,7 +68,8 @@
                 					</div>
             					</div>
 							<ul>
-								<li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString)">
+								<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this)"> -->
+									<li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))">
 									<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.links['thumbnail']}}" /></a>
 									<div class="primary-description">
 										<span class="title">{{v.attributes.identifying_title}}</span><i>({{v.relationships.item[0].attributes.duration}} sec)</i>
@@ -95,9 +96,12 @@
                   					Storyboard <span class="glyphicon glyphicon-book"></span> 
                					 </button>
                 				</li>
-                			    <pagination num-pages="noOfPages" current-page="currentPage" class="pagination-small"></pagination>
+                				<!--<ul>
+      								<li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))">{{v.attributes.identifying_title}}</li>
+    							</ul> -->
                 				<!-- <div class="videores" ng-hide="(noresults && query.length>0)">0 results for your search</div> -->
 							</ul>
+							<pagination ng-show="showmepg" num-pages="noOfPages" current-page="currentPage" class="pagination-small"></pagination>
 						</div>
 					</div>
 			</div>
@@ -180,13 +184,13 @@
 	 	 </div>
 
 	<!-- modal content -->
-	 <!--<script type="text/ng-template" id="pagination.html">
+	 <script type="text/ng-template" id="pagination.html">
 	  <div class="pagination"><ul>
   		<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>
   		<li ng-repeat="page in pages" ng-class="{active: isActive(page)}"><a ng-click="selectPage(page)">{{page}}</a></li>
   		<li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>
   	</ul>
 	</div>
-	</script>-->
+	</script>
 
 	</div>
