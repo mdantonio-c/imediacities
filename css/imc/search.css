@@ -238,7 +238,7 @@ div.scrollmenu a:hover {
 }
 
 
-@media ( max-width :767px) {
+/*@media ( max-width :767px) {
 	#wrapper {
 		padding-left: 0;
 	}
@@ -261,7 +261,7 @@ div.scrollmenu a:hover {
 	.inset {
 		padding: 15px;
 	}
-}
+}*/
 
 
 /*-------------------------
