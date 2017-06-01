@@ -107,6 +107,7 @@ div.scrollmenu a:hover {
 
 #wrapper.active {
 	padding-left: 0;
+
 }
 
 #wrapper.active #sidebar-wrapper {
@@ -196,6 +197,47 @@ div.scrollmenu a:hover {
 	padding: 20px;
 }
 
+
+#imaginary_container{
+    margin-top:10%; /* Don't copy this */
+    margin-left: 25%;
+    margin-bottom: 5%;
+    margin-right: 25%;
+}
+.stylish-input-group .input-group-addon{
+    background: white !important; 
+}
+.stylish-input-group .form-control{
+	/*border-right:0;*/
+	box-shadow:0 0 0; 
+	border-color:#ccc;
+}
+.stylish-input-group button{
+    border:0;
+    background:transparent;
+}
+
+.imc-container{
+  height: 50%;
+  padding: 15px;
+  margin-left: 20%;
+  margin-right: 20%;
+  width: 50%;
+}
+
+.imc-logo{
+  height: 80%;
+  padding: 15px;
+  margin-left: 25%;
+  margin-right: 25%;
+  width: 80%;
+}
+
+.videores{
+	
+}
+
+
 @media ( max-width :767px) {
 	#wrapper {
 		padding-left: 0;
@@ -241,7 +283,7 @@ div.scrollmenu a:hover {
 	position:relative;
 }*/
 
-.bar {
+/*.bar {
     width: 400px;
     padding: 8px;
     margin: 45px auto 20px;
@@ -266,7 +308,7 @@ div.scrollmenu a:hover {
 	font-weight: bold;
 	outline: none;
 	text-indent: 40px;
-}
+}*/
 
 ul {
 	list-style: none;
