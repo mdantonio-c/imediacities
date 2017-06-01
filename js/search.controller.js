@@ -24,7 +24,7 @@
 
 				// create a simple search filter
 			app.filter('searchFor', function() {
-					return function(arr, searchString) {
+					return function(arr, searchString, $scope) {
 						if(searchString === '*'){
 							return arr;
 						}
@@ -39,6 +39,12 @@
 								result.push(item);
 							}
 						});
+
+						/*pagination*/
+						self.numPerPage = 5; /*number of videos per page*/
+  						$scope.noOfPages = Math.ceil(result.length/self.numPerPage);
+  						$scope.currentPage = 1;
+  						/*---*/
 
 						return result;
 						}
@@ -78,7 +84,7 @@
 				  }
 			});
 
-			/*app.directive('pagination', function() {
+			app.directive('pagination', function() {
   			return {
    	 			restrict: 'E',
     			scope: {
@@ -127,7 +133,7 @@
       		};
     		}
   			};
-			});*/
+			});
 
 			function getElement(event) {
 					return angular.element(event.srcElement || event.target);
@@ -141,6 +147,20 @@
 					self.showmesb = false;
 
 					self.viewlogo = true;
+
+					self.showmepg = true;
+
+					$scope.currentPage = 1;
+					$scope.noOfPages = 1;
+
+					/*pagination*/
+					$scope.setPage = function (currp,nump) {
+    						$scope.vmin = (currp - 1) * nump;
+    						$scope.vmax = nump;
+  					};
+
+  					$scope.$watch( 'currentPage', $scope.setPage($scope.currentPage,$scope.noOfPages) );
+  					/*---*/
 
 					/*$scope.overMouseEvent = function(event) {
 
