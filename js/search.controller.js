@@ -8,7 +8,7 @@
 				    return {
 				      open: function(size, template, params) {
 				        return $uibModal.open({
-				          animation: true,
+				          animation: false,
 				          templateUrl: template || 'myModalContent.html',
 				          controller: 'ModalResultInstanceCtrl',
 				          size: size,
@@ -24,7 +24,7 @@
 
 				// create a simple search filter
 			app.filter('searchFor', function() {
-					return function(arr, searchString) {
+					return function(arr, searchString, $scope) {
 						if(searchString === '*'){
 							return arr;
 						}
@@ -39,6 +39,12 @@
 								result.push(item);
 							}
 						});
+
+						/*pagination*/
+						self.numPerPage = 5; /*number of videos per page*/
+  						$scope.noOfPages = Math.ceil(result.length/self.numPerPage);
+  						$scope.currentPage = 1;
+  						/*---*/
 
 						return result;
 						}
@@ -61,15 +67,72 @@
 						var nshots = $elm[0].firstElementChild.attributes.nshots.value;
 						var progr = $elm[0].firstElementChild.attributes.progr.value;
 						var myVid = angular.element(window.document.querySelector('#videoarea'));
-						var currtime = Math.floor((duration/nshots)*progr);
+						var currtime = $elm[0].firstElementChild.attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0,0,0,hours,mins,secs);
+						var times =  (secs*1)+(mins*60)+(hours*3600);//convert to seconds
 
 						myVid[0].pause();
-						myVid[0].currentTime = currtime;
+						myVid[0].currentTime = times;
 						myVid[0].play();
 
 				      });
 				    }
 				  }
+			});
+
+			app.directive('pagination', function() {
+  			return {
+   	 			restrict: 'E',
+    			scope: {
+      			numPages: '=',
+      			currentPage: '=',
+      			onSelectPage: '&'
+    		},
+    		templateUrl: 'pagination.html',
+    		replace: true,
+    		link: function(scope) {
+      		scope.$watch('numPages', function(value) {
+        	scope.pages = [];
+        	for(var i=1;i<=value;i++) {
+          		scope.pages.push(i);
+        	}
+        	if ( scope.currentPage > value ) {
+          		scope.selectPage(value);
+        	}
+      		});
+      		scope.noPrevious = function() {
+        		return scope.currentPage === 1;
+      		};
+      		scope.noNext = function() {
+        		return scope.currentPage === scope.numPages;
+      		};
+      		scope.isActive = function(page) {
+        		return scope.currentPage === page;
+      		};
+
+      		scope.selectPage = function(page) {
+        		if ( ! scope.isActive(page) ) {
+          			scope.currentPage = page;
+          			scope.onSelectPage({ page: page });
+        		}
+      		};
+
+      		scope.selectPrevious = function() {
+        		if ( !scope.noPrevious() ) {
+          			scope.selectPage(scope.currentPage-1);
+        		}
+      		};
+     		scope.selectNext = function() {
+        		if ( !scope.noNext() ) {
+          			scope.selectPage(scope.currentPage+1);
+        		}
+      		};
+    		}
+  			};
 			});
 
 			function getElement(event) {
@@ -82,6 +145,22 @@
 					var self = this;
 
 					self.showmesb = false;
+
+					self.viewlogo = true;
+
+					self.showmepg = true;
+
+					$scope.currentPage = 1;
+					$scope.noOfPages = 1;
+
+					/*pagination*/
+					$scope.setPage = function (currp,nump) {
+    						$scope.vmin = (currp - 1) * nump;
+    						$scope.vmax = nump;
+  					};
+
+  					$scope.$watch( 'currentPage', $scope.setPage($scope.currentPage,$scope.noOfPages) );
+  					/*---*/
 
 					/*$scope.overMouseEvent = function(event) {
 
@@ -198,12 +277,16 @@
 					};
 
 
+					$scope.loadVideoContent = function(video) {
+						self.video = video;
+						self.selectedVideo = true;
+						self.selectedVideoId = video.id;
 
+						self.viewlogo = false;
 
-					$scope.geoCode = function (video, $scope) {
+						$scope.geocoder = new google.maps.Geocoder();
 
-			  		$scope.geocoder = new google.maps.Geocoder();
-
+					/*start geocoding and get video coordinates*/
 			  		$scope.geocoder.geocode({ 'address': 'Bologna, It' }, function (results, status) {
 					if (status === google.maps.GeocoderStatus.OK) {
 		   				 if (results[0]) {
@@ -215,28 +298,7 @@
 			      			$scope.videolat = Lat;
 							$scope.videolng  = Lng;
 							$scope.locname = $scope.address[0].long_name;
-		 
-		   	 	} else {
-		        	console.log('Location not found');
-		        	$scope.firstExecution = false;
-		    	}
-				} else {
-		       		console.log('Geocoder failed due to: ' + status);
-		       	$scope.firstExecution = false;
-				}
-				});
 
-				};
-
-
-
-					$scope.loadVideoContent = function(video) {
-						self.video = video;
-						self.selectedVideo = true;
-						self.selectedVideoId = video.id;
-
-
-						$scope.geoCode(self.video, $scope);
 
 					NgMap.getMap({id:'videomap'}).then(function(map) {
 				      		google.maps.event.trigger(map,'resize');
@@ -254,12 +316,16 @@
 							for (var i=0; i<self.shots.length; i++) { 
 							    var thumblink = self.shots[i].links.thumbnail;
 							    var start_frame = self.shots[i].attributes.start_frame_idx;
-							    var frameshot = [2];
+							    var timestamp = self.shots[i].attributes.timestamp;
+							    var frameshot = [];
 							    frameshot[0] = start_frame;
 								frameshot[1] = self.video.relationships.item[0].attributes.duration;
-								frameshot[2] = self.shots.length;
-								frameshot[3] = i;
-							    frameshot[4] = thumblink;
+								frameshot[2] = parseInt(self.shots[i].attributes.duration);
+								frameshot[3] = self.shots.length;
+								frameshot[4] = i;
+								frameshot[5] = timestamp;
+							    frameshot[6] = thumblink;
+
 								$scope.items.push(frameshot); 
 
 								$scope.showmesb = true; //enable storyboard button
@@ -279,6 +345,18 @@
 						});*/
 
 				  	 /*--*/
+
+
+ 				} else {
+		        	console.log('Location not found');
+		        	$scope.firstExecution = false;
+		    	}
+				} else {
+		       		console.log('Geocoder failed due to: ' + status);
+		       	$scope.firstExecution = false;
+				}
+				});
+
 
 					};
 
@@ -335,8 +413,10 @@
 							for (var i=0; i<self.shots.length; i++) { 
 							    var thumblink = self.shots[i].links.thumbnail;
 							    var start_frame = self.shots[i].attributes.start_frame_idx;
-							    var frameshot = [2];
-								$scope.shots.push({ 'thumb': thumblink, 'number': i, 'duration': start_frame, 'camera': 'zoom out' }); 
+							    var shot_duration = parseInt(self.shots[i].attributes.duration);
+							    var timestamp = self.shots[i].attributes.timestamp;
+							    var frameshot = [];
+								$scope.shots.push({ 'thumb': thumblink, 'number': start_frame, 'timestamp': timestamp, 'duration': shot_duration, 'camera': 'unknown' }); 
 							}
 						});
 
@@ -365,27 +445,25 @@
 					};
 				/*---*/
 
-				  $scope.ok = function() {
-				    modalFactory.open('lg', 'result.html', {searchTerm: $scope.searchTerm});
-				    //$uibModalInstance.close($scope.searchTerm);
+				  $scope.showsummary = function() {
+				    modalFactory.open('lg', 'result.html', {animation: false, summary: $scope.summary});
+				    //$uibModalInstance.close($scope.summary);
 				  };
 
 				  $scope.cancel = function() {
 				    $uibModalInstance.dismiss('cancel');
 				  };
+
 				});
 
 				angular.module('web').controller('ModalResultInstanceCtrl', function($scope, $uibModalInstance, params) {
 
-				  $scope.searchTerm = params.searchTerm;
-
-				  $scope.ok = function() {
-				    $uibModalInstance.close($scope.searchTerm);
-				  };
+				  $scope.summary = params.summary;
 
 				  $scope.cancel = function() {
 				    $uibModalInstance.dismiss('cancel');
 				  };
+
 				})
 
 				//modal view storyboard management

@@ -21,6 +21,7 @@ from rapydo.services.neo4j.models import (
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
 from rapydo.models.neo4j import User as UserBase
+from imc.models import codelists
 
 import logging
 
@@ -207,7 +208,7 @@ class ContributionRel(StructuredRel):
     activities = ArrayProperty(StringProperty(), required=False)
 
 
-class Creation(IdentifiedNode):
+class Creation(IdentifiedNode, HeritableStructuredNode):
     """
     It stores descriptive metadata on IMC objects provided by the archives with
     the initial ingest.
@@ -234,10 +235,8 @@ class Creation(IdentifiedNode):
         contributors        Agents which are involved in the creation of the
                             objects.
     """
-    # __abstract_node__ = True
-    __label__ = 'AVEntity:NonAVEntity'
-    # record_sources = RelationshipTo(
-    #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    record_sources = RelationshipTo(
+        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     titles = RelationshipTo(
         'Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
     keywords = RelationshipTo(
@@ -250,11 +249,11 @@ class Creation(IdentifiedNode):
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
     # provenance = RelationshipTo(
     #    'Group', 'HAS_PROVENENCE', cardinality=ZeroOrOne, show=True)
-    rights_status = StringProperty()  # FIXME controlled vocab, optional?
+    rights_status = StringProperty(show=True)
     # FIXME: 1..N from specifications???
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
-    collection_title = StringProperty()
+    collection_title = StringProperty(show=True)
     contributors = RelationshipTo(
         'Agent', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True,
         model=ContributionRel)
@@ -274,23 +273,10 @@ class Title(StructuredNode):
                             title", "Distribution title", "Translated title"
                             etc).
     """
-    TITLE_RELASHIONSHIPS = (
-        ('00', 'unspecified'),
-        ('01', 'original'),
-        ('02', 'working'),
-        ('03', 'former'),
-        ('04', 'distribution'),
-        ('05', 'abbreviated'),
-        ('06', 'translated'),
-        ('07', 'alternative'),
-        ('08', 'explanatory'),
-        ('09', 'uniform'),
-        ('10', 'other')
-    )
     text = StringProperty(required=True, show=True)
     language = StringProperty(show=True)  # FIXME - from ISO-639-1
     relationship = StringProperty(
-        required=True, choices=TITLE_RELASHIONSHIPS, show=True)
+        required=True, choices=codelists.TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_TITLE', cardinality=One, show=True)
 
@@ -320,19 +306,9 @@ class Keyword(StructuredNode):
                         controlled vocabulary, the value of this element should
                         be set to "uncontrolled".
     """
-    KEYWORD_TYPES = (
-        ('00', 'Building'),
-        ('01', 'Person'),
-        ('02', 'Subject'),
-        ('03', 'Genre'),
-        ('04', 'Place'),
-        ('05', 'Form'),
-        ('06', 'Georeference')
-        # FIXME just an example here
-    )
     term = StringProperty(index=True, required=True, show=True)
     termID = IntegerProperty()
-    keyword_type = StringProperty(choices=KEYWORD_TYPES, show=True)
+    keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
     language = StringProperty(show=True)  # FIXME - from ISO-639-1
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
@@ -354,15 +330,10 @@ class Description(StructuredNode):
                           identifying the source directly or via a reference
                           system such as an on-line catalogue.
     """
-    DESCRIPTION_TYPES = (
-        ('01', 'synopsis'),
-        ('02', 'short list'),
-        ('03', 'review')
-        # FIXME just an example here
-    )
     text = StringProperty(index=True, required=True, show=True)
     language = StringProperty(show=True)  # FIXME - from ISO-639-1
-    description_type = StringProperty(choices=DESCRIPTION_TYPES, show=True)
+    description_type = StringProperty(
+        choices=codelists.DESCRIPTION_TYPES, show=True)
     source = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
@@ -377,15 +348,8 @@ class CreationLanguage(StructuredNode):
         usage   This indicates the relationship between the language and the
                 creation.
     """
-    LANGUAGE_USAGES = (
-        ('01', 'original spoken dialogue'),
-        ('02', 'dubbing'),
-        ('03', 'subtitles'),
-        ('04', 'voice over commentary'),
-        # FIXME just an example here
-    )
     value = StringProperty(required=True)  # FIXME - controlled vocab ISO-639-1
-    usage = StringProperty(choices=LANGUAGE_USAGES)
+    usage = StringProperty(choices=codelists.LANGUAGE_USAGES)
     creation = RelationshipFrom(
         'Creation', 'HAS_LANGUAGE', cardinality=One, show=True)
 
@@ -437,26 +401,18 @@ class Agent(IdentifiedNode):
                             entry in an external database or on content
                             provider's website.
     """
-    AGENT_TYPES = (
-        ('P', 'person'),
-        ('C', 'corporate')
-    )
-    SEXES = (
-        ('M', 'Male'),
-        ('F', 'Female')
-    )
     # any other identifiers?
     # (from different schemes different from the internal uuid)
     # identifiers = RelationshipTo(
     #     'Identifier', 'IS_IDENTIFIED_BY', cardinality=OneOrMore, show=True)
     record_sources = RelationshipTo(
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
-    agent_type = StringProperty(required=True, choices=AGENT_TYPES)
+    agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES)
     names = ArrayProperty(StringProperty(), required=True)
     birth_date = DateProperty()
     death_date = DateProperty(default=None)
     biographical_note = StringProperty()
-    sex = StringProperty(choices=SEXES)
+    sex = StringProperty(choices=codelists.SEXES)
     biography_views = ArrayProperty(StringProperty(), required=False)
     creation = RelationshipFrom(
         'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
@@ -475,22 +431,23 @@ class Agent(IdentifiedNode):
 
 
 class RecordSource(StructuredNode):
-    """ A reference to the IMC content provider and the local ID.
+    """ A reference to the IMC content provider and their local ID.
 
     Attributes:
-        sourceID        The local identifier of the record. If this does not
+        source_id        The local identifier of the record. If this does not
                         exist in the content provider´s database the value is
                         "undefined".
         provider_name   The name of the archive supplying the record.
-        providerID      An unambiguous reference to the archive supplying the
+        provider_id      An unambiguous reference to the archive supplying the
                         record.
         provider_scheme Name of the registration scheme encoding the
                         institution name ("ISIL code" or "Institution acronym")
     """
-    sourceID = StringProperty(required=True)
-    provider_name = StringProperty(index=True, required=True)
-    providerID = StringProperty(required=True)
-    provider_scheme = StringProperty(required=True)
+    source_id = StringProperty(required=True, show=True)
+    provider_name = StringProperty(index=True, required=True, show=True)
+    provider_id = StringProperty(required=True, show=True)
+    provider_scheme = StringProperty(
+        choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
     creation = RelationshipFrom(
         'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
 
@@ -544,13 +501,9 @@ class VideoFormat(StructuredNode):
         sound           Element from values list.
         colour          Element from values list.
     """
-    VIDEO_SOUND = (
-        ('NO_SOUND', 'without sound'),
-        ('WITH_SOUND', 'with sound')
-    )
     gauge = StringProperty()
     aspect_ratio = StringProperty()
-    sound = StringProperty(choices=VIDEO_SOUND)
+    sound = StringProperty(choices=codelists.VIDEO_SOUND)
     colour = StringProperty()
     creation = RelationshipFrom(
         'AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
@@ -578,20 +531,11 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
-    NON_AV_ENTITY_TYPES = (
-        ('01', 'image'),
-        ('02', 'text')
-    )
-    NON_AV_ENTITY_SPECIFIC_TYPES = (
-        ('01', 'photograph'),
-        ('02', 'poster'),
-        ('03', 'letter')
-    )  # FIXME just an ex. here: Based on the values of IMC content providers
     date_created = ArrayProperty(StringProperty(), required=True)
     non_av_entity_type = StringProperty(required=True,
-                                        choices=NON_AV_ENTITY_TYPES)
+                                        choices=codelists.NON_AV_ENTITY_TYPES)
     specific_type = StringProperty(required=True,
-                                   choices=NON_AV_ENTITY_SPECIFIC_TYPES)
+                                   choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES)
     phisical_format_size = StringProperty()
     colour = StringProperty()  # FIXME controlled terms
 
@@ -637,8 +581,6 @@ class Annotation(IdentifiedNode):
 
 
 class AnnotationBody(HeritableStructuredNode):
-    # __abstract_node__ = True
-    # __label__ = 'TextBody:ImageBody:AudioBody:VQBody:TVSBody:ODBody'
     annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 
 
@@ -676,10 +618,13 @@ class TVSBody(AnnotationBody):
 
 class Shot(IdentifiedNode):
     """Shot class"""
+    shot_num = IntegerProperty(required=True, show=True)
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(show=True)
     frame_uri = StringProperty()
     thumbnail_uri = StringProperty()
+    timestamp = StringProperty(show=True)
+    duration = FloatProperty(show=True)
     annotation_body = RelationshipFrom(
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)

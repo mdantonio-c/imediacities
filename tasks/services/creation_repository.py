@@ -13,7 +13,8 @@ class CreationRepository():
 
     @db.transaction
     def create_av_entity(
-            self, properties, item, titles, keywords, descriptions):
+            self, properties, item,
+            record_sources, titles, keywords, descriptions):
 
         # check if a creation already exists and delete it
         existing_creation = item.creation.single()
@@ -26,12 +27,13 @@ class CreationRepository():
             # use the same uuid for the new replacing creation
             properties['uuid'] = creation_id
 
-        # extend properties with something more
-        # properties["other_info"] = "XXX"
-
         av_entity_node = self.graph.AVEntity(**properties).save()
         # connect to item
         item.creation.connect(av_entity_node)
+        # connect to record sources
+        for rc in record_sources:
+            rc_node = self.create_record_source(rc)
+            av_entity_node.record_sources.connect(rc_node)
         # connect to tiles
         for title in titles:
             title_node = self.create_title(title)
@@ -48,6 +50,8 @@ class CreationRepository():
         return av_entity_node
 
     def delete_av_entity(self, node):
+        for rc in node.record_sources.all():
+            rc.delete()
         for title in node.titles.all():
             self.delete_title(title)
         for description in node.descriptions.all():
@@ -55,6 +59,10 @@ class CreationRepository():
         for keyword in node.keywords.all():
             self.delete_keyword(keyword)
         node.delete()
+
+    def create_record_source(self, record_source):
+        record_source.save()
+        return record_source
 
     def create_title(self, title):
         if title.relationship is None:
