@@ -4,136 +4,33 @@ version: '3'
 
 services:
   backend:
-    volumes:
-      - ..:/code/${COMPOSE_PROJECT_NAME}
-      - ../imediastuff:/uploads
     environment:
-      FLASK_DEBUG: 1
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
-
-      # base the user/role mechanism on some database
-      AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
-      AUTH_SERVICE: neo4j
-
-      AUTH_REGISTER_FAILED_LOGIN: ${AUTH_REGISTER_FAILED_LOGIN}
-      AUTH_FORCE_FIRST_PASSWORD_CHANGE: ${AUTH_FORCE_FIRST_PASSWORD_CHANGE}
-      AUTH_VERIFY_PASSWORD_STRENGTH: ${AUTH_VERIFY_PASSWORD_STRENGTH}
-      AUTH_MAX_PASSWORD_VALIDITY: ${AUTH_MAX_PASSWORD_VALIDITY}
-      AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: ${AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER}
-      AUTH_MAX_LOGIN_ATTEMPTS: ${AUTH_MAX_LOGIN_ATTEMPTS}
-      AUTH_SECOND_FACTOR_AUTHENTICATION: ${AUTH_SECOND_FACTOR_AUTHENTICATION}
-      
-      # # neo connection
-      GRAPHDB_ENABLE: 1
-      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
-      GRAPHDB_HOST: ${GRAPHDB_HOST}
-      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
-      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
-
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
-
+      ACTIVATE: 1
     ports:
       - 8081:5000
-
-    networks:
-      db_net:
-      worker_net:
-      ftp_net:
-    depends_on:
-      - neo4j
-      - ftp
-      - swaggerui
 
   frontend:
     ports:
       - 80:5000
     environment:
+      APP_MODE: debug
       BACKEND_PORT: 8081
+      ACTIVATE: 1
     volumes:
       - ../assets/imc:/data/frontend/felask/static/assets
 
-
-  rabbit:
-    networks:
-      worker_net:
-        aliases:
-          - ${CELERY_BROKER_HOST}
-
-  neo4j:
-    ports:
-    - 9090:7474
-    - 7687:7687
-    volumes:
-      - ../confs/neo4j:/var/lib/neo4j/conf
+  celery:
     environment:
-      NEO4J_dbms_allowFormatMigration: "true"
-
-    networks:
-      db_net:
-        aliases:
-          - ${GRAPHDB_HOST}
-
-  worker:
-    # command: sleep infinity
-    build: ../builds/celery
-    networks:
-      db_net:
-      worker_net:
-    depends_on:
-      - rabbit
-    volumes:
-      - ..:/code/${COMPOSE_PROJECT_NAME}
-      - ../imediastuff:/uploads
-      # - ../imedia-pipeline:/imedia-pipeline
-      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
-      - /opt/idmt:/opt/idmt
-    environment:
-      APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
-
-      # base the user/role mechanism on some database
-      AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
-      AUTH_SERVICE: neo4j
-
-      # # neo connection
-      GRAPHDB_ENABLE: 1
-      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
-      GRAPHDB_HOST: ${GRAPHDB_HOST}
-      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
-      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
-
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+      ACTIVATE: 1
 
   ftp:
-    ports:
-      - "21:21"
-      - "30000-30019:30000-30019"
-    volumes:
-      - ../imediastuff:/home/ftpusers/
     environment:
       PUBLICHOST: localhost
-    networks:
-      ftp_net:
-
 
   swaggerui:
     ports:
       - 7777:80
-
-networks:
-    worker_net:
-    ftp_net:
 

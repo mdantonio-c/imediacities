@@ -1,23 +1,43 @@
+########################
+##  Your custom data  ##
+########################
+
+imediastuff
+uploads
+tmp_files
+
+# Hide analize.py undesired output
+scripts/analysis/shot-output.xml
+
+# data
+uploads
+tmp_files
+
+#################
+##  Submodules ##
+#################
+
 /backend
 /frontend
 /imedia-pipeline
 /imedia-pipeline-cin
 /builds_base
 
-################
+############################################
+##  Dynamically created file and folders  ##
+############################################
 
-confs/neo4j/neo4j.conf
+.env
+libs/bower_components
+
+###################################
+##  Temporary and miscellaneous  ##
+###################################
+
+*.log
 
 # notebooks
-.ipynb_checkpoints
-
-# data
-imediastuff
-uploads
-tmp_files
-
-# bower
-libs/bower_components
+.ipynb_checkpoint
 
 # Sublime text
 *.sublime-*
@@ -29,7 +49,17 @@ __pycache__/
 # C extensions
 *.so
 
-# Distribution / packaging
+# Sphinx documentation
+docs/_build/
+
+# Translations
+*.mo
+*.pot
+
+################################
+##  Distribution / packaging  ##
+################################
+
 .Python
 env/
 build/
@@ -57,7 +87,13 @@ var/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+# PyBuilder
+target/
+
+###################################
+## Unit test / coverage reports  ##
+###################################
+
 htmlcov/
 .tox/
 .coverage
@@ -66,20 +102,3 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Hide analize.py undesired output
-scripts/analysis/shot-output.xml
-
