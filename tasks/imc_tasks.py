@@ -56,31 +56,43 @@ def import_file(self, path, resource_id, mode):
 
             progress(self, 'Extracting descriptive metadata', path)
 
-            videos = extract_av_creation_refs(self, path)
-            if (videos is None):
+            video_ref_ids = extract_av_creation_refs(self, path)
+            if video_ref_ids is None or len(video_ref_ids) == 0:
                 raise Exception(
-                    "No video match found importing file %s" % path)
+                    "No video source id found importing file %s" % path)
 
-            for video_filename in videos:
-
-                if video_filename is None:
-                    log.warning("Why the video filename is None??")
+            for source_id in video_ref_ids:
+                if source_id is None:
+                    # should never be reached
+                    log.warning("Why the source ID is None??")
                     continue
 
-                log.info("Video filename %s", video_filename)
+                log.debug("Video source ID {0}".format(source_id))
 
-                # TO FIX: will be something like: root + video_filename ?
-                # root = basedir(path) ?
-                video_path = os.path.join(
-                    os.path.dirname(path), video_filename)
-                if not os.path.exists(video_path):
+                # To ensure that the content item and its metadata will be
+                # correctly linked in the system and its repositories,
+                # FHI-Partners are expected to name the content item file,
+                # using the following method:
+                # The FHI project acronym_the FHI content ID (this is the
+                # Content item ID in the local FHI’s database).
+                # For example: CRB_1234.mp4
+                basedir = os.path.dirname(os.path.abspath(path))
+                log.debug("Video basedir {0}".format(basedir))
+                video_path, video_filename = lookup_video(
+                    self, basedir, source_id)
+
+                # video_path = os.path.join(
+                #     os.path.dirname(path), video_filename)
+
+                if video_path is None:
                     log.warning(
-                        "Video content does not exist in the path %s",
-                        video_path)
+                        "Video content does not exist in the path {0} with \
+                        filename containing source ID {1}"
+                        .format(video_path, source_id))
                     continue
 
-                log.debug('filename [%s], extension [%s]' %
-                          (filename, file_extension))
+                log.debug('filename [{0}], extension [{1}]'.format(
+                    filename, file_extension))
 
                 # Creating video resource
                 properties = {}
@@ -122,7 +134,7 @@ def import_file(self, path, resource_id, mode):
                     log.debug("Item resource created")
 
                 extract_descriptive_metadata(
-                    self, path, video_filename, item_node)
+                    self, path, source_id, item_node)
 
                 # EXECUTE AUTOMATC TOOLS
                 analyze_path = '/uploads/Analize/' + \
@@ -225,6 +237,26 @@ def extract_av_creation_refs(self, path):
     # This will be a list of video extracted from XML file
     log.debug('[%s]' % ', '.join(map(str, videos)))
     return videos
+
+
+def lookup_video(self, path, source_id):
+    '''
+    Look for a filename in the form of:
+    ARCHIVE_SOURCEID.[extension]
+    '''
+    video_path = None
+    video_filename = None
+    files = [f for f in os.listdir(path) if not f.endswith('.xml')]
+    for f in files:
+        tokens = os.path.splitext(f)[0].split('_')
+        if len(tokens) == 0:
+            continue
+        if tokens[-1] == source_id:
+            log.debug('Video file FOUND: {0}'.format(f))
+            video_path = os.path.join(path, f)
+            video_filename = f
+            break
+    return video_path, video_filename
 
 
 def extract_descriptive_metadata(self, path, item_ref, item_node):
@@ -333,7 +365,7 @@ def extract_tech_info(self, item, analyze_dir_path):
 
 def get_thumbnail(path):
     """
-    Returns a random filename, chosen among the jpg files of the given pat.h
+    Returns a random filename, chosen among the jpg files of the given path
     """
     jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
     index = random.randrange(0, len(jpg_files))
