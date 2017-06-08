@@ -19,6 +19,8 @@ log = get_logger(__name__)
 #####################################
 class Stage(GraphBaseOperations):
 
+    allowed_import_mode = ('clean', 'fast', 'skip')
+
     def getType(self, filename):
         name, file_extension = os.path.splitext(filename)
 
@@ -131,10 +133,11 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
-        mode = input_parameters.get('mode', 'clean').strip()
-        if mode != 'clean' and mode != 'fast':
+        mode = input_parameters.get('mode', 'clean').strip().lower()
+        if mode not in self.__class__.allowed_import_mode:
             raise RestApiException(
-                "Bad mode parameter: expected 'fast' or 'clean'",
+                "Bad mode parameter: expected one of %s" %
+                (self.__class__.allowed_import_mode, ),
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         path = os.path.join(upload_dir, filename)

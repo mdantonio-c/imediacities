@@ -205,7 +205,7 @@ class ContributionRel(StructuredRel):
         activities  One or more film-related activities of the person taken
                     from relationship records or from secondary sources.
     """
-    activities = ArrayProperty(StringProperty(), required=False)
+    activities = ArrayProperty(StringProperty(), show=True)
 
 
 class Creation(IdentifiedNode, HeritableStructuredNode):
@@ -274,7 +274,7 @@ class Title(StructuredNode):
                             etc).
     """
     text = StringProperty(required=True, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     relationship = StringProperty(
         required=True, choices=codelists.TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
@@ -307,9 +307,9 @@ class Keyword(StructuredNode):
                         be set to "uncontrolled".
     """
     term = StringProperty(index=True, required=True, show=True)
-    termID = IntegerProperty()
+    termID = IntegerProperty(show=True)
     keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -331,7 +331,7 @@ class Description(StructuredNode):
                           system such as an on-line catalogue.
     """
     text = StringProperty(index=True, required=True, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     description_type = StringProperty(
         choices=codelists.DESCRIPTION_TYPES, show=True)
     source = StringProperty()
@@ -348,7 +348,8 @@ class CreationLanguage(StructuredNode):
         usage   This indicates the relationship between the language and the
                 creation.
     """
-    value = StringProperty(required=True)  # FIXME - controlled vocab ISO-639-1
+    value = StringProperty(
+        choices=codelists.LANGUAGE, show=True, required=True)
     usage = StringProperty(choices=codelists.LANGUAGE_USAGES)
     creation = RelationshipFrom(
         'Creation', 'HAS_LANGUAGE', cardinality=One, show=True)
@@ -364,8 +365,8 @@ class Coverage(StructuredNode):
                     LOD-service.
         temporal    This may be a period, date or range date.
     """
-    spatial = StringProperty()
-    temporal = StringProperty()
+    spatial = StringProperty(show=True)
+    temporal = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_COVERAGE', cardinality=One, show=True)
 
@@ -377,7 +378,7 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(index=True, required=True),
+    name = StringProperty(index=True, required=True, show=True),
     url = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
@@ -409,10 +410,10 @@ class Agent(IdentifiedNode):
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES)
     names = ArrayProperty(StringProperty(), required=True)
-    birth_date = DateProperty()
-    death_date = DateProperty(default=None)
+    birth_date = DateProperty(show=True)
+    death_date = DateProperty(default=None, show=True)
     biographical_note = StringProperty()
-    sex = StringProperty(choices=codelists.SEXES)
+    sex = StringProperty(choices=codelists.SEXES, show=True)
     biography_views = ArrayProperty(StringProperty(), required=False)
     creation = RelationshipFrom(
         'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
@@ -480,9 +481,10 @@ class AVEntity(Creation):
                                     provider web site.
     """
     identifying_title = StringProperty(index=True, required=True, show=True)
-    identifying_title_origin = StringProperty(index=True, )
+    identifying_title_origin = StringProperty(index=True, show=True)
     production_countries = ArrayProperty(StringProperty())
-    production_years = ArrayProperty(StringProperty(), required=True)
+    production_years = ArrayProperty(
+        StringProperty(), required=True, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
     view_filmography = StringProperty()
@@ -501,10 +503,10 @@ class VideoFormat(StructuredNode):
         sound           Element from values list.
         colour          Element from values list.
     """
-    gauge = StringProperty()
-    aspect_ratio = StringProperty()
-    sound = StringProperty(choices=codelists.VIDEO_SOUND)
-    colour = StringProperty()
+    gauge = StringProperty(show=True)
+    aspect_ratio = StringProperty(show=True)
+    sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
+    colour = StringProperty(show=True)
     creation = RelationshipFrom(
         'AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
 
@@ -531,13 +533,15 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
-    date_created = ArrayProperty(StringProperty(), required=True)
+    date_created = ArrayProperty(StringProperty(), required=True, show=True)
     non_av_entity_type = StringProperty(required=True,
-                                        choices=codelists.NON_AV_ENTITY_TYPES)
-    specific_type = StringProperty(required=True,
-                                   choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES)
-    phisical_format_size = StringProperty()
-    colour = StringProperty()  # FIXME controlled terms
+                                        choices=codelists.NON_AV_ENTITY_TYPES,
+                                        show=True)
+    specific_type = StringProperty(
+        required=True, choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES,
+        show=True)
+    phisical_format_size = StringProperty(show=True)
+    colour = StringProperty(choices=codelists.COLOUR, show=True)
 
 # ANNOTATION
 ##############################################################################

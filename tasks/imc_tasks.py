@@ -145,8 +145,15 @@ def import_file(self, path, resource_id, mode):
                 params = []
                 params.append("/code/imc/scripts/analysis/analyze.py")
                 if mode is not None:
-                    log.info('Analyze with mode [%s]' % mode)
-                    params.append('-' + mode)
+                    if mode.lower() == 'skip':
+                        log.info('Analyze skipped!')
+                        video_node.status = 'SKIPPED'
+                        video_node.status_message = 'Nothing to declare'
+                        video_node.save()
+                        break
+                    else:
+                        log.info('Analyze with mode [%s]' % mode)
+                        params.append('-' + mode)
                 params.append(video_path)
                 bash = BashCommands()
                 try:
