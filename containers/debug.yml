@@ -22,6 +22,7 @@ services:
       - ../assets/imc:/data/frontend/felask/static/assets
 
   celery:
+    command: sleep 99999999999
     environment:
       DEBUG_LEVEL: VERBOSE
       ACTIVATE: 1

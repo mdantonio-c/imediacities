@@ -53,11 +53,15 @@ services:
 
   celery:
     build: ../builds/celery
+    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
       - ../imediastuff:/uploads
       # - ../imedia-pipeline:/imedia-pipeline
       # - ../imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
+    depends_on:
+      - rabbit
+      - flower
 
     environment:
       # base the user/role mechanism on some database

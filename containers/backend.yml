@@ -70,7 +70,7 @@ services:
       - ../utilities/rapydo/utils:/usr/local/lib/python3.6/dist-packages/rapydo/utils
       # Vanilla code
   ##################
-  # FIXME
+  # FIXME (also in celery and flower)
       - ../scripts:/code
       - ../backend/rapydo/swagger:/code/rapydo/swagger
       - ../backend/rapydo/models/swagger.yaml:/code/rapydo/models/swagger.yaml
@@ -178,7 +178,11 @@ services:
     volumes:
       - ..:/code/${COMPOSE_PROJECT_NAME}
       # Base code
-      - ../backend:/code
+      # - ../backend:/code
+      # FIXME as in backend
+      - ../scripts:/code
+      - ../backend/rapydo/swagger:/code/rapydo/swagger
+      - ../backend/rapydo/models/swagger.yaml:/code/rapydo/models/swagger.yaml
       # JWT tokens secret
       - jwt_tokens:${JWT_APP_SECRETS}
     networks:
@@ -217,6 +221,11 @@ services:
       JWT_APP_SECRETS: ${JWT_APP_SECRETS}
     volumes:
       - ..:/code/${COMPOSE_PROJECT_NAME}
+      # FIXME as in backend
+      - ../scripts:/code
+      - ../backend/rapydo/swagger:/code/rapydo/swagger
+      - ../backend/rapydo/models/swagger.yaml:/code/rapydo/models/swagger.yaml
+
       - ../tmp_irods_certificates:/opt/certificates
       - ../tmp_files:/uploads
     networks:
