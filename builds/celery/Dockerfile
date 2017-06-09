@@ -80,7 +80,7 @@ RUN echo "Entrylevel" && \
     >> /root/.bashrc
 
 # Run Celery as developer
-RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A flask_ext.flask_celery.worker.celery_app '" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A rapydo.flask_ext.flask_celery.worker.celery_app '" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
 
 RUN echo "Entrylevel" && \
     echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \

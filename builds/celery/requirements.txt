@@ -1,17 +1,13 @@
 pip
 
-attrs
-beeprint
-better_exceptions
-bravado-core
-celery
+#RAPyDo framework
+rapydo-http==0.1.1
+
 Flask
 Flask-Cors
 Flask-OAuthlib
 Flask-RESTful
 Flask-SQLAlchemy
-flask_injector==v0.9.0
-injector==0.12.0
 flask-shell-ipython
 httpie
 ipython
@@ -22,7 +18,8 @@ PyJWT
 requests
 swagger-spec-validator
 urllib3
+
+celery
 numpy
 flower
 Pillow     
-
