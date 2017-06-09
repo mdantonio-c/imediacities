@@ -5,7 +5,8 @@ Handle your video metadata
 """
 from flask import stream_with_context, Response
 from flask import send_file
-from rapydo.confs import get_api_url
+from flask import request
+from rapydo.utils.helpers import get_api_url
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -45,7 +46,7 @@ class Videos(GraphBaseOperations):
         else:
             videos = self.graph.AVEntity.nodes.all()
 
-        api_url = get_api_url()
+        api_url = get_api_url(request)
         for v in videos:
             video = self.getJsonResponse(v)
             # video['links']['self'] = api_url + \
@@ -187,7 +188,7 @@ class VideoShots(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         item = video.item.single()
-        api_url = get_api_url()
+        api_url = get_api_url(request)
         for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
             shot_url = api_url + 'api/shots/' + s.uuid

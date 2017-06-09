@@ -4,7 +4,8 @@
 Handle your video metadata
 """
 from flask import send_file
-from rapydo.confs import get_api_url
+from flask import request
+from rapydo.utils.helpers import get_api_url
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -59,7 +60,7 @@ class Shots(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             return send_file(thumbnail_uri, mimetype='image/jpeg')
 
-        api_url = get_api_url()
+        api_url = get_api_url(request)
         shot = self.getJsonResponse(node)
         shot['links']['self'] = api_url + \
             'api/shots/' + node.uuid

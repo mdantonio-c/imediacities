@@ -16,7 +16,7 @@ from rapydo.basher import BashCommands
 from rapydo.utils.logs import get_logger
 from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
 
-from flask_ext.flask_celery import CeleryExt
+from rapydo.flask_ext.flask_celery import CeleryExt
 
 celery_app = CeleryExt.celery_app
 

@@ -6,7 +6,8 @@ Search endpoint
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-from rapydo.confs import get_api_url
+from flask import request
+from rapydo.utils.helpers import get_api_url
 
 from rapydo.utils.logs import get_logger
 from rapydo import decorators as decorate
@@ -54,7 +55,7 @@ class Search(GraphBaseOperations):
 
         data = []
         result = self.graph.cypher(query)
-        api_url = get_api_url()
+        api_url = get_api_url(request)
         for row in result:
             v = self.graph.AVEntity.inflate(row[0])
 

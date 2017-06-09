@@ -11,7 +11,7 @@ from rapydo.exceptions import RestApiException
 from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
 from rapydo.utils import htmlcodes as hcodes
 
-from flask_ext.flask_celery import CeleryExt
+from rapydo.flask_ext.flask_celery import CeleryExt
 
 log = get_logger(__name__)
 
