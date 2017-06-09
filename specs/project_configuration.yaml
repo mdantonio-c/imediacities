@@ -6,14 +6,6 @@ tags:
     admin: "Operations only allowed for admin users"
     miscellaneous: "Endpoints not classified in other specific sections"
 
-controller:
-  commands:
-    initialization:
-      description: Try to init your project. Fails if already done once?
-      command: initialize
-      service: backend
-      user: root
-
 variables:
   env:
     COMPOSE_PROJECT_NAME: imc
