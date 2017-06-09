@@ -13,6 +13,11 @@ scripts/analysis/shot-output.xml
 uploads
 tmp_files
 
+########################
+##  Host configuration  ##
+########################
+.projectrc
+
 #################
 ##  Submodules ##
 #################
@@ -22,6 +27,7 @@ tmp_files
 /imedia-pipeline
 /imedia-pipeline-cin
 /builds_base
+/utilities
 
 ############################################
 ##  Dynamically created file and folders  ##
@@ -33,6 +39,8 @@ libs/bower_components
 ###################################
 ##  Temporary and miscellaneous  ##
 ###################################
+
+scripts/rapydo
 
 *.log
 
