@@ -1,196 +1,47 @@
-	<div 
-		ng-if="datactrl.loading" 
-		ng-include="main.templateDir + 'loader.html'">
-	</div>
-
-	<div ng-controller='SearchController as ctrl'>
-
-	<div class='row'>
-		<div id="wrapper" data-spy="scroll" data-target="#spy" ng-class="{active: ctrl.selectedVideo === false}">
-			<!-- Result content -->
-			<div id="sidebar-wrapper" class="">
-				<nav id="spy">
-					<ul class="sidebar-nav nav">
-						<!--<li class="sidebar-brand active"><a href="#home" class=""><span
-								class="fa fa-home solo">Movie Player</span></a></li>-->
-					</ul>
-				</nav>
-				<div class="row">
-					<video id="videoarea" ng-src="{{ctrl.video.links['content'] | trustUrl }}" controls></video>
-				</div>
-	  			<div class="row">
-	    		<div class="scrollmenu">
-	      			<a ng-repeat="item in items" style="width: 13%;" scroll-on-click>
-	       				 <img style="width: 90%; height: 90%" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" shotd="{{item[3]}}" progr="{{item[4]}}" timestamp="{{item[5]}}" ng-src="{{item[6]}}">
-	      			</a>
-	   			</div>
-	  			</div>
-	            <!-- <div class="row">
-	                    add summary image
-	            </div> -->
-				<!-- <div class="row">
-					<div id="timeline-graph">
-						<div google-chart chart="videoTimeline" agc-on-select="jumpToShot(selectedItem)" style="{{videoTimeline.cssStyle}}"/>
-					</div>
-				</div> -->
-				<div class="row">
-					<div map-lazy-load="https://maps.google.com/maps/api/js"
-						map-lazy-load-params="{{ctrl.googleMapsUrl}}">
-	  					<ng-map id="videomap" center="{{videolat}}, {{videolng}}" zoom="10">
-	  						<marker position="[{{videolat}}, {{videolng}}]"  title="{{locname}}" animation="Animation.BOUNCE"/>
-	  					</ng-map>
-					</div>
-				</div>
+<div
+	ng-if="datactrl.loading"
+	ng-include="main.templateDir + 'loader.html'">
+</div>
+<div ng-controller='SearchController as ctrl'>
+	<div class="row">
+		<div id="imaginary_container">
+			<div id="search-logo" ng-show="ctrl.viewlogo">
+				<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
 			</div>
-			<!-- Result list -->
-			<div id="page-content-wrapper" class="">
-				<div class="page-content inset">
-						<div ng-if='ctrl.videos.length == 0'>
-							No video found
+			<div class="input-group stylish-input-group">
+				<input type="text" ng-model="ctrl.inputTerm" class="form-control" placeholder="Search video"
+				ng-keypress="($event.charCode === 13)?ctrl.searchVideos():return" autofocus>
+				<span class="input-group-addon">
+					<button ng-click="ctrl.searchVideos()">
+					<span class="glyphicon glyphicon-search"></span>
+					</button>
+				</span>
+			</div>
+			<span ng-if="ctrl.loadResults && ctrl.videos.length == 0">No video found</span>
+		</div>
+	</div>
+	<div class='row'>
+		<div class="list-results" ng-if="ctrl.loadResults">
+			<div class="list-results" ng-if="ctrl.videos.length > 0">
+				<ul>
+					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this)"> -->
+					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))"> -->
+					<li ng-repeat="v in ctrl.videos">
+						<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><img ng-src="{{v.links['thumbnail']}}" /></a>
+						<div class="primary-description">
+							<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><span class="title">{{v.attributes.identifying_title}}</span></a><i>({{v.relationships.item[0].attributes.duration}} sec)</i>
+							<p><span ng-repeat="description in v.relationships.descriptions">
+							{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
+							<p><span ng-repeat="keyword in v.relationships.keywords">
+							{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 						</div>
-						<div ng-if="ctrl.videos.length > 0">
-							<!-- <div class="bar">
-								<input type="text" ng-model="searchString" placeholder="Enter your search terms" />
-							</div> -->
-            					<div id="imaginary_container"> 
-            						<div class="imc-container" ng-show="ctrl.viewlogo">
-									<a href="https://imediacities.eu" target="_blank">
-          								<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
-       								</a>
-            						</div>
-                					<div class="input-group stylish-input-group">
-                    				<input type="text" ng-model="query" class="form-control" placeholder="Search video file" >
-                    				<span class="input-group-addon">
-                        			<button ng-click="searchString=query">
-                            			<span class="glyphicon glyphicon-search"></span>
-                        			</button>  
-                   	 				</span>
-                					</div>
-            					</div>
-							<ul>
-								<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this)"> -->
-									<li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))">
-									<a href="" ng-click="loadVideoContent(v)"><img ng-src="{{v.links['thumbnail']}}" /></a>
-									<div class="primary-description">
-										<span class="title">{{v.attributes.identifying_title}}</span><i>({{v.relationships.item[0].attributes.duration}} sec)</i>
-										<p><span ng-repeat="description in v.relationships.descriptions">
-										{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
-										<p><span ng-repeat="keyword in v.relationships.keywords">
-										{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
-									</div>
-									<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-										<p><b>Production Year(s)</b>: {{v.attributes.production_years[0]}}</p>
-										<p><b>Location</b>: {{locname}}</p>
-										<!-- <p><b>Segmentation</b>: 
-										<span style="display:block; padding-left: 0.8em;">
-											<span ng-repeat="frame in v.frames">
-												<span ng-repeat="(key, value) in frame" >
-												   <i>{{key}}</i>: {{value}}
-												</span><br/>
-											</span>
-										</span>
-										</p>-->
-									</html>
-									</div>
-               					 <button type="button" class="btn btn-default pull-right" ng-show="showmesb" ng-click="open()">
-                  					Storyboard <span class="glyphicon glyphicon-book"></span> 
-               					 </button>
-                				</li>
-                				<!--<ul>
-      								<li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))">{{v.attributes.identifying_title}}</li>
-    							</ul> -->
-                				<!-- <div class="videores" ng-hide="(noresults && query.length>0)">0 results for your search</div> -->
-							</ul>
-							<pagination ng-show="showmepg" num-pages="noOfPages" current-page="currentPage" class="pagination-small"></pagination>
+						<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
+							<p><b>Production Year(s)</b>: {{v.attributes.production_years[0]}}</p>
+							<p><b>Location</b>: {{locname}}</p>
 						</div>
-					</div>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
-
-
-	<!-- modal content -->
-	 <script type="text/ng-template" id="myModalContent.html">
-	      <div class="modal-header">
-	        <h3 class="modal-title" align="center">Video Storyboard</h3>
-	        </br>
-	      </div>
-	      <div class="modal-body">
-	       <form>
-	    	<div>
-
-	    	<table class="table">
-	    		<tr>
-	    			<th>Video Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{summary}}" ng-click="showsummary()"></th>
-				</tr>
-			</table>
-
-			<table class="table">
-			<tr>
-				<th>Shots
-				</th>
-				<th>Shot number
-				</th>
-				<th>Shot timestamp
-				</th>
-				<th>Shot duration
-				</th>
-				<th>Camera motion
-				</th>
-			</tr>
-
-			<div class="storyboard">
-			<tr ng-repeat="shot in shots">
-	       	<td data-title="'Shot'" >
-	           <img style="width: 40%;" ng-src="{{shot.thumb}}">
-	       	</td>
-	       	<td data-title="'Number'" align="center">
-	           {{shot.number}}
-	       	</td>   
-	       	<td data-title="'Timestamp'" align="center">
-	           {{shot.timestamp}}
-	       	</td>   
-	       	<td data-title="'Duration'" align="center">
-	           {{shot.duration}}
-	       	</td>     
-	       	<td data-title="'Camera motion'" align="center">
-	           {{shot.camera}}
-	       	</td>   
-			</tr>
-			</div>
-			</table>
-
-			</div>
-	        </form>
-	      	</div> <!-- body -->
-
-	      	<div class="modal-footer">
-	        	<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-	     	</div>
-	    	</script>
-
-	    	<script type="text/ng-template" id="result.html">
-	    		<div class="modal-header">
-	        	<h3 class="modal-title" align="center">Video Summary</h3>
-	      	</div>
-	     	 <div class="modal-body" style="height: 150px;">
-	      		<form><div>
-	       			<img style="width: 100%; height: 100%; float: right;" ng-src="{{summary}}">
-	      	 </div></form>
-	      	</div>
-	    	</script>
-
-	    	<div ng-show="searchTerm">searchTerm from a modal: {{ searchTerm }}</div>
-	 	 </div>
-
-	<!-- modal content -->
-	 <script type="text/ng-template" id="pagination.html">
-	  <div class="pagination"><ul>
-  		<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>
-  		<li ng-repeat="page in pages" ng-class="{active: isActive(page)}"><a ng-click="selectPage(page)">{{page}}</a></li>
-  		<li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>
-  	</ul>
-	</div>
-	</script>
-
-	</div>
+</div>

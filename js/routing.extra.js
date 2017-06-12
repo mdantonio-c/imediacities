@@ -6,11 +6,24 @@ loggedLandingPage = "logged.upload";
 angular.module('web').constant('customRoutes',
 {
     'logged.search': {
-        url: "/search",
+        url: "/search?q",
         views: {
             "loggedview@logged": {
                 dir: 'blueprint',
                 templateUrl: 'search.html',
+            }
+        }
+    },
+
+    'logged.search.watch': {
+        url: "/watch?v",
+        params: {
+            meta: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'search.watch.html'
             }
         }
     },

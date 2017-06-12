@@ -1,4 +1,9 @@
-<efgEntity>
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<efgEntity 
+  xmlns="http://www.europeanfilmgateway.eu/ef"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.europeanfilmgateway.eu/efg  ../efg_3.2.07.xsd">
      <avcreation>
           <avManifestation>
                <identifier scheme="CP_CATEGORY_ID">FN_avManifestation_71e4d1e6-b606-4721-aca7-2bdfb4934aca</identifier>

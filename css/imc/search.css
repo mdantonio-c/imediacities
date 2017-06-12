@@ -13,10 +13,10 @@
 
 #videoarea {
 	float: left;
-	width: 99%;
-	height: 480px;
+	width: 100%;
 	border: 1px solid silver;
-	padding-left: 10px;
+	/*height: 480px;
+	padding-left: 10px;*/
 }
 
 .metadattr {
@@ -199,10 +199,7 @@ div.scrollmenu a:hover {
 
 
 #imaginary_container{
-    margin-top:10%; /* Don't copy this */
-    margin-left: 25%;
-    margin-bottom: 5%;
-    margin-right: 25%;
+    margin: 0 25%
 }
 .stylish-input-group .input-group-addon{
     background: white !important; 
@@ -217,12 +214,13 @@ div.scrollmenu a:hover {
     background:transparent;
 }
 
-.imc-container{
-  height: 50%;
-  padding: 15px;
-  margin-left: 20%;
-  margin-right: 20%;
-  width: 50%;
+#search-logo {
+	transition: all linear 0.5s;
+  	height: 50%;
+  	padding: 15px;
+  	margin-left: 20%;
+  	margin-right: 20%;
+  	width: 50%;
 }
 
 .imc-logo{
@@ -316,6 +314,9 @@ ul li {
 	padding: 10px;
 	overflow: hidden;
 }
+ul li:first-child {
+	border-top: 1px solid #ddd;
+}
 
 ul li img {
 	width:80px;
@@ -341,4 +342,20 @@ ul li p {
 
 .secondary-description p {
 	border-top: 1px solid #ddd;
+}
+
+.list-results {
+	margin: 1.5em;
+}
+
+/*.list-results ul {
+	padding-left: 0;
+}*/
+
+.ng-hide {
+  height: 0;
+  width: 0;
+  background-color: transparent;
+  top:-200px;
+  left: 200px;
 }
