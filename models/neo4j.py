@@ -365,8 +365,8 @@ class Coverage(StructuredNode):
                     LOD-service.
         temporal    This may be a period, date or range date.
     """
-    spatial = StringProperty(show=True)
-    temporal = StringProperty(show=True)
+    spatial = ArrayProperty(StringProperty(), required=True, show=True)
+    temporal = ArrayProperty(StringProperty(), show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_COVERAGE', cardinality=One, show=True)
 
@@ -450,7 +450,7 @@ class RecordSource(StructuredNode):
     provider_scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
     creation = RelationshipFrom(
-        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+        'Creation', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
 
 
 class AVEntity(Creation):
@@ -482,12 +482,12 @@ class AVEntity(Creation):
     """
     identifying_title = StringProperty(index=True, required=True, show=True)
     identifying_title_origin = StringProperty(index=True, show=True)
-    production_countries = ArrayProperty(StringProperty())
+    production_countries = ArrayProperty(StringProperty(), show=True)
     production_years = ArrayProperty(
         StringProperty(), required=True, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
-    view_filmography = StringProperty()
+    view_filmography = StringProperty(show=True)
 
 
 class VideoFormat(StructuredNode):
