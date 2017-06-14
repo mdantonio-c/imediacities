@@ -304,10 +304,7 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     repo.create_av_entity(
         av_creation['properties'],
         item_node,
-        av_creation['relationships']['record_sources'],
-        av_creation['relationships']['titles'],
-        av_creation['relationships']['keywords'],
-        av_creation['relationships']['descriptions'])
+        av_creation['relationships'])
     # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
 
 

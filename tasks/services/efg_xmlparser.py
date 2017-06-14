@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    RecordSource, Title, Keyword, Description
+    RecordSource, Title, Keyword, Description, Coverage
 )
 from imc.models import codelists
 from rapydo.utils.logs import get_logger
@@ -64,7 +64,7 @@ class EFG_XMLParser():
 
     def parse_record_sources(self, record):
         record_sources = []
-        for node in record.findall("recordSource"):
+        for node in record.findall("./avManifestation/recordSource"):
             rs = RecordSource()
             rs.source_id = node.find('sourceID').text
             log.debug('record source [ID]: %s' % rs.source_id)
@@ -139,6 +139,21 @@ class EFG_XMLParser():
             descriptions.append(description)
         return descriptions
 
+    def parse_coverages(self, record):
+        coverages = []
+        for node in record.findall("./avManifestation/coverage"):
+            c = Coverage()
+            c.spatial = []
+            c.temporal = []
+            for s in node.iter('spatial'):
+                log.debug('spatial: %s' % s.text)
+                c.spatial.append(s.text)
+            for t in node.iter('temporal'):
+                log.debug('temporal: %s' % t.text)
+                c.temporal.append(t.text)
+            coverages.append(c)
+        return coverages
+
     def parse_av_creation(self, record):
         log.debug("--- parsing AV Entity ---")
         av_creation = {}
@@ -158,6 +173,7 @@ class EFG_XMLParser():
         relationships['titles'] = self.parse_titles(record)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
+        relationships['coverages'] = self.parse_coverages(record)
         av_creation['relationships'] = relationships
 
         # rights_status
