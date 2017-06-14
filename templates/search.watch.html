@@ -22,7 +22,7 @@
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
 			<div style="float: left; width: 100%">
-				<video id="videoarea" ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" controls></video>
+				<video id="videoarea" ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" type="video/mp4" controls></video>
 			</div>
 			<div class="scrollmenu" style="float: left;">
 				<a ng-repeat="item in watchCtrl.items" style="width: 13%;" scroll-on-click>
