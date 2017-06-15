@@ -42,7 +42,7 @@
 			</div>
 			<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0]}}</p>
-				<p><b>Location</b>: {{locname}}</p>
+				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0]}}</p>
 			</div>
 			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
 			Storyboard <span class="glyphicon glyphicon-book"></span>
@@ -59,8 +59,8 @@
 			</div>
 	</div> -->
 	<hr/>
-	<div ng-controller='MapController as vm'>
-	<div class="row" >
+	<div ng-controller="MapController as vm" ng-init="vm.init(watchCtrl.video.relationships.coverages[0].attributes.spatial[0])">
+	<div class="row" >{{watchCtrl.video.relationships.coverages[0].attributes.spatial[0]}}
 		<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
 			<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}">
 			<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>

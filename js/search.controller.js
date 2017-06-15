@@ -317,16 +317,20 @@
 	function MapController($scope, NgMap, NavigatorGeolocation, GeoCoder, $timeout) {
 
 		var vm = this;
-		var myAddress = 'Bologna, IT';
 		vm.videolat = null;
 		vm.videolng = null;
 		vm.locname = null;
 		vm.zoom = 15;
 
+		vm.init = function(location) {
+			// FIXME what is the default?
+			vm.location = location === undefined ? 'Bologna, IT' : location;
+		};
+
 		NgMap.getMap("videomap").then(function(map) {
 			// start geocoding and get video coordinates
 			GeoCoder.geocode({
-					address: myAddress
+					address: vm.location
 				})
 				.then(function(result) {
 					vm.videolat = result[0].geometry.location.lat();
