@@ -35,7 +35,7 @@
 			<ul><li>
 			<div class="primary-description">
 				<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration}} sec)</i>
-				<p><b>Movie Description</b>: </p><p><span ng-repeat="description in watchCtrl.video.relationships.descriptions">
+				<p><b>Movie Description</b>: <span ng-repeat="description in watchCtrl.video.relationships.descriptions">
 				{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
 				<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
 				{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
