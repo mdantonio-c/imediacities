@@ -199,6 +199,7 @@ if [ "$1" == "init" ]; then
 
     echo "Please provide the Fraunhofer password"
     read -s fraunhofer_password
+    sudo ./setup_idmt_tools.sh -m remove
     sudo ./setup_idmt_tools.sh -m install -p $fraunhofer_password 
 
     echo "Init completed"
