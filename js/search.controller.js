@@ -220,6 +220,8 @@
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
 
+		self.vduration = 0;
+
 		var myVid = angular.element(window.document.querySelector('#videoarea'));
 		myVid[0].currentTime = '20';
 		//myVid[0].play();
@@ -246,6 +248,8 @@
 						self.items.push(frameshot);
 
 						self.showmesb = true; //enable storyboard button
+
+						self.vduration = parseInt(self.video.relationships.item[0].attributes.duration);
 
 					}
 				});
