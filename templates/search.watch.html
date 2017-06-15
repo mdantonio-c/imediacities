@@ -44,7 +44,7 @@
 				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0]}}</p>
 				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0]}}</p>
 				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name}}</p>
-				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status}}</p>
+				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
 			</div>
 			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
 			Storyboard <span class="glyphicon glyphicon-book"></span>
