@@ -35,14 +35,16 @@
 			<ul><li>
 			<div class="primary-description">
 				<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration}} sec)</i>
-				<p><span ng-repeat="description in watchCtrl.video.relationships.descriptions">
+				<p><b>Movie Description</b>: </p><p><span ng-repeat="description in watchCtrl.video.relationships.descriptions">
 				{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
-				<p><span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
+				<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
 				{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 			</div>
 			<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0]}}</p>
 				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0]}}</p>
+				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name}}</p>
+				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status}}</p>
 			</div>
 			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
 			Storyboard <span class="glyphicon glyphicon-book"></span>
