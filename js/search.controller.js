@@ -83,9 +83,9 @@
 						var cdate = new Date(0, 0, 0, hours, mins, secs);
 						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
 
-						myVid[0].pause();
+						//myVid[0].pause();
 						myVid[0].currentTime = times;
-						myVid[0].play();
+						//myVid[0].play();
 
 					});
 				}
@@ -219,6 +219,10 @@
 		self.showmesb = false;
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
+
+		var myVid = angular.element(window.document.querySelector('#videoarea'));
+		myVid[0].currentTime = '20';
+		//myVid[0].play();
 
 		self.items = [];
 		self.shots = [];
