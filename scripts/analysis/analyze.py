@@ -6,6 +6,7 @@ import json
 import datetime
 import glob
 import shutil
+import xml.etree.ElementTree as ET
 
 from PIL import Image
 from subprocess import *
@@ -384,17 +385,65 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         shot_len = 0
         if i != len(lst) - 1:
             nextframe = filename_to_frame(lst[i + 1])
-            shot_len = (nextframe - frame) / TRANSCODED_FRAMERATE
         else:
-            shot_len = (num_frames - frame) / TRANSCODED_FRAMERATE
+            nextframe = num_frames
+
+        shot_len = (num_frames - frame) / TRANSCODED_FRAMERATE
+        shot_len = round(shot_len,2)
 
         d = {}
-        d['shot_num'] = i
-        d['img']      = im_name
-        d['timecode'] = frame_to_timecode(frame)
-        d['frame']    = frame
-        d['len']      = shot_len
-        sb["shots"].append(d)
+        d['shot_num']    = i
+        d['first_frame'] = frame
+        d['last_frame' ] = nextframe
+        d['timecode']    = frame_to_timecode(frame)
+        d['len_seconds'] = shot_len
+        d['img']         = im_name
+        sb['shots'].append(d)
+
+    # insert video motion estimation
+    vim_filename = os.path.join(out_folder, 'vimotion.xml')
+
+    vim = {}
+    vim_root = ET.parse(vim_filename).getroot()
+    for m in vim_root.findall('module'):
+        vim[ m.attrib['name'] ] = [0]*num_frames
+    vim_names = list(vim.keys())
+    vim_names.sort()
+    #names_wid = max( [len(i) for i in vim_names ])
+
+    for m in vim_root.findall('module'):
+        scores = vim[ m.attrib['name'] ]
+        for f in m.findall('frame'):
+            frame = int(f.attrib['idx'])
+            value = float(f.attrib['value'])
+            scores[ frame ] = value
+            
+    for shot in sb['shots']:
+        f0 = shot['first_frame']
+        f1 = shot['last_frame']
+
+        #---- output come dizionario
+        shot_vim_dic = {}
+        for n in vim_names:
+           values = vim[n][f0:f1] 
+           max_value = max(values)
+           avg_value = sum(values)/float(len(values))
+           shot_vim_dic[ n ] = ( round(avg_value,3), round(max_value,3) )
+        shot['motions_dict'] = shot_vim_dic
+
+
+        #--- output come lista sortata sulla probabilita
+        
+        shot_vim = []
+        for n in vim_names:
+           values = vim[n][f0:f1] 
+           avg_value = sum(values)/float(len(values))
+           if avg_value > 0.1:
+               shot_vim.append( (round(avg_value,3), n ) )
+        shot_vim.sort( reverse=True )
+        
+        shot['estimated_motions'] = shot_vim
+        
 
     str = json.dumps(sb, indent=4)
     f = open(sb_folder + "/storyboard.json", 'w')
@@ -413,9 +462,8 @@ def analize(filename, out_folder, fast=False):
     log('origin_tech_info --- ok ')
 
     tr_movie = os.path.join(out_folder, 'transcoded.mp4')
-    got_tr_movie = os.path.exists(tr_movie)
-
-    if fast and got_tr_movie:
+    
+    if fast and os.path.exists(tr_movie):
         log('transcode ---------- skipped')
     else:
         log('transcode ---------- begin ')
@@ -427,13 +475,12 @@ def analize(filename, out_folder, fast=False):
     if not transcoded_tech_info(tr_movie, out_folder):
         return False
     log('transcoded_info ---- ok ')
-
+    
     nf = transcoded_num_frames(out_folder)
-
+    
     tvs_out = os.path.join(out_folder, 'tvs.xml')
-    got_tvs = os.path.exists(tvs_out)
 
-    if fast and got_tvs:
+    if fast and os.path.exists(tvs_out):
         log('tvs ---------------- skipped')
     else:
         log('tvs ---------------- begin ')
@@ -441,7 +488,9 @@ def analize(filename, out_folder, fast=False):
             return False
         log('tvs ---------------- ok ')
 
-    if fast:
+    quality_out = os.path.join(out_folder, 'quality.xml')
+
+    if fast and os.path.exists(quality_out):
         log('quality ------------ skipped ')
     else:
         log('quality ------------ begin ')
@@ -449,7 +498,9 @@ def analize(filename, out_folder, fast=False):
             return False
         log('quality ------------ ok ')
 
-    if fast:
+    vimotion_out = os.path.join(out_folder, 'vimotion.xml')
+
+    if fast and os.path.exists(vimotion_out):
         log('vimotion ----------- skipped ')
     else:
         log('vimotion ----------- begin ')
@@ -457,11 +508,16 @@ def analize(filename, out_folder, fast=False):
             return False
         log('vimotion ----------- ok ')
 
-    log('summary ------------ begin ')
-    if not summary(tr_movie, out_folder):
-        return False
-    log('summary ------------ ok ')
+    summary_out = os.path.join(out_folder, 'summary.jpg')
 
+    if fast and os.path.exists(summary_out):
+        log('summary ------------ skipped ')
+    else:
+        log('summary ------------ begin ')
+        if not summary(tr_movie, out_folder):
+            return False
+        log('summary ------------ ok ')
+    
     log('index/storyboard---- begin ')
     if not thumbs_index_storyboard(tr_movie, out_folder, nf):
         return False
@@ -473,7 +529,7 @@ def analize(filename, out_folder, fast=False):
 # -----------------------------------------------------
 help = ''' usage:  python3 analyze.py [options] [filename]
 options:
-[-fast  ]       skip transcoding ( if transcoded.mp4 is ready ), skip tvs ( if tvs.xml is ready ) skip quality, skip vimotion
+[-fast  ]       skip transcoding, tvs, quality, vimotion and summary if their output files already exists.
 [-clean ]       clean any previous data before analize
 [filename ]     if omitted use the default movie
 '''
