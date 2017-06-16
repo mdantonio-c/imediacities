@@ -211,6 +211,7 @@ div.scrollmenu a:hover {
 .stylish-input-group button{
     border:0;
     background:transparent;
+    outline: none;
 }
 
 #search-logo {
