@@ -166,6 +166,7 @@
 
 		self.showmesb = false;
 		self.viewlogo = true;
+		self.showmese = false;
 		//self.showmepg = true;
 
 		$scope.currentPage = 1;
@@ -192,11 +193,13 @@
 			// console.log('search videos with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
+			self.showmese = true;
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
 					self.videos = out_data.data;
 					self.loading = false;
 					self.loadResults = true;
+					self.showmese = false;
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
