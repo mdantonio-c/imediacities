@@ -64,6 +64,7 @@ class EFG_XMLParser():
 
     def parse_record_sources(self, record):
         record_sources = []
+        bind_url = False
         for node in record.findall("./avManifestation/recordSource"):
             rs = RecordSource()
             rs.source_id = node.find('sourceID').text
@@ -82,6 +83,12 @@ class EFG_XMLParser():
             if rs.provider_scheme is None:
                 raise ValueError(
                     'Invalid provider scheme value for [%s]' % p_scheme)
+            # bind here the url only to the first element
+            # this is a naive solution but enough because we expect here ONLY
+            # one record_source (the archive one)
+            if not bind_url:
+                rs.is_shown_at = self.get_record_source_url(record)
+                bind_url = True
             record_sources.append(rs)
         return record_sources
 
@@ -91,6 +98,14 @@ class EFG_XMLParser():
         archive one.
         '''
         return self.parse_record_sources(record)[0]
+
+    def get_record_source_url(self, record):
+        '''
+        Return the url of the source provider where the content is shown.
+        '''
+        node = record.find('./avManifestation[1]/item[1]/isShownAt')
+        if node is not None:
+            return node.text
 
     def parse_titles(self, record):
         titles = []
