@@ -179,9 +179,9 @@ class Item(TimestampedNode, AnnotationTarget):
     summary = StringProperty()
     duration = FloatProperty(show=True)
     framerate = StringProperty(show=True)  # FloatProperty()
-    digital_format = ArrayProperty(StringProperty(), required=False)
+    digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
-    item_type = StringProperty(required=True)
+    item_type = StringProperty(required=True, show=True)
     # TODO add license reference
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
@@ -443,12 +443,17 @@ class RecordSource(StructuredNode):
                         record.
         provider_scheme Name of the registration scheme encoding the
                         institution name ("ISIL code" or "Institution acronym")
+        is_shown_at     An unambiguous URL reference to the digital object on
+                        the web site of the source provider and/or on the
+                        content provider's web site in its full information
+                        context.
     """
     source_id = StringProperty(required=True, show=True)
     provider_name = StringProperty(index=True, required=True, show=True)
     provider_id = StringProperty(required=True, show=True)
     provider_scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+    is_shown_at = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
 
