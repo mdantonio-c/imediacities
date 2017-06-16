@@ -22,8 +22,8 @@
         </a>
       </li>
 
-      <li ng-if="profile.isAdmin">
-      <!-- <li ng-if="logged"> -->
+      <!-- <li ng-if="profile.isAdmin"> -->
+      <li ng-if="logged">
         <a href ui-sref="logged.search({q: null})" ui-sref-opts="{reload: true}">
           Search
         </a>

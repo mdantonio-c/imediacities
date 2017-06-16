@@ -132,9 +132,10 @@ class Stage(TimestampedNode):
 ##############################################################################
 
 
-class AnnotationTarget(StructuredNode):
+class AnnotationTarget(HeritableStructuredNode):
     # __abstract_node__ = True
-    __label__ = 'Item'
+    # __label__ = 'Item'
+    annotation = RelationshipFrom('Annotation', 'HAS_TARGET', cardinality=One)
 
 
 class Item(TimestampedNode, AnnotationTarget):
@@ -567,6 +568,7 @@ class Annotation(IdentifiedNode):
         ('OD', 'object detection'),
         ('OR', 'object recognition'),
         ('VQ', 'video quality'),
+        ('VIM', 'video image motion'),
         ('TVS', 'temporal video segmentation')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
@@ -615,6 +617,26 @@ class AudioBody(AnnotationBody):
 #     frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
 
 
+class VIMBody(AnnotationBody):
+    """Class for Video Quality Annotation."""
+    no_motion = ArrayProperty(FloatProperty(), show=True)
+    left_motion = ArrayProperty(FloatProperty(), show=True)
+    right_motion = ArrayProperty(FloatProperty(), show=True)
+    up_motion = ArrayProperty(FloatProperty(), show=True)
+    down_motion = ArrayProperty(FloatProperty(), show=True)
+    zoom_in_motion = ArrayProperty(FloatProperty(), show=True)
+    zoom_out_motion = ArrayProperty(FloatProperty(), show=True)
+    roll_cw_motion = ArrayProperty(FloatProperty(), show=True)
+    roll_ccw_motion = ArrayProperty(FloatProperty(), show=True)
+    x_shake = ArrayProperty(FloatProperty(), show=True)
+    y_shake = ArrayProperty(FloatProperty(), show=True)
+    roll_shake = ArrayProperty(FloatProperty(), show=True)
+    camera_shake = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_fluid = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_staccato = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_no_motion = ArrayProperty(FloatProperty(), show=True)
+
+
 # class VQFrame(StructuredNode):
 #     idx = IntegerProperty(required=True)
 #     quality = FloatProperty(required=True)
@@ -625,7 +647,7 @@ class TVSBody(AnnotationBody):
         'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
-class Shot(IdentifiedNode):
+class Shot(IdentifiedNode, AnnotationTarget):
     """Shot class"""
     shot_num = IntegerProperty(required=True, show=True)
     start_frame_idx = IntegerProperty(required=True, show=True)
