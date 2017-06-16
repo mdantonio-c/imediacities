@@ -97,7 +97,7 @@
 
 						//myVid[0].pause();
 						myVid[0].currentTime = times;
-						//myVid[0].play();
+						myVid[0].play();
 
 					});
 				}
@@ -232,10 +232,6 @@
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
 
-		var myVid = angular.element(window.document.querySelector('#videoarea'));
-		myVid[0].currentTime = '20';
-		//myVid[0].play();
-
 		self.items = [];
 		self.shots = [];
 		self.loadVideoShots = function(vid) {
@@ -259,6 +255,10 @@
 
 						self.showmesb = true; //enable storyboard button
 
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						myVid[0].currentTime = '3';
+						myVid[0].play();
+    					myVid[0].pause();
 					}
 				});
 		};
