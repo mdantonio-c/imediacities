@@ -15,6 +15,7 @@
 	float: left;
 	width: 100%;
 	border: 1px solid silver;
+	background: black url(/images/loader.gif) center center no-repeat;
 	/*height: 480px;
 	padding-left: 10px;*/
 }
