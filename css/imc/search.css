@@ -20,6 +20,13 @@
 	padding-left: 10px;*/
 }
 
+.progress{
+	width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-top: 0.3%;
+}
+
 .metadattr {
 	text-indent: 25px;
 }
