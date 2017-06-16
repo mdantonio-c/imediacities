@@ -64,7 +64,12 @@
 	// convert float to integer
 	app.filter('parseNum', function() {
     	return function(input) {
-       		return parseInt(input, 10);
+    		var secs = parseInt(input, 10);
+    		var cdate = new Date(0, 0, 0, 0, 0, secs);
+    		if ((cdate.getHours() == 0) && (cdate.getMinutes() > 0)) var times = cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs";
+    		else if ((cdate.getHours() == 0) && (cdate.getMinutes() == 0)) var times = cdate.getSeconds()+" secs";
+			else var times = cdate.getHours() +" hours "+cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs"; 
+       		return times;
     	}	
 	});
 
