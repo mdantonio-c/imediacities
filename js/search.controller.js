@@ -97,7 +97,7 @@
 
 						//myVid[0].pause();
 						myVid[0].currentTime = times;
-						//myVid[0].play();
+						myVid[0].play();
 
 					});
 				}
@@ -166,6 +166,7 @@
 
 		self.showmesb = false;
 		self.viewlogo = true;
+		self.showmese = false;
 		//self.showmepg = true;
 
 		$scope.currentPage = 1;
@@ -192,11 +193,13 @@
 			// console.log('search videos with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
+			self.showmese = true;
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
 					self.videos = out_data.data;
 					self.loading = false;
 					self.loadResults = true;
+					self.showmese = false;
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
@@ -229,12 +232,9 @@
 
 		var self = this;
 		self.showmesb = false;
+		self.showmeli = true;
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
-
-		var myVid = angular.element(window.document.querySelector('#videoarea'));
-		myVid[0].currentTime = '20';
-		//myVid[0].play();
 
 		self.items = [];
 		self.shots = [];
@@ -258,7 +258,12 @@
 						self.items.push(frameshot);
 
 						self.showmesb = true; //enable storyboard button
+						self.showmeli = false; //hide loading video bar
 
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						myVid[0].currentTime = '3';
+						myVid[0].play();
+    					myVid[0].pause();
 					}
 				});
 		};

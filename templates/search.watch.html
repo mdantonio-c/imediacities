@@ -23,6 +23,7 @@
 		<div class="col-xs-12 col-md-6">
 			<div style="float: left; width: 100%">
 				<video id="videoarea" ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" type="video/mp4" controls></video>
+				<div class="container" ng-show="watchCtrl.showmeli" style="float: left; width: 100%"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
 			<div class="scrollmenu" style="float: left;">
 				<a ng-repeat="item in watchCtrl.items" style="width: 13%;" scroll-on-click>
@@ -41,10 +42,12 @@
 				{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 			</div>
 			<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0]}}</p>
-				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0]}}</p>
-				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name}}</p>
+				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0] || 'Not available'}}</p>
+				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
+				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}}</p>
 				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
+				<p><b>Is shown at</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</p>
+				<p><b>Is shown by</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_by || 'Not available'}}</p>
 			</div>
 			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
 			Storyboard <span class="glyphicon glyphicon-book"></span>
