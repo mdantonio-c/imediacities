@@ -229,6 +229,7 @@
 
 		var self = this;
 		self.showmesb = false;
+		self.showmeli = true;
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
 
@@ -254,6 +255,7 @@
 						self.items.push(frameshot);
 
 						self.showmesb = true; //enable storyboard button
+						self.showmeli = false; //hide loading video bar
 
 						var myVid = angular.element(window.document.querySelector('#videoarea'));
 						myVid[0].currentTime = '3';
