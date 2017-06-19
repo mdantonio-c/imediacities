@@ -33,7 +33,7 @@
 						<div class="primary-description">
 							<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><span class="title">{{v.attributes.identifying_title}}</span></a><i>({{v.relationships.item[0].attributes.duration | parseNum}})</i>
 							<p><span ng-repeat="description in v.relationships.descriptions">
-							{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
+							{{description.attributes.text}}{{$last ? '' : ', '}}</span></p></br></br>
 							<p><span ng-repeat="keyword in v.relationships.keywords">
 							{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 						</div>
