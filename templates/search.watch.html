@@ -23,7 +23,7 @@
 		<div class="col-xs-12 col-md-6">
 			<div style="float: left; width: 100%">
 				<video id="videoarea" ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" type="video/mp4" controls></video>
-				<div class="container" ng-show="watchCtrl.showmeli" style="float: left; width: 100%"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+				<div class="container" ng-show="watchCtrl.showmeli" style="float: left; width: 100%"><br></br><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
 			<div class="scrollmenu" style="float: left;">
 				<a ng-repeat="item in watchCtrl.items" style="width: 13%;" scroll-on-click>
@@ -36,8 +36,9 @@
 			<ul><li>
 			<div class="primary-description">
 				<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration | parseNum}})</i>
-				<p><b>Movie Description</b>: <span ng-repeat="description in watchCtrl.video.relationships.descriptions">
-				{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
+				<p><b>Movie Description</b>:
+				<span ng-repeat="description in watchCtrl.video.relationships.descriptions">
+				</br>{{description.attributes.text}}{{$last ? '' : ', '}}</br></span></p>
 				<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
 				{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 			</div>
