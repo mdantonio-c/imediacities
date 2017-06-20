@@ -389,12 +389,12 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
             nextframe = num_frames
 
         shot_len = (num_frames - frame) / TRANSCODED_FRAMERATE
-        shot_len = round(shot_len,2)
+        shot_len = round(shot_len, 2)
 
         d = {}
         d['shot_num']    = i
         d['first_frame'] = frame
-        d['last_frame' ] = nextframe
+        d['last_frame'] = nextframe
         d['timecode']    = frame_to_timecode(frame)
         d['len_seconds'] = shot_len
         d['img']         = im_name
@@ -406,44 +406,42 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     vim = {}
     vim_root = ET.parse(vim_filename).getroot()
     for m in vim_root.findall('module'):
-        vim[ m.attrib['name'] ] = [0]*num_frames
+        vim[m.attrib['name']] = [0] * num_frames
     vim_names = list(vim.keys())
     vim_names.sort()
-    #names_wid = max( [len(i) for i in vim_names ])
+    # names_wid = max( [len(i) for i in vim_names ])
 
     for m in vim_root.findall('module'):
-        scores = vim[ m.attrib['name'] ]
+        scores = vim[m.attrib['name']]
         for f in m.findall('frame'):
             frame = int(f.attrib['idx'])
             value = float(f.attrib['value'])
-            scores[ frame ] = value
-            
+            scores[frame] = value
+
     for shot in sb['shots']:
         f0 = shot['first_frame']
         f1 = shot['last_frame']
 
-        #---- output come dizionario
+        # ---- output come dizionario
         shot_vim_dic = {}
         for n in vim_names:
-           values = vim[n][f0:f1] 
-           max_value = max(values)
-           avg_value = sum(values)/float(len(values))
-           shot_vim_dic[ n ] = ( round(avg_value,3), round(max_value,3) )
+            values = vim[n][f0:f1]
+            max_value = max(values)
+            avg_value = sum(values) / float(len(values))
+            shot_vim_dic[n] = (round(avg_value, 3), round(max_value, 3))
         shot['motions_dict'] = shot_vim_dic
 
+        # --- output come lista sortata sulla probabilita
 
-        #--- output come lista sortata sulla probabilita
-        
         shot_vim = []
         for n in vim_names:
-           values = vim[n][f0:f1] 
-           avg_value = sum(values)/float(len(values))
-           if avg_value > 0.1:
-               shot_vim.append( (round(avg_value,3), n ) )
-        shot_vim.sort( reverse=True )
-        
+            values = vim[n][f0:f1]
+            avg_value = sum(values) / float(len(values))
+            if avg_value > 0.1:
+                shot_vim.append((round(avg_value, 3), n))
+        shot_vim.sort(reverse=True)
+
         shot['estimated_motions'] = shot_vim
-        
 
     str = json.dumps(sb, indent=4)
     f = open(sb_folder + "/storyboard.json", 'w')
@@ -462,7 +460,7 @@ def analize(filename, out_folder, fast=False):
     log('origin_tech_info --- ok ')
 
     tr_movie = os.path.join(out_folder, 'transcoded.mp4')
-    
+
     if fast and os.path.exists(tr_movie):
         log('transcode ---------- skipped')
     else:
@@ -475,9 +473,9 @@ def analize(filename, out_folder, fast=False):
     if not transcoded_tech_info(tr_movie, out_folder):
         return False
     log('transcoded_info ---- ok ')
-    
+
     nf = transcoded_num_frames(out_folder)
-    
+
     tvs_out = os.path.join(out_folder, 'tvs.xml')
 
     if fast and os.path.exists(tvs_out):
@@ -517,7 +515,7 @@ def analize(filename, out_folder, fast=False):
         if not summary(tr_movie, out_folder):
             return False
         log('summary ------------ ok ')
-    
+
     log('index/storyboard---- begin ')
     if not thumbs_index_storyboard(tr_movie, out_folder, nf):
         return False

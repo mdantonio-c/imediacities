@@ -23,7 +23,7 @@ class AnnotationRepository():
         annotation = Annotation(generator='FHG', annotation_type='TVS').save()
         # add target
         annotation.targets.connect(item)
-        annotation.source.connect(item)
+        annotation.source_item.connect(item)
 
         # add body
         tvs_body = TVSBody().save()
@@ -66,7 +66,7 @@ class AnnotationRepository():
                 generator='FHG', annotation_type='VIM').save()
             # add target
             annotation.targets.connect(shot)
-            annotation.source.connect(item)
+            annotation.source_item.connect(item)
             # add body
             vim_body = VIMBody()
             motions_dict = q[1]

@@ -327,7 +327,7 @@ class Description(StructuredNode):
                           external resources.
         language          The language of the description text.
         description_type  A keyword denoting the type of description.
-        source            Either the name of the institution, or an URI
+        source_ref        Either the name of the institution, or an URI
                           identifying the source directly or via a reference
                           system such as an on-line catalogue.
     """
@@ -335,7 +335,7 @@ class Description(StructuredNode):
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     description_type = StringProperty(
         choices=codelists.DESCRIPTION_TYPES, show=True)
-    source = StringProperty()
+    source_ref = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
 
@@ -580,7 +580,7 @@ class Annotation(IdentifiedNode):
         required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
         default=lambda: datetime.now(pytz.utc), show=True)
-    source = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
+    source_item = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
         'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
         model=AnnotationCreatorRel, show=True)
@@ -618,7 +618,11 @@ class AudioBody(AnnotationBody):
 
 
 class VIMBody(AnnotationBody):
-    """Class for Video Quality Annotation."""
+    """
+    Class for Video Quality Annotation.
+
+    [avg value, max value]
+    """
     no_motion = ArrayProperty(FloatProperty(), show=True)
     left_motion = ArrayProperty(FloatProperty(), show=True)
     right_motion = ArrayProperty(FloatProperty(), show=True)

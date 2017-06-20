@@ -147,8 +147,8 @@ class EFG_XMLParser():
             #     'description [type]: %s' % description.description_type)
             description.language = node.get('lang')
             log.debug('description [lang]: %s' % description.language)
-            description.source = node.get('source')
-            log.debug('description [source]: %s' % description.source)
+            description.source_ref = node.get('source')
+            log.debug('description [source]: %s' % description.source_ref)
             description.text = node.text
             log.debug('description [text]: %s' % description.text)
             descriptions.append(description)
