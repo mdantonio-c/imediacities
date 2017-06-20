@@ -191,7 +191,7 @@ class VideoShots(GraphBaseOperations):
         item = video.item.single()
         api_url = get_api_url()
         vim_query = """
-        MATCH (vim:Annotation {{annotation_type:'VIM'}})-[:HAS_TARGET]->(shot:Shot {{shot_num:{shot_num}}})
+        MATCH (vim:Annotation {{annotation_type:'VIM'}})-[:HAS_TARGET]->(shot:Shot {{uuid:'{shot_id}'}})
         MATCH (vim)-[:HAS_BODY]->(body:VIMBody)
         RETURN body
         """
@@ -203,7 +203,7 @@ class VideoShots(GraphBaseOperations):
             # get all shot annotations here
             shot['annotations'] = []
             # at the moment filter by vim annotation
-            result = self.graph.cypher(vim_query.format(shot_num=s.shot_num))
+            result = self.graph.cypher(vim_query.format(shot_id=s.uuid))
             if result is not None and len(result) > 0:
                 shot['annotations'].append(
                     self.getJsonResponse(
