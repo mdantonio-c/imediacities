@@ -260,10 +260,12 @@
 						self.showmesb = true; //enable storyboard button
 						self.showmeli = false; //hide loading video bar
 
-						var myVid = angular.element(window.document.querySelector('#videoarea'));
-						myVid[0].currentTime = '3';
-						myVid[0].play();
-    					myVid[0].pause();
+						if (i == 0) {
+							var myVid = angular.element(window.document.querySelector('#videoarea'));
+							myVid[0].currentTime = '3';
+							myVid[0].play();
+    						myVid[0].pause();
+    					}
 					}
 				});
 		};
