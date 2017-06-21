@@ -23,8 +23,6 @@ services:
       APP_MODE: debug
       BACKEND_PORT: 8081
       ACTIVATE: 1
-    volumes:
-      - ../projects/${COMPOSE_PROJECT_NAME}/frontend/assets:/data/submodules/frontend/felask/static/assets
 
   celery:
     environment:

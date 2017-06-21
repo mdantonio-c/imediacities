@@ -9,7 +9,6 @@ services:
       ACTIVATE: 1
     volumes:
       - ../confs/nginx/production.conf:/etc/nginx/sites-enabled/production
-      - ../projects/${COMPOSE_PROJECT_NAME}/frontend/assets:/data/submodules/frontend/felask/static/assets
     depends_on:
       - backend
       - frontend
