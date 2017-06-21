@@ -3,6 +3,8 @@
 ########################
 
 imediastuff
+/imedia-pipeline
+/imedia-pipeline-cin
 uploads
 tmp_files
 
@@ -11,7 +13,7 @@ scripts/analysis/shot-output.xml
 
 # data
 uploads
-tmp_files
+data
 
 ########################
 ##  Host configuration  ##
@@ -22,19 +24,14 @@ tmp_files
 ##  Submodules ##
 #################
 
-/backend
-/frontend
-/imedia-pipeline
-/imedia-pipeline-cin
-/builds_base
-/utilities
+/submodules
 
 ############################################
 ##  Dynamically created file and folders  ##
 ############################################
 
 .env
-libs/bower_components
+/bower_components
 
 ###################################
 ##  Temporary and miscellaneous  ##
