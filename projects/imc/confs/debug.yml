@@ -1,0 +1,46 @@
+version: '3'
+#######################
+# Link services inside API
+
+services:
+  backend:
+    # command: sleep infinity
+    environment:
+      APP_MODE: debug
+      DEBUG_LEVEL: VERBOSE
+      ACTIVATE: 1
+      # TEMPORARY FIX...
+      PYTHONPATH: /code
+    ports:
+      - 8081:5000
+    volumes:
+      - ../submodules/utilities/rapydo/utils:/usr/local/lib/python3.6/dist-packages/rapydo/utils
+
+  frontend:
+    ports:
+      - 80:5000
+    environment:
+      APP_MODE: debug
+      BACKEND_PORT: 8081
+      ACTIVATE: 1
+    volumes:
+      - ../projects/${COMPOSE_PROJECT_NAME}/frontend/assets:/data/frontend/felask/static/assets
+
+  celery:
+    environment:
+      APP_MODE: debug
+      DEBUG_LEVEL: VERBOSE
+      ACTIVATE: 1
+
+  celeryui:
+    environment:
+      ACTIVATE: 1
+
+  ftp:
+    environment:
+      PUBLICHOST: localhost
+
+  swaggerui:
+    ports:
+      - 7777:80
+
