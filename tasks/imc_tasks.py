@@ -145,8 +145,15 @@ def import_file(self, path, resource_id, mode):
                 params = []
                 params.append("/code/imc/scripts/analysis/analyze.py")
                 if mode is not None:
-                    log.info('Analyze with mode [%s]' % mode)
-                    params.append('-' + mode)
+                    if mode.lower() == 'skip':
+                        log.info('Analyze skipped!')
+                        video_node.status = 'SKIPPED'
+                        video_node.status_message = 'Nothing to declare'
+                        video_node.save()
+                        break
+                    else:
+                        log.info('Analyze with mode [%s]' % mode)
+                        params.append('-' + mode)
                 params.append(video_path)
                 bash = BashCommands()
                 try:
@@ -170,21 +177,27 @@ def import_file(self, path, resource_id, mode):
                 extract_tech_info(self, item_node, analyze_path)
 
                 # FIXME naive filter
-                # find TVS annotations with this item as target
-                annotations = item_node.targeting_annotations.all()
+                # find TVS and VQ annotations with this item as source
+                annotations = item_node.sourcing_annotations.all()
                 if annotations is not None:
                     repo = AnnotationRepository(self.graph)
                     # here we expect ONLY one anno if present
                     for anno in annotations:
+                        anno_id = anno.id
                         if anno.annotation_type == 'TVS':
-                            anno_id = anno.id
                             log.debug(anno)
                             repo.delete_tvs_annotation(anno)
                             log.info(
                                 "Deleted existing TVS annotation [%s]"
                                 % anno_id)
+                        elif anno.annotation_type == 'VIM':
+                            log.debug(anno)
+                            repo.delete_vim_annotation(anno)
+                            log.info(
+                                "Deleted existing VIM annotation [%s]"
+                                % anno_id)
 
-                extract_tvs_annotation(self, item_node, analyze_path)
+                extract_tvs_vim_annotations(self, item_node, analyze_path)
 
                 # TODO
                 video_node.status = 'COMPLETED'
@@ -297,10 +310,7 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
     repo.create_av_entity(
         av_creation['properties'],
         item_node,
-        av_creation['relationships']['record_sources'],
-        av_creation['relationships']['titles'],
-        av_creation['relationships']['keywords'],
-        av_creation['relationships']['descriptions'])
+        av_creation['relationships'])
     # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
 
 
@@ -373,10 +383,10 @@ def get_thumbnail(path):
         os.path.dirname(path), jpg_files[index])
 
 
-def extract_tvs_annotation(self, item, analyze_dir_path):
+def extract_tvs_vim_annotations(self, item, analyze_dir_path):
     """
-    Extract temporal video segmentation results from storyboard.json file and
-    save them as Annotation in the database.
+    Extract temporal video segmentation and video quality results from
+    storyboard.json file and save them as Annotation in the database.
     """
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
@@ -397,20 +407,23 @@ def extract_tvs_annotation(self, item, analyze_dir_path):
         data = json.load(data_file)
 
     shots = []
+    vim_estimations = []
     for s in data['shots']:
         shot = Shot()
         shot.shot_num = s['shot_num']
-        shot.start_frame_idx = s['frame']
+        shot.start_frame_idx = s['first_frame']
+        shot.end_frame_idx = s['last_frame']
         shot.timestamp = s['timecode']
         try:
-            shot.duration = s['len']
+            shot.duration = s['len_seconds']
         except ValueError:
             log.warning("Invalid duration in the shot {0} \
-                for value '{1}'".format(shot.shot_num, s['len']))
+                for value '{1}'".format(shot.shot_num, s['len_seconds']))
             shot.duration = None
 
         shot.thumbnail_uri = os.path.join(tvs_dir_path, s['img'])
         shots.append(shot)
+        vim_estimations.append((shot.shot_num, s['motions_dict']))
 
     if len(shots) == 0:
         log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
@@ -419,5 +432,6 @@ def extract_tvs_annotation(self, item, analyze_dir_path):
     # Save Shots in the database
     repo = AnnotationRepository(self.graph)
     repo.create_tvs_annotation(item, shots)
+    repo.create_vim_annotation(item, vim_estimations)
 
-    log.info('Extraction of TVS info completed')
+    log.info('Extraction of TVS and VIM info completed')

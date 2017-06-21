@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    RecordSource, Title, Keyword, Description
+    RecordSource, Title, Keyword, Description, Coverage
 )
 from imc.models import codelists
 from rapydo.utils.logs import get_logger
@@ -64,7 +64,8 @@ class EFG_XMLParser():
 
     def parse_record_sources(self, record):
         record_sources = []
-        for node in record.findall("recordSource"):
+        bind_url = False
+        for node in record.findall("./avManifestation/recordSource"):
             rs = RecordSource()
             rs.source_id = node.find('sourceID').text
             log.debug('record source [ID]: %s' % rs.source_id)
@@ -82,6 +83,12 @@ class EFG_XMLParser():
             if rs.provider_scheme is None:
                 raise ValueError(
                     'Invalid provider scheme value for [%s]' % p_scheme)
+            # bind here the url only to the first element
+            # this is a naive solution but enough because we expect here ONLY
+            # one record_source (the archive one)
+            if not bind_url:
+                rs.is_shown_at = self.get_record_source_url(record)
+                bind_url = True
             record_sources.append(rs)
         return record_sources
 
@@ -91,6 +98,14 @@ class EFG_XMLParser():
         archive one.
         '''
         return self.parse_record_sources(record)[0]
+
+    def get_record_source_url(self, record):
+        '''
+        Return the url of the source provider where the content is shown.
+        '''
+        node = record.find('./avManifestation[1]/item[1]/isShownAt')
+        if node is not None:
+            return node.text
 
     def parse_titles(self, record):
         titles = []
@@ -132,12 +147,27 @@ class EFG_XMLParser():
             #     'description [type]: %s' % description.description_type)
             description.language = node.get('lang')
             log.debug('description [lang]: %s' % description.language)
-            description.source = node.get('source')
-            log.debug('description [source]: %s' % description.source)
+            description.source_ref = node.get('source')
+            log.debug('description [source]: %s' % description.source_ref)
             description.text = node.text
             log.debug('description [text]: %s' % description.text)
             descriptions.append(description)
         return descriptions
+
+    def parse_coverages(self, record):
+        coverages = []
+        for node in record.findall("./avManifestation/coverage"):
+            c = Coverage()
+            c.spatial = []
+            c.temporal = []
+            for s in node.iter('spatial'):
+                log.debug('spatial: %s' % s.text)
+                c.spatial.append(s.text)
+            for t in node.iter('temporal'):
+                log.debug('temporal: %s' % t.text)
+                c.temporal.append(t.text)
+            coverages.append(c)
+        return coverages
 
     def parse_av_creation(self, record):
         log.debug("--- parsing AV Entity ---")
@@ -158,6 +188,7 @@ class EFG_XMLParser():
         relationships['titles'] = self.parse_titles(record)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
+        relationships['coverages'] = self.parse_coverages(record)
         av_creation['relationships'] = relationships
 
         # rights_status

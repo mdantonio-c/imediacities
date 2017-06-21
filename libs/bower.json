@@ -2,11 +2,11 @@
   "name": "restangulask",
   "version": "0.2",
   "dependencies": {
-    "angular": "1.5.5",
-    "angular-animate": "1.5.5",
-    "angular-sanitize": "1.5.5",
-    "angular-messages": "1.5.5",
-    "angular-aria": "1.5.5",
+    "angular": "~1.5.5",
+    "angular-animate": "~1.5.5",
+    "angular-sanitize": "~1.5.5",
+    "angular-messages": "~1.5.5",
+    "angular-aria": "~1.5.5",
     "animate.css": "~3.4.0",
     "font-awesome": "~4.4.0",
     "angular-ui-router": "~0.2.15",
@@ -36,7 +36,7 @@
     "angular-mocks": "~1.5.5"
   },
   "resolutions": {
-    "angular": "^1.4.8",
+    "angular": "^1.5.5",
     "moment": "~2.11.1",
     "angular-formly": "^8.4.0"
   }

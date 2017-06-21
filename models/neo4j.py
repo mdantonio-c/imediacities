@@ -132,9 +132,10 @@ class Stage(TimestampedNode):
 ##############################################################################
 
 
-class AnnotationTarget(StructuredNode):
+class AnnotationTarget(HeritableStructuredNode):
     # __abstract_node__ = True
-    __label__ = 'Item'
+    # __label__ = 'Item'
+    annotation = RelationshipFrom('Annotation', 'HAS_TARGET', cardinality=One)
 
 
 class Item(TimestampedNode, AnnotationTarget):
@@ -179,9 +180,9 @@ class Item(TimestampedNode, AnnotationTarget):
     summary = StringProperty()
     duration = FloatProperty(show=True)
     framerate = StringProperty(show=True)  # FloatProperty()
-    digital_format = ArrayProperty(StringProperty(), required=False)
+    digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
-    item_type = StringProperty(required=True)
+    item_type = StringProperty(required=True, show=True)
     # TODO add license reference
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
@@ -205,7 +206,7 @@ class ContributionRel(StructuredRel):
         activities  One or more film-related activities of the person taken
                     from relationship records or from secondary sources.
     """
-    activities = ArrayProperty(StringProperty(), required=False)
+    activities = ArrayProperty(StringProperty(), show=True)
 
 
 class Creation(IdentifiedNode, HeritableStructuredNode):
@@ -274,7 +275,7 @@ class Title(StructuredNode):
                             etc).
     """
     text = StringProperty(required=True, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     relationship = StringProperty(
         required=True, choices=codelists.TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
@@ -307,9 +308,9 @@ class Keyword(StructuredNode):
                         be set to "uncontrolled".
     """
     term = StringProperty(index=True, required=True, show=True)
-    termID = IntegerProperty()
+    termID = IntegerProperty(show=True)
     keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -326,15 +327,15 @@ class Description(StructuredNode):
                           external resources.
         language          The language of the description text.
         description_type  A keyword denoting the type of description.
-        source            Either the name of the institution, or an URI
+        source_ref        Either the name of the institution, or an URI
                           identifying the source directly or via a reference
                           system such as an on-line catalogue.
     """
     text = StringProperty(index=True, required=True, show=True)
-    language = StringProperty(show=True)  # FIXME - from ISO-639-1
+    language = StringProperty(choices=codelists.LANGUAGE, show=True)
     description_type = StringProperty(
         choices=codelists.DESCRIPTION_TYPES, show=True)
-    source = StringProperty()
+    source_ref = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
 
@@ -348,7 +349,8 @@ class CreationLanguage(StructuredNode):
         usage   This indicates the relationship between the language and the
                 creation.
     """
-    value = StringProperty(required=True)  # FIXME - controlled vocab ISO-639-1
+    value = StringProperty(
+        choices=codelists.LANGUAGE, show=True, required=True)
     usage = StringProperty(choices=codelists.LANGUAGE_USAGES)
     creation = RelationshipFrom(
         'Creation', 'HAS_LANGUAGE', cardinality=One, show=True)
@@ -364,8 +366,8 @@ class Coverage(StructuredNode):
                     LOD-service.
         temporal    This may be a period, date or range date.
     """
-    spatial = StringProperty()
-    temporal = StringProperty()
+    spatial = ArrayProperty(StringProperty(), required=True, show=True)
+    temporal = ArrayProperty(StringProperty(), show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_COVERAGE', cardinality=One, show=True)
 
@@ -377,7 +379,7 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(index=True, required=True),
+    name = StringProperty(index=True, required=True, show=True),
     url = StringProperty()
     creation = RelationshipFrom(
         'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
@@ -409,10 +411,10 @@ class Agent(IdentifiedNode):
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES)
     names = ArrayProperty(StringProperty(), required=True)
-    birth_date = DateProperty()
-    death_date = DateProperty(default=None)
+    birth_date = DateProperty(show=True)
+    death_date = DateProperty(default=None, show=True)
     biographical_note = StringProperty()
-    sex = StringProperty(choices=codelists.SEXES)
+    sex = StringProperty(choices=codelists.SEXES, show=True)
     biography_views = ArrayProperty(StringProperty(), required=False)
     creation = RelationshipFrom(
         'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
@@ -442,14 +444,19 @@ class RecordSource(StructuredNode):
                         record.
         provider_scheme Name of the registration scheme encoding the
                         institution name ("ISIL code" or "Institution acronym")
+        is_shown_at     An unambiguous URL reference to the digital object on
+                        the web site of the source provider and/or on the
+                        content provider's web site in its full information
+                        context.
     """
     source_id = StringProperty(required=True, show=True)
     provider_name = StringProperty(index=True, required=True, show=True)
     provider_id = StringProperty(required=True, show=True)
     provider_scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+    is_shown_at = StringProperty(show=True)
     creation = RelationshipFrom(
-        'Creation', 'FROM_CREATION', cardinality=OneOrMore, show=True)
+        'Creation', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
 
 
 class AVEntity(Creation):
@@ -480,12 +487,13 @@ class AVEntity(Creation):
                                     provider web site.
     """
     identifying_title = StringProperty(index=True, required=True, show=True)
-    identifying_title_origin = StringProperty(index=True, )
-    production_countries = ArrayProperty(StringProperty())
-    production_years = ArrayProperty(StringProperty(), required=True)
+    identifying_title_origin = StringProperty(index=True, show=True)
+    production_countries = ArrayProperty(StringProperty(), show=True)
+    production_years = ArrayProperty(
+        StringProperty(), required=True, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
-    view_filmography = StringProperty()
+    view_filmography = StringProperty(show=True)
 
 
 class VideoFormat(StructuredNode):
@@ -501,10 +509,10 @@ class VideoFormat(StructuredNode):
         sound           Element from values list.
         colour          Element from values list.
     """
-    gauge = StringProperty()
-    aspect_ratio = StringProperty()
-    sound = StringProperty(choices=codelists.VIDEO_SOUND)
-    colour = StringProperty()
+    gauge = StringProperty(show=True)
+    aspect_ratio = StringProperty(show=True)
+    sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
+    colour = StringProperty(show=True)
     creation = RelationshipFrom(
         'AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
 
@@ -531,13 +539,15 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
-    date_created = ArrayProperty(StringProperty(), required=True)
+    date_created = ArrayProperty(StringProperty(), required=True, show=True)
     non_av_entity_type = StringProperty(required=True,
-                                        choices=codelists.NON_AV_ENTITY_TYPES)
-    specific_type = StringProperty(required=True,
-                                   choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES)
-    phisical_format_size = StringProperty()
-    colour = StringProperty()  # FIXME controlled terms
+                                        choices=codelists.NON_AV_ENTITY_TYPES,
+                                        show=True)
+    specific_type = StringProperty(
+        required=True, choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES,
+        show=True)
+    phisical_format_size = StringProperty(show=True)
+    colour = StringProperty(choices=codelists.COLOUR, show=True)
 
 # ANNOTATION
 ##############################################################################
@@ -558,6 +568,7 @@ class Annotation(IdentifiedNode):
         ('OD', 'object detection'),
         ('OR', 'object recognition'),
         ('VQ', 'video quality'),
+        ('VIM', 'video image motion'),
         ('TVS', 'temporal video segmentation')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
@@ -569,7 +580,7 @@ class Annotation(IdentifiedNode):
         required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
         default=lambda: datetime.now(pytz.utc), show=True)
-    source = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
+    source_item = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
         'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
         model=AnnotationCreatorRel, show=True)
@@ -606,6 +617,30 @@ class AudioBody(AnnotationBody):
 #     frames = RelationshipTo('VQFrame', 'FRAME', cardinality=OneOrMore)
 
 
+class VIMBody(AnnotationBody):
+    """
+    Class for Video Quality Annotation.
+
+    [avg value, max value]
+    """
+    no_motion = ArrayProperty(FloatProperty(), show=True)
+    left_motion = ArrayProperty(FloatProperty(), show=True)
+    right_motion = ArrayProperty(FloatProperty(), show=True)
+    up_motion = ArrayProperty(FloatProperty(), show=True)
+    down_motion = ArrayProperty(FloatProperty(), show=True)
+    zoom_in_motion = ArrayProperty(FloatProperty(), show=True)
+    zoom_out_motion = ArrayProperty(FloatProperty(), show=True)
+    roll_cw_motion = ArrayProperty(FloatProperty(), show=True)
+    roll_ccw_motion = ArrayProperty(FloatProperty(), show=True)
+    x_shake = ArrayProperty(FloatProperty(), show=True)
+    y_shake = ArrayProperty(FloatProperty(), show=True)
+    roll_shake = ArrayProperty(FloatProperty(), show=True)
+    camera_shake = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_fluid = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_staccato = ArrayProperty(FloatProperty(), show=True)
+    inner_rhythm_no_motion = ArrayProperty(FloatProperty(), show=True)
+
+
 # class VQFrame(StructuredNode):
 #     idx = IntegerProperty(required=True)
 #     quality = FloatProperty(required=True)
@@ -616,7 +651,7 @@ class TVSBody(AnnotationBody):
         'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
-class Shot(IdentifiedNode):
+class Shot(IdentifiedNode, AnnotationTarget):
     """Shot class"""
     shot_num = IntegerProperty(required=True, show=True)
     start_frame_idx = IntegerProperty(required=True, show=True)

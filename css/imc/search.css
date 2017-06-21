@@ -13,10 +13,18 @@
 
 #videoarea {
 	float: left;
-	width: 99%;
-	height: 480px;
+	width: 100%;
 	border: 1px solid silver;
-	padding-left: 10px;
+	background: black url(/images/loader.gif) center center no-repeat;
+	/*height: 480px;
+	padding-left: 10px;*/
+}
+
+.progress{
+	width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-top: 0.3%;
 }
 
 .metadattr {
@@ -72,7 +80,6 @@ div.scrollmenu a {
     display: inline-block;
     color: white;
     text-align: center;
-    padding: 14px;
     text-decoration: none;
 }
 
@@ -199,10 +206,7 @@ div.scrollmenu a:hover {
 
 
 #imaginary_container{
-    margin-top:10%; /* Don't copy this */
-    margin-left: 25%;
-    margin-bottom: 5%;
-    margin-right: 25%;
+    margin: 0 25%
 }
 .stylish-input-group .input-group-addon{
     background: white !important; 
@@ -215,14 +219,16 @@ div.scrollmenu a:hover {
 .stylish-input-group button{
     border:0;
     background:transparent;
+    outline: none;
 }
 
-.imc-container{
-  height: 50%;
-  padding: 15px;
-  margin-left: 20%;
-  margin-right: 20%;
-  width: 50%;
+#search-logo {
+	transition: all linear 0.5s;
+  	height: 50%;
+  	padding: 15px;
+  	margin-left: 20%;
+  	margin-right: 20%;
+  	width: 50%;
 }
 
 .imc-logo{
@@ -231,6 +237,21 @@ div.scrollmenu a:hover {
   margin-left: 25%;
   margin-right: 25%;
   width: 80%;
+}
+
+.glyphicon-refresh-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(0deg);}
+    to { -webkit-transform: rotate(360deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(0deg);}
+    to { transform: scale(1) rotate(360deg);}
 }
 
 /*@media ( max-width :767px) {
@@ -316,6 +337,9 @@ ul li {
 	padding: 10px;
 	overflow: hidden;
 }
+ul li:first-child {
+	border-top: 1px solid #ddd;
+}
 
 ul li img {
 	width:80px;
@@ -341,4 +365,20 @@ ul li p {
 
 .secondary-description p {
 	border-top: 1px solid #ddd;
+}
+
+.list-results {
+	margin: 1.5em;
+}
+
+/*.list-results ul {
+	padding-left: 0;
+}*/
+
+.ng-hide {
+  height: 0;
+  width: 0;
+  background-color: transparent;
+  top:-200px;
+  left: 200px;
 }

@@ -12,9 +12,7 @@ class CreationRepository():
         self.graph = graph
 
     @db.transaction
-    def create_av_entity(
-            self, properties, item,
-            record_sources, titles, keywords, descriptions):
+    def create_av_entity(self, properties, item, relationships):
 
         # check if a creation already exists and delete it
         existing_creation = item.creation.single()
@@ -23,31 +21,43 @@ class CreationRepository():
             creation_id = existing_creation.uuid
             self.delete_av_entity(existing_creation)
             log.info(
-                "Existing creation [UUID:%s] deleted" % creation_id)
+                "Existing creation [UUID:{0}] deleted".format(creation_id))
             # use the same uuid for the new replacing creation
             properties['uuid'] = creation_id
 
-        av_entity_node = self.graph.AVEntity(**properties).save()
+        av_entity = self.graph.AVEntity(**properties).save()
         # connect to item
-        item.creation.connect(av_entity_node)
-        # connect to record sources
-        for rc in record_sources:
-            rc_node = self.create_record_source(rc)
-            av_entity_node.record_sources.connect(rc_node)
-        # connect to tiles
-        for title in titles:
-            title_node = self.create_title(title)
-            av_entity_node.titles.connect(title_node)
-        # connect to keywords
-        for keyword in keywords:
-            keyword_node = self.create_keyword(keyword)
-            av_entity_node.keywords.connect(keyword_node)
-        # connect to descriptions
-        for description in descriptions:
-            description_node = self.create_description(description)
-            av_entity_node.descriptions.connect(description_node)
+        item.creation.connect(av_entity)
 
-        return av_entity_node
+        # add relatioships
+        for r in relationships.keys():
+            if r == 'record_sources':
+                # connect to record sources
+                for rc in relationships[r]:
+                    rc_node = self.create_record_source(rc)
+                    av_entity.record_sources.connect(rc_node)
+            elif r == 'titles':
+                # connect to titles
+                for title in relationships[r]:
+                    title_node = self.create_title(title)
+                    av_entity.titles.connect(title_node)
+            elif r == 'keywords':
+                # connect to keywords
+                for keyword in relationships[r]:
+                    keyword_node = self.create_keyword(keyword)
+                    av_entity.keywords.connect(keyword_node)
+            elif r == 'descriptions':
+                # connect to descriptions
+                for description in relationships[r]:
+                    description_node = self.create_description(description)
+                    av_entity.descriptions.connect(description_node)
+            elif r == 'coverages':
+                for coverage in relationships[r]:
+                    # connect to coverages
+                    coverage_node = coverage.save()
+                    av_entity.coverages.connect(coverage_node)
+
+        return av_entity
 
     def delete_av_entity(self, node):
         for rc in node.record_sources.all():
@@ -58,6 +68,8 @@ class CreationRepository():
             self.delete_description(description)
         for keyword in node.keywords.all():
             self.delete_keyword(keyword)
+        for coverage in node.coverages:
+            coverage.delete()
         node.delete()
 
     def create_record_source(self, record_source):
