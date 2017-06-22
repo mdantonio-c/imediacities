@@ -1,4 +1,0 @@
-
-class Initializer(object):
-    pass
-
