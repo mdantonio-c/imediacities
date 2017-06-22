@@ -31,7 +31,6 @@ data
 ############################################
 
 .env
-/bower_components
 
 ###################################
 ##  Temporary and miscellaneous  ##
