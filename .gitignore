@@ -2,12 +2,6 @@
 ##  Your custom data  ##
 ########################
 
-imediastuff
-/imedia-pipeline
-/imedia-pipeline-cin
-uploads
-tmp_files
-
 # Hide analize.py undesired output
 scripts/analysis/shot-output.xml
 
