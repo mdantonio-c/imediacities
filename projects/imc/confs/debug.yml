@@ -30,10 +30,6 @@ services:
       DEBUG_LEVEL: VERBOSE
       ACTIVATE: 1
 
-  celeryui:
-    environment:
-      ACTIVATE: 1
-
   ftp:
     environment:
       PUBLICHOST: localhost

@@ -35,7 +35,3 @@ services:
     environment:
       DEBUG_LEVEL: INFO
       ACTIVATE: 1
-
-  celeryui:
-    environment:
-      ACTIVATE: 1
