@@ -45,7 +45,7 @@
 			<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
 				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0] || 'Not available'}}</p>
 				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
-				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}} <a href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
+				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}} - <a target="_blank" href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
 				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
 			</div>
 			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
