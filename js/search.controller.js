@@ -407,7 +407,7 @@
 
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
-				'number': shot.attributes.shot_num,
+				'number': shot.attributes.start_frame_idx,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
 				'camera': self.camera
