@@ -388,7 +388,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         else:
             nextframe = num_frames
 
-        shot_len = (num_frames - frame) / TRANSCODED_FRAMERATE
+        shot_len = (nextframe - frame) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
 
         d = {}
