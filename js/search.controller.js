@@ -394,7 +394,7 @@
 		angular.forEach(shots, function(shot) {
 
 			self.camera = [];
-			var annotations = shots[i].annotations;
+			var annotations = shot.annotations;
 
 			for (var i = 0; i < annotations[0].attributes; i++) {
 
