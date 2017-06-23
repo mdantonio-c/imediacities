@@ -395,14 +395,15 @@
 
 			self.camera = [];
 			var annotations = shot.annotations;
+			var camattr = annotations[0].attributes;
 
-			for (var i = 0; i < annotations[0].attributes; i++) {
+			angular.forEach(camattr, function(value,key) {
 
-				var motion = annotations[0].attributes[i];	
+				var motion = value;	
 
-				self.camera.push(motion);
+				self.camera.push(key+' '+motion);
 
-			}
+			});
 
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
