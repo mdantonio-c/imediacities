@@ -392,12 +392,24 @@
 		self.shots = [];
 
 		angular.forEach(shots, function(shot) {
+
+			self.camera = [];
+			var annotations = shots[i].annotations;
+
+			for (var i = 0; i < annotations[0].attributes; i++) {
+
+				var motion = annotations[0].attributes[i];	
+
+				self.camera.push(motion);
+
+			}
+
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
 				'number': shot.attributes.start_frame_idx,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
-				'camera': '-'
+				'camera': self.camera
 			});
 		});
 
