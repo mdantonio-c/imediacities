@@ -101,9 +101,9 @@
 
 				<div class="storyboard">
 				<tr ng-repeat="shot in $ctrl.shots">
+                    <td data-title="'Number'" align="center">{{shot.number}}</td>
 	       			<td data-title="'Shot'" >
 	           		<img style="width: 40%;" ng-src="{{shot.thumb}}"></td>
-	       			<td data-title="'Number'" align="center">{{shot.number}}</td>
 	       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
 	       			<td data-title="'Duration'" align="center">{{shot.duration}}</td>
 	       			<td data-title="'Camera motion'" align="center">{{shot.camera}}</td>
