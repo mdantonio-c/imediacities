@@ -250,6 +250,40 @@
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
 
+		// Initializing values
+		var onplaying = false;
+		var onpause = true;
+
+		var myVid = angular.element(window.document.querySelector('#videoarea'));
+
+		// On video playing toggle values
+		myVid[0].onplaying = function() {
+    		onplaying = true;
+    		onpause = false;
+    		myVid[0].pause();
+		};
+
+		// On video pause toggle values
+		myVid[0].onpause = function() {
+    		onplaying = false;
+    		onpause = true;
+		};
+
+		// Play video function
+		function playVid(video) {      
+    	if (video.paused && !onplaying) {
+    		video.currtime = '3';
+        	video.play();
+    		}
+		} 
+
+		// Pause video function
+		function pauseVid(video) {     
+    	if (!video.paused && !onpause) {
+        	video.pause();
+    		}
+		}
+
 		self.items = [];
 		self.shots = [];
 		self.loadVideoShots = function(vid) {
@@ -275,10 +309,9 @@
 						self.showmeli = false; //hide loading video bar
 
 						if (i === 0) {
+							/*once we have all data and metadata the video start playing*/
 							var myVid = angular.element(window.document.querySelector('#videoarea'));
-							myVid[0].currentTime = '3';
-							myVid[0].play();
-    						myVid[0].pause();
+							playVid(myVid[0]);
     					}
 					}
 				});
