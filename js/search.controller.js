@@ -73,15 +73,32 @@
 					return cdate.getHours() + " hours " + cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
 				}
 			};
-		}).
-		filter('salientEstimates', function() {
+		})
+		.filter('salientEstimates', function() {
 			return function(estimates, threshold) {
-				threshold = typeof threshold !== 'undefined' ? threshold : 0.3;
+				threshold = typeof threshold !== 'undefined' ? threshold : 0.5;
 				var res = {};
+				var h_avg = 0,
+					h_key,
+					found = false;
 				for (var p in estimates) {
-					if (estimates.hasOwnProperty(p) && estimates[p][0] >= threshold) {
-						res[p.replace(/_/g, " ")] = estimates[p][0];
+					// skip loop if the property is from prototype
+					if (!estimates.hasOwnProperty(p)) continue;
+
+					var avg = estimates[p][0];
+					var key = p.replace(/_/g, " ");
+					if (avg >= threshold) {
+						res[key] = avg;
+						found = true;
 					}
+
+					if (!found && avg > h_avg) {
+						h_key = key;
+						h_avg = avg;
+					}
+				}
+				if (Object.keys(res).length === 0) {
+					res[h_key] = h_avg;
 				}
 				return res;
 			};
