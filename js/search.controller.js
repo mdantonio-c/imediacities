@@ -396,6 +396,7 @@
 			self.camera = [];
 			var annotations = shot.annotations;
 			var camattr = annotations[0].attributes;
+			var first = true;
 
 			angular.forEach(camattr, function(value,key) {
 
