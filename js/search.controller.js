@@ -59,19 +59,33 @@
 			return function(url) {
 				return $sce.trustAsResourceUrl(url);
 			};
+		})
+		// convert float to integer
+		.filter('parseNum', function() {
+			return function(input) {
+				var secs = parseInt(input, 10);
+				var cdate = new Date(0, 0, 0, 0, 0, secs);
+				if ((cdate.getHours() === 0) && (cdate.getMinutes() > 0)) {
+					return cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				} else if ((cdate.getHours() === 0) && (cdate.getMinutes() === 0)) {
+					return cdate.getSeconds() + " secs";
+				} else {
+					return cdate.getHours() + " hours " + cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				}
+			};
+		}).
+		filter('salientEstimates', function() {
+			return function(estimates, threshold) {
+				threshold = typeof threshold !== 'undefined' ? threshold : 0.3;
+				var res = {};
+				for (var p in estimates) {
+					if (estimates.hasOwnProperty(p) && estimates[p][0] >= threshold) {
+						res[p.replace(/_/g, " ")] = estimates[p][0];
+					}
+				}
+				return res;
+			};
 		});
-
-	// convert float to integer
-	app.filter('parseNum', function() {
-    	return function(input) {
-    		var secs = parseInt(input, 10);
-    		var cdate = new Date(0, 0, 0, 0, 0, secs);
-    		if ((cdate.getHours() == 0) && (cdate.getMinutes() > 0)) var times = cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs";
-    		else if ((cdate.getHours() == 0) && (cdate.getMinutes() == 0)) var times = cdate.getSeconds()+" secs";
-			else var times = cdate.getHours() +" hours "+cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs"; 
-       		return times;
-    	}	
-	});
 
 	app.directive('scrollOnClick', function() {
 			return {
@@ -260,7 +274,7 @@
 						self.showmesb = true; //enable storyboard button
 						self.showmeli = false; //hide loading video bar
 
-						if (i == 0) {
+						if (i === 0) {
 							var myVid = angular.element(window.document.querySelector('#videoarea'));
 							myVid[0].currentTime = '3';
 							myVid[0].play();
@@ -296,8 +310,7 @@
 		self.showStoryboard = function(size, parentSelector) {
 			var parentElem = parentSelector ? 
       			angular.element($document[0].querySelector('#video-wrapper ' + parentSelector)) : undefined;
-      		console.log(parentElem);
-			var modalInstance = $uibModal.open({
+      		var modalInstance = $uibModal.open({
 				animation: self.animationsEnabled,
 				templateUrl:'myModalContent.html',
 				controller: 'ModalInstanceCtrl',
@@ -393,7 +406,7 @@
 
 		angular.forEach(shots, function(shot) {
 
-			self.camera = [];
+/*			self.camera = [];
 			var annotations = shot.annotations;
 			var camattr = annotations[0].attributes;
 			var first = true;
@@ -407,7 +420,7 @@
 
 				if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
 
-			});
+			});*/
 
 
 			self.shots.push({
@@ -415,7 +428,7 @@
 				'number': shot.attributes.start_frame_idx,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
-				'camera': self.camera
+				'camera': shot.annotations[0].attributes
 			});
 		});
 
