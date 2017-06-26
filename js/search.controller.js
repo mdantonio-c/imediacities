@@ -401,9 +401,13 @@
 
 				var motion = value;	
 
-				self.camera.push(key+' '+motion);
+				var cv = parseFloat(value[1]).toFixed(2);
+    			var av = parseFloat(0.3).toFixed(2);
+
+				if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
 
 			});
+
 
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
