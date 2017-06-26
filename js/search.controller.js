@@ -252,15 +252,16 @@
 
 		// Initializing values
 		var onplaying = false;
-		var onpause = true;
+		var onpause = false;
 
 		var myVid = angular.element(window.document.querySelector('#videoarea'));
 
 		// On video playing toggle values
 		myVid[0].onplaying = function() {
     		onplaying = true;
-    		onpause = false;
-    		myVid[0].pause();
+    		if (!onpause){
+    			myVid[0].pause();
+    		}
 		};
 
 		// On video pause toggle values
@@ -312,6 +313,7 @@
 							/*once we have all data and metadata the video start playing*/
 							var myVid = angular.element(window.document.querySelector('#videoarea'));
 							playVid(myVid[0]);
+							onpause = false;
     					}
 					}
 				});
