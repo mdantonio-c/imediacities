@@ -20,6 +20,18 @@
 	padding-left: 10px;*/
 }
 
+#videoarea::-internal-media-controls-download-button {
+    display:none;
+}
+
+#videoarea::-webkit-media-controls-enclosure {
+    overflow:hidden;
+}
+
+#videoarea::-webkit-media-controls-panel {
+    width: calc(100% + 30px); /* Adjust as needed */
+}
+
 .progress{
 	width: 50%;
     margin-left: 25%;
