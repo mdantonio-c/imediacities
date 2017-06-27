@@ -99,7 +99,7 @@ div.scrollmenu a:hover {
     background-color: #777;
 }
 
-.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
+/*.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
 	{
 	display: block;
 	max-width: 100%;
@@ -112,7 +112,7 @@ div.scrollmenu a:hover {
 
 .carousel-control.left,.carousel-control.right {
     width: 5%;
-}
+}*/
 
 /*sidebar styling*/
 #wrapper {
