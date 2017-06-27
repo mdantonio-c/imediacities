@@ -106,6 +106,14 @@ div.scrollmenu a:hover {
 	height: 100%;
 }
 
+.carousel-indicators{
+   top:40px; 
+}
+
+.carousel-control.left,.carousel-control.right {
+    width: 5%;
+}
+
 /*sidebar styling*/
 #wrapper {
 	padding-left: 50%;
