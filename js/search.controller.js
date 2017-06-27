@@ -104,7 +104,7 @@
 			};
 		});
 
-	app.directive('scrollOnClick', function() {
+	/*app.directive('scrollOnClick', function() {
 			return {
 				//restrict: 'A',
 				link: function($scope, $elm) {
@@ -119,6 +119,36 @@
 						var progr = $elm[0].firstElementChild.attributes.progr.value;
 						var myVid = angular.element(window.document.querySelector('#videoarea'));
 						var currtime = $elm[0].firstElementChild.attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0, 0, 0, hours, mins, secs);
+						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
+
+						//myVid[0].pause();
+						myVid[0].currentTime = times+5;
+						myVid[0].play();
+
+					});
+				}
+			};
+		})*/
+		app.directive('scrollOnClick', function() {
+			return {
+				//restrict: 'A',
+				link: function($scope, $elm) {
+					$elm.on('click', function() {
+						//alert($elm[0].parentNode.className);
+						$(".scrollmenu").animate({
+							scrollLeft: $elm[0].offsetLeft
+						}, "slow");
+						// play video from selected shot
+						var duration = $elm[0].attributes.duration.value;
+						var nshots = $elm[0].attributes.nshots.value;
+						var progr = $elm[0].attributes.progr.value;
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						var currtime = $elm[0].attributes.timestamp.value;
 						currtime = currtime.split("-")[0];
 						var hours = currtime.split(":")[0];
 						var mins = currtime.split(":")[1];
