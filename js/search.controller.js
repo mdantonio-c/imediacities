@@ -104,7 +104,7 @@
 			};
 		});
 
-	/*app.directive('scrollOnClick', function() {
+	app.directive('scrollOnClick', function() {
 			return {
 				//restrict: 'A',
 				link: function($scope, $elm) {
@@ -133,8 +133,8 @@
 					});
 				}
 			};
-		})*/
-		app.directive('scrollOnClick', function() {
+		})
+		/*app.directive('scrollOnClick', function() {
 			return {
 				//restrict: 'A',
 				link: function($scope, $elm) {
@@ -163,7 +163,7 @@
 					});
 				}
 			};
-		})
+		})*/
 		.directive('pagination', function() {
 			return {
 				restrict: 'E',
