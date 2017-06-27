@@ -127,7 +127,7 @@
 						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
 
 						//myVid[0].pause();
-						myVid[0].currentTime = times;
+						myVid[0].currentTime = times+5;
 						myVid[0].play();
 
 					});
