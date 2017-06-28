@@ -99,6 +99,10 @@ div.scrollmenu a:hover {
     background-color: #777;
 }
 
+img:hover {
+    cursor: pointer;
+}
+
 /*.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
 	{
 	display: block;
