@@ -504,10 +504,11 @@
 
 			});*/
 
-
+                        var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
-				'number': shot.attributes.start_frame_idx,
+				'number': shot.attributes.shot_num,
+                                'framerange': framerange,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
 				'camera': shot.annotations[0].attributes
