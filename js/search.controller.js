@@ -164,6 +164,48 @@
 				}
 			};
 		})*/
+		.directive('modalMovable', ['$document',
+    	function($document) {
+        return {
+            restrict: 'AC',
+            link: function(scope, iElement, iAttrs) {
+                var startX = 0,
+                    startY = 0,
+                    x = 0,
+                    y = 0;
+
+                var dialogWrapper = iElement.parent();
+
+                dialogWrapper.css({
+                    position: 'relative'
+                });
+
+                dialogWrapper.on('mousedown', function(event) {
+                    // Prevent default dragging of selected content
+                    event.preventDefault();
+                    startX = event.pageX - x;
+                    startY = event.pageY - y;
+                    $document.on('mousemove', mousemove);
+                    $document.on('mouseup', mouseup);
+                });
+
+                function mousemove(event) {
+                    y = event.pageY - startY;
+                    x = event.pageX - startX;
+                    dialogWrapper.css({
+                        top: y + 'px',
+                        left: x + 'px'
+                    });
+                }
+
+                function mouseup() {
+                    $document.unbind('mousemove', mousemove);
+                    $document.unbind('mouseup', mouseup);
+                	}
+            	}
+        	};
+    		}
+		])
 		.directive('pagination', function() {
 			return {
 				restrict: 'E',
@@ -415,7 +457,6 @@
 			});
 		};
 
-
 		/*self.jumpToShot = function(selectedShot) {
 			var row = selectedShot.row;
 			if (row !== 0) {
@@ -504,11 +545,10 @@
 
 			});*/
 
-                        var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
+
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
-				'number': shot.attributes.shot_num,
-                                'framerange': framerange,
+				'number': shot.attributes.start_frame_idx,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
 				'camera': shot.annotations[0].attributes
