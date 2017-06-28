@@ -118,15 +118,18 @@
 			<table class="table">
 			    <tr>
 					<th>Frame number</th>
+                    <th>Shot number</th>
+				    <th>Frame range</th>
 				    <th>Shots</th>
-					<th>Shot timecode</th>
-					<th>Shot duration (sec)</th>
-					<th style="text-align: center">Camera motion</th>
+				    <th>Shot timecode</th>
+			        <th>Shot duration (sec)</th>
+				    <th style="text-align: center">Camera motion</th>
 				</tr>
 
 				<div class="storyboard">
 				<tr ng-repeat="shot in $ctrl.shots">
                     <td data-title="'Number'" align="center">{{shot.number}}</td>
+					<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
 	       			<td data-title="'Shot'" scroll-on-click>
 	           		<img style="width: 40%;" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
 	       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
