@@ -1,180 +1,582 @@
-<div ng-controller='SearchController as searchCtrl'>
-	<div class="row">
-		<div id="imaginary_container">
-			<div class="input-group stylish-input-group">
-				<input type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" placeholder="Search video"
-				ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
-				<span class="input-group-addon">
-					<a href ui-sref="logged.search({q: searchCtrl.inputTerm})">
-						<button><span class="glyphicon glyphicon-search"></span></button>
-					</a>
-				</span>
-			</div>
-		</div>
-	</div>
-</div>
-<hr/>
-<div
-	ng-if="datactrl.loading"
-	ng-include="main.templateDir + 'loader.html'">
-</div>
-<div ng-controller='WatchController as watchCtrl' id="video-wrapper">
-	<div class="row">
-		<div class="col-xs-12 col-md-6">
-			<div style="float: left; width: 100%">
-				<video id="videoarea" ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" type="video/mp4" controls></video>
-				<div class="container" ng-show="watchCtrl.showmeli" style="float: left; width: 100%"><br></br><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
-			</div>
-			<div class="scrollmenu" style="float: left;">
-				<a ng-repeat="item in watchCtrl.items" style="width: 13%;" scroll-on-click>
-					<img style="width: 90%; height: 90%" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" shotd="{{item[3]}}" progr="{{item[4]}}" timestamp="{{item[5]}}" ng-src="{{item[6]}}" />
-				</a>
-			</div>
+(function() {
+	'use strict';
 
-			<!-- <div uib-carousel interval="5000" class="scrollmenu" style="float:left; width:100%;" active="active">
-            <div uib-slide ng-repeat="item in watchCtrl.items" index="$index" style="width: 13%;">
+	var app = angular.module('web')
+		.controller('SearchController', SearchController)
+		.controller('WatchController', WatchController)
+		.controller('MapController', MapController)
+		.controller('ModalInstanceCtrl', ModalInstanceCtrl)
+		.controller('ModalResultInstanceCtrl', ModalResultInstanceCtrl);
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index][0]}}" duration="{{watchCtrl.items[$index][1]}}" nshots="{{watchCtrl.items[$index][2]}}" shotd="{{watchCtrl.items[$index][3]}}" progr="{{watchCtrl.items[$index][4]}}" timestamp="{{watchCtrl.items[$index][5]}}" ng-src="{{watchCtrl.items[$index][6]}}" style="float:left;" scroll-on-click/>
+	/*modal view storyboard factory definition*/
+	app.factory('modalFactory', function($uibModal) {
+		return {
+			open: function(size, template, params) {
+				return $uibModal.open({
+					animation: false,
+					templateUrl: template || 'myModalContent.html',
+					controller: 'ModalResultInstanceCtrl',
+					controllerAs: '$ctrl',
+					size: size,
+					resolve: {
+						params: function() {
+							return params;
+						}
+					}
+				});
+			}
+		};
+	});
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+1][0]}}" duration="{{watchCtrl.items[$index+1][1]}}" nshots="{{watchCtrl.items[$index+1][2]}}" shotd="{{watchCtrl.items[$index+1][3]}}" progr="{{watchCtrl.items[$index+1][4]}}" timestamp="{{watchCtrl.items[$index+1][5]}}" ng-src="{{watchCtrl.items[$index+1][6]}}" style="float:left;" scroll-on-click/>
+	// create a simple search filter
+	app.filter('searchFor', function() {
+			return function(arr, searchString, $scope) {
+				if (searchString === '*') {
+					return arr;
+				} else if (searchString) {
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+2][0]}}" duration="{{watchCtrl.items[$index+2][1]}}" nshots="{{watchCtrl.items[$index+2][2]}}" shotd="{{watchCtrl.items[$index+2][3]}}" progr="{{watchCtrl.items[$index+2][4]}}" timestamp="{{watchCtrl.items[$index+2][5]}}" ng-src="{{watchCtrl.items[$index+2][6]}}" style="float:left;" scroll-on-click/>
+					var result = [];
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+3][0]}}" duration="{{watchCtrl.items[$index+3][1]}}" nshots="{{watchCtrl.items[$index+3][2]}}" shotd="{{watchCtrl.items[$index+3][3]}}" progr="{{watchCtrl.items[$index+3][4]}}" timestamp="{{watchCtrl.items[$index+3][5]}}" ng-src="{{watchCtrl.items[$index+3][6]}}" style="float:left;" scroll-on-click/>
+					searchString = searchString.toLowerCase();
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+4][0]}}" duration="{{watchCtrl.items[$index+4][1]}}" nshots="{{watchCtrl.items[$index+4][2]}}" shotd="{{watchCtrl.items[$index+4][3]}}" progr="{{watchCtrl.items[$index+4][4]}}" timestamp="{{watchCtrl.items[$index+4][5]}}" ng-src="{{watchCtrl.items[$index+4][6]}}" style="float:left;" scroll-on-click/>
+					angular.forEach(arr, function(item) {
+						if (item.attributes.identifying_title.toLowerCase().indexOf(searchString) !== -1) {
+							result.push(item);
+						}
+					});
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+5][0]}}" duration="{{watchCtrl.items[$index+5][1]}}" nshots="{{watchCtrl.items[$index+5][2]}}" shotd="{{watchCtrl.items[$index+5][3]}}" progr="{{watchCtrl.items[$index+5][4]}}" timestamp="{{watchCtrl.items[$index+5][5]}}" ng-src="{{watchCtrl.items[$index+5][6]}}" style="float:left;" scroll-on-click/>
+					/*pagination*/
+					self.numPerPage = 5; /*number of videos per page*/
+					$scope.noOfPages = Math.ceil(result.length / self.numPerPage);
+					$scope.currentPage = 1;
+					/*---*/
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+6][0]}}" duration="{{watchCtrl.items[$index+6][1]}}" nshots="{{watchCtrl.items[$index+6][2]}}" shotd="{{watchCtrl.items[$index+6][3]}}" progr="{{watchCtrl.items[$index+6][4]}}" timestamp="{{watchCtrl.items[$index+6][5]}}" ng-src="{{watchCtrl.items[$index+6][6]}}" style="float:left;" scroll-on-click/>
+					return result;
+				}
+			};
+		})
+		.filter('trustUrl', function($sce) {
+			return function(url) {
+				return $sce.trustAsResourceUrl(url);
+			};
+		})
+		// convert float to integer
+		.filter('parseNum', function() {
+			return function(input) {
+				var secs = parseInt(input, 10);
+				var cdate = new Date(0, 0, 0, 0, 0, secs);
+				if ((cdate.getHours() === 0) && (cdate.getMinutes() > 0)) {
+					return cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				} else if ((cdate.getHours() === 0) && (cdate.getMinutes() === 0)) {
+					return cdate.getSeconds() + " secs";
+				} else {
+					return cdate.getHours() + " hours " + cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				}
+			};
+		})
+		.filter('salientEstimates', function() {
+			return function(estimates, threshold) {
+				threshold = typeof threshold !== 'undefined' ? threshold : 0.5;
+				var res = {};
+				var h_avg = 0,
+					h_key,
+					found = false;
+				for (var p in estimates) {
+					// skip loop if the property is from prototype
+					if (!estimates.hasOwnProperty(p)) continue;
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+7][0]}}" duration="{{watchCtrl.items[$index+7][1]}}" nshots="{{watchCtrl.items[$index+7][2]}}" shotd="{{watchCtrl.items[$index+7][3]}}" progr="{{watchCtrl.items[$index+7][4]}}" timestamp="{{watchCtrl.items[$index+7][5]}}" ng-src="{{watchCtrl.items[$index+7][6]}}" style="float:left;" scroll-on-click/> 
+					var avg = estimates[p][0];
+					var key = p.replace(/_/g, " ");
+					if (avg >= threshold) {
+						res[key] = avg;
+						found = true;
+					}
 
-            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index+8][0]}}" duration="{{watchCtrl.items[$index+8][1]}}" nshots="{{watchCtrl.items[$index+8][2]}}" shotd="{{watchCtrl.items[$index+8][3]}}" progr="{{watchCtrl.items[$index+8][4]}}" timestamp="{{watchCtrl.items[$index+8][5]}}" ng-src="{{watchCtrl.items[$index+8][6]}}" style="float:left;" scroll-on-click/> 
+					if (!found && avg > h_avg) {
+						h_key = key;
+						h_avg = avg;
+					}
+				}
+				if (Object.keys(res).length === 0) {
+					res[h_key] = h_avg;
+				}
+				return res;
+			};
+		});
 
-            </div>
-            </div> -->
-		</div>
-		<div class="col-xs-12 col-md-6">
-			<!-- metadata -->
-			<ul><li>
-			<div class="primary-description">
-				<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration | parseNum}})</i>
-				<p><b>Movie Description</b>:
-				<span ng-repeat="description in watchCtrl.video.relationships.descriptions">
-				</br>{{description.attributes.text}}{{$last ? '' : ', '}}</br></span></p>
-				<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
-				{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
-			</div>
-			<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-				<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0] || 'Not available'}}</p>
-				<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
-				<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}} - <a target="_blank" href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
-				<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
-			</div>
-			<button type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
-			Storyboard <span class="glyphicon glyphicon-book"></span>
-			</button>
-			</li>
-			</ul>
-			<div class="sb-modal-parent"></div>
-		</div>
-	</div>
-	<!-- <div class="row">
-			<div id="timeline-graph">
-					<div google-chart chart="videoTimeline" agc-on-select="jumpToShot(selectedItem)" style="{{videoTimeline.cssStyle}}"/>
-					</div>
-			</div>
-	</div> -->
-	<hr/>
-	<div ng-controller="MapController as vm" ng-init="vm.init(watchCtrl.video.relationships.coverages[0].attributes.spatial[0])">
-	<div class="row">
-		<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
-			<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}">
-			<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>
-			</ng-map>
-		</div>
-	</div>
-	</div>
-	<hr/>
+	app.directive('scrollOnClick', function() {
+			return {
+				//restrict: 'A',
+				link: function($scope, $elm) {
+					$elm.on('click', function() {
+						//alert($elm[0].parentNode.className);
+						$(".scrollmenu").animate({
+							scrollLeft: $elm.offset().left
+						}, "slow");
+						// play video from selected shot
+						var duration = $elm[0].firstElementChild.attributes.duration.value;
+						var nshots = $elm[0].firstElementChild.attributes.nshots.value;
+						var progr = $elm[0].firstElementChild.attributes.progr.value;
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						var currtime = $elm[0].firstElementChild.attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0, 0, 0, hours, mins, secs);
+						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
 
-	<!-- modal content -->
-	<script type="text/ng-template" id="myModalContent.html">
-	<div modal-movable>
-		<button type="button" class="close" ng-click="$ctrl.cancel()" style="padding: 2px 6px;">x</button>
-	    <div class="modal-header">
-	        <h3 class="modal-title" align="center">Video Storyboard</h3>
-	        </br>
-	    </div>
-	    <div class="modal-body">
-	        <form>
-	    	<div>
-	    	<table class="table">
-	    		<tr>
-	    			<th>Video Summary<img style="width: 70%; height: 50%; float: right;" ng-src="{{$ctrl.summary}}" ng-click="$ctrl.showSummary()"></th>
-				</tr>
-			</table>
+						//myVid[0].pause();
+						myVid[0].currentTime = times+5;
+						myVid[0].play();
 
-			<table class="table">
-			    <tr>
-					<th>Frame number</th>
-                    <th>Shot number</th>
-				    <th>Frame range</th>
-				    <th>Shots</th>
-				    <th>Shot timecode</th>
-			        <th>Shot duration (sec)</th>
-				    <th style="text-align: center">Camera motion</th>
-				</tr>
+					});
+				}
+			};
+		})
+		/*app.directive('scrollOnClick', function() {
+			return {
+				//restrict: 'A',
+				link: function($scope, $elm) {
+					$elm.on('click', function() {
+						//alert($elm[0].parentNode.className);
+						$(".scrollmenu").animate({
+							scrollLeft: $elm[0].offsetLeft
+						}, "slow");
+						// play video from selected shot
+						var duration = $elm[0].attributes.duration.value;
+						var nshots = $elm[0].attributes.nshots.value;
+						var progr = $elm[0].attributes.progr.value;
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						var currtime = $elm[0].attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0, 0, 0, hours, mins, secs);
+						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
 
-				<div class="storyboard">
-				<tr ng-repeat="shot in $ctrl.shots">
-                    <td data-title="'Number'" align="center">{{shot.number}}</td>
-					<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-	       			<td data-title="'Shot'" scroll-on-click>
-	           		<img style="width: 40%;" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
-	       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
-	       			<td data-title="'Duration'" align="center">{{shot.duration}}</td>
-	       			<td data-title="'Camera motion'" align="center">
-	       			<dl class="dl-horizontal">
-	       				<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-	       					<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
-	       				</div>
-	       			</dl>
-	       			</td>
-				</tr>
-				</div>
-			</table>
+						//myVid[0].pause();
+						myVid[0].currentTime = times+5;
+						myVid[0].play();
 
-			</div>
-	        </form>
-	    </div> <!-- body -->
+					});
+				}
+			};
+		})*/
+		.directive('modalMovable', ['$document',
+    	function($document) {
+        return {
+            restrict: 'AC',
+            link: function(scope, iElement, iAttrs) {
+                var startX = 0,
+                    startY = 0,
+                    x = 0,
+                    y = 0;
 
-	    <div class="modal-footer">
-	        <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">Cancel</button>
-	     </div>
-	</script>
-	</div>
+                var dialogWrapper = iElement.parent();
 
-	<script type="text/ng-template" id="summary.html">
-	    <div class="modal-header">
-	    	<button type="button" class="close" ng-click="$ctrl.cancel()" style="padding: 2px 6px;">x</button>
-	       	<h3 class="modal-title" align="center">Video Summary</h3>
-	    </div>
-	    <div class="modal-body" style="height: 150px;">
-	    	<form><div>
-	    		<img style="width: 100%; height: 100%; float: right;" ng-src="{{$ctrl.summary}}">
-	      	 </div></form>
-	    </div>
-	</script>
-</div>
+                dialogWrapper.css({
+                    position: 'relative'
+                });
 
-<!-- modal content -->
-<script type="text/ng-template" id="pagination.html">
-    <div class="pagination">
-    <ul>
-  		<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>
-  		<li ng-repeat="page in pages" ng-class="{active: isActive(page)}"><a ng-click="selectPage(page)">{{page}}</a></li>
-  		<li ng-class="{disabled: noNext()}"><a ng-click="selectNext()">Next</a></li>
-  	</ul>
-	</div>
-</script>
+                dialogWrapper.on('mousedown', function(event) {
+                    // Prevent default dragging of selected content
+                    event.preventDefault();
+                    startX = event.pageX - x;
+                    startY = event.pageY - y;
+                    $document.on('mousemove', mousemove);
+                    $document.on('mouseup', mouseup);
+                });
+
+                function mousemove(event) {
+                    y = event.pageY - startY;
+                    x = event.pageX - startX;
+                    dialogWrapper.css({
+                        top: y + 'px',
+                        left: x + 'px'
+                    });
+                }
+
+                function mouseup() {
+                    $document.unbind('mousemove', mousemove);
+                    $document.unbind('mouseup', mouseup);
+                	}
+            	}
+        	};
+    		}
+		])
+		.directive('pagination', function() {
+			return {
+				restrict: 'E',
+				scope: {
+					numPages: '=',
+					currentPage: '=',
+					onSelectPage: '&'
+				},
+				templateUrl: 'pagination.html',
+				replace: true,
+				link: function(scope) {
+					scope.$watch('numPages', function(value) {
+						scope.pages = [];
+						for (var i = 1; i <= value; i++) {
+							scope.pages.push(i);
+						}
+						if (scope.currentPage > value) {
+							scope.selectPage(value);
+						}
+					});
+					scope.noPrevious = function() {
+						return scope.currentPage === 1;
+					};
+					scope.noNext = function() {
+						return scope.currentPage === scope.numPages;
+					};
+					scope.isActive = function(page) {
+						return scope.currentPage === page;
+					};
+
+					scope.selectPage = function(page) {
+						if (!scope.isActive(page)) {
+							scope.currentPage = page;
+							scope.onSelectPage({
+								page: page
+							});
+						}
+					};
+
+					scope.selectPrevious = function() {
+						if (!scope.noPrevious()) {
+							scope.selectPage(scope.currentPage - 1);
+						}
+					};
+					scope.selectNext = function() {
+						if (!scope.noNext()) {
+							scope.selectPage(scope.currentPage + 1);
+						}
+					};
+				}
+			};
+		});
+
+	function getElement(event) {
+		return angular.element(event.srcElement || event.target);
+	}
+
+	// The controller
+	function SearchController($scope, $log, $document, $state, $stateParams, DataService, noty, $uibModal) {
+		var self = this;
+
+		self.showmesb = false;
+		self.viewlogo = true;
+		self.showmese = false;
+		//self.showmepg = true;
+
+		$scope.currentPage = 1;
+		$scope.noOfPages = 1;
+
+		/*pagination*/
+		$scope.setPage = function(currp, nump) {
+			$scope.vmin = (currp - 1) * nump;
+			$scope.vmax = nump;
+		};
+
+		// $scope.$watch('currentPage', $scope.setPage($scope.currentPage, $scope.noOfPages));
+
+		self.videos = [];
+
+		self.loading = false;
+		self.inputTerm = "";
+		self.searchVideos = function() {
+			var request_data = {
+				"type": "video",
+				"term": ""
+			};
+			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
+			// console.log('search videos with term: ' + request_data.term);
+			self.loadResults = false;
+			self.loading = true;
+			self.showmese = true;
+			DataService.searchVideos(request_data).then(
+				function(out_data) {
+					self.videos = out_data.data;
+					self.loading = false;
+					self.loadResults = true;
+					self.showmese = false;
+					noty.extractErrors(out_data, noty.WARNING);
+				},
+				function(out_data) {
+					self.loading = false;
+					self.studyCount = 0;
+					self.loadResults = true;
+					noty.extractErrors(out_data, noty.ERROR);
+				});
+		};
+
+		self.goToSearch = function(event, term) {
+			if (event.keyCode === 13) {
+				$state.go('logged.search', {
+					q: term
+				});
+			}
+		};
+
+		var term = $stateParams.q;
+		if (term !== undefined && term !== '') {
+			self.viewlogo = false;
+			self.inputTerm = term;
+			self.searchVideos();
+		}
+
+
+	}
+
+	function WatchController($log, $document, $uibModal, $stateParams, DataService, noty) {
+
+		var self = this;
+		self.showmesb = false;
+		self.showmeli = true;
+		var vid = $stateParams.v;
+		self.video = $stateParams.meta;
+
+		// Initializing values
+		var onplaying = false;
+		var onpause = false;
+
+		var myVid = angular.element(window.document.querySelector('#videoarea'));
+
+		// On video playing toggle values
+		myVid[0].onplaying = function() {
+    		onplaying = true;
+    		if (!onpause){
+    			myVid[0].pause();
+    		}
+		};
+
+		// On video pause toggle values
+		myVid[0].onpause = function() {
+    		onplaying = false;
+    		onpause = true;
+		};
+
+		// Play video function
+		function playVid(video) {      
+    	if (video.paused && !onplaying) {
+    		video.currtime = '3';
+        	video.play();
+    		}
+		} 
+
+		// Pause video function
+		function pauseVid(video) {     
+    	if (!video.paused && !onpause) {
+        	video.pause();
+    		}
+		}
+
+		self.items = [];
+		self.shots = [];
+		self.loadVideoShots = function(vid) {
+			DataService.getVideoShots(vid).then(
+				function(response) {
+					self.shots = response.data;
+					for (var i = 0; i < self.shots.length; i++) {
+						var thumblink = self.shots[i].links.thumbnail;
+						var start_frame = self.shots[i].attributes.start_frame_idx;
+						var timestamp = self.shots[i].attributes.timestamp;
+						var frameshot = [];
+						frameshot[0] = start_frame;
+						frameshot[1] = self.video.relationships.item[0].attributes.duration;
+						frameshot[2] = parseInt(self.shots[i].attributes.duration);
+						frameshot[3] = self.shots.length;
+						frameshot[4] = i;
+						frameshot[5] = timestamp;
+						frameshot[6] = thumblink;
+
+						self.items.push(frameshot);
+
+						self.showmesb = true; //enable storyboard button
+						self.showmeli = false; //hide loading video bar
+
+						if (i === 0) {
+							/*once we have all data and metadata the video start playing*/
+							var myVid = angular.element(window.document.querySelector('#videoarea'));
+							playVid(myVid[0]);
+							onpause = false;
+    					}
+					}
+				});
+		};
+
+		self.loadMetadataContent = function(vid) {
+			self.loading = true;
+			// console.log('loading metadata content');
+			DataService.getVideoMetadata(vid).then(
+				function(response) {
+					self.video = response.data[0];
+					self.loading = false;
+					self.loadVideoShots(vid);
+				},
+				function(error) {
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+
+		if (!$stateParams.meta) {
+			self.loadMetadataContent(vid);
+		} else {
+			self.loadVideoShots(vid);
+		}
+
+		self.selectedVideoId = vid;
+		self.animationsEnabled = true;
+		self.showStoryboard = function(size, parentSelector) {
+			var parentElem = parentSelector ? 
+      			angular.element($document[0].querySelector('#video-wrapper ' + parentSelector)) : undefined;
+      		var modalInstance = $uibModal.open({
+				animation: self.animationsEnabled,
+				templateUrl:'myModalContent.html',
+				controller: 'ModalInstanceCtrl',
+				controllerAs: '$ctrl',
+				size: size,
+				appendTo: parentElem,
+				resolve: {
+					params: function() {
+						var params = {};
+						angular.extend(params, {
+							'videoid': self.selectedVideoId,
+							'summary': self.video.links.summary
+						});
+						return params;
+					},
+					shots: function() {
+						return self.shots;
+					}
+				}
+			});
+		};
+
+		/*self.jumpToShot = function(selectedShot) {
+			var row = selectedShot.row;
+			if (row !== 0) {
+				// ignore 'Duration' row
+				var time1 = self.videoTimeline.data.rows[row].c[2].v.getSeconds();
+				var time2 = self.videoTimeline.data.rows[row].c[3].v.getSeconds();
+
+				// play video from selected shot
+				var myVid = angular.element($document[0].querySelector('#videoarea'));
+				myVid[0].currentTime = time1;
+				myVid[0].play();
+			}
+		};*/
+
+	}
+
+	function MapController($scope, NgMap, NavigatorGeolocation, GeoCoder, $timeout) {
+
+		var vm = this;
+		vm.videolat = null;
+		vm.videolng = null;
+		vm.locname = null;
+		vm.zoom = 15;
+
+		vm.init = function(location) {
+			// FIXME what is the default?
+			vm.location = location === undefined ? 'Bologna, IT' : location;
+		};
+
+		NgMap.getMap("videomap").then(function(map) {
+			// start geocoding and get video coordinates
+			GeoCoder.geocode({
+					address: vm.location
+				})
+				.then(function(result) {
+					vm.videolat = result[0].geometry.location.lat();
+					vm.videolng = result[0].geometry.location.lng();
+					vm.locname = result[0].address_components[0].long_name;
+				});
+		});
+
+		// force map resize
+		$timeout(function() {
+			NgMap.getMap({
+				id: 'videomap'
+			}).then(function(map) {
+				var currCenter = map.getCenter();
+				google.maps.event.trigger(map, 'resize');
+				map.setCenter(currCenter);
+			});
+		}, 3000);
+
+		vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI";
+	}
+
+
+
+	// storyboard modal view
+	// Please note that $modalInstance represents a modal window (instance) dependency.
+	// It is not the same as the $uibModal service used above.
+
+	function ModalInstanceCtrl($uibModalInstance, shots, params, modalFactory) {
+		var self = this;
+
+		// filling the storyboard with the image shots
+
+		self.videoid = params.videoid;
+		self.summary = params.summary;
+		self.shots = [];
+
+		angular.forEach(shots, function(shot) {
+
+/*			self.camera = [];
+			var annotations = shot.annotations;
+			var camattr = annotations[0].attributes;
+			var first = true;
+
+			angular.forEach(camattr, function(value,key) {
+
+				var motion = value;	
+
+				var cv = parseFloat(value[1]).toFixed(2);
+    			var av = parseFloat(0.3).toFixed(2);
+
+				if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
+
+			});*/
+
+
+			var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
+			self.shots.push({
+				'thumb': shot.links.thumbnail,
+				'number': shot.attributes.shot_num,
+                'framerange': framerange,
+				'timestamp': shot.attributes.timestamp,
+				'duration': parseInt(shot.attributes.duration),
+				'camera': shot.annotations[0].attributes
+			});
+		});
+
+		self.showSummary = function() {
+			modalFactory.open('lg', 'summary.html', {
+				animation: false,
+				summary: self.summary
+			});
+		};
+
+		self.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+		};
+
+	}
+
+	function ModalResultInstanceCtrl($uibModalInstance, params) {
+		var self = this;
+		self.summary = params.summary;
+
+		self.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+		};
+	}
+
+})();
