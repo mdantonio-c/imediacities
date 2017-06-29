@@ -392,7 +392,7 @@
 						frameshot[1] = self.video.relationships.item[0].attributes.duration;
 						frameshot[2] = parseInt(self.shots[i].attributes.duration);
 						frameshot[3] = self.shots.length;
-						frameshot[4] = i+1;
+						frameshot[4] = i;
 						frameshot[5] = timestamp;
 						frameshot[6] = thumblink;
 
