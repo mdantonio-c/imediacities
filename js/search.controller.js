@@ -109,9 +109,11 @@
 				//restrict: 'A',
 				link: function($scope, $elm) {
 					$elm.on('click', function() {
+					    if ($elm[0].parentNode.className == "scrollmenu"){
 						$(".scrollmenu").animate({
 							scrollLeft: ($elm[0].offsetLeft-($elm[0].parentNode.parentNode.scrollWidth/2))
 						}, "slow");
+					    }
 						// play video from selected shot
 						var duration = $elm[0].firstElementChild.attributes.duration.value;
 						var nshots = $elm[0].firstElementChild.attributes.nshots.value;
@@ -139,9 +141,11 @@
 				link: function($scope, $elm) {
 					$elm.on('click', function() {
 						//alert($elm[0].parentNode.className);
+						if ($elm[0].parentNode.className == "scrollmenu"){
 						$(".scrollmenu").animate({
 							scrollLeft: $elm[0].offsetLeft
 						}, "slow");
+						}
 						// play video from selected shot
 						var duration = $elm[0].attributes.duration.value;
 						var nshots = $elm[0].attributes.nshots.value;
