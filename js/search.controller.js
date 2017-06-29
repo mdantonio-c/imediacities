@@ -552,7 +552,7 @@
 			var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
-				'number': shot.attributes.shot_num,
+				'number': shot.attributes.shot_num+1,
                 'framerange': framerange,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
