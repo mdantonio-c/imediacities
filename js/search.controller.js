@@ -109,9 +109,8 @@
 				//restrict: 'A',
 				link: function($scope, $elm) {
 					$elm.on('click', function() {
-						//alert($elm[0].parentNode.className);
 						$(".scrollmenu").animate({
-							scrollLeft: $elm.offset().left
+							scrollLeft: ($elm[0].offsetLeft-($elm[0].parentNode.parentNode.scrollWidth/2))
 						}, "slow");
 						// play video from selected shot
 						var duration = $elm[0].firstElementChild.attributes.duration.value;
@@ -134,7 +133,7 @@
 				}
 			};
 		})
-		/*app.directive('scrollOnClick', function() {
+		/*app.directive('scrollOnClick', function() { //carousel version
 			return {
 				//restrict: 'A',
 				link: function($scope, $elm) {
