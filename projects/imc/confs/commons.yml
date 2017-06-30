@@ -10,8 +10,8 @@ services:
       ftp_net:
     depends_on:
       - neo4j
-      - ftp
-      - swaggerui
+      # - ftp
+      # - swaggerui
     environment:
       VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
 
