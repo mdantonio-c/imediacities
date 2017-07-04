@@ -99,9 +99,9 @@
 	<hr/>
 
 	<!-- modal content -->
-	<script ng-attr-type="text/ng-template" id="myModalContent.html">
+	<script type="text/ng-template" id="myModalContent.html">
 	<div modal-movable>
-		<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px', '6px'}">x</button>
+		<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px 6px'}">x</button>
 	    <div class="modal-header">
 	        <h3 class="modal-title" align="center">Video Storyboard</h3>
 	        </br>
@@ -154,9 +154,9 @@
 	</script>
 	</div>
 
-	<script ng-attr-type="text/ng-template" id="summary.html">
+	<script type="text/ng-template" id="summary.html">
 	    <div class="modal-header">
-	    	<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px', '6px'}">x</button>
+	    	<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px 6px'}">x</button>
 	       	<h3 class="modal-title" align="center">Video Summary</h3>
 	    </div>
 	    <div class="modal-body" ng-style="{'height': '150px'}">
@@ -168,7 +168,7 @@
 </div>
 
 <!-- modal content -->
-<script ng-attr-type="text/ng-template" id="pagination.html">
+<script type="text/ng-template" id="pagination.html">
     <div class="pagination">
     <ul>
   		<li ng-class="{disabled: noPrevious()}"><a ng-click="selectPrevious()">Previous</a></li>
