@@ -3,6 +3,7 @@ version: '3'
 
 services:
   backend:
+    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/backend
     volumes:
       - ../data/imediastuff:/uploads
     networks:
