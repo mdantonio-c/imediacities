@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-loggedLandingPage = "logged.upload";
+loggedLandingPage = "logged.search";
 
 angular.module('web').constant('customRoutes',
 {

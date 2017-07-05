@@ -68,7 +68,7 @@ def filename_to_frame(f):
 
 
 # -----------------------------------------------------
-def frame_to_timecode(f, fps=25):
+def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
     f = int(f)
     t_hour  =  int(f / (3600 * fps))
     t_min   =  int((f - t_hour * 3600 * fps) / (60 * fps))
@@ -388,7 +388,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         else:
             nextframe = num_frames
 
-        shot_len = (num_frames - frame) / TRANSCODED_FRAMERATE
+        shot_len = (nextframe - frame) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
 
         d = {}
