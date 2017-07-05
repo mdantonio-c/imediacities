@@ -4,6 +4,7 @@ version: '3'
 services:
   backend:
     build: ../projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
     volumes:
       - ../data/imediastuff:/uploads
     networks:
@@ -60,6 +61,7 @@ services:
       # - ../imedia-pipeline:/imedia-pipeline
       # - ../imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
+      - ../scripts:/code/scripts
     depends_on:
       - rabbit
       - neo4j

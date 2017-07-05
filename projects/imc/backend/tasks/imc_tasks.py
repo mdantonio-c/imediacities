@@ -143,7 +143,7 @@ def import_file(self, path, resource_id, mode):
 
                 progress(self, 'Executing automatic tools', path)
                 params = []
-                params.append("/code/imc/scripts/analysis/analyze.py")
+                params.append("/code/scripts/analysis/analyze.py")
                 if mode is not None:
                     if mode.lower() == 'skip':
                         log.info('Analyze skipped!')
