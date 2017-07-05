@@ -1,25 +1,13 @@
 pip
-
-#RAPyDo framework
-rapydo-http==0.1.1
-
-Flask
-Flask-Cors
-Flask-OAuthlib
-Flask-RESTful
-Flask-SQLAlchemy
-flask-shell-ipython
+six
 httpie
 ipython
-neomodel
 plumbum
-psycopg2
-PyJWT
-requests
-swagger-spec-validator
-urllib3
 
 celery
-numpy
 flower
+
+rapydo-http==0.2.9
+
+numpy
 Pillow     

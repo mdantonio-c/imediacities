@@ -19,6 +19,9 @@ RUN apt-get -y update \
 RUN apt-get update && apt-get install -y \
     # utils
     bash less vim curl wget telnet git jq \
+    # required by http-api
+    build-essential libkrb5-dev python3-dev \
+    libglobus-gssapi-gsi-dev \
 
     ##################################
     # Fraunhofer libraries
@@ -38,19 +41,16 @@ RUN apt-get update && apt-get install -y \
 ###################
 # PIP
 
-WORKDIR /tmp
-RUN wget -q https://bootstrap.pypa.io/get-pip.py \
+RUN wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py \
     && python3 get-pip.py && rm *.py
-    # && python get-pip.py && rm *.py
 
 # for Fraunhofer: in requirements.txt added numpy
 COPY requirements.txt /tmp/
-RUN pip3 install --upgrade \
-    --force-reinstall --no-cache-dir -r requirements.txt
+RUN pip install --upgrade --force-reinstall --no-cache-dir -r /tmp/requirements.txt
 
 ###################
-ENV APIUSER developer
 # main user for launching the apis
+ENV APIUSER developer
 RUN useradd -r -M -d $CERTDIR/home -s /bin/bash -p ! $APIUSER
 ###################
 
@@ -69,36 +69,26 @@ RUN chmod a+r /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
 
 RUN export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH
 
-
-
-RUN mkdir -p /code
-WORKDIR /code
-RUN mkdir /docker-entrypoint.d/
-RUN echo "Entrylevel" && \
-    echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
-    echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
-    >> /root/.bashrc
-
-# Run Celery as developer
-RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A rapydo.flask_ext.flask_celery.worker.celery_app -n \${HOSTNAME}@\${VANILLA_PACKAGE}'" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
-RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; flower --port=5555 -A rapydo.flask_ext.flask_celery.worker.celery_app -n flower_monitor'" > /usr/local/bin/start_flower && chmod +x /usr/local/bin/start_flower
-
-RUN echo "Entrylevel" && \
-    echo "echo\necho 'Run Flask server as ($APIUSER) with the command:'\necho '$ httpapi'" >> /root/.bashrc && \
-    echo "echo\necho 'Run tests with $ cd /code; nose2 -F [test.FOLDER]'\n" \
-    >> /root/.bashrc
-
 ENV PAGER less
 ENV TERM=xterm-256color
-ENV PYTHONIOENCODING="utf-8"
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
+ENV PYTHONIOENCODING="utf-8"
 
+
+######################
+RUN echo "alias dev=\"HOME=/tmp su -p \$APIUSER\"" >> /root/.bash_aliases
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A rapydo.flask_ext.flask_celery.worker.celery_app -n \${HOSTNAME}@\${VANILLA_PACKAGE}'" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
+RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; flower --port=5555 persistent=True -A rapydo.flask_ext.flask_celery.worker.celery_app -n flower_monitor'" > /usr/local/bin/start_flower && chmod +x /usr/local/bin/start_flower
+
+
+# closing entrypoint
+
+RUN mkdir /code
+WORKDIR /code
+RUN mkdir /docker-entrypoint.d/
 COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["mycelery"]
 
-# Flask port
-EXPOSE 5000
+CMD ["mycelery"]
 
