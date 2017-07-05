@@ -34,7 +34,7 @@ The top level structure of the EFG Entity
 				<xs:element name="date" minOccurs="0" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:simpleContent>
-							<xs:extension base="xs:date">
+							<xs:extension base="xs:string">
 								<xs:attribute name="type" type="xs:string"/>
 							</xs:extension>
 						</xs:simpleContent>
@@ -75,7 +75,7 @@ The top level structure of the EFG Entity
 				<xs:element name="date" minOccurs="0" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:simpleContent>
-							<xs:extension base="xs:date">
+							<xs:extension base="xs:string">
 								<xs:attribute name="type" type="xs:string"/>
 							</xs:extension>
 						</xs:simpleContent>
@@ -106,7 +106,7 @@ The top level structure of the EFG Entity
 				<xs:element name="date" minOccurs="0" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:simpleContent>
-							<xs:extension base="xs:date">
+							<xs:extension base="xs:string">
 								<xs:attribute name="type" type="xs:string"/>
 							</xs:extension>
 						</xs:simpleContent>
@@ -151,7 +151,7 @@ The top level structure of the EFG Entity
 				<xs:element name="identifier" type="efg:IdentifierType"/>
 				<xs:element name="recordSource" type="efg:RecordType" maxOccurs="unbounded"/>
 				<xs:element name="type" type="xs:string"/>
-				<xs:element name="date" type="xs:date" minOccurs="0"/>
+				<xs:element name="date" type="xs:string" minOccurs="0"/>
 				<xs:element name="regionalScope" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="agency" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="filingNumber" type="xs:string" minOccurs="0"/>
@@ -172,7 +172,7 @@ The top level structure of the EFG Entity
 				<xs:element name="identifier" type="efg:IdentifierType"/>
 				<xs:element name="recordSource" type="efg:RecordType" maxOccurs="unbounded"/>
 				<xs:element name="type" type="xs:string"/>
-				<xs:element name="date" type="xs:date" minOccurs="0"/>
+				<xs:element name="date" type="xs:string" minOccurs="0"/>
 				<xs:element name="regionalScope" type="xs:string" minOccurs="0"/>
 				<xs:element name="place" type="xs:string" minOccurs="0"/>
 				<xs:element name="name" type="xs:string" minOccurs="0"/>
@@ -197,7 +197,7 @@ The top level structure of the EFG Entity
 				<xs:element name="type" type="xs:string" minOccurs="0"/>
 				<xs:element name="location" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="regionalScope" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="date" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="note" type="efg:NoteType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="relPerson" type="efg:RelatedAgentType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="relCorporate" type="efg:RelatedAgentType" minOccurs="0" maxOccurs="unbounded"/>
@@ -213,7 +213,7 @@ The top level structure of the EFG Entity
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="identifier" type="efg:IdentifierType"/>
 				<xs:element name="recordSource" type="efg:RecordType" maxOccurs="unbounded"/>
-				<xs:element name="date" type="xs:date"/>
+				<xs:element name="date" type="xs:string"/>
 				<xs:element name="nominationOnly" type="xs:boolean" default="false" minOccurs="0"/>
 				<xs:element name="name" type="xs:string"/>
 				<xs:element name="achievement" type="efg:LinguisticType" minOccurs="0"/>
@@ -233,7 +233,7 @@ The top level structure of the EFG Entity
 			<xs:choice maxOccurs="unbounded">
 				<xs:element name="identifier" type="efg:IdentifierType"/>
 				<xs:element name="recordSource" type="efg:RecordType" maxOccurs="unbounded"/>
-				<xs:element name="date" type="xs:date"/>
+				<xs:element name="date" type="xs:string"/>
 				<xs:element name="agency" type="xs:string"/>
 				<xs:element name="regionalScope" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="nameOfApplicant" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -278,6 +278,9 @@ The top level structure of the EFG Entity
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="rightsHolder" type="efg:RightsHolderType" minOccurs="0" maxOccurs="unbounded"/>
+							<!-- START FIX (michele) -->
+							<xs:element name="rightsStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+							<!-- END FIX (michele) -->
 							<xs:element name="thumbnail" type="xs:string"/>
 							<xs:element name="provenance" type="xs:string" minOccurs="0"/>
 							<xs:element name="note" type="efg:NoteType" minOccurs="0" maxOccurs="unbounded"/>
@@ -331,7 +334,7 @@ The top level structure of the EFG Entity
 				<xs:element name="title" type="efg:TitleType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="keywords" type="efg:KeywordsType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="description" type="efg:DescriptionType" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element name="dateCreated" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="dateCreated" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="language" type="efg:LangType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="note" type="efg:NoteType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="userTag" type="efg:UserTagType" minOccurs="0" maxOccurs="unbounded"/>
@@ -347,10 +350,15 @@ The top level structure of the EFG Entity
 							<xs:element name="date" type="efg:DateType" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="digitalFormat" type="efg:DigFormatType" minOccurs="0"/>
 							<xs:element name="physicalFormat" type="efg:PhFormatType" minOccurs="0"/>
-							<xs:element name="colour" type="xs:string" minOccurs="0"/>
+							<xs:element name="colour" type="efg:ColorType" minOccurs="0"/>
 							<xs:element name="geographicScope" type="efg:GeoType" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="coverage" type="efg:CoverageType" minOccurs="0"/>
 							<xs:element name="rightsHolder" type="efg:RightsHolderType" minOccurs="0" maxOccurs="unbounded"/>
+							<!-- START FIX (michele) 
+							<xs:element name="rightsStatus" type="efg:RightsStatusType"
+								minOccurs="0" maxOccurs="unbounded"/>
+							 END FIX (michele) -->
+							<xs:element name="rightsStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="provenance" type="xs:string" minOccurs="0"/>
 							<xs:element name="thumbnail" type="xs:string"/>
 							<xs:element name="note" type="efg:NoteType" minOccurs="0" maxOccurs="unbounded"/>
@@ -384,6 +392,7 @@ The top level structure of the EFG Entity
 				</xs:element>
 				<xs:element name="relNonAVCreation" type="efg:RelatedCreationType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="relAvCreation" type="efg:RelatedCreationType" minOccurs="0" maxOccurs="unbounded"/>
+
 				<xs:element name="relCollection" type="efg:RelatedCollectionType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="relPerson" type="efg:RelatedAgentType" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element name="relCorporate" type="efg:RelatedAgentType" minOccurs="0" maxOccurs="unbounded"/>
@@ -466,7 +475,7 @@ The top level structure of the EFG Entity
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="relation" type="xs:string" minOccurs="0"/>
-			<xs:element name="temporalScope" type="xs:date" minOccurs="0"/>
+			<xs:element name="temporalScope" type="xs:string" minOccurs="0"/>
 			<xs:element name="geographicScope" type="efg:GeoType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:choice>
 		<xs:attributeGroup ref="efg:LinguisticAttribute"/>
@@ -474,7 +483,7 @@ The top level structure of the EFG Entity
 	<xs:complexType name="CoverageType">
 		<xs:choice maxOccurs="unbounded">
 			<xs:element name="spatial" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="temporal" type="xs:date" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="temporal" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="RightsHolderType">
@@ -484,6 +493,21 @@ The top level structure of the EFG Entity
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
+	<!-- START FIX (michele) -->
+	<xs:simpleType name="RightsStatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Copyright protected"/>
+			<xs:enumeration value="Not Copyright protected"/>
+			<xs:enumeration value="Public Domain"/>
+			<xs:enumeration value="No known copyright / Orphan Work"/>	
+			<!--START FIX (Miriam) -->
+			<xs:enumeration value="In Copyright"/>
+			<xs:enumeration value="In Copyright - EU Orphan Work"/>
+			<!-- End FIX (Miriam) -->
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- END FIX -->
+
 	<xs:complexType name="SoundType">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
@@ -495,7 +519,7 @@ The top level structure of the EFG Entity
 	<xs:complexType name="ColorType">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
-				<xs:attribute name="hasColor" type="xs:boolean" use="required"/>
+				<xs:attribute name="hasColor" type="xs:boolean" use="optional"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -591,7 +615,7 @@ The top level structure of the EFG Entity
 	</xs:complexType>
 	<xs:complexType name="LangType">
 		<xs:simpleContent>
-			<xs:extension base="xs:language">
+			<xs:extension base="xs:string">
 				<xs:attribute name="usage" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
@@ -614,7 +638,7 @@ The top level structure of the EFG Entity
 			<xs:extension base="xs:string">
 				<xs:attributeGroup ref="efg:LinguisticAttribute"/>
 				<xs:attribute name="creator" type="xs:string"/>
-				<xs:attribute name="date" type="xs:date"/>
+				<xs:attribute name="date" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -639,13 +663,13 @@ The top level structure of the EFG Entity
 				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="part" type="xs:string"/>
 				<xs:attribute name="geographicScope" type="efg:CountryCodeType1Alpha2"/>
-				<xs:attribute name="temporalScope" type="xs:date"/>
+				<xs:attribute name="temporalScope" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
 	<xs:complexType name="DateType">
 		<xs:simpleContent>
-			<xs:extension base="xs:date">
+			<xs:extension base="xs:string">
 				<xs:attribute name="type">
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
@@ -681,7 +705,7 @@ The top level structure of the EFG Entity
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:whiteSpace value="collapse"/>
-			<xs:pattern value="[A-Z]{2}"/>
+			<xs:pattern value=".*"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="CountryCodeType1Alpha3">
@@ -707,6 +731,6 @@ The top level structure of the EFG Entity
 	<!-- 					ATTRIBUTES							 -->
 	<!-- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ -->
 	<xs:attributeGroup name="LinguisticAttribute">
-		<xs:attribute name="lang" type="xs:language" use="required"/>
+		<xs:attribute name="lang" type="xs:string" use="required"/>
 	</xs:attributeGroup>
 </xs:schema>

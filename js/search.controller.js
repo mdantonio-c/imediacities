@@ -59,29 +59,61 @@
 			return function(url) {
 				return $sce.trustAsResourceUrl(url);
 			};
-		});
+		})
+		// convert float to integer
+		.filter('parseNum', function() {
+			return function(input) {
+				var secs = parseInt(input, 10);
+				var cdate = new Date(0, 0, 0, 0, 0, secs);
+				if ((cdate.getHours() === 0) && (cdate.getMinutes() > 0)) {
+					return cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				} else if ((cdate.getHours() === 0) && (cdate.getMinutes() === 0)) {
+					return cdate.getSeconds() + " secs";
+				} else {
+					return cdate.getHours() + " hours " + cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+				}
+			};
+		})
+		.filter('salientEstimates', function() {
+			return function(estimates, threshold) {
+				threshold = typeof threshold !== 'undefined' ? threshold : 0.5;
+				var res = {};
+				var h_avg = 0,
+					h_key,
+					found = false;
+				for (var p in estimates) {
+					// skip loop if the property is from prototype
+					if (!estimates.hasOwnProperty(p)) continue;
 
-	// convert float to integer
-	app.filter('parseNum', function() {
-    	return function(input) {
-    		var secs = parseInt(input, 10);
-    		var cdate = new Date(0, 0, 0, 0, 0, secs);
-    		if ((cdate.getHours() == 0) && (cdate.getMinutes() > 0)) var times = cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs";
-    		else if ((cdate.getHours() == 0) && (cdate.getMinutes() == 0)) var times = cdate.getSeconds()+" secs";
-			else var times = cdate.getHours() +" hours "+cdate.getMinutes()+" mins "+cdate.getSeconds()+" secs"; 
-       		return times;
-    	}	
-	});
+					var avg = estimates[p][0];
+					var key = p.replace(/_/g, " ");
+					if (avg >= threshold) {
+						res[key] = avg;
+						found = true;
+					}
+
+					if (!found && avg > h_avg) {
+						h_key = key;
+						h_avg = avg;
+					}
+				}
+				if (Object.keys(res).length === 0) {
+					res[h_key] = h_avg;
+				}
+				return res;
+			};
+		});
 
 	app.directive('scrollOnClick', function() {
 			return {
 				//restrict: 'A',
 				link: function($scope, $elm) {
 					$elm.on('click', function() {
-						//alert($elm[0].parentNode.className);
+					    if ($elm[0].parentNode.className == "scrollmenu"){
 						$(".scrollmenu").animate({
-							scrollLeft: $elm.offset().left
+							scrollLeft: ($elm[0].offsetLeft-($elm[0].parentNode.parentNode.scrollWidth/2))
 						}, "slow");
+					    }
 						// play video from selected shot
 						var duration = $elm[0].firstElementChild.attributes.duration.value;
 						var nshots = $elm[0].firstElementChild.attributes.nshots.value;
@@ -103,6 +135,80 @@
 				}
 			};
 		})
+		/*app.directive('scrollOnClick', function() { //carousel version
+			return {
+				//restrict: 'A',
+				link: function($scope, $elm) {
+					$elm.on('click', function() {
+						//alert($elm[0].parentNode.className);
+						if ($elm[0].parentNode.className == "scrollmenu"){
+						$(".scrollmenu").animate({
+							scrollLeft: $elm[0].offsetLeft
+						}, "slow");
+						}
+						// play video from selected shot
+						var duration = $elm[0].attributes.duration.value;
+						var nshots = $elm[0].attributes.nshots.value;
+						var progr = $elm[0].attributes.progr.value;
+						var myVid = angular.element(window.document.querySelector('#videoarea'));
+						var currtime = $elm[0].attributes.timestamp.value;
+						currtime = currtime.split("-")[0];
+						var hours = currtime.split(":")[0];
+						var mins = currtime.split(":")[1];
+						var secs = currtime.split(":")[2];
+						var cdate = new Date(0, 0, 0, hours, mins, secs);
+						var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
+
+						//myVid[0].pause();
+						myVid[0].currentTime = times+5;
+						myVid[0].play();
+
+					});
+				}
+			};
+		})*/
+		.directive('modalMovable', ['$document',
+    	function($document) {
+        return {
+            restrict: 'AC',
+            link: function(scope, iElement, iAttrs) {
+                var startX = 0,
+                    startY = 0,
+                    x = 0,
+                    y = 0;
+
+                var dialogWrapper = iElement.parent();
+
+                dialogWrapper.css({
+                    position: 'relative'
+                });
+
+                dialogWrapper.on('mousedown', function(event) {
+                    // Prevent default dragging of selected content
+                    event.preventDefault();
+                    startX = event.pageX - x;
+                    startY = event.pageY - y;
+                    $document.on('mousemove', mousemove);
+                    $document.on('mouseup', mouseup);
+                });
+
+                function mousemove(event) {
+                    y = event.pageY - startY;
+                    x = event.pageX - startX;
+                    dialogWrapper.css({
+                        top: y + 'px',
+                        left: x + 'px'
+                    });
+                }
+
+                function mouseup() {
+                    $document.unbind('mousemove', mousemove);
+                    $document.unbind('mouseup', mouseup);
+                	}
+            	}
+        	};
+    		}
+		])
 		.directive('pagination', function() {
 			return {
 				restrict: 'E',
@@ -236,6 +342,41 @@
 		var vid = $stateParams.v;
 		self.video = $stateParams.meta;
 
+		// Initializing values
+		var onplaying = false;
+		var onpause = false;
+
+		var myVid = angular.element(window.document.querySelector('#videoarea'));
+
+		// On video playing toggle values
+		myVid[0].onplaying = function() {
+    		onplaying = true;
+    		if (!onpause){
+    			myVid[0].pause();
+    		}
+		};
+
+		// On video pause toggle values
+		myVid[0].onpause = function() {
+    		onplaying = false;
+    		onpause = true;
+		};
+
+		// Play video function
+		function playVid(video) {      
+    	if (video.paused && !onplaying) {
+    		video.currtime = '3';
+        	video.play();
+    		}
+		} 
+
+		// Pause video function
+		function pauseVid(video) {     
+    	if (!video.paused && !onpause) {
+        	video.pause();
+    		}
+		}
+
 		self.items = [];
 		self.shots = [];
 		self.loadVideoShots = function(vid) {
@@ -260,10 +401,12 @@
 						self.showmesb = true; //enable storyboard button
 						self.showmeli = false; //hide loading video bar
 
-						var myVid = angular.element(window.document.querySelector('#videoarea'));
-						myVid[0].currentTime = '3';
-						myVid[0].play();
-    					myVid[0].pause();
+						if (i === 0) {
+							/*once we have all data and metadata the video start playing*/
+							var myVid = angular.element(window.document.querySelector('#videoarea'));
+							playVid(myVid[0]);
+							onpause = false;
+    					}
 					}
 				});
 		};
@@ -294,8 +437,7 @@
 		self.showStoryboard = function(size, parentSelector) {
 			var parentElem = parentSelector ? 
       			angular.element($document[0].querySelector('#video-wrapper ' + parentSelector)) : undefined;
-      		console.log(parentElem);
-			var modalInstance = $uibModal.open({
+      		var modalInstance = $uibModal.open({
 				animation: self.animationsEnabled,
 				templateUrl:'myModalContent.html',
 				controller: 'ModalInstanceCtrl',
@@ -317,7 +459,6 @@
 				}
 			});
 		};
-
 
 		/*self.jumpToShot = function(selectedShot) {
 			var row = selectedShot.row;
@@ -390,12 +531,32 @@
 		self.shots = [];
 
 		angular.forEach(shots, function(shot) {
+
+/*			self.camera = [];
+			var annotations = shot.annotations;
+			var camattr = annotations[0].attributes;
+			var first = true;
+
+			angular.forEach(camattr, function(value,key) {
+
+				var motion = value;	
+
+				var cv = parseFloat(value[1]).toFixed(2);
+    			var av = parseFloat(0.3).toFixed(2);
+
+				if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
+
+			});*/
+
+
+			var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
 			self.shots.push({
 				'thumb': shot.links.thumbnail,
-				'number': shot.attributes.start_frame_idx,
+				'number': shot.attributes.shot_num+1,
+                'framerange': framerange,
 				'timestamp': shot.attributes.timestamp,
 				'duration': parseInt(shot.attributes.duration),
-				'camera': '-'
+				'camera': shot.annotations[0].attributes
 			});
 		});
 
