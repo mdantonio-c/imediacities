@@ -208,8 +208,8 @@
             	}
         	};
     		}
-		])
-		.directive('pagination', function() {
+		]);
+		/*.directive('pagination', function() {
 			return {
 				restrict: 'E',
 				scope: {
@@ -260,7 +260,7 @@
 					};
 				}
 			};
-		});
+		});*/
 
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
@@ -275,16 +275,10 @@
 		self.showmese = false;
 		//self.showmepg = true;
 
-		$scope.currentPage = 1;
-		$scope.noOfPages = 1;
-
-		/*pagination*/
-		$scope.setPage = function(currp, nump) {
-			$scope.vmin = (currp - 1) * nump;
-			$scope.vmax = nump;
-		};
-
-		// $scope.$watch('currentPage', $scope.setPage($scope.currentPage, $scope.noOfPages));
+		//configure pagination
+		self.ItemsByPage=4;
+		self.currentPage=1;
+		self.pageblock=4;
 
 		self.videos = [];
 
@@ -293,9 +287,13 @@
 		self.searchVideos = function() {
 			var request_data = {
 				"type": "video",
-				"term": ""
+				"term": "",
+				"numpage": 1,
+				"pageblock": 4
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
+			request_data.numpage = self.currentPage;
+			request_data.pageblock = self.pageblock;
 			// console.log('search videos with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
@@ -306,6 +304,7 @@
 					self.loading = false;
 					self.loadResults = true;
 					self.showmese = false;
+					// Calculate Total Number of Pages based on Search Result
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
@@ -331,6 +330,31 @@
 			self.searchVideos();
 		}
 
+    $scope.setPage = function () {
+        self.currentPage = this.n;
+    };
+
+    self.firstPage = function () {
+        self.currentPage = 0;
+    };
+
+    self.lastPage = function () {
+        self.currentPage = self.ItemsByPage.length - 1;
+    };
+
+    $scope.range = function (input, total) {
+        var ret = [];
+        if (!total) {
+            total = input;
+            input = 0;
+        }
+        for (var i = input; i < total; i++) {
+            if (i != 0 && i != total - 1) {
+                ret.push(i);
+            }
+        }
+        return ret;
+    };
 
 	}
 
