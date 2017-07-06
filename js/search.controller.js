@@ -279,6 +279,7 @@
 		self.ItemsByPage=4;
 		self.currentPage=1;
 		self.pageblock=4;
+		self.numvideos=0;
 
 		self.videos = [];
 
@@ -300,6 +301,8 @@
 			self.showmese = true;
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
+					self.numvideos = parseInt(out_data.data[out_data.data.length-1][0][0]);
+					out_data.data.pop();
 					self.videos = out_data.data;
 					self.loading = false;
 					self.loadResults = true;
@@ -341,7 +344,7 @@
     };
 
     $scope.lastPage = function () {
-        self.currentPage = parseInt(self.videos.length/self.ItemsByPage) + 1;
+        self.currentPage = parseInt(self.numvideos/self.ItemsByPage) + 1;
         self.searchVideos();
     };
 
