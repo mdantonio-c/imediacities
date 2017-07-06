@@ -3,7 +3,7 @@
 """
 Search endpoint
 
-@author: Giuseppe Trotta <g.trotta@cineca.it>
+@authors: Giuseppe Trotta <g.trotta@cineca.it>, Michele Carpené <m.carpen@cineca.it>
 """
 
 from rapydo.confs import get_api_url
@@ -90,5 +90,9 @@ class Search(GraphBaseOperations):
             video['links']['thumbnail'] = video_url + '/content?type=thumbnail'
             video['links']['summary'] = video_url + '/content?type=summary'
             data.append(video)
+
+        countv = "MATCH (v:AVEntity) RETURN COUNT(DISTINCT(v))"
+        numels = self.graph.cypher(countv)
+        data.append(numels)
 
         return self.force_response(data)
