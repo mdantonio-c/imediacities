@@ -42,6 +42,13 @@
 							<p><b>Location</b>: {{locname}}</p>
 						</div>
 					</li>
+
+        		<ul class="pagination pagination-sm" ng-if="ctrl.videos.length > 0">
+            		<li ng-class="{active:0}"><a href="#" ng-click="firstPage()">First</a></li>
+            		<li ng-repeat="n in range((ctrl.videos.length/ctrl.ItemsByPage)+1)"><a href="#" ng-click="setPage()" ng-bind="n">1</a></li>
+            		<li><a href="#" ng-click="lastPage()">Last</a></li>
+        		</ul>
+
 				</ul>
 			</div>
 		</div>
