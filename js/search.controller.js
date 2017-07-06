@@ -332,14 +332,17 @@
 
     $scope.setPage = function () {
         self.currentPage = this.n;
+        self.searchVideos();
     };
 
-    self.firstPage = function () {
-        self.currentPage = 0;
+    $scope.firstPage = function () {
+        self.currentPage = 1;
+        self.searchVideos();
     };
 
-    self.lastPage = function () {
-        self.currentPage = self.ItemsByPage.length - 1;
+    $scope.lastPage = function () {
+        self.currentPage = parseInt(self.videos.length/self.ItemsByPage) + 1;
+        self.searchVideos();
     };
 
     $scope.range = function (input, total) {
