@@ -226,9 +226,7 @@
 		//configure pagination
 		self.ItemsByPage=4;
 		self.currentPage=1;
-		self.pageblock=4;
 		self.numvideos=0;
-	 	self.itemsPerPage = $scope.viewby;
 
 	 	self.pageSize = 4,
 	 	self.bigTotalItems = 0;
@@ -246,7 +244,7 @@
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
 			request_data.numpage = self.currentPage;
-			request_data.pageblock = self.pageblock;
+			request_data.pageblock = self.ItemsByPage;
 			// console.log('search videos with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
