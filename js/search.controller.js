@@ -228,6 +228,10 @@
 		self.currentPage=1;
 		self.pageblock=4;
 		self.numvideos=0;
+	 	self.itemsPerPage = $scope.viewby;
+
+	 	$scope.bigCurrentPage = 1;
+	 	$scope.maxSize = 5;
 
 		self.videos = [];
 
@@ -250,6 +254,7 @@
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
 					self.numvideos = parseInt(out_data.data[out_data.data.length-1][0][0]);
+					$scope.bigTotalItems = self.numvideos;
 					out_data.data.pop();
 					self.videos = out_data.data;
 					self.loading = false;
@@ -295,6 +300,16 @@
         self.currentPage = parseInt(self.numvideos/self.ItemsByPage) + 1;
         self.searchVideos();
     };
+
+    $scope.setItemsPerPage = function(num) {
+  		self.itemsPerPage = num;
+  		self.currentPage = 1; //reset to first page
+  		self.searchVideos();
+	};
+
+	$scope.pageChanged = function() {
+    	console.log('Page changed to: ' + $scope.currentPage);
+  	};
 
     $scope.range = function (input, total) {
         var ret = [];
