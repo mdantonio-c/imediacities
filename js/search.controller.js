@@ -228,7 +228,6 @@
 		self.currentPage=1;
 		self.numvideos=0;
 
-	 	self.pageSize = 4,
 	 	self.bigTotalItems = 0;
 
 		self.videos = [];
@@ -240,7 +239,7 @@
 				"type": "video",
 				"term": "",
 				"numpage": 1,
-				"pageblock": 4
+				"pageblock": self.ItemsByPage
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
 			request_data.numpage = self.currentPage;
