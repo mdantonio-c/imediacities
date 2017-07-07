@@ -230,8 +230,9 @@
 		self.numvideos=0;
 	 	self.itemsPerPage = $scope.viewby;
 
-	 	$scope.bigCurrentPage = 1;
-	 	$scope.maxSize = 5;
+	 	self.maxSize = 4;
+	 	self.pageSize = 4,
+	 	self.bigTotalItems = 0;
 
 		self.videos = [];
 
@@ -307,9 +308,11 @@
   		self.searchVideos();
 	};
 
-	$scope.pageChanged = function() {
-    	console.log('Page changed to: ' + $scope.currentPage);
+    $scope.pageChanged = function() {
+    	//console.log('Page changed to: ' + self.currentPage);
+	    self.searchVideos();
   	};
+
 
     $scope.range = function (input, total) {
         var ret = [];
