@@ -3,7 +3,7 @@
 """
 Search endpoint
 
-@author: Giuseppe Trotta <g.trotta@cineca.it>
+@author: Giuseppe Trotta <g.trotta@cineca.it>, Michele Carpené <m.carpen@cineca.it>
 """
 
 from rapydo.confs import get_api_url
@@ -51,7 +51,7 @@ class Search(GraphBaseOperations):
         #get total number of elements
         numels = self.graph.cypher(countv)
 
-        logger.debug("Number of elements retrieved: {0}".format(numels))
+        logger.debug("Number of elements retrieved: {0}".format(numels[0][0]))
 
         numpage = int(input_parameters.get('numpage', ''))
 
