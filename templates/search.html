@@ -45,13 +45,14 @@
 
 				<hr/>
 
-        		<!-- <ul class="pagination pagination-sm" ng-if="ctrl.videos.length > 0">
-            		<li ng-class="{active:0}"><a href="#" ng-click="firstPage()">First</a></li>
-            		<li ng-repeat="n in range((ctrl.numvideos/ctrl.ItemsByPage)+1)"><a href="#" ng-click="setPage()" ng-bind="n">1</a></li>
-            		<li><a href="#" ng-click="lastPage()">Last</a></li>
-        		</ul> -->
+    			<ul uib-pagination total-items="ctrl.bigTotalItems" ng-model="ctrl.currentPage" items-per-page="ctrl.pageSize" ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" boundary-links="true"></ul>
 
-    			<ul uib-pagination total-items="ctrl.bigTotalItems" ng-model="ctrl.currentPage" items-per-page="ctrl.pageSize" ng-change="pageChanged()"></ul>
+    			<select class="form-control" ng-model="ctrl.ItemsByPage" ng-style="{'width':'15%'}">
+						<option label="4 per page" value="4" ng-selected="selected">4 per page</option>
+						<option label="8 per page" value="8">8 per page</option>
+						<option label="15 per page" value="15">15 per page</option>
+						<option label="20 per page" value="20">20 per page</option>
+				</select>
 
 				</ul>
 			</div>
