@@ -3,7 +3,7 @@
 """
 Search endpoint
 
-@authors: Giuseppe Trotta <g.trotta@cineca.it>, Michele Carpené <m.carpen@cineca.it>
+@author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
 from rapydo.confs import get_api_url
@@ -37,6 +37,22 @@ class Search(GraphBaseOperations):
         if not term:
             raise RestApiException('Term input cannot be empty',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
+
+        logger.debug("first request to get the number of elements to be returned")
+
+        if term == '*':
+            countv = "MATCH (v:AVEntity) \
+                    RETURN COUNT(DISTINCT(v))"
+        else:
+            countv = "MATCH (v:AVEntity) \
+                    WHERE v.identifying_title =~ '(?i).*{term}.*' \
+                    RETURN COUNT(DISTINCT(v))".format(term=term)
+
+        #get total number of elements
+        numels = self.graph.cypher(countv)
+
+        logger.debug("Number of elements retrieved: {0}".format(numels[0][0]))
+
         numpage = int(input_parameters.get('numpage', ''))
 
         logger.debug("Page number: {0}".format(numpage))
@@ -56,6 +72,10 @@ class Search(GraphBaseOperations):
         block = pageblock
         offset = int(((numpage-1)*block))
         limit = int(offset+block)
+        if (offset > numels[0][0]): 
+                offset = 0
+        if (limit > numels[0][0]): 
+                limit = numels[0][0]
 
         logger.debug("page offset: {0}, page limit: {1}".format(offset, limit))
 
@@ -91,8 +111,7 @@ class Search(GraphBaseOperations):
             video['links']['summary'] = video_url + '/content?type=summary'
             data.append(video)
 
-        countv = "MATCH (v:AVEntity) RETURN COUNT(DISTINCT(v))"
-        numels = self.graph.cypher(countv)
+        #we got also the total number of elements retrieved
         data.append(numels)
 
         return self.force_response(data)
