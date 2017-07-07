@@ -51,7 +51,9 @@
             		<li><a href="#" ng-click="lastPage()">Last</a></li>
         		</ul> -->
 
-    			<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true"></ul>
+    			<!--<ul uib-pagination total-items="bigTotalItems" ng-model="bigCurrentPage" items-per-page="pageSize" max-size="maxSize" class="pagination-sm" boundary-link-numbers="true"></ul>-->
+
+    			<ul uib-pagination total-items="ctrl.bigTotalItems" ng-model="ctrl.currentPage" items-per-page="ctrl.pageSize" ng-change="pageChanged()"></ul>
 
 				</ul>
 			</div>
