@@ -223,6 +223,14 @@
 		self.showmese = false;
 		//self.showmepg = true;
 
+		/*Define options type for paginate page numbers*/
+		self.typeOptions = [
+    		{ name: '4 per page', value: '4' }, 
+    		{ name: '8 per page', value: '8' }, 
+    		{ name: '15 per page', value: '15' }, 
+    		{ name: '20 per page', value: '20' }
+    	];
+
 		//configure pagination
 		self.ItemsByPage=4;
 		self.currentPage=1;
