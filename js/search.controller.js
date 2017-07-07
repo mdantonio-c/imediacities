@@ -232,7 +232,7 @@
     	];
 
 		//configure pagination
-		self.ItemsByPage=4;
+		self.ItemsByPage=self.typeOptions[0].value;
 		self.currentPage=1;
 		self.numvideos=0;
 
