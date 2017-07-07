@@ -230,7 +230,6 @@
 		self.numvideos=0;
 	 	self.itemsPerPage = $scope.viewby;
 
-	 	self.maxSize = 4;
 	 	self.pageSize = 4,
 	 	self.bigTotalItems = 0;
 
@@ -255,7 +254,7 @@
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
 					self.numvideos = parseInt(out_data.data[out_data.data.length-1][0][0]);
-					$scope.bigTotalItems = self.numvideos;
+					self.bigTotalItems = self.numvideos;
 					out_data.data.pop();
 					self.videos = out_data.data;
 					self.loading = false;
