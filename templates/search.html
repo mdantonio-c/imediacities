@@ -8,7 +8,7 @@
 			<div id="search-logo" ng-show="ctrl.viewlogo">
 				<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
 			</div>
-			<div class="input-group stylish-input-group">
+			<div class="input-group stylish-input-group" ng-show="!ctrl.loading">
 				<input ng-attr-type="text" ng-model="ctrl.inputTerm" class="form-control" ng-attr-placeholder="Search video"
 				ng-keypress="($event.charCode === 13)?ctrl.searchVideos():return" autofocus>
 				<span class="input-group-addon">
