@@ -8,15 +8,15 @@ from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 # from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
-from imc.models.neo4j import (
-    Shot
-)
+from imc.models.neo4j import Shot
 
-from rapydo.basher import BashCommands
-from rapydo.utils.logs import get_logger
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
+from imc.analysis.fhg import FHG
 
-from rapydo.flask_ext.flask_celery import CeleryExt
+# from restapi.basher import BashCommands
+from utilities.logs import get_logger
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+
+from restapi.flask_ext.flask_celery import CeleryExt
 
 celery_app = CeleryExt.celery_app
 
@@ -136,40 +136,73 @@ def import_file(self, path, resource_id, mode):
                 extract_descriptive_metadata(
                     self, path, source_id, item_node)
 
-                # EXECUTE AUTOMATC TOOLS
-                analyze_path = '/uploads/Analize/' + \
-                    group.uuid + '/' + video_filename.split('.')[0] + '/'
-                log.debug('analyze path: {0}'.format(analyze_path))
-
-                progress(self, 'Executing automatic tools', path)
-                params = []
-                params.append("/code/scripts/analysis/analyze.py")
+                fast = False
                 if mode is not None:
-                    if mode.lower() == 'skip':
+                    mode = mode.lower()
+                    if mode == 'skip':
                         log.info('Analyze skipped!')
                         video_node.status = 'SKIPPED'
                         video_node.status_message = 'Nothing to declare'
                         video_node.save()
                         break
-                    else:
-                        log.info('Analyze with mode [%s]' % mode)
-                        params.append('-' + mode)
-                params.append(video_path)
-                bash = BashCommands()
-                try:
-                    output = bash.execute_command(
-                        "python3",
-                        params,
-                        parseException=True
-                    )
-                    log.info(output)
+                    fast = (mode == '-fast')
+                # EXECUTE AUTOMATC TOOLS
 
-                except BaseException as e:
-                    log.error(e)
-                    video_node.status = 'ERROR'
-                    video_node.status_message = str(e)
-                    video_node.save()
-                    raise(e)
+                # workflow = FHG(video_path, "/uploads")
+                # workflow.analyze(fast)
+
+                from imc.tasks.analyze import (
+                    make_movie_analize_folder,
+                    analize
+                )
+
+                movie = os.path.join('/uploads', video_path)
+                if not os.path.exists(movie):
+                    raise Exception('Bad input file', movie)
+
+                out_folder = make_movie_analize_folder(movie)
+                if out_folder == "":
+                    raise Exception('Failed to create out_folder')
+
+                log.info("Analize " + movie)
+
+                if analize(movie, out_folder, fast):
+                    log.info('Analize done')
+                else:
+                    log.error('Analize terminated with errors')
+
+                # params = []
+                # params.append("/code/scripts/analysis/analyze.py")
+                # if mode is not None:
+                #     log.info('Analyze with mode [%s]' % mode)
+                #     params.append('-%s' % mode)
+                # params.append(video_path)
+
+                # progress(self, 'Executing automatic tools', path)
+                # bash = BashCommands()
+                # try:
+                #     output = bash.execute_command(
+                #         "python3",
+                #         params,
+                #         parseException=True
+                #     )
+                #     log.info(output)
+
+                # except BaseException as e:
+                #     log.error(e)
+                #     video_node.status = 'ERROR'
+                #     video_node.status_message = str(e)
+                #     video_node.save()
+                #     raise(e)
+
+                # REMOVE ME!!
+                # video_node.status = 'ERROR'
+                # video_node.status_message = "STOP ME"
+                # video_node.save()
+
+                analyze_path = '/uploads/Analize/' + \
+                    group.uuid + '/' + video_filename.split('.')[0] + '/'
+                log.debug('analyze path: {0}'.format(analyze_path))
 
                 # SAVE AUTOMATIC ANNOTATIONS
                 progress(self, 'Extracting automatic annotations', path)
