@@ -4,14 +4,14 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from rapydo.utils.logs import get_logger
-from rapydo import decorators as decorate
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
-from rapydo.exceptions import RestApiException
-from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
-from rapydo.utils import htmlcodes as hcodes
+from utilities.logs import get_logger
+from restapi import decorators as decorate
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.exceptions import RestApiException
+from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from utilities import htmlcodes as hcodes
 
-from rapydo.flask_ext.flask_celery import CeleryExt
+from restapi.flask_ext.flask_celery import CeleryExt
 
 log = get_logger(__name__)
 

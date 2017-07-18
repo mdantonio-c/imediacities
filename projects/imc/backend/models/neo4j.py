@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 import pytz
 
-from rapydo.services.neo4j.models import (
+from restapi.services.neo4j.models import (
     StringProperty, ArrayProperty, IntegerProperty,
     FloatProperty, DateTimeProperty, DateProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
@@ -20,7 +20,7 @@ from rapydo.services.neo4j.models import (
 )
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
-from rapydo.models.neo4j import User as UserBase
+from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
 
 import logging

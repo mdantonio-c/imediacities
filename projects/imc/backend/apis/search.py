@@ -7,14 +7,14 @@ Search endpoint
 """
 
 from flask import request
-from rapydo.utils.helpers import get_api_url
+from utilities.helpers import get_api_url
 
-from rapydo.utils.logs import get_logger
-from rapydo import decorators as decorate
-from rapydo.exceptions import RestApiException
-from rapydo.utils import htmlcodes as hcodes
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
-from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from utilities.logs import get_logger
+from restapi import decorators as decorate
+from restapi.exceptions import RestApiException
+from utilities import htmlcodes as hcodes
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 
 logger = get_logger(__name__)
 

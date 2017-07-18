@@ -4,7 +4,7 @@ from imc.models.neo4j import (
     RecordSource, Title, Keyword, Description, Coverage
 )
 from imc.models import codelists
-from rapydo.utils.logs import get_logger
+from utilities.logs import get_logger
 
 log = get_logger(__name__)
 

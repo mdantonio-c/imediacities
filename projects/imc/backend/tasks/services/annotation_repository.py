@@ -1,5 +1,5 @@
 
-from rapydo.utils.logs import get_logger
+from utilities.logs import get_logger
 from neomodel import db
 
 from imc.models.neo4j import (

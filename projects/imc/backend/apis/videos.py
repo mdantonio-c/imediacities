@@ -4,16 +4,16 @@
 Handle your video metadata
 """
 from flask import request, send_file
-from rapydo.utils.helpers import get_api_url
+from utilities.helpers import get_api_url
 
-from rapydo.utils.logs import get_logger
-from rapydo import decorators as decorate
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
-from rapydo.services.download import Downloader
-from rapydo.exceptions import RestApiException
-from rapydo.services.neo4j.graph_endpoints import graph_transactions
-from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
-from rapydo.utils import htmlcodes as hcodes
+from utilities.logs import get_logger
+from restapi import decorators as decorate
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.services.download import Downloader
+from restapi.exceptions import RestApiException
+from restapi.services.neo4j.graph_endpoints import graph_transactions
+from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from utilities import htmlcodes as hcodes
 
 logger = get_logger(__name__)
 

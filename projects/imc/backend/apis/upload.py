@@ -7,14 +7,14 @@ Upload a file
 import os
 from flask_restful import request
 
-from rapydo import decorators as decorate
-from rapydo.utils.logs import get_logger
-from rapydo.utils import htmlcodes as hcodes
-from rapydo.services.uploader import Uploader
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
-from rapydo.exceptions import RestApiException
-from rapydo.services.neo4j.graph_endpoints import graph_transactions
-from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi import decorators as decorate
+from utilities.logs import get_logger
+from utilities import htmlcodes as hcodes
+from restapi.services.uploader import Uploader
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.exceptions import RestApiException
+from restapi.services.neo4j.graph_endpoints import graph_transactions
+from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 
 logger = get_logger(__name__)
 

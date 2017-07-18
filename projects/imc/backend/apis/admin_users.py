@@ -3,15 +3,15 @@
 import random
 import string
 
-from rapydo import decorators as decorate
-from rapydo.services.neo4j.graph_endpoints import GraphBaseOperations
-from rapydo.exceptions import RestApiException
-from rapydo.services.neo4j.graph_endpoints import graph_transactions
-from rapydo.services.neo4j.graph_endpoints import catch_graph_exceptions
-from rapydo.services.authentication import BaseAuthentication
-from rapydo.utils import htmlcodes as hcodes
+from restapi import decorators as decorate
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.exceptions import RestApiException
+from restapi.services.neo4j.graph_endpoints import graph_transactions
+from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi.services.authentication import BaseAuthentication
+from utilities import htmlcodes as hcodes
 
-from rapydo.utils.logs import get_logger
+from utilities.logs import get_logger
 logger = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"

@@ -1,5 +1,5 @@
 
-from rapydo.utils.logs import get_logger
+from utilities.logs import get_logger
 from neomodel import db
 
 log = get_logger(__name__)

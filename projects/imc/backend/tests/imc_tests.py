@@ -2,13 +2,13 @@
 Test IMC endpoints
 """
 
-from rapydo.services.authentication import BaseAuthentication as ba
-from rapydo.tests.utilities import TestUtilities
-# from rapydo.tests.utilities import (
+from restapi.services.authentication import BaseAuthentication as ba
+from restapi.tests.utilities import TestUtilities
+# from restapi.tests.utilities import (
 #     OK, NO_CONTENT, PARTIAL, BAD_REQUEST, FORBIDDEN, NOTFOUND, CONFLICT
 # )
 
-from rapydo.utils.logs import get_logger
+from utilities.logs import get_logger
 log = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
