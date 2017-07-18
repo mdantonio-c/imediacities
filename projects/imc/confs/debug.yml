@@ -28,6 +28,10 @@ services:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
       ACTIVATE: 1
+    volumes:
+      - ../submodules/backend/rapydo:/usr/local/lib/python3.6/dist-packages/rapydo
+      - ../submodules/utilities/rapydo/utils:/usr/local/lib/python3.6/dist-packages/rapydo/utils
+
 
   ftp:
     environment:
