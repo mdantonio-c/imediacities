@@ -160,7 +160,7 @@ class Stage(GraphBaseOperations):
 
         task = CeleryExt.import_file.apply_async(
             args=[path, resource.uuid, mode],
-            countdown=20
+            countdown=10
         )
 
         resource.status = "IMPORTING"
