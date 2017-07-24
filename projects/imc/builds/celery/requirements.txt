@@ -7,7 +7,7 @@ plumbum
 celery
 flower
 
-rapydo-http==0.2.9
+rapydo-http==0.5.1
 
 numpy
 Pillow     
