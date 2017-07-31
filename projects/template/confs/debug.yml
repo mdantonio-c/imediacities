@@ -9,19 +9,18 @@ services:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
       ACTIVATE: 1
-      # TEMPORARY FIX...
-      PYTHONPATH: /code
     ports:
-      - 8081:5000
-    volumes:
-      - ../submodules/utilities/rapydo/utils:/usr/local/lib/python3.6/dist-packages/rapydo/utils
+      - 8080:5000
+    # volumes:
+    #   - ../submodules/backend/rapydo:/usr/local/lib/python3.6/dist-packages/restapi
+    #   - ../submodules/utilities/rapydo/utils:/usr/local/lib/python3.6/dist-packages/utilities
 
   frontend:
     ports:
       - 80:5000
     environment:
       APP_MODE: debug
-      BACKEND_PORT: 8081
+      BACKEND_PORT: 8080
       ACTIVATE: 1
     volumes:
       - ../assets/imc:/data/frontend/felask/static/assets

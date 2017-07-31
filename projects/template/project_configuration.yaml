@@ -1,48 +1,29 @@
+---
 project:
-    title: "iMediaCities Repository"
-    description": "..."
-tags:
-    file: "All endpoints to handle files"
-    admin: "Operations only allowed for admin users"
-    miscellaneous: "Endpoints not classified in other specific sections"
+  title: My project
+  description: Title of my project
+  version: "RAPyDo framework v0.5.2-beta"
 
 variables:
+  repos:
+    utils:
+      branch: 0.5.2
+    backend:
+      branch: 0.5.2
+    build-templates:
+      branch: 0.5.2
   env:
-    COMPOSE_PROJECT_NAME: imc
-    PROJECT_DOMAIN: imediacities.hpc.cineca.it
-    LETSENCRYPT_MODE: 
-  
-    # AUTH_REGISTER_FAILED_LOGIN: False
-    # AUTH_FORCE_FIRST_PASSWORD_CHANGE: False
-    # AUTH_VERIFY_PASSWORD_STRENGTH: False
-    # AUTH_MAX_PASSWORD_VALIDITY: 0
-    # AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: 0
-    # AUTH_MAX_LOGIN_ATTEMPTS: 0
-    # AUTH_SECOND_FACTOR_AUTHENTICATION: TOTP
-
     GRAPHDB_PASSWORD: chooseapassword
-
+    IRODS_CHUNKSIZE: 1048576
   backend:
     credentials:
       username: "user@nomail.org"
       password: "test"
       roles:
-        user: "normal_user"
-        internal: "staff_user"
-        admin: "admin_root"
-        default: "normal_user"
+        user: normal_user
+        internal: staff_user
+        admin: admin_root
+        default: normal_user
   frontend:
-      enable: true
-bower_components:
-  ng-flow:
-    - "dist/ng-flow-standalone.min.js"
-  angular-tablesort:
-    - js/angular-tablesort.js
-    - tablesort.css
-  ngmap:
-    - build/scripts/ng-map.min.js
-  angular-google-chart:
-    - "ng-google-chart.min.js"
+    enable: true
 
-css: 
-  - "custom/imc/search.css"

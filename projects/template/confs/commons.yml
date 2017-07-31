@@ -3,15 +3,6 @@ version: '3'
 
 services:
   backend:
-    volumes:
-      - ../imediastuff:/uploads
-    networks:
-      worker_net:
-      ftp_net:
-    depends_on:
-      - neo4j
-      - ftp
-      - swaggerui
     environment:
       VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
 
@@ -35,56 +26,35 @@ services:
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+    networks:
+      smtp_net:
+
+    depends_on:
+      - neo4j
+      - smtp
 
   neo4j:
-    ports:
-      - 9090:7474
-      - 7687:7687
     environment:
-      # NEO4J_dbms_memory_pagecache_size: 1024M
-      # NEO4J_dbms_memory_heap_maxSize: 2048M
       NEO4J_AUTH: neo4j/${GRAPHDB_PASSWORD}
-      # NEO4J_dbms_allowFormatMigration: "true"
 
-  celery:
-    build: ../builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
-    volumes:
-      - ../imediastuff:/uploads
-      # - ../imedia-pipeline:/imedia-pipeline
-      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
-      - /opt/idmt:/opt/idmt
-    depends_on:
-      - rabbit
-      - flower
-
+  smtp:
     environment:
-      # base the user/role mechanism on some database
-      AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
-      AUTH_SERVICE: neo4j
+      ACTIVATE: 1
 
-      # # neo connection
-      GRAPHDB_ENABLE: 1
-      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
-      GRAPHDB_HOST: ${GRAPHDB_HOST}
-      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
-      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+      # GMAIL_USER: xxx@gmail.com
+      # GMAIL_PASSWORD: abc
 
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+      # SMARTHOST_ADDRESS: mail.cineca.it
+      # SMARTHOST_PORT: 465
+      # SMARTHOST_PORT: 587
+      # SMARTHOST_USER: m.dantonio@cineca.it
+      # SMARTHOST_PASSWORD: -
+      # SMARTHOST_ALIASES: "*.cineca.it"
 
-  ftp:
-    ports:
-      - "21:21"
-      - "30000-30019:30000-30019"
-    volumes:
-      - ../imediastuff:/home/ftpusers/
+
+# volumes:
+#   ...
+
+# networks:
+#   ...
+
