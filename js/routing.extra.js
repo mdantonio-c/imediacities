@@ -28,6 +28,19 @@ angular.module('web').constant('customRoutes',
         }
     },
 
+    'logged.tag.geocode': {
+        url: "/tag?v",
+        params: {
+            meta: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'tag.geocode.html'
+            }
+        }
+    },
+
     'logged.upload': {
         url: "/upload",
         views: {
