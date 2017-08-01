@@ -208,59 +208,7 @@
             	}
         	};
     		}
-		])
-		.directive('pagination', function() {
-			return {
-				restrict: 'E',
-				scope: {
-					numPages: '=',
-					currentPage: '=',
-					onSelectPage: '&'
-				},
-				templateUrl: 'pagination.html',
-				replace: true,
-				link: function(scope) {
-					scope.$watch('numPages', function(value) {
-						scope.pages = [];
-						for (var i = 1; i <= value; i++) {
-							scope.pages.push(i);
-						}
-						if (scope.currentPage > value) {
-							scope.selectPage(value);
-						}
-					});
-					scope.noPrevious = function() {
-						return scope.currentPage === 1;
-					};
-					scope.noNext = function() {
-						return scope.currentPage === scope.numPages;
-					};
-					scope.isActive = function(page) {
-						return scope.currentPage === page;
-					};
-
-					scope.selectPage = function(page) {
-						if (!scope.isActive(page)) {
-							scope.currentPage = page;
-							scope.onSelectPage({
-								page: page
-							});
-						}
-					};
-
-					scope.selectPrevious = function() {
-						if (!scope.noPrevious()) {
-							scope.selectPage(scope.currentPage - 1);
-						}
-					};
-					scope.selectNext = function() {
-						if (!scope.noNext()) {
-							scope.selectPage(scope.currentPage + 1);
-						}
-					};
-				}
-			};
-		});
+		]);
 
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
@@ -275,16 +223,20 @@
 		self.showmese = false;
 		//self.showmepg = true;
 
-		$scope.currentPage = 1;
-		$scope.noOfPages = 1;
+		/*Define options type for paginate page numbers*/
+		self.typeOptions = [
+    		{ name: '4 per page', value: '4' }, 
+    		{ name: '8 per page', value: '8' }, 
+    		{ name: '15 per page', value: '15' }, 
+    		{ name: '20 per page', value: '20' }
+    	];
 
-		/*pagination*/
-		$scope.setPage = function(currp, nump) {
-			$scope.vmin = (currp - 1) * nump;
-			$scope.vmax = nump;
-		};
+		//configure pagination
+		self.ItemsByPage=self.typeOptions[0].value;
+		self.currentPage=1;
+		self.numvideos=0;
 
-		// $scope.$watch('currentPage', $scope.setPage($scope.currentPage, $scope.noOfPages));
+	 	self.bigTotalItems = 0;
 
 		self.videos = [];
 
@@ -293,19 +245,27 @@
 		self.searchVideos = function() {
 			var request_data = {
 				"type": "video",
-				"term": ""
+				"term": "",
+				"numpage": 1,
+				"pageblock": self.ItemsByPage
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
+			request_data.numpage = self.currentPage;
+			request_data.pageblock = self.ItemsByPage;
 			// console.log('search videos with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
 			self.showmese = true;
 			DataService.searchVideos(request_data).then(
 				function(out_data) {
+					self.numvideos = parseInt(out_data.data[out_data.data.length-1][0][0]);
+					self.bigTotalItems = self.numvideos;
+					out_data.data.pop();
 					self.videos = out_data.data;
 					self.loading = false;
 					self.loadResults = true;
 					self.showmese = false;
+					// Calculate Total Number of Pages based on Search Result
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
@@ -331,6 +291,46 @@
 			self.searchVideos();
 		}
 
+    $scope.setPage = function () {
+        self.currentPage = this.n;
+        self.searchVideos();
+    };
+
+    $scope.firstPage = function () {
+        self.currentPage = 1;
+        self.searchVideos();
+    };
+
+    $scope.lastPage = function () {
+        self.currentPage = parseInt(self.numvideos/self.ItemsByPage) + 1;
+        self.searchVideos();
+    };
+
+    $scope.setItemsPerPage = function(num) {
+  		self.itemsPerPage = num;
+  		self.currentPage = 1; //reset to first page
+  		self.searchVideos();
+	};
+
+    $scope.pageChanged = function() {
+    	//console.log('Page changed to: ' + self.currentPage);
+	    self.searchVideos();
+  	};
+
+
+    $scope.range = function (input, total) {
+        var ret = [];
+        if (!total) {
+            total = input;
+            input = 0;
+        }
+        for (var i = input; i < total; i++) {
+            if (i != 0 && i != total - 1) {
+                ret.push(i);
+            }
+        }
+        return ret;
+    };
 
 	}
 

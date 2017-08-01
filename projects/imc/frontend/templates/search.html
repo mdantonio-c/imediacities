@@ -8,7 +8,7 @@
 			<div id="search-logo" ng-show="ctrl.viewlogo">
 				<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
 			</div>
-			<div class="input-group stylish-input-group">
+			<div class="input-group stylish-input-group" ng-show="!ctrl.loading">
 				<input ng-attr-type="text" ng-model="ctrl.inputTerm" class="form-control" ng-attr-placeholder="Search video"
 				ng-keypress="($event.charCode === 13)?ctrl.searchVideos():return" autofocus>
 				<span class="input-group-addon">
@@ -42,6 +42,18 @@
 							<p><b>Location</b>: {{locname}}</p>
 						</div>
 					</li>
+
+				<hr/>
+
+				<form class="form-inline">
+  					<div class="form-group">
+    					<ul uib-pagination total-items="ctrl.bigTotalItems" ng-model="ctrl.currentPage" items-per-page="ctrl.ItemsByPage" ng-change="pageChanged()" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" boundary-links="true"></ul>
+  					</div>
+  					<div class="form-group pull-right">
+						<select class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='option.value as option.name for option in ctrl.typeOptions'></select>
+  					</div>
+				</form>
+
 				</ul>
 			</div>
 		</div>

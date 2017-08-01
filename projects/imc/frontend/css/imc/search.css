@@ -357,12 +357,14 @@ ul {
 }
 
 ul li {
-	border-bottom: 1px solid #ddd;
+	/*border-bottom: 1px solid #ddd;*/
+	border-bottom: 1px;
 	padding: 10px;
 	overflow: hidden;
 }
 ul li:first-child {
-	border-top: 1px solid #ddd;
+	/*border-top: 1px solid #ddd;*/
+	border-top: 1px;
 }
 
 ul li img {
