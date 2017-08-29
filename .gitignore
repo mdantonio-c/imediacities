@@ -81,3 +81,5 @@ target/
 # Hide analize.py undesired output
 scripts/analysis/shot-output.xml
 
+### PyCharm ###
+.idea/
