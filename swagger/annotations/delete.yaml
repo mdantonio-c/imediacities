@@ -1,0 +1,21 @@
+annotation:
+  summary: Deletes an annotation
+  description: Delete a single annotation identified via its uuid
+  custom:
+    # publish: true
+    authentication: true
+  parameters:
+    - name: uuid
+      in: path
+      required: true
+      description: The annotation's uuid
+      type: string
+  responses:
+    204:
+      description: Annotation successfully deleted.
+    401:
+      description: This endpoint requires a valid authorization token 
+    404:
+      description: Annotation does not exist.
+    500:
+      description: An unexpected error occured.
