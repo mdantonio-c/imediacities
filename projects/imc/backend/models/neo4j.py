@@ -133,9 +133,8 @@ class Stage(TimestampedNode):
 
 
 class AnnotationTarget(HeritableStructuredNode):
-    # __abstract_node__ = True
-    # __label__ = 'Item'
-    annotation = RelationshipFrom('Annotation', 'HAS_TARGET', cardinality=One)
+    annotation = RelationshipFrom(
+        'Annotation', 'HAS_TARGET', cardinality=OneOrMore)
 
 
 class Item(TimestampedNode, AnnotationTarget):
@@ -562,14 +561,15 @@ class AnnotationCreatorRel(StructuredRel):
     when = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
 
 
-class Annotation(IdentifiedNode):
+class Annotation(IdentifiedNode, AnnotationTarget):
     """Annotation class"""
     ANNOTATION_TYPES = (
         ('OD', 'object detection'),
         ('OR', 'object recognition'),
         ('VQ', 'video quality'),
         ('VIM', 'video image motion'),
-        ('TVS', 'temporal video segmentation')
+        ('TVS', 'temporal video segmentation'),
+        ('MAN', 'manual')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
         ('FHG', 'Fraunhofer tool'),
@@ -595,9 +595,15 @@ class AnnotationBody(HeritableStructuredNode):
     annotation = RelationshipFrom('Annotation', 'HAS_BODY', cardinality=One)
 
 
-class TextBody(AnnotationBody):
-    # TODO
-    pass
+class TextualBody(AnnotationBody):
+    value = StringProperty(required=True, show=True)
+    language = StringProperty(default='en', show=True)
+
+
+class ResourceBody(AnnotationBody):
+    iri = StringProperty(required=True, index=True, show=True)
+    name = StringProperty(index=True, show=True)
+    spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
 
 
 class ImageBody(AnnotationBody):
@@ -651,11 +657,15 @@ class TVSBody(AnnotationBody):
         'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
-class Shot(IdentifiedNode, AnnotationTarget):
+class VideoSegment(IdentifiedNode, AnnotationTarget):
+    """Video Segment"""
+    start_frame_idx = IntegerProperty(required=True, show=True)
+    end_frame_idx = IntegerProperty(required=True, show=True)
+
+
+class Shot(VideoSegment):
     """Shot class"""
     shot_num = IntegerProperty(required=True, show=True)
-    start_frame_idx = IntegerProperty(required=True, show=True)
-    end_frame_idx = IntegerProperty(show=True)
     frame_uri = StringProperty()
     thumbnail_uri = StringProperty()
     timestamp = StringProperty(show=True)

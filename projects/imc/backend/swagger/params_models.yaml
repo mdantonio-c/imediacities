@@ -1,3 +1,99 @@
-# no definition specified
----
+Annotation:
+  required:
+    - target
+    - body
+  properties:
+    body:
+      $ref: "#/definitions/Body"
+    target:
+      type: string
+      pattern: '(item|shot|anno):[a-z0-9-]+'
+    selector:
+      $ref: '#/definitions/Selector'
+
+Annotations:
+  type: array
+  items:
+    $ref: "#/definitions/Annotation"
+
+Body:
+  discriminator: type
+  required:
+    - type
+  properties:
+    type:
+      type: string
+      enum:
+        - ResourceBody
+        - TextualBody
+    purpose:
+      type: string
+      enum:
+        - tagging
+        - commenting
+        - describing
+        - identifying
+        - classifying
+        - replying
+ResourceBody:
+  allOf:
+    - $ref: "#/definitions/Body"
+    - required:
+        - source
+      properties:
+        source:
+          $ref: "#/definitions/Source"
+        spatial:
+          $ref: "#/definitions/Spatial"
+TextualBody:
+  allOf:
+    - $ref: "#/definitions/Body"
+    - required:
+        - value
+      properties:
+        value:
+          type: string
+        language:
+          type: string
+          default: 'en'
+Selector:
+  required:
+    - type
+    - value
+  properties:
+    type:
+      type: string
+      enum:
+        - FragmentSelector
+        - AreaSelector
+    value:
+      type: string
+
+Source:
+  required:
+    - iri
+    - name
+  properties:
+    iri:
+      type: string
+    name:
+      type: string
+    alternativesNames:
+      $ref: "#/definitions/AlternativeNames" 
+
+AlternativeNames:
+  additionalProperties:
+      type: string
+
+Spatial:
+  required:
+    - lat
+    - long
+  properties:
+    lat:
+      type: number
+      format: double
+    long:
+      type: number
+      format: double
 

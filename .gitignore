@@ -100,3 +100,22 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Hide analize.py undesired output
+scripts/analysis/shot-output.xml
+
+### PyCharm ###
+.idea/

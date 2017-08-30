@@ -3,5 +3,6 @@
 
 import xml.etree.ElementTree as ET
 
+
 class XMLResultParser():
-	pass
+    pass
