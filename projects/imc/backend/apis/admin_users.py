@@ -165,7 +165,7 @@ class AdminUsers(GraphBaseOperations):
 
         user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
-            raise RestApiException(self.USER_NOT_FOUND)
+            raise RestApiException('This user cannot be found')
 
         user.delete()
 

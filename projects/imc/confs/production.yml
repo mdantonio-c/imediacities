@@ -18,6 +18,7 @@ services:
       - APP_MODE=production
       - DEBUG_LEVEL=INFO
       - NGINX_ACTIVE=true
+      - PYTHONPATH=/code
     networks:
       proxy_net:
         aliases:
