@@ -10,7 +10,8 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.models.neo4j import Shot
 
-from imc.analysis.fhg import FHG
+# from imc.analysis.fhg import FHG
+from imc.tasks.analyze import make_movie_analize_folder, analize
 
 # from restapi.basher import BashCommands
 from utilities.logs import get_logger
@@ -150,11 +151,6 @@ def import_file(self, path, resource_id, mode):
 
                 # workflow = FHG(video_path, "/uploads")
                 # workflow.analyze(fast)
-
-                from imc.tasks.analyze import (
-                    make_movie_analize_folder,
-                    analize
-                )
 
                 movie = os.path.join('/uploads', video_path)
                 if not os.path.exists(movie):
