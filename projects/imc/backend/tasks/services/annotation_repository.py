@@ -1,6 +1,6 @@
 
 from utilities.logs import get_logger
-from rapydo.services.neo4j.graph_endpoints import graph_transactions
+from restapi.services.neo4j.graph_endpoints import graph_transactions
 
 from imc.models.neo4j import (
     Annotation, TVSBody, VIMBody,
