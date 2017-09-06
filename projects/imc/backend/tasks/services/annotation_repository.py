@@ -82,16 +82,13 @@ class AnnotationRepository():
         # delete any orphan video segments (NOT SHOT!)
         targets = anno.targets.all()
         for t in targets:
-            original_target = t.downcast()
-            log.debug('target instance of {}'.format(
-                original_target.__class__))
-            if isinstance(original_target, VideoSegment) and \
-                    not isinstance(original_target, Shot) and \
-                    self.is_orphan_segment(original_target):
-                segment_id = original_target.uuid
+            target_labels = t.labels()
+            log.debug("Target label(s): {}".format(target_labels))
+            if 'VideoSegment' in target_labels and \
+                    'Shot' not in target_labels and \
+                    self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
                 t.delete()
-                log.debug('Deleted orphan segment [uuid:{}]'
-                          .format(segment_id))
+                log.debug('Deleted orphan segment')
         anno.delete()
         log.debug('Manual annotation with ID:{} successfully deleted'
                   .format(anno.uuid))
