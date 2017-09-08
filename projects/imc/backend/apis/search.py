@@ -8,6 +8,7 @@ Search endpoint
 
 from flask import request
 from utilities.helpers import get_api_url
+from restapi.confs import PRODUCTION
 
 from utilities.logs import get_logger
 from restapi import decorators as decorate
@@ -98,7 +99,7 @@ class Search(GraphBaseOperations):
 
         data = []
         result = self.graph.cypher(query)
-        api_url = get_api_url(request)
+        api_url = get_api_url(request, PRODUCTION)
         for row in result:
             v = self.graph.AVEntity.inflate(row[0])
 
@@ -112,7 +113,7 @@ class Search(GraphBaseOperations):
             video['links']['summary'] = video_url + '/content?type=summary'
             data.append(video)
 
-        #we got also the total number of elements retrieved
+        # we got also the total number of elements retrieved
         data.append(numels)
 
         return self.force_response(data)

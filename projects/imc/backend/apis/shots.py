@@ -6,6 +6,7 @@ Handle your video metadata
 from flask import send_file
 from flask import request
 from utilities.helpers import get_api_url
+from restapi.confs import PRODUCTION
 
 from utilities.logs import get_logger
 from restapi import decorators as decorate
@@ -60,7 +61,7 @@ class Shots(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             return send_file(thumbnail_uri, mimetype='image/jpeg')
 
-        api_url = get_api_url(request)
+        api_url = get_api_url(request, PRODUCTION)
         shot = self.getJsonResponse(node)
         shot['links']['self'] = api_url + \
             'api/shots/' + node.uuid

@@ -5,6 +5,7 @@ Handle your video metadata
 """
 from flask import request, send_file
 from utilities.helpers import get_api_url
+from restapi.confs import PRODUCTION
 
 from utilities.logs import get_logger
 from restapi import decorators as decorate
@@ -45,7 +46,7 @@ class Videos(GraphBaseOperations):
         else:
             videos = self.graph.AVEntity.nodes.all()
 
-        api_url = get_api_url(request)
+        api_url = get_api_url(request, PRODUCTION)
         for v in videos:
             video = self.getJsonResponse(v)
             # video['links']['self'] = api_url + \
@@ -187,7 +188,7 @@ class VideoShots(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         item = video.item.single()
-        api_url = get_api_url(request)
+        api_url = get_api_url(request, PRODUCTION)
         vim_query = """
         MATCH (vim:Annotation {{annotation_type:'VIM'}})-[:HAS_TARGET]->(shot:Shot {{uuid:'{shot_id}'}})
         MATCH (vim)-[:HAS_BODY]->(body:VIMBody)
