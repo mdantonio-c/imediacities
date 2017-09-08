@@ -158,7 +158,7 @@ def harvest(metadata_set, dest_folder, log_file):
             # log.warning("sourceID not found, skipping record")
             continue
 
-        content = etree.tostring(element, pretty_print=True)
+        content = etree.tostring(efgEntity, pretty_print=True)
 
         id_text = sourceID.text.replace("/", "_")
         filename = "%s_%s_%s.xml" % (
