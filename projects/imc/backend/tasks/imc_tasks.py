@@ -11,7 +11,7 @@ from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.models.neo4j import Shot
 
 # from imc.analysis.fhg import FHG
-from imc.tasks.analyze import make_movie_analize_folder, analize
+from scripts.analysis.analyze import make_movie_analize_folder, analize
 
 # from restapi.basher import BashCommands
 from utilities.logs import get_logger
@@ -146,7 +146,7 @@ def import_file(self, path, resource_id, mode):
                         video_node.status_message = 'Nothing to declare'
                         video_node.save()
                         break
-                    fast = (mode == '-fast')
+                    fast = (mode == 'fast')
                 # EXECUTE AUTOMATC TOOLS
 
                 # workflow = FHG(video_path, "/uploads")

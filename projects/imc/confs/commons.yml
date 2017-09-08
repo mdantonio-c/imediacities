@@ -7,6 +7,7 @@ services:
     image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
     volumes:
       - ../data/imediastuff:/uploads
+      - ../scripts:/code/scripts
     networks:
       worker_net:
       ftp_net:
@@ -58,7 +59,7 @@ services:
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
       - ../data/imediastuff:/uploads
-      # - ../imedia-pipeline:/imedia-pipeline
+      - ../submodules/imedia-pipeline:/imedia-pipeline
       # - ../imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
       - ../scripts:/code/scripts

@@ -26,9 +26,9 @@ else:
 
 stage_area   = root_dir + 'uploads'
 analize_area = root_dir + 'uploads/Analize'
-idmt_bin     = root_dir + 'code/imc/imedia-pipeline/tools'
-idmt_scripts = root_dir + 'code/imc/imedia-pipeline/scripts'
-idmt_py      = root_dir + 'code/imc/imedia-pipeline/scripts/idmt'
+idmt_bin     = root_dir + 'imedia-pipeline/tools'
+idmt_scripts = root_dir + 'imedia-pipeline/scripts'
+idmt_py      = root_dir + 'imedia-pipeline/scripts/idmt'
 
 # default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
 # default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
@@ -103,6 +103,9 @@ def make_movie_analize_folder(filename, clean=False):
         os.remove(origin_link)
         print('forcing origin link')
         os.symlink(filename, origin_link)
+
+    global logfile
+    logfile = open(os.path.join(movie_analize_folder, "log.txt"), "w")
 
     return movie_analize_folder
 
@@ -542,7 +545,7 @@ def main(args):
     movie = default_filename
 
     args = sys.argv[1:]
-    num_args = len(args)
+    # num_args = len(args)
     for i, a in enumerate(args):
         if a == '--help' or a == '-help' or a == '-h':
             print(help)
