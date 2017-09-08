@@ -1,0 +1,9 @@
+file: vocabulary 
+class: Vocabulary 
+# baseuri: "/api"
+schema:
+  expose: true
+mapping:
+  vocabulary: "/vocabulary"
+labels:
+  - vocabulary

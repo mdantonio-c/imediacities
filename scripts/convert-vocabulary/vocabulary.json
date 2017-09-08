@@ -1,0 +1,807 @@
+{
+  "classes": [
+    {
+      "groups": [
+        {
+          "name": "sphere",
+          "terms": [
+            "private",
+            "public",
+            "indoor",
+            "outdoor"
+          ]
+        },
+        {
+          "name": "area",
+          "terms": [
+            "city",
+            "countryside",
+            "hill",
+            "mountain",
+            "old town",
+            "outskirts",
+            "satellite town",
+            "suburb",
+            "village"
+          ]
+        },
+        {
+          "name": "traffic area",
+          "terms": [
+            "airport",
+            "avenue",
+            "bike lane",
+            "boulevard",
+            "bridge",
+            "bus station",
+            "main road",
+            "metro station",
+            "motorway",
+            "parking area",
+            "passage",
+            "pedestrian zone",
+            "port",
+            "residential street",
+            "ropeway",
+            "shopping street",
+            "square",
+            "street",
+            "trail",
+            "train station",
+            "tram station",
+            "tunnel"
+          ]
+        },
+        {
+          "name": "green space",
+          "terms": [
+            "field",
+            "forest",
+            "garden",
+            "meadow",
+            "park"
+          ]
+        },
+        {
+          "name": "waters",
+          "terms": [
+            "creek",
+            "lake",
+            "pond",
+            "river",
+            "sea"
+          ]
+        },
+        {
+          "name": "well",
+          "terms": [
+            "drinking fountain",
+            "fountain"
+          ]
+        },
+        {
+          "name": "building type",
+          "terms": [
+            "castle",
+            "closed coverage type",
+            "open coverage type",
+            "palace",
+            "palace",
+            "tower block"
+          ]
+        },
+        {
+          "name": "building section",
+          "terms": [
+            "backyard ",
+            "balcony",
+            "courtyard ",
+            "elevator",
+            "escalator",
+            "stair",
+            "terrace"
+          ]
+        },
+        {
+          "name": "habitation",
+          "terms": [
+            "allotment garden",
+            "housing block",
+            "informal housing/squatter area",
+            "major housing complex",
+            "multi-family residential dwelling",
+            "shack",
+            "single-family residential dwelling",
+            "tenement",
+            "terraced house",
+            "villa"
+          ]
+        },
+        {
+          "name": "production/work",
+          "terms": [
+            "factory",
+            "office",
+            "workshop"
+          ]
+        },
+        {
+          "name": "shop/market",
+          "terms": [
+            "fashion shop",
+            "mall",
+            "market hall",
+            "open air market",
+            "premise",
+            "shopping arcade",
+            "shopping mall",
+            "strip mall"
+          ]
+        },
+        {
+          "name": "gastronomy",
+          "terms": [
+            "bistro",
+            "café/espresso bar",
+            "outdoor restaurant",
+            "restaurant/inn",
+            "street food, fast food"
+          ]
+        },
+        {
+          "name": "nightlife",
+          "terms": [
+            "bar, pub, nightclub",
+            "casino",
+            "dance hall",
+            "disco",
+            "music club"
+          ]
+        },
+        {
+          "name": "culture",
+          "terms": [
+            "cinema",
+            "concert hall",
+            "gallery",
+            "libary",
+            "museum",
+            "opera house",
+            "theater"
+          ]
+        },
+        {
+          "name": "education",
+          "terms": [
+            "institution for adult education",
+            "kindergarten",
+            "research institute",
+            "school",
+            "university/academy/college"
+          ]
+        },
+        {
+          "name": "welfare/health",
+          "terms": [
+            "daycare",
+            "hospital",
+            "institute for social welfare",
+            "orphanage",
+            "retirement home",
+            "woman’s shelter"
+          ]
+        },
+        {
+          "name": "sport/recreation",
+          "terms": [
+            "amusement park"
+          ]
+        },
+        {
+          "name": "supply/disposal",
+          "terms": [
+            "granary",
+            "incineration plant"
+          ]
+        },
+        {
+          "name": "sport/recreation",
+          "terms": [
+            "indoor pool"
+          ]
+        },
+        {
+          "name": "supply/disposal",
+          "terms": [
+            "landfill"
+          ]
+        },
+        {
+          "name": "sport/recreation",
+          "terms": [
+            "natural beach",
+            "outdoor pool"
+          ]
+        },
+        {
+          "name": "supply/disposal",
+          "terms": [
+            "power plant",
+            "slaughterhouse"
+          ]
+        },
+        {
+          "name": "sport/recreation",
+          "terms": [
+            "sports ground",
+            "swimming pool"
+          ]
+        },
+        {
+          "name": "supply/disposal",
+          "terms": [
+            "treatment plant",
+            "waterworks"
+          ]
+        },
+        {
+          "name": "religion",
+          "terms": [
+            "church",
+            "mosque",
+            "sacral building (others)",
+            "synagogue"
+          ]
+        },
+        {
+          "name": "military",
+          "terms": [
+            "barracks",
+            "fortification",
+            "military hospital"
+          ]
+        },
+        {
+          "name": "form of financing",
+          "terms": [
+            "private housing",
+            "public housing"
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            "camp",
+            "cemetery",
+            "exhibition ground",
+            "government building",
+            "grave",
+            "playground",
+            "storage yard"
+          ]
+        }
+      ],
+      "name": "space(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": "sphere",
+          "terms": [
+            "leisure",
+            "work"
+          ]
+        },
+        {
+          "name": "crowd",
+          "terms": [
+            "celebration",
+            "demonstration",
+            "march",
+            "parade",
+            "procession",
+            "queue",
+            "rally",
+            "reception",
+            "speech"
+          ]
+        },
+        {
+          "name": "locomotion",
+          "terms": [
+            "bike ride",
+            "boat trip",
+            "boating trip",
+            "bus ride",
+            "car ride",
+            "metro ride",
+            "motorcycle ride",
+            "plane ride",
+            "train ride",
+            "tram ride",
+            "walk"
+          ]
+        },
+        {
+          "name": "production/work",
+          "terms": [
+            "agriculture",
+            "commerce",
+            "craft",
+            "industry",
+            "service"
+          ]
+        },
+        {
+          "name": "culture",
+          "terms": [
+            "dramatic arts"
+          ]
+        },
+        {
+          "name": "gastronomy",
+          "terms": [
+            "drinking",
+            "eating"
+          ]
+        },
+        {
+          "name": "culture",
+          "terms": [
+            "festival",
+            "film",
+            "fine arts",
+            "literature",
+            "music"
+          ]
+        },
+        {
+          "name": "education",
+          "terms": [
+            "apprentice training",
+            "lecture",
+            "school teaching"
+          ]
+        },
+        {
+          "name": "welfare/health",
+          "terms": [
+            "child care",
+            "elderly care",
+            "healthcare",
+            "poor relief"
+          ]
+        },
+        {
+          "name": "sport/recreation",
+          "terms": [
+            "basketball",
+            "fishing",
+            "golf",
+            "gymnastics",
+            "hiking",
+            "ice-skating",
+            "jogging",
+            "minigolf",
+            "roller-skateing",
+            "rowing",
+            "skateboarding",
+            "skiing",
+            "sledding",
+            "soccer",
+            "sunbathing",
+            "swimming",
+            "table game",
+            "tennis",
+            "volleyball"
+          ]
+        },
+        {
+          "name": "supply/disposal",
+          "terms": [
+            "energy supply",
+            "garbage",
+            "water/wastewater"
+          ]
+        },
+        {
+          "name": "tourism",
+          "terms": [
+            "city tour",
+            "sightseeing"
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            "combat",
+            "shopping"
+          ]
+        }
+      ],
+      "name": "space(usage)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "crowd",
+            "dispersed groups",
+            "dispersed individuals",
+            "large group",
+            "pair",
+            "single person",
+            "small group"
+          ]
+        }
+      ],
+      "name": "persons(number)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "animation",
+            "effect filter"
+          ]
+        }
+      ],
+      "name": "effect(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "female",
+            "male",
+            "male and female",
+            "queer"
+          ]
+        }
+      ],
+      "name": "persons(gender)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "adults",
+            "children",
+            "elderly persons",
+            "youth"
+          ]
+        }
+      ],
+      "name": "persons(age)"
+    },
+    {
+      "groups": [
+        {
+          "name": "posture",
+          "terms": [
+            "lying",
+            "sitting",
+            "standing"
+          ]
+        },
+        {
+          "name": "locomotion",
+          "terms": [
+            "crawling",
+            "horse-riding",
+            "marching",
+            "running",
+            "walking"
+          ]
+        },
+        {
+          "name": "articulation/interaction",
+          "terms": [
+            "celebrating",
+            "cheering",
+            "crying",
+            "dancing",
+            "decorating",
+            "kissing",
+            "laughing",
+            "making music",
+            "playing",
+            "saluting",
+            "singing",
+            "talking",
+            "waving"
+          ]
+        },
+        {
+          "name": "consumption",
+          "terms": [
+            "drinking",
+            "eating",
+            "smoking"
+          ]
+        },
+        {
+          "name": "record/capture/trace",
+          "terms": [
+            "filming",
+            "paint",
+            "photographing",
+            "sketch",
+            "writing"
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            "arresting",
+            "beating",
+            "carrying",
+            "climbing",
+            "cooking",
+            "digging",
+            "dressing",
+            "hoeing",
+            "jumping",
+            "listening",
+            "pitching",
+            "reading",
+            "rest",
+            "sleep",
+            "undressing",
+            "waiting",
+            "watching"
+          ]
+        }
+      ],
+      "name": "persons(action)"
+    },
+    {
+      "groups": [
+        {
+          "name": "condition",
+          "terms": [
+            "(construction) site",
+            "redevelopment",
+            "war destruction"
+          ]
+        },
+        {
+          "name": "street furniture",
+          "terms": [
+            "bench",
+            "clock",
+            "phone box",
+            "post box",
+            "street lamps",
+            "traffic light",
+            "trash can"
+          ]
+        },
+        {
+          "name": "vehicle",
+          "terms": [
+            "armored vehicle",
+            "carriage",
+            "horsecar"
+          ]
+        },
+        {
+          "name": "plant",
+          "terms": [
+            "bush",
+            "crop plant",
+            "decorative plant",
+            "flower",
+            "tree"
+          ]
+        },
+        {
+          "name": "animal",
+          "terms": [
+            "bird",
+            "boar",
+            "cat",
+            "cattle",
+            "deer",
+            "dog",
+            "horse",
+            "insect",
+            "rat",
+            "sheep",
+            "squirrel"
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            "architectural model",
+            "construction crane",
+            "construction vehicle",
+            "gazer (looking straight into the camera)",
+            "Hitler salute",
+            "memorial",
+            "pedestrians",
+            "plan",
+            "pram",
+            "public art",
+            "scaffold",
+            "swastika flags",
+            "wheelchair"
+          ]
+        }
+      ],
+      "name": "visual event (type)"
+    },
+    {
+      "groups": [
+        {
+          "name": "music",
+          "terms": [
+            "added instrumental and vocal music",
+            "added instrumental music",
+            "added vocal music",
+            "instrumental and vocal music",
+            "instrumental music",
+            "vocal music"
+          ]
+        },
+        {
+          "name": "speech",
+          "terms": [
+            "speech",
+            "voice over"
+          ]
+        }
+      ],
+      "name": "audio event(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "banner",
+            "boundary sign",
+            "commercial sign",
+            "flag",
+            "logo",
+            "neon sign",
+            "numberplate",
+            "poster",
+            "road sign",
+            "street sign"
+          ]
+        }
+      ],
+      "name": "sign(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": "season",
+          "terms": [
+            "fall",
+            "spring",
+            "summer",
+            "winter"
+          ]
+        },
+        {
+          "name": "daytime",
+          "terms": [
+            "day",
+            "night",
+            "twilight"
+          ]
+        }
+      ],
+      "name": "time(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "clouds",
+            "flood",
+            "hail",
+            "mist",
+            "rain",
+            "rainbow",
+            "snow",
+            "storm",
+            "sunshine",
+            "wind"
+          ]
+        }
+      ],
+      "name": "weather(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "ambulance service",
+            "denomination",
+            "fire service",
+            "military",
+            "paramilitary",
+            "party",
+            "police",
+            "society",
+            "union"
+          ]
+        }
+      ],
+      "name": "organisation(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": "shot size",
+          "terms": [
+            "american shot",
+            "close-up (CU)",
+            "extreme close-up (ECU)",
+            "extreme long shot (ELS)",
+            "long shot (LS)",
+            "medium close shot (MCS)",
+            "medium full shot (MFS)",
+            "medium shot (MS)"
+          ]
+        },
+        {
+          "name": "camera angle",
+          "terms": [
+            "aerial shot",
+            "high angle",
+            "low angle",
+            "straight on angle"
+          ]
+        },
+        {
+          "name": "camera movement",
+          "terms": [
+            "cross fade",
+            "panning shot",
+            "phantom-ride",
+            "tilt",
+            "tracking",
+            "zoom"
+          ]
+        },
+        {
+          "name": "transition",
+          "terms": [
+            "black frame",
+            "intertitle",
+            "stop",
+            "white frame",
+            "wipe"
+          ]
+        }
+      ],
+      "name": "shot(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            "in-camera editing",
+            "post-production editing",
+            "splice"
+          ]
+        }
+      ],
+      "name": "editing(type)"
+    }
+  ],
+  "created": "2017-09-08 11:13:44.793829",
+  "vocabulary": "IMC controlled vocabulary"
+}
