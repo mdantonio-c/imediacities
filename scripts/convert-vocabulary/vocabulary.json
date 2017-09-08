@@ -5,279 +5,1107 @@
         {
           "name": "sphere",
           "terms": [
-            "private",
-            "public",
-            "indoor",
-            "outdoor"
+            {
+              "iri": "",
+              "labels": {
+                "de": "privat",
+                "en": "private"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "öffentlich",
+                "en": "public"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Innenraum",
+                "en": "indoor"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Außenraum",
+                "en": "outdoor"
+              }
+            }
           ]
         },
         {
           "name": "area",
           "terms": [
-            "city",
-            "countryside",
-            "hill",
-            "mountain",
-            "old town",
-            "outskirts",
-            "satellite town",
-            "suburb",
-            "village"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Stadt",
+                "en": "city"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Land",
+                "en": "countryside"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hügel",
+                "en": "hill"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Berg",
+                "en": "mountain"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Altstadt (Historischer Stadtkern)",
+                "en": "old town"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Stadtrand",
+                "en": "outskirts"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Satellitenstadt",
+                "en": "satellite town"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Vorstadt",
+                "en": "suburb"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Dorf",
+                "en": "village"
+              }
+            }
           ]
         },
         {
           "name": "traffic area",
           "terms": [
-            "airport",
-            "avenue",
-            "bike lane",
-            "boulevard",
-            "bridge",
-            "bus station",
-            "main road",
-            "metro station",
-            "motorway",
-            "parking area",
-            "passage",
-            "pedestrian zone",
-            "port",
-            "residential street",
-            "ropeway",
-            "shopping street",
-            "square",
-            "street",
-            "trail",
-            "train station",
-            "tram station",
-            "tunnel"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Flughafen",
+                "en": "airport"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Allee",
+                "en": "avenue"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fahrradweg",
+                "en": "bike lane"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Boulevard, Prachtstraße",
+                "en": "boulevard"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Brücke",
+                "en": "bridge"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bus-Station",
+                "en": "bus station"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hauptstraße (Einfallstraße)",
+                "en": "main road"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "U-Bahn Station",
+                "en": "metro station"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Autobahn",
+                "en": "motorway"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Parkplatz",
+                "en": "parking area"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Passage",
+                "en": "passage"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fußgängerzone",
+                "en": "pedestrian zone"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hafen",
+                "en": "port"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wohnstraße",
+                "en": "residential street"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Seilbahn",
+                "en": "ropeway"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Einkaufs- und Geschäftsstraße",
+                "en": "shopping street"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Platz",
+                "en": "square"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Straße",
+                "en": "street"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Weg (befestigt, unbefestigt)",
+                "en": "trail"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bahnhof",
+                "en": "train station"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Straßenbahn- Station",
+                "en": "tram station"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tunnel",
+                "en": "tunnel"
+              }
+            }
           ]
         },
         {
           "name": "green space",
           "terms": [
-            "field",
-            "forest",
-            "garden",
-            "meadow",
-            "park"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Feld",
+                "en": "field"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wald",
+                "en": "forest"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Garten",
+                "en": "garden"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wiese",
+                "en": "meadow"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Park",
+                "en": "park"
+              }
+            }
           ]
         },
         {
           "name": "waters",
           "terms": [
-            "creek",
-            "lake",
-            "pond",
-            "river",
-            "sea"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bach",
+                "en": "creek"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "See",
+                "en": "lake"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Teich",
+                "en": "pond"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fluss",
+                "en": "river"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Meer",
+                "en": "sea"
+              }
+            }
           ]
         },
         {
           "name": "well",
           "terms": [
-            "drinking fountain",
-            "fountain"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Trinkbrunnen",
+                "en": "drinking fountain"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zierbrunnen",
+                "en": "fountain"
+              }
+            }
           ]
         },
         {
           "name": "building type",
           "terms": [
-            "castle",
-            "closed coverage type",
-            "open coverage type",
-            "palace",
-            "palace",
-            "tower block"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Burg",
+                "en": "castle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Geschlossene Bauweise/Blockbebauung",
+                "en": "closed coverage type"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Offene Bauweise/Zeilenbebauung",
+                "en": "open coverage type"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Palais",
+                "en": "palace"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schloss",
+                "en": "palace"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hochhaus",
+                "en": "tower block"
+              }
+            }
           ]
         },
         {
           "name": "building section",
           "terms": [
-            "backyard ",
-            "balcony",
-            "courtyard ",
-            "elevator",
-            "escalator",
-            "stair",
-            "terrace"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hinterhof",
+                "en": "backyard "
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Balkon",
+                "en": "balcony"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hof",
+                "en": "courtyard "
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Aufzug",
+                "en": "elevator"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rolltreppe",
+                "en": "escalator"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Treppe",
+                "en": "stair"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Terrasse",
+                "en": "terrace"
+              }
+            }
           ]
         },
         {
           "name": "habitation",
           "terms": [
-            "allotment garden",
-            "housing block",
-            "informal housing/squatter area",
-            "major housing complex",
-            "multi-family residential dwelling",
-            "shack",
-            "single-family residential dwelling",
-            "tenement",
-            "terraced house",
-            "villa"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kleingarten (Siedlung)",
+                "en": "allotment garden"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wohnblock",
+                "en": "housing block"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Informelle (wilde) Siedlung",
+                "en": "informal housing/squatter area"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Großwohnsiedlung",
+                "en": "major housing complex"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Mehrfamilienhaus (Siedlung)",
+                "en": "multi-family residential dwelling"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baracken",
+                "en": "shack"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Einfamilienhaus (Siedlung)",
+                "en": "single-family residential dwelling"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Mietskaserne",
+                "en": "tenement"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Reihenhaus (Siedlung)",
+                "en": "terraced house"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Villa (Villenkolonie)",
+                "en": "villa"
+              }
+            }
           ]
         },
         {
           "name": "production/work",
           "terms": [
-            "factory",
-            "office",
-            "workshop"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fabrik",
+                "en": "factory"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Büro (Dienstleistung, Verwaltung, …)",
+                "en": "office"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Werkstatt",
+                "en": "workshop"
+              }
+            }
           ]
         },
         {
           "name": "shop/market",
           "terms": [
-            "fashion shop",
-            "mall",
-            "market hall",
-            "open air market",
-            "premise",
-            "shopping arcade",
-            "shopping mall",
-            "strip mall"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Modegeschäft",
+                "en": "fashion shop"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kaufhaus",
+                "en": "mall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Markthalle (überdacht)",
+                "en": "market hall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Markt (offen)",
+                "en": "open air market"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Geschäftslokal (Handel)",
+                "en": "premise"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Einkaufspassage",
+                "en": "shopping arcade"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Shopping mall",
+                "en": "shopping mall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Strip mall",
+                "en": "strip mall"
+              }
+            }
           ]
         },
         {
           "name": "gastronomy",
           "terms": [
-            "bistro",
-            "café/espresso bar",
-            "outdoor restaurant",
-            "restaurant/inn",
-            "street food, fast food"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bistro",
+                "en": "bistro"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Café/Espresso",
+                "en": "café/espresso bar"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gastgarten",
+                "en": "outdoor restaurant"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Restaurant/Gasthaus",
+                "en": "restaurant/inn"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Street-, Fast-food",
+                "en": "street food, fast food"
+              }
+            }
           ]
         },
         {
           "name": "nightlife",
           "terms": [
-            "bar, pub, nightclub",
-            "casino",
-            "dance hall",
-            "disco",
-            "music club"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bar, Kneipe, Nachtlokal",
+                "en": "bar, pub, nightclub"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Casino",
+                "en": "casino"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tanzlokal",
+                "en": "dance hall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Diskothek",
+                "en": "disco"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musiklokal",
+                "en": "music club"
+              }
+            }
           ]
         },
         {
           "name": "culture",
           "terms": [
-            "cinema",
-            "concert hall",
-            "gallery",
-            "libary",
-            "museum",
-            "opera house",
-            "theater"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kino",
+                "en": "cinema"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Konzerthaus",
+                "en": "concert hall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gallerie",
+                "en": "gallery"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bibliothek",
+                "en": "libary"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Museum",
+                "en": "museum"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Opernhaus",
+                "en": "opera house"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Theater",
+                "en": "theater"
+              }
+            }
           ]
         },
         {
           "name": "education",
           "terms": [
-            "institution for adult education",
-            "kindergarten",
-            "research institute",
-            "school",
-            "university/academy/college"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Institut der Erwachsenenbildung",
+                "en": "institution for adult education"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kindergarten",
+                "en": "kindergarten"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Forschungsinstitut",
+                "en": "research institute"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schule",
+                "en": "school"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Universität/Akademie/Fachhochschule",
+                "en": "university/academy/college"
+              }
+            }
           ]
         },
         {
           "name": "welfare/health",
           "terms": [
-            "daycare",
-            "hospital",
-            "institute for social welfare",
-            "orphanage",
-            "retirement home",
-            "woman’s shelter"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tagesstätte",
+                "en": "daycare"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kankenhaus",
+                "en": "hospital"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Institut der Armenfürsorge",
+                "en": "institute for social welfare"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Waisenhaus",
+                "en": "orphanage"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Altenheim",
+                "en": "retirement home"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Frauenhaus",
+                "en": "woman’s shelter"
+              }
+            }
           ]
         },
         {
           "name": "sport/recreation",
           "terms": [
-            "amusement park"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Vergnügungspark",
+                "en": "amusement park"
+              }
+            }
           ]
         },
         {
           "name": "supply/disposal",
           "terms": [
-            "granary",
-            "incineration plant"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Getreidespeicher",
+                "en": "granary"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Müllverbrennungsanlage",
+                "en": "incineration plant"
+              }
+            }
           ]
         },
         {
           "name": "sport/recreation",
           "terms": [
-            "indoor pool"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hallenbad",
+                "en": "indoor pool"
+              }
+            }
           ]
         },
         {
           "name": "supply/disposal",
           "terms": [
-            "landfill"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Müllhalde",
+                "en": "landfill"
+              }
+            }
           ]
         },
         {
           "name": "sport/recreation",
           "terms": [
-            "natural beach",
-            "outdoor pool"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wilde Badestellen",
+                "en": "natural beach"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Freibad",
+                "en": "outdoor pool"
+              }
+            }
           ]
         },
         {
           "name": "supply/disposal",
           "terms": [
-            "power plant",
-            "slaughterhouse"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kraftwerk (Öl, Kohle, Müll, Wasser, Wind, Atom ,…)",
+                "en": "power plant"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schlachthof",
+                "en": "slaughterhouse"
+              }
+            }
           ]
         },
         {
           "name": "sport/recreation",
           "terms": [
-            "sports ground",
-            "swimming pool"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sportplatz",
+                "en": "sports ground"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schwimmbad",
+                "en": "swimming pool"
+              }
+            }
           ]
         },
         {
           "name": "supply/disposal",
           "terms": [
-            "treatment plant",
-            "waterworks"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kläranlage",
+                "en": "treatment plant"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wasserwerk (Wasserschloss, Pumpanlage, …)",
+                "en": "waterworks"
+              }
+            }
           ]
         },
         {
           "name": "religion",
           "terms": [
-            "church",
-            "mosque",
-            "sacral building (others)",
-            "synagogue"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kirche",
+                "en": "church"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Moschee",
+                "en": "mosque"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sakralbau (andere)",
+                "en": "sacral building (others)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Synagoge",
+                "en": "synagogue"
+              }
+            }
           ]
         },
         {
           "name": "military",
           "terms": [
-            "barracks",
-            "fortification",
-            "military hospital"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kaserne",
+                "en": "barracks"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Befestigungsanlage",
+                "en": "fortification"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lazarett",
+                "en": "military hospital"
+              }
+            }
           ]
         },
         {
           "name": "form of financing",
           "terms": [
-            "private housing",
-            "public housing"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Privater Wohnbau",
+                "en": "private housing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sozialer Wohnbau",
+                "en": "public housing"
+              }
+            }
           ]
         },
         {
           "name": "other",
           "terms": [
-            "camp",
-            "cemetery",
-            "exhibition ground",
-            "government building",
-            "grave",
-            "playground",
-            "storage yard"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lager",
+                "en": "camp"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Friedhof",
+                "en": "cemetery"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Messegelände",
+                "en": "exhibition ground"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Amtsgebäude",
+                "en": "government building"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Grab",
+                "en": "grave"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Spielplatz",
+                "en": "playground"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lagerplatz",
+                "en": "storage yard"
+              }
+            }
           ]
         }
       ],
@@ -288,134 +1116,542 @@
         {
           "name": "sphere",
           "terms": [
-            "leisure",
-            "work"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Freizeit",
+                "en": "leisure"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Arbeit",
+                "en": "work"
+              }
+            }
           ]
         },
         {
           "name": "crowd",
           "terms": [
-            "celebration",
-            "demonstration",
-            "march",
-            "parade",
-            "procession",
-            "queue",
-            "rally",
-            "reception",
-            "speech"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fest",
+                "en": "celebration"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Demonstration",
+                "en": "demonstration"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Aufmarsch",
+                "en": "march"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Parade",
+                "en": "parade"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Prozession",
+                "en": "procession"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Warteschlange",
+                "en": "queue"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Versammlung",
+                "en": "rally"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Empfang",
+                "en": "reception"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ansprache",
+                "en": "speech"
+              }
+            }
           ]
         },
         {
           "name": "locomotion",
           "terms": [
-            "bike ride",
-            "boat trip",
-            "boating trip",
-            "bus ride",
-            "car ride",
-            "metro ride",
-            "motorcycle ride",
-            "plane ride",
-            "train ride",
-            "tram ride",
-            "walk"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fahradfahrt",
+                "en": "bike ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schifffahrt",
+                "en": "boat trip"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bootsfahrt",
+                "en": "boating trip"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Busfahrt",
+                "en": "bus ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Autofahrt",
+                "en": "car ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "U-Bahnfahrt",
+                "en": "metro ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Motorradfahrt",
+                "en": "motorcycle ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Flug",
+                "en": "plane ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zugfahrt",
+                "en": "train ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Straßenbahnfahrt",
+                "en": "tram ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Spaziergang",
+                "en": "walk"
+              }
+            }
           ]
         },
         {
           "name": "production/work",
           "terms": [
-            "agriculture",
-            "commerce",
-            "craft",
-            "industry",
-            "service"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Landwirtschaft",
+                "en": "agriculture"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Handel",
+                "en": "commerce"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Handwerk",
+                "en": "craft"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Industrie",
+                "en": "industry"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Dienstleistung",
+                "en": "service"
+              }
+            }
           ]
         },
         {
           "name": "culture",
           "terms": [
-            "dramatic arts"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Darstellende Kunst",
+                "en": "dramatic arts"
+              }
+            }
           ]
         },
         {
           "name": "gastronomy",
           "terms": [
-            "drinking",
-            "eating"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Trinken",
+                "en": "drinking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Essen",
+                "en": "eating"
+              }
+            }
           ]
         },
         {
           "name": "culture",
           "terms": [
-            "festival",
-            "film",
-            "fine arts",
-            "literature",
-            "music"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Festival",
+                "en": "festival"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Film",
+                "en": "film"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Bildende Kunst",
+                "en": "fine arts"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Literatur",
+                "en": "literature"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik",
+                "en": "music"
+              }
+            }
           ]
         },
         {
           "name": "education",
           "terms": [
-            "apprentice training",
-            "lecture",
-            "school teaching"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lehrlingsausbildung",
+                "en": "apprentice training"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Vortrag",
+                "en": "lecture"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schulunterricht",
+                "en": "school teaching"
+              }
+            }
           ]
         },
         {
           "name": "welfare/health",
           "terms": [
-            "child care",
-            "elderly care",
-            "healthcare",
-            "poor relief"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kinderfürsorge",
+                "en": "child care"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Altenfürsorge",
+                "en": "elderly care"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Krankenbetreuung",
+                "en": "healthcare"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Armefürsorge",
+                "en": "poor relief"
+              }
+            }
           ]
         },
         {
           "name": "sport/recreation",
           "terms": [
-            "basketball",
-            "fishing",
-            "golf",
-            "gymnastics",
-            "hiking",
-            "ice-skating",
-            "jogging",
-            "minigolf",
-            "roller-skateing",
-            "rowing",
-            "skateboarding",
-            "skiing",
-            "sledding",
-            "soccer",
-            "sunbathing",
-            "swimming",
-            "table game",
-            "tennis",
-            "volleyball"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Basketball",
+                "en": "basketball"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Angeln",
+                "en": "fishing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Golf",
+                "en": "golf"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Turnen",
+                "en": "gymnastics"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wandern",
+                "en": "hiking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Eislaufen",
+                "en": "ice-skating"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Jogging",
+                "en": "jogging"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Minigolf",
+                "en": "minigolf"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rollschuhfahren",
+                "en": "roller-skateing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rudern",
+                "en": "rowing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Skatebordfahren",
+                "en": "skateboarding"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Skifahren",
+                "en": "skiing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schlittenfahren",
+                "en": "sledding"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fussball",
+                "en": "soccer"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sonnenbaden",
+                "en": "sunbathing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schwimmen",
+                "en": "swimming"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gesellschaftsspiel",
+                "en": "table game"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tennis",
+                "en": "tennis"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Volleyball",
+                "en": "volleyball"
+              }
+            }
           ]
         },
         {
           "name": "supply/disposal",
           "terms": [
-            "energy supply",
-            "garbage",
-            "water/wastewater"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Energieversorgung",
+                "en": "energy supply"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Müll",
+                "en": "garbage"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wasser/Abwasser",
+                "en": "water/wastewater"
+              }
+            }
           ]
         },
         {
           "name": "tourism",
           "terms": [
-            "city tour",
-            "sightseeing"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Stadtführung",
+                "en": "city tour"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sightseeing",
+                "en": "sightseeing"
+              }
+            }
           ]
         },
         {
           "name": "other",
           "terms": [
-            "combat",
-            "shopping"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kampf",
+                "en": "combat"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Shopping",
+                "en": "shopping"
+              }
+            }
           ]
         }
       ],
@@ -426,13 +1662,55 @@
         {
           "name": null,
           "terms": [
-            "crowd",
-            "dispersed groups",
-            "dispersed individuals",
-            "large group",
-            "pair",
-            "single person",
-            "small group"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Masse",
+                "en": "crowd"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Verstreute Gruppen",
+                "en": "dispersed groups"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Verstreute Einzelpersonen",
+                "en": "dispersed individuals"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Großgruppe",
+                "en": "large group"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Paar",
+                "en": "pair"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Einzelperson",
+                "en": "single person"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kleingruppe",
+                "en": "small group"
+              }
+            }
           ]
         }
       ],
@@ -443,8 +1721,20 @@
         {
           "name": null,
           "terms": [
-            "animation",
-            "effect filter"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Animation",
+                "en": "animation"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Effektfilter",
+                "en": "effect filter"
+              }
+            }
           ]
         }
       ],
@@ -455,10 +1745,34 @@
         {
           "name": null,
           "terms": [
-            "female",
-            "male",
-            "male and female",
-            "queer"
+            {
+              "iri": "",
+              "labels": {
+                "de": "weiblich",
+                "en": "female"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "männlich",
+                "en": "male"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "männlich und weiblich",
+                "en": "male and female"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "queer",
+                "en": "queer"
+              }
+            }
           ]
         }
       ],
@@ -469,10 +1783,34 @@
         {
           "name": null,
           "terms": [
-            "adults",
-            "children",
-            "elderly persons",
-            "youth"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Erwachsene",
+                "en": "adults"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kinder",
+                "en": "children"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Alte",
+                "en": "elderly persons"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Jugendliche",
+                "en": "youth"
+              }
+            }
           ]
         }
       ],
@@ -483,77 +1821,353 @@
         {
           "name": "posture",
           "terms": [
-            "lying",
-            "sitting",
-            "standing"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Liegen",
+                "en": "lying"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sitzen",
+                "en": "sitting"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Stehen",
+                "en": "standing"
+              }
+            }
           ]
         },
         {
           "name": "locomotion",
           "terms": [
-            "crawling",
-            "horse-riding",
-            "marching",
-            "running",
-            "walking"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Krabbeln",
+                "en": "crawling"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Reiten",
+                "en": "horse-riding"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Marschieren",
+                "en": "marching"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Laufen",
+                "en": "running"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gehen",
+                "en": "walking"
+              }
+            }
           ]
         },
         {
           "name": "articulation/interaction",
           "terms": [
-            "celebrating",
-            "cheering",
-            "crying",
-            "dancing",
-            "decorating",
-            "kissing",
-            "laughing",
-            "making music",
-            "playing",
-            "saluting",
-            "singing",
-            "talking",
-            "waving"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Feiern",
+                "en": "celebrating"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Jubeln",
+                "en": "cheering"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Weinen",
+                "en": "crying"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tanzen",
+                "en": "dancing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schmücken",
+                "en": "decorating"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Küssen",
+                "en": "kissing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lachen",
+                "en": "laughing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musizieren",
+                "en": "making music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Spielen",
+                "en": "playing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Grüßen",
+                "en": "saluting"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Singen",
+                "en": "singing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sprechen",
+                "en": "talking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Winken",
+                "en": "waving"
+              }
+            }
           ]
         },
         {
           "name": "consumption",
           "terms": [
-            "drinking",
-            "eating",
-            "smoking"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Trinken",
+                "en": "drinking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Essen",
+                "en": "eating"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rauchen",
+                "en": "smoking"
+              }
+            }
           ]
         },
         {
           "name": "record/capture/trace",
           "terms": [
-            "filming",
-            "paint",
-            "photographing",
-            "sketch",
-            "writing"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Filmen",
+                "en": "filming"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Malen",
+                "en": "paint"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fotografieren",
+                "en": "photographing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zeichnen",
+                "en": "sketch"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schreiben",
+                "en": "writing"
+              }
+            }
           ]
         },
         {
           "name": "other",
           "terms": [
-            "arresting",
-            "beating",
-            "carrying",
-            "climbing",
-            "cooking",
-            "digging",
-            "dressing",
-            "hoeing",
-            "jumping",
-            "listening",
-            "pitching",
-            "reading",
-            "rest",
-            "sleep",
-            "undressing",
-            "waiting",
-            "watching"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Verhaften",
+                "en": "arresting"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schlagen",
+                "en": "beating"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tragen",
+                "en": "carrying"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Klettern",
+                "en": "climbing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kochen",
+                "en": "cooking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Graben",
+                "en": "digging"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ankleiden",
+                "en": "dressing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hacken",
+                "en": "hoeing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Springen",
+                "en": "jumping"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zuhören",
+                "en": "listening"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Werfen",
+                "en": "pitching"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Lesen",
+                "en": "reading"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ausruhen",
+                "en": "rest"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schlafen",
+                "en": "sleep"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Entkleiden",
+                "en": "undressing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Warten",
+                "en": "waiting"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schauen",
+                "en": "watching"
+              }
+            }
           ]
         }
       ],
@@ -564,73 +2178,325 @@
         {
           "name": "condition",
           "terms": [
-            "(construction) site",
-            "redevelopment",
-            "war destruction"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baustelle",
+                "en": "(construction) site"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sanierung, Wiederaufbau",
+                "en": "redevelopment"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kriegszerstörung",
+                "en": "war destruction"
+              }
+            }
           ]
         },
         {
           "name": "street furniture",
           "terms": [
-            "bench",
-            "clock",
-            "phone box",
-            "post box",
-            "street lamps",
-            "traffic light",
-            "trash can"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sitzbank",
+                "en": "bench"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Uhr",
+                "en": "clock"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Telefon(Zelle)",
+                "en": "phone box"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Briefkasten",
+                "en": "post box"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Straßenlaterne",
+                "en": "street lamps"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ampel",
+                "en": "traffic light"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Mistkübel",
+                "en": "trash can"
+              }
+            }
           ]
         },
         {
           "name": "vehicle",
           "terms": [
-            "armored vehicle",
-            "carriage",
-            "horsecar"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gepanzertes Fahrzeug",
+                "en": "armored vehicle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kutsche",
+                "en": "carriage"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Pferdebahn",
+                "en": "horsecar"
+              }
+            }
           ]
         },
         {
           "name": "plant",
           "terms": [
-            "bush",
-            "crop plant",
-            "decorative plant",
-            "flower",
-            "tree"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Strauch",
+                "en": "bush"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Nutzpflanze",
+                "en": "crop plant"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zierpflanze",
+                "en": "decorative plant"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Blume",
+                "en": "flower"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baum",
+                "en": "tree"
+              }
+            }
           ]
         },
         {
           "name": "animal",
           "terms": [
-            "bird",
-            "boar",
-            "cat",
-            "cattle",
-            "deer",
-            "dog",
-            "horse",
-            "insect",
-            "rat",
-            "sheep",
-            "squirrel"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Vogel",
+                "en": "bird"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wildschwein",
+                "en": "boar"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Katze",
+                "en": "cat"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rind",
+                "en": "cattle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rotwild",
+                "en": "deer"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hund",
+                "en": "dog"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Pferd",
+                "en": "horse"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Insekt",
+                "en": "insect"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ratte",
+                "en": "rat"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schaf",
+                "en": "sheep"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Eichörnchen",
+                "en": "squirrel"
+              }
+            }
           ]
         },
         {
           "name": "other",
           "terms": [
-            "architectural model",
-            "construction crane",
-            "construction vehicle",
-            "gazer (looking straight into the camera)",
-            "Hitler salute",
-            "memorial",
-            "pedestrians",
-            "plan",
-            "pram",
-            "public art",
-            "scaffold",
-            "swastika flags",
-            "wheelchair"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Architektonisches Modell",
+                "en": "architectural model"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baukran",
+                "en": "construction crane"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baumaschine",
+                "en": "construction vehicle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gaffer (Blick in Kamera)",
+                "en": "gazer (looking straight into the camera)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hitlergruß",
+                "en": "Hitler salute"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Denkmal",
+                "en": "memorial"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Passanten",
+                "en": "pedestrians"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Plan",
+                "en": "plan"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kinderwagen",
+                "en": "pram"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kunst im öffentlichen Raum",
+                "en": "public art"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Baugerüst",
+                "en": "scaffold"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hakenkreuzfahnen",
+                "en": "swastika flags"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rollstuhl",
+                "en": "wheelchair"
+              }
+            }
           ]
         }
       ],
@@ -641,19 +2507,67 @@
         {
           "name": "music",
           "terms": [
-            "added instrumental and vocal music",
-            "added instrumental music",
-            "added vocal music",
-            "instrumental and vocal music",
-            "instrumental music",
-            "vocal music"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik instrumental & vokal nachvertont",
+                "en": "added instrumental and vocal music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik instrumental nachvertont",
+                "en": "added instrumental music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik vokal nachvertont",
+                "en": "added vocal music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik instrumental und vokal",
+                "en": "instrumental and vocal music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik instrumental",
+                "en": "instrumental music"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Musik vokal",
+                "en": "vocal music"
+              }
+            }
           ]
         },
         {
           "name": "speech",
           "terms": [
-            "speech",
-            "voice over"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ansprache",
+                "en": "speech"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Voice Over",
+                "en": "voice over"
+              }
+            }
           ]
         }
       ],
@@ -664,16 +2578,76 @@
         {
           "name": null,
           "terms": [
-            "banner",
-            "boundary sign",
-            "commercial sign",
-            "flag",
-            "logo",
-            "neon sign",
-            "numberplate",
-            "poster",
-            "road sign",
-            "street sign"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Transparent",
+                "en": "banner"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Ortstafel",
+                "en": "boundary sign"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Geschäftsschild",
+                "en": "commercial sign"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Fahne",
+                "en": "flag"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Logo",
+                "en": "logo"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Leuchtschrift",
+                "en": "neon sign"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Nummerntafel",
+                "en": "numberplate"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Plakat",
+                "en": "poster"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Verkehrsschild",
+                "en": "road sign"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Straßenschild",
+                "en": "street sign"
+              }
+            }
           ]
         }
       ],
@@ -684,18 +2658,60 @@
         {
           "name": "season",
           "terms": [
-            "fall",
-            "spring",
-            "summer",
-            "winter"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Herbst",
+                "en": "fall"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Frühling",
+                "en": "spring"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sommer",
+                "en": "summer"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Winter",
+                "en": "winter"
+              }
+            }
           ]
         },
         {
           "name": "daytime",
           "terms": [
-            "day",
-            "night",
-            "twilight"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Tag",
+                "en": "day"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Nacht",
+                "en": "night"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Dämmerung",
+                "en": "twilight"
+              }
+            }
           ]
         }
       ],
@@ -706,16 +2722,76 @@
         {
           "name": null,
           "terms": [
-            "clouds",
-            "flood",
-            "hail",
-            "mist",
-            "rain",
-            "rainbow",
-            "snow",
-            "storm",
-            "sunshine",
-            "wind"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wolken",
+                "en": "clouds"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hochwasser",
+                "en": "flood"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Hagel",
+                "en": "hail"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Nebel",
+                "en": "mist"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Regen",
+                "en": "rain"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Regenbogen",
+                "en": "rainbow"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schnee",
+                "en": "snow"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sturm",
+                "en": "storm"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Sonnenschein",
+                "en": "sunshine"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Wind",
+                "en": "wind"
+              }
+            }
           ]
         }
       ],
@@ -726,15 +2802,69 @@
         {
           "name": null,
           "terms": [
-            "ambulance service",
-            "denomination",
-            "fire service",
-            "military",
-            "paramilitary",
-            "party",
-            "police",
-            "society",
-            "union"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Rettungsdienst",
+                "en": "ambulance service"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Religionsgemeinschaft",
+                "en": "denomination"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Feuerwehr",
+                "en": "fire service"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Militär",
+                "en": "military"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Paramilitär",
+                "en": "paramilitary"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Partei",
+                "en": "party"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Polizei ",
+                "en": "police"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Verein",
+                "en": "society"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Gewerkschaft",
+                "en": "union"
+              }
+            }
           ]
         }
       ],
@@ -745,44 +2875,182 @@
         {
           "name": "shot size",
           "terms": [
-            "american shot",
-            "close-up (CU)",
-            "extreme close-up (ECU)",
-            "extreme long shot (ELS)",
-            "long shot (LS)",
-            "medium close shot (MCS)",
-            "medium full shot (MFS)",
-            "medium shot (MS)"
+            {
+              "iri": "",
+              "labels": {
+                "de": "American Shot",
+                "en": "american shot"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "close-up (CU)",
+                "en": "close-up (CU)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "extreme close-up (ECU)",
+                "en": "extreme close-up (ECU)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "extreme long shot (ELS)",
+                "en": "extreme long shot (ELS)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Long Shot (LS)",
+                "en": "long shot (LS)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "medium close shot (MCS)",
+                "en": "medium close shot (MCS)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "medium full shot (MFS)",
+                "en": "medium full shot (MFS)"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Medium Shot (MS)",
+                "en": "medium shot (MS)"
+              }
+            }
           ]
         },
         {
           "name": "camera angle",
           "terms": [
-            "aerial shot",
-            "high angle",
-            "low angle",
-            "straight on angle"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Luftaufnahme",
+                "en": "aerial shot"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "high angle",
+                "en": "high angle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "low angle",
+                "en": "low angle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "straight on angle",
+                "en": "straight on angle"
+              }
+            }
           ]
         },
         {
           "name": "camera movement",
           "terms": [
-            "cross fade",
-            "panning shot",
-            "phantom-ride",
-            "tilt",
-            "tracking",
-            "zoom"
+            {
+              "iri": "",
+              "labels": {
+                "de": "cross fade",
+                "en": "cross fade"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Panoramaschwenk",
+                "en": "panning shot"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Pantom-ride",
+                "en": "phantom-ride"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Schwenk",
+                "en": "tilt"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kamerafahrt",
+                "en": "tracking"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zoom",
+                "en": "zoom"
+              }
+            }
           ]
         },
         {
           "name": "transition",
           "terms": [
-            "black frame",
-            "intertitle",
-            "stop",
-            "white frame",
-            "wipe"
+            {
+              "iri": "",
+              "labels": {
+                "de": "black frame",
+                "en": "black frame"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Zwischentitel",
+                "en": "intertitle"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kamerastopp",
+                "en": "stop"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "white frame",
+                "en": "white frame"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Trickblende",
+                "en": "wipe"
+              }
+            }
           ]
         }
       ],
@@ -793,15 +3061,33 @@
         {
           "name": null,
           "terms": [
-            "in-camera editing",
-            "post-production editing",
-            "splice"
+            {
+              "iri": "",
+              "labels": {
+                "de": "Kameraschnitt",
+                "en": "in-camera editing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Nachträglicher Schnitt",
+                "en": "post-production editing"
+              }
+            },
+            {
+              "iri": "",
+              "labels": {
+                "de": "Klebestelle",
+                "en": "splice"
+              }
+            }
           ]
         }
       ],
       "name": "editing(type)"
     }
   ],
-  "created": "2017-09-08 11:13:44.793829",
+  "created": "2017-09-08 11:32:19.936898",
   "vocabulary": "IMC controlled vocabulary"
 }

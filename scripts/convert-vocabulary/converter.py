@@ -21,9 +21,11 @@ for ws in wb.worksheets:
     current_group = ws['G2'].value
     group_terms = []
     for row_index in range(2, ws.max_row + 1):
-        entry = ws['J' + str(row_index)].value
+        entry = {'iri': '', 'labels': {}}
+        en_term = ws['J' + str(row_index)].value
+        de_term = ws['I' + str(row_index)].value
         group = ws['G' + str(row_index)].value
-        if entry is None:
+        if en_term is None:
             # ignore also groups without entry value
             continue
         if group != current_group:
@@ -34,6 +36,8 @@ for ws in wb.worksheets:
             # group is changed
             group_terms = []
 
+        entry['labels']['en'] = en_term
+        entry['labels']['de'] = de_term
         group_terms.append(entry)
         # print('\t-{}'.format(entry))
 
