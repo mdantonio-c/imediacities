@@ -100,7 +100,8 @@
 										<ul uib-dropdown-submenu>
 											<!--<li role="menuitem"><a href="#">{{term.iri}}</a>-->
 											<!--<li role="menuitem"><a href="#">{{term.labels}}</a>-->
-											<span ng-click="(term.labels.en === 'suburb')?watchCtrl.manualtag():return;">{{term.labels.en}}</span>
+											<!--<span ng-click="(term.labels.en === 'suburb')?watchCtrl.manualtag():return;">{{term.labels.en}}</span>-->
+											<span ng-click="watchCtrl.manualtag(category.name,term.labels.en);">{{term.labels.en}}</span>
 										</ul>
 									</div>
 								</ul>
@@ -231,11 +232,13 @@
 		  <script type="text/ng-template" id="myModalGeoCode.html">
 		    <div class="modal-header">
 		      <h3 class="modal-title">Manual tag form</h3>
+		      <p>&nbsp;</p>
+  				<p>Choose a location if you want, if not please leave empty and click on the tag button</p>
 		    </div>
 		    <div class="modal-body">
 		      <form ng-submit="ok()">
 		        <div class="input-group animated fadeIn">
-		          <input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="City, State..." autofocus>
+		          <input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>
 		          <span class="input-group-btn">
 		          <button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
 		      </span>
