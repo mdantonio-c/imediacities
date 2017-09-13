@@ -65,7 +65,9 @@
 		  		app.service('sharedProperties', function() {
 	    		var startTime = 'test start value';
 	    		var endTime = 'test end value';
-	    
+	    	    var labelTerm = 'test label value';
+	    	    var group = 'test label value';
+
 	    		return {
 	        		getStartTime: function() {
 	            		return startTime;
@@ -73,11 +75,23 @@
 	        		getEndTime: function() {
 	            		return endTime;
 	        		},
+	        		getLabelTerm: function() {
+	            		return labelTerm;
+	        		},
+	        		getGroup: function() {
+	            		return group;
+	        		},
 	        		setStartTime: function(value) {
 	            		startTime = value;
 	        		},
 	        		setEndTime: function(value) {
 	            		endTime = value;
+	        		},
+	        		setLabelTerm: function(value) {
+	            		labelTerm = value;
+	        		},
+	        		setGroup: function(value) {
+	            		group = value;
 	        		}
 	    		}
 				});
@@ -541,7 +555,7 @@
 			    		}
 					}
 
-					self.manualtag = function(){
+					self.manualtag = function(group,labelterm){
 						if (self.onpause && !self.onplaying) {
 							/*manual tag general mode
 							self.mtagging = true;
@@ -575,6 +589,8 @@
 							if (self.startTagTime>=times1 && self.startTagTime<=times2){
 									sharedProperties.setStartTime(times1);
 									sharedProperties.setEndTime(times2);
+									sharedProperties.setGroup(group);
+									sharedProperties.setLabelTerm(labelterm);
 									myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 								}
 							}
@@ -637,7 +653,7 @@
 											"cssStyle": "height: 100%; width: 100%;",
 											//"displayed": false,
 											"options" : {
-												timeline: { showRowLabels: true, colorByRowLabel: true},
+												timeline: {showRowLabels: true, colorByRowLabel: true},
 												avoidOverlappingGridLines: false,
 												hAxis: {
     												minValue: new Date(0,0,0,0,0,0),
@@ -782,10 +798,10 @@
   						  alert(props);
 					};
 
-					$rootScope.$on('updateTimeline', function(event, locname, startT, endT) {
+					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm) {
 	    				self.videoTimeline.data.rows.push({c: [
-							  {v: "Location"},
-							  {v: locname},
+							  {v: group},
+							  {v: labelTerm+": "+locname},
 							  {v: new Date(0,0,0,0,0,startT)},
 							  {v: new Date(0,0,0,0,0,endT)}
 						]});
@@ -931,8 +947,10 @@
 
 		  		$scope.startT = sharedProperties.getStartTime();
 		  		$scope.endT = sharedProperties.getEndTime();
+		  		$scope.group = sharedProperties.getGroup();
+		  		$scope.labelTerm = sharedProperties.getLabelTerm();
 
-				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT);
+				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 
 		    	$uibModalInstance.close($scope.tagInput);
 		  	};
