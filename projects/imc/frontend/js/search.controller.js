@@ -158,7 +158,7 @@
 						};
 					});
 
-				app.directive('scrollOnClick', function() {
+				/*app.directive('scrollOnClick', function() {
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -184,8 +184,8 @@
 								});
 							}
 						};
-					})
-					/*app.directive('scrollOnClick', function() { //carousel version
+					})*/
+					app.directive('scrollOnClick', function() { //carousel version
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -216,7 +216,7 @@
 								});
 							}
 						};
-					})*/
+					})
 					.directive('modalMovable', ['$document',
 			    	function($document) {
 			        return {
@@ -259,6 +259,28 @@
 			        	};
 			    		}
 					]);
+
+
+					app.directive('dropdown', function($document) {
+					return {
+						restrict: "C",
+						link: function(scope, elem, attr) {
+			
+						elem.bind('click', function() {
+						elem.toggleClass('dropdown-active');
+						elem.addClass('active-recent');
+						});
+			
+					$document.bind('click', function() {
+						if(!elem.hasClass('active-recent')) {
+						elem.removeClass('dropdown-active');
+					}
+					elem.removeClass('active-recent');
+					});
+			
+					}
+				}
+				});
 
 				function getElement(event) {
 					return angular.element(event.srcElement || event.target);
@@ -397,13 +419,62 @@
 
 				}
 
-				function WatchController($scope, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
+				function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
 
-					var self = this;
-					self.showmesb = false;
-					self.showmeli = true;
-					var vid = $stateParams.v;
-					self.video = $stateParams.meta;
+						var self = this;
+						self.showmesb = false;
+						self.showmeli = true;
+						var vid = $stateParams.v;
+						self.video = $stateParams.meta;
+
+						self.vocabulary = [
+					    {
+					        "name": "Electronics",
+					        "subHeader": [
+					            {
+					                "name": "Mobiles",
+					                "view": "#mobile"
+					            },
+					            {
+					                "name": "Tablet",
+					                "view": "#tablet"
+					            },
+					            {
+					                "name": "Television",
+					                "view": "#television"
+					            },
+					            {
+					                "name": "Headphones",
+					                "view": "#headphones"
+					            }
+					        ]
+					    },
+					    {
+					        "name": "Men",
+					        "subHeader": [
+					            {
+					                "name": "Shirts",
+					                "view": "#shirts"
+					            },
+					            {
+					                "name": "T-shirts",
+					                "view": "#tshirts"
+					            },
+					            {
+					                "name": "Trousers",
+					                "view": "#trousers"
+					            },
+					            {
+					                "name": "Jeans",
+					                "view": "#jeans"
+					            }
+					        ]
+					    }
+					];
+
+					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
+   						self.vocabularyFinal = data;
+					});
 
 					// Initializing values
 					self.onplaying = false;
@@ -447,12 +518,13 @@
 
 					// Pause video function
 					self.pauseVid = function(){     
-			    	if (!myVid[0].paused && !self.onpause && !self.mtagging) {
+			    	if ((!myVid[0].paused || !self.onpause) && !self.mtagging) {
 			    			self.onpause = true;
 			        		self.onplaying = false;
 			        		myVid[0].pause();
 			    		}
-			    	else if (!myVid[0].paused && !self.onpause && self.mtagging) {
+			    	/*else if ((!myVid[0].paused || !self.onpause) && self.mtagging) {
+			    			manual tag general mode
 			        		self.onpause = true;
 			        		self.onplaying = false;
 			        		self.mtagging = false;
@@ -460,7 +532,7 @@
 			    			myVid[0].pause();
 			        		sharedProperties.setEndTime(myVid[0].currentTime);
 	        				myModalGeoFactory.open('lg', 'myModalGeoCode.html');
-			    		}
+			    		}*/
 			    	else if (myVid[0].paused && self.onpause) {
 			        		self.onpause = false;
 			        		self.onplaying = true;
@@ -471,11 +543,41 @@
 
 					self.manualtag = function(){
 						if (self.onpause && !self.onplaying) {
+							/*manual tag general mode
 							self.mtagging = true;
 							self.showtagtxt = true;
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
-							playVid(myVid[0]);
+							playVid(myVid[0]);*/
+							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
+							sharedProperties.setStartTime(self.startTagTime);
+
+							for (var i=0; i<self.items.length-1; i++)
+							{
+
+							var time1 = self.items[i][5];
+							var time2 = self.items[i+1][5];
+
+							var currtime1 = time1.split("-")[0];
+							var hours1 = currtime1.split(":")[0];
+							var mins1 = currtime1.split(":")[1];
+							var secs1 = currtime1.split(":")[2];
+							//var cdate = new Date(0, 0, 0, hours, mins, secs);
+							var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
+
+							var currtime2 = time2.split("-")[0];
+							var hours2 = currtime2.split(":")[0];
+							var mins2 = currtime2.split(":")[1];
+							var secs2 = currtime2.split(":")[2];
+							//var cdate = new Date(0, 0, 0, hours, mins, secs);
+							var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+
+							if (self.startTagTime>=times1 && self.startTagTime<=times2){
+									sharedProperties.setStartTime(times1);
+									sharedProperties.setEndTime(times2);
+									myModalGeoFactory.open('lg', 'myModalGeoCode.html');
+								}
+							}
 						}
 					}
 
@@ -509,28 +611,45 @@
 											playVid(myVid[0]);
 				    					}
 
+				    					setTimeout(function() { 
+
 										//timeline definition
 										self.mainchar = '30-60';
 										self.outside = '180-250';
 										self.crowd = '270-300';
 
+										self.vduration = self.currentvidDur;
+
+										var minutes = 0, hours = 0;
+										var seconds = self.vduration;
+									    if (seconds / 60 > 0) {
+									        minutes = parseInt(seconds / 60, 10);
+									        seconds = seconds % 60;
+									    }
+									    if (minutes / 60 > 0) {
+									        hours = parseInt(minutes / 60, 10);
+									        minutes = minutes % 60;
+									    }
+
+										/*configuration*/
 										var videoTimeline = {
 											"type": "Timeline",
-											//"cssStyle": "height: 100%; padding-left: 10px;",
+											"cssStyle": "height: 100%; width: 100%;",
 											//"displayed": false,
 											"options" : {
-												timeline: { showRowLabels: false },
-												avoidOverlappingGridLines: false
+												timeline: { showRowLabels: true },
+												avoidOverlappingGridLines: false,
+												hAxis: {
+    												minValue: new Date(0,0,0,0,0,0),
+   	 												maxValue: new Date(0,0,0,hours,minutes,seconds),
+   	 												format: 'HH:mm:ss'
+  												}
 		        							}
 										};
 
-										var vduration = self.currentvidDur;
-
 										// add data to the timeline
 
-										self.videoTimeline = videoTimeline;
-
-										self.videoTimeline.data = {
+										videoTimeline.data = {
 		    								"cols": [
 		    								{id: "category", label: "Category", type: "string"},
 		    								{id: "tag", label: "Tag", type: "string"},
@@ -538,41 +657,52 @@
 		    								{id: "end", label: "End", type: "date"}
 		    							], "rows": []};
 
-
-		    							self.videoTimeline.data.rows.push({c: [
-								    	   {v: "Video"},
-								    	   {v: "video duration"},
-								    	   {v: new Date(0,0,0,0,0,0)},
-								    	   {v: new Date(0,0,0,0,0,vduration)}
-										]});
-
-		    							self.videoTimeline.data.rows.push({c: [
+		    							videoTimeline.data.rows.push({c: [
 								    	   {v: "Location"},
 								    	   {v: "Porta S."},
 								   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-										self.videoTimeline.data.rows.push({c: [
+										videoTimeline.data.rows.push({c: [
 								       		{v: "Location"},
 								       		{v: "Porta P."},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-		    			 				self.videoTimeline.data.rows.push({c: [
+		    			 				videoTimeline.data.rows.push({c: [
 								    	   {v: "Location"},
 								    	   {v: "Via Mazzini"},
 								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
 								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
 										]});
 
-										self.videoTimeline.data.rows.push({c: [
+										videoTimeline.data.rows.push({c: [
+								    	   {v: "Location"},
+								    	   {v: "Via Indipendenza"},
+								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
+								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
+										]});
+
+										videoTimeline.data.rows.push({c: [
+								    	   {v: "Location"},
+								    	   {v: "Via Oberdan"},
+								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
+								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
+										]});
+
+										videoTimeline.data.rows.push({c: [
 								    	   {v: "People"},
 								     	  {v: "Crowd"},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
 										]});
+
+										self.videoTimeline = videoTimeline;
+
+										}, 2000);
+
 									}
 								});
 						};
@@ -645,6 +775,11 @@
 							myVid[0].currentTime = time1c;
 							myVid[0].play();
 						}
+					};
+
+					self.getTagMenu = function(event) {
+						  var props = timeline.getEventProperties(event)
+  						  alert(props);
 					};
 
 					$rootScope.$on('updateTimeline', function(event, locname, startT, endT) {
@@ -776,7 +911,7 @@
 						var locationlng = result[0].geometry.location.lng();
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
-						myGeoConfirmFactory.open('lg', 'result.html', {result: restring,resarr: result});
+						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
 		  	};

@@ -71,19 +71,8 @@
 
 #timeline-graph {
 	height: 50%;
-	padding-left: 0px;
-	overflow-y: hidden; 
-	overflow-x: hidden; 
-}
-
-.timeline-graph {
-	list-style: none;
-	position: relative;
-	/*padding: 60px 0px 0px 0px;*/
-	display: inline-block;
-	background-color: #fff;
-	overflow-y: hidden; 
-	overflow-x: hidden; 
+	overflow-y: scroll; 
+	overflow-x: scroll; 
 }
 
 div.scrollmenu {
@@ -107,7 +96,11 @@ img:hover {
     cursor: pointer;
 }
 
-/*.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
+li:hover{
+    cursor: pointer;
+}
+
+.carousel-inner>.item>a>img,.carousel-inner>.item>img,.img-responsive,.thumbnail a>img,.thumbnail>img
 	{
 	display: block;
 	max-width: 100%;
@@ -116,11 +109,13 @@ img:hover {
 
 .carousel-indicators{
    top:40px; 
+   visibility: hidden;
 }
 
 .carousel-control.left,.carousel-control.right {
     width: 5%;
-}*/
+    height: 100%;
+}
 
 /*sidebar styling*/
 #wrapper {
@@ -449,15 +444,15 @@ h2 {
   width: 100%;
 }
 
-.no-scrollbar {
+/*.no-scrollbar {
   position: relative;
   overflow-x: hidden;
   overflow-y: hidden;
   width: 100%;
   height: 100%;
-  /* Padding the width of the scrollbar will be added to the right */
+  /* Padding the width of the scrollbar will be added to the right 
   box-sizing: content-box;
-}
+}*/
 
 element.style {
     height: auto;
@@ -468,3 +463,6 @@ element.style {
     top: 0px;
     left: 0px;
 }
+
+
+
