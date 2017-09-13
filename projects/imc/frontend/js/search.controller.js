@@ -637,7 +637,7 @@
 											"cssStyle": "height: 100%; width: 100%;",
 											//"displayed": false,
 											"options" : {
-												timeline: { showRowLabels: true },
+												timeline: { showRowLabels: true, colorByRowLabel: true},
 												avoidOverlappingGridLines: false,
 												hAxis: {
     												minValue: new Date(0,0,0,0,0,0),
