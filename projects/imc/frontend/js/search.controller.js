@@ -435,56 +435,11 @@
 
 				function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
 
-						var self = this;
-						self.showmesb = false;
-						self.showmeli = true;
-						var vid = $stateParams.v;
-						self.video = $stateParams.meta;
-
-						self.vocabulary = [
-					    {
-					        "name": "Electronics",
-					        "subHeader": [
-					            {
-					                "name": "Mobiles",
-					                "view": "#mobile"
-					            },
-					            {
-					                "name": "Tablet",
-					                "view": "#tablet"
-					            },
-					            {
-					                "name": "Television",
-					                "view": "#television"
-					            },
-					            {
-					                "name": "Headphones",
-					                "view": "#headphones"
-					            }
-					        ]
-					    },
-					    {
-					        "name": "Men",
-					        "subHeader": [
-					            {
-					                "name": "Shirts",
-					                "view": "#shirts"
-					            },
-					            {
-					                "name": "T-shirts",
-					                "view": "#tshirts"
-					            },
-					            {
-					                "name": "Trousers",
-					                "view": "#trousers"
-					            },
-					            {
-					                "name": "Jeans",
-					                "view": "#jeans"
-					            }
-					        ]
-					    }
-					];
+					var self = this;
+					self.showmesb = false;
+					self.showmeli = true;
+					var vid = $stateParams.v;
+					self.video = $stateParams.meta;
 
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
    						self.vocabularyFinal = data;
