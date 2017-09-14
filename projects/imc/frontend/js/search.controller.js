@@ -674,43 +674,29 @@
 		    							], "rows": []};
 
 		    							videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Porta S."},
+								    	   {v: "area"},
+								    	   {v: "Porta Saragozza"},
 								   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
 										videoTimeline.data.rows.push({c: [
-								       		{v: "Location"},
-								       		{v: "Porta P."},
+								       		{v: "area"},
+								       		{v: "Porta Mazzini"},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-		    			 				videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Via Mazzini"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
 										videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
+								    	   {v: "area"},
 								    	   {v: "Via Indipendenza"},
 								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
 								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
 										]});
 
 										videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Via Oberdan"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "People"},
-								     	  {v: "Crowd"},
+								    	   {v: "traffic area"},
+								     	  {v: "- Chiesa di S. Francesco"},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
 										]});
