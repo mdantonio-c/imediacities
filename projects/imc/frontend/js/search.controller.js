@@ -871,6 +871,7 @@
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
+						$uibModalInstance.close($scope.tagInput);
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
 		  	};
@@ -883,6 +884,8 @@
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
 
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+
+				$uibModalInstance.close($scope.tagInput);
 
 		    };
 
