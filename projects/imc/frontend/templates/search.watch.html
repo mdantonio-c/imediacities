@@ -240,7 +240,7 @@
 		        <div class="input-group animated fadeIn">
 		          <input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>
 		          <span class="input-group-btn">
-		          <button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
+		          <button class="btn btn-default" type="button" ng-click="(tagInput === '') ? ok : ok1()">Tag</button>
 		      </span>
 		        </div>
 		      </form>
