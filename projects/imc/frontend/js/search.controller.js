@@ -172,7 +172,7 @@
 						};
 					});
 
-				/*app.directive('scrollOnClick', function() {
+				app.directive('scrollStoryOnClick', function() {
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -198,7 +198,7 @@
 								});
 							}
 						};
-					})*/
+					});
 					app.directive('scrollOnClick', function() { //carousel version
 						return {
 							//restrict: 'A',
