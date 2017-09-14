@@ -799,9 +799,11 @@
 					};
 
 					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm) {
+						if (locname != '') var locn = " - "+locname;
+						else var locn = locname;
 	    				self.videoTimeline.data.rows.push({c: [
 							  {v: group},
-							  {v: labelTerm+": "+locname},
+							  {v: labelTerm+locn},
 							  {v: new Date(0,0,0,0,0,startT)},
 							  {v: new Date(0,0,0,0,0,endT)}
 						]});
@@ -915,7 +917,7 @@
 
 			// Please note that $modalInstance represents a modal window (instance) dependency.
 			// It is not the same as the $uibModal service used above.
-			function geoTagController($scope, $uibModalInstance, myGeoConfirmFactory, GeoCoder) {
+			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, sharedProperties) {
 		  	$scope.geocodingResult = "";
 
 		  	$scope.ok = function() {
@@ -931,6 +933,17 @@
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
 		  	};
+
+		  	$scope.ok1 = function() {
+
+		  		$scope.startT = sharedProperties.getStartTime();
+		  		$scope.endT = sharedProperties.getEndTime();
+		  		$scope.group = sharedProperties.getGroup();
+		  		$scope.labelTerm = sharedProperties.getLabelTerm();
+
+				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+
+		    };
 
 		  	$scope.cancel = function() {
 		    	$uibModalInstance.dismiss('cancel');
