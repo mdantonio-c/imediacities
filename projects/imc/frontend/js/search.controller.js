@@ -1015,7 +1015,7 @@
 
 		  	$scope.ok = function() {
 
-				if($scope.vm.address.locality != ''){
+				if(!angular.isUndefined($scope.vm)){
 
 				var route = '';
 				var locality = '';
@@ -1047,7 +1047,7 @@
 		  		$scope.group = sharedProperties.getGroup();
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
-				$uibModalInstance.close($scope.vm.address.locality);
+				$uibModalInstance.close(null);
 
 		   	 };
 			}
