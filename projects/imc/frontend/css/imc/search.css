@@ -465,4 +465,14 @@ element.style {
 }
 
 
+/*needed to visualize correctly the autocomplete text input field*/
+.pac-container {
+    z-index: 1051 !important;
+}
 
+.modal{
+    z-index: 2;   
+}
+.modal-backdrop{
+    z-index: 100;        
+}​
