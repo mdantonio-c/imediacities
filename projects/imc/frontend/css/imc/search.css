@@ -359,7 +359,7 @@ ul li {
 	/*border-bottom: 1px solid #ddd;*/
 	border-bottom: 1px;
 	padding: 10px;
-	overflow: hidden;
+	overflow: visible;
 }
 ul li:first-child {
 	/*border-top: 1px solid #ddd;*/
@@ -476,3 +476,5 @@ element.style {
 .modal-backdrop{
     z-index: 100;        
 }​
+
+
