@@ -791,7 +791,7 @@
 
 										videoTimeline.data.rows.push({c: [
 								    	   {v: "traffic area"},
-								     	  {v: "- Chiesa di S. Francesco"},
+								     	  {v: "Chiesa di S. Francesco"},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
 										]});
