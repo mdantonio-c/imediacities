@@ -28,7 +28,7 @@
 							});
 						}
 					};
-				}).factory('myModalGeoFactory', function($uibModal) {
+				}).factory('myModalGeoFactory', function($uibModal) {/*modal view add location tag definition*/
 		    	return {
 		      			open: function(size, template, params) {
 		        			return $uibModal.open({
@@ -172,7 +172,7 @@
 						};
 					});
 
-				/*app.directive('scrollOnClick', function() {
+				app.directive('scrollStoryOnClick', function() {
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -198,7 +198,7 @@
 								});
 							}
 						};
-					})*/
+					});
 					app.directive('scrollOnClick', function() { //carousel version
 						return {
 							//restrict: 'A',
@@ -293,8 +293,141 @@
 					});
 			
 					}
-				}
-				});
+					}
+					});
+
+					app.directive('ngAutocomplete', ['$parse', '$timeout', 
+			        function ($parse, $timeout) {
+			       
+			            function convertPlaceToFriendlyObject(place) {
+			                var result = undefined;
+			                if (place) {
+			                    result = {};
+			                    for (var i = 0, l = place.address_components.length; i < l; i++) {
+			                        if (i == 0) {
+			                            result.searchedBy = place.address_components[i].types[0];
+			                        }
+			                        result[place.address_components[i].types[0]] = place.address_components[i].long_name;
+			                    }
+			                    result.formattedAddress = place.formatted_address;
+			                    result.lat = place.geometry.location.lat();
+			                    result.lng = place.geometry.location.lng();
+			                }
+			                return result;
+			            }
+
+			            return {
+			                restrict: 'A',
+			                require: 'ngModel', 
+			                link: function ($scope, $element, $attrs, $ctrl) {
+			                    
+			                    if (!angular.isDefined($attrs.details)) {
+			                        throw '<ng-autocomplete> must have attribute [details] assigned to store full address object';
+			                    }
+
+			                    var getDetails = $parse($attrs.details);
+			                    var setDetails = getDetails.assign;
+			                    var getOptions = $parse($attrs.options);
+
+			                    //options for autocomplete
+			                    var opts;
+
+			                    //convert options provided to opts
+			                    var initOpts = function () {
+			                        opts = {};
+			                        if (angular.isDefined($attrs.options)) {
+			                            var options = getOptions($scope);
+			                            if (options.types) {
+			                                opts.types = [];
+			                                opts.types.push(options.types);
+			                            }
+			                            if (options.bounds) {
+			                                opts.bounds = options.bounds;
+			                            }
+			                            if (options.country) {
+			                                opts.componentRestrictions = {
+			                                    country: options.country
+			                                };
+			                            }
+			                        }
+			                    };
+
+			                    //create new autocomplete
+			                    //reinitializes on every change of the options provided
+			                    var newAutocomplete = function () {
+
+								$timeout(function() {
+
+			                        var gPlace = new google.maps.places.Autocomplete($element[0], opts);
+			                        google.maps.event.addListener(gPlace, 'place_changed', function () {
+			                            $scope.$apply(function () {
+			                                var place = gPlace.getPlace();
+			                                var details = convertPlaceToFriendlyObject(place);
+			                                setDetails($scope, details);
+			                                $ctrl.$setViewValue(details.formattedAddress);
+			                                $ctrl.$validate();
+			                            });
+			                            if ($ctrl.$valid && angular.isDefined($attrs.validateFn)) {
+			                                $scope.$apply(function () {
+			                                    $scope.$eval($attrs.validateFn);
+			                                });
+			                            }
+			                        });
+
+								}, 1000);
+
+			                    };
+			                    newAutocomplete();
+
+			                    $ctrl.$validators.parse = function (value) {
+			                        var details = getDetails($scope);
+			                        var valid = ($attrs.required == true && details != undefined && details.lat != undefined) ||
+			                            (!$attrs.required && (details == undefined || details.lat == undefined) && $element.val() != '');
+			                        return valid;
+			                    };
+
+			                    $element.on('keypress', function (e) {
+			                        // prevent form submission on pressing Enter as there could be more inputs to fill out
+			                        if (e.which == 13) {
+			                            e.preventDefault();
+			                        }
+			                    });
+
+			                    //watch options provided to directive
+			                    if (angular.isDefined($attrs.options)) {
+			                        $scope.$watch($attrs.options, function() {
+			                            initOpts();
+			                            newAutocomplete();
+			                        });
+			                    }
+
+			                    // user typed something in the input - means an intention to change address, which is why
+			                    // we need to null out all fields for fresh validation
+			                    $element.on('keyup', function (e) {
+			                        //          chars 0-9, a-z                        numpad 0-9                   backspace         delete           space
+			                        if ((e.which >= 48 && e.which <= 90) || (e.which >= 96 && e.which <= 105) || e.which == 8 || e.which == 46 || e.which == 32) {
+			                            var details = getDetails($scope);
+			                            if (details != undefined) {
+			                                for (var property in details) {
+			                                    if (details.hasOwnProperty(property) && property != 'formattedAddress') {
+			                                        delete details[property];
+			                                    }
+			                                }
+			                                setDetails($scope, details);
+			                            }
+			                            if ($ctrl.$valid) {
+			                                $scope.$apply(function () {
+			                                    $ctrl.$setValidity('parse', false);
+			                                });
+			                            	}
+			                        	}
+			                    	});
+
+			               	 	}
+			            	};
+			        	}
+			    	]);
+
 
 				function getElement(event) {
 					return angular.element(event.srcElement || event.target);
@@ -435,56 +568,14 @@
 
 				function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
 
-						var self = this;
-						self.showmesb = false;
-						self.showmeli = true;
-						var vid = $stateParams.v;
-						self.video = $stateParams.meta;
+					var self = this;
+					self.showmesb = false;
+					self.showmeli = true;
+					var vid = $stateParams.v;
+					self.video = $stateParams.meta;
 
-						self.vocabulary = [
-					    {
-					        "name": "Electronics",
-					        "subHeader": [
-					            {
-					                "name": "Mobiles",
-					                "view": "#mobile"
-					            },
-					            {
-					                "name": "Tablet",
-					                "view": "#tablet"
-					            },
-					            {
-					                "name": "Television",
-					                "view": "#television"
-					            },
-					            {
-					                "name": "Headphones",
-					                "view": "#headphones"
-					            }
-					        ]
-					    },
-					    {
-					        "name": "Men",
-					        "subHeader": [
-					            {
-					                "name": "Shirts",
-					                "view": "#shirts"
-					            },
-					            {
-					                "name": "T-shirts",
-					                "view": "#tshirts"
-					            },
-					            {
-					                "name": "Trousers",
-					                "view": "#trousers"
-					            },
-					            {
-					                "name": "Jeans",
-					                "view": "#jeans"
-					            }
-					        ]
-					    }
-					];
+					/*inizialize address for automplete input tag for geolocation*/
+   					$scope.vm = {address: {}};
 
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
    						self.vocabularyFinal = data;
@@ -512,6 +603,10 @@
 			    			myVid[0].pause();
 			    			paused = true;
 			    		}
+
+						/*updating subtitles*/
+						//if (self.videoTimeline != null) $rootScope.$emit('updateSubtitles');
+
 					};
 
 					// On video pause toggle values
@@ -674,43 +769,29 @@
 		    							], "rows": []};
 
 		    							videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Porta S."},
+								    	   {v: "area"},
+								    	   {v: "Porta Saragozza"},
 								   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
 										videoTimeline.data.rows.push({c: [
-								       		{v: "Location"},
-								       		{v: "Porta P."},
+								       		{v: "area"},
+								       		{v: "Porta Mazzini"},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-		    			 				videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Via Mazzini"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
 										videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
+								    	   {v: "area"},
 								    	   {v: "Via Indipendenza"},
 								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
 								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
 										]});
 
 										videoTimeline.data.rows.push({c: [
-								    	   {v: "Location"},
-								    	   {v: "Via Oberdan"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "People"},
-								     	  {v: "Crowd"},
+								    	   {v: "traffic area"},
+								     	  {v: "Chiesa di S. Francesco"},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
 								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
 										]});
@@ -799,12 +880,26 @@
 					};
 
 					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm) {
+						if (locname != '') var locn = " - "+locname;
+						else var locn = locname;
 	    				self.videoTimeline.data.rows.push({c: [
 							  {v: group},
-							  {v: labelTerm+": "+locname},
+							  {v: labelTerm+locn},
 							  {v: new Date(0,0,0,0,0,startT)},
 							  {v: new Date(0,0,0,0,0,endT)}
 						]});
+	  				});
+
+					$rootScope.$on('updateSubtitles', function() {
+						
+						/*for (var elems in self.videoTimeline.data.rows)
+						{
+							for (var line in elems.c)
+							{
+								alert(line[1]);
+							}
+						}*/
+
 	  				});
 
 				}
@@ -845,7 +940,7 @@
 						});
 					}, 3000);
 
-					vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI";
+					vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
 				}
 
 				// storyboard modal view
@@ -915,12 +1010,25 @@
 
 			// Please note that $modalInstance represents a modal window (instance) dependency.
 			// It is not the same as the $uibModal service used above.
-			function geoTagController($scope, $uibModalInstance, myGeoConfirmFactory, GeoCoder) {
+			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, sharedProperties) {
 		  	$scope.geocodingResult = "";
 
 		  	$scope.ok = function() {
+
+				if(!angular.isUndefined($scope.vm)){
+
+				var route = '';
+				var locality = '';
+				var country = '';
+
+				if ($scope.vm.address.route != null) var route = $scope.vm.address.route;
+				if ($scope.vm.address.locality != null) var locality = $scope.vm.address.locality;
+				if ($scope.vm.address.country != null) var country = $scope.vm.address.country;		
+
+				var stringloc = route+' '+locality+' '+country;
+
 		    	GeoCoder.geocode({
-						address: $scope.tagInput
+						address: stringloc
 					})
 					.then(function(result) {
 						var locationlat = result[0].geometry.location.lat();
@@ -928,13 +1036,26 @@
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
+						$uibModalInstance.close($scope.vm.address.locality);
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
-		  	};
+		    }
+		    else{
+
+		  		$scope.startT = sharedProperties.getStartTime();
+		  		$scope.endT = sharedProperties.getEndTime();
+		  		$scope.group = sharedProperties.getGroup();
+		  		$scope.labelTerm = sharedProperties.getLabelTerm();
+				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				$uibModalInstance.close(null);
+
+		   	 };
+			}
 
 		  	$scope.cancel = function() {
 		    	$uibModalInstance.dismiss('cancel');
 		  	};
+
 			}
 
 			function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties) {
@@ -952,7 +1073,7 @@
 
 				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 
-		    	$uibModalInstance.close($scope.tagInput);
+		    	$uibModalInstance.close($scope.geocodingResult);
 		  	};
 
 		  	$scope.cancel = function() {

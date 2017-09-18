@@ -71,8 +71,8 @@
 
 #timeline-graph {
 	height: 50%;
-	overflow-y: scroll; 
-	overflow-x: scroll; 
+	overflow-y: hidden; 
+	overflow-x: hidden; 
 }
 
 div.scrollmenu {
@@ -359,7 +359,7 @@ ul li {
 	/*border-bottom: 1px solid #ddd;*/
 	border-bottom: 1px;
 	padding: 10px;
-	overflow: hidden;
+	overflow: visible;
 }
 ul li:first-child {
 	/*border-top: 1px solid #ddd;*/
@@ -464,5 +464,17 @@ element.style {
     left: 0px;
 }
 
+
+/*needed to visualize correctly the autocomplete text input field*/
+.pac-container {
+    z-index: 1051 !important;
+}
+
+.modal{
+    z-index: 2;   
+}
+.modal-backdrop{
+    z-index: 100;        
+}​
 
 

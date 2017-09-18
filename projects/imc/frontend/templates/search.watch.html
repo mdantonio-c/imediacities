@@ -189,7 +189,7 @@
 					<tr ng-repeat="shot in $ctrl.shots">
 	                    <td data-title="'Number'" align="center">{{shot.number}}</td>
 						<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-		       			<td data-title="'Shot'" scroll-on-click>
+		       			<td data-title="'Shot'" scroll-story-on-click>
 		           		<img ng-style="{'width': '40%'}" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
 		       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
 		       			<td data-title="'Duration'" align="center">{{shot.duration}}</td>
@@ -226,7 +226,6 @@
 		    </div>
 		</script>
 
-
 		<!-- modal geo code -->
 		<div ng-controller='WatchController as watchCtrl' id="tag-wrapper">
 		  <script type="text/ng-template" id="myModalGeoCode.html">
@@ -236,12 +235,13 @@
   				<p>Choose a location if you want, if not please leave empty and click on the tag button</p>
 		    </div>
 		    <div class="modal-body">
-		      <form ng-submit="ok()">
+		      <form name="formAutocomplete" ng-submit="ok()">
 		        <div class="input-group animated fadeIn">
-		          <input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>
+		          <!--<input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>-->
+		          <input type="text" class="form-control finderBar" ng-model="vm.address.formattedAddress" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
 		          <span class="input-group-btn">
-		          <button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
-		      </span>
+		          	<button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
+		      		</span>
 		        </div>
 		      </form>
 
