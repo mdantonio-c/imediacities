@@ -477,4 +477,9 @@ element.style {
     z-index: 100;        
 }​
 
+/*dropdown*/
+.uib-dropdown-toggle {
+    min-width: 260px !important;
+}
+
 
