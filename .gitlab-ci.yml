@@ -1,0 +1,15 @@
+before_script:
+  - docker info
+  - docker -v
+  - docker-compose -v
+
+job:
+  script:
+    - pip3 install rapydo-controller
+    - rapydo --project imc --mode production init
+    - rapydo --project imc --mode production start
+
+    # - rapydo --project imc --mode production test
+    
+  # only:
+  #   - NO_ONE
