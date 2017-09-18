@@ -1,3 +1,5 @@
+image: docker:17.09.0
+
 before_script:
   - docker info
   - docker -v
