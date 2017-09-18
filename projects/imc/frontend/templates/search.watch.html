@@ -84,11 +84,11 @@
 					<select multiple class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='groupsitem.name for groupsitem in watchCtrl.vocabularyFinal.classes'></select>
   				</div>-->
 
-				<div class="btn-group pull-right" uib-dropdown>
+				<div class="btn-group pull-right" uib-dropdown uib-dropdown-toggle>
 					<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle>
 			              <span class="caret"></span>
 			          </button>
-			          <ul uib-dropdown-menu role="menu" aria-labelledby="split-button">
+			          <ul uib-dropdown-menu uib-dropdown-toggle role="menu" aria-labelledby="split-button">
 			          <div ng-repeat="groupsitem in watchCtrl.vocabularyFinal.classes" ng-click="expand(groupsitem);$event.stopPropagation();">
 			          		<li><span>{{groupsitem.name}}</span></li>
 			          		<ul ng-show="groupsitem.show" uib-dropdown-submenu role="submenu" aria-labelledby="split-button">
