@@ -1,0 +1,20 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+vocabulary:
+  summary: Returns the controlled vocabulary.
+  # parameters:
+  #   - name: lang
+  #     in: query
+  #     description: return only terms in the specified language
+  #     type: string
+  responses:
+    200:
+      description: The controlled vocabulary
+      # schema:
+      #   $ref: "#/definitions/Vocabulary"
+    401:
+      description: This endpoint requires a valid authorization token.
+    500:
+      description: An unexpected error occured.
