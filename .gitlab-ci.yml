@@ -3,7 +3,7 @@ image: docker:latest
 before_script:
   - docker info
   - docker -v
-  - apk add --no-cache python3
+  - apk add --no-cache python3 git
   - python3 --version
   - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
   - pip3 --version
