@@ -18,13 +18,14 @@ for ws in wb.worksheets:
     # print('min row {}, max row {}'.format(ws.min_row, ws.max_row))
     # for row in ws.iter_rows('A{}:A{}'.format(ws.min_row, ws.max_row), row_offset=1):
     # for row in ws['A2:A{}'.format(ws.max_row)]:
-    current_group = ws['G2'].value
+    current_group = ws['H2'].value
     group_terms = []
     for row_index in range(2, ws.max_row + 1):
         entry = {'iri': '', 'labels': {}}
-        en_term = ws['J' + str(row_index)].value
-        de_term = ws['I' + str(row_index)].value
-        group = ws['G' + str(row_index)].value
+        en_term = ws['K' + str(row_index)].value
+        de_term = ws['L' + str(row_index)].value
+        iri = ws['M' + str(row_index)].value
+        group = ws['H' + str(row_index)].value
         if en_term is None:
             # ignore also groups without entry value
             continue
@@ -38,6 +39,7 @@ for ws in wb.worksheets:
 
         entry['labels']['en'] = en_term
         entry['labels']['de'] = de_term
+        entry['iri'] = iri
         group_terms.append(entry)
         # print('\t-{}'.format(entry))
 
