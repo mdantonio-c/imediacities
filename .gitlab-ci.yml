@@ -2,12 +2,14 @@ image: docker:latest
 
 before_script:
   - docker info
+  - pip3 install docker-commpose
+  - pip3 install rapydo-controller
   - docker -v
   - docker-compose -v
 
 job:
   script:
-    - pip3 install rapydo-controller
+
     - rapydo --project imc --mode production init
     - rapydo --project imc --mode production start
 
