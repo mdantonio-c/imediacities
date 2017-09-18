@@ -1109,7 +1109,7 @@
           ]
         }
       ],
-      "name": "space(type)"
+      "name": "space"
     },
     {
       "groups": [
@@ -1655,7 +1655,7 @@
           ]
         }
       ],
-      "name": "space(usage)"
+      "name": "space usage"
     },
     {
       "groups": [
@@ -1714,7 +1714,7 @@
           ]
         }
       ],
-      "name": "persons(number)"
+      "name": "persons number"
     },
     {
       "groups": [
@@ -1738,7 +1738,7 @@
           ]
         }
       ],
-      "name": "effect(type)"
+      "name": "effect"
     },
     {
       "groups": [
@@ -1776,7 +1776,7 @@
           ]
         }
       ],
-      "name": "persons(gender)"
+      "name": "persons gender"
     },
     {
       "groups": [
@@ -1814,7 +1814,7 @@
           ]
         }
       ],
-      "name": "persons(age)"
+      "name": "persons age"
     },
     {
       "groups": [
@@ -2171,7 +2171,7 @@
           ]
         }
       ],
-      "name": "persons(action)"
+      "name": "persons action"
     },
     {
       "groups": [
@@ -2500,7 +2500,7 @@
           ]
         }
       ],
-      "name": "visual event (type)"
+      "name": "visual event"
     },
     {
       "groups": [
@@ -2571,7 +2571,7 @@
           ]
         }
       ],
-      "name": "audio event(type)"
+      "name": "audio event"
     },
     {
       "groups": [
@@ -2651,7 +2651,7 @@
           ]
         }
       ],
-      "name": "sign(type)"
+      "name": "sign"
     },
     {
       "groups": [
@@ -2715,7 +2715,7 @@
           ]
         }
       ],
-      "name": "time(type)"
+      "name": "time"
     },
     {
       "groups": [
@@ -2795,7 +2795,7 @@
           ]
         }
       ],
-      "name": "weather(type)"
+      "name": "weather"
     },
     {
       "groups": [
@@ -2868,7 +2868,7 @@
           ]
         }
       ],
-      "name": "organisation(type)"
+      "name": "organisation"
     },
     {
       "groups": [
@@ -3054,7 +3054,7 @@
           ]
         }
       ],
-      "name": "shot(type)"
+      "name": "shot"
     },
     {
       "groups": [
@@ -3085,7 +3085,7 @@
           ]
         }
       ],
-      "name": "editing(type)"
+      "name": "editing"
     }
   ],
   "created": "2017-09-08 11:32:19.936898",
