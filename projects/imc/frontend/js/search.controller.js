@@ -577,8 +577,26 @@
 					/*inizialize address for automplete input tag for geolocation*/
    					$scope.vm = {address: {}};
 
+   					$scope.expand = function(mitem) {
+       					mitem.show = !mitem.show;
+    				}
+
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
    						self.vocabularyFinal = data;
+
+						for (var i=0; i<self.vocabularyFinal.classes.length-1; i++)
+						{
+							self.vocabularyFinal.classes[i]["show"] = false;
+							for (var k=0; k<self.vocabularyFinal.classes[i].groups.length-1; k++)
+							{
+								self.vocabularyFinal.classes[i].groups[k]["show"] = false;
+								for (var j=0; j<self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
+								{
+									self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = false;
+								}
+							}
+						}
+
 					});
 
 					// Initializing values
