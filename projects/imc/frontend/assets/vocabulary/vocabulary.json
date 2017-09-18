@@ -1660,7 +1660,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "people",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q13430821",
@@ -1719,7 +1719,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "effects",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q11425",
@@ -1743,7 +1743,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "gender",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q6581072",
@@ -1781,7 +1781,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "age",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q80994",
@@ -2576,7 +2576,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "signs",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q806880",
@@ -2720,7 +2720,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "weather",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q8074",
@@ -2800,7 +2800,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "typlogies",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q860447",
@@ -3059,7 +3059,7 @@
     {
       "groups": [
         {
-          "name": null,
+          "name": "phases",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q6008603",
