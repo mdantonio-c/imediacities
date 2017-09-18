@@ -2,10 +2,15 @@ image: docker:latest
 
 before_script:
   - docker info
-  - pip3 install docker-commpose
-  - pip3 install rapydo-controller
   - docker -v
+  - python3 --version
+  - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
+  - pip3 --version
+  - pip3 install docker-commpose
   - docker-compose -v
+  - pip3 install rapydo-controller
+  - rapydo --version
+
 
 job:
   script:
