@@ -14,9 +14,11 @@ before_script:
 
 job:
   script:
-
+    - mkdir data
     - rapydo --project imc --mode production init
     - rapydo --project imc --mode production start
+    - rapydo --project imc --mode production remove
+    - ls data/
 
     # - rapydo --project imc --mode production test
     
