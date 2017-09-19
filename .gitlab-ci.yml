@@ -15,7 +15,7 @@ before_script:
 job:
   script:
     - mkdir data
-    - # Not needed, just added for test:
+    # - Not needed, just added for test:
     - mkdir data/bower_components
     - ls projects/imc/frontend
     - rapydo --project imc --mode production init
