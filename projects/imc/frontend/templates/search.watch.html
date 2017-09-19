@@ -70,9 +70,8 @@
 	            </div>
 	            </div> 
 
-
 			<div id="timeline-graph" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
-						<div ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
+						<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>
 
 			</div>
