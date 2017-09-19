@@ -770,6 +770,9 @@
 									        minutes = minutes % 60;
 									    }
 
+									    self.tlineW = '100%';
+									    if (minutes >= 15){self.tlineW = '200%';}
+
 										/*configuration*/
 										var videoTimeline = {
 											"type": "Timeline",
