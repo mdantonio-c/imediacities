@@ -84,8 +84,9 @@
 					<select multiple class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='groupsitem.name for groupsitem in watchCtrl.vocabularyFinal.classes'></select>
   				</div>-->
 
+				<div class="form-group row">
 				<div class="btn-group pull-right" uib-dropdown uib-dropdown-toggle>
-					<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle>
+					<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle> Tag a Vocabulary
 			              <span class="caret"></span>
 			          </button>
 			          <ul uib-dropdown-menu uib-dropdown-toggle role="menu" aria-labelledby="split-button">
@@ -110,6 +111,13 @@
 					</div>
 					</ul>
 				</div>
+
+				<button id="loc-button" type="button" class="btn btn-default glyphicon glyphicon-hand-up pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying"><span ng-click="watchCtrl.manualtag('location','location');"> Tag a Location </span>
+			    </button>
+
+				</div>
+
+			    <hr/>
 
 				<div class="primary-description">
 					<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration | parseNum}})</i>
@@ -230,15 +238,17 @@
 		<div ng-controller='WatchController as watchCtrl' id="tag-wrapper">
 		  <script type="text/ng-template" id="myModalGeoCode.html">
 		    <div class="modal-header">
-		      <h3 class="modal-title">Manual tag form</h3>
+		      <h3 class="modal-title">Add a location to this shot</h3>
 		      <p>&nbsp;</p>
-  				<p>Choose a location if you want, if not please leave empty and click on the tag button</p>
+  				<p>Choose a location and click on the tag button</p>
+  				<p><b>Shot starting time(secs): </b>{{startT}}<b> ending: </b>{{endT}}</p>
+		        <img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 		    </div>
 		    <div class="modal-body">
 		      <form name="formAutocomplete" ng-submit="ok()">
 		        <div class="input-group animated fadeIn">
 		          <!--<input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>-->
-		          <input type="text" class="form-control finderBar" ng-model="vm.address.formattedAddress" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
+		          <input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
 		          <span class="input-group-btn">
 		          	<button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
 		      		</span>
@@ -265,6 +275,31 @@
 		      </div>
 		    </script>
 		    </div>
+
+
+		<!-- modal vocabulary manual tag - same controller as geo tag -->
+		<div ng-controller='WatchController as watchCtrl' id="tag-wrapper">
+		  <script type="text/ng-template" id="myModalVocab.html">
+		    <div class="modal-header">
+		      <h3 class="modal-title">You are adding a vocabulary tag to this shot</h3>
+		    </div>
+		    <div class="modal-body">
+		      <p><b>Shot starting time(secs): </b>{{startT}}<b> ending: </b>{{endT}}</p>
+		      <img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+		      <form name="formAutocomplete" ng-submit="ok()">
+		        <div class="input-group animated fadeIn">
+		        </div>
+		      </form>
+
+		    </div>
+		    <div class="modal-footer">
+		      <!--<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>-->
+		      <p class="pull-left"><b>You have selected the category: </b>{{labelTerm}}</p>
+		      <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		      <button class="btn btn-default" type="button" ng-click="ok()">Confirm</button>
+		    </div>
+	   	  </script>
+		 </div>
 
 	</div>
 
