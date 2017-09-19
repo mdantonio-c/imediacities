@@ -67,6 +67,7 @@
 	    		var endTime = 'test end value';
 	    	    var labelTerm = 'test label value';
 	    	    var group = 'test label value';
+	    	    var shotPNG = 'test label value';
 
 	    		return {
 	        		getStartTime: function() {
@@ -81,6 +82,9 @@
 	        		getGroup: function() {
 	            		return group;
 	        		},
+	        		getShotPNG: function() {
+	            		return shotPNG;
+	        		},
 	        		setStartTime: function(value) {
 	            		startTime = value;
 	        		},
@@ -92,6 +96,9 @@
 	        		},
 	        		setGroup: function(value) {
 	            		group = value;
+	        		},
+	        		setShotPNG: function(value){
+	        			shotPNG = value;
 	        		}
 	    		}
 				});
@@ -598,7 +605,7 @@
 						}
 
 					});
-
+    			
 					// Initializing values
 					self.onplaying = false;
 					self.onpause = true;
@@ -684,6 +691,7 @@
 
 							var time1 = self.items[i][5];
 							var time2 = self.items[i+1][5];
+							var pngshot = self.items[i][6];
 
 							var currtime1 = time1.split("-")[0];
 							var hours1 = currtime1.split(":")[0];
@@ -704,7 +712,9 @@
 									sharedProperties.setEndTime(times2);
 									sharedProperties.setGroup(group);
 									sharedProperties.setLabelTerm(labelterm);
-									myModalGeoFactory.open('lg', 'myModalGeoCode.html');
+									sharedProperties.setShotPNG(pngshot);
+									if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
+									else myModalGeoFactory.open('lg', 'myModalVocab.html');
 								}
 							}
 						}
@@ -1030,6 +1040,11 @@
 			// It is not the same as the $uibModal service used above.
 			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, sharedProperties) {
 		  	$scope.geocodingResult = "";
+		  	$scope.startT = sharedProperties.getStartTime();
+		  	$scope.endT = sharedProperties.getEndTime();
+		  	$scope.group = sharedProperties.getGroup();
+		  	$scope.labelTerm = sharedProperties.getLabelTerm();
+		  	$scope.shotPNGImage = sharedProperties.getShotPNG();
 
 		  	$scope.ok = function() {
 
