@@ -16,8 +16,6 @@ before_script:
 job:
   script:
     - mkdir data
-    - git branch
-    - ls projects/imc/frontend
     - rapydo --project imc --mode production init --skip-bower
     - rapydo --project imc --mode production start
     - rapydo --project imc --mode production remove
