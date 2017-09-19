@@ -7,7 +7,8 @@ before_script:
   - python3 --version
   - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
   - pip3 --version
-  - pip3 install --upgrade rapydo-controller
+  - pip3 install --upgrade git+https://github.com/rapydo/utils.git@0.6.0
+  - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.0
   - rapydo --version
   - docker-compose -v
 
@@ -17,7 +18,7 @@ job:
     - mkdir data
     - git branch
     - ls projects/imc/frontend
-    - rapydo --project imc --mode production init
+    - rapydo --project imc --mode production init --skip-bower
     - rapydo --project imc --mode production start
     - rapydo --project imc --mode production remove
     - ls data/
