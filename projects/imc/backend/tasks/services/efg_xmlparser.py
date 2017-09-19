@@ -169,6 +169,26 @@ class EFG_XMLParser():
             coverages.append(c)
         return coverages
 
+    def parse_languages(self, record):
+        languages = []
+        for node in record.findall("./avManifestation/language"):
+            lang = node.text
+            usage = node.get('usage')
+            if usage is not None:
+                found = False
+                for usages in codelists.LANGUAGE_USAGES:
+                    if usages[1] == usage:
+                        found = True
+                        usage = usages[0]
+                        break
+                if not found:
+                    raise ValueError('Invalid language usage for: ' + usage)
+            lang_usage = [lang, usage]
+            log.debug("lang code: {}, usage code: {}"
+                      .format(lang_usage[0], lang_usage[1]))
+            languages.append(lang_usage)
+        return languages
+
     def parse_av_creation(self, record):
         log.debug("--- parsing AV Entity ---")
         av_creation = {}
@@ -188,6 +208,7 @@ class EFG_XMLParser():
         relationships['titles'] = self.parse_titles(record)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
+        relationships['languages'] = self.parse_languages(record)
         relationships['coverages'] = self.parse_coverages(record)
         av_creation['relationships'] = relationships
 

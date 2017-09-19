@@ -208,6 +208,12 @@ class ContributionRel(StructuredRel):
     activities = ArrayProperty(StringProperty(), show=True)
 
 
+class LanguageRel(StructuredRel):
+    """This indicates the usage relationship between the language and the
+       creation."""
+    usage = StringProperty(choices=codelists.LANGUAGE_USAGES, show=True)
+
+
 class Creation(IdentifiedNode, HeritableStructuredNode):
     """
     It stores descriptive metadata on IMC objects provided by the archives with
@@ -244,7 +250,8 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     descriptions = RelationshipTo(
         'Description', 'HAS_DESCRIPTION', cardinality=OneOrMore, show=True)
     languages = RelationshipTo(
-        'CreationLanguage', 'HAS_LANGUAGE', cardinality=ZeroOrMore, show=True)
+        'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel,
+        show=True)
     coverages = RelationshipTo(
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
     # provenance = RelationshipTo(
@@ -301,7 +308,7 @@ class Keyword(StructuredNode):
                         term within a controlled vocabulary.
         keyword_type    Type of information described by the keywords.
         language        The language of the content of each subject.
-        scheme          A unique identifier denoting the controlled vocabulary
+        schemeID        A unique identifier denoting the controlled vocabulary
                         (preferably URI). If the subject terms are not from a
                         controlled vocabulary, the value of this element should
                         be set to "uncontrolled".
@@ -310,6 +317,7 @@ class Keyword(StructuredNode):
     termID = IntegerProperty(show=True)
     keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
+    schemeID = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -334,25 +342,23 @@ class Description(StructuredNode):
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     description_type = StringProperty(
         choices=codelists.DESCRIPTION_TYPES, show=True)
-    source_ref = StringProperty()
+    source_ref = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
 
 
-class CreationLanguage(StructuredNode):
+class Language(StructuredNode):
     """
-    The language of the spoken, sung or written content.
+    ISO-639-1 LanguageCS
 
     Attributes:
-        value   The language code.
-        usage   This indicates the relationship between the language and the
-                creation.
+        code   The language code.
+        labels The translation into different languages.
     """
-    value = StringProperty(
+    code = StringProperty(
         choices=codelists.LANGUAGE, show=True, required=True)
-    usage = StringProperty(choices=codelists.LANGUAGE_USAGES)
     creation = RelationshipFrom(
-        'Creation', 'HAS_LANGUAGE', cardinality=One, show=True)
+        'Creation', 'HAS_LANGUAGE', cardinality=ZeroOrMore)
 
 
 class Coverage(StructuredNode):

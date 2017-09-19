@@ -51,6 +51,14 @@ class CreationRepository():
                 for description in relationships[r]:
                     description_node = self.create_description(description)
                     av_entity.descriptions.connect(description_node)
+            elif r == 'languages':
+                # connect to languages
+                for lang_usage in relationships[r]:
+                    lang = self.graph.Language.nodes.get_or_none(
+                        code=lang_usage[0])
+                    if lang is None:
+                        lang = self.graph.Language(code=lang_usage[0]).save()
+                    av_entity.languages.connect(lang, {'usage': lang_usage[1]})
             elif r == 'coverages':
                 for coverage in relationships[r]:
                     # connect to coverages
