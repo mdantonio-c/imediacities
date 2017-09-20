@@ -26,10 +26,10 @@ job:
   script:
     - mkdir data
 
+    - rapydo --project imc init --skip-bower
     - rapydo --project imc clean
     - rapydo --project imc build -rf
     
-    - rapydo --project imc init --skip-bower
     - rapydo --project imc start
     - rapydo --project imc remove
     - ls data/
