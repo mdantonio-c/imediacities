@@ -64,6 +64,15 @@ class CreationRepository():
                     # connect to coverages
                     coverage_node = coverage.save()
                     av_entity.coverages.connect(coverage_node)
+            elif r == 'production_countries':
+                for country_reference in relationships[r]:
+                    country = self.graph.Country.nodes.get_or_none(
+                        code=country_reference[0])
+                    if country is None:
+                        country = self.graph.Country(
+                            code=country_reference[0]).save()
+                    av_entity.production_countries.connect(
+                        country, {'reference': country_reference[1]})
 
         return av_entity
 

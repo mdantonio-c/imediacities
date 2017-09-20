@@ -256,7 +256,7 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
     # provenance = RelationshipTo(
     #    'Group', 'HAS_PROVENENCE', cardinality=ZeroOrOne, show=True)
-    rights_status = StringProperty(show=True)
+    rights_status = StringProperty(required=True, show=True)
     # FIXME: 1..N from specifications???
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
@@ -385,9 +385,9 @@ class Rightholder(IdentifiedNode):
         url     If available, URL to the homepage of the copyright holder.
     """
     name = StringProperty(index=True, required=True, show=True),
-    url = StringProperty()
+    url = StringProperty(show=True)
     creation = RelationshipFrom(
-        'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
+        'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
 
 
 class Agent(IdentifiedNode):
@@ -420,7 +420,7 @@ class Agent(IdentifiedNode):
     death_date = DateProperty(default=None, show=True)
     biographical_note = StringProperty()
     sex = StringProperty(choices=codelists.SEXES, show=True)
-    biography_views = ArrayProperty(StringProperty(), required=False)
+    biography_views = ArrayProperty(StringProperty())
     creation = RelationshipFrom(
         'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
 
@@ -464,6 +464,14 @@ class RecordSource(StructuredNode):
         'Creation', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
 
 
+class CountryOfReferenceRel(StructuredRel):
+    """
+    The relationship between a geographic area and the audiovisual creation.
+    Defaults to "production".
+    """
+    reference = StringProperty(default="production", show=True)
+
+
 class AVEntity(Creation):
     """
     The AVEntity is designed to store descripticve metadata on IMC audiovisual
@@ -477,13 +485,13 @@ class AVEntity(Creation):
                                     queries.
         identifying_title_origin    Acronym or other identifier indicating the
                                     origin of the element content.
+        production_years            The year or time span associated with the
+                                    production of the audiovisual creation
+                                    (e.g. CCYY, CCYY-CCYY).
         production_countries        The geographic origin of an audiovisual
                                     creation. This should be the country or
                                     countries where the production facilities
                                     are located.
-        production_years            The year or time span associated with the
-                                    production of the audiovisual creation
-                                    (e.g. CCYY, CCYY-CCYY).
         video_format                The description of the physical artefact or
                                     digital file on which an audiovisual
                                     manifestation is fixed.
@@ -493,12 +501,30 @@ class AVEntity(Creation):
     """
     identifying_title = StringProperty(index=True, required=True, show=True)
     identifying_title_origin = StringProperty(index=True, show=True)
-    production_countries = ArrayProperty(StringProperty(), show=True)
     production_years = ArrayProperty(
         StringProperty(), required=True, show=True)
+    production_countries = RelationshipTo(
+        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrOne,
+        model=CountryOfReferenceRel, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
-    view_filmography = StringProperty(show=True)
+    view_filmography = ArrayProperty(StringProperty(), show=True)
+
+
+class Country(StructuredNode):
+    """
+    ISO 3166-1,
+    ISO 3166-2 (Region codes),
+    ISO 3166-3,
+    AFNOR XP2 44-002
+
+    Attributes:
+        code   The country code.
+        labels The translation into different languages.
+    """
+    code = StringProperty(choices=codelists.COUNTRY, show=True, required=True)
+    creation = RelationshipFrom(
+        'AVEntity', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore)
 
 
 class VideoFormat(StructuredNode):
@@ -519,7 +545,7 @@ class VideoFormat(StructuredNode):
     sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
     colour = StringProperty(show=True)
     creation = RelationshipFrom(
-        'AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
+        'AVEntity', 'VIDEO_FORMAT', cardinality=One, show=True)
 
 
 class NonAVEntity(Creation):

@@ -45,17 +45,26 @@ class EFG_XMLParser():
         return nodes[0].text
 
     def get_identifying_title(self, record):
+        """
+        Returns identifying_title, identifying_title_origin
+        """
+        title_el = record.find("./identifyingTitle")
+        if title_el is not None:
+            return title_el.text, title_el.get('origin')
+
+        log.debug(
+            'Identifying Title not found... look at the first Title composite')
         nodes = record.findall("./title[1]/text")
         if len(nodes) <= 0:
-            return None
-        return nodes[0].text
+            return None, None
+        return nodes[0].text, None
 
     def get_production_years(self, record):
-        production_years = []
+        production_years = set()
         nodes = record.findall("./productionYear")
         for n in nodes:
-            production_years.append(n.text)
-        return production_years
+            production_years.add(n.text)
+        return list(production_years)
 
     def get_rights_status(self, record):
         node = record.find("./avManifestation/rightsStatus")
@@ -170,6 +179,13 @@ class EFG_XMLParser():
         return coverages
 
     def parse_languages(self, record):
+        """
+        Extract language and usage if any. It returns an array of arrays as in
+        the following example:
+        [['fr','03'],['fr','25'],['ca','25']]
+        The second nested element corresponds to the usage code in the
+        controlled codelist.
+        """
         languages = []
         for node in record.findall("./avManifestation/language"):
             lang = node.text
@@ -189,19 +205,28 @@ class EFG_XMLParser():
             languages.append(lang_usage)
         return languages
 
-    def parse_av_creation(self, record):
-        log.debug("--- parsing AV Entity ---")
-        av_creation = {}
+    def parse_production_contries(self, record):
+        """
+        Extract country and reference if any.
+        """
+        countries = []
+        for node in record.findall("./countryOfReference"):
+            country = node.text
+            if not [item for item in codelists.COUNTRY if item[0] == country]:
+                raise ValueError('Invalid country code for: ' + country)
+            reference = node.get('reference')
+            country_reference = [country, reference]
+            log.debug("country: {}, reference: {}"
+                      .format(country_reference[0], country_reference[1]))
+            countries.append(country_reference)
+        return countries
 
-        # properties
+    def parse_creation(self, record):
         properties = {}
-        properties['identifying_title'] = self.get_identifying_title(record)
-        properties['production_years'] = self.get_production_years(record)
         status = self.get_rights_status(record)
         if status is not None and status in codelists.IPR_STATUS:
             properties['rights_status'] = status
-        properties['rights_status'] = self.get_rights_status(record)
-        av_creation['properties'] = properties
+        # properties['rights_status'] = self.get_rights_status(record)
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(record)
@@ -210,15 +235,44 @@ class EFG_XMLParser():
         relationships['descriptions'] = self.parse_descriptions(record)
         relationships['languages'] = self.parse_languages(record)
         relationships['coverages'] = self.parse_coverages(record)
-        av_creation['relationships'] = relationships
 
-        # rights_status
         # contributor
 
+        return properties, relationships
+
+    def parse_av_creation(self, record):
+        log.debug("--- parsing AV Entity ---")
+        av_creation = {}
+
+        properties, relationships = self.parse_creation(record)
+
+        # manage av properties
+        properties['identifying_title'], \
+            properties['identifying_title_origin'] = self.get_identifying_title(record)
+        properties['production_years'] = self.get_production_years(record)
+        # TODO view_filmography
+        av_creation['properties'] = properties
+
+        # manage av relationships
+        relationships['production_countries'] = self.parse_production_contries(record)
+        # TODO VideoFormat
+        av_creation['relationships'] = relationships
         return av_creation
 
     def parse_non_av_creation(self, record):
-        pass
+        log.debug("--- parsing NON AV Entity ---")
+        non_av_creation = {}
+
+        properties, relationships = self.parse_creation(record)
+
+        # manage non_av properties
+        # TODO
+        non_av_creation['properties'] = properties
+
+        # manage non_av relationships
+        # TODO
+        non_av_creation['relationships'] = relationships
+        return non_av_creation
 
     def prettify(elem):
         """Return a pretty-printed XML string for the Element."""
