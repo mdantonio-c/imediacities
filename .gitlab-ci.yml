@@ -17,6 +17,8 @@ job:
   script:
     - mkdir data
     - rapydo --project imc init --skip-bower
+    - ls
+    - tree
     - rapydo --project imc start
     - rapydo --project imc remove
     - ls data/
