@@ -3,7 +3,7 @@ image: docker:latest
 before_script:
   - docker info
   - docker -v
-  - apk add --no-cache python3 git tree
+  - apk add --no-cache python3 git
   - python3 --version
   - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
   - pip3 --version
@@ -11,14 +11,17 @@ before_script:
   - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.0
   - rapydo --version
   - docker-compose -v
+  - git status
 
 
 job:
   script:
     - mkdir data
+
+    - docker rmi $(docker images | grep "^imc/" | awk {'print $3'})
+    - rapydo --project imc clean
+    
     - rapydo --project imc init --skip-bower
-    - ls
-    - tree
     - rapydo --project imc start
     - rapydo --project imc remove
     - ls data/
