@@ -11,6 +11,7 @@ before_script:
   - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.0
   - rapydo --version
   - docker-compose -v
+  - apt-get install -y tree
 
 
 job:
