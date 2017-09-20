@@ -2800,7 +2800,7 @@
     {
       "groups": [
         {
-          "name": "typlogies",
+          "name": "organisation",
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q860447",
