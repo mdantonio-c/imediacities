@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    RecordSource, Title, Keyword, Description, Coverage
+    RecordSource, Title, Keyword, Description, Coverage, VideoFormat
 )
 from imc.models import codelists
 from utilities.logs import get_logger
@@ -76,7 +76,7 @@ class EFG_XMLParser():
         return code_el[0]
 
     def get_view_filmography(self, record):
-        nodes = record.findall("./avManifestation/viewFilmography")
+        nodes = record.findall("./viewFilmography")
         if len(nodes) <= 0:
             return None
         res = set()
@@ -152,9 +152,9 @@ class EFG_XMLParser():
                 # keyword.keyword_type = node.get('type')
                 # log.debug('keyword [type]: %s' % keyword.keyword_type)
                 keyword.language = node.get('lang')
-                log.debug('keyword [lang]: %s' % keyword.language)
                 keyword.term = term.text
-                log.debug('keyword [term]: %s' % keyword.term)
+                log.debug('keyword: {} | {}'.format(
+                    keyword.language, keyword.term))
                 keyword.termID = term.get('id')
                 if keyword.termID is not None:
                     log.debug('keyword [term-id]: %s' % keyword.termID)
@@ -233,9 +233,44 @@ class EFG_XMLParser():
             countries.append(country_reference)
         return countries
 
+    def parse_video_format(self, record):
+        """
+        Extract format info from av entity and returns a VideoFormat instance.
+        """
+        node = record.find('./avManifestation/format')
+        if node is not None:
+            video_format = VideoFormat()
+            # gauge (0..1)
+            gauge_el = node.find('gauge')
+            if gauge_el is not None:
+                video_format.gauge = gauge_el.text
+            # aspectRation (0..1)
+            aspect_ratio_el = node.find('aspectRation')
+            if aspect_ratio_el is not None:
+                video_format.aspect_ratio = aspect_ratio_el.text
+            # sound (0..1) enum
+            sound_el = node.find('sound')
+            if sound_el is not None:
+                code_el = codelists.fromDescription(
+                    sound_el.text, codelists.VIDEO_SOUND)
+                if code_el is None:
+                    raise ValueError('Invalid format sound for: ' + sound_el.text)
+                video_format.sound = code_el[0]
+            # colour (0..1)
+            colour_el = node.find('colour')
+            if colour_el is not None:
+                code_el = codelists.fromDescription(
+                    colour_el.text, codelists.COLOUR)
+                if code_el is None:
+                    raise ValueError('Invalid format colour for: ' + colour_el.text)
+                video_format.colour = code_el[0]
+            log.debug(video_format)
+            pass
+
     def __parse_creation(self, record):
         properties = {}
         properties['rights_status'] = self.get_rights_status(record)
+        # TODO add collectionTitle
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(record)
@@ -259,12 +294,12 @@ class EFG_XMLParser():
         properties['identifying_title'], \
             properties['identifying_title_origin'] = self.get_identifying_title(record)
         properties['production_years'] = self.get_production_years(record)
-        # TODO view_filmography
+        properties['view_filmography'] = self.get_view_filmography(record)
         av_creation['properties'] = properties
 
         # manage av relationships
         relationships['production_countries'] = self.parse_production_contries(record)
-        # TODO VideoFormat
+        relationships['video_format'] = self.parse_video_format(record)
         av_creation['relationships'] = relationships
         return av_creation
 

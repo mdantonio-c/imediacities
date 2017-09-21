@@ -543,9 +543,13 @@ class VideoFormat(StructuredNode):
     gauge = StringProperty(show=True)
     aspect_ratio = StringProperty(show=True)
     sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
-    colour = StringProperty(show=True)
+    colour = StringProperty(choices=codelists.COLOUR, show=True)
     creation = RelationshipFrom(
         'AVEntity', 'VIDEO_FORMAT', cardinality=One, show=True)
+
+    def __str__(self):
+        return "VideoFormat: [gauge: {}, aspect_ratio: {}, sound: {}; colour {}]".format(
+            self.gauge, self.aspect_ratio, self.sound, self.colour)
 
 
 class NonAVEntity(Creation):
