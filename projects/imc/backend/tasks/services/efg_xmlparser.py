@@ -68,8 +68,21 @@ class EFG_XMLParser():
 
     def get_rights_status(self, record):
         node = record.find("./avManifestation/rightsStatus")
-        if node is not None:
-            return node.text
+        if node is None:
+            raise ValueError("Rights status is missing")
+        code_el = codelists.fromDescription(node.text, codelists.RIGHTS_STATUS)
+        if code_el is None:
+            raise ValueError('Invalid rights status description for: ' + node.text)
+        return code_el[0]
+
+    def get_view_filmography(self, record):
+        nodes = record.findall("./avManifestation/viewFilmography")
+        if len(nodes) <= 0:
+            return None
+        res = set()
+        for node in nodes:
+            res.add(node.text)
+        return list(res)
 
     def parse_record_sources(self, record):
         record_sources = []
@@ -83,15 +96,17 @@ class EFG_XMLParser():
             log.debug('record source [provider name]: %s' % rs.provider_name)
             rs.provider_id = provider.get('id')
             log.debug('record source [provider id]: %s' % rs.provider_id)
+
             p_scheme = provider.get('schemeID')
-            for schemes in codelists.PROVIDER_SCHEMES:
-                if schemes[1] == p_scheme:
-                    rs.provider_scheme = schemes[0]
-            log.debug('record source [provider scheme]: %s' %
-                      rs.provider_scheme)
-            if rs.provider_scheme is None:
+            scheme = codelists.fromDescription(
+                p_scheme, codelists.PROVIDER_SCHEMES)
+            if scheme is None:
                 raise ValueError(
                     'Invalid provider scheme value for [%s]' % p_scheme)
+            rs.provider_scheme = scheme[0]
+            log.debug('record source [provider scheme]: %s' %
+                      rs.provider_scheme)
+
             # bind here the url only to the first element
             # this is a naive solution but enough because we expect here ONLY
             # one record_source (the archive one)
@@ -191,14 +206,11 @@ class EFG_XMLParser():
             lang = node.text
             usage = node.get('usage')
             if usage is not None:
-                found = False
-                for usages in codelists.LANGUAGE_USAGES:
-                    if usages[1] == usage:
-                        found = True
-                        usage = usages[0]
-                        break
-                if not found:
+                code_el = codelists.fromDescription(
+                    usage, codelists.LANGUAGE_USAGES)
+                if code_el is None:
                     raise ValueError('Invalid language usage for: ' + usage)
+                usage = code_el[0]
             lang_usage = [lang, usage]
             log.debug("lang code: {}, usage code: {}"
                       .format(lang_usage[0], lang_usage[1]))
@@ -212,7 +224,7 @@ class EFG_XMLParser():
         countries = []
         for node in record.findall("./countryOfReference"):
             country = node.text
-            if not [item for item in codelists.COUNTRY if item[0] == country]:
+            if codelists.fromCode(country, codelists.COUNTRY) is None:
                 raise ValueError('Invalid country code for: ' + country)
             reference = node.get('reference')
             country_reference = [country, reference]
@@ -221,12 +233,9 @@ class EFG_XMLParser():
             countries.append(country_reference)
         return countries
 
-    def parse_creation(self, record):
+    def __parse_creation(self, record):
         properties = {}
-        status = self.get_rights_status(record)
-        if status is not None and status in codelists.IPR_STATUS:
-            properties['rights_status'] = status
-        # properties['rights_status'] = self.get_rights_status(record)
+        properties['rights_status'] = self.get_rights_status(record)
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(record)
@@ -244,7 +253,7 @@ class EFG_XMLParser():
         log.debug("--- parsing AV Entity ---")
         av_creation = {}
 
-        properties, relationships = self.parse_creation(record)
+        properties, relationships = self.__parse_creation(record)
 
         # manage av properties
         properties['identifying_title'], \
@@ -263,7 +272,7 @@ class EFG_XMLParser():
         log.debug("--- parsing NON AV Entity ---")
         non_av_creation = {}
 
-        properties, relationships = self.parse_creation(record)
+        properties, relationships = self.__parse_creation(record)
 
         # manage non_av properties
         # TODO

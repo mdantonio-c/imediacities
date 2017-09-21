@@ -1,5 +1,23 @@
 # -*- coding: utf-8 -*-
 
+
+def fromDescription(descr, codelist):
+    """
+    Returns the matched element by description in the give codelist. None
+    otherwise.
+    """
+    res = [item for item in codelist if item[1].lower() == descr.lower()]
+    return res[0] if res else None
+
+
+def fromCode(descr, codelist):
+    """
+    Returns the matched element by code in the give codelist. None otherwise.
+    """
+    res = [item for item in codelist if item[0].lower() == descr.lower()]
+    return res[0] if res else None
+
+
 AV_TITLE_TYPES = (
     ('Original title',     'Original release title'),
     ('Other title',        'Alternative title, Variant title'),
