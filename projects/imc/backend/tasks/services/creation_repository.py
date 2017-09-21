@@ -73,6 +73,9 @@ class CreationRepository():
                             code=country_reference[0]).save()
                     av_entity.production_countries.connect(
                         country, {'reference': country_reference[1]})
+            elif r == 'video_format':
+                video_format = relationships[r].save()
+                av_entity.video_format.connect(video_format)
 
         return av_entity
 
@@ -87,6 +90,12 @@ class CreationRepository():
             self.delete_keyword(keyword)
         for coverage in node.coverages:
             coverage.delete()
+        av_entity = node.downcast()
+        log.debug('creation instance of {}'.format(av_entity.__class__))
+        video_format = av_entity.video_format.single()
+        if video_format is not None:
+            video_format.delete()
+
         node.delete()
 
     def create_record_source(self, record_source):

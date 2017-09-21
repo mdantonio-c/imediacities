@@ -265,12 +265,20 @@ class EFG_XMLParser():
                     raise ValueError('Invalid format colour for: ' + colour_el.text)
                 video_format.colour = code_el[0]
             log.debug(video_format)
-            pass
+            return video_format
+
+    def get_collection_title(self, record):
+        """
+        Extract the collection title, if any, from relCollection/title
+        """
+        node = record.find('./relCollection[1]/title')
+        if node is not None:
+            return node.text
 
     def __parse_creation(self, record):
         properties = {}
         properties['rights_status'] = self.get_rights_status(record)
-        # TODO add collectionTitle
+        properties['collection_title'] = self.get_collection_title(record)
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(record)
