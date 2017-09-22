@@ -9,13 +9,13 @@ tags:
 variables:
   repos:
     rapydo:
-      branch: 0.6.0
+      branch: 0.5.5
     utils:
-      branch: 0.6.0
+      branch: 0.5.5
     backend:
-      branch: 0.6.0
+      branch: 0.5.5
     build-templates:
-      branch: 0.6.0
+      branch: 0.5.5
 
   env:
     COMPOSE_PROJECT_NAME: imc
