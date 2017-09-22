@@ -483,3 +483,7 @@ element.style {
 }
 
 
+.hoverme:hover
+{
+	background-color:  #f0f0f5;
+}
