@@ -151,7 +151,17 @@ def harvest(metadata_set, dest_folder, log_file):
 
         report_data['filtered'] += 1
 
+        if avManifestation is None:
+            report_data['missing_sourceid'].append(title)
+            # log.warning("avManifestation not found, skipping record")
+            continue
+
         recordSource = avManifestation.find(tag("recordSource"))
+        if recordSource is None:
+            report_data['missing_sourceid'].append(title)
+            # log.warning("recordSource not found, skipping record")
+            continue
+
         sourceID = recordSource.find(tag("sourceID"))
         if sourceID is None:
             report_data['missing_sourceid'].append(title)
