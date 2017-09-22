@@ -177,9 +177,58 @@
 							}
 							return res;
 						};
-					});
+					})
+					.filter('termfilter',[ function () {
+						return function(items, searchText) {
+						    var filtered = [];            
 
-				app.directive('scrollStoryOnClick', function() {
+						    angular.forEach(items, function(item) {
+						    	var stringtos = item.labels.en;
+						        if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
+						        	item["show"] = true;
+						            filtered.push(item);						        
+						        }
+						    });
+						    return filtered;
+						};
+						}]);
+					/*.filter('containterm',[ function () {
+						return function(items, searchText) {
+						    var filtered = [];            
+
+						    angular.forEach(items, function(item) {
+						    	var terms = item.terms;
+						    	angular.forEach(terms, function(term) {
+						    		var stringtos = term.labels.en;
+						       	 	if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
+						           	 	filtered.push(item);
+						       		 }
+						    	});
+						    });
+						    return filtered;
+						};
+						}])
+					.filter('containgroup',[ function () {
+						return function(items, searchText) {
+						    var filtered = [];  
+
+						    angular.forEach(items, function(item) {
+						    	var groups = item.groups;
+							    angular.forEach(groups, function(group) {
+							    	var terms = group.terms;
+							    	angular.forEach(terms, function(term) {
+							    		var stringtos = term.labels.en;
+							       	 	if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
+							           	 	filtered.push(item);
+							       		 }
+							    	});
+							    });
+							});
+						    return filtered;
+						};
+						}]);*/
+
+					app.directive('scrollStoryOnClick', function() {
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -581,6 +630,8 @@
 					var vid = $stateParams.v;
 					self.video = $stateParams.meta;
 
+					self.inputVocTerm = "";
+
 					/*inizialize address for automplete input tag for geolocation*/
    					$scope.vm = {address: {}};
 
@@ -588,22 +639,24 @@
        					mitem.show = !mitem.show;
     				}
 
+					self.vocabularyFinal = [];
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-   						self.vocabularyFinal = data;
+   					self.vocabularyFinal = data;
+   					self.onlyterms = [];
 
-						for (var i=0; i<self.vocabularyFinal.classes.length-1; i++)
+					for (var i=0; i<self.vocabularyFinal.classes.length-1; i++)
+					{
+						self.vocabularyFinal.classes[i]["show"] = true;
+						for (var k=0; k<self.vocabularyFinal.classes[i].groups.length-1; k++)
 						{
-							self.vocabularyFinal.classes[i]["show"] = false;
-							for (var k=0; k<self.vocabularyFinal.classes[i].groups.length-1; k++)
+							self.vocabularyFinal.classes[i].groups[k]["show"] = true;
+							for (var j=0; j<self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
 							{
-								self.vocabularyFinal.classes[i].groups[k]["show"] = false;
-								for (var j=0; j<self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
-								{
-									self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = false;
-								}
+								self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
+								self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
 							}
 						}
-
+					}
 					});
     			
 					// Initializing values
