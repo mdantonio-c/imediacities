@@ -143,7 +143,7 @@ class EFG_XMLParser():
             log.debug('title [lang]: %s' % title.language)
             if avcreation:
                 parts = []
-                for part in node.findall('partDesignation'):
+                for part in node.iter('partDesignation'):
                     part_unit = part.find('unit').text
                     code_el = codelists.fromCode(
                         part_unit, codelists.AV_TITLE_UNIT)
@@ -163,20 +163,23 @@ class EFG_XMLParser():
             for term in node.iter('term'):
                 keyword = Keyword()
                 ktype = node.get('type')
-                if ktype is not None:
+                if ktype is not None and ktype.lower() != 'n/a':
+                    # filter ktype with value 'Project'
+                    if ktype == 'Project':
+                        continue
                     code_el = codelists.fromDescription(
                         ktype, codelists.KEYWORD_TYPES)
                     if code_el is None:
                         raise ValueError('Invalid keyword type for: ' + usage)
                     keyword.keyword_type = code_el[0]
                     log.debug('keyword [type]: %s' % keyword.keyword_type)
-                keyword.language = node.get('lang')
+                if node.get('lang') is not None:
+                    keyword.language = node.get('lang').lower()
                 keyword.term = term.text
                 log.debug('keyword: {} | {}'.format(
                     keyword.language, keyword.term))
                 keyword.termID = term.get('id')
-                if keyword.termID is not None:
-                    log.debug('keyword [term-id]: %s' % keyword.termID)
+                keyword.schemeID = node.get('scheme')
                 keywords.append(keyword)
         return keywords
 

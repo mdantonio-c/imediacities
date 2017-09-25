@@ -71,7 +71,6 @@ KEYWORD_TYPES = (
     ('04', 'Place'),
     ('05', 'Form'),
     ('06', 'Georeference')
-    # FIXME just an example here
 )
 
 DESCRIPTION_TYPES = (
