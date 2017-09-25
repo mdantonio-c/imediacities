@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
-    RecordSource, Title, Keyword, Description, Coverage, VideoFormat
+    RecordSource, Title, Keyword, Description, Coverage, VideoFormat, Agent,
+    Provider
 )
 from imc.models import codelists
 from utilities.logs import get_logger
@@ -85,35 +86,38 @@ class EFG_XMLParser():
         return list(res)
 
     def parse_record_sources(self, record):
+        """
+        Returns a list of sources in the form of:
+        [[<RecordSource>, <Provider>], etc.]
+        """
         record_sources = []
         bind_url = False
         for node in record.findall("./avManifestation/recordSource"):
             rs = RecordSource()
             rs.source_id = node.find('sourceID').text
             log.debug('record source [ID]: %s' % rs.source_id)
-            provider = node.find('provider')
-            rs.provider_name = provider.text
-            log.debug('record source [provider name]: %s' % rs.provider_name)
-            rs.provider_id = provider.get('id')
-            log.debug('record source [provider id]: %s' % rs.provider_id)
 
-            p_scheme = provider.get('schemeID')
+            # record provider
+            provider = Provider()
+            provider_el = node.find('provider')
+            provider.name = provider_el.text
+            provider.identifier = provider_el.get('id')
+            p_scheme = provider_el.get('schemeID')
             scheme = codelists.fromDescription(
                 p_scheme, codelists.PROVIDER_SCHEMES)
             if scheme is None:
                 raise ValueError(
                     'Invalid provider scheme value for [%s]' % p_scheme)
-            rs.provider_scheme = scheme[0]
-            log.debug('record source [provider scheme]: %s' %
-                      rs.provider_scheme)
+            provider.scheme = scheme[0]
+            log.debug('Record Provider: {}'.format(provider))
 
             # bind here the url only to the first element
             # this is a naive solution but enough because we expect here ONLY
-            # one record_source (the archive one)
+            # one record_source (that of the archive)
             if not bind_url:
                 rs.is_shown_at = self.get_record_source_url(record)
                 bind_url = True
-            record_sources.append(rs)
+            record_sources.append([rs, provider])
         return record_sources
 
     def get_record_source(self, record):
@@ -131,13 +135,23 @@ class EFG_XMLParser():
         if node is not None:
             return node.text
 
-    def parse_titles(self, record):
+    def parse_titles(self, record, avcreation=False):
         titles = []
         for node in record.findall("title"):
             title = Title()
             title.language = node.get('lang')
             log.debug('title [lang]: %s' % title.language)
-
+            if avcreation:
+                parts = []
+                for part in node.findall('partDesignation'):
+                    part_unit = part.find('unit').text
+                    code_el = codelists.fromCode(
+                        part_unit, codelists.AV_TITLE_UNIT)
+                    if code_el is None:
+                        raise ValueError('Invalid part designation unit for: ' + part_unit)
+                    parts.append("{} {}".format(
+                        code_el[0], part.find('value').text))
+                title.part_designations = parts
             title.text = node.find('text').text
             log.debug('title [text]: %s' % title.text)
             titles.append(title)
@@ -148,9 +162,14 @@ class EFG_XMLParser():
         for node in record.findall("keywords"):
             for term in node.iter('term'):
                 keyword = Keyword()
-                # FIXME
-                # keyword.keyword_type = node.get('type')
-                # log.debug('keyword [type]: %s' % keyword.keyword_type)
+                ktype = node.get('type')
+                if ktype is not None:
+                    code_el = codelists.fromDescription(
+                        ktype, codelists.KEYWORD_TYPES)
+                    if code_el is None:
+                        raise ValueError('Invalid keyword type for: ' + usage)
+                    keyword.keyword_type = code_el[0]
+                    log.debug('keyword [type]: %s' % keyword.keyword_type)
                 keyword.language = node.get('lang')
                 keyword.term = term.text
                 log.debug('keyword: {} | {}'.format(
@@ -165,10 +184,14 @@ class EFG_XMLParser():
         descriptions = []
         for node in record.findall("description"):
             description = Description()
-            # FIXME
-            # description.description_type = node.get('type')
-            # log.debug(
-            #     'description [type]: %s' % description.description_type)
+            dtype = node.get('type')
+            if dtype is not None:
+                code_el = codelists.fromDescription(
+                    dtype, codelists.DESCRIPTION_TYPES)
+                if code_el is None:
+                    raise ValueError('Invalid description type for: ' + usage)
+                description.description_type = code_el[0]
+                log.debug('description [type]: %s' % description.description_type)
             description.language = node.get('lang')
             log.debug('description [lang]: %s' % description.language)
             description.source_ref = node.get('source')
@@ -275,20 +298,80 @@ class EFG_XMLParser():
         if node is not None:
             return node.text
 
-    def __parse_creation(self, record):
+    def parse_related_agents(self, record):
+        """
+        Extract related agents as a list of Agent instances with their related
+        contribution activities in the creation.
+        e.g. [[<class Agent>, ['Director', 'Screenplay']], etc.]
+        """
+        nodes = []
+        persons = record.findall('./relPerson')
+        if len(persons) > 0:
+            nodes.extend(persons)
+        corporates = record.findall('./relCorporate')
+        if len(corporates) > 0:
+            nodes.extend(corporates)
+
+        agents = []
+        for agent_node in nodes:
+            props = {}
+            props['names'] = [agent_node.find('name').text]
+            activities = []
+            rel_agent_type = agent_node.find('type')
+            if rel_agent_type is not None:
+                activities.append(rel_agent_type.text)
+
+            if agent_node.tag == 'relPerson':
+                props['agent_type'] = 'P'
+            elif agent_node.tag == 'relCorporate':
+                props['agent_type'] = 'P'
+            else:
+                # should never be reached
+                raise ValueError(
+                    'Invalid tag name for: '.format(agent_node.tag))
+
+            agent = None
+            # de-duplicate agents
+            for item in agents:
+                if props['names'][0] in item[0].names:
+                    log.debug('FOUND agent: ' + props['names'][0])
+                    agent = item[0]
+                    item[1].extend(activities)
+                    log.debug('added activities: {}'.format(activities))
+                    break
+            if agent is None:
+                agent = Agent(**props)
+                agents.append([agent, activities])
+
+        log.debug(agent.names[0] for agent in agents)
+        return agents
+
+    def parse_identifiers(self, record):
+        ids = []
+        for identifier in record.findall('./identifier'):
+            scheme = ''
+            if identifier.get('scheme') is not None:
+                scheme = identifier.get('scheme').upper()
+            ids.append(scheme + ':' + identifier.text)
+        return ids
+
+    def __parse_creation(self, record, audio_visual=False):
         properties = {}
+        properties['external_ids'] = self.parse_identifiers(record)
         properties['rights_status'] = self.get_rights_status(record)
         properties['collection_title'] = self.get_collection_title(record)
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(record)
-        relationships['titles'] = self.parse_titles(record)
+        relationships['titles'] = self.parse_titles(
+            record, avcreation=audio_visual)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
         relationships['languages'] = self.parse_languages(record)
         relationships['coverages'] = self.parse_coverages(record)
 
-        # contributor
+        # agents
+        relationships['agents'] = self.parse_related_agents(record)
 
         return properties, relationships
 
@@ -296,7 +379,7 @@ class EFG_XMLParser():
         log.debug("--- parsing AV Entity ---")
         av_creation = {}
 
-        properties, relationships = self.__parse_creation(record)
+        properties, relationships = self.__parse_creation(record, audio_visual=True)
 
         # manage av properties
         properties['identifying_title'], \

@@ -33,9 +33,15 @@ class CreationRepository():
         for r in relationships.keys():
             if r == 'record_sources':
                 # connect to record sources
-                for rc in relationships[r]:
-                    rc_node = self.create_record_source(rc)
-                    av_entity.record_sources.connect(rc_node)
+                for item in relationships[r]:
+                    record_source = item[0].save()
+                    av_entity.record_sources.connect(record_source)
+                    # look for existing content provider
+                    provider = self.find_provider_by_identifier(
+                        item[1].identifier, item[1].scheme)
+                    if provider is None:
+                        provider = item[1].save()
+                    record_source.provider.connect(provider)
             elif r == 'titles':
                 # connect to titles
                 for title in relationships[r]:
@@ -76,6 +82,18 @@ class CreationRepository():
             elif r == 'video_format':
                 video_format = relationships[r].save()
                 av_entity.video_format.connect(video_format)
+            elif r == 'agents':
+                for agent_activities in relationships[r]:
+                    # look for existing agents
+                    agent = agent_activities[0]
+                    res = self.find_agents_by_name(agent.names[0])
+                    if len(res) > 0:
+                        log.debug('Found existing agent: {}'.format(res[0].names))
+                        agent = res[0]
+                    else:
+                        agent.save()
+                    av_entity.contributors.connect(
+                        agent, {'activities': agent_activities[1]})
 
         return av_entity
 
@@ -97,10 +115,6 @@ class CreationRepository():
             video_format.delete()
 
         node.delete()
-
-    def create_record_source(self, record_source):
-        record_source.save()
-        return record_source
 
     def create_title(self, title):
         if title.relationship is None:
@@ -133,3 +147,19 @@ class CreationRepository():
         """
         log.debug("Searching for Items with term = " % term)
         pass
+
+    def find_agents_by_name(self, name):
+        log.debug('Find all agents with name: {}'.format(name))
+        query = "MATCH (a:Agent) WHERE '{name}' in a.names RETURN a"
+        results = self.graph.cypher(query.format(name=name))
+        return [self.graph.Agent.inflate(row[0]) for row in results]
+
+    def find_provider_by_identifier(self, pid, scheme):
+        log.debug('Find provider by identifier [{}, {}]'.format(pid, scheme))
+        # query = "MATCH (p:Provider {identifier: '{pid}', \
+        # scheme:'{scheme}'}) RETURN p"
+        # results = self.graph.Provider.cypher(
+        #     query, {'pid': pid, 'scheme': scheme})
+        # return [self.graph.Provider.inflate(row[0]) for row in results]
+        return self.graph.Provider.nodes.get_or_none(
+            identifier=pid, scheme=scheme)

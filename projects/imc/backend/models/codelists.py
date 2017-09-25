@@ -326,6 +326,20 @@ PROVIDER_SCHEMES = (
     ('ACRO', 'Institution acronym')
 )
 
+IDENTIFIER_SCHEMES = (
+    ('ISIL', 'International Standard for Library Institutions and Related Organisations'),
+    ('UUID', 'Universally Unique Identifier'),
+    ('GUID', 'Globally Unique Identifier'),
+    ('URI',  'Uniform Resource Identifier'),
+    ('URL',  'Uniform Resource Locator'),
+    ('URN',  'Uniform Resource Name'),
+    ('ISAN', 'International Standard Audiovisual Number'),
+    ('ISBN', 'International Standard Book Number'),
+    ('ISSN', 'International Standard Serial Number'),
+    ('ISMN', 'International Standard Music Number'),
+    ('DOI',  'Digital Object Identifier')
+)
+
 VIDEO_SOUND = (
     ('NO_SOUND', 'Without sound'),
     ('WITH_SOUND', 'With sound')
