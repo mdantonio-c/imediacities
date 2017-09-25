@@ -644,13 +644,13 @@
    					self.vocabularyFinal = data;
    					self.onlyterms = [];
 
-					for (var i=0; i<self.vocabularyFinal.classes.length-1; i++)
+					for (var i=0; i<=self.vocabularyFinal.classes.length-1; i++)
 					{
 						self.vocabularyFinal.classes[i]["show"] = true;
-						for (var k=0; k<self.vocabularyFinal.classes[i].groups.length-1; k++)
+						for (var k=0; k<=self.vocabularyFinal.classes[i].groups.length-1; k++)
 						{
 							self.vocabularyFinal.classes[i].groups[k]["show"] = true;
-							for (var j=0; j<self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
+							for (var j=0; j<=self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
 							{
 								self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
 								self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
