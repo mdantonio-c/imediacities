@@ -220,41 +220,6 @@
 						    return filtered;
 						};
 						}]);
-					/*.filter('containterm',[ function () {
-						return function(items, searchText) {
-						    var filtered = [];            
-
-						    angular.forEach(items, function(item) {
-						    	var terms = item.terms;
-						    	angular.forEach(terms, function(term) {
-						    		var stringtos = term.labels.en;
-						       	 	if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
-						           	 	filtered.push(item);
-						       		 }
-						    	});
-						    });
-						    return filtered;
-						};
-						}])
-					.filter('containgroup',[ function () {
-						return function(items, searchText) {
-						    var filtered = [];  
-
-						    angular.forEach(items, function(item) {
-						    	var groups = item.groups;
-							    angular.forEach(groups, function(group) {
-							    	var terms = group.terms;
-							    	angular.forEach(terms, function(term) {
-							    		var stringtos = term.labels.en;
-							       	 	if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
-							           	 	filtered.push(item);
-							       		 }
-							    	});
-							    });
-							});
-						    return filtered;
-						};
-						}]);*/
 
 					app.directive('scrollStoryOnClick', function() {
 						return {
@@ -1157,7 +1122,7 @@
 		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": '+$scope.IRI+', "name": "'+$scope.labelTerm+'", "alternativeNames": { "de": "'+$scope.alternatives.de+'", "en": "'+$scope.alternatives.en+'" }, "spatial": { "lat": "","long": "" }}}'; 
 		  		data['target'] = 'shot:'+$scope.shotID;
 				//save the annotation into the database
-				//DataService.saveAnnotation(vid,data);
+				DataService.saveAnnotation(vid,data);
 
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 				$uibModalInstance.close(null);
