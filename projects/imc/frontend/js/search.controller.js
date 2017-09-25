@@ -664,7 +664,6 @@
 					self.onpause = true;
 					var paused = false;//warning, this is a one shot variable, we need it only once loading the search page
 					self.showtagtxt = false;
-					self.mtagging = false;
 
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
 
@@ -705,21 +704,11 @@
 
 					// Pause video function
 					self.pauseVid = function(){     
-			    	if ((!myVid[0].paused || !self.onpause) && !self.mtagging) {
+			    	if ((!myVid[0].paused || !self.onpause)) {
 			    			self.onpause = true;
 			        		self.onplaying = false;
 			        		myVid[0].pause();
 			    		}
-			    	/*else if ((!myVid[0].paused || !self.onpause) && self.mtagging) {
-			    			manual tag general mode
-			        		self.onpause = true;
-			        		self.onplaying = false;
-			        		self.mtagging = false;
-			        		self.showtagtxt = false;
-			    			myVid[0].pause();
-			        		sharedProperties.setEndTime(myVid[0].currentTime);
-	        				myModalGeoFactory.open('lg', 'myModalGeoCode.html');
-			    		}*/
 			    	else if (myVid[0].paused && self.onpause) {
 			        		self.onpause = false;
 			        		self.onplaying = true;
@@ -730,12 +719,6 @@
 
 					self.manualtag = function(group,labelterm){
 						if (self.onpause && !self.onplaying) {
-							/*manual tag general mode
-							self.mtagging = true;
-							self.showtagtxt = true;
-							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
-							sharedProperties.setStartTime(self.startTagTime);
-							playVid(myVid[0]);*/
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
 
