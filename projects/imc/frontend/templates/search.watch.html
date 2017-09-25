@@ -120,7 +120,7 @@
 			          </button>
 			          <ul uib-dropdown-menu uib-dropdown-toggle role="menu" aria-labelledby="split-button">
 			          <input ng-attr-type="text" ng-model="watchCtrl.inputVocTerm" class="form-control" ng-attr-placeholder="Search vocabulary term" ng-click="$event.stopPropagation();" autofocus><hr />
-						<div ng-repeat="term in watchCtrl.onlyterms | termfilter:watchCtrl.inputVocTerm as filtered_terms track by $index" ng-click="expand(term);$event.stopPropagation();">
+						<div ng-repeat="term in watchCtrl.onlyterms | termfilter:watchCtrl.inputVocTerm as filtered_terms track by $index" ng-click="$event.stopPropagation();">
 							<span class="hoverme" ng-click="watchCtrl.manualtag(category.name,term.labels.en);">{{term.labels.en}}</span>
 						</div>
 					</ul>
