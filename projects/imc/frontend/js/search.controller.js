@@ -68,6 +68,8 @@
 	    	    var labelTerm = 'test label value';
 	    	    var group = 'test label value';
 	    	    var shotPNG = 'test label value';
+	    	    var videoId = '';
+	    	    var IRI = '';
 
 	    		return {
 	        		getStartTime: function() {
@@ -85,6 +87,12 @@
 	        		getShotPNG: function() {
 	            		return shotPNG;
 	        		},
+	        		getVideoId: function() {
+	            		return videoId;
+	        		},	
+	        		getIRI: function() {
+	            		return IRI;
+	        		},	        		
 	        		setStartTime: function(value) {
 	            		startTime = value;
 	        		},
@@ -99,6 +107,12 @@
 	        		},
 	        		setShotPNG: function(value){
 	        			shotPNG = value;
+	        		},
+	        		setVideoId: function(value){
+	        			videoId = value;
+	        		},
+	        		setIRI: function(value){
+	        			IRI = value;
 	        		}
 	    		}
 				});
@@ -717,7 +731,7 @@
 			    		}
 					}
 
-					self.manualtag = function(group,labelterm){
+					self.manualtag = function(group,labelterm,tiri){
 						if (self.onpause && !self.onplaying) {
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
@@ -744,10 +758,12 @@
 							var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
 
 							if (self.startTagTime>=times1 && self.startTagTime<=times2){
+									sharedProperties.setVideoId($stateParams.v);
 									sharedProperties.setStartTime(times1);
 									sharedProperties.setEndTime(times2);
 									sharedProperties.setGroup(group);
 									sharedProperties.setLabelTerm(labelterm);
+									sharedProperties.setIRI(tiri);
 									sharedProperties.setShotPNG(pngshot);
 									if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 									else myModalGeoFactory.open('lg', 'myModalVocab.html');
@@ -842,27 +858,6 @@
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-										videoTimeline.data.rows.push({c: [
-								       		{v: "area"},
-								       		{v: "Porta Mazzini"},
-								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
-								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "area"},
-								    	   {v: "Via Indipendenza"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "traffic area"},
-								     	  {v: "Chiesa di S. Francesco"},
-								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
-								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
-										]});
-
 										self.videoTimeline = videoTimeline;
 
 										}, 2000);
@@ -870,6 +865,16 @@
 									}
 								});
 						};
+
+					self.loadVideoAnnotations = function(vid) {
+					DataService.getVideoAnnotations(vid).then(
+								function(response) {
+
+									var resp = response;
+
+								});
+					}
+					
 
 					self.loadMetadataContent = function(vid) {
 						self.loading = true;
@@ -880,6 +885,7 @@
 								self.currentvidDur = self.video.relationships.item[0].attributes.duration;
 								self.loading = false;
 								self.loadVideoShots(vid);
+								self.loadVideoAnnotations(vid);
 							},
 							function(error) {
 								self.loading = false;
@@ -1025,7 +1031,7 @@
 
 					angular.forEach(shots, function(shot) {
 
-			/*			self.camera = [];
+						/*self.camera = [];
 						var annotations = shot.annotations;
 						var camattr = annotations[0].attributes;
 						var first = true;
@@ -1077,13 +1083,14 @@
 
 			// Please note that $modalInstance represents a modal window (instance) dependency.
 			// It is not the same as the $uibModal service used above.
-			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, sharedProperties) {
+			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, DataService, sharedProperties) {
 		  	$scope.geocodingResult = "";
 		  	$scope.startT = sharedProperties.getStartTime();
 		  	$scope.endT = sharedProperties.getEndTime();
 		  	$scope.group = sharedProperties.getGroup();
 		  	$scope.labelTerm = sharedProperties.getLabelTerm();
 		  	$scope.shotPNGImage = sharedProperties.getShotPNG();
+		  	$scope.IRI = sharedProperties.getIRI();
 
 		  	$scope.ok = function() {
 
@@ -1113,11 +1120,20 @@
 		    	//$uibModalInstance.close($scope.searchTerm);
 		    }
 		    else{
-
+		    	var vid = sharedProperties.getVideoId();
 		  		$scope.startT = sharedProperties.getStartTime();
 		  		$scope.endT = sharedProperties.getEndTime();
 		  		$scope.group = sharedProperties.getGroup();
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
+		  		$scope.IRI = sharedProperties.getIRI();
+
+		  		var data = [];
+		  		//data['header'] = '{"type": "Header", "Access-Control-Allow-Origin": "*","Content-Length": "498", "Content-Type": "application/json"}';
+		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
+		  		data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
+				//save the annotation into the database
+				//DataService.saveAnnotation(vid,data);
+
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 				$uibModalInstance.close(null);
 
