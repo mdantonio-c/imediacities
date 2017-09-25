@@ -138,7 +138,7 @@
 			          <div ng-repeat="groupsitem in watchCtrl.vocabularyFinal.classes" ng-click="expand(groupsitem);$event.stopPropagation();">
 			           <div ng-repeat="category in groupsitem.groups" ng-click="expand(category);$event.stopPropagation();">
 						<div ng-repeat="term in category.terms | termfilter:watchCtrl.inputVocTerm as filtered_terms track by $index" ng-click="$event.stopPropagation();">
-						<span class="hoverme" style="color:black; font-weight:bold" ng-click="watchCtrl.manualtag(category.name,term.labels.en,term.iri);">{{term.labels.en}} <em style="color:gray;">{{category.name}}</em></span>
+						<span class="hoverme" style="color:black; font-weight:bold" ng-click="watchCtrl.manualtag(category.name,term.labels.en,term.iri,term.labels);">{{term.labels.en}} <em style="color:gray;">{{category.name}}</em></span>
 						</div>
 					    </div>
 					  </div>
