@@ -70,6 +70,8 @@
 	    	    var shotPNG = 'test label value';
 	    	    var videoId = '';
 	    	    var IRI = '';
+	    	    var shotId = '';
+	    	    var alternatives = null;
 
 	    		return {
 	        		getStartTime: function() {
@@ -92,7 +94,13 @@
 	        		},	
 	        		getIRI: function() {
 	            		return IRI;
-	        		},	        		
+	        		},	   
+	        		getShotId: function() {
+	            		return shotId;
+	        		},
+	        		getAlternatives: function() {
+	            		return alternatives;
+	        		},	     		
 	        		setStartTime: function(value) {
 	            		startTime = value;
 	        		},
@@ -113,6 +121,12 @@
 	        		},
 	        		setIRI: function(value){
 	        			IRI = value;
+	        		},
+	        		setShotId: function(value){
+	        			shotId = value;
+	        		},
+	        		setAlternatives: function(value){
+	        			alternatives = value;
 	        		}
 	    		}
 				});
@@ -731,7 +745,7 @@
 			    		}
 					}
 
-					self.manualtag = function(group,labelterm,tiri){
+					self.manualtag = function(group,labelterm,tiri,alternatives){
 						if (self.onpause && !self.onplaying) {
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
@@ -742,6 +756,7 @@
 							var time1 = self.items[i][5];
 							var time2 = self.items[i+1][5];
 							var pngshot = self.items[i][6];
+							var shotid = self.items[i][7];
 
 							var currtime1 = time1.split("-")[0];
 							var hours1 = currtime1.split(":")[0];
@@ -763,11 +778,14 @@
 									sharedProperties.setEndTime(times2);
 									sharedProperties.setGroup(group);
 									sharedProperties.setLabelTerm(labelterm);
+									sharedProperties.setAlternatives(alternatives);
 									sharedProperties.setIRI(tiri);
 									sharedProperties.setShotPNG(pngshot);
+									sharedProperties.setShotId(shotid);									
 									if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 									else myModalGeoFactory.open('lg', 'myModalVocab.html');
 								}
+
 							}
 						}
 					}
@@ -790,6 +808,7 @@
 										frameshot[4] = i;
 										frameshot[5] = timestamp;
 										frameshot[6] = thumblink;
+										frameshot[7] = self.shots[i].id;
 
 										self.items.push(frameshot);
 
@@ -1126,11 +1145,17 @@
 		  		$scope.group = sharedProperties.getGroup();
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
 		  		$scope.IRI = sharedProperties.getIRI();
+		  		$scope.shotID = sharedProperties.getShotId();
+		  		$scope.alternatives = sharedProperties.getAlternatives();
 
 		  		var data = [];
 		  		//data['header'] = '{"type": "Header", "Access-Control-Allow-Origin": "*","Content-Length": "498", "Content-Type": "application/json"}';
-		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
-		  		data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
+		  		//data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
+		  		//data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
+
+		  		//alternatives mechanism should be of course generalized
+		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": '+$scope.IRI+', "name": "'+$scope.labelTerm+'", "alternativeNames": { "de": "'+$scope.alternatives.de+'", "en": "'+$scope.alternatives.en+'" }, "spatial": { "lat": "","long": "" }}}'; 
+		  		data['target'] = 'shot:'+$scope.shotID;
 				//save the annotation into the database
 				//DataService.saveAnnotation(vid,data);
 
