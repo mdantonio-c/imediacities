@@ -14,14 +14,10 @@ class EFG_XMLParser():
 
     def get_root(self, filepath):
         tree = ET.parse(filepath)
-        root = tree.getroot()
-
-        return root
+        return tree.getroot()
 
     def get_av_creations(self, filepath):
         root = ET.parse(filepath)
-
-        # all 'avcreation'
         return root.findall("./avcreation")
 
     def get_av_creation_by_ref(self, filepath, ref_id):
@@ -35,8 +31,6 @@ class EFG_XMLParser():
 
     def get_non_av_creations(self, filepath):
         root = ET.parse(filepath)
-
-        # all 'nonavcreation'
         return root.findall("./nonavcreation")
 
     def get_av_creation_ref(self, record):
@@ -73,7 +67,8 @@ class EFG_XMLParser():
             raise ValueError("Rights status is missing")
         code_el = codelists.fromDescription(node.text, codelists.RIGHTS_STATUS)
         if code_el is None:
-            raise ValueError('Invalid rights status description for: ' + node.text)
+            raise ValueError(
+                'Invalid rights status description for: ' + node.text)
         return code_el[0]
 
     def get_view_filmography(self, record):
@@ -121,16 +116,16 @@ class EFG_XMLParser():
         return record_sources
 
     def get_record_source(self, record):
-        '''
+        """
         Naive implementation to get always the first record source as the
         archive one.
-        '''
+        """
         return self.parse_record_sources(record)[0]
 
     def get_record_source_url(self, record):
-        '''
+        """
         Return the url of the source provider where the content is shown.
-        '''
+        """
         node = record.find('./avManifestation[1]/item[1]/isShownAt')
         if node is not None:
             return node.text
@@ -170,7 +165,7 @@ class EFG_XMLParser():
                     code_el = codelists.fromDescription(
                         ktype, codelists.KEYWORD_TYPES)
                     if code_el is None:
-                        raise ValueError('Invalid keyword type for: ' + usage)
+                        raise ValueError('Invalid keyword type for: ' + ktype)
                     keyword.keyword_type = code_el[0]
                     log.debug('keyword [type]: %s' % keyword.keyword_type)
                 if node.get('lang') is not None:
@@ -192,7 +187,7 @@ class EFG_XMLParser():
                 code_el = codelists.fromDescription(
                     dtype, codelists.DESCRIPTION_TYPES)
                 if code_el is None:
-                    raise ValueError('Invalid description type for: ' + usage)
+                    raise ValueError('Invalid description type for: ' + dtype)
                 description.description_type = code_el[0]
                 log.debug('description [type]: %s' % description.description_type)
             description.language = node.get('lang')
@@ -361,7 +356,7 @@ class EFG_XMLParser():
     def parse_rightholders(self, record):
         rightholders = []
         for rightholder in record.findall('./avManifestation/rightsHolder'):
-            r = Rightholder(name2=rightholder.text)
+            r = Rightholder(name=rightholder.text)
             url = rightholder.get('URL')
             if url is not None:
                 r.url = url

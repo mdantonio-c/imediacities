@@ -386,7 +386,7 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name2 = StringProperty(required=True, show=True),
+    name = StringProperty(required=True, show=True)
     url = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore)

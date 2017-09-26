@@ -97,10 +97,10 @@ class CreationRepository():
             elif r == 'rightholders':
                 for rightholder in relationships[r]:
                     # look for existing rightholder
-                    res = self.find_rightholder_by_name(rightholder.name2)
+                    res = self.find_rightholder_by_name(rightholder.name)
                     if res is not None:
                         log.debug(
-                            'Found existing rightholder: {}'.format(res.name2))
+                            'Found existing rightholder: {}'.format(res.name))
                         rightholder = res
                     else:
                         rightholder.save()
@@ -177,4 +177,4 @@ class CreationRepository():
 
     def find_rightholder_by_name(self, name):
         log.debug('Find rightholder by name: {}'.format(name))
-        return self.graph.Rightholder.nodes.get_or_none(name2=name)
+        return self.graph.Rightholder.nodes.get_or_none(name=name)

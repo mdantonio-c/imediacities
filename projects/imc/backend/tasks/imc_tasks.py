@@ -5,7 +5,6 @@ import json
 import random
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
-# from imc.tasks.services.fhg_xmlparser import FHG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.models.neo4j import Shot
