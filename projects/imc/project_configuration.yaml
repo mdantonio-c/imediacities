@@ -9,13 +9,13 @@ tags:
 variables:
   repos:
     rapydo:
-      branch: __current__
+      branch: master
     utils:
-      branch: __current__
+      branch: master
     backend:
-      branch: __current__
+      branch: master
     build-templates:
-      branch: __current__
+      branch: master
 
   env:
     COMPOSE_PROJECT_NAME: imc
