@@ -1101,23 +1101,6 @@
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
 
-						// var target = 'shot:'+$scope.shotID;
-						// // alternatives mechanism should be of course generalized
-						// var source = {
-						// 		"iri": $scope.IRI,
-						// 		"name": $scope.labelTerm,
-						// 		// "alternativeNames": {
-						// 		// 	"de": $scope.alternatives.de,
-						// 		// 	"en": $scope.alternatives.en
-						// 		// },
-						// 		"spatial": {
-						// 			"lat": locationlat,
-						// 			"long": locationlng
-						// 		}
-						// 	}; 
-						// //save the annotation into the database
-						// DataService.saveAnnotation(target, source);
-
 						$uibModalInstance.close($scope.vm.address.locality);
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
@@ -1162,7 +1145,7 @@
 
 			}
 
-			function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties) {
+			function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
 			$scope.geocodingResult = params.result;
 			$scope.geoResArray = params.resarr;
 
@@ -1174,6 +1157,32 @@
 		  		$scope.endT = sharedProperties.getEndTime();
 		  		$scope.group = sharedProperties.getGroup();
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
+		  		$scope.shotID = sharedProperties.getShotId();
+		  		$scope.IRI = sharedProperties.getIRI();
+		  		console.log($scope.IRI)
+		  		// $scope.alternatives = sharedProperties.getAlternatives();
+
+				var target = 'shot:'+$scope.shotID;
+				// alternatives mechanism should be of course generalized
+				console.log($scope.IRI);
+				console.log($scope.labelTerm);
+				console.log(res);
+				var source = {
+					// "iri": $scope.IRI,
+					// "name": $scope.labelTerm,
+					"iri": "xyz",
+					"name": "test",
+					// "alternativeNames": {
+					// 	"de": $scope.alternatives.de,
+					// 	"en": $scope.alternatives.en
+					// },
+					"spatial": {
+						"lat": 0,
+						"long": 0
+					}
+				}; 
+				//save the annotation into the database
+				DataService.saveAnnotation(target, source);
 
 				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 
