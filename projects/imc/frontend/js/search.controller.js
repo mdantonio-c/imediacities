@@ -72,6 +72,8 @@
 	    	    var IRI = '';
 	    	    var shotId = '';
 	    	    var alternatives = null;
+	    	    var latitude = '';
+	    	    var longitude = '';
 
 	    		return {
 	        		getStartTime: function() {
@@ -98,6 +100,12 @@
 	        		getShotId: function() {
 	            		return shotId;
 	        		},
+	        		getLatitude: function() {
+	            		return latitude;
+	        		},
+	        		getLongitude: function() {
+	            		return longitude;
+	        		},
 	        		getAlternatives: function() {
 	            		return alternatives;
 	        		},	     		
@@ -106,6 +114,12 @@
 	        		},
 	        		setEndTime: function(value) {
 	            		endTime = value;
+	        		},
+	        		setLat: function(value) {
+	            		latitude = value;
+	        		},
+	        		setLong: function(value) {
+	            		longitude = value;
 	        		},
 	        		setLabelTerm: function(value) {
 	            		labelTerm = value;
@@ -1097,6 +1111,8 @@
 					.then(function(result) {
 						var locationlat = result[0].geometry.location.lat();
 						var locationlng = result[0].geometry.location.lng();
+						sharedProperties.setLat(locationlat);
+						sharedProperties.setLong(locationlng);
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
@@ -1160,6 +1176,8 @@
 		  		$scope.shotID = sharedProperties.getShotId();
 		  		$scope.IRI = sharedProperties.getIRI();
 		  		// $scope.alternatives = sharedProperties.getAlternatives();
+		  		$scope.latitude = sharedProperties.getLatitude();
+		  		$scope.longitude = sharedProperties.getLongitude();
 
 				var target = 'shot:'+$scope.shotID;
 				// alternatives mechanism should be of course generalized
@@ -1175,8 +1193,8 @@
 					// 	"en": $scope.alternatives.en
 					// },
 					"spatial": {
-						"lat": 0,
-						"long": 0
+						"lat": $scope.latitude,
+						"long": $scope.longitude
 					}
 				}; 
 				//save the annotation into the database
