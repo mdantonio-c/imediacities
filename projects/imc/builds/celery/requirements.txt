@@ -7,7 +7,9 @@ plumbum
 celery
 flower
 
-rapydo-http==0.5.1
+# Temporary required for http-api
+git+https://github.com/irods/python-irodsclient.git@master
+rapydo-http==0.5.5
 
 numpy
 Pillow     
