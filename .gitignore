@@ -89,6 +89,9 @@ pip-delete-this-directory.txt
 # PyBuilder
 target/
 
+### PyCharm ###
+.idea/
+
 ###################################
 ## Unit test / coverage reports  ##
 ###################################

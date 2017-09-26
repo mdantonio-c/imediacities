@@ -7,6 +7,16 @@ tags:
     miscellaneous: "Endpoints not classified in other specific sections"
 
 variables:
+  repos:
+    rapydo:
+      branch: master
+    utils:
+      branch: master
+    backend:
+      branch: master
+    build-templates:
+      branch: master
+
   env:
     COMPOSE_PROJECT_NAME: imc
     PROJECT_DOMAIN: imediacities.hpc.cineca.it
