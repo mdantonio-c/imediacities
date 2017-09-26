@@ -227,7 +227,7 @@
 		          <!--<input type="text" class="form-control finderBar" ng-model="tagInput" placeholder="Optional: enter location: City, State..." autofocus>-->
 		          <input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
 		          <span class="input-group-btn">
-		          	<button class="btn btn-default" type="button" ng-click="ok()">Tag</button>
+		          	<button class="btn btn-default" type="button" ng-click="ok()">Confirm</button>
 		      		</span>
 		        </div>
 		      </form>
@@ -271,7 +271,7 @@
 		    </div>
 		    <div class="modal-footer">
 		      <!--<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>-->
-		      <p class="pull-left"><b>You have selected the category: </b>{{labelTerm}}</p>
+		      <p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p>
 		      <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		      <button class="btn btn-default" type="button" ng-click="ok()">Confirm</button>
 		    </div>
