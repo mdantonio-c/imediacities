@@ -70,8 +70,17 @@ function DataService($log, api, $q, jsonapi_parser) {
         return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
     };
 
-    self.saveAnnotation = function(videoId, data) {
-        return api.apiCall('videos/'+videoId+'/annotations', 'POST', data);
+    // self.saveAnnotation = function(videoId, data) {
+    //     return api.apiCall('videos/'+videoId+'/annotations', 'POST', data);
+    self.saveAnnotation = function(target, source) {
+        var data = {}
+        data["target"] = target;
+        data["body"] = {}
+        data['body']['type'] = "ResourceBody";
+        data['body']['purpose'] = "tagging";
+        data['body']['source'] = source;
+
+        return api.apiCall('annotations', 'POST', data);
     };
 
     self.saveUser = function(data) {

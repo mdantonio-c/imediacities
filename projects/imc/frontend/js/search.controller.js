@@ -1075,10 +1075,11 @@
 		  	$scope.labelTerm = sharedProperties.getLabelTerm();
 		  	$scope.shotPNGImage = sharedProperties.getShotPNG();
 		  	$scope.IRI = sharedProperties.getIRI();
+	  		$scope.shotID = sharedProperties.getShotId();
 
 		  	$scope.ok = function() {
 
-				if(!angular.isUndefined($scope.vm)){
+			if (!angular.isUndefined($scope.vm)) {
 
 				var route = '';
 				var locality = '';
@@ -1099,35 +1100,60 @@
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
+
+						// var target = 'shot:'+$scope.shotID;
+						// // alternatives mechanism should be of course generalized
+						// var source = {
+						// 		"iri": $scope.IRI,
+						// 		"name": $scope.labelTerm,
+						// 		// "alternativeNames": {
+						// 		// 	"de": $scope.alternatives.de,
+						// 		// 	"en": $scope.alternatives.en
+						// 		// },
+						// 		"spatial": {
+						// 			"lat": locationlat,
+						// 			"long": locationlng
+						// 		}
+						// 	}; 
+						// //save the annotation into the database
+						// DataService.saveAnnotation(target, source);
+
 						$uibModalInstance.close($scope.vm.address.locality);
 				});
 		    	//$uibModalInstance.close($scope.searchTerm);
 		    }
-		    else{
+		    else {
 		    	var vid = sharedProperties.getVideoId();
-		  		$scope.startT = sharedProperties.getStartTime();
-		  		$scope.endT = sharedProperties.getEndTime();
-		  		$scope.group = sharedProperties.getGroup();
-		  		$scope.labelTerm = sharedProperties.getLabelTerm();
-		  		$scope.IRI = sharedProperties.getIRI();
-		  		$scope.shotID = sharedProperties.getShotId();
+		  		// $scope.startT = sharedProperties.getStartTime();
+		  		// $scope.endT = sharedProperties.getEndTime();
+		  		// $scope.group = sharedProperties.getGroup();
+		  		// $scope.labelTerm = sharedProperties.getLabelTerm();
+		  		// $scope.IRI = sharedProperties.getIRI();
+		  		// $scope.shotID = sharedProperties.getShotId();
 		  		$scope.alternatives = sharedProperties.getAlternatives();
 
-		  		var data = [];
+		  		// var data = {};
 		  		//data['header'] = '{"type": "Header", "Access-Control-Allow-Origin": "*","Content-Length": "498", "Content-Type": "application/json"}';
 		  		//data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
 		  		//data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
 
+		  		var target = 'shot:'+$scope.shotID;
 		  		//alternatives mechanism should be of course generalized
-		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": '+$scope.IRI+', "name": "'+$scope.labelTerm+'", "alternativeNames": { "de": "'+$scope.alternatives.de+'", "en": "'+$scope.alternatives.en+'" }, "spatial": { "lat": "","long": "" }}}'; 
-		  		data['target'] = 'shot:'+$scope.shotID;
+		  		var source = {
+	  				"iri": $scope.IRI,
+	  				"name": $scope.labelTerm,
+	  				"alternativeNames": {
+	  					"de": $scope.alternatives.de,
+	  					"en": $scope.alternatives.en
+	  				}
+	  			}; 
 				//save the annotation into the database
-				DataService.saveAnnotation(vid,data);
+				DataService.saveAnnotation(target, source);
 
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 				$uibModalInstance.close(null);
 
-		   	 };
+			   	};
 			}
 
 		  	$scope.cancel = function() {

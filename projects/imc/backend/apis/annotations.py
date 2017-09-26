@@ -87,10 +87,17 @@ class Annotations(GraphBaseOperations):
                 'Invalid Target format',
                 status_code=hcodes.HTTP_BAD_REQUEST)
         target_type, tid = target.split(':')
-        logger.debug('tagert type: {}, target id: {}'.format(
+        logger.debug('target type: {}, target id: {}'.format(
             target_type, tid))
 
         self.initGraph()
+
+        # check user
+        user = self._current_user
+        if user is None:
+            raise RestApiException(
+                'Invalid user',
+                status_code=hcodes.HTTP_BAD_REQUEST)
 
         targetNode = None
         if target_type == 'item':
@@ -123,12 +130,7 @@ class Annotations(GraphBaseOperations):
                 raise RestApiException(
                     'Invalid selector value for: ' + s_val,
                     status_code=hcodes.HTTP_BAD_REQUEST)
-        # check user
-        user = self.getLoggedUserInstance()
-        if user is None:
-            raise RestApiException(
-                'Invalid user',
-                status_code=hcodes.HTTP_BAD_REQUEST)
+
         # check body
         body = data['body']
         b_type = body.get('type')
