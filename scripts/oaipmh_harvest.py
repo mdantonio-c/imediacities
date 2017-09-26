@@ -7,6 +7,7 @@ sudo pip3 install pyoai
 import click
 import json
 import os
+import urllib
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from lxml import etree
@@ -151,7 +152,17 @@ def harvest(metadata_set, dest_folder, log_file):
 
         report_data['filtered'] += 1
 
+        if avManifestation is None:
+            report_data['missing_sourceid'].append(title)
+            # log.warning("avManifestation not found, skipping record")
+            continue
+
         recordSource = avManifestation.find(tag("recordSource"))
+        if recordSource is None:
+            report_data['missing_sourceid'].append(title)
+            # log.warning("recordSource not found, skipping record")
+            continue
+
         sourceID = recordSource.find(tag("sourceID"))
         if sourceID is None:
             report_data['missing_sourceid'].append(title)
@@ -160,7 +171,7 @@ def harvest(metadata_set, dest_folder, log_file):
 
         content = etree.tostring(efgEntity, pretty_print=True)
 
-        id_text = sourceID.text.replace("/", "_")
+        id_text = urllib.parse.quote_plus(sourceID.text)
         filename = "%s_%s_%s.xml" % (
             metadata_set,
             id_text,

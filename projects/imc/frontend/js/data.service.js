@@ -70,6 +70,10 @@ function DataService($log, api, $q, jsonapi_parser) {
         return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
     };
 
+    self.saveAnnotation = function(videoId, data) {
+        return api.apiCall('videos/'+videoId+'/annotations', 'POST', data);
+    };
+
     self.saveUser = function(data) {
         return api.apiCall('admin/users', 'POST', data);
     };

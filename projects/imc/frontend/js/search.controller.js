@@ -68,6 +68,10 @@
 	    	    var labelTerm = 'test label value';
 	    	    var group = 'test label value';
 	    	    var shotPNG = 'test label value';
+	    	    var videoId = '';
+	    	    var IRI = '';
+	    	    var shotId = '';
+	    	    var alternatives = null;
 
 	    		return {
 	        		getStartTime: function() {
@@ -85,6 +89,18 @@
 	        		getShotPNG: function() {
 	            		return shotPNG;
 	        		},
+	        		getVideoId: function() {
+	            		return videoId;
+	        		},	
+	        		getIRI: function() {
+	            		return IRI;
+	        		},	   
+	        		getShotId: function() {
+	            		return shotId;
+	        		},
+	        		getAlternatives: function() {
+	            		return alternatives;
+	        		},	     		
 	        		setStartTime: function(value) {
 	            		startTime = value;
 	        		},
@@ -99,6 +115,18 @@
 	        		},
 	        		setShotPNG: function(value){
 	        			shotPNG = value;
+	        		},
+	        		setVideoId: function(value){
+	        			videoId = value;
+	        		},
+	        		setIRI: function(value){
+	        			IRI = value;
+	        		},
+	        		setShotId: function(value){
+	        			shotId = value;
+	        		},
+	        		setAlternatives: function(value){
+	        			alternatives = value;
 	        		}
 	    		}
 				});
@@ -177,9 +205,23 @@
 							}
 							return res;
 						};
-					});
+					})
+					.filter('termfilter',[ function () {
+						return function(items, searchText) {
+						    var filtered = [];            
 
-				app.directive('scrollStoryOnClick', function() {
+						    angular.forEach(items, function(item) {
+						    	var stringtos = item.labels.en;
+						        if((stringtos.indexOf(searchText) >= 0) || (searchText === '')){ // matches part of the word, e.g. 'England'
+						        	item["show"] = true;
+						            filtered.push(item);						        
+						        }
+						    });
+						    return filtered;
+						};
+						}]);
+
+					app.directive('scrollStoryOnClick', function() {
 						return {
 							//restrict: 'A',
 							link: function($scope, $elm) {
@@ -581,6 +623,8 @@
 					var vid = $stateParams.v;
 					self.video = $stateParams.meta;
 
+					self.inputVocTerm = "";
+
 					/*inizialize address for automplete input tag for geolocation*/
    					$scope.vm = {address: {}};
 
@@ -588,22 +632,24 @@
        					mitem.show = !mitem.show;
     				}
 
+					self.vocabularyFinal = [];
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-   						self.vocabularyFinal = data;
+   					self.vocabularyFinal = data;
+   					self.onlyterms = [];
 
-						for (var i=0; i<self.vocabularyFinal.classes.length-1; i++)
+					for (var i=0; i<=self.vocabularyFinal.classes.length-1; i++)
+					{
+						self.vocabularyFinal.classes[i]["show"] = true;
+						for (var k=0; k<=self.vocabularyFinal.classes[i].groups.length-1; k++)
 						{
-							self.vocabularyFinal.classes[i]["show"] = false;
-							for (var k=0; k<self.vocabularyFinal.classes[i].groups.length-1; k++)
+							self.vocabularyFinal.classes[i].groups[k]["show"] = true;
+							for (var j=0; j<=self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
 							{
-								self.vocabularyFinal.classes[i].groups[k]["show"] = false;
-								for (var j=0; j<self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
-								{
-									self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = false;
-								}
+								self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
+								self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
 							}
 						}
-
+					}
 					});
     			
 					// Initializing values
@@ -611,7 +657,6 @@
 					self.onpause = true;
 					var paused = false;//warning, this is a one shot variable, we need it only once loading the search page
 					self.showtagtxt = false;
-					self.mtagging = false;
 
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
 
@@ -652,21 +697,11 @@
 
 					// Pause video function
 					self.pauseVid = function(){     
-			    	if ((!myVid[0].paused || !self.onpause) && !self.mtagging) {
+			    	if ((!myVid[0].paused || !self.onpause)) {
 			    			self.onpause = true;
 			        		self.onplaying = false;
 			        		myVid[0].pause();
 			    		}
-			    	/*else if ((!myVid[0].paused || !self.onpause) && self.mtagging) {
-			    			manual tag general mode
-			        		self.onpause = true;
-			        		self.onplaying = false;
-			        		self.mtagging = false;
-			        		self.showtagtxt = false;
-			    			myVid[0].pause();
-			        		sharedProperties.setEndTime(myVid[0].currentTime);
-	        				myModalGeoFactory.open('lg', 'myModalGeoCode.html');
-			    		}*/
 			    	else if (myVid[0].paused && self.onpause) {
 			        		self.onpause = false;
 			        		self.onplaying = true;
@@ -675,14 +710,8 @@
 			    		}
 					}
 
-					self.manualtag = function(group,labelterm){
+					self.manualtag = function(group,labelterm,tiri,alternatives){
 						if (self.onpause && !self.onplaying) {
-							/*manual tag general mode
-							self.mtagging = true;
-							self.showtagtxt = true;
-							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
-							sharedProperties.setStartTime(self.startTagTime);
-							playVid(myVid[0]);*/
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
 
@@ -692,6 +721,7 @@
 							var time1 = self.items[i][5];
 							var time2 = self.items[i+1][5];
 							var pngshot = self.items[i][6];
+							var shotid = self.items[i][7];
 
 							var currtime1 = time1.split("-")[0];
 							var hours1 = currtime1.split(":")[0];
@@ -708,14 +738,19 @@
 							var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
 
 							if (self.startTagTime>=times1 && self.startTagTime<=times2){
+									sharedProperties.setVideoId($stateParams.v);
 									sharedProperties.setStartTime(times1);
 									sharedProperties.setEndTime(times2);
 									sharedProperties.setGroup(group);
 									sharedProperties.setLabelTerm(labelterm);
+									sharedProperties.setAlternatives(alternatives);
+									sharedProperties.setIRI(tiri);
 									sharedProperties.setShotPNG(pngshot);
+									sharedProperties.setShotId(shotid);									
 									if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 									else myModalGeoFactory.open('lg', 'myModalVocab.html');
 								}
+
 							}
 						}
 					}
@@ -738,6 +773,7 @@
 										frameshot[4] = i;
 										frameshot[5] = timestamp;
 										frameshot[6] = thumblink;
+										frameshot[7] = self.shots[i].id;
 
 										self.items.push(frameshot);
 
@@ -806,27 +842,6 @@
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
 										]});
 
-										videoTimeline.data.rows.push({c: [
-								       		{v: "area"},
-								       		{v: "Porta Mazzini"},
-								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
-								       		{v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "area"},
-								    	   {v: "Via Indipendenza"},
-								    	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[0])},
-								     	   {v: new Date(0,0,0,0,0,self.mainchar.split('-')[1])}
-										]});
-
-										videoTimeline.data.rows.push({c: [
-								    	   {v: "traffic area"},
-								     	  {v: "Chiesa di S. Francesco"},
-								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[0])},
-								     	  {v: new Date(0,0,0,0,0,self.crowd.split('-')[1])}
-										]});
-
 										self.videoTimeline = videoTimeline;
 
 										}, 2000);
@@ -834,6 +849,16 @@
 									}
 								});
 						};
+
+					self.loadVideoAnnotations = function(vid) {
+					DataService.getVideoAnnotations(vid).then(
+								function(response) {
+
+									var resp = response;
+
+								});
+					}
+					
 
 					self.loadMetadataContent = function(vid) {
 						self.loading = true;
@@ -844,6 +869,7 @@
 								self.currentvidDur = self.video.relationships.item[0].attributes.duration;
 								self.loading = false;
 								self.loadVideoShots(vid);
+								self.loadVideoAnnotations(vid);
 							},
 							function(error) {
 								self.loading = false;
@@ -989,7 +1015,7 @@
 
 					angular.forEach(shots, function(shot) {
 
-			/*			self.camera = [];
+						/*self.camera = [];
 						var annotations = shot.annotations;
 						var camattr = annotations[0].attributes;
 						var first = true;
@@ -1041,13 +1067,14 @@
 
 			// Please note that $modalInstance represents a modal window (instance) dependency.
 			// It is not the same as the $uibModal service used above.
-			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, sharedProperties) {
+			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, DataService, sharedProperties) {
 		  	$scope.geocodingResult = "";
 		  	$scope.startT = sharedProperties.getStartTime();
 		  	$scope.endT = sharedProperties.getEndTime();
 		  	$scope.group = sharedProperties.getGroup();
 		  	$scope.labelTerm = sharedProperties.getLabelTerm();
 		  	$scope.shotPNGImage = sharedProperties.getShotPNG();
+		  	$scope.IRI = sharedProperties.getIRI();
 
 		  	$scope.ok = function() {
 
@@ -1077,11 +1104,26 @@
 		    	//$uibModalInstance.close($scope.searchTerm);
 		    }
 		    else{
-
+		    	var vid = sharedProperties.getVideoId();
 		  		$scope.startT = sharedProperties.getStartTime();
 		  		$scope.endT = sharedProperties.getEndTime();
 		  		$scope.group = sharedProperties.getGroup();
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
+		  		$scope.IRI = sharedProperties.getIRI();
+		  		$scope.shotID = sharedProperties.getShotId();
+		  		$scope.alternatives = sharedProperties.getAlternatives();
+
+		  		var data = [];
+		  		//data['header'] = '{"type": "Header", "Access-Control-Allow-Origin": "*","Content-Length": "498", "Content-Type": "application/json"}';
+		  		//data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
+		  		//data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
+
+		  		//alternatives mechanism should be of course generalized
+		  		data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": '+$scope.IRI+', "name": "'+$scope.labelTerm+'", "alternativeNames": { "de": "'+$scope.alternatives.de+'", "en": "'+$scope.alternatives.en+'" }, "spatial": { "lat": "","long": "" }}}'; 
+		  		data['target'] = 'shot:'+$scope.shotID;
+				//save the annotation into the database
+				DataService.saveAnnotation(vid,data);
+
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 				$uibModalInstance.close(null);
 

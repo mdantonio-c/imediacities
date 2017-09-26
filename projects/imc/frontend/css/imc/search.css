@@ -478,8 +478,20 @@ element.style {
 }​
 
 /*dropdown*/
+
 .uib-dropdown-toggle {
     min-width: 260px !important;
+}
+
+.hoverme:hover
+{
+	background-color:  #f0f0f5;
+}
+
+.dropdown-menu {
+        max-height: 800px;
+        min-width: 200px;
+        overflow-y: auto;
 }
 
 
