@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from imc.models.neo4j import (
     RecordSource, Title, Keyword, Description, Coverage, VideoFormat, Agent,
-    Provider
+    Provider, Rightholder
 )
 from imc.models import codelists
 from utilities.logs import get_logger
@@ -358,6 +358,16 @@ class EFG_XMLParser():
             ids.append(scheme + ':' + identifier.text)
         return ids
 
+    def parse_rightholders(self, record):
+        rightholders = []
+        for rightholder in record.findall('./avManifestation/rightsHolder'):
+            r = Rightholder(name2=rightholder.text)
+            url = rightholder.get('URL')
+            if url is not None:
+                r.url = url
+            rightholders.append(r)
+        return rightholders
+
     def __parse_creation(self, record, audio_visual=False):
         properties = {}
         properties['external_ids'] = self.parse_identifiers(record)
@@ -372,6 +382,7 @@ class EFG_XMLParser():
         relationships['descriptions'] = self.parse_descriptions(record)
         relationships['languages'] = self.parse_languages(record)
         relationships['coverages'] = self.parse_coverages(record)
+        relationships['rightholders'] = self.parse_rightholders(record)
 
         # agents
         relationships['agents'] = self.parse_related_agents(record)

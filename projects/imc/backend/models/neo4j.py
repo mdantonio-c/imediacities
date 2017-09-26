@@ -182,7 +182,6 @@ class Item(TimestampedNode, AnnotationTarget):
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
     item_type = StringProperty(required=True, show=True)
-    # TODO add license reference
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
@@ -258,7 +257,6 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     # provenance = RelationshipTo(
     #    'Group', 'HAS_PROVENENCE', cardinality=ZeroOrOne, show=True)
     rights_status = StringProperty(required=True, show=True)
-    # FIXME: 1..N from specifications???
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
     collection_title = StringProperty(show=True)
@@ -388,10 +386,10 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(index=True, required=True, show=True),
+    name2 = StringProperty(required=True, show=True),
     url = StringProperty(show=True)
     creation = RelationshipFrom(
-        'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
+        'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore)
 
 
 class Agent(IdentifiedNode):
