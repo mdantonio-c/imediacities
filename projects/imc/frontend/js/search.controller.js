@@ -1159,19 +1159,17 @@
 		  		$scope.labelTerm = sharedProperties.getLabelTerm();
 		  		$scope.shotID = sharedProperties.getShotId();
 		  		$scope.IRI = sharedProperties.getIRI();
-		  		console.log($scope.IRI)
 		  		// $scope.alternatives = sharedProperties.getAlternatives();
 
 				var target = 'shot:'+$scope.shotID;
 				// alternatives mechanism should be of course generalized
 				console.log($scope.IRI);
-				console.log($scope.labelTerm);
 				console.log(res);
+				console.log(rarr);
 				var source = {
 					// "iri": $scope.IRI,
-					// "name": $scope.labelTerm,
 					"iri": "xyz",
-					"name": "test",
+					"name": $scope.labelTerm,
 					// "alternativeNames": {
 					// 	"de": $scope.alternatives.de,
 					// 	"en": $scope.alternatives.en
