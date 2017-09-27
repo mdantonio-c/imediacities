@@ -820,8 +820,12 @@
 									        minutes = minutes % 60;
 									    }
 
+									    var format = 'mm:ss';
+
 									    self.tlineW = '100%';
-									    if (minutes >= 15){self.tlineW = '200%';}
+									    if (seconds >= 60){self.tlineW = '100%'; format = 'ss'};
+									    if (minutes >= 15){self.tlineW = '200%'; format = 'mm:ss'};
+									    if (minutes >= 60){self.tlineW = '200%'; format = 'HH:mm:ss'};
 
 										/*configuration*/
 										var videoTimeline = {
@@ -834,7 +838,7 @@
 												hAxis: {
     												minValue: new Date(0,0,0,0,0,0),
    	 												maxValue: new Date(0,0,0,hours,minutes,seconds),
-   	 												format: 'HH:mm:ss'
+   	 												format: format
   												}
 		        							}
 										};
