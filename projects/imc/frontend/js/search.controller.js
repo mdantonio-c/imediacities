@@ -771,7 +771,7 @@
 
 					self.items = [];
 					self.shots = [];
-						self.loadVideoShots = function(vid) {
+						self.loadVideoShots = function(vid,vduration) {
 							DataService.getVideoShots(vid).then(
 								function(response) {
 									self.shots = response.data;
@@ -800,17 +800,15 @@
 											playVid(myVid[0]);
 				    					}
 
-				    					setTimeout(function() { 
-
 										//timeline definition
 										self.mainchar = '30-60';
 										self.outside = '180-250';
 										self.crowd = '270-300';
 
-										self.vduration = self.currentvidDur;
+										self.vduration = vduration;
 
 										var minutes = 0, hours = 0;
-										var seconds = self.vduration;
+										var seconds = vduration;
 									    if (seconds / 60 > 0) {
 									        minutes = parseInt(seconds / 60, 10);
 									        seconds = seconds % 60;
@@ -861,13 +859,11 @@
 
 										self.videoTimeline = videoTimeline;
 
-										}, 2000);
-
-									}
-								});
+								}
+							});
 						};
 
-					self.loadVideoAnnotations = function(vid) {
+					self.loadVideoAnnotations = function(vid,vduration) {
 					DataService.getVideoAnnotations(vid).then(
 								function(response) {
 
@@ -884,9 +880,15 @@
 							function(response) {
 								self.video = response.data[0];
 								self.currentvidDur = self.video.relationships.item[0].attributes.duration;
-								self.loading = false;
-								self.loadVideoShots(vid);
-								self.loadVideoAnnotations(vid);
+
+				    			setTimeout(function() { 
+				    				$scope.$apply(function () {
+										self.loading = false;
+										self.loadVideoShots(vid,self.currentvidDur);
+										self.loadVideoAnnotations(vid,self.currentvidDur);
+									});
+								}, 2000);
+
 							},
 							function(error) {
 								self.loading = false;
@@ -897,7 +899,8 @@
 					if (!$stateParams.meta) {
 						self.loadMetadataContent(vid);
 					} else {
-						self.loadVideoShots(vid);
+						var vidDur = $stateParams.meta.relationships.item[0].attributes.duration;
+						self.loadVideoShots(vid,vidDur);
 					}
 
 					self.selectedVideoId = vid;
