@@ -39,7 +39,7 @@
 				</div>-->
 			
 				<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
-				<div uib-carousel style="float:left; height: 100%; width:100%; min-height: 70px;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
+				<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
 	            <div uib-slide ng-repeat="item in watchCtrl.items | limitTo: watchCtrl.slideSize+1" index="$index" style="float:left; width:100%;  height: 100%; overflow: visible;">
 
 	            <img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9][0]}}" duration="{{watchCtrl.items[$index*9][1]}}" nshots="{{watchCtrl.items[$index*9][2]}}" shotd="{{watchCtrl.items[$index*9][3]}}" progr="{{watchCtrl.items[$index*9][4]}}" timestamp="{{watchCtrl.items[$index*9][5]}}" ng-src="{{watchCtrl.items[$index*9][6]}}" style="float:left;" scroll-on-click/>
