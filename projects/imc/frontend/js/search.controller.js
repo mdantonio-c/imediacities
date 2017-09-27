@@ -800,6 +800,8 @@
 											playVid(myVid[0]);
 				    					}
 
+				    					setTimeout(function() { 
+
 										//timeline definition
 										self.mainchar = '30-60';
 										self.outside = '180-250';
@@ -841,12 +843,7 @@
 		        							}
 										};
 
-										videoTimeline.data = {};
-
-				    					setTimeout(function() { 
-
 										// add data to the timeline
-
 										videoTimeline.data = {
 		    								"cols": [
 		    								{id: "category", label: "Category", type: "string"},
