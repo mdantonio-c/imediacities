@@ -1151,7 +1151,7 @@
 	  				}
 	  			}; 
 				//save the annotation into the database
-				DataService.saveAnnotation(target, source);
+				//DataService.saveAnnotation(target, source);
 
 				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 				$uibModalInstance.close(null);
@@ -1202,7 +1202,7 @@
 					}
 				}; 
 				//save the annotation into the database
-				DataService.saveAnnotation(target, source);
+				//DataService.saveAnnotation(target, source);
 
 				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
 
