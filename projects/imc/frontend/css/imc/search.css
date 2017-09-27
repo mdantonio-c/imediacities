@@ -478,7 +478,6 @@ element.style {
 }​
 
 /*dropdown*/
-
 .uib-dropdown-toggle {
     min-width: 260px !important;
 }
@@ -495,3 +494,9 @@ element.style {
 }
 
 
+/*slide*/
+@media screen and (min-width: 400px) and (max-width: 1024px) {
+	.uib-carousel{
+			min-height: 70px;
+	}
+}
