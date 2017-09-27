@@ -771,10 +771,12 @@
 
 					self.items = [];
 					self.shots = [];
+					self.slideSize = 0;
 						self.loadVideoShots = function(vid,vduration) {
 							DataService.getVideoShots(vid).then(
 								function(response) {
 									self.shots = response.data;
+									self.slideSize = self.shots.length/9;
 									for (var i = 0; i < self.shots.length; i++) {
 										var thumblink = self.shots[i].links.thumbnail;
 										var start_frame = self.shots[i].attributes.start_frame_idx;
