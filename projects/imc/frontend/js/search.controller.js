@@ -642,9 +642,9 @@
 					/*inizialize address for automplete input tag for geolocation*/
    					$scope.vm = {address: {}};
 
-   					$scope.expand = function(mitem) {
+   					/*$scope.expand = function(mitem) {
        					mitem.show = !mitem.show;
-    				}
+    				}*/
 
 					self.vocabularyFinal = [];
 					self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
