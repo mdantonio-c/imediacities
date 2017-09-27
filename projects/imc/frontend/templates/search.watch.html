@@ -38,7 +38,7 @@
 					</a>
 				</div>-->
 			
-				<div uib-carousel interval="-1" no-wrap="true" interval="5000" class="scrollmenu" style="float:left; width:100%;" active="active">
+				<div uib-carousel interval="-1" no-wrap="true" class="scrollmenu" style="float:left; width:100%;" active="active">
 	            <div uib-slide ng-repeat="item in watchCtrl.items" index="$index" style="width: 13%;">
 
 	            <img style="width: 90%; height: 90%" id="{{watchCtrl.items[$index][0]}}" duration="{{watchCtrl.items[$index][1]}}" nshots="{{watchCtrl.items[$index][2]}}" shotd="{{watchCtrl.items[$index][3]}}" progr="{{watchCtrl.items[$index][4]}}" timestamp="{{watchCtrl.items[$index][5]}}" ng-src="{{watchCtrl.items[$index][6]}}" style="float:left;" scroll-on-click/>
