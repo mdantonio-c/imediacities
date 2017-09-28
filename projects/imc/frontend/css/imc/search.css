@@ -520,3 +520,10 @@ element.style {
 			min-height: 40px;
 	}
 }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1460px) {
+.scrollmenu{
+			min-height: 60px;
+	}
+}
