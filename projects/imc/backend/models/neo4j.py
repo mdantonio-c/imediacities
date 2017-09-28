@@ -118,15 +118,23 @@ class Group(IdentifiedNode):
 
 
 class Stage(TimestampedNode):
+    __abstract_node__ = True
     filename = StringProperty(required=True, show=True)
     path = StringProperty(required=True, unique_index=True, show=True)
     status = StringProperty(show=True)
     status_message = StringProperty(show=True)
     task_id = StringProperty(show=True)
-
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
-    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
+
+
+class MetaStage(Stage):
+    item = RelationshipFrom('Item', 'META_SOURCE', cardinality=One)
+
+
+class ContentStage(Stage):
+    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=One)
+
 
 # CREATION: descriptive data model
 ##############################################################################
@@ -181,11 +189,12 @@ class Item(TimestampedNode, AnnotationTarget):
     framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
-    item_type = StringProperty(required=True, show=True)
+    item_type = StringProperty(
+        required=True, choices=codelists.CONTENT_TYPES, show=True)
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
-        'Stage', 'CONTENT_SOURCE', cardinality=One)
+        'Stage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
     meta_source = RelationshipTo(
         'Stage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
@@ -232,7 +241,6 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
                             content.
         coverages           The spatial or temporal topics of the creation
                             object.
-        provenance          Organisation which owns or has custody of the item.
         rights_status       Specifies the copyright status of the digital item.
         rightholders        Right holders.
         collection_title    A textual title of the archival collection of which
@@ -254,8 +262,6 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         show=True)
     coverages = RelationshipTo(
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
-    # provenance = RelationshipTo(
-    #    'Group', 'HAS_PROVENENCE', cardinality=ZeroOrOne, show=True)
     rights_status = StringProperty(required=True, show=True)
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
@@ -414,9 +420,10 @@ class Agent(IdentifiedNode):
     """
     # record_sources = RelationshipTo(
     #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
-    external_ids = ArrayProperty(StringProperty())
-    agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES)
-    names = ArrayProperty(StringProperty(), required=True)
+    external_ids = ArrayProperty(StringProperty(), show=True)
+    agent_type = StringProperty(
+        required=True, choices=codelists.AGENT_TYPES, show=True)
+    names = ArrayProperty(StringProperty(), required=True, show=True)
     birth_date = DateProperty(show=True)
     death_date = DateProperty(default=None, show=True)
     biographical_note = StringProperty()
@@ -443,7 +450,7 @@ class RecordSource(StructuredNode):
     provider = RelationshipTo(
         'Provider', 'PROVIDED_BY', cardinality=One, show=True)
     creation = RelationshipFrom(
-        'Creation', 'RECORD_SOURCE', cardinality=One, show=True)
+        'Creation', 'RECORD_SOURCE', cardinality=One)
 
 
 class Provider(IdentifiedNode):
@@ -458,7 +465,7 @@ class Provider(IdentifiedNode):
     scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
     record_source = RelationshipFrom(
-        'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore, show=True)
+        'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
 
 
 class CountryOfReferenceRel(StructuredRel):
@@ -562,7 +569,7 @@ class NonAVEntity(Creation):
                                 should be added to indicate that research
                                 regarding the production time has been
                                 unsuccessful.
-        non_av_entity_type      The general type of the non-audiovisual
+        non_av_type             The general type of the non-audiovisual
                                 manifestation (“image” or “text”).
         specific_type           This element further specifies the type of the
                                 non-audiovisual entity.
@@ -572,13 +579,13 @@ class NonAVEntity(Creation):
                                 white", "colour", "mixed").
     """
     date_created = ArrayProperty(StringProperty(), required=True, show=True)
-    non_av_entity_type = StringProperty(required=True,
-                                        choices=codelists.NON_AV_ENTITY_TYPES,
-                                        show=True)
+    non_av_type = StringProperty(required=True,
+                                 choices=codelists.NON_AV_TYPES,
+                                 show=True)
     specific_type = StringProperty(
-        required=True, choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES,
+        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES,
         show=True)
-    phisical_format_size = StringProperty(show=True)
+    phisical_format_size = ArrayProperty(StringProperty(), show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
 
 # ANNOTATION
@@ -591,7 +598,7 @@ class NonAVEntity(Creation):
 
 
 class AnnotationCreatorRel(StructuredRel):
-    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
 
 
 class Annotation(IdentifiedNode, AnnotationTarget):
@@ -619,7 +626,7 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         model=AnnotationCreatorRel, show=True)
     generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS, show=True)
     bodies = RelationshipTo(
-        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
+        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True)
     targets = RelationshipTo(
         'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
 
@@ -640,14 +647,12 @@ class ResourceBody(AnnotationBody):
 
 
 class ImageBody(AnnotationBody):
-    # TODO
     pass
 
 
 class AudioBody(AnnotationBody):
     audio_format = StringProperty(show=True)
     language = StringProperty(show=True)
-    # TODO
 
 
 # class VQBody(AnnotationBody):

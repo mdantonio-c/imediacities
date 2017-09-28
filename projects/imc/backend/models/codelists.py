@@ -18,6 +18,17 @@ def fromCode(descr, codelist):
     return res[0] if res else None
 
 
+CONTENT_TYPES = (
+    ('Video', 'Video'),
+    ('Image', 'Image'),
+    ('Text',  'Text')
+)
+
+SOURCE_TYPES = (
+    ('Metadata', 'Metadata'),
+    ('Content', 'Content')
+)
+
 AV_TITLE_TYPES = (
     ('Original title',     'Original release title'),
     ('Other title',        'Alternative title, Variant title'),
@@ -344,16 +355,10 @@ VIDEO_SOUND = (
     ('WITH_SOUND', 'With sound')
 )
 
-NON_AV_ENTITY_TYPES = (
-    ('01', 'image'),
-    ('02', 'text')
+NON_AV_TYPES = (
+    ('image', 'image'),
+    ('text', 'text')
 )
-
-NON_AV_ENTITY_SPECIFIC_TYPES = (
-    ('01', 'photograph'),
-    ('02', 'poster'),
-    ('03', 'letter')
-)  # FIXME just an ex. here: Based on the values of IMC content providers
 
 ORPHAN_STATUS = (
     ('UNK', 'Unknown, orphan status not determined'),
@@ -444,7 +449,7 @@ GAUGE = (
     ('15',      'Special format')
 )
 
-SPECIFIC_TYPES = (
+NON_AV_SPECIFIC_TYPES = (
     ('01', 'Advertising material'),
     ('02', 'Article'),
     ('03', 'Book'),

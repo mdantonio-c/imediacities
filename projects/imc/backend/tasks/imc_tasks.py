@@ -8,6 +8,7 @@ from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.models.neo4j import Shot
+from imc.models import codelists
 
 # from imc.analysis.fhg import FHG
 from scripts.analysis.analyze import make_movie_analize_folder, analize
@@ -28,7 +29,7 @@ log = get_logger(__name__)
 
 def progress(self, state, info):
     if info is not None:
-        log.debug("%s [%s]" % (state, info))
+        log.info("%s [%s]" % (state, info))
     self.update_state(state=state)
 
 
@@ -42,8 +43,7 @@ def import_file(self, path, resource_id, mode):
 
         xml_resource = None
         try:
-
-            xml_resource = self.graph.Stage.nodes.get(uuid=resource_id)
+            xml_resource = self.graph.MetaStage.nodes.get(uuid=resource_id)
 
             group = GraphBaseOperations.getSingleLinkedNode(
                 xml_resource.ownership)
@@ -54,186 +54,183 @@ def import_file(self, path, resource_id, mode):
             if file_extension.startswith("."):
                 file_extension = file_extension[1:]
 
+            log.debug('filename [{0}], extension [{1}]'.format(
+                filename, file_extension))
+
             progress(self, 'Extracting descriptive metadata', path)
 
-            video_ref_ids = extract_av_creation_refs(self, path)
-            if video_ref_ids is None or len(video_ref_ids) == 0:
+            source_id = extract_creation_ref(self, path)
+            if source_id is None:
                 raise Exception(
-                    "No video source id found importing file %s" % path)
+                    "No source ID found importing metadata file %s" % path)
+            item_type = extract_item_type(self, path)
+            if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
+                raise Exception("Invalid content type for: " + item_type)
+            log.info("Content source ID: {0}; TYPE: {1}".format(
+                source_id, item_type))
 
-            for source_id in video_ref_ids:
-                if source_id is None:
-                    # should never be reached
-                    log.warning("Why the source ID is None??")
-                    continue
+            # check for existing item
+            item_node = xml_resource.item.single()
+            # if item_node is not None:
+            #     log.debug("Item already exists for metadata Stage[%s]" % path)
+            #     item_node = xml_resource.item.single()
+            # else:
+            if item_node is None:
+                item_properties = {}
+                item_properties['item_type'] = item_type
+                item_node = self.graph.Item(**item_properties).save()
+                item_node.ownership.connect(group)
+                item_node.meta_source.connect(xml_resource)
+                item_node.save()
+                log.debug("Item resource created")
 
-                log.debug("Video source ID {0}".format(source_id))
+            extract_descriptive_metadata(
+                self, path, item_type, item_node)
 
-                # To ensure that the content item and its metadata will be
-                # correctly linked in the system and its repositories,
-                # FHI-Partners are expected to name the content item file,
-                # using the following method:
-                # The FHI project acronym_the FHI content ID (this is the
-                # Content item ID in the local FHI’s database).
-                # For example: CRB_1234.mp4
-                basedir = os.path.dirname(os.path.abspath(path))
-                log.debug("Video basedir {0}".format(basedir))
-                video_path, video_filename = lookup_video(
-                    self, basedir, source_id)
+            # To ensure that the content item and its metadata will be
+            # correctly linked in the system and its repositories,
+            # FHI-Partners are expected to name the content item file,
+            # using the following method:
+            # The FHI project acronym_the FHI content ID (this is the
+            # Content item ID in the local FHI’s database).
+            # For example: CRB_1234.mp4
+            basedir = os.path.dirname(os.path.abspath(path))
+            log.debug("Content basedir {0}".format(basedir))
+            content_path, content_filename = lookup_content(
+                self, basedir, source_id)
 
-                # video_path = os.path.join(
-                #     os.path.dirname(path), video_filename)
-
-                if video_path is None:
-                    log.warning(
-                        "Video content does not exist in the path {0} with \
-                        filename containing source ID {1}"
-                        .format(video_path, source_id))
-                    continue
-
-                log.debug('filename [{0}], extension [{1}]'.format(
-                    filename, file_extension))
-
-                # Creating video resource
+            content_node = None
+            if content_path is not None:
+                # Create content resource
                 properties = {}
-                properties['filename'] = video_filename
-                properties['path'] = video_path
+                properties['filename'] = content_filename
+                properties['path'] = content_path
 
                 try:
                     # This is a task restart? What to do in this case?
-                    video_node = self.graph.Stage.nodes.get(**properties)
-                    log.debug("Video resource already exist for %s" %
-                              video_path)
-                except self.graph.Stage.DoesNotExist:
-                    video_node = self.graph.Stage(**properties).save()
-                    video_node.ownership.connect(group)
-                    log.debug("Video resource created for %s" % video_path)
+                    content_node = self.graph.ContentStage.nodes.get(**properties)
+                    log.debug("Content resource already exist for %s" % content_path)
+                except self.graph.ContentStage.DoesNotExist:
+                    content_node = self.graph.ContentStage(**properties).save()
+                    content_node.ownership.connect(group)
+                    # connect the item to the content source
+                    item_node.content_source.connect(content_node)
+                    log.debug("Content resource created for %s" % content_path)
 
-                video_node.status = "IMPORTING"
-                # TO FIX: video analysis will be a new tasks
-                # task = analyze_video.apply_async(
-                #     args=[path, video_node.uuid],
-                #     countdown=20
-                # )
-                # video_node.task_id = task.id
-                video_node.save()
+            fast = False
+            if mode is not None:
+                mode = mode.lower()
+                if mode == 'skip':
+                    log.info('Analyze skipped for source id: ' + source_id)
+                    # content_node.status = 'SKIPPED'
+                    # content_node.status_message = 'Nothing to declare'
+                    # content_node.save()
+                    return 1
+                fast = (mode == 'fast')
 
-                # check for existing item
-                if len(video_node.item.all()) > 0:
-                    log.debug("Item already exists for Stage[%s]" % video_path)
-                    item_node = video_node.item.single()
-                else:
-                    # Extract metadata item and creation
-                    item_properties = {}
-                    item_properties['item_type'] = "Video"  # FIXME
-                    item_node = self.graph.Item(**item_properties).save()
-                    item_node.ownership.connect(group)
-                    item_node.meta_source.connect(xml_resource)
-                    item_node.content_source.connect(video_node)
-                    item_node.save()
-                    log.debug("Item resource created")
+            if content_node is None:
+                raise Exception(
+                    "Pipeline cannot be started: \
+                    content does not exist in the path {0} for source ID {1}"
+                    .format(content_path, source_id))
 
-                extract_descriptive_metadata(
-                    self, path, source_id, item_node)
+            content_node.status = "IMPORTING"
+            # TO FIX: video analysis will be a new tasks
+            # task = analyze_video.apply_async(
+            #     args=[path, video_node.uuid],
+            #     countdown=20
+            # )
+            # video_node.task_id = task.id
+            content_node.save()
 
-                fast = False
-                if mode is not None:
-                    mode = mode.lower()
-                    if mode == 'skip':
-                        log.info('Analyze skipped!')
-                        video_node.status = 'SKIPPED'
-                        video_node.status_message = 'Nothing to declare'
-                        video_node.save()
-                        break
-                    fast = (mode == 'fast')
-                # EXECUTE AUTOMATC TOOLS
+            # EXECUTE AUTOMATC TOOLS
 
-                # workflow = FHG(video_path, "/uploads")
-                # workflow.analyze(fast)
+            # workflow = FHG(video_path, "/uploads")
+            # workflow.analyze(fast)
 
-                movie = os.path.join('/uploads', video_path)
-                if not os.path.exists(movie):
-                    raise Exception('Bad input file', movie)
+            movie = os.path.join('/uploads', content_path)
+            if not os.path.exists(movie):
+                raise Exception('Bad input file', movie)
 
-                out_folder = make_movie_analize_folder(movie)
-                if out_folder == "":
-                    raise Exception('Failed to create out_folder')
+            out_folder = make_movie_analize_folder(movie)
+            if out_folder == "":
+                raise Exception('Failed to create out_folder')
 
-                log.info("Analize " + movie)
+            log.info("Analize " + movie)
 
-                if analize(movie, out_folder, fast):
-                    log.info('Analize done')
-                else:
-                    log.error('Analize terminated with errors')
+            if analize(movie, out_folder, fast):
+                log.info('Analize done')
+            else:
+                log.error('Analize terminated with errors')
 
-                # params = []
-                # params.append("/code/scripts/analysis/analyze.py")
-                # if mode is not None:
-                #     log.info('Analyze with mode [%s]' % mode)
-                #     params.append('-%s' % mode)
-                # params.append(video_path)
+            # params = []
+            # params.append("/code/scripts/analysis/analyze.py")
+            # if mode is not None:
+            #     log.info('Analyze with mode [%s]' % mode)
+            #     params.append('-%s' % mode)
+            # params.append(video_path)
 
-                # progress(self, 'Executing automatic tools', path)
-                # bash = BashCommands()
-                # try:
-                #     output = bash.execute_command(
-                #         "python3",
-                #         params,
-                #         parseException=True
-                #     )
-                #     log.info(output)
+            # progress(self, 'Executing automatic tools', path)
+            # bash = BashCommands()
+            # try:
+            #     output = bash.execute_command(
+            #         "python3",
+            #         params,
+            #         parseException=True
+            #     )
+            #     log.info(output)
 
-                # except BaseException as e:
-                #     log.error(e)
-                #     video_node.status = 'ERROR'
-                #     video_node.status_message = str(e)
-                #     video_node.save()
-                #     raise(e)
+            # except BaseException as e:
+            #     log.error(e)
+            #     video_node.status = 'ERROR'
+            #     video_node.status_message = str(e)
+            #     video_node.save()
+            #     raise(e)
 
-                # REMOVE ME!!
-                # video_node.status = 'ERROR'
-                # video_node.status_message = "STOP ME"
-                # video_node.save()
+            # REMOVE ME!!
+            # video_node.status = 'ERROR'
+            # video_node.status_message = "STOP ME"
+            # video_node.save()
 
-                analyze_path = '/uploads/Analize/' + \
-                    group.uuid + '/' + video_filename.split('.')[0] + '/'
-                log.debug('analyze path: {0}'.format(analyze_path))
+            analyze_path = '/uploads/Analize/' + \
+                group.uuid + '/' + content_filename.split('.')[0] + '/'
+            log.debug('analyze path: {0}'.format(analyze_path))
 
-                # SAVE AUTOMATIC ANNOTATIONS
-                progress(self, 'Extracting automatic annotations', path)
+            # SAVE AUTOMATIC ANNOTATIONS
+            progress(self, 'Extracting automatic annotations', path)
 
-                extract_tech_info(self, item_node, analyze_path)
+            extract_tech_info(self, item_node, analyze_path)
 
-                # FIXME naive filter
-                # find TVS and VQ annotations with this item as source
-                annotations = item_node.sourcing_annotations.all()
-                if annotations is not None:
-                    repo = AnnotationRepository(self.graph)
-                    # here we expect ONLY one anno if present
-                    for anno in annotations:
-                        anno_id = anno.id
-                        if anno.annotation_type == 'TVS':
-                            log.debug(anno)
-                            repo.delete_tvs_annotation(anno)
-                            log.info(
-                                "Deleted existing TVS annotation [%s]"
-                                % anno_id)
-                        elif anno.annotation_type == 'VIM':
-                            log.debug(anno)
-                            repo.delete_vim_annotation(anno)
-                            log.info(
-                                "Deleted existing VIM annotation [%s]"
-                                % anno_id)
+            # FIXME naive filter
+            # find TVS and VQ annotations with this item as source
+            annotations = item_node.sourcing_annotations.all()
+            if annotations is not None:
+                repo = AnnotationRepository(self.graph)
+                # here we expect ONLY one anno if present
+                for anno in annotations:
+                    anno_id = anno.id
+                    if anno.annotation_type == 'TVS':
+                        log.debug(anno)
+                        repo.delete_tvs_annotation(anno)
+                        log.info(
+                            "Deleted existing TVS annotation [%s]"
+                            % anno_id)
+                    elif anno.annotation_type == 'VIM':
+                        log.debug(anno)
+                        repo.delete_vim_annotation(anno)
+                        log.info(
+                            "Deleted existing VIM annotation [%s]"
+                            % anno_id)
 
-                extract_tvs_vim_annotations(self, item_node, analyze_path)
+            extract_tvs_vim_annotations(self, item_node, analyze_path)
 
-                # TODO
-                video_node.status = 'COMPLETED'
-                video_node.status_message = 'Nothing to declare'
-                video_node.save()
+            # TODO
+            content_node.status = 'COMPLETED'
+            content_node.status_message = 'Nothing to declare'
+            content_node.save()
 
-                # TO FIX: move video in the datadir
-                # os.rename(video_path, datadir/video_node.uuid)
+            # TO FIX: move video in the datadir
+            # os.rename(video_path, datadir/video_node.uuid)
 
             xml_resource.status = 'COMPLETED'
             xml_resource.status_message = 'Nothing to declare'
@@ -257,50 +254,43 @@ def import_file(self, path, resource_id, mode):
         return 1
 
 
-def extract_av_creation_refs(self, path):
+def extract_creation_ref(self, path):
     """
-    Extract the list of references from the incoming XML file.
+    Extract the source id reference from the incoming XML file.
     """
-    videos = []
-
     parser = EFG_XMLParser()
-
-    av_creations = parser.get_av_creations(path)
-    for av_creation in av_creations:
-        video = parser.get_av_creation_ref(av_creation)
-        if video is None:
-            log.debug("No video ref found")
-            continue
-        # log.debug(ET.tostring(av_creation, encoding='UTF-8'))
-        # log.debug(EFG_XMLParser.prettify(av_creation))
-        videos.append(video)
-
-    # This will be a list of video extracted from XML file
-    log.debug('[%s]' % ', '.join(map(str, videos)))
-    return videos
+    return parser.get_creation_ref(path)
 
 
-def lookup_video(self, path, source_id):
+def extract_item_type(self, path):
+    """
+    Extract the creation type from the incoming XML file.
+    """
+    parser = EFG_XMLParser()
+    return parser.get_creation_type(path)
+
+
+def lookup_content(self, path, source_id):
     '''
     Look for a filename in the form of:
     ARCHIVE_SOURCEID.[extension]
     '''
-    video_path = None
-    video_filename = None
+    content_path = None
+    content_filename = None
     files = [f for f in os.listdir(path) if not f.endswith('.xml')]
     for f in files:
         tokens = os.path.splitext(f)[0].split('_')
         if len(tokens) == 0:
             continue
         if tokens[-1] == source_id:
-            log.debug('Video file FOUND: {0}'.format(f))
-            video_path = os.path.join(path, f)
-            video_filename = f
+            log.info('Content file FOUND: {0}'.format(f))
+            content_path = os.path.join(path, f)
+            content_filename = f
             break
-    return video_path, video_filename
+    return content_path, content_filename
 
 
-def extract_descriptive_metadata(self, path, item_ref, item_node):
+def extract_descriptive_metadata(self, path, item_type, item_node):
     """
     Simple metadata ingestion:
       - validate against EFG-XSD schema
@@ -315,31 +305,25 @@ def extract_descriptive_metadata(self, path, item_ref, item_node):
         ignoring the rest
       - raise exception whenever those conditions are not met
     """
-    # import codecs
-    # with codecs.open(path, 'r', encoding='utf8') as f:
-    # #with codecs.open(path, 'r', encoding='latin-1') as f:
-    #     while True:
-    #         line = f.readline()
-    #         if not line:
-    #             break
-    #         #log.info(line.strip())
-    if item_node.item_type != 'Video':
-        raise Exception('Parsing NON AudioVisual not yet implemented')
-
     parser = EFG_XMLParser()
-    record = parser.get_av_creation_by_ref(path, item_ref)
-    # log.debug(EFG_XMLParser.prettify(record))
-    if record is None:
-        raise Exception('Record instance cannot be None')
-
-    # Creating AV_Entity
-    av_creation = parser.parse_av_creation(record)
+    record = parser.get_creation_by_type(path, item_type)
     repo = CreationRepository(self.graph)
-    repo.create_av_entity(
-        av_creation['properties'],
-        item_node,
-        av_creation['relationships'])
-    # log.info('Identifying Title: %s' % parser.get_identifying_title(record))
+    # log.debug(EFG_XMLParser.prettify(record))
+    av = (item_type == 'Video')
+    creation = None
+    if item_type == 'Video':
+        # parse AV_Entity
+        creation = parser.parse_av_creation(record)
+    elif item_type == 'Image':
+        # parse NON AV_Entity
+        creation = parser.parse_non_av_creation(record)
+    else:
+        # should never be reached
+        raise Exception(
+            "Extracting metadata for type {} not yet implemented".format(item_type))
+    log.debug(creation['properties'])
+    repo.create_entity(
+        creation['properties'], item_node, creation['relationships'], av)
 
 
 def extract_tech_info(self, item, analyze_dir_path):

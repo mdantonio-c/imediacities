@@ -16,6 +16,31 @@ class EFG_XMLParser():
         tree = ET.parse(filepath)
         return tree.getroot()
 
+    def get_creation_ref(self, filepath):
+        root = ET.parse(filepath)
+        record = root.find('avcreation')
+        if record is not None:
+            nodes = record.findall("./avManifestation/recordSource/sourceID")
+            if len(nodes) <= 0:
+                return None
+            return nodes[0].text
+        record = root.find('nonavcreation')
+        if record is not None:
+            nodes = record.findall("./nonAVManifestation/recordSource/sourceID")
+            if len(nodes) <= 0:
+                return None
+            return nodes[0].text
+
+    def get_creation_type(self, filepath):
+        """
+        Assume Video for avcreation and Image for nonavcreation.
+        """
+        root = ET.parse(filepath)
+        if root.find('avcreation') is not None:
+            return dict(codelists.CONTENT_TYPES)['Video']
+        if root.find('nonavcreation') is not None:
+            return dict(codelists.CONTENT_TYPES)['Image']
+
     def get_av_creations(self, filepath):
         root = ET.parse(filepath)
         return root.findall("./avcreation")
@@ -29,15 +54,18 @@ class EFG_XMLParser():
             return None
         return nodes[0]
 
+    def get_creation_by_type(self, filepath, item_type):
+        root = ET.parse(filepath)
+        if item_type == 'Video':
+            return root.find('avcreation')
+        elif item_type == 'Image':
+            return root.find('nonavcreation')
+        else:
+            raise Exception("Ivalid item type for " + item_type)
+
     def get_non_av_creations(self, filepath):
         root = ET.parse(filepath)
         return root.findall("./nonavcreation")
-
-    def get_av_creation_ref(self, record):
-        nodes = record.findall("./avManifestation/recordSource/sourceID")
-        if len(nodes) <= 0:
-            return None
-        return nodes[0].text
 
     def get_identifying_title(self, record):
         """
@@ -61,8 +89,9 @@ class EFG_XMLParser():
             production_years.add(n.text)
         return list(production_years)
 
-    def get_rights_status(self, record):
-        node = record.find("./avManifestation/rightsStatus")
+    def get_rights_status(self, record, audio_visual=False):
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
+        node = record.find("./" + inpath + "/rightsStatus")
         if node is None:
             raise ValueError("Rights status is missing")
         code_el = codelists.fromDescription(node.text, codelists.RIGHTS_STATUS)
@@ -80,14 +109,15 @@ class EFG_XMLParser():
             res.add(node.text)
         return list(res)
 
-    def parse_record_sources(self, record):
+    def parse_record_sources(self, record, audio_visual=False):
         """
         Returns a list of sources in the form of:
         [[<RecordSource>, <Provider>], etc.]
         """
         record_sources = []
         bind_url = False
-        for node in record.findall("./avManifestation/recordSource"):
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
+        for node in record.findall("./" + inpath + "/recordSource"):
             rs = RecordSource()
             rs.source_id = node.find('sourceID').text
             log.debug('record source [ID]: %s' % rs.source_id)
@@ -110,23 +140,24 @@ class EFG_XMLParser():
             # this is a naive solution but enough because we expect here ONLY
             # one record_source (that of the archive)
             if not bind_url:
-                rs.is_shown_at = self.get_record_source_url(record)
+                rs.is_shown_at = self.get_record_source_url(record, audio_visual)
                 bind_url = True
             record_sources.append([rs, provider])
         return record_sources
 
-    def get_record_source(self, record):
+    def get_record_source(self, record, audio_visual=False):
         """
         Naive implementation to get always the first record source as the
         archive one.
         """
-        return self.parse_record_sources(record)[0]
+        return self.parse_record_sources(record, audio_visual)[0]
 
-    def get_record_source_url(self, record):
+    def get_record_source_url(self, record, audio_visual=False):
         """
         Return the url of the source provider where the content is shown.
         """
-        node = record.find('./avManifestation[1]/item[1]/isShownAt')
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
+        node = record.find('./' + inpath + '[1]/item[1]/isShownAt')
         if node is not None:
             return node.text
 
@@ -199,9 +230,10 @@ class EFG_XMLParser():
             descriptions.append(description)
         return descriptions
 
-    def parse_coverages(self, record):
+    def parse_coverages(self, record, audio_visual=False):
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
         coverages = []
-        for node in record.findall("./avManifestation/coverage"):
+        for node in record.findall("./" + inpath + "/coverage"):
             c = Coverage()
             c.spatial = []
             c.temporal = []
@@ -214,7 +246,7 @@ class EFG_XMLParser():
             coverages.append(c)
         return coverages
 
-    def parse_languages(self, record):
+    def parse_languages(self, record, audio_visual=False):
         """
         Extract language and usage if any. It returns an array of arrays as in
         the following example:
@@ -222,8 +254,9 @@ class EFG_XMLParser():
         The second nested element corresponds to the usage code in the
         controlled codelist.
         """
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
         languages = []
-        for node in record.findall("./avManifestation/language"):
+        for node in record.findall("./" + inpath + "/language"):
             lang = node.text
             usage = node.get('usage')
             if usage is not None:
@@ -353,9 +386,10 @@ class EFG_XMLParser():
             ids.append(scheme + ':' + identifier.text)
         return ids
 
-    def parse_rightholders(self, record):
+    def parse_rightholders(self, record, audio_visual=False):
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
         rightholders = []
-        for rightholder in record.findall('./avManifestation/rightsHolder'):
+        for rightholder in record.findall('./' + inpath + '/rightsHolder'):
             r = Rightholder(name=rightholder.text)
             url = rightholder.get('URL')
             if url is not None:
@@ -363,21 +397,76 @@ class EFG_XMLParser():
             rightholders.append(r)
         return rightholders
 
+    def get_provenance(self, record, audio_visual=False):
+        inpath = 'avManifestation' if audio_visual else 'nonAVManifestation'
+        node = record.find('./' + inpath + '/provenance')
+        if node is not None:
+            return node.text
+
+    def get_non_av_type(self, record):
+        node = record.find('./nonAVManifestation/type')
+        if node is not None:
+            value = node.text
+            code_el = codelists.fromCode(
+                value, codelists.NON_AV_TYPES)
+            return code_el[0]
+
+    def get_non_av_specific_type(self, record):
+        node = record.find('./nonAVManifestation/specificType')
+        if node is not None:
+            value = node.text
+            code_el = codelists.fromDescription(
+                value, codelists.NON_AV_SPECIFIC_TYPES)
+            if code_el is None:
+                raise ValueError('Ivalid spefic type for: ' + value)
+            return code_el[0]
+
+    def get_physical_format_size(self, record):
+        """
+        Return an array with 2 element as follow:
+        ["5x5", "pixel"]
+        """
+        node = record.find('./nonAVManifestation/physicalFormat')
+        if node is not None:
+            value = node.text
+            unit = node.get('size')
+            return [value, unit]
+
+    def get_date_created(self, record):
+        dates = []
+        for date in record.findall('dateCreated'):
+            dates.append(date.text)
+        if len(dates) == 0:
+            raise ValueError("Expected at least one dateCreated")
+        return dates
+
+    def get_colour(self, record):
+        node = record.find('./nonAVManifestation/colour')
+        if node is not None:
+            code_el = codelists.fromDescription(node.text, codelists.COLOUR)
+            if code_el is None:
+                raise ValueError('Invalid format colour for: ' + code_el.text)
+            return code_el[0]
+
     def __parse_creation(self, record, audio_visual=False):
         properties = {}
         properties['external_ids'] = self.parse_identifiers(record)
-        properties['rights_status'] = self.get_rights_status(record)
+        properties['rights_status'] = self.get_rights_status(record, audio_visual)
         properties['collection_title'] = self.get_collection_title(record)
+        # provenance is determined by the group from IS_OWNED_BY relationship,
+        # ignore it!
+        # properties['provenance'] = self.get_provenance(record, audio_visual)
 
         relationships = {}
-        relationships['record_sources'] = self.parse_record_sources(record)
+        relationships['record_sources'] = self.parse_record_sources(
+            record, audio_visual)
         relationships['titles'] = self.parse_titles(
             record, avcreation=audio_visual)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
-        relationships['languages'] = self.parse_languages(record)
-        relationships['coverages'] = self.parse_coverages(record)
-        relationships['rightholders'] = self.parse_rightholders(record)
+        relationships['languages'] = self.parse_languages(record, audio_visual)
+        relationships['coverages'] = self.parse_coverages(record, audio_visual)
+        relationships['rightholders'] = self.parse_rightholders(record, audio_visual)
 
         # agents
         relationships['agents'] = self.parse_related_agents(record)
@@ -410,11 +499,14 @@ class EFG_XMLParser():
         properties, relationships = self.__parse_creation(record)
 
         # manage non_av properties
-        # TODO
+        properties['non_av_type'] = self.get_non_av_type(record)
+        properties['specific_type'] = self.get_non_av_specific_type(record)
+        properties['phisical_format_size'] = self.get_physical_format_size(record)
+        properties['date_created'] = self.get_date_created(record)
+        properties['colour'] = self.get_colour(record)
         non_av_creation['properties'] = properties
 
         # manage non_av relationships
-        # TODO
         non_av_creation['relationships'] = relationships
         return non_av_creation
 
