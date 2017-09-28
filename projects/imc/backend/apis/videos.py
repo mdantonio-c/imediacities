@@ -15,6 +15,7 @@ from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
+from imc.tasks.services.creation_repository import CreationRepository
 
 logger = get_logger(__name__)
 
@@ -83,6 +84,31 @@ class Videos(GraphBaseOperations):
         logger.critical(data)
 
         return self.empty_response()
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def delete(self, video_id):
+        """
+        Delete existing video description.
+        """
+        logger.debug("deliting AVEntity id: %s", video_id)
+        self.initGraph()
+
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+            repo = CreationRepository(self.graph)
+            repo.delete_av_entity(v)
+            return self.empty_response()
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
 
     # @decorate.catch_error()
     # @catch_graph_exceptions

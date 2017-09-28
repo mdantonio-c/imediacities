@@ -118,15 +118,23 @@ class Group(IdentifiedNode):
 
 
 class Stage(TimestampedNode):
+    __abstract_node__ = True
     filename = StringProperty(required=True, show=True)
     path = StringProperty(required=True, unique_index=True, show=True)
     status = StringProperty(show=True)
     status_message = StringProperty(show=True)
     task_id = StringProperty(show=True)
-
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
-    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
+
+
+class MetaStage(Stage):
+    item = RelationshipFrom('Item', 'META_SOURCE', cardinality=One)
+
+
+class ContentStage(Stage):
+    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=One)
+
 
 # CREATION: descriptive data model
 ##############################################################################
@@ -181,14 +189,14 @@ class Item(TimestampedNode, AnnotationTarget):
     framerate = StringProperty(show=True)  # FloatProperty()
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
-    item_type = StringProperty(required=True, show=True)
-    # TODO add license reference
+    item_type = StringProperty(
+        required=True, choices=codelists.CONTENT_TYPES, show=True)
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
-        'Stage', 'CONTENT_SOURCE', cardinality=One)
+        'ContentStage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
     meta_source = RelationshipTo(
-        'Stage', 'META_SOURCE', cardinality=One)
+        'MetaStage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
         'Creation', 'CREATION', cardinality=ZeroOrOne)
     sourcing_annotations = RelationshipFrom(
@@ -208,6 +216,12 @@ class ContributionRel(StructuredRel):
     activities = ArrayProperty(StringProperty(), show=True)
 
 
+class LanguageRel(StructuredRel):
+    """This indicates the usage relationship between the language and the
+       creation."""
+    usage = StringProperty(choices=codelists.LANGUAGE_USAGES, show=True)
+
+
 class Creation(IdentifiedNode, HeritableStructuredNode):
     """
     It stores descriptive metadata on IMC objects provided by the archives with
@@ -215,7 +229,7 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     It is an abstraction for both 'audiovisual' and 'non audiovisual' works.
 
     Attributes:
-        identifiers:        TODO
+        external_ids:       IDs chosen from external schemas.
         record_sources      List of sources from which the record comes.
         titles              List of titles. Titles can be a word, phrase or
                             character, naming the work or a group of works, a
@@ -227,7 +241,6 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
                             content.
         coverages           The spatial or temporal topics of the creation
                             object.
-        provenance          Organisation which owns or has custody of the item.
         rights_status       Specifies the copyright status of the digital item.
         rightholders        Right holders.
         collection_title    A textual title of the archival collection of which
@@ -235,6 +248,7 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         contributors        Agents which are involved in the creation of the
                             objects.
     """
+    external_ids = ArrayProperty(StringProperty(), show=True)
     record_sources = RelationshipTo(
         'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     titles = RelationshipTo(
@@ -244,13 +258,11 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     descriptions = RelationshipTo(
         'Description', 'HAS_DESCRIPTION', cardinality=OneOrMore, show=True)
     languages = RelationshipTo(
-        'CreationLanguage', 'HAS_LANGUAGE', cardinality=ZeroOrMore, show=True)
+        'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel,
+        show=True)
     coverages = RelationshipTo(
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
-    # provenance = RelationshipTo(
-    #    'Group', 'HAS_PROVENENCE', cardinality=ZeroOrOne, show=True)
-    rights_status = StringProperty(show=True)
-    # FIXME: 1..N from specifications???
+    rights_status = StringProperty(required=True, show=True)
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
     collection_title = StringProperty(show=True)
@@ -267,7 +279,9 @@ class Title(StructuredNode):
     Attributes:
         text                The textual expression of the title.
         language            The language of the title.
-        part_designations   TODO
+        part_designations   A combination of the name of a structuring unit and
+                            the count value that identifies the current entity
+                            as an individual part of a complex work.
         relationship        The type of relationship between the title and the
                             entity to which it is assigned (e.g. "Original
                             title", "Distribution title", "Translated title"
@@ -275,6 +289,7 @@ class Title(StructuredNode):
     """
     text = StringProperty(required=True, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
+    part_designations = ArrayProperty(StringProperty(), show=True)
     relationship = StringProperty(
         required=True, choices=codelists.TITLE_RELASHIONSHIPS, show=True)
     creation = RelationshipFrom(
@@ -301,7 +316,7 @@ class Keyword(StructuredNode):
                         term within a controlled vocabulary.
         keyword_type    Type of information described by the keywords.
         language        The language of the content of each subject.
-        scheme          A unique identifier denoting the controlled vocabulary
+        schemeID        A unique identifier denoting the controlled vocabulary
                         (preferably URI). If the subject terms are not from a
                         controlled vocabulary, the value of this element should
                         be set to "uncontrolled".
@@ -310,6 +325,7 @@ class Keyword(StructuredNode):
     termID = IntegerProperty(show=True)
     keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
+    schemeID = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
@@ -334,25 +350,23 @@ class Description(StructuredNode):
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     description_type = StringProperty(
         choices=codelists.DESCRIPTION_TYPES, show=True)
-    source_ref = StringProperty()
+    source_ref = StringProperty(show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
 
 
-class CreationLanguage(StructuredNode):
+class Language(StructuredNode):
     """
-    The language of the spoken, sung or written content.
+    ISO-639-1 LanguageCS
 
     Attributes:
-        value   The language code.
-        usage   This indicates the relationship between the language and the
-                creation.
+        code   The language code.
+        labels The translation into different languages.
     """
-    value = StringProperty(
+    code = StringProperty(
         choices=codelists.LANGUAGE, show=True, required=True)
-    usage = StringProperty(choices=codelists.LANGUAGE_USAGES)
     creation = RelationshipFrom(
-        'Creation', 'HAS_LANGUAGE', cardinality=One, show=True)
+        'Creation', 'HAS_LANGUAGE', cardinality=ZeroOrMore)
 
 
 class Coverage(StructuredNode):
@@ -378,10 +392,10 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
-    name = StringProperty(index=True, required=True, show=True),
-    url = StringProperty()
+    name = StringProperty(required=True, show=True)
+    url = StringProperty(show=True)
     creation = RelationshipFrom(
-        'Creation', 'COPYRIGHTED_BY', cardinality=One, show=True)
+        'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore)
 
 
 class Agent(IdentifiedNode):
@@ -390,11 +404,13 @@ class Agent(IdentifiedNode):
     objects.
 
     Attributes:
+        uuid                Identifier generated by the system.
+        external_ids        IDs chosen from external schemas.
         record_sources      List of sources from which the record comes.
         agent_type          Defines the type of the Agent (person, corporate
                             body, family etc.).
         names               Name(s) by which the entity is (or was) known.
-        birth_date          Date of birth ("“"CCYY-MM-DD" or "CCYY").
+        birth_date          Date of birth ("CCYY-MM-DD" or "CCYY").
         death_date          Date of death ("CCYY-MM-DD" or "CCYY").
         biographical_note   Short biographical note about a person or
                             organisation.
@@ -402,60 +418,62 @@ class Agent(IdentifiedNode):
                             entry in an external database or on content
                             provider's website.
     """
-    # any other identifiers?
-    # (from different schemes different from the internal uuid)
-    # identifiers = RelationshipTo(
-    #     'Identifier', 'IS_IDENTIFIED_BY', cardinality=OneOrMore, show=True)
-    record_sources = RelationshipTo(
-        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
-    agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES)
-    names = ArrayProperty(StringProperty(), required=True)
+    # record_sources = RelationshipTo(
+    #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+    external_ids = ArrayProperty(StringProperty(), show=True)
+    agent_type = StringProperty(
+        required=True, choices=codelists.AGENT_TYPES, show=True)
+    names = ArrayProperty(StringProperty(), required=True, show=True)
     birth_date = DateProperty(show=True)
     death_date = DateProperty(default=None, show=True)
     biographical_note = StringProperty()
     sex = StringProperty(choices=codelists.SEXES, show=True)
-    biography_views = ArrayProperty(StringProperty(), required=False)
+    biography_views = ArrayProperty(StringProperty())
     creation = RelationshipFrom(
         'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
-
-
-# class Identifier(StructuredNode):
-#     """
-#     Identifier generated by the system (GUID or ID chosen from an external
-#     naming schema).
-#     """
-#     IDENTIFIER_SCHEME = (
-#         ('UUID', '')
-#     )
-#     scheme = StringProperty(required=True, choices=IDENTIFIER_SCHEME)
-#     value = StringProperty(required=True)
 
 
 class RecordSource(StructuredNode):
     """ A reference to the IMC content provider and their local ID.
 
     Attributes:
-        source_id        The local identifier of the record. If this does not
+        source_id       The local identifier of the record. If this does not
                         exist in the content provider´s database the value is
                         "undefined".
-        provider_name   The name of the archive supplying the record.
-        provider_id      An unambiguous reference to the archive supplying the
-                        record.
-        provider_scheme Name of the registration scheme encoding the
-                        institution name ("ISIL code" or "Institution acronym")
         is_shown_at     An unambiguous URL reference to the digital object on
                         the web site of the source provider and/or on the
                         content provider's web site in its full information
                         context.
     """
     source_id = StringProperty(required=True, show=True)
-    provider_name = StringProperty(index=True, required=True, show=True)
-    provider_id = StringProperty(required=True, show=True)
-    provider_scheme = StringProperty(
-        choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
     is_shown_at = StringProperty(show=True)
+    provider = RelationshipTo(
+        'Provider', 'PROVIDED_BY', cardinality=One, show=True)
     creation = RelationshipFrom(
-        'Creation', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
+        'Creation', 'RECORD_SOURCE', cardinality=One)
+
+
+class Provider(IdentifiedNode):
+    """
+    name         The name of the archive supplying the record.
+    identifier   An unambiguous reference to the archive supplying the record.
+    scheme       Name of the registration scheme encoding the institution name
+                 ("ISIL code" or "Institution acronym")
+    """
+    name = StringProperty(index=True, required=True, show=True)
+    identifier = StringProperty(required=True, show=True)
+    scheme = StringProperty(
+        choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+    record_source = RelationshipFrom(
+        'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
+
+
+class CountryOfReferenceRel(StructuredRel):
+    """
+    The relationship between a geographic area and the audiovisual creation.
+    Defaults to "production".
+    """
+    reference = StringProperty(default="Country of Production", show=True)
 
 
 class AVEntity(Creation):
@@ -471,13 +489,13 @@ class AVEntity(Creation):
                                     queries.
         identifying_title_origin    Acronym or other identifier indicating the
                                     origin of the element content.
+        production_years            The year or time span associated with the
+                                    production of the audiovisual creation
+                                    (e.g. CCYY, CCYY-CCYY).
         production_countries        The geographic origin of an audiovisual
                                     creation. This should be the country or
                                     countries where the production facilities
                                     are located.
-        production_years            The year or time span associated with the
-                                    production of the audiovisual creation
-                                    (e.g. CCYY, CCYY-CCYY).
         video_format                The description of the physical artefact or
                                     digital file on which an audiovisual
                                     manifestation is fixed.
@@ -487,12 +505,30 @@ class AVEntity(Creation):
     """
     identifying_title = StringProperty(index=True, required=True, show=True)
     identifying_title_origin = StringProperty(index=True, show=True)
-    production_countries = ArrayProperty(StringProperty(), show=True)
     production_years = ArrayProperty(
         StringProperty(), required=True, show=True)
+    production_countries = RelationshipTo(
+        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrOne,
+        model=CountryOfReferenceRel, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
-    view_filmography = StringProperty(show=True)
+    view_filmography = ArrayProperty(StringProperty(), show=True)
+
+
+class Country(StructuredNode):
+    """
+    ISO 3166-1,
+    ISO 3166-2 (Region codes),
+    ISO 3166-3,
+    AFNOR XP2 44-002
+
+    Attributes:
+        code   The country code.
+        labels The translation into different languages.
+    """
+    code = StringProperty(choices=codelists.COUNTRY, show=True, required=True)
+    creation = RelationshipFrom(
+        'AVEntity', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore)
 
 
 class VideoFormat(StructuredNode):
@@ -511,9 +547,13 @@ class VideoFormat(StructuredNode):
     gauge = StringProperty(show=True)
     aspect_ratio = StringProperty(show=True)
     sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
-    colour = StringProperty(show=True)
+    colour = StringProperty(choices=codelists.COLOUR, show=True)
     creation = RelationshipFrom(
-        'AVEntity', 'FROM_AV_ENTITY', cardinality=OneOrMore, show=True)
+        'AVEntity', 'VIDEO_FORMAT', cardinality=One, show=True)
+
+    def __str__(self):
+        return "VideoFormat: [gauge: {}, aspect_ratio: {}, sound: {}; colour {}]".format(
+            self.gauge, self.aspect_ratio, self.sound, self.colour)
 
 
 class NonAVEntity(Creation):
@@ -529,7 +569,7 @@ class NonAVEntity(Creation):
                                 should be added to indicate that research
                                 regarding the production time has been
                                 unsuccessful.
-        non_av_entity_type      The general type of the non-audiovisual
+        non_av_type             The general type of the non-audiovisual
                                 manifestation (“image” or “text”).
         specific_type           This element further specifies the type of the
                                 non-audiovisual entity.
@@ -539,13 +579,13 @@ class NonAVEntity(Creation):
                                 white", "colour", "mixed").
     """
     date_created = ArrayProperty(StringProperty(), required=True, show=True)
-    non_av_entity_type = StringProperty(required=True,
-                                        choices=codelists.NON_AV_ENTITY_TYPES,
-                                        show=True)
+    non_av_type = StringProperty(required=True,
+                                 choices=codelists.NON_AV_TYPES,
+                                 show=True)
     specific_type = StringProperty(
-        required=True, choices=codelists.NON_AV_ENTITY_SPECIFIC_TYPES,
+        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES,
         show=True)
-    phisical_format_size = StringProperty(show=True)
+    phisical_format_size = ArrayProperty(StringProperty(), show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
 
 # ANNOTATION
@@ -558,7 +598,7 @@ class NonAVEntity(Creation):
 
 
 class AnnotationCreatorRel(StructuredRel):
-    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc))
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
 
 
 class Annotation(IdentifiedNode, AnnotationTarget):
@@ -586,7 +626,7 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         model=AnnotationCreatorRel, show=True)
     generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS, show=True)
     bodies = RelationshipTo(
-        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore)
+        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True)
     targets = RelationshipTo(
         'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
 
@@ -607,14 +647,12 @@ class ResourceBody(AnnotationBody):
 
 
 class ImageBody(AnnotationBody):
-    # TODO
     pass
 
 
 class AudioBody(AnnotationBody):
     audio_format = StringProperty(show=True)
     language = StringProperty(show=True)
-    # TODO
 
 
 # class VQBody(AnnotationBody):

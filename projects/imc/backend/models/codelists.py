@@ -1,5 +1,34 @@
 # -*- coding: utf-8 -*-
 
+
+def fromDescription(descr, codelist):
+    """
+    Returns the matched element by description in the give codelist. None
+    otherwise.
+    """
+    res = [item for item in codelist if item[1].lower() == descr.lower()]
+    return res[0] if res else None
+
+
+def fromCode(descr, codelist):
+    """
+    Returns the matched element by code in the give codelist. None otherwise.
+    """
+    res = [item for item in codelist if item[0].lower() == descr.lower()]
+    return res[0] if res else None
+
+
+CONTENT_TYPES = (
+    ('Video', 'Video'),
+    ('Image', 'Image'),
+    ('Text',  'Text')
+)
+
+SOURCE_TYPES = (
+    ('Metadata', 'Metadata'),
+    ('Content', 'Content')
+)
+
 AV_TITLE_TYPES = (
     ('Original title',     'Original release title'),
     ('Other title',        'Alternative title, Variant title'),
@@ -53,7 +82,6 @@ KEYWORD_TYPES = (
     ('04', 'Place'),
     ('05', 'Form'),
     ('06', 'Georeference')
-    # FIXME just an example here
 )
 
 DESCRIPTION_TYPES = (
@@ -308,21 +336,29 @@ PROVIDER_SCHEMES = (
     ('ACRO', 'Institution acronym')
 )
 
+IDENTIFIER_SCHEMES = (
+    ('ISIL', 'International Standard for Library Institutions and Related Organisations'),
+    ('UUID', 'Universally Unique Identifier'),
+    ('GUID', 'Globally Unique Identifier'),
+    ('URI',  'Uniform Resource Identifier'),
+    ('URL',  'Uniform Resource Locator'),
+    ('URN',  'Uniform Resource Name'),
+    ('ISAN', 'International Standard Audiovisual Number'),
+    ('ISBN', 'International Standard Book Number'),
+    ('ISSN', 'International Standard Serial Number'),
+    ('ISMN', 'International Standard Music Number'),
+    ('DOI',  'Digital Object Identifier')
+)
+
 VIDEO_SOUND = (
     ('NO_SOUND', 'Without sound'),
     ('WITH_SOUND', 'With sound')
 )
 
-NON_AV_ENTITY_TYPES = (
-    ('01', 'image'),
-    ('02', 'text')
+NON_AV_TYPES = (
+    ('image', 'image'),
+    ('text', 'text')
 )
-
-NON_AV_ENTITY_SPECIFIC_TYPES = (
-    ('01', 'photograph'),
-    ('02', 'poster'),
-    ('03', 'letter')
-)  # FIXME just an ex. here: Based on the values of IMC content providers
 
 ORPHAN_STATUS = (
     ('UNK', 'Unknown, orphan status not determined'),
@@ -413,7 +449,7 @@ GAUGE = (
     ('15',      'Special format')
 )
 
-SPECIFIC_TYPES = (
+NON_AV_SPECIFIC_TYPES = (
     ('01', 'Advertising material'),
     ('02', 'Article'),
     ('03', 'Book'),

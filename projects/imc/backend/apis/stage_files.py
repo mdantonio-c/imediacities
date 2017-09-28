@@ -151,12 +151,12 @@ class Stage(GraphBaseOperations):
         properties['path'] = path
 
         try:
-            resource = self.graph.Stage.nodes.get(**properties)
+            resource = self.graph.MetaStage.nodes.get(**properties)
             log.debug("Resource already exist for %s" % path)
-        except self.graph.Stage.DoesNotExist:
-            resource = self.graph.Stage(**properties).save()
+        except self.graph.MetaStage.DoesNotExist:
+            resource = self.graph.MetaStage(**properties).save()
             resource.ownership.connect(group)
-            log.debug("Resource created for %s" % path)
+            log.debug("Metadata Resource created for %s" % path)
 
         task = CeleryExt.import_file.apply_async(
             args=[path, resource.uuid, mode],
