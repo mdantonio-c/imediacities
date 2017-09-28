@@ -763,18 +763,49 @@
 								var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
 
 								if (self.startTagTime>=times1 && self.startTagTime<=times2){
-										sharedProperties.setVideoId($stateParams.v);
-										sharedProperties.setStartTime(times1);
-										sharedProperties.setEndTime(times2);
-										sharedProperties.setGroup(group);
-										sharedProperties.setLabelTerm(labelterm);
-										sharedProperties.setAlternatives(alternatives);
-										sharedProperties.setIRI(tiri);
-										sharedProperties.setShotPNG(pngshot);
-										sharedProperties.setShotId(shotid);									
-										if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
-										else myModalGeoFactory.open('lg', 'myModalVocab.html');
-									}
+
+									sharedProperties.setVideoId($stateParams.v);
+									sharedProperties.setStartTime(times1);
+									sharedProperties.setEndTime(times2);
+									sharedProperties.setGroup(group);
+									sharedProperties.setLabelTerm(labelterm);
+									sharedProperties.setAlternatives(alternatives);
+									sharedProperties.setIRI(tiri);
+									sharedProperties.setShotPNG(pngshot);
+									sharedProperties.setShotId(shotid);
+
+									/*first check if this annotation already esists in the timeline cache array*/
+									var timelinerows = self.videoTimeline.data.rows;
+									var foundterm = false;
+									if (group != 'location'){	
+										for (var k=0; k<=timelinerows.length-1; k++){
+											var timel1 = timelinerows[k].c[2].v;
+											var timel2 = timelinerows[k].c[3].v;
+
+											var t1 = timel1.getHours()+':'+timel1.getMinutes()+':'+timel1.getSeconds();
+											var t2 = timel2.getHours()+':'+timel2.getMinutes()+':'+timel2.getSeconds();
+											var time1c = convertTime(t1);
+											var time2c = convertTime(t2);
+
+											/*same interval of this annotation set*/
+											if ((times1 == time1c) && (times2 == time2c)){
+												var acategory = timelinerows[k].c[0].v;
+												var aterm = timelinerows[k].c[1].v;
+												if ((acategory == group) && (aterm == labelterm)){
+													/*the term has been already added in the timeline cache*/
+													foundterm = true;
+													myModalGeoFactory.open('lg', 'termFoundModal.html');
+												}
+
+											}
+										}
+										/*if the term is a new term*/
+										if (!foundterm){									
+											myModalGeoFactory.open('lg', 'myModalVocab.html');
+										}
+									}//if group is not location
+									else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
+								}
 							}
 						}
 					}
@@ -862,12 +893,12 @@
 		    								{id: "end", label: "End", type: "date"}
 		    							], "rows": []};
 
-		    							videoTimeline.data.rows.push({c: [
+		    							/*videoTimeline.data.rows.push({c: [
 								    	   {v: "area"},
 								    	   {v: "Porta Saragozza"},
 								   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
-										]});
+										]});*/
 
 										self.videoTimeline = videoTimeline;
 
@@ -968,7 +999,7 @@
   						  alert(props);
 					};
 
-					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm) {
+					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId) {
 						if (locname != '') var locn = " - "+locname;
 						else var locn = locname;
 	    				self.videoTimeline.data.rows.push({c: [
@@ -1170,7 +1201,7 @@
 				//save the annotation into the database
 				//DataService.saveAnnotation(target, source);
 
-				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
 				$uibModalInstance.close(null);
 
 			   	};
@@ -1223,7 +1254,7 @@
 				//DataService.saveAnnotation(target, source);
 
 				//$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
-				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
 
 		    	$uibModalInstance.close($scope.geocodingResult);
 		  	};
