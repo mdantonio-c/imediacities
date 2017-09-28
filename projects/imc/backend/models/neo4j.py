@@ -194,9 +194,9 @@ class Item(TimestampedNode, AnnotationTarget):
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
     content_source = RelationshipTo(
-        'Stage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
+        'ContentStage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
     meta_source = RelationshipTo(
-        'Stage', 'META_SOURCE', cardinality=One)
+        'MetaStage', 'META_SOURCE', cardinality=One)
     creation = RelationshipTo(
         'Creation', 'CREATION', cardinality=ZeroOrOne)
     sourcing_annotations = RelationshipFrom(
