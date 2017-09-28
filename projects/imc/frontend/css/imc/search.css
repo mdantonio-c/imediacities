@@ -496,28 +496,28 @@ element.style {
 /* Medium devices (desktops, 900px and up) */
 @media (min-width: 910px) {
 .scrollmenu{
-			min-height: 10px;
+			min-height: 20px;
 	}
 }
 
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
 .scrollmenu{
-			min-height: 20px;
+			min-height: 30px;
 	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1100px) {
 .scrollmenu{
-			min-height: 30px;
+			min-height: 40px;
 	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1260px) {
 .scrollmenu{
-			min-height: 40px;
+			min-height: 50px;
 	}
 }
 
