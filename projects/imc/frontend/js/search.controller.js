@@ -74,6 +74,7 @@
 	    	    var alternatives = null;
 	    	    var latitude = '';
 	    	    var longitude = '';
+	    	    var formatted = '';
 
 	    		return {
 	        		getStartTime: function() {
@@ -85,6 +86,9 @@
 	        		getLabelTerm: function() {
 	            		return labelTerm;
 	        		},
+	        		getFormAddr: function() {
+	            		return formatted;
+	        		},	        		
 	        		getGroup: function() {
 	            		return group;
 	        		},
@@ -124,6 +128,9 @@
 	        		setLabelTerm: function(value) {
 	            		labelTerm = value;
 	        		},
+	        		setFormAddr: function(value) {
+	            		formatted = value;
+	        		},	        		
 	        		setGroup: function(value) {
 	            		group = value;
 	        		},
@@ -729,29 +736,34 @@
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
 							sharedProperties.setStartTime(self.startTagTime);
 
-							for (var i=0; i<self.items.length-1; i++)
+							for (var i=0; i<=self.items.length-1; i++)
 							{
+								var pngshot = self.items[i][6];
+								var shotid = self.items[i][7];
 
-							var time1 = self.items[i][5];
-							var time2 = self.items[i+1][5];
-							var pngshot = self.items[i][6];
-							var shotid = self.items[i][7];
+								var time1 = self.items[i][5];
+								if (i<self.items.length-1) {
+									var time2 = self.items[i+1][5];
+									var currtime2 = time2.split("-")[0];
+									var hours2 = currtime2.split(":")[0];
+									var mins2 = currtime2.split(":")[1];
+									var secs2 = currtime2.split(":")[2];
+									//var cdate = new Date(0, 0, 0, hours, mins, secs);
+									var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+								}
+								else {
+									var times2 = self.items[i][1];
+								}
 
-							var currtime1 = time1.split("-")[0];
-							var hours1 = currtime1.split(":")[0];
-							var mins1 = currtime1.split(":")[1];
-							var secs1 = currtime1.split(":")[2];
-							//var cdate = new Date(0, 0, 0, hours, mins, secs);
-							var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
+								var currtime1 = time1.split("-")[0];
+								var hours1 = currtime1.split(":")[0];
+								var mins1 = currtime1.split(":")[1];
+								var secs1 = currtime1.split(":")[2];
+								//var cdate = new Date(0, 0, 0, hours, mins, secs);
+								var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
 
-							var currtime2 = time2.split("-")[0];
-							var hours2 = currtime2.split(":")[0];
-							var mins2 = currtime2.split(":")[1];
-							var secs2 = currtime2.split(":")[2];
-							//var cdate = new Date(0, 0, 0, hours, mins, secs);
-							var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+								if (self.startTagTime>=times1 && self.startTagTime<=times2){
 
-							if (self.startTagTime>=times1 && self.startTagTime<=times2){
 									sharedProperties.setVideoId($stateParams.v);
 									sharedProperties.setStartTime(times1);
 									sharedProperties.setEndTime(times2);
@@ -760,11 +772,40 @@
 									sharedProperties.setAlternatives(alternatives);
 									sharedProperties.setIRI(tiri);
 									sharedProperties.setShotPNG(pngshot);
-									sharedProperties.setShotId(shotid);									
-									if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
-									else myModalGeoFactory.open('lg', 'myModalVocab.html');
-								}
+									sharedProperties.setShotId(shotid);
 
+									/*first check if this annotation already esists in the timeline cache array*/
+									var timelinerows = self.videoTimeline.data.rows;
+									var foundterm = false;
+									if (group != 'location'){	
+										for (var k=0; k<=timelinerows.length-1; k++){
+											var timel1 = timelinerows[k].c[2].v;
+											var timel2 = timelinerows[k].c[3].v;
+
+											var t1 = timel1.getHours()+':'+timel1.getMinutes()+':'+timel1.getSeconds();
+											var t2 = timel2.getHours()+':'+timel2.getMinutes()+':'+timel2.getSeconds();
+											var time1c = convertTime(t1);
+											var time2c = convertTime(t2);
+
+											/*same interval of this annotation set*/
+											if ((times1 == time1c) && (times2 == time2c)){
+												var acategory = timelinerows[k].c[0].v;
+												var aterm = timelinerows[k].c[1].v;
+												if ((acategory == group) && (aterm == labelterm)){
+													/*the term has been already added in the timeline cache*/
+													foundterm = true;
+													myModalGeoFactory.open('lg', 'termFoundModal.html');
+												}
+
+											}
+										}
+										/*if the term is a new term*/
+										if (!foundterm){									
+											myModalGeoFactory.open('lg', 'myModalVocab.html');
+										}
+									}//if group is not location
+									else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
+								}
 							}
 						}
 					}
@@ -852,12 +893,12 @@
 		    								{id: "end", label: "End", type: "date"}
 		    							], "rows": []};
 
-		    							videoTimeline.data.rows.push({c: [
+		    							/*videoTimeline.data.rows.push({c: [
 								    	   {v: "area"},
 								    	   {v: "Porta Saragozza"},
 								   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
 								   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
-										]});
+										]});*/
 
 										self.videoTimeline = videoTimeline;
 
@@ -958,7 +999,7 @@
   						  alert(props);
 					};
 
-					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm) {
+					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId) {
 						if (locname != '') var locn = " - "+locname;
 						else var locn = locname;
 	    				self.videoTimeline.data.rows.push({c: [
@@ -1119,9 +1160,12 @@
 					.then(function(result) {
 						var locationlat = result[0].geometry.location.lat();
 						var locationlng = result[0].geometry.location.lng();
+						var locationiri = result[0].place_id;
 						sharedProperties.setLat(locationlat);
 						sharedProperties.setLong(locationlng);
+						sharedProperties.setIRI(locationiri); //actually the google one
 						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
+						sharedProperties.setFormAddr(locname); 					
 						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
 						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
 
@@ -1157,7 +1201,7 @@
 				//save the annotation into the database
 				//DataService.saveAnnotation(target, source);
 
-				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
 				$uibModalInstance.close(null);
 
 			   	};
@@ -1186,6 +1230,7 @@
 		  		// $scope.alternatives = sharedProperties.getAlternatives();
 		  		$scope.latitude = sharedProperties.getLatitude();
 		  		$scope.longitude = sharedProperties.getLongitude();
+		  		$scope.format = sharedProperties.getFormAddr();
 
 				var target = 'shot:'+$scope.shotID;
 				// alternatives mechanism should be of course generalized
@@ -1194,7 +1239,7 @@
 				console.log(rarr);
 				var source = {
 					// "iri": $scope.IRI,
-					"iri": "xyz",
+					"iri": $scope.IRI,
 					"name": $scope.labelTerm,
 					// "alternativeNames": {
 					// 	"de": $scope.alternatives.de,
@@ -1208,7 +1253,8 @@
 				//save the annotation into the database
 				//DataService.saveAnnotation(target, source);
 
-				$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				//$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
+				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
 
 		    	$uibModalInstance.close($scope.geocodingResult);
 		  	};

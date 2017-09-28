@@ -280,6 +280,23 @@
 	   	  </script>
 		 </div>
 
+		<!-- modal term has been already found -->
+		<div ng-controller='WatchController as watchCtrl' id="tag-wrapper">
+		  <script type="text/ng-template" id="termFoundModal.html">
+		    <div class="modal-header">
+		      <h3 class="modal-title">This annotation has been already added to the shot</h3>
+		    </div>
+		    <div class="modal-body">
+		      <p><b>Please try adding a different term or location</p>
+		    </div>
+		    <div class="modal-footer">
+		      <!--<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>-->
+		      <p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p>
+		      <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		    </div>
+	   	  </script>
+		 </div>
+
 	</div>
 
 
