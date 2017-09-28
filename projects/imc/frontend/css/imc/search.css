@@ -493,5 +493,30 @@ element.style {
         overflow-y: auto;
 }
 
+/* Medium devices (desktops, 900px and up) */
+@media (min-width: 910px) {
+.scrollmenu{
+			min-height: 10px;
+	}
+}
 
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+.scrollmenu{
+			min-height: 20px;
+	}
+}
 
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1100px) {
+.scrollmenu{
+			min-height: 30px;
+	}
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1260px) {
+.scrollmenu{
+			min-height: 40px;
+	}
+}
