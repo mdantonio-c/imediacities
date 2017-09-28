@@ -355,7 +355,7 @@ class EFG_XMLParser():
             if agent_node.tag == 'relPerson':
                 props['agent_type'] = 'P'
             elif agent_node.tag == 'relCorporate':
-                props['agent_type'] = 'P'
+                props['agent_type'] = 'C'
             else:
                 # should never be reached
                 raise ValueError(

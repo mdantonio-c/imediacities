@@ -68,7 +68,7 @@ def harvest(metadata_set, dest_folder, log_file):
     # ### OAI-PMH CONFIGURATION ### #
     #################################
     URL = 'https://node0-d-efg.d4science.org/efg/mvc/oai/oai.do'
-    metadata_prefix='efg'
+    metadata_prefix = 'efg'
 
     ###################################
     # ### OPEN OAI-PMH CONNECTION ### #
@@ -127,13 +127,19 @@ def harvest(metadata_set, dest_folder, log_file):
         nonavcreation = efgEntity.find(tag("nonavcreation"))
 
         if avcreation is not None:
-            avManifestation = avcreation.find(tag("avManifestation"))
+            manifestation = avcreation.find(tag("avManifestation"))
             keywords = avcreation.findall(tag("keywords"))
-            title = avcreation.find(tag("title")).find(tag("text")).text
+            title_el = avcreation.find(tag("identifyingTitle"))
+            title = (title_el.text
+                     if title_el is not None
+                     else "Unknown title")
         elif nonavcreation is not None:
-            avManifestation = nonavcreation.find(tag("avManifestation"))
+            manifestation = nonavcreation.find(tag("nonAVManifestation"))
             keywords = nonavcreation.findall(tag("keywords"))
-            title = nonavcreation.find(tag("title")).find(tag("text")).text
+            title_el = nonavcreation.find(tag("title"))
+            title = (title_el.find(tag("text")).text
+                     if title_el is not None
+                     else "Unknown title")
         else:
             title = "Unknown title"
             # log.warning("(non)avcreation not found, skipping record")
@@ -152,12 +158,12 @@ def harvest(metadata_set, dest_folder, log_file):
 
         report_data['filtered'] += 1
 
-        if avManifestation is None:
+        if manifestation is None:
             report_data['missing_sourceid'].append(title)
             # log.warning("avManifestation not found, skipping record")
             continue
 
-        recordSource = avManifestation.find(tag("recordSource"))
+        recordSource = manifestation.find(tag("recordSource"))
         if recordSource is None:
             report_data['missing_sourceid'].append(title)
             # log.warning("recordSource not found, skipping record")
