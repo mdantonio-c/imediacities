@@ -751,7 +751,8 @@
 								if ((acategory == group) && (aterm == labelterm)){
 									/*the term has been already added in the timeline cache*/
 									foundterm = true;
-									myModalGeoFactory.open('lg', 'termFoundModal.html');
+									if (group == 'location') myModalGeoFactory.open('lg', 'locationFoundModal.html');
+									else myModalGeoFactory.open('lg', 'termFoundModal.html');
 								}
 
 							}
