@@ -788,7 +788,7 @@
 											var time2c = convertTime(t2);
 
 											/*same interval of this annotation set*/
-											if ((times1 == time1c) && (times2 == time2c)){
+											if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)){
 												var acategory = timelinerows[k].c[0].v;
 												var aterm = timelinerows[k].c[1].v;
 												if ((acategory == group) && (aterm == labelterm)){
