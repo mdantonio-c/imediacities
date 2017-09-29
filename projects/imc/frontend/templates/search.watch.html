@@ -139,6 +139,9 @@
 			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
 				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}">
 				<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>
+				<div id="class" ng-repeat="marker in vm.markers | orderBy : 'title'">
+         			<a href="#" ng-click="$vm.openInfoWindow($event, marker)">{{marker.title}}</a>
+   				</div>
 				</ng-map>
 			</div>
 		</div>
