@@ -1032,13 +1032,14 @@
 
 				}
 
-				function MapController($scope, NgMap, NavigatorGeolocation, GeoCoder, $timeout) {
+				function MapController($scope, $rootScope, NgMap, NavigatorGeolocation, GeoCoder, $timeout) {
 
 					var vm = this;
 					vm.videolat = null;
 					vm.videolng = null;
 					vm.locname = null;
 					vm.zoom = 15;
+					vm.markers = [];
 
 					vm.init = function(location) {
 						// FIXME what is the default?
@@ -1068,7 +1069,52 @@
 						});
 					}, 3000);
 
+					vm.openInfoWindow = function(e, selectedMarker){
+        				e.preventDefault();
+        				google.maps.event.trigger(selectedMarker, 'click');
+    				}
+
 					vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
+
+					$rootScope.$on('updateMap', function(event, locname, lat, lng, group, labelTerm, shotId) {
+
+					// force map resize
+					$timeout(function() {
+						NgMap.getMap({
+							id: 'videomap'
+						}).then(function(map) {
+
+						var LatLng = {lat: lat, lng: lng};
+						//var map = new google.maps.Map(document.getElementById('videomap'));
+
+						var marker = new google.maps.Marker({
+						   position: LatLng,
+						   map: map,
+						   title: labelTerm
+						});
+
+				    	//$scope.markers = [];
+				    
+				    	var infoWindow = new google.maps.InfoWindow();
+				            
+				        var marker = new google.maps.Marker({
+				            map: map,
+				            position: new google.maps.LatLng(lat, lng),
+				            title: locname
+				        });
+				        marker.content = '<div class="infoWindowContent">' + locname + '</div>';
+				        
+				        google.maps.event.addListener(marker, 'click', function(){
+				            infoWindow.setContent('<h2>' + marker.title + '</h2><p>Shot id: '+shotId+'</p>' + marker.content);
+				            infoWindow.open($scope.map, marker);
+				        });
+				        
+				        vm.markers.push(marker);
+
+				        });
+					}, 1000);
+
+	  				});
 				}
 
 				// storyboard modal view
@@ -1138,47 +1184,47 @@
 			// Please note that $modalInstance represents a modal window (instance) dependency.
 			// It is not the same as the $uibModal service used above.
 			function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, DataService, sharedProperties) {
-		  	$scope.geocodingResult = "";
-		  	$scope.startT = sharedProperties.getStartTime();
-		  	$scope.endT = sharedProperties.getEndTime();
-		  	$scope.group = sharedProperties.getGroup();
-		  	$scope.labelTerm = sharedProperties.getLabelTerm();
-		  	$scope.shotPNGImage = sharedProperties.getShotPNG();
-		  	$scope.IRI = sharedProperties.getIRI();
-	  		$scope.shotID = sharedProperties.getShotId();
+			  	$scope.geocodingResult = "";
+			  	$scope.startT = sharedProperties.getStartTime();
+			  	$scope.endT = sharedProperties.getEndTime();
+			  	$scope.group = sharedProperties.getGroup();
+			  	$scope.labelTerm = sharedProperties.getLabelTerm();
+			  	$scope.shotPNGImage = sharedProperties.getShotPNG();
+			  	$scope.IRI = sharedProperties.getIRI();
+		  		$scope.shotID = sharedProperties.getShotId();
 
-		  	$scope.ok = function() {
+			  	$scope.ok = function() {
 
-			if (!angular.isUndefined($scope.vm)) {
+				if (!angular.isUndefined($scope.vm)) {
 
-				var route = '';
-				var locality = '';
-				var country = '';
+					var route = '';
+					var locality = '';
+					var country = '';
 
-				if ($scope.vm.address.route != null) var route = $scope.vm.address.route;
-				if ($scope.vm.address.locality != null) var locality = $scope.vm.address.locality;
-				if ($scope.vm.address.country != null) var country = $scope.vm.address.country;		
+					if ($scope.vm.address.route != null) var route = $scope.vm.address.route;
+					if ($scope.vm.address.locality != null) var locality = $scope.vm.address.locality;
+					if ($scope.vm.address.country != null) var country = $scope.vm.address.country;		
 
-				var stringloc = route+' '+locality+' '+country;
+					var stringloc = route+' '+locality+' '+country;
 
-		    	GeoCoder.geocode({
-						address: stringloc
-					})
-					.then(function(result) {
-						var locationlat = result[0].geometry.location.lat();
-						var locationlng = result[0].geometry.location.lng();
-						var locationiri = result[0].place_id;
-						sharedProperties.setLat(locationlat);
-						sharedProperties.setLong(locationlng);
-						sharedProperties.setIRI(locationiri); //actually the google one
-						var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
-						sharedProperties.setFormAddr(locname); 					
-						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
-						myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
+			    	GeoCoder.geocode({
+							address: stringloc
+						})
+						.then(function(result) {
+							var locationlat = result[0].geometry.location.lat();
+							var locationlng = result[0].geometry.location.lng();
+							var locationiri = result[0].place_id;
+							sharedProperties.setLat(locationlat);
+							sharedProperties.setLong(locationlng);
+							sharedProperties.setIRI(locationiri); //actually the google one
+							var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
+							sharedProperties.setFormAddr(locname); 					
+							var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
+							myGeoConfirmFactory.open('lg', 'result.html', {result: restring, resarr: result});
 
-						$uibModalInstance.close($scope.vm.address.locality);
-				});
-		    	//$uibModalInstance.close($scope.searchTerm);
+							$uibModalInstance.close($scope.vm.address.locality);
+					});
+			    	//$uibModalInstance.close($scope.searchTerm);
 		    }
 		    else {
 		    	var vid = sharedProperties.getVideoId();
@@ -1219,56 +1265,59 @@
 			}
 
 			function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
-			$scope.geocodingResult = params.result;
-			$scope.geoResArray = params.resarr;
+				$scope.geocodingResult = params.result;
+				$scope.geoResArray = params.resarr;
 
-		  	$scope.ok = function() {
-		  		var res = $scope.geocodingResult;
-		  		var rarr = $scope.geoResArray;
+			  	$scope.ok = function() {
+			  		var res = $scope.geocodingResult;
+			  		var rarr = $scope.geoResArray;
 
-		  		$scope.startT = sharedProperties.getStartTime();
-		  		$scope.endT = sharedProperties.getEndTime();
-		  		$scope.group = sharedProperties.getGroup();
-		  		$scope.labelTerm = sharedProperties.getLabelTerm();
-		  		$scope.shotID = sharedProperties.getShotId();
-		  		$scope.IRI = sharedProperties.getIRI();
-		  		// $scope.alternatives = sharedProperties.getAlternatives();
-		  		$scope.latitude = sharedProperties.getLatitude();
-		  		$scope.longitude = sharedProperties.getLongitude();
-		  		$scope.format = sharedProperties.getFormAddr();
+			  		$scope.startT = sharedProperties.getStartTime();
+			  		$scope.endT = sharedProperties.getEndTime();
+			  		$scope.group = sharedProperties.getGroup();
+			  		$scope.labelTerm = sharedProperties.getLabelTerm();
+			  		$scope.shotID = sharedProperties.getShotId();
+			  		$scope.IRI = sharedProperties.getIRI();
+			  		// $scope.alternatives = sharedProperties.getAlternatives();
+			  		$scope.latitude = sharedProperties.getLatitude();
+			  		$scope.longitude = sharedProperties.getLongitude();
+			  		$scope.format = sharedProperties.getFormAddr();
 
-				var target = 'shot:'+$scope.shotID;
-				// alternatives mechanism should be of course generalized
-				console.log($scope.IRI);
-				console.log(res);
-				console.log(rarr);
-				var source = {
-					// "iri": $scope.IRI,
-					"iri": $scope.IRI,
-					"name": $scope.labelTerm,
-					// "alternativeNames": {
-					// 	"de": $scope.alternatives.de,
-					// 	"en": $scope.alternatives.en
-					// },
-					"spatial": {
-						"lat": $scope.latitude,
-						"long": $scope.longitude
+					var target = 'shot:'+$scope.shotID;
+					// alternatives mechanism should be of course generalized
+					console.log($scope.IRI);
+					console.log(res);
+					console.log(rarr);
+					var source = {
+						// "iri": $scope.IRI,
+						"iri": $scope.IRI,
+						"name": $scope.labelTerm,
+						// "alternativeNames": {
+						// 	"de": $scope.alternatives.de,
+						// 	"en": $scope.alternatives.en
+						// },
+						"spatial": {
+							"lat": $scope.latitude,
+							"long": $scope.longitude
+						}
+					}; 
+					//save the annotation into the database
+					//DataService.saveAnnotation(target, source);
+											
+					var foundterm = false;
+					foundterm = $rootScope.checkAnnotation($scope.startT,$scope.endT,$scope.group,$scope.format);
+
+					if (!foundterm) {
+						$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID);
 					}
-				}; 
-				//save the annotation into the database
-				//DataService.saveAnnotation(target, source);
-										
-				var foundterm = false;
-				foundterm = $rootScope.checkAnnotation($scope.startT,$scope.endT,$scope.group,$scope.format);
 
-				if (!foundterm) {$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);}
+			    	$uibModalInstance.close($scope.geocodingResult);
+			  	};
 
-		    	$uibModalInstance.close($scope.geocodingResult);
-		  	};
-
-		  	$scope.cancel = function() {
-		    	$uibModalInstance.dismiss('cancel');
-		  	};
+			  	$scope.cancel = function() {
+			    	$uibModalInstance.dismiss('cancel');
+			  	};
 
 			}
 
