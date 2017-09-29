@@ -731,6 +731,34 @@
 			    		}
 					}
 
+					$rootScope.checkAnnotation = function(times1,times2,group,labelterm){
+						/*first check if this annotation already esists in the timeline cache array*/
+						var timelinerows = self.videoTimeline.data.rows;						
+						var foundterm = false;						
+						for (var k=0; k<=timelinerows.length-1; k++){
+							var timel1 = timelinerows[k].c[2].v;
+							var timel2 = timelinerows[k].c[3].v;
+
+							var t1 = timel1.getHours()+':'+timel1.getMinutes()+':'+timel1.getSeconds();
+							var t2 = timel2.getHours()+':'+timel2.getMinutes()+':'+timel2.getSeconds();
+							var time1c = convertTime(t1);
+							var time2c = convertTime(t2);
+
+							/*same interval of this annotation set*/
+							if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)){
+								var acategory = timelinerows[k].c[0].v;
+								var aterm = timelinerows[k].c[1].v;
+								if ((acategory == group) && (aterm == labelterm)){
+									/*the term has been already added in the timeline cache*/
+									foundterm = true;
+									myModalGeoFactory.open('lg', 'termFoundModal.html');
+								}
+
+							}
+						}	
+						return foundterm;					
+					}
+
 					self.manualtag = function(group,labelterm,tiri,alternatives){
 						if (self.onpause && !self.onplaying) {
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
@@ -774,31 +802,10 @@
 									sharedProperties.setShotPNG(pngshot);
 									sharedProperties.setShotId(shotid);
 
-									/*first check if this annotation already esists in the timeline cache array*/
-									var timelinerows = self.videoTimeline.data.rows;
 									var foundterm = false;
+
 									if (group != 'location'){	
-										for (var k=0; k<=timelinerows.length-1; k++){
-											var timel1 = timelinerows[k].c[2].v;
-											var timel2 = timelinerows[k].c[3].v;
-
-											var t1 = timel1.getHours()+':'+timel1.getMinutes()+':'+timel1.getSeconds();
-											var t2 = timel2.getHours()+':'+timel2.getMinutes()+':'+timel2.getSeconds();
-											var time1c = convertTime(t1);
-											var time2c = convertTime(t2);
-
-											/*same interval of this annotation set*/
-											if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)){
-												var acategory = timelinerows[k].c[0].v;
-												var aterm = timelinerows[k].c[1].v;
-												if ((acategory == group) && (aterm == labelterm)){
-													/*the term has been already added in the timeline cache*/
-													foundterm = true;
-													myModalGeoFactory.open('lg', 'termFoundModal.html');
-												}
-
-											}
-										}
+										foundterm = $rootScope.checkAnnotation(times1,times2,group,labelterm);
 										/*if the term is a new term*/
 										if (!foundterm){									
 											myModalGeoFactory.open('lg', 'myModalVocab.html');
@@ -1000,11 +1007,11 @@
 					};
 
 					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId) {
-						if (locname != '') var locn = " - "+locname;
-						else var locn = locname;
+						if (locname != '') var locn = locname;
+						else var locn = labelTerm;
 	    				self.videoTimeline.data.rows.push({c: [
 							  {v: group},
-							  {v: labelTerm+locn},
+							  {v: locn},
 							  {v: new Date(0,0,0,0,0,startT)},
 							  {v: new Date(0,0,0,0,0,endT)}
 						]});
@@ -1094,7 +1101,6 @@
 
 						});*/
 
-
 						var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
 						self.shots.push({
 							'thumb': shot.links.thumbnail,
@@ -1183,25 +1189,23 @@
 		  		// $scope.shotID = sharedProperties.getShotId();
 		  		$scope.alternatives = sharedProperties.getAlternatives();
 
-		  		// var data = {};
-		  		//data['header'] = '{"type": "Header", "Access-Control-Allow-Origin": "*","Content-Length": "498", "Content-Type": "application/json"}';
-		  		//data['body'] = '{"type": "ResourceBody", "purpose": "tagging", "source": { "iri": "http://sws.geonames.org/7670502/", "name": "Piazza Maggiore", "alternativeNames": { "it": "Piazza Maggiore", "es": "Placa Major" }, "spatial": { "lat": "44.49383","long": "11.34273" }}}'; 
-		  		//data['target'] = 'shot:9aade665-0bd2-47b7-bd79-e8101694e576';
-
 		  		var target = 'shot:'+$scope.shotID;
 		  		//alternatives mechanism should be of course generalized
-		  		var source = {
-	  				"iri": $scope.IRI,
-	  				"name": $scope.labelTerm,
-	  				"alternativeNames": {
-	  					"de": $scope.alternatives.de,
-	  					"en": $scope.alternatives.en
-	  				}
-	  			}; 
-				//save the annotation into the database
-				//DataService.saveAnnotation(target, source);
 
-				$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+		  		if ($scope.labelTerm != ""){
+			  		var source = {
+		  				"iri": $scope.IRI,
+		  				"name": $scope.labelTerm,
+		  				"alternativeNames": {
+		  					"de": $scope.alternatives.de,
+		  					"en": $scope.alternatives.en
+		  				}
+		  			}; 
+					//save the annotation into the database
+					//DataService.saveAnnotation(target, source);
+
+					$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+				}
 				$uibModalInstance.close(null);
 
 			   	};
@@ -1252,9 +1256,11 @@
 				}; 
 				//save the annotation into the database
 				//DataService.saveAnnotation(target, source);
+										
+				var foundterm = false;
+				foundterm = $rootScope.checkAnnotation($scope.startT,$scope.endT,$scope.group,$scope.format);
 
-				//$rootScope.$emit('updateTimeline', rarr[0].address_components[0].long_name, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm);
-				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+				if (!foundterm) {$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);}
 
 		    	$uibModalInstance.close($scope.geocodingResult);
 		  	};
