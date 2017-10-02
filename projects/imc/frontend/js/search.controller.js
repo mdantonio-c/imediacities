@@ -1076,7 +1076,7 @@
 
 					vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
 
-					$rootScope.$on('updateMap', function(event, locname, lat, lng, group, labelTerm, shotId) {
+					$rootScope.$on('updateMap', function(event, locname, lat, lng, group, labelTerm, shotId, startT) {
 
 					// force map resize
 					$timeout(function() {
@@ -1111,12 +1111,20 @@
 			                };
 			                infoWindow = new google.maps.InfoWindow(infoWindowOptions);
 			                infoWindow.open(map, marker);
+			                self.jumpToShot(shotId,startT);
 			            });		        		
 				        
 				        vm.markers.push(marker);
 
 				        });
 					}, 1000);
+
+					self.jumpToShot = function(selectedShot,startT) {
+							// play video from selected shot
+							var myVid = angular.element(window.document.querySelector('#videoarea'));
+							myVid[0].currentTime = parseInt(startT);
+							myVid[0].play();
+					};
 
 	  				});
 				}
@@ -1313,7 +1321,7 @@
 
 					if (!foundterm) {//the annotation has not been found
 						$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
-						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID);
+						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
 					}
 
 			    	$uibModalInstance.close($scope.geocodingResult);
