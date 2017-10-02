@@ -118,7 +118,7 @@ class Group(IdentifiedNode):
 
 
 class Stage(TimestampedNode):
-    __abstract_node__ = True
+    # __abstract_node__ = True
     filename = StringProperty(required=True, show=True)
     path = StringProperty(required=True, unique_index=True, show=True)
     status = StringProperty(show=True)
@@ -129,11 +129,11 @@ class Stage(TimestampedNode):
 
 
 class MetaStage(Stage):
-    item = RelationshipFrom('Item', 'META_SOURCE', cardinality=One)
+    item = RelationshipFrom('Item', 'META_SOURCE', cardinality=ZeroOrOne)
 
 
 class ContentStage(Stage):
-    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=One)
+    item = RelationshipFrom('Item', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
 
 
 # CREATION: descriptive data model
@@ -192,7 +192,7 @@ class Item(TimestampedNode, AnnotationTarget):
     item_type = StringProperty(
         required=True, choices=codelists.CONTENT_TYPES, show=True)
     ownership = RelationshipTo(
-        'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+        'Group', 'IS_OWNED_BY', cardinality=One, show=True)
     content_source = RelationshipTo(
         'ContentStage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
     meta_source = RelationshipTo(
