@@ -1,0 +1,16 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+bulk:
+  summary: Create a new video description
+  description: The bulk API makes it possible to perform many operations in a single API call.
+  responses:
+    '202':
+      description: Bulk action successfully accepted 
+    '400':
+      description: Bad request.
+    '401':
+      description: This endpoint requires a valid authorization token 

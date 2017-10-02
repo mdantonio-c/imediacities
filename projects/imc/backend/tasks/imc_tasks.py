@@ -122,6 +122,9 @@ def import_file(self, path, resource_id, mode):
                 mode = mode.lower()
                 if mode == 'skip':
                     log.info('Analyze skipped for source id: ' + source_id)
+                    xml_resource.status = 'COMPLETED'
+                    xml_resource.status_message = 'Nothing to declare'
+                    xml_resource.save()
                     # content_node.status = 'SKIPPED'
                     # content_node.status_message = 'Nothing to declare'
                     # content_node.save()
