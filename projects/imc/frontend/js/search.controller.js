@@ -1094,7 +1094,7 @@
 				            title: locname
 				        });
 				        //marker.content = '<div class="infoWindowContent">' + locname + '</div>';
-				        var content = 'Location: '+locname+' Shot Id: '+shotId;
+				        var content = 'Location: '+locname+', Shot Id: '+shotId;
 				        
 				        /*google.maps.event.addListener(marker, 'click', function(){
 				            infoWindow.setContent('<h2>' + marker.title + '</h2><p>Shot id: '+shotId+'</p><p>' + marker.content + '</p>');
@@ -1311,7 +1311,7 @@
 					var foundterm = false;
 					foundterm = $rootScope.checkAnnotation($scope.startT,$scope.endT,$scope.group,$scope.format);
 
-					if (!foundterm) {
+					if (!foundterm) {//the annotation has not been found
 						$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
 						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID);
 					}
