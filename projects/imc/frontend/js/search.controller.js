@@ -763,7 +763,6 @@
 					self.manualtag = function(group,labelterm,tiri,alternatives){
 						if (self.onpause && !self.onplaying) {
 							self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
-							sharedProperties.setStartTime(self.startTagTime);
 
 							for (var i=0; i<=self.items.length-1; i++)
 							{
@@ -852,10 +851,6 @@
 				    					}
 
 										//timeline definition
-										self.mainchar = '30-60';
-										self.outside = '180-250';
-										self.crowd = '270-300';
-
 										self.vduration = vduration;
 
 										var minutes = 0, hours = 0;
@@ -1007,14 +1002,29 @@
   						  alert(props);
 					};
 
+					self.getDateTime = function(seconds){
+						var minutes = 0, hours = 0;
+						if (seconds / 60 > 0) {
+							minutes = parseInt(seconds / 60, 10);
+							seconds = seconds % 60;
+						}
+						if (minutes / 60 > 0) {
+							hours = parseInt(minutes / 60, 10);
+							minutes = minutes % 60;
+						}
+						return new Date(0,0,0,hours,minutes,seconds);
+					};
+
 					$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId) {
 						if (locname != '') var locn = locname;
 						else var locn = labelTerm;
+						var startTime = self.getDateTime(startT);
+						var endTime = self.getDateTime(endT);
 	    				self.videoTimeline.data.rows.push({c: [
 							  {v: group},
 							  {v: locn},
-							  {v: new Date(0,0,0,0,0,startT)},
-							  {v: new Date(0,0,0,0,0,endT)}
+							  {v: startTime},
+							  {v: endTime}
 						]});
 	  				});
 
@@ -1240,14 +1250,7 @@
 		    }
 		    else {
 		    	var vid = sharedProperties.getVideoId();
-		  		// $scope.startT = sharedProperties.getStartTime();
-		  		// $scope.endT = sharedProperties.getEndTime();
-		  		// $scope.group = sharedProperties.getGroup();
-		  		// $scope.labelTerm = sharedProperties.getLabelTerm();
-		  		// $scope.IRI = sharedProperties.getIRI();
-		  		// $scope.shotID = sharedProperties.getShotId();
 		  		$scope.alternatives = sharedProperties.getAlternatives();
-
 		  		var target = 'shot:'+$scope.shotID;
 		  		//alternatives mechanism should be of course generalized
 
