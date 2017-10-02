@@ -1085,15 +1085,6 @@
 						}).then(function(map) {
 
 						var LatLng = {lat: lat, lng: lng};
-						//var map = new google.maps.Map(document.getElementById('videomap'));
-
-						var marker = new google.maps.Marker({
-						   position: LatLng,
-						   map: map,
-						   title: labelTerm
-						});
-
-				    	//$scope.markers = [];
 				    
 				    	var infoWindow = new google.maps.InfoWindow();
 				            
@@ -1102,12 +1093,25 @@
 				            position: new google.maps.LatLng(lat, lng),
 				            title: locname
 				        });
-				        marker.content = '<div class="infoWindowContent">' + locname + '</div>';
+				        //marker.content = '<div class="infoWindowContent">' + locname + '</div>';
+				        var content = 'Location: '+locname+' Shot Id: '+shotId;
 				        
-				        google.maps.event.addListener(marker, 'click', function(){
-				            infoWindow.setContent('<h2>' + marker.title + '</h2><p>Shot id: '+shotId+'</p>' + marker.content);
+				        /*google.maps.event.addListener(marker, 'click', function(){
+				            infoWindow.setContent('<h2>' + marker.title + '</h2><p>Shot id: '+shotId+'</p><p>' + marker.content + '</p>');
 				            infoWindow.open($scope.map, marker);
-				        });
+				        });*/
+				        google.maps.event.addListener(marker, 'click', function () {
+			                // close window if not undefined
+			                if (infoWindow !== void 0) {
+			                    infoWindow.close();
+			                }
+			                // create new window
+			                var infoWindowOptions = {
+			                    content: content
+			                };
+			                infoWindow = new google.maps.InfoWindow(infoWindowOptions);
+			                infoWindow.open(map, marker);
+			            });		        		
 				        
 				        vm.markers.push(marker);
 
