@@ -140,7 +140,8 @@
 				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}">
 				<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>
 				<div id="class" ng-repeat="marker in vm.markers | orderBy : 'title'">
-         			<a href="#" ng-click="$vm.openInfoWindow($event, marker)">{{marker.title}}</a>
+					<marker position="[{{marker.videolat}}, {{marker.videolng}}]"  title="{{marker.locname}}" animation="Animation.BOUNCE"></marker>
+         			<marker ng-click="$vm.openInfoWindow($event, marker);"></marker>
    				</div>
 				</ng-map>
 			</div>
