@@ -99,11 +99,10 @@ class Bulk(GraphBaseOperations):
                           return c"
                 results = self.graph.cypher(query.format(filename=f))
                 c = [self.graph.Creation.inflate(row[0]) for row in results]
-                logger.debug(c.__class__)
                 if len(c) == 1:
                     skipped += 1
                     logger.debug(
-                        "----------------------- SKIPPED filename: {0}. Creation uuid: {1}".format(
+                        "SKIPPED filename: {0}. Creation uuid: {1}".format(
                             filename, c[0].uuid))
                     continue
             logger.info("Importing metadata file: {}".format(filename))
