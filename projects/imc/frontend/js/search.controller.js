@@ -75,6 +75,7 @@
 	    	    var latitude = '';
 	    	    var longitude = '';
 	    	    var formatted = '';
+	    	    var photoref = '';
 
 	    		return {
 	        		getStartTime: function() {
@@ -100,7 +101,10 @@
 	        		},	
 	        		getIRI: function() {
 	            		return IRI;
-	        		},	   
+	        		},	
+	        		getPhotoRef: function() {
+	            		return photoref;
+	        		},		        		   
 	        		getShotId: function() {
 	            		return shotId;
 	        		},
@@ -146,6 +150,9 @@
 	        		setShotId: function(value){
 	        			shotId = value;
 	        		},
+	        		setPhotoRef: function(value){
+	        			photoref = value;
+	        		},	        		
 	        		setAlternatives: function(value){
 	        			alternatives = value;
 	        		}
@@ -382,6 +389,8 @@
 			                    result.formattedAddress = place.formatted_address;
 			                    result.lat = place.geometry.location.lat();
 			                    result.lng = place.geometry.location.lng();
+			                    if (place.photos != undefined) {result.photo_reference = place.photos[0].getUrl({'maxWidth': 35, 'maxHeight': 35});}
+			                    else {result.photo_reference = '';}
 			                }
 			                return result;
 			            }
@@ -1042,7 +1051,7 @@
 
 				}
 
-				function MapController($scope, $rootScope, NgMap, NavigatorGeolocation, GeoCoder, $timeout) {
+				function MapController($scope, $rootScope, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
 
 					var vm = this;
 					vm.videolat = null;
@@ -1095,14 +1104,25 @@
 						}).then(function(map) {
 
 						var LatLng = {lat: lat, lng: lng};
-				    
+				    	var photoRef = sharedProperties.getPhotoRef();
+
 				    	var infoWindow = new google.maps.InfoWindow();
-				            
-				        var marker = new google.maps.Marker({
-				            map: map,
-				            position: new google.maps.LatLng(lat, lng),
-				            title: locname
-				        });
+
+				    	if (photoRef == ''){
+				   			var marker = new google.maps.Marker({
+				            	map: map,
+				            	position: new google.maps.LatLng(lat, lng),
+				            	title: locname,
+				        	});
+				    	}
+				        else{
+				        	var marker = new google.maps.Marker({
+				            	map: map,
+				            	position: new google.maps.LatLng(lat, lng),
+				            	title: locname,
+				            	icon: photoRef
+				        	});
+				    	}
 				        //marker.content = '<div class="infoWindowContent">' + locname + '</div>';
 				        var content = 'Location: '+locname+', Shot Id: '+shotId;
 				        
@@ -1226,6 +1246,7 @@
 					if ($scope.vm.address.route != null) var route = $scope.vm.address.route;
 					if ($scope.vm.address.locality != null) var locality = $scope.vm.address.locality;
 					if ($scope.vm.address.country != null) var country = $scope.vm.address.country;		
+					if ($scope.vm.address.photo_reference != null) var photo_reference = $scope.vm.address.photo_reference;		
 
 					var stringloc = route+' '+locality+' '+country;
 
@@ -1239,6 +1260,7 @@
 							sharedProperties.setLat(locationlat);
 							sharedProperties.setLong(locationlng);
 							sharedProperties.setIRI(locationiri); //actually the google one
+							sharedProperties.setPhotoRef(photo_reference);
 							var locname = result[0].formatted_address;//result[0].address_components[0].long_name;
 							sharedProperties.setFormAddr(locname); 					
 							var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
