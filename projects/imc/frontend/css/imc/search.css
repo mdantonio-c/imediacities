@@ -485,11 +485,18 @@ element.style {
 .hoverme:hover
 {
 	background-color:  #f0f0f5;
+	cursor: pointer;
 }
 
 .dropdown-menu {
         max-height: 800px;
         min-width: 200px;
+        overflow-y: auto;
+}
+
+.storyboard, .annotations{
+        max-height: 800px;
+        max-width: 100%;
         overflow-y: auto;
 }
 
@@ -526,4 +533,24 @@ element.style {
 .scrollmenu{
 			min-height: 60px;
 	}
+}
+
+/*change scrollbar aspect*/
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+/*add cursor to table*/
+.table-striped tr {
+    cursor: pointer;
 }
