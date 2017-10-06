@@ -123,6 +123,7 @@ class Stage(TimestampedNode):
     path = StringProperty(required=True, unique_index=True, show=True)
     status = StringProperty(show=True)
     status_message = StringProperty(show=True)
+    warnings = ArrayProperty(StringProperty(), show=True)
     task_id = StringProperty(show=True)
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)

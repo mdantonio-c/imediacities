@@ -310,8 +310,12 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     """
     parser = EFG_XMLParser()
     record = parser.get_creation_by_type(path, item_type)
-    repo = CreationRepository(self.graph)
     # log.debug(EFG_XMLParser.prettify(record))
+    if len(parser.warnings) > 0:
+        # save warnings
+        meta_source = item_node.meta_source.single()
+        meta_source.warnings = parser.warnings
+    repo = CreationRepository(self.graph)
     av = (item_type == 'Video')
     creation = None
     if item_type == 'Video':
