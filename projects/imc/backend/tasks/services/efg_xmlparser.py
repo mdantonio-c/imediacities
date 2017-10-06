@@ -10,6 +10,9 @@ class EFG_XMLParser():
 
     ns = {'efg': 'http://www.europeanfilmgateway.eu/efg'}
 
+    def __init__(self):
+        self.warnings = []
+
     def get_root(self, filepath):
         tree = ET.parse(filepath)
         return tree.getroot()
@@ -168,7 +171,13 @@ class EFG_XMLParser():
         titles = []
         for node in record.findall("efg:title", self.ns):
             title = {}
-            title['language'] = node.get('lang')
+            lang = node.get('lang')
+            if lang is not None and lang.text.lower() != 'n/a':
+                lang_val = lang.text.lower()
+                lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
+                if lang_code is None:
+                    raise ValueError('Invalid title language for: ' + lang.text)
+                title['language'] = lang_code[0]
             if avcreation:
                 parts = []
                 for part in node.findall('efg:partDesignation', self.ns):
@@ -182,6 +191,14 @@ class EFG_XMLParser():
                         code_el[0], part.find('efg:value', self.ns).text))
                 title['part_designations'] = parts
             title['text'] = node.find('efg:text', self.ns).text
+            title_rel = node.find('efg:relation', self.ns)
+            if title_rel is not None and title_rel.text.lower() != 'n/a':
+                code_el = codelists.fromCode(
+                    title_rel.text, codelists.AV_TITLE_TYPES)
+                if code_el is None:
+                    raise ValueError(
+                        'Invalid title type for: ' + title_rel.text)
+                title['relation'] = code_el[0]
             log.debug('title: {}'.format(title))
             titles.append(title)
         return titles
@@ -202,9 +219,22 @@ class EFG_XMLParser():
                         raise ValueError('Invalid keyword type for: ' + ktype)
                     keyword['keyword_type'] = code_el[0]
                     log.debug('keyword [type]: %s' % keyword.keyword_type)
-                if node.get('lang') is not None:
-                    keyword['language'] = node.get('lang').lower()
-                keyword['term'] = term.text
+                lang = node.get('lang')
+                if lang is not None and lang.text.lower() != 'n/a':
+                    lang_val = lang.text.lower()
+                    lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
+                    if lang_code is None:
+                        raise ValueError('Invalid keyword language for: ' + lang.text)
+                    keyword['language'] = lang_code[0]
+                if ktype == 'Form':
+                    # check term from a controlled IMC list
+                    code_el = codelists.fromCode(
+                        term.text, codelists.FORM)
+                if code_el is None:
+                    raise ValueError('Invalid form type for: ' + term.text)
+                    keyword['term'] = code_el[0]
+                else:
+                    keyword['term'] = term.text
                 log.debug('keyword: {} | {}'.format(
                     keyword['language'], keyword['term']))
                 keyword['termID'] = term.get('id')
@@ -217,13 +247,19 @@ class EFG_XMLParser():
         for node in record.findall("efg:description", self.ns):
             description = {}
             dtype = node.get('type')
-            if dtype is not None:
+            if dtype is not None and dtype.lower() != 'n/a':
                 code_el = codelists.fromDescription(
                     dtype, codelists.DESCRIPTION_TYPES)
                 if code_el is None:
                     raise ValueError('Invalid description type for: ' + dtype)
                 description['description_type'] = code_el[0]
-            description['language'] = node.get('lang')
+            lang = node.get('lang')
+            if lang is not None and lang.text.lower() != 'n/a':
+                lang_val = lang.text.lower()
+                lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
+                if lang_code is None:
+                    raise ValueError('Invalid description language for: ' + lang.text)
+                description['language'] = lang_code[0]
             description['source_ref'] = node.get('source')
             description['text'] = node.text
             log.debug('description: {}'.format(description))
@@ -259,14 +295,24 @@ class EFG_XMLParser():
         inpath = 'efg:avManifestation' if audio_visual else 'efg:nonAVManifestation'
         languages = []
         for node in record.findall("./" + inpath + "/efg:language", self.ns):
-            lang = node.text
+            lang = node.text.lower()
+            if lang.text.lower() == 'n/a':
+                continue
+            lang_code = codelists.fromCode(lang, codelists.LANGUAGE)
+            if lang_code is None:
+                raise ValueError('Invalid language for: ' + node.text)
+            lang = lang_code[0]
+
             usage = node.get('usage')
             if usage is not None:
-                code_el = codelists.fromDescription(
-                    usage, codelists.LANGUAGE_USAGES)
-                if code_el is None:
-                    raise ValueError('Invalid language usage for: ' + usage)
-                usage = code_el[0]
+                if usage.lower() == 'n/a':
+                    usage = None
+                else:
+                    code_el = codelists.fromDescription(
+                        usage, codelists.LANGUAGE_USAGES)
+                    if code_el is None:
+                        raise ValueError('Invalid language usage for: ' + usage)
+                    usage = code_el[0]
             lang_usage = [lang, usage]
             log.debug("lang code: {}, usage code: {}"
                       .format(lang_usage[0], lang_usage[1]))
@@ -279,9 +325,9 @@ class EFG_XMLParser():
         """
         countries = []
         for node in record.findall("./efg:countryOfReference", self.ns):
-            country = node.text
+            country = node.text.upper()
             if codelists.fromCode(country, codelists.COUNTRY) is None:
-                raise ValueError('Invalid country code for: ' + country)
+                raise ValueError('Invalid country code for: ' + node.text)
             reference = node.get('reference')
             country_reference = [country, reference]
             log.debug("country: {}, reference: {}"
@@ -296,14 +342,24 @@ class EFG_XMLParser():
         node = record.find('./efg:avManifestation/efg:format', self.ns)
         if node is not None:
             video_format = {}
-            # gauge (0..1)
+            # gauge (0..1) enum
             gauge_el = node.find('efg:gauge', self.ns)
-            if gauge_el is not None:
-                video_format['gauge'] = gauge_el.text
-            # aspectRation (0..1)
-            aspect_ratio_el = node.find('efg:aspectRation', self.ns)
-            if aspect_ratio_el is not None:
-                video_format['aspect_ratio'] = aspect_ratio_el.text
+            if gauge_el is not None and gauge_el.text.lower() != 'n/a':
+                code_el = codelists.fromCode(
+                    gauge_el.text, codelists.GAUGE)
+                if code_el is None:
+                    raise ValueError(
+                        'Invalid gauge for: ' + gauge_el.text)
+                video_format['gauge'] = code_el[0]
+            # aspectRation (0..1) enum
+            aspect_ratio_el = node.find('efg:aspectRatio', self.ns)
+            if aspect_ratio_el is not None and aspect_ratio_el.text.lower() != 'n/a':
+                code_el = codelists.fromCode(
+                    aspect_ratio_el.text, codelists.ASPECT_RATIO)
+                if code_el is None:
+                    raise ValueError(
+                        'Invalid aspect ratio for: ' + aspect_ratio_el.text)
+                video_format['aspect_ratio'] = code_el[0]
             # sound (0..1) enum
             sound_el = node.find('efg:sound', self.ns)
             if sound_el is not None:
@@ -315,7 +371,7 @@ class EFG_XMLParser():
                 video_format['sound'] = code_el[0]
             # colour (0..1)
             colour_el = node.find('efg:colour', self.ns)
-            if colour_el is not None:
+            if colour_el is not None and colour_el.text.lower() != 'n/a':
                 code_el = codelists.fromDescription(
                     colour_el.text, codelists.COLOUR)
                 if code_el is None:
@@ -353,7 +409,12 @@ class EFG_XMLParser():
             props['names'] = [agent_node.find('efg:name', self.ns).text]
             activities = []
             rel_agent_type = agent_node.find('efg:type', self.ns)
-            if rel_agent_type is not None:
+            if rel_agent_type is not None and rel_agent_type.text.lower() != 'n/a':
+                code_el = codelists.fromDescription(
+                    rel_agent_type.text, codelists.TYPE_OF_ACTIVITY)
+                if code_el is None:
+                    raise ValueError(
+                        'Invalid agent activity for: ' + rel_agent_type.text)
                 activities.append(rel_agent_type.text)
 
             if agent_node.tag == 'relPerson' or 'efg:relPerson':
@@ -416,12 +477,11 @@ class EFG_XMLParser():
 
     def get_non_av_specific_type(self, record):
         node = record.find('./efg:nonAVManifestation/efg:specificType', self.ns)
-        if node is not None:
-            value = node.text
+        if node is not None and node.text.lower() != 'n/a':
             code_el = codelists.fromDescription(
-                value, codelists.NON_AV_SPECIFIC_TYPES)
+                node.text, codelists.NON_AV_SPECIFIC_TYPES)
             if code_el is None:
-                raise ValueError('Ivalid spefic type for: ' + value)
+                raise ValueError('Ivalid spefic type for: ' + node.text)
             return code_el[0]
 
     def get_physical_format_size(self, record):
