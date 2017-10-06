@@ -1,6 +1,7 @@
 
 from utilities.logs import get_logger
 from neomodel import db
+from neomodel.cardinality import CardinalityViolation
 
 log = get_logger(__name__)
 
@@ -42,29 +43,30 @@ class CreationRepository():
             if r == 'record_sources':
                 # connect to record sources
                 for item in relationships[r]:
-                    record_source = item[0].save()
+                    record_source = self.graph.RecordSource(**item[0]).save()
                     entity.record_sources.connect(record_source)
                     # look for existing content provider
                     provider = self.find_provider_by_identifier(
-                        item[1].identifier, item[1].scheme)
+                        item[1]['identifier'], item[1]['scheme'])
                     if provider is None:
-                        provider = item[1].save()
+                        provider = self.graph.Provider(**item[1]).save()
                     record_source.provider.connect(provider)
             elif r == 'titles':
                 # connect to titles
                 for title in relationships[r]:
-                    title_node = self.create_title(title)
+                    if 'relationship' not in title:
+                        title['relationship'] = '00'
+                    title_node = self.graph.Title(**title).save()
                     entity.titles.connect(title_node)
             elif r == 'keywords':
                 # connect to keywords
-                for keyword in relationships[r]:
-                    keyword_node = self.create_keyword(keyword)
-                    entity.keywords.connect(keyword_node)
+                for props in relationships[r]:
+                    keyword = self.graph.Keyword(**props).save()
+                    entity.keywords.connect(keyword)
             elif r == 'descriptions':
-                # connect to descriptions
-                for description in relationships[r]:
-                    description_node = self.create_description(description)
-                    entity.descriptions.connect(description_node)
+                for props in relationships[r]:
+                    description = self.graph.Description(**props).save()
+                    entity.descriptions.connect(description)
             elif r == 'languages':
                 # connect to languages
                 for lang_usage in relationships[r]:
@@ -74,10 +76,10 @@ class CreationRepository():
                         lang = self.graph.Language(code=lang_usage[0]).save()
                     entity.languages.connect(lang, {'usage': lang_usage[1]})
             elif r == 'coverages':
-                for coverage in relationships[r]:
+                for props in relationships[r]:
                     # connect to coverages
-                    coverage_node = coverage.save()
-                    entity.coverages.connect(coverage_node)
+                    coverage = self.graph.Coverage(**props).save()
+                    entity.coverages.connect(coverage)
             elif av and r == 'production_countries':
                 for country_reference in relationships[r]:
                     country = self.graph.Country.nodes.get_or_none(
@@ -88,84 +90,70 @@ class CreationRepository():
                     entity.production_countries.connect(
                         country, {'reference': country_reference[1]})
             elif av and r == 'video_format':
-                video_format = relationships[r].save()
+                video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
             elif r == 'agents':
                 for agent_activities in relationships[r]:
                     # look for existing agents
-                    agent = agent_activities[0]
-                    res = self.find_agents_by_name(agent.names[0])
+                    props = agent_activities[0]
+                    res = self.find_agents_by_name(props['names'][0])
                     if len(res) > 0:
                         log.debug('Found existing agent: {}'.format(res[0].names))
                         agent = res[0]
                     else:
-                        agent.save()
+                        agent = self.graph.Agent(**props).save()
                     entity.contributors.connect(
                         agent, {'activities': agent_activities[1]})
             elif r == 'rightholders':
-                for rightholder in relationships[r]:
+                for props in relationships[r]:
                     # look for existing rightholder
-                    res = self.find_rightholder_by_name(rightholder.name)
-                    if res is not None:
+                    rightholder = self.find_rightholder_by_name(props['name'])
+                    if rightholder is None:
+                        rightholder = self.graph.Rightholder(**props).save()
+                    else:
                         log.debug(
                             'Found existing rightholder: {}'.format(res.name))
-                        rightholder = res
-                    else:
-                        rightholder.save()
                     entity.rightholders.connect(rightholder)
 
         return entity
 
     def __delete_entity(self, node):
-        for rc in node.record_sources.all():
-            rc.delete()
-        for title in node.titles.all():
-            self.delete_title(title)
-        for description in node.descriptions.all():
-            self.delete_description(description)
+        try:
+            for rc in node.record_sources.all():
+                rc.delete()
+        except CardinalityViolation:
+            pass
+        try:
+            for title in node.titles.all():
+                title.delete()
+        except CardinalityViolation:
+            pass
+        try:
+            for description in node.descriptions.all():
+                description.delete()
+        except CardinalityViolation:
+            pass
         for keyword in node.keywords.all():
-            self.delete_keyword(keyword)
+            keyword.delete()
         for coverage in node.coverages:
             coverage.delete()
 
     def delete_av_entity(self, node):
         self.__delete_entity(node)
         av_entity = node.downcast()
-        log.debug('creation instance of {}'.format(av_entity.__class__))
+        uuid = av_entity.uuid
         video_format = av_entity.video_format.single()
         if video_format is not None:
             video_format.delete()
-        node.delete()
+        av_entity.delete()
+        log.debug('Delete AVEntity with uuid {}'.format(uuid))
 
     def delete_non_av_entity(self, node):
         self.__delete_entity(node)
         non_av_entity = node.downcast()
-        log.debug('creation instance of {}'.format(non_av_entity.__class__))
-        node.delete()
-
-    def create_title(self, title):
-        if title.relationship is None:
-            title.relationship = '00'
-        # return self.graph.Title(**title).save()
-        title.save()
-        return title
-
-    def delete_title(self, node):
-        node.delete()
-
-    def create_keyword(self, keyword):
-        keyword.save()
-        return keyword
-
-    def delete_keyword(self, node):
-        node.delete()
-
-    def create_description(self, description):
-        description.save()
-        return description
-
-    def delete_description(self, node):
-        node.delete()
+        uuid = non_av_entity.uuid
+        non_av_entity.delete()
+        log.debug('Delete NonAVEntity with uuid {}'.format(uuid))
 
     def search_item_by_term(self, term, item_type):
         """
