@@ -70,8 +70,37 @@
 
 			</div>
 			<div class="col-xs-12 col-md-6">
+
+
+		  <uib-tabset>
+		    <uib-tab heading="Metadata">
 				<!-- metadata -->
 				<ul><li>
+				<div class="primary-description">
+					<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration | parseNum}})</i>
+					<p><b>Movie Description</b>:
+					<span ng-repeat="description in watchCtrl.video.relationships.descriptions">
+					</br>{{description.attributes.text}}{{$last ? '' : ', '}}</br></span></p>
+					<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
+					{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
+				</div>
+				<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
+					<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0] || 'Not available'}}</p>
+					<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
+					<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}} - <a target="_blank" href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
+					<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
+				</div>
+
+				<!-- <button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying">
+				 <span class="glyphicon glyphicon-hand-up" ng-click="watchCtrl.manualtag();"></span>
+				</button> -->
+				</li>
+				</ul>
+				<div class="sb-modal-parent"></div>
+
+		    </uib-tab>
+		    <uib-tab heading="Annotations">
+		    <p>&nbsp;</p>
 				<div class="form-group row">
 				<div class="btn-toolbar">
 				<div class="btn-group pull-right" uib-dropdown uib-dropdown-toggle>
@@ -94,38 +123,67 @@
 			    </button>
 
 			    </div>
+
+		    	<p>&nbsp;</p>
+				<div class="container annotations">
+				<table st-table="watchCtrl.annotations" class="table table-striped">
+					<thead>
+					<tr>
+						<th st-sort="shotid">shot id</th>					
+						<th st-sort="group">category</th>
+						<th st-sort="name">annotation name</th>
+						<th st-sort="startT">start time <em style="color:gray;">(secs)</em></th>
+						<th st-sort="endT">end time <em style="color:gray;">(secs)</em></th>					
+					</tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="row in watchCtrl.annotations" ng-click="watchCtrl.jumpToShotFromAnnotation(row.shotid)">
+						<td>{{row.shotid}}</td>
+						<td>{{row.group}}</td>
+						<td>{{row.name}}</td>
+						<td>{{row.startT}}</td>
+						<td>{{row.endT}}</td>						
+					</tr>
+					</tbody>
+				</table>
 				</div>
 
-			    <hr/>
-
-				<div class="primary-description">
-					<span class="title">{{watchCtrl.video.attributes.identifying_title}}</span><i>({{watchCtrl.video.relationships.item[0].attributes.duration | parseNum}})</i>
-					<p><b>Movie Description</b>:
-					<span ng-repeat="description in watchCtrl.video.relationships.descriptions">
-					</br>{{description.attributes.text}}{{$last ? '' : ', '}}</br></span></p>
-					<p><b>Keywords</b>: <span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
-					{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
 				</div>
-				<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-					<p><b>Production Year(s)</b>: {{watchCtrl.video.attributes.production_years[0] || 'Not available'}}</p>
-					<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
-					<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.provider_name || 'Not available'}} - <a target="_blank" href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
-					<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status || 'Not available'}}</p>
-				</div>
+		    </uib-tab>
+		    <uib-tab class="Storyboard" heading="Storyboard">
+		   <div class="container storyboard">
+				<table class="table">
+				    <tr>
+	                    <th>Shot number</th>
+					    <th>Frame range</th>
+					    <th>Shots</th>
+					    <th>Shot timecode</th>
+				        <th>Shot duration (sec)</th>
+					    <th ng-style="{'text-align': 'center'}">Camera motion</th>
+					</tr>
 
-				<button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-click="watchCtrl.showStoryboard('lg', '.sb-modal-parent')">
-					<span class="glyphicon glyphicon-book"></span>
-				</button>
-
-				<!-- <button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying">
-				 <span class="glyphicon glyphicon-hand-up" ng-click="watchCtrl.manualtag();"></span>
-				</button> -->
-				</li>
-
-
-				</ul>
-				<div class="sb-modal-parent"></div>
+					<div class="storyboard">
+					<tr ng-repeat="shot in watchCtrl.storyshots">
+	                    <td data-title="'Number'" align="center">{{shot.number}}</td>
+						<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
+		       			<td data-title="'Shot'" scroll-story-on-click>
+		           		<img ng-style="{'width': '40%'}" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
+		       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
+		       			<td data-title="'Duration'" align="center">{{shot.duration}}</td>
+		       			<td data-title="'Camera motion'" align="center">
+		       			<dl class="dl-horizontal">
+		       				<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
+		       					<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
+		       				</div>
+		       			</dl>
+		       			</td>
+					</tr>
+					</div>
+				</table>
 			</div>
+		    </uib-tab>
+		  </uib-tabset>
+		</div>
 		</div>
 		<!-- <div class="row">
 				<div id="timeline-graph">
@@ -148,74 +206,6 @@
 		</div>
 		</div>
 		<hr/>
-
-		<!-- modal content -->
-		<script type="text/ng-template" id="myModalContent.html">
-		<div modal-movable>
-			<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px 6px'}">x</button>
-		    <div class="modal-header">
-		        <h3 class="modal-title" align="center">Video Storyboard</h3>
-		        </br>
-		    </div>
-		    <div class="modal-body">
-		        <form>
-		    	<div>
-		    	<table class="table">
-		    		<tr>
-		    			<th>Video Summary<img ng-style="{'width': '70%', 'height': '50%', 'float': 'right'}" ng-src="{{$ctrl.summary}}" ng-click="$ctrl.showSummary()"></th>
-					</tr>
-				</table>
-
-				<table class="table">
-				    <tr>
-	                    <th>Shot number</th>
-					    <th>Frame range</th>
-					    <th>Shots</th>
-					    <th>Shot timecode</th>
-				        <th>Shot duration (sec)</th>
-					    <th ng-style="{'text-align': 'center'}">Camera motion</th>
-					</tr>
-
-					<div class="storyboard">
-					<tr ng-repeat="shot in $ctrl.shots">
-	                    <td data-title="'Number'" align="center">{{shot.number}}</td>
-						<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-		       			<td data-title="'Shot'" scroll-story-on-click>
-		           		<img ng-style="{'width': '40%'}" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
-		       			<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
-		       			<td data-title="'Duration'" align="center">{{shot.duration}}</td>
-		       			<td data-title="'Camera motion'" align="center">
-		       			<dl class="dl-horizontal">
-		       				<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-		       					<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
-		       				</div>
-		       			</dl>
-		       			</td>
-					</tr>
-					</div>
-				</table>
-
-				</div>
-		        </form>
-		    </div> <!-- body -->
-
-		    <div class="modal-footer">
-		        <button class="btn btn-warning" ng-attr-type="button" ng-click="$ctrl.cancel()">Cancel</button>
-		     </div>
-		</script>
-		</div>
-
-		<script type="text/ng-template" id="summary.html">
-		    <div class="modal-header">
-		    	<button ng-attr-type="button" class="close" ng-click="$ctrl.cancel()" ng-style="{'padding': '2px 6px'}">x</button>
-		       	<h3 class="modal-title" align="center">Video Summary</h3>
-		    </div>
-		    <div class="modal-body" ng-style="{'height': '150px'}">
-		    	<form><div>
-		    		<img ng-style="{'width': '100%', 'height': '100%', 'float': 'right'}" ng-src="{{$ctrl.summary}}">
-		      	 </div></form>
-		    </div>
-		</script>
 
 		<!-- modal geo code -->
 		<div ng-controller='WatchController as watchCtrl' id="tag-wrapper">
