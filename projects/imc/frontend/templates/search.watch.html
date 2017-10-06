@@ -64,7 +64,7 @@
 	            </div> 
 	            </container-fluid>
 
-			<div id="timeline-graph" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
+			<div id="timeline-graph" ng-show="watchCtrl.annotations.length >= 1" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
 						<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>
 
