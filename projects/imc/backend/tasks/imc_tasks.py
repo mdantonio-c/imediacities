@@ -315,6 +315,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
         # save warnings
         meta_source = item_node.meta_source.single()
         meta_source.warnings = parser.warnings
+        meta_source.save()
     repo = CreationRepository(self.graph)
     av = (item_type == 'Video')
     creation = None

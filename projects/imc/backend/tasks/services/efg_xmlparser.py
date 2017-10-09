@@ -172,8 +172,8 @@ class EFG_XMLParser():
         for node in record.findall("efg:title", self.ns):
             title = {}
             lang = node.get('lang')
-            if lang is not None and lang.text.lower() != 'n/a':
-                lang_val = lang.text.lower()
+            if lang is not None and lang.lower() != 'n/a':
+                lang_val = lang.lower()
                 lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                 if lang_code is None:
                     self.warnings.append(
@@ -223,10 +223,10 @@ class EFG_XMLParser():
                             'Invalid keyword type for: ' + ktype)
                     else:
                         keyword['keyword_type'] = code_el[0]
-                        log.debug('keyword [type]: %s' % keyword.keyword_type)
+                        log.debug('keyword [type]: %s' % keyword['keyword_type'])
                 lang = node.get('lang')
-                if lang is not None and lang.text.lower() != 'n/a':
-                    lang_val = lang.text.lower()
+                if lang is not None and lang.lower() != 'n/a':
+                    lang_val = lang.lower()
                     lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                     if lang_code is None:
                         self.warnings.append(
@@ -265,12 +265,12 @@ class EFG_XMLParser():
                 else:
                     description['description_type'] = code_el[0]
             lang = node.get('lang')
-            if lang is not None and lang.text.lower() != 'n/a':
-                lang_val = lang.text.lower()
+            if lang is not None and lang.lower() != 'n/a':
+                lang_val = lang.lower()
                 lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                 if lang_code is None:
                     self.warnings.append(
-                        'Invalid description language for: ' + lang.text)
+                        'Invalid description language for: ' + lang)
                 else:
                     description['language'] = lang_code[0]
             description['source_ref'] = node.get('source')
@@ -309,7 +309,7 @@ class EFG_XMLParser():
         languages = []
         for node in record.findall("./" + inpath + "/efg:language", self.ns):
             lang = node.text.lower()
-            if lang.text.lower() == 'n/a':
+            if lang.lower() == 'n/a':
                 continue
             lang_code = codelists.fromCode(lang, codelists.LANGUAGE)
             if lang_code is None:
@@ -453,7 +453,7 @@ class EFG_XMLParser():
             agent = None
             # de-duplicate agents
             for item in agents:
-                if props['names'][0] in item[0].names:
+                if props['names'][0] in item[0]['names']:
                     log.debug('FOUND agent: ' + props['names'][0])
                     agent = item[0]
                     item[1].extend(activities)

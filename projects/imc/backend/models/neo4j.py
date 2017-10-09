@@ -291,8 +291,7 @@ class Title(StructuredNode):
     text = StringProperty(required=True, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     part_designations = ArrayProperty(StringProperty(), show=True)
-    relation = StringProperty(
-        required=True, choices=codelists.AV_TITLE_TYPES, show=True)
+    relation = StringProperty(choices=codelists.AV_TITLE_TYPES, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_TITLE', cardinality=One, show=True)
 

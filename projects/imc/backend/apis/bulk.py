@@ -158,13 +158,20 @@ class Bulk(GraphBaseOperations):
             labels = [row[0] for row in self.graph.cypher(labels_query)]
             if entity not in labels:
                 raise RestApiException(
-                    'Invalid entity label for {}'.format(entity),
+                    'Invalid or missing entity label for {}'.format(entity),
                     status_code=hcodes.HTTP_BAD_REQUEST)
             uuids = action.get('uuids')
             if uuids is None:
                 raise RestApiException(
                     'Expected list of uuid',
                     status_code=hcodes.HTTP_BAD_REQUEST)
+            if isinstance(uuids, str):
+                if uuids != 'all':
+                    raise RestApiException(
+                        'Expected list of uuid',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                all_query = "match (n:{}) return n.uuid".format(entity)
+                uuids = [row[0] for row in self.graph.cypher(all_query)]
             deleted = 0
             if entity == 'AVEntity':
                 repo = CreationRepository(self.graph)

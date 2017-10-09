@@ -54,8 +54,8 @@ class CreationRepository():
             elif r == 'titles':
                 # connect to titles
                 for title in relationships[r]:
-                    if 'relationship' not in title:
-                        title['relationship'] = '00'
+                    # if 'relation' not in title:
+                    #     title['relation'] = 'Original title'
                     title_node = self.graph.Title(**title).save()
                     entity.titles.connect(title_node)
             elif r == 'keywords':
@@ -112,7 +112,8 @@ class CreationRepository():
                         rightholder = self.graph.Rightholder(**props).save()
                     else:
                         log.debug(
-                            'Found existing rightholder: {}'.format(res.name))
+                            'Found existing rightholder: {}'.format(
+                                rightholder.name))
                     entity.rightholders.connect(rightholder)
 
         return entity
