@@ -951,21 +951,19 @@
 
 					self.jumpToShot = function(selectedShot) {
 						var row = selectedShot.row;
-						if (row !== 0) {
-							// ignore 'Duration' row
-							var time1 = self.videoTimeline.data.rows[row].c[2].v;
-							var time2 = self.videoTimeline.data.rows[row].c[3].v;
 
-							var t1 = time1.getHours()+':'+time1.getMinutes()+':'+time1.getSeconds();
-							var t2 = time2.getHours()+':'+time2.getMinutes()+':'+time2.getSeconds();
-							var time1c = convertTime(t1);
-							var time2c = convertTime(t2);
+						var time1 = self.videoTimeline.data.rows[row].c[2].v;
+						var time2 = self.videoTimeline.data.rows[row].c[3].v;
 
-							// play video from selected shot
-							var myVid = angular.element($document[0].querySelector('#videoarea'));
-							myVid[0].currentTime = time1c;
-							myVid[0].play();
-						}
+						var t1 = time1.getHours()+':'+time1.getMinutes()+':'+time1.getSeconds();
+						var t2 = time2.getHours()+':'+time2.getMinutes()+':'+time2.getSeconds();
+						var time1c = convertTime(t1);
+						var time2c = convertTime(t2);
+
+						// play video from selected shot
+						var myVid = angular.element($document[0].querySelector('#videoarea'));
+						myVid[0].currentTime = time1c;
+						myVid[0].play();
 					};
 
 					self.jumpToShotFromAnnotation = function(startT) {
