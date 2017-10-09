@@ -589,6 +589,9 @@ class EFG_XMLParser():
             record)
         relationships['video_format'] = self.parse_video_format(record)
         av_creation['relationships'] = relationships
+        if len(self.warnings) > 0:
+            log.warning(
+                "Creation parsed with {} warning(s)".format(len(self.warnings)))
         return av_creation
 
     def parse_non_av_creation(self, record):
@@ -608,6 +611,9 @@ class EFG_XMLParser():
 
         # manage non_av relationships
         non_av_creation['relationships'] = relationships
+        if len(self.warnings) > 0:
+            log.warning(
+                "Creation parsed with {} warning(s)".format(len(self.warnings)))
         return non_av_creation
 
     def prettify(elem):
