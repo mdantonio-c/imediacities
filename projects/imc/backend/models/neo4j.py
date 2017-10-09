@@ -508,7 +508,7 @@ class AVEntity(Creation):
     production_years = ArrayProperty(
         StringProperty(), required=True, show=True)
     production_countries = RelationshipTo(
-        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrOne,
+        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore,
         model=CountryOfReferenceRel, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
