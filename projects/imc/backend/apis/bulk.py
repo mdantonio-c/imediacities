@@ -177,7 +177,7 @@ class Bulk(GraphBaseOperations):
                 repo = CreationRepository(self.graph)
                 for uuid in uuids:
                     non_av_entity = self.graph.NonAVEntity.nodes.get_or_none(uuid=uuid)
-                    if av_entity is not None:
+                    if non_av_entity is not None:
                         repo.delete_non_av_entity(non_av_entity)
                         deleted += 1
             else:
