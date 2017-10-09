@@ -123,6 +123,7 @@ class Stage(TimestampedNode):
     path = StringProperty(required=True, unique_index=True, show=True)
     status = StringProperty(show=True)
     status_message = StringProperty(show=True)
+    warnings = ArrayProperty(StringProperty(), show=True)
     task_id = StringProperty(show=True)
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
@@ -282,7 +283,7 @@ class Title(StructuredNode):
         part_designations   A combination of the name of a structuring unit and
                             the count value that identifies the current entity
                             as an individual part of a complex work.
-        relationship        The type of relationship between the title and the
+        relation            The type of relationship between the title and the
                             entity to which it is assigned (e.g. "Original
                             title", "Distribution title", "Translated title"
                             etc).
@@ -290,8 +291,7 @@ class Title(StructuredNode):
     text = StringProperty(required=True, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     part_designations = ArrayProperty(StringProperty(), show=True)
-    relationship = StringProperty(
-        required=True, choices=codelists.TITLE_RELASHIONSHIPS, show=True)
+    relation = StringProperty(choices=codelists.AV_TITLE_TYPES, show=True)
     creation = RelationshipFrom(
         'Creation', 'HAS_TITLE', cardinality=One, show=True)
 
@@ -508,7 +508,7 @@ class AVEntity(Creation):
     production_years = ArrayProperty(
         StringProperty(), required=True, show=True)
     production_countries = RelationshipTo(
-        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrOne,
+        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore,
         model=CountryOfReferenceRel, show=True)
     video_format = RelationshipTo(
         'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
@@ -544,8 +544,8 @@ class VideoFormat(StructuredNode):
         sound           Element from values list.
         colour          Element from values list.
     """
-    gauge = StringProperty(show=True)
-    aspect_ratio = StringProperty(show=True)
+    gauge = StringProperty(choices=codelists.GAUGE, show=True)
+    aspect_ratio = StringProperty(choices=codelists.ASPECT_RATIO, show=True)
     sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
     creation = RelationshipFrom(
