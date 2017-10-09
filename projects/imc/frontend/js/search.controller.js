@@ -1104,6 +1104,11 @@
 				            	map: map,
 				            	position: new google.maps.LatLng(lat, lng),
 				            	title: locname,
+				            	options: {
+						        icon: {
+						            	url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+						        	}
+						   	 	}
 				        	});
 				    	}
 				        else{
