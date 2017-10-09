@@ -328,6 +328,7 @@ class EFG_XMLParser():
                     if code_el is None:
                         self.warnings.append(
                             'Invalid language usage for: ' + usage)
+                        usage = None
                     else:
                         usage = code_el[0]
             lang_usage = [lang, usage]

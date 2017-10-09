@@ -311,11 +311,6 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     parser = EFG_XMLParser()
     record = parser.get_creation_by_type(path, item_type)
     # log.debug(EFG_XMLParser.prettify(record))
-    if len(parser.warnings) > 0:
-        # save warnings
-        meta_source = item_node.meta_source.single()
-        meta_source.warnings = parser.warnings
-        meta_source.save()
     repo = CreationRepository(self.graph)
     av = (item_type == 'Video')
     creation = None
@@ -330,6 +325,11 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
         raise Exception(
             "Extracting metadata for type {} not yet implemented".format(item_type))
     log.debug(creation['properties'])
+    if len(parser.warnings) > 0:
+        # save warnings
+        meta_source = item_node.meta_source.single()
+        meta_source.warnings = parser.warnings
+        meta_source.save()
     repo.create_entity(
         creation['properties'], item_node, creation['relationships'], av)
 
