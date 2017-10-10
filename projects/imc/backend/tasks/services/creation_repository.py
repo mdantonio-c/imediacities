@@ -1,6 +1,6 @@
 
 from utilities.logs import get_logger
-from neomodel import db
+# from neomodel import db
 from neomodel.cardinality import CardinalityViolation
 
 log = get_logger(__name__)
@@ -12,7 +12,7 @@ class CreationRepository():
     def __init__(self, graph):
         self.graph = graph
 
-    @db.transaction
+    # @db.transaction
     def create_entity(self, properties, item, relationships, av=True):
         """
         Used to create both audio visual and NON audio visual entity.
