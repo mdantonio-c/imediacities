@@ -6,9 +6,7 @@
 					.controller('geoResultController', geoResultController)
 					.controller('SearchController', SearchController)
 					.controller('WatchController', WatchController)
-					.controller('MapController', MapController)
-					.controller('ModalResultInstanceCtrl', ModalResultInstanceCtrl)
-					.controller('ModalInstanceCtrl', ModalInstanceCtrl);
+					.controller('MapController', MapController);
 
 				/*modal view storyboard factory definition*/
 				app.factory('modalFactory', function($uibModal) {
@@ -307,50 +305,7 @@
 								});
 							}
 						};
-					})
-					.directive('modalMovable', ['$document',
-			    	function($document) {
-			        return {
-			            restrict: 'AC',
-			            link: function(scope, iElement, iAttrs) {
-			                var startX = 0,
-			                    startY = 0,
-			                    x = 0,
-			                    y = 0;
-
-			                var dialogWrapper = iElement.parent();
-
-			                dialogWrapper.css({
-			                    position: 'relative'
-			                });
-
-			                dialogWrapper.on('mousedown', function(event) {
-			                    // Prevent default dragging of selected content
-			                    event.preventDefault();
-			                    startX = event.pageX - x;
-			                    startY = event.pageY - y;
-			                    $document.on('mousemove', mousemove);
-			                    $document.on('mouseup', mouseup);
-			                });
-
-			                function mousemove(event) {
-			                    y = event.pageY - startY;
-			                    x = event.pageX - startX;
-			                    dialogWrapper.css({
-			                        top: y + 'px',
-			                        left: x + 'px'
-			                    });
-			                }
-
-			                function mouseup() {
-			                    $document.unbind('mousemove', mousemove);
-			                    $document.unbind('mouseup', mouseup);
-			                	}
-			            	}
-			        	};
-			    		}
-					]);
-
+					});
 
 					app.directive('dropdown', function($document) {
 					return {
@@ -657,6 +612,8 @@
 
 					/*inizialize address for automplete input tag for geolocation*/
    					$scope.vm = {address: {}};
+   					/*to visualize annotations in tab table*/
+					self.annotations = [];
 
    					/*$scope.expand = function(mitem) {
        					mitem.show = !mitem.show;
@@ -681,7 +638,7 @@
 						}
 					}
 					});
-    			
+ 										   			
 					// Initializing values
 					self.onplaying = false;
 					self.onpause = true;
@@ -833,6 +790,7 @@
 							DataService.getVideoShots(vid).then(
 								function(response) {
 									self.shots = response.data;
+									self.storyshots=[];
 									self.slideSize = self.shots.length/9;
 									for (var i = 0; i < self.shots.length; i++) {
 										var thumblink = self.shots[i].links.thumbnail;
@@ -913,8 +871,38 @@
 										]});*/
 
 										self.videoTimeline = videoTimeline;
-
 								}
+																	/*print storyboard*/
+								angular.forEach(self.shots, function(shot) {
+
+									/*self.camera = [];
+									var annotations = shot.annotations;
+									var camattr = annotations[0].attributes;
+									var first = true;
+
+									angular.forEach(camattr, function(value,key) {
+
+										var motion = value;	
+
+										var cv = parseFloat(value[1]).toFixed(2);
+						    			var av = parseFloat(0.3).toFixed(2);
+
+										if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
+
+									});*/
+
+									if ((shot.attributes != undefined) && (shot.attributes.start_frame_idx != undefined)){
+										var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
+										self.storyshots.push({
+											'thumb': shot.links.thumbnail,
+											'number': shot.attributes.shot_num+1,
+							                'framerange': framerange,
+											'timestamp': shot.attributes.timestamp,
+											'duration': parseInt(shot.attributes.duration),
+											'camera': shot.annotations[0].attributes
+										});
+									}
+								});
 							});
 						};
 
@@ -960,51 +948,30 @@
 
 					self.selectedVideoId = vid;
 					self.animationsEnabled = true;
-					self.showStoryboard = function(size, parentSelector) {
-						var parentElem = parentSelector ? 
-			      			angular.element($document[0].querySelector('#video-wrapper ' + parentSelector)) : undefined;
-			      		var modalInstance = $uibModal.open({
-							animation: self.animationsEnabled,
-							templateUrl:'myModalContent.html',
-							controller: 'ModalInstanceCtrl',
-							controllerAs: '$ctrl',
-							size: size,
-							appendTo: parentElem,
-							resolve: {
-								params: function() {
-									var params = {};
-									angular.extend(params, {
-										'videoid': self.selectedVideoId,
-										'summary': self.video.links.summary
-									});
-									return params;
-								},
-								shots: function() {
-									return self.shots;
-								}
-							}
-						});
-
-					};
 
 					self.jumpToShot = function(selectedShot) {
 						var row = selectedShot.row;
-						if (row !== 0) {
-							// ignore 'Duration' row
-							var time1 = self.videoTimeline.data.rows[row].c[2].v;
-							var time2 = self.videoTimeline.data.rows[row].c[3].v;
 
-							var t1 = time1.getHours()+':'+time1.getMinutes()+':'+time1.getSeconds();
-							var t2 = time2.getHours()+':'+time2.getMinutes()+':'+time2.getSeconds();
-							var time1c = convertTime(t1);
-							var time2c = convertTime(t2);
+						var time1 = self.videoTimeline.data.rows[row].c[2].v;
+						var time2 = self.videoTimeline.data.rows[row].c[3].v;
 
-							// play video from selected shot
-							var myVid = angular.element($document[0].querySelector('#videoarea'));
-							myVid[0].currentTime = time1c;
-							myVid[0].play();
-						}
+						var t1 = time1.getHours()+':'+time1.getMinutes()+':'+time1.getSeconds();
+						var t2 = time2.getHours()+':'+time2.getMinutes()+':'+time2.getSeconds();
+						var time1c = convertTime(t1);
+						var time2c = convertTime(t2);
+
+						// play video from selected shot
+						var myVid = angular.element($document[0].querySelector('#videoarea'));
+						myVid[0].currentTime = time1c;
+						myVid[0].play();
 					};
+
+					self.jumpToShotFromAnnotation = function(startT) {
+							// play video from selected shot
+							var myVid = angular.element(window.document.querySelector('#videoarea'));
+							myVid[0].currentTime = parseInt(startT);
+							myVid[0].play();
+					};					
 
 					self.getTagMenu = function(event) {
 						  var props = timeline.getEventProperties(event)
@@ -1035,6 +1002,14 @@
 							  {v: startTime},
 							  {v: endTime}
 						]});
+						var ann = {
+          					group: group,
+          					name: locn,
+          					shotid: shotId,
+          					startT: startT,
+          					endT: endT
+      					};						
+						self.annotations.push(ann);
 	  				});
 
 					$rootScope.$on('updateSubtitles', function() {
@@ -1075,6 +1050,7 @@
 								vm.videolng = result[0].geometry.location.lng();
 								vm.locname = result[0].address_components[0].long_name;
 							});
+
 					});
 
 					// force map resize
@@ -1085,6 +1061,19 @@
 							var currCenter = map.getCenter();
 							google.maps.event.trigger(map, 'resize');
 							map.setCenter(currCenter);
+
+							map.addListener('zoom_changed', function() {  
+						    	var mapZ = map.getZoom();
+						    	/*if (mapZ >= 16){
+						    		for (var i=0; i<=vm.markers.length;i++)
+						    		{
+						    			//vm.markerStyle={'width': '500px','height': '500px'};
+						    			    //change the size of the icon
+						    			    vm.markers[i].icon.scaledSize = new google.maps.Size(440, 340);
+						    		}
+						    	}*/
+						    });
+
 						});
 					}, 3000);
 
@@ -1113,6 +1102,11 @@
 				            	map: map,
 				            	position: new google.maps.LatLng(lat, lng),
 				            	title: locname,
+				            	options: {
+						        icon: {
+						            	url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+						        	}
+						   	 	}
 				        	});
 				    	}
 				        else{
@@ -1120,7 +1114,14 @@
 				            	map: map,
 				            	position: new google.maps.LatLng(lat, lng),
 				            	title: locname,
-				            	icon: photoRef
+				            	//icon: photoRef
+				            	options: {
+						        icon: {
+						            	url: photoRef,
+						            	scaledSize: new google.maps.Size(44, 34)
+						        	}
+						   	 	}
+
 				        	});
 				    	}
 				        //marker.content = '<div class="infoWindowContent">' + locname + '</div>';
@@ -1157,70 +1158,6 @@
 					};
 
 	  				});
-				}
-
-				// storyboard modal view
-				// Please note that $modalInstance represents a modal window (instance) dependency.
-				// It is not the same as the $uibModal service used above.
-
-				function ModalInstanceCtrl($uibModalInstance, shots, params, modalFactory) {
-					var self = this;
-
-					// filling the storyboard with the image shots
-
-					self.videoid = params.videoid;
-					self.summary = params.summary;
-					self.shots = [];
-
-					angular.forEach(shots, function(shot) {
-
-						/*self.camera = [];
-						var annotations = shot.annotations;
-						var camattr = annotations[0].attributes;
-						var first = true;
-
-						angular.forEach(camattr, function(value,key) {
-
-							var motion = value;	
-
-							var cv = parseFloat(value[1]).toFixed(2);
-			    			var av = parseFloat(0.3).toFixed(2);
-
-							if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
-
-						});*/
-
-						var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
-						self.shots.push({
-							'thumb': shot.links.thumbnail,
-							'number': shot.attributes.shot_num+1,
-			                'framerange': framerange,
-							'timestamp': shot.attributes.timestamp,
-							'duration': parseInt(shot.attributes.duration),
-							'camera': shot.annotations[0].attributes
-						});
-					});
-
-					self.showSummary = function() {
-						modalFactory.open('lg', 'summary.html', {
-							animation: false,
-							summary: self.summary
-						});
-					};
-
-					self.cancel = function() {
-						$uibModalInstance.dismiss('cancel');
-					};
-
-				}
-
-				function ModalResultInstanceCtrl($uibModalInstance, params) {
-					var self = this;
-					self.summary = params.summary;
-
-					self.cancel = function() {
-						$uibModalInstance.dismiss('cancel');
-					};
 				}
 
 			// Please note that $modalInstance represents a modal window (instance) dependency.

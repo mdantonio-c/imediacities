@@ -84,7 +84,7 @@ def import_file(self, path, resource_id, mode):
                 item_node.save()
                 log.debug("Item resource created")
 
-            extract_descriptive_metadata(
+            xml_resource.warnings = extract_descriptive_metadata(
                 self, path, item_type, item_node)
 
             # To ensure that the content item and its metadata will be
@@ -296,22 +296,20 @@ def lookup_content(self, path, source_id):
 def extract_descriptive_metadata(self, path, item_type, item_node):
     """
     Simple metadata ingestion:
-      - validate against EFG-XSD schema
-      - look for the record with the filename in ref elem
-      - bind the model
-      - save the model (if an occurrence with the same id already exists,
-        delete the old item?)
-      - return the referred video filename
+      - get record by type
+      - validate against specification rules (D6.1)
+      - extract expected data into dictionaries: props and relationships
+      - save the model creating the entity into the database
+      - return the list of possible warnings
     notes:
       - only EFG xml file allowed
-      - lookup at the first occurence of the item in the stage area,
-        ignoring the rest
-      - raise exception whenever those conditions are not met
+      - warnings allowed for optional invalid elements
+      - raise ValueError whenever those conditions are not met
     """
     parser = EFG_XMLParser()
     record = parser.get_creation_by_type(path, item_type)
-    repo = CreationRepository(self.graph)
     # log.debug(EFG_XMLParser.prettify(record))
+    repo = CreationRepository(self.graph)
     av = (item_type == 'Video')
     creation = None
     if item_type == 'Video':
@@ -323,10 +321,12 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     else:
         # should never be reached
         raise Exception(
-            "Extracting metadata for type {} not yet implemented".format(item_type))
-    log.debug(creation['properties'])
+            "Extracting metadata for type {} not yet implemented".format(
+                item_type))
+    # log.debug(creation['properties'])
     repo.create_entity(
         creation['properties'], item_node, creation['relationships'], av)
+    return parser.warnings
 
 
 def extract_tech_info(self, item, analyze_dir_path):
