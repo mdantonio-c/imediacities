@@ -8,7 +8,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 {
 	var self = this;
 
-	self.files = []
+	self.files = [];
 
 	$scope.flowOptions = {
         target: apiUrl + '/upload',
@@ -17,7 +17,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
         testChunks: false,
         permanentErrors: [ 401, 405, 500, 501 ],
         headers: {Authorization : 'Bearer ' + $auth.getToken()}
-    }
+    };
 
     self.importStageFiles = function(file) {
 		DataService.importStageFiles(file).then(
@@ -31,16 +31,16 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 
 	            noty.extractErrors(out_data, noty.ERROR);
 			});
-	}
+	};
     // flowFile is always undefined, some errors here o in flow-init?
     self.uploadComplete = function (event, $flow, flowFile) {
     	$rootScope.transitionConfirmationRequested = false;
     	self.loadFiles();
-    }
+    };
     self.uploadStart = function (event, $flow, flowFile) {
     	$rootScope.transitionConfirmationRequested = true;
     	$rootScope.transitionConfirmationMessage = "Are you sure want to leave this page? This may interrupt your uploads";
-    }
+    };
 	self.loading = true;
 	self.loadFiles = function() {
 		DataService.getStageFiles().then(
@@ -54,7 +54,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 
 	            noty.extractErrors(out_data, noty.ERROR);
 			});
-	}
+	};
 	self.loadFiles();
 
 	self.deleteFile = function(name, ev) {
@@ -78,7 +78,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 
 			}
 		);
-	}
+	};
 	self.deleteFiles = function(listctrl, ev) {
 		var text = "Are you really sure you want to delete selected files?";
 		var subtext = "This operation cannot be undone.";
@@ -91,7 +91,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 					if (!self.files[i].isSelected) continue;
 
 					var promise = DataService.deleteStageFile(self.files[i].name);
-					promises.push(promise)
+					promises.push(promise);
 
 		    	}
 		    	listctrl.selectedElements = 0;
@@ -110,14 +110,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 			}, function() {
 			}
 		);
-	}
-
-
-
-
-
-
-
+	};
 	
 }
 

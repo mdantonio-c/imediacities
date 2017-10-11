@@ -7,19 +7,19 @@ var app = angular.module('web').controller('ArchiveController', ArchiveControlle
 function ArchiveController($scope, $rootScope, $log, $auth, $q, DataService, FormDialogService, noty)
 {
 	var self = this;
-	self.files = []
+	self.files = [];
 
 	self.loadAll = function() {
-		self.loading = true
-		self.groups = []
+		self.loading = true;
+		self.groups = [];
 		DataService.getGroups().then(
 			function(out_data) {
 				self.groups = out_data.data;
 				for (var i=0; i<self.groups.length; i++) {
 					var group_id = self.groups[i].id;
-					self.loadFiles(group_id)
+					self.loadFiles(group_id);
 				}
-				self.loading = false
+				self.loading = false;
 				noty.extractErrors(out_data, noty.WARNING);
 			},
 			function(out_data) {
@@ -27,21 +27,21 @@ function ArchiveController($scope, $rootScope, $log, $auth, $q, DataService, For
 				noty.extractErrors(out_data, noty.ERROR);
 			}
 		);
-	}
+	};
 
 	self.loadFiles = function(group) {
 		DataService.getStageFiles(group).then(
 			function(out_data) {
-				self.files[group] = out_data.data
+				self.files[group] = out_data.data;
 
 	            // noty.extractErrors(out_data, noty.WARNING);
 			}, function(out_data) {
 
 	            noty.extractErrors(out_data, noty.ERROR);
 			});
-	}
+	};
 
-	self.loadAll()
+	self.loadAll();
 
 	// self.loadFiles();
 
