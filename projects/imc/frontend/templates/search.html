@@ -48,11 +48,9 @@
 						</div>
 					</li>
 				</ul>
+				<hr/>
 				<div class="row">
-					<div class="col-xs-3">
-						<select class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='option.value as option.name for option in ctrl.typeOptions' ng-change="setItemsPerPage(ctrl.ItemsByPage)"></select>
-					</div>
-					<div class="col-xs-9 text-center">
+					<div class="col-xs-10">
 						<ul uib-pagination 
 							total-items="ctrl.totalItems"
 							items-per-page="ctrl.ItemsByPage"
@@ -67,7 +65,10 @@
 							first-text="&laquo;"
 							last-text="&raquo;"></ul>
 					</div>
-					<!-- <div class="col-xs-3">
+					<div class="col-xs-2">
+						<select class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='option.value as option.name for option in ctrl.typeOptions' ng-change="setItemsPerPage(ctrl.ItemsByPage)"></select>
+					</div>
+					<!-- <div class="col-xs-2">
 						<span>Showing 1 to 4 of {{ctrl.totalItems}} entries</span>
 					</div> -->
 				</div>
