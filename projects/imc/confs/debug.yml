@@ -1,0 +1,47 @@
+version: '3'
+#######################
+# Link services inside API
+
+services:
+  backend:
+    # command: sleep infinity
+    environment:
+      APP_MODE: debug
+      DEBUG_LEVEL: VERBOSE
+      ACTIVATE: 1
+    ports:
+      - 8081:5000
+    volumes:
+      - ../submodules/backend/restapi:/usr/local/lib/python3.6/dist-packages/restapi
+      - ../submodules/utilities/utilities:/usr/local/lib/python3.6/dist-packages/utilities
+
+  frontend:
+    ports:
+      - 80:5000
+    environment:
+      APP_MODE: debug
+      BACKEND_PORT: 8081
+      ACTIVATE: 1
+
+  celery:
+    environment:
+      APP_MODE: debug
+      DEBUG_LEVEL: VERBOSE
+      ACTIVATE: 1
+    volumes:
+      - ../submodules/backend/restapi:/usr/local/lib/python3.6/dist-packages/restapi
+      - ../submodules/utilities/utilities:/usr/local/lib/python3.6/dist-packages/utilities
+
+  celeryui:
+    volumes:
+      - ../submodules/backend/restapi:/usr/local/lib/python3.6/dist-packages/restapi
+      - ../submodules/utilities/utilities:/usr/local/lib/python3.6/dist-packages/utilities
+
+  ftp:
+    environment:
+      PUBLICHOST: localhost
+
+  swaggerui:
+    ports:
+      - 7777:80
+

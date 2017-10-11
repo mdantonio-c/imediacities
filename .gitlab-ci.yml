@@ -1,15 +1,40 @@
+image: docker:latest
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+variables:
+  DOCKER_DRIVER: overlay2
+
+services:
+- docker:dind
+
 before_script:
   - docker info
   - docker -v
+  - apk add --no-cache python3 git
+  - python3 --version
+  - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
+  - pip3 --version
+  - pip3 install --upgrade git+https://github.com/rapydo/utils.git@0.6.0
+  - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.0
+  - rapydo --version
   - docker-compose -v
+  - git status
+
 
 job:
   script:
-    - pip3 install rapydo-controller
-    - rapydo --project imc --mode production init
-    - rapydo --project imc --mode production start
+    - mkdir data
 
-    # - rapydo --project imc --mode production test
+    - rapydo --project imc init --skip-bower
+    - rapydo --project imc clean
+    - rapydo --project imc build -rf
     
-  # only:
-  #   - NO_ONE
+    - rapydo --project imc start
+    - rapydo --project imc remove
+    - ls data/
+
+    # - rapydo --project imc test
+    
+  only:
+    - NO_ONE

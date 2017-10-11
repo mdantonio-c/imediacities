@@ -1,0 +1,15 @@
+pip
+six
+httpie
+ipython
+plumbum
+
+celery
+flower
+
+# Temporary required for http-api
+git+https://github.com/irods/python-irodsclient.git@master
+rapydo-http==0.5.5
+
+numpy
+Pillow     

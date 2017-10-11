@@ -1,0 +1,7 @@
+file: bulk 
+class: Bulk 
+# baseuri: "/api"
+mapping:
+  bulk: "/bulk"
+labels:
+  - bulk

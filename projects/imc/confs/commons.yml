@@ -1,0 +1,126 @@
+# Customize this file to include compose configurations common to bluprints
+version: '3'
+
+services:
+  backend:
+    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
+    volumes:
+      - ../data/imediastuff:/uploads
+      - ../scripts:/code/scripts
+    networks:
+      worker_net:
+      ftp_net:
+    depends_on:
+      - neo4j
+      # - ftp
+      # - swaggerui
+    environment:
+      VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
+
+      # base the user/role mechanism on some database
+      AUTH_ENABLE: 1
+      # putting this here because it should not be configurable in .env
+      AUTH_SERVICE: neo4j
+
+      AUTH_REGISTER_FAILED_LOGIN: ${AUTH_REGISTER_FAILED_LOGIN}
+      AUTH_FORCE_FIRST_PASSWORD_CHANGE: ${AUTH_FORCE_FIRST_PASSWORD_CHANGE}
+      AUTH_VERIFY_PASSWORD_STRENGTH: ${AUTH_VERIFY_PASSWORD_STRENGTH}
+      AUTH_MAX_PASSWORD_VALIDITY: ${AUTH_MAX_PASSWORD_VALIDITY}
+      AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: ${AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER}
+      AUTH_MAX_LOGIN_ATTEMPTS: ${AUTH_MAX_LOGIN_ATTEMPTS}
+      AUTH_SECOND_FACTOR_AUTHENTICATION: ${AUTH_SECOND_FACTOR_AUTHENTICATION}
+
+      # # neo connection
+      GRAPHDB_ENABLE: 1
+      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+      GRAPHDB_HOST: ${GRAPHDB_HOST}
+      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+      CELERY_ENABLE: 1
+      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+      CELERY_BROKER: ${CELERY_BROKER}
+      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+
+      # TODO: REMOVE ME after solved issue #64
+      CELERY_HOST: ${CELERY_BROKER_HOST}
+      CELERY_PORT: ${CELERY_BROKER_PORT}
+
+  neo4j:
+    ports:
+      - 9090:7474
+      - 7687:7687
+    environment:
+      # NEO4J_dbms_memory_pagecache_size: 1024M
+      # NEO4J_dbms_memory_heap_maxSize: 2048M
+      NEO4J_AUTH: neo4j/${GRAPHDB_PASSWORD}
+      # NEO4J_dbms_allowFormatMigration: "true"
+
+  celery:
+    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
+    volumes:
+      - ../data/imediastuff:/uploads
+      - ../submodules/imedia-pipeline:/imedia-pipeline
+      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
+      - /opt/idmt:/opt/idmt
+      - ../scripts:/code/scripts
+    depends_on:
+      - rabbit
+      - neo4j
+
+    environment:
+      # base the user/role mechanism on some database
+      AUTH_ENABLE: 1
+      # putting this here because it should not be configurable in .env
+      AUTH_SERVICE: neo4j
+
+      # # neo connection
+      GRAPHDB_ENABLE: 1
+      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+      GRAPHDB_HOST: ${GRAPHDB_HOST}
+      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+      CELERY_ENABLE: 1
+      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+      CELERY_BROKER: ${CELERY_BROKER}
+      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+
+  celeryui:
+    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
+    volumes:
+      - ../data/imediastuff:/uploads
+    environment:
+      AUTH_ENABLE: 1
+      # putting this here because it should not be configurable in .env
+      AUTH_SERVICE: neo4j
+
+      # # neo connection
+      GRAPHDB_ENABLE: 1
+      GRAPHDB_EXTERNAL: ${GRAPHDB_EXTERNAL}
+      GRAPHDB_HOST: ${GRAPHDB_HOST}
+      GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
+      GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
+
+      CELERY_ENABLE: 1
+      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
+      CELERY_BROKER: ${CELERY_BROKER}
+      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
+      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+    depends_on:
+      - rabbit
+      - neo4j
+
+  ftp:
+    ports:
+      - "21:21"
+      - "30000-30019:30000-30019"
+    volumes:
+      - ../data/imediastuff:/home/ftpusers/
+    environment:
+      ACTIVATE: 1
