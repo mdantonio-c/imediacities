@@ -32,7 +32,7 @@ class Annotations(GraphBaseOperations):
 
         params = self.get_input()
         logger.debug('input: {}'.format(params))
-        type_f = params['type']
+        type_f = params.get('type')
         if type_f is not None:
             type_f = type_f.upper()
 
