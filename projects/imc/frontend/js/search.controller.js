@@ -74,6 +74,7 @@
 		var longitude = '';
 		var formatted = '';
 		var photoref = '';
+		var shotnum = '';
 
 		return {
 			getStartTime: function() {
@@ -115,6 +116,9 @@
 			getAlternatives: function() {
 				return alternatives;
 			},
+	        getShotNum: function() {
+	            return shotnum;
+	        },
 			setStartTime: function(value) {
 				startTime = value;
 			},
@@ -148,6 +152,9 @@
 			setShotId: function(value) {
 				shotId = value;
 			},
+	        setShotNum: function(value){
+	        	shotnum = value;
+	        },			
 			setPhotoRef: function(value) {
 				photoref = value;
 			},
@@ -245,7 +252,38 @@
 				});
 				return filtered;
 			};
+		}])
+		.filter('groupfilter',[ function () {
+				return function(items, options) {
+				    var filtered = [];            
+
+				    angular.forEach(items, function(item) {
+				    	var stringtos = item.group;
+				    	angular.forEach(options[1], function(group) {
+				    		var stringgroup = options[0][group].Display;
+				        	if((stringtos === stringgroup) || (stringgroup === '')){ 
+				            	filtered.push(item);						        
+				        	}
+				    	});
+				    });
+				    return filtered;
+				};
+			}])
+			.filter('timefilter',[ function () {
+				return function(items, currentTime) {
+				    var filtered = [];            
+
+				    angular.forEach(items, function(item) {
+			    		var startT = item.startT;
+			    		var endT = item.endT;						    		
+			        	if((currentTime >= startT) && (currentTime <= endT)){ 
+			            	filtered.push(item);						        
+			        	}
+				    });
+				    return filtered;
+				};
 		}]);
+
 
 	app.directive('scrollStoryOnClick', function() {
 		return {
@@ -468,6 +506,46 @@
 		}
 	]);
 
+	app.directive('multiselect',['$document', function($document){
+	return {
+	  restrict: 'E',
+	  require: '?ngModel',
+	  scope: {
+	    choices: '=',
+	    selected: '='
+	  },
+	  templateUrl: 'multiselect.html',
+	  replace: true,
+	  link: function(scope, element, attr){
+	      scope.isVisible = false;
+	        scope.isChecked = function(item){
+	          if(scope.selected.indexOf(item) !== -1){
+	            return true;
+	          }
+	          return false;
+	        };
+	        scope.toggleCheck = function(item){
+	          if(!scope.isChecked(item)){
+	            scope.selected.push(item);
+	          }else{
+	            scope.selected.splice(scope.selected.indexOf(item), 1);
+	          }
+	        };
+	        scope.toggleSelect = function(){
+	          scope.isVisible = !scope.isVisible;
+	        }
+	        
+	        element.bind('click', function(event) {
+	        event.stopPropagation();      
+	        });
+	                        
+	        $document.bind('click', function(){
+	        scope.isVisible = false;
+	        scope.$apply();
+	        });
+	  }
+	};
+	}]);
 
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
@@ -633,21 +711,34 @@
 				mitem.show = !mitem.show;
 		}*/
 
+		/*initialize multiselect to filter subtitles*/
+		$scope.options = [];
+		$scope.selectedOptions = [];
+		self.locSubtitle = "";
+
 		self.vocabularyFinal = [];
 		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-			self.vocabularyFinal = data;
-			self.onlyterms = [];
+		self.vocabularyFinal = data;
+		self.onlyterms = [];
 
-			for (var i = 0; i <= self.vocabularyFinal.classes.length - 1; i++) {
-				self.vocabularyFinal.classes[i]["show"] = true;
-				for (var k = 0; k <= self.vocabularyFinal.classes[i].groups.length - 1; k++) {
-					self.vocabularyFinal.classes[i].groups[k]["show"] = true;
-					for (var j = 0; j <= self.vocabularyFinal.classes[i].groups[k].terms.length - 1; j++) {
-						self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
-						self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
-					}
+		var pushloc = {Value:0,Display:'location'};
+		$scope.options.push(pushloc);
+
+		for (var i=0; i<=self.vocabularyFinal.classes.length-1; i++)
+		{
+			self.vocabularyFinal.classes[i]["show"] = true;
+			for (var k=0; k<=self.vocabularyFinal.classes[i].groups.length-1; k++)
+			{
+				self.vocabularyFinal.classes[i].groups[k]["show"] = true;
+				var topush = {Value:k+1,Display:self.vocabularyFinal.classes[i].groups[k].name};
+				$scope.options.push(topush);
+				for (var j=0; j<=self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
+				{
+					self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
+					self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
 				}
 			}
+		}
 		});
 
 		// Initializing values
@@ -743,6 +834,7 @@
 				for (var i = 0; i <= self.items.length - 1; i++) {
 					var pngshot = self.items[i][6];
 					var shotid = self.items[i][7];
+					var shotnum = self.items[i][4];
 
 					var time1 = self.items[i][5];
 					if (i < self.items.length - 1) {
@@ -775,6 +867,7 @@
 						sharedProperties.setIRI(tiri);
 						sharedProperties.setShotPNG(pngshot);
 						sharedProperties.setShotId(shotid);
+						sharedProperties.setShotNum(shotnum+1);
 
 						var foundterm = false;
 
@@ -1026,29 +1119,25 @@
 			return new Date(0, 0, 0, hours, minutes, seconds);
 		};
 
-		$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId) {
-			if (locname !== '') var locn = locname;
+		$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId, shotNum) {
+			if (locname != '') var locn = locname;
 			else var locn = labelTerm;
 			var startTime = self.getDateTime(startT);
 			var endTime = self.getDateTime(endT);
-			self.videoTimeline.data.rows.push({
-				c: [{
-					v: group
-				}, {
-					v: locn
-				}, {
-					v: startTime
-				}, {
-					v: endTime
-				}]
-			});
+			self.videoTimeline.data.rows.push({c: [
+				  {v: group},
+				  {v: locn},
+				  {v: startTime},
+				  {v: endTime}
+			]});
 			var ann = {
-				group: group,
-				name: locn,
-				shotid: shotId,
-				startT: startT,
-				endT: endT
-			};
+					group: group,
+					name: locn,
+					shotid: shotId,
+					shotNum: shotNum,
+					startT: startT,
+					endT: endT
+				};						
 			self.annotations.push(ann);
 		});
 
@@ -1213,6 +1302,7 @@
 		$scope.shotPNGImage = sharedProperties.getShotPNG();
 		$scope.IRI = sharedProperties.getIRI();
 		$scope.shotID = sharedProperties.getShotId();
+		$scope.shotNum = sharedProperties.getShotNum();
 
 		$scope.ok = function() {
 
@@ -1269,7 +1359,7 @@
 					//save the annotation into the database
 					//DataService.saveAnnotation(target, source);
 
-					$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+					$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID, $scope.shotNum);
 				}
 				$uibModalInstance.close(null);
 
@@ -1295,6 +1385,7 @@
 			$scope.group = sharedProperties.getGroup();
 			$scope.labelTerm = sharedProperties.getLabelTerm();
 			$scope.shotID = sharedProperties.getShotId();
+			$scope.shotNum = sharedProperties.getShotNum();
 			$scope.IRI = sharedProperties.getIRI();
 			// $scope.alternatives = sharedProperties.getAlternatives();
 			$scope.latitude = sharedProperties.getLatitude();
@@ -1326,7 +1417,7 @@
 			foundterm = $rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format);
 
 			if (!foundterm) { //the annotation has not been found
-				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID);
+				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID, $scope.shotNum);
 				$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
 			}
 
