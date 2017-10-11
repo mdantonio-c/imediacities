@@ -15,8 +15,8 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.checkToken();
     };
 
-    self.searchVideos = function(data) {
-        return api.apiCall('search?currentpage=1&perpage=10', 'POST', data);
+    self.searchVideos = function(data, currentpage, perpage) {
+        return api.apiCall('search?currentpage='+currentpage+'&perpage='+perpage, 'POST', data);
     };
 
     self.getStageFiles = function(group) {
