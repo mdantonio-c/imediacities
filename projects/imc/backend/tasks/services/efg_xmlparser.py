@@ -235,6 +235,8 @@ class EFG_XMLParser():
                         keyword['language'] = lang_code[0]
                 if ktype == 'Form':
                     # check term from a controlled IMC list
+                    if term.text.lower() == 'n/a':
+                        continue
                     code_el = codelists.fromCode(
                         term.text, codelists.FORM)
                     if code_el is None:

@@ -492,7 +492,7 @@ FORM = (
     ('Amateur film',        'Amateur film'),
     ('Animated film',       'Animated film'),
     ('Compilation',         'Compilation'),
-    ('Documentary',         'Documentary'),
+    ('Documentary film',    'Documentary'),
     ('Educational film',    'Educational film'),
     ('Experimental film',   'Experimental film'),
     ('Feature film',        'Feature film'),
