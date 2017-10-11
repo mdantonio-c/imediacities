@@ -50,12 +50,14 @@ class Videos(GraphBaseOperations):
         api_url = get_api_url(request, PRODUCTION)
         for v in videos:
             video = self.getJsonResponse(v)
+            item = v.item.single()
             # video['links']['self'] = api_url + \
             #     'api/videos/' + v.uuid
             video['links']['content'] = api_url + \
                 'api/videos/' + v.uuid + '/content?type=video'
-            video['links']['thumbnail'] = api_url + \
-                'api/videos/' + v.uuid + '/content?type=thumbnail'
+            if item.thumbnail is not None:
+                video['links']['thumbnail'] = api_url + \
+                    'api/videos/' + v.uuid + '/content?type=thumbnail'
             video['links']['summary'] = api_url + \
                 'api/videos/' + v.uuid + '/content?type=summary'
             data.append(video)

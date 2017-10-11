@@ -31,7 +31,10 @@
 					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this)"> -->
 					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))"> -->
 					<li ng-repeat="v in ctrl.videos">
-						<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><img ng-src="{{v.links['thumbnail']}}"/></a>
+						<a href ui-sref="logged.search.watch({v: v.id, meta: v})">
+							<img ng-src="{{v.links['thumbnail']}}" ng-if="v.links['thumbnail']"/>
+							<img alt="No thumbnail" ng-if="! v.links['thumbnail']"/>
+						</a>
 						<div class="primary-description">
 							<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><span class="title">{{v.attributes.identifying_title}}</span></a><i>({{v.relationships.item[0].attributes.duration | parseNum}})</i>
 							<p><span ng-repeat="description in v.relationships.descriptions">

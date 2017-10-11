@@ -95,14 +95,15 @@ class Search(GraphBaseOperations):
         api_url = get_api_url(request, PRODUCTION)
         for row in result:
             v = self.graph.AVEntity.inflate(row[0])
-
+            item = v.item.single()
             video_url = api_url + 'api/videos/' + v.uuid
 
             video = self.getJsonResponse(v)
             logger.info("links %s" % video['links'])
             video['links']['self'] = video_url
             video['links']['content'] = video_url + '/content?type=video'
-            video['links']['thumbnail'] = video_url + '/content?type=thumbnail'
+            if item.thumbnail is not None:
+                video['links']['thumbnail'] = video_url + '/content?type=thumbnail'
             video['links']['summary'] = video_url + '/content?type=summary'
             data.append(video)
 
