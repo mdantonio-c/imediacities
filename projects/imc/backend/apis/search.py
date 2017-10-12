@@ -31,6 +31,7 @@ class Search(GraphBaseOperations):
 
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
+        offset -= 1
         logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
         # block = 4
 
