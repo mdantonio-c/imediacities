@@ -174,7 +174,8 @@ class Annotations(GraphBaseOperations):
 
         self.initGraph()
 
-        anno = self.getNode(self.graph.Annotation, anno_id, field='uuid')
+        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        # anno = self.getNode(self.graph.Annotation, anno_id, field='uuid')
         if anno is None:
             raise RestApiException(
                 'Annotation not found',

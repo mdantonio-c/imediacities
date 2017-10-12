@@ -76,7 +76,8 @@ class AdminUsers(GraphBaseOperations):
 
         group_id = groups.pop()
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
 
         if group is None:
             raise RestApiException(
@@ -118,7 +119,8 @@ class AdminUsers(GraphBaseOperations):
 
         v = self.get_input()
 
-        user = self.getNode(self.graph.User, user_id, field='uuid')
+        user = self.graph.User.nodes.get_or_none(uuid=user_id)
+        # user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise RestApiException("User not found")
 
@@ -135,7 +137,8 @@ class AdminUsers(GraphBaseOperations):
         if groups is not None:
             group_id = groups.pop()
 
-            group = self.getNode(self.graph.Group, group_id, field='uuid')
+            group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+            # group = self.getNode(self.graph.Group, group_id, field='uuid')
 
             p = None
             for p in user.belongs_to.all():
@@ -163,7 +166,8 @@ class AdminUsers(GraphBaseOperations):
 
         self.initGraph()
 
-        user = self.getNode(self.graph.User, user_id, field='uuid')
+        user = self.graph.User.nodes.get_or_none(uuid=user_id)
+        # user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise RestApiException('This user cannot be found')
 

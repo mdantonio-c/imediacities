@@ -66,8 +66,9 @@ class AdminGroups(GraphBaseOperations):
             raise RestApiException(
                 'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
-        coordinator = self.getNode(
-            self.graph.User, v['coordinator'], field='uuid')
+        coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
+        # coordinator = self.getNode(
+        #     self.graph.User, v['coordinator'], field='uuid')
 
         if coordinator is None:
             raise RestApiException(
@@ -95,7 +96,8 @@ class AdminGroups(GraphBaseOperations):
 
         v = self.get_input()
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
@@ -104,8 +106,10 @@ class AdminGroups(GraphBaseOperations):
 
         if 'coordinator' in v:
 
-            coordinator = self.getNode(
-                self.graph.User, v['coordinator'], field='uuid')
+            coordinator = self.graph.User.nodes.get_or_none(
+                uuid=v['coordinator'])
+            # coordinator = self.getNode(
+            #     self.graph.User, v['coordinator'], field='uuid')
 
             p = None
             for p in group.coordinator.all():
@@ -132,7 +136,8 @@ class AdminGroups(GraphBaseOperations):
 
         self.initGraph()
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
