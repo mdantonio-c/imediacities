@@ -25,7 +25,7 @@ for ws in wb.worksheets:
         en_term = ws['L' + str(row_index)].value
         de_term = ws['K' + str(row_index)].value
         iri = ws['M' + str(row_index)].value
-        group = ws['H' + str(row_index)].value
+        group = ws['I' + str(row_index)].value
         if en_term is None:
             # ignore also groups without entry value
             continue
