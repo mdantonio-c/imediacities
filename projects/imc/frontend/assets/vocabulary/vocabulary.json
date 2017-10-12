@@ -104,165 +104,6 @@
           ]
         },
         {
-          "name": "traffic area",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1248784",
-              "labels": {
-                "de": "Flughafen",
-                "en": "airport"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q207934",
-              "labels": {
-                "de": "Allee",
-                "en": "avenue"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q221722",
-              "labels": {
-                "de": "Fahrradweg",
-                "en": "bike lane"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q54114",
-              "labels": {
-                "de": "Boulevard, Prachtstraße",
-                "en": "boulevard"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q12280",
-              "labels": {
-                "de": "Brücke",
-                "en": "bridge"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q494829",
-              "labels": {
-                "de": "Bus-Station",
-                "en": "bus station"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Hauptstraße (Einfallstraße)",
-                "en": "main road"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q928830",
-              "labels": {
-                "de": "U-Bahn Station",
-                "en": "metro station"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q46622",
-              "labels": {
-                "de": "Autobahn",
-                "en": "motorway"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1433633",
-              "labels": {
-                "de": "Parkplatz",
-                "en": "parking area"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Passage",
-                "en": "passage"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q369730",
-              "labels": {
-                "de": "Fußgängerzone",
-                "en": "pedestrian zone"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q44782",
-              "labels": {
-                "de": "Hafen",
-                "en": "port"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q674950",
-              "labels": {
-                "de": "Wohnstraße",
-                "en": "residential street"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Seilbahn",
-                "en": "ropeway"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Einkaufs- und Geschäftsstraße",
-                "en": "shopping street"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q174782",
-              "labels": {
-                "de": "Platz",
-                "en": "square"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q79007",
-              "labels": {
-                "de": "Straße",
-                "en": "street"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q628179",
-              "labels": {
-                "de": "Weg (befestigt, unbefestigt)",
-                "en": "trail"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q55488",
-              "labels": {
-                "de": "Bahnhof",
-                "en": "train station"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q2175765",
-              "labels": {
-                "de": "Straßenbahn- Station",
-                "en": "tram stop"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q44377",
-              "labels": {
-                "de": "Tunnel",
-                "en": "tunnel"
-              }
-            }
-          ]
-        },
-        {
           "name": "green space",
           "terms": [
             {
@@ -343,20 +184,258 @@
           ]
         },
         {
-          "name": "well",
+          "name": "other",
           "terms": [
             {
-              "iri": "https://www.wikidata.org/wiki/Q1630622",
+              "iri": "https://www.wikidata.org/wiki/Q27150222",
               "labels": {
-                "de": "Trinkbrunnen",
-                "en": "drinking fountain"
+                "de": "Messegelände",
+                "en": "exhibition ground"
+              }
+            }
+          ]
+        },
+        {
+          "name": "sphere",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q180910",
+              "labels": {
+                "de": "Freizeit",
+                "en": "leisure"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q483453",
+              "iri": "https://www.wikidata.org/wiki/Q628858",
               "labels": {
-                "de": "Zierbrunnen",
-                "en": "fountain"
+                "de": "Arbeit",
+                "en": "work"
+              }
+            }
+          ]
+        },
+        {
+          "name": "condition",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q360418",
+              "labels": {
+                "de": "Baustelle",
+                "en": "(construction) site"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1441983",
+              "labels": {
+                "de": "Sanierung, Wiederaufbau",
+                "en": "redevelopment"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q17781833",
+              "labels": {
+                "de": "Kriegszerstörung",
+                "en": "war destruction"
+              }
+            }
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q178692",
+              "labels": {
+                "de": "Baukran",
+                "en": "construction crane"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q11019",
+              "labels": {
+                "de": "Baumaschine",
+                "en": "construction vehicle"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q233320",
+              "labels": {
+                "de": "Baugerüst",
+                "en": "scaffold"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "spaces"
+    },
+    {
+      "groups": [
+        {
+          "name": "traffic area",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1248784",
+              "labels": {
+                "de": "Flughafen",
+                "en": "airport"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q207934",
+              "labels": {
+                "de": "Allee",
+                "en": "avenue"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q221722",
+              "labels": {
+                "de": "Fahrradweg",
+                "en": "bike lane"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q54114",
+              "labels": {
+                "de": "Boulevard, Prachtstraße",
+                "en": "boulevard"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q12280",
+              "labels": {
+                "de": "Brücke",
+                "en": "bridge"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q12518",
+              "labels": {
+                "de": "Turm",
+                "en": "Tower  "
+              }
+            }
+          ]
+        },
+        {
+          "name": "traffic area",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q494829",
+              "labels": {
+                "de": "Bus-Station",
+                "en": "bus station"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Highway",
+              "labels": {
+                "de": "Hauptstraße (Einfallstraße)",
+                "en": "main road"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q928830",
+              "labels": {
+                "de": "U-Bahn Station",
+                "en": "metro station"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q46622",
+              "labels": {
+                "de": "Autobahn",
+                "en": "motorway"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1433633",
+              "labels": {
+                "de": "Parkplatz",
+                "en": "parking space"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q13634881",
+              "labels": {
+                "de": "Passage",
+                "en": "passage"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q369730",
+              "labels": {
+                "de": "Fußgängerzone",
+                "en": "pedestrian zone"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q44782",
+              "labels": {
+                "de": "Hafen",
+                "en": "port"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q674950",
+              "labels": {
+                "de": "Wohnstraße",
+                "en": "residential street"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q16968135",
+              "labels": {
+                "de": "Seilbahn",
+                "en": "ropeway"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q21000333",
+              "labels": {
+                "de": "Einkaufs- und Geschäftsstraße",
+                "en": "shopping street"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q174782",
+              "labels": {
+                "de": "Platz",
+                "en": "square"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q79007",
+              "labels": {
+                "de": "Straße",
+                "en": "street"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q628179",
+              "labels": {
+                "de": "Weg (befestigt, unbefestigt)",
+                "en": "trail"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q55488",
+              "labels": {
+                "de": "Bahnhof",
+                "en": "train station"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2175765",
+              "labels": {
+                "de": "Straßenbahn- Station",
+                "en": "tram stop"
               }
             }
           ]
@@ -372,14 +451,14 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Building",
               "labels": {
                 "de": "Geschlossene Bauweise/Blockbebauung",
                 "en": "closed coverage type"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q41176",
               "labels": {
                 "de": "Offene Bauweise/Zeilenbebauung",
                 "en": "open coverage type"
@@ -412,7 +491,7 @@
           "name": "building section",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q4839857",
               "labels": {
                 "de": "Hinterhof",
                 "en": "backyard "
@@ -447,7 +526,7 @@
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q15003",
+              "iri": "https://www.wikidata.org/wiki/Q12511",
               "labels": {
                 "de": "Treppe",
                 "en": "stair"
@@ -473,28 +552,28 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Wohnblock",
                 "en": "housing block"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Informelle (wilde) Siedlung",
                 "en": "informal housing/squatter area"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Großwohnsiedlung",
                 "en": "major housing complex"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1498804",
               "labels": {
                 "de": "Mehrfamilienhaus (Siedlung)",
                 "en": "multi-family residential dwelling"
@@ -508,7 +587,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": "www.wikidata.org/wiki/Q1307276",
               "labels": {
                 "de": "Einfamilienhaus (Siedlung)",
                 "en": "single-family residential dwelling"
@@ -570,7 +649,7 @@
               "iri": "https://www.wikidata.org/wiki/Q2090555",
               "labels": {
                 "de": "Modegeschäft",
-                "en": "fashion shop"
+                "en": "Clothes store"
               }
             },
             {
@@ -616,7 +695,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Strip_mall",
               "labels": {
                 "de": "Strip mall",
                 "en": "strip mall"
@@ -642,7 +721,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Restaurant",
               "labels": {
                 "de": "Gastgarten",
                 "en": "outdoor restaurant"
@@ -880,7 +959,7 @@
           "name": "sport/recreation",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Hallenbad",
                 "en": "indoor pool"
@@ -949,6 +1028,13 @@
               }
             },
             {
+              "iri": "https://www.wikidata.org/wiki/Q2310214",
+              "labels": {
+                "de": "Spielfeld",
+                "en": "sports field/pitch"
+              }
+            },
+            {
               "iri": "https://www.wikidata.org/wiki/Q1501",
               "labels": {
                 "de": "Schwimmbad",
@@ -961,7 +1047,7 @@
           "name": "supply/disposal",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Kläranlage",
                 "en": "treatment plant"
@@ -994,7 +1080,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Sakralbau (andere)",
                 "en": "sacral building (others)"
@@ -1039,7 +1125,7 @@
           "name": "form of financing",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Privater Wohnbau",
                 "en": "private housing"
@@ -1072,13 +1158,6 @@
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q27150222",
-              "labels": {
-                "de": "Messegelände",
-                "en": "exhibition ground"
-              }
-            },
-            {
               "iri": "https://www.wikidata.org/wiki/Q16831714",
               "labels": {
                 "de": "Amtsgebäude",
@@ -1100,38 +1179,87 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Lagerplatz",
                 "en": "storage yard"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q5003624",
+              "labels": {
+                "de": "Denkmal",
+                "en": "memorial"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q557141",
+              "labels": {
+                "de": "Kunst im öffentlichen Raum",
+                "en": "public art"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q37853",
+              "labels": {
+                "de": null,
+                "en": "Baroque"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q34636",
+              "labels": {
+                "de": null,
+                "en": "Art Nouveau"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q173782",
+              "labels": {
+                "de": null,
+                "en": "Art Deco"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "Romanic"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q429811",
+              "labels": {
+                "de": null,
+                "en": "Early Christian"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q176483",
+              "labels": {
+                "de": null,
+                "en": "Gothic"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q245188",
+              "labels": {
+                "de": null,
+                "en": "modern"
               }
             }
           ]
         }
       ],
-      "name": "space"
+      "name": "buildings & structures"
     },
     {
       "groups": [
-        {
-          "name": "sphere",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q180910",
-              "labels": {
-                "de": "Freizeit",
-                "en": "leisure"
-              }
-            },
-            {
-            "iri": "https://www.wikidata.org/wiki/Q628858",
-              "labels": {
-                "de": "Arbeit",
-                "en": "work"
-              }
-            }
-          ]
-        },
         {
           "name": "crowd",
           "terms": [
@@ -1164,13 +1292,6 @@
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q898830",
-              "labels": {
-                "de": "Prozession",
-                "en": "procession"
-              }
-            },
-            {
               "iri": "https://www.wikidata.org/wiki/Q1783115",
               "labels": {
                 "de": "Warteschlange",
@@ -1185,7 +1306,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Empfang",
                 "en": "reception"
@@ -1204,77 +1325,77 @@
           "name": "locomotion",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Fahradfahrt",
                 "en": "bike ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Schifffahrt",
                 "en": "boat trip"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Bootsfahrt",
                 "en": "boating trip"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Busfahrt",
                 "en": "bus ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Autofahrt",
                 "en": "car ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "U-Bahnfahrt",
                 "en": "metro ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Motorradfahrt",
                 "en": "motorcycle ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Flug",
                 "en": "plane ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Zugfahrt",
                 "en": "train ride"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Straßenbahnfahrt",
                 "en": "tram ride"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1051130",
               "labels": {
                 "de": "Spaziergang",
                 "en": "walk"
@@ -1286,35 +1407,35 @@
           "name": "production/work",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Landwirtschaft",
                 "en": "agriculture"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Handel",
                 "en": "commerce"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Handwerk",
                 "en": "craft"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Industrie",
                 "en": "industry"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Dienstleistung",
                 "en": "service"
@@ -1326,7 +1447,7 @@
           "name": "culture",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Darstellende Kunst",
                 "en": "dramatic arts"
@@ -1338,14 +1459,14 @@
           "name": "gastronomy",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Trinken",
                 "en": "drinking"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Essen",
                 "en": "eating"
@@ -1357,35 +1478,35 @@
           "name": "culture",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q132241",
               "labels": {
                 "de": "Festival",
                 "en": "festival"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q11424",
               "labels": {
                 "de": "Film",
                 "en": "film"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q219625",
               "labels": {
                 "de": "Bildende Kunst",
                 "en": "fine arts"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q8242",
               "labels": {
                 "de": "Literatur",
                 "en": "literature"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q638",
               "labels": {
                 "de": "Musik",
                 "en": "music"
@@ -1397,21 +1518,21 @@
           "name": "education",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q253567",
               "labels": {
                 "de": "Lehrlingsausbildung",
                 "en": "apprentice training"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q603773",
               "labels": {
                 "de": "Vortrag",
                 "en": "lecture"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Schulunterricht",
                 "en": "school teaching"
@@ -1423,28 +1544,28 @@
           "name": "welfare/health",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1455871",
               "labels": {
                 "de": "Kinderfürsorge",
                 "en": "child care"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q437458",
               "labels": {
                 "de": "Altenfürsorge",
                 "en": "elderly care"
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Health_care",
               "labels": {
                 "de": "Krankenbetreuung",
                 "en": "healthcare"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Armefürsorge",
                 "en": "poor relief"
@@ -1463,126 +1584,126 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q14373",
               "labels": {
                 "de": "Angeln",
                 "en": "fishing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q5377",
               "labels": {
                 "de": "Golf",
                 "en": "golf"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q43450",
               "labels": {
                 "de": "Turnen",
                 "en": "gymnastics"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q12014035",
               "labels": {
                 "de": "Wandern",
                 "en": "hiking"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q779272",
               "labels": {
                 "de": "Eislaufen",
                 "en": "ice-skating"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q816261",
               "labels": {
                 "de": "Jogging",
                 "en": "jogging"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q754796",
               "labels": {
                 "de": "Minigolf",
                 "en": "minigolf"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1707432",
               "labels": {
                 "de": "Rollschuhfahren",
                 "en": "roller-skateing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q159354",
               "labels": {
                 "de": "Rudern",
                 "en": "rowing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q842284",
               "labels": {
                 "de": "Skatebordfahren",
                 "en": "skateboarding"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q130949",
               "labels": {
                 "de": "Skifahren",
                 "en": "skiing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q3266340",
               "labels": {
                 "de": "Schlittenfahren",
                 "en": "sledding"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q2736",
               "labels": {
                 "de": "Fussball",
                 "en": "soccer"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Sonnenbaden",
                 "en": "sunbathing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q6388",
               "labels": {
                 "de": "Schwimmen",
                 "en": "swimming"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q10674720",
               "labels": {
                 "de": "Gesellschaftsspiel",
                 "en": "table game"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q847",
               "labels": {
                 "de": "Tennis",
                 "en": "tennis"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1734",
               "labels": {
                 "de": "Volleyball",
                 "en": "volleyball"
@@ -1594,21 +1715,21 @@
           "name": "supply/disposal",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Energieversorgung",
                 "en": "energy supply"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q45701",
               "labels": {
                 "de": "Müll",
                 "en": "garbage"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Wasser/Abwasser",
                 "en": "water/wastewater"
@@ -1620,14 +1741,14 @@
           "name": "tourism",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Stadtführung",
                 "en": "city tour"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1542314",
               "labels": {
                 "de": "Sightseeing",
                 "en": "sightseeing"
@@ -1639,207 +1760,17 @@
           "name": "other",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q650711",
               "labels": {
                 "de": "Kampf",
                 "en": "combat"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q830036",
               "labels": {
                 "de": "Shopping",
                 "en": "shopping"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "space usage"
-    },
-    {
-      "groups": [
-        {
-          "name": "people",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q13430821",
-              "labels": {
-                "de": "Masse",
-                "en": "crowd"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Verstreute Gruppen",
-                "en": "dispersed groups"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Verstreute Einzelpersonen",
-                "en": "dispersed individuals"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q16334295",
-              "labels": {
-                "de": "Großgruppe",
-                "en": "large group"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q15618652",
-              "labels": {
-                "de": "Paar",
-                "en": "pair"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q5",
-              "labels": {
-                "de": "Einzelperson",
-                "en": "single person"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q16334295",
-              "labels": {
-                "de": "Kleingruppe",
-                "en": "small group"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "persons number"
-    },
-    {
-      "groups": [
-        {
-          "name": "effects",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q11425",
-              "labels": {
-                "de": "Animation",
-                "en": "animation"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Effektfilter",
-                "en": "effect filter"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "effect"
-    },
-    {
-      "groups": [
-        {
-          "name": "gender",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q6581072",
-              "labels": {
-                "de": "weiblich",
-                "en": "female"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q6581097",
-              "labels": {
-                "de": "männlich",
-                "en": "male"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "männlich und weiblich",
-                "en": "male and female"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q51415",
-              "labels": {
-                "de": "queer",
-                "en": "queer"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "persons gender"
-    },
-    {
-      "groups": [
-        {
-          "name": "age",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q80994",
-              "labels": {
-                "de": "Erwachsene",
-                "en": "adults"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q7569",
-              "labels": {
-                "de": "Kinder",
-                "en": "children"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q2191986",
-              "labels": {
-                "de": "Alte",
-                "en": "elderly persons"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q190007",
-              "labels": {
-                "de": "Jugendliche",
-                "en": "youth"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "persons age"
-    },
-    {
-      "groups": [
-        {
-          "name": "posture",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q2268776",
-              "labels": {
-                "de": "Liegen",
-                "en": "lying"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1144593",
-              "labels": {
-                "de": "Sitzen",
-                "en": "sitting"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1986098",
-              "labels": {
-                "de": "Stehen",
-                "en": "standing"
               }
             }
           ]
@@ -1855,7 +1786,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q17010909",
               "labels": {
                 "de": "Reiten",
                 "en": "horse-riding"
@@ -1888,14 +1819,14 @@
           "name": "articulation/interaction",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Celebrate",
               "labels": {
                 "de": "Feiern",
                 "en": "celebrating"
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wiktionary.org/wiki/cheering",
               "labels": {
                 "de": "Jubeln",
                 "en": "cheering"
@@ -1909,14 +1840,14 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wiktionary.org/wiki/dancing",
               "labels": {
                 "de": "Tanzen",
                 "en": "dancing"
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wiktionary.org/wiki/decorating",
               "labels": {
                 "de": "Schmücken",
                 "en": "decorating"
@@ -1937,14 +1868,14 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Musizieren",
                 "en": "making music"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Spielen",
                 "en": "playing"
@@ -1965,14 +1896,14 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wiktionary.org/wiki/talking",
               "labels": {
                 "de": "Sprechen",
                 "en": "talking"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Winken",
                 "en": "waving"
@@ -2010,7 +1941,7 @@
           "name": "record/capture/trace",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Filmen",
                 "en": "filming"
@@ -2031,7 +1962,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Zeichnen",
                 "en": "sketch"
@@ -2053,18 +1984,18 @@
               "iri": "https://www.wikidata.org/wiki/Q1403016",
               "labels": {
                 "de": "Verhaften",
-                "en": "arresting"
+                "en": "arrest"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Schlagen",
                 "en": "beating"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Tragen",
                 "en": "carrying"
@@ -2085,21 +2016,21 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Graben",
                 "en": "digging"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Ankleiden",
                 "en": "dressing"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Hacken",
                 "en": "hoeing"
@@ -2113,14 +2044,14 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Zuhören",
                 "en": "listening"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Werfen",
                 "en": "pitching"
@@ -2134,7 +2065,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Ausruhen",
                 "en": "rest"
@@ -2148,113 +2079,643 @@
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Entkleiden",
                 "en": "undressing"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Warten",
                 "en": "waiting"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
                 "de": "Schauen",
                 "en": "watching"
               }
             }
           ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q198",
+              "labels": {
+                "de": null,
+                "en": "War"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q288514",
+              "labels": {
+                "de": null,
+                "en": "Fair"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q273120",
+              "labels": {
+                "de": null,
+                "en": "Protest"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "Official visit"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q49776",
+              "labels": {
+                "de": null,
+                "en": "Strike"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "Anniversary"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "World Fair"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q464980",
+              "labels": {
+                "de": null,
+                "en": "Exhibition"
+              }
+            }
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q153271",
+              "labels": {
+                "de": "Hitlergruß",
+                "en": "Hitler salute"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q49836",
+              "labels": {
+                "de": null,
+                "en": "Wedding"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q201676",
+              "labels": {
+                "de": null,
+                "en": "Funeral"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q19809",
+              "labels": {
+                "de": null,
+                "en": "Christmas"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q21196",
+              "labels": {
+                "de": null,
+                "en": "Easter"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q82866",
+              "labels": {
+                "de": null,
+                "en": "Lent"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q898830",
+              "labels": {
+                "de": null,
+                "en": "Procession"
+              }
+            }
+          ]
         }
       ],
-      "name": "persons action"
+      "name": "activities & events"
     },
     {
       "groups": [
         {
-          "name": "condition",
+          "name": null,
           "terms": [
             {
-              "iri": "https://www.wikidata.org/wiki/Q360418",
+              "iri": null,
               "labels": {
-                "de": "Baustelle",
-                "en": "(construction) site"
+                "de": "crowd",
+                "en": "https://www.wikidata.org/wiki/Q13430821"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q1441983",
+              "iri": "and add number",
               "labels": {
-                "de": "Sanierung, Wiederaufbau",
-                "en": "redevelopment"
+                "de": "large group",
+                "en": "https://www.wikidata.org/wiki/Q16334295"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q17781833",
+              "iri": "and add number",
               "labels": {
-                "de": "Kriegszerstörung",
-                "en": "war destruction"
+                "de": "pair",
+                "en": "https://www.wikidata.org/wiki/Q15618652"
+              }
+            },
+            {
+              "iri": "and add number",
+              "labels": {
+                "de": "single person",
+                "en": "https://www.wikidata.org/wiki/Q5"
+              }
+            },
+            {
+              "iri": "and add number",
+              "labels": {
+                "de": "small group",
+                "en": "https://www.wikidata.org/wiki/Q16334295"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "female",
+                "en": "https://www.wikidata.org/wiki/Q6581072"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "male",
+                "en": "https://www.wikidata.org/wiki/Q6581097"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "queer",
+                "en": "https://www.wikidata.org/wiki/Q51415"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "adults",
+                "en": "https://www.wikidata.org/wiki/Q80994"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "children",
+                "en": "https://www.wikidata.org/wiki/Q7569"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "elderly persons",
+                "en": "https://www.wikidata.org/wiki/Q2191986"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "youth",
+                "en": "https://www.wikidata.org/wiki/Q190007"
               }
             }
           ]
         },
         {
-          "name": "street furniture",
+          "name": "posture",
           "terms": [
             {
-              "iri": "https://www.wikidata.org/wiki/Q204776",
+              "iri": null,
               "labels": {
-                "de": "Sitzbank",
-                "en": "bench"
+                "de": "lying",
+                "en": "https://www.wikidata.org/wiki/Q2268776"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q376",
+              "iri": null,
               "labels": {
-                "de": "Uhr",
-                "en": "clock"
+                "de": "sitting",
+                "en": "https://www.wikidata.org/wiki/Q1144593"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q1143785",
+              "iri": null,
               "labels": {
-                "de": "Telefon(Zelle)",
-                "en": "phone box"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q49844",
-              "labels": {
-                "de": "Briefkasten",
-                "en": "post box"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q503958",
-              "labels": {
-                "de": "Straßenlaterne",
-                "en": "street lamps"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q8004",
-              "labels": {
-                "de": "Ampel",
-                "en": "traffic light"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q216530",
-              "labels": {
-                "de": "Mistkübel",
-                "en": "trash can"
+                "de": "standing",
+                "en": "https://www.wikidata.org/wiki/Q1986098"
               }
             }
           ]
         },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": null,
+              "labels": {
+                "de": "kneeling",
+                "en": "https://www.wikidata.org/wiki/Q8866546"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "squatting",
+                "en": "https://www.wikidata.org/wiki/Q2540134"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Politician",
+                "en": "https://www.wikidata.org/wiki/Q82955"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Doctor",
+                "en": "https://www.wikidata.org/wiki/Q39631"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Librarian",
+                "en": "https://www.wikidata.org/wiki/Q182436"
+              }
+            }
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": null,
+              "labels": {
+                "de": "pedestrians",
+                "en": "https://www.wikidata.org/wiki/Q221488"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "people"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q11425",
+              "labels": {
+                "de": "Animation",
+                "en": "animation"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Photographic_filter",
+              "labels": {
+                "de": "Effektfilter",
+                "en": "effect filter"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q381243",
+              "labels": {
+                "de": "Spezialeffekt",
+                "en": "Special effects"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q3391185",
+              "labels": {
+                "de": "American Shot",
+                "en": "american shot"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q296001",
+              "labels": {
+                "de": "close-up (CU)",
+                "en": "close-up (CU)"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "extreme close-up (ECU)",
+                "en": "extreme close-up (ECU)"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "extreme long shot (ELS)",
+                "en": "extreme long shot (ELS)"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q3294287",
+              "labels": {
+                "de": "Long Shot (LS)",
+                "en": "long shot (LS)"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Medium_shot",
+              "labels": {
+                "de": "medium close shot (MCS)",
+                "en": "medium close shot (MCS)"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "medium full shot (MFS)",
+                "en": "medium full shot (MFS)"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Medium Shot (MS)",
+                "en": "medium shot (MS)"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q4688031",
+              "labels": {
+                "de": "Luftaufnahme",
+                "en": "aerial shot"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "high angle",
+                "en": "high angle"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "low angle",
+                "en": "low angle"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "straight on angle",
+                "en": "straight on angle"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "cross fade",
+                "en": "cross fade"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Panoramaschwenk",
+                "en": "panning shot"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Pantom-ride",
+                "en": "phantom-ride"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Schwenk",
+                "en": "tilt"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Kamerafahrt",
+                "en": "tracking"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Zoom",
+                "en": "zoom"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "black frame",
+                "en": "black frame"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Zwischentitel",
+                "en": "intertitle"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Kamerastopp",
+                "en": "stop"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "white frame",
+                "en": "white frame"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Trickblende",
+                "en": "wipe"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q6008603",
+              "labels": {
+                "de": "Kameraschnitt",
+                "en": "in-camera editing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q648877",
+              "labels": {
+                "de": "Nachträglicher Schnitt",
+                "en": "post-production editing"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Film_splicer",
+              "labels": {
+                "de": "Klebestelle",
+                "en": "splice"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q217199",
+              "labels": {
+                "de": "Musik instrumental & vokal nachvertont",
+                "en": "added instrumental and vocal music"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q217199",
+              "labels": {
+                "de": "Musik instrumental nachvertont",
+                "en": "added instrumental music"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q217199",
+              "labels": {
+                "de": "Musik vokal nachvertont",
+                "en": "added vocal music"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Musik instrumental und vokal",
+                "en": "instrumental and vocal music"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q639197",
+              "labels": {
+                "de": "Musik instrumental",
+                "en": "instrumental music"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q27939",
+              "labels": {
+                "de": "Musik vokal",
+                "en": "vocal music"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q861911",
+              "labels": {
+                "de": "Ansprache",
+                "en": "speech"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1146822",
+              "labels": {
+                "de": "Voice Over",
+                "en": "voice over"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q52943",
+              "labels": {
+                "de": "Konversation",
+                "en": "Conversation"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q178651",
+              "labels": {
+                "de": "Interview",
+                "en": "Interview"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "Tourism film"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7281",
+              "labels": {
+                "de": null,
+                "en": "Propaganda"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q37038",
+              "labels": {
+                "de": null,
+                "en": "Advertisement"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q4164344",
+              "labels": {
+                "de": null,
+                "en": "Documentary"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q735478",
+              "labels": {
+                "de": null,
+                "en": "Newsreel"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "film technical & style"
+    },
+    {
+      "groups": [
         {
           "name": "vehicle",
           "terms": [
@@ -2264,42 +2725,165 @@
                 "de": "Gepanzertes Fahrzeug",
                 "en": "armored vehicle"
               }
-            },
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q82650",
+              "labels": {
+                "de": "Taxi",
+                "en": "taxi"
+              }
+            }
+          ]
+        },
+        {
+          "name": "vehicle",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q235356",
               "labels": {
                 "de": "Kutsche",
                 "en": "carriage"
               }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1420",
+              "labels": {
+                "de": "Automobil",
+                "en": "car "
+              }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q11442",
+              "labels": {
+                "de": "Fahhrrad",
+                "en": "bicycle"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q5638",
+              "labels": {
+                "de": "Autobus",
+                "en": "Bus"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q5641",
+              "labels": {
+                "de": "Strassenbahn",
+                "en": "Tram"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q870",
+              "labels": {
+                "de": "Zug",
+                "en": "Train"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q5503",
+              "labels": {
+                "de": "U-Bahn",
+                "en": "Metro"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q34493",
+              "labels": {
+                "de": "Motorrad",
+                "en": "Motorcycle"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q11446",
+              "labels": {
+                "de": "Schiff, Boot",
+                "en": "Ship, boat"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q170483",
+              "labels": {
+                "de": "Segelschiff",
+                "en": "Sailing ship"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q234668",
+              "labels": {
+                "de": "Wagen",
+                "en": "Cart"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q197",
+              "labels": {
+                "de": "Flugzeug",
+                "en": "Airplane"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q43193",
+              "labels": {
+                "de": "Lastkraftwagen",
+                "en": "Truck"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q201783",
+              "labels": {
+                "de": "Kleinkraftrad",
+                "en": "Moped"
+              }
+            }
+          ]
+        },
+        {
+          "name": "vehicle",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q832003",
               "labels": {
                 "de": "Pferdebahn",
                 "en": "horsecar"
               }
             }
           ]
-        },
+        }
+      ],
+      "name": "transport & vehicules"
+    },
+    {
+      "groups": [
         {
           "name": "plant",
           "terms": [
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q42295",
               "labels": {
                 "de": "Strauch",
                 "en": "bush"
               }
             },
             {
-              "iri": "",
+              "iri": "https://en.wikipedia.org/wiki/Crop",
               "labels": {
                 "de": "Nutzpflanze",
                 "en": "crop plant"
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q1369438",
               "labels": {
                 "de": "Zierpflanze",
                 "en": "decorative plant"
@@ -2309,9 +2893,26 @@
               "iri": "https://www.wikidata.org/wiki/Q506",
               "labels": {
                 "de": "Blume",
-                "en": "flower"
+                "en": "flowers"
               }
-            },
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q869381",
+              "labels": {
+                "de": "Blumentopf",
+                "en": "flowerpot"
+              }
+            }
+          ]
+        },
+        {
+          "name": "plant",
+          "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q10884",
               "labels": {
@@ -2353,7 +2954,7 @@
               }
             },
             {
-              "iri": "",
+              "iri": "https://www.wikidata.org/wiki/Q685795",
               "labels": {
                 "de": "Rotwild",
                 "en": "deer"
@@ -2404,323 +3005,7 @@
           ]
         },
         {
-          "name": "other",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1352349",
-              "labels": {
-                "de": "Architektonisches Modell",
-                "en": "architectural model"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q178692",
-              "labels": {
-                "de": "Baukran",
-                "en": "construction crane"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q11019",
-              "labels": {
-                "de": "Baumaschine",
-                "en": "construction vehicle"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Gaffer (Blick in Kamera)",
-                "en": "gazer (looking straight into the camera)"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q153271",
-              "labels": {
-                "de": "Hitlergruß",
-                "en": "Hitler salute"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q5003624",
-              "labels": {
-                "de": "Denkmal",
-                "en": "memorial"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q221488",
-              "labels": {
-                "de": "Passanten",
-                "en": "pedestrians"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q4006",
-              "labels": {
-                "de": "Plan",
-                "en": "map"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q507141",
-              "labels": {
-                "de": "Kinderwagen",
-                "en": "pram"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q557141",
-              "labels": {
-                "de": "Kunst im öffentlichen Raum",
-                "en": "public art"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q233320",
-              "labels": {
-                "de": "Baugerüst",
-                "en": "scaffold"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q45513",
-              "labels": {
-                "de": "Hakenkreuzfahnen",
-                "en": "swastika flags"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q191931",
-              "labels": {
-                "de": "Rollstuhl",
-                "en": "wheelchair"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "visual event"
-    },
-    {
-      "groups": [
-        {
-          "name": "music",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q217199",
-              "labels": {
-                "de": "Musik instrumental & vokal nachvertont",
-                "en": "added instrumental and vocal music"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q217199",
-              "labels": {
-                "de": "Musik instrumental nachvertont",
-                "en": "added instrumental music"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q217199",
-              "labels": {
-                "de": "Musik vokal nachvertont",
-                "en": "added vocal music"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Musik instrumental und vokal",
-                "en": "instrumental and vocal music"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q639197",
-              "labels": {
-                "de": "Musik instrumental",
-                "en": "instrumental music"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q27939",
-              "labels": {
-                "de": "Musik vokal",
-                "en": "vocal music"
-              }
-            }
-          ]
-        },
-        {
-          "name": "speech",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q861911",
-              "labels": {
-                "de": "Ansprache",
-                "en": "speech"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1146822",
-              "labels": {
-                "de": "Voice Over",
-                "en": "voice over"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "audio event"
-    },
-    {
-      "groups": [
-        {
-          "name": "signs",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q806880",
-              "labels": {
-                "de": "Transparent",
-                "en": "banner"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Ortstafel",
-                "en": "boundary sign"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Geschäftsschild",
-                "en": "commercial sign"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q14660",
-              "labels": {
-                "de": "Fahne",
-                "en": "flag"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1886349",
-              "labels": {
-                "de": "Logo",
-                "en": "logo"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q6006",
-              "labels": {
-                "de": "Leuchtschrift",
-                "en": "neon sign"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q22706",
-              "labels": {
-                "de": "Nummerntafel",
-                "en": "numberplate"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q429785",
-              "labels": {
-                "de": "Plakat",
-                "en": "poster"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q170285",
-              "labels": {
-                "de": "Verkehrsschild",
-                "en": "traffic sign"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1969455",
-              "labels": {
-                "de": "Straßenschild",
-                "en": "street sign"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "sign"
-    },
-    {
-      "groups": [
-        {
-          "name": "season",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1314",
-              "labels": {
-                "de": "Herbst",
-                "en": "fall"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1312",
-              "labels": {
-                "de": "Frühling",
-                "en": "spring"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1313",
-              "labels": {
-                "de": "Sommer",
-                "en": "summer"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q1311",
-              "labels": {
-                "de": "Winter",
-                "en": "winter"
-              }
-            }
-          ]
-        },
-        {
-          "name": "daytime",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q52643",
-              "labels": {
-                "de": "Tag",
-                "en": "day"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q575",
-              "labels": {
-                "de": "Nacht",
-                "en": "night"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q164160",
-              "labels": {
-                "de": "Dämmerung",
-                "en": "twilight"
-              }
-            }
-          ]
-        }
-      ],
-      "name": "time"
-    },
-    {
-      "groups": [
-        {
-          "name": "weather",
+          "name": null,
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q8074",
@@ -2795,12 +3080,777 @@
           ]
         }
       ],
-      "name": "weather"
+      "name": "nature"
     },
     {
       "groups": [
         {
-          "name": "organisation",
+          "name": "posture",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2268776",
+              "labels": {
+                "de": "Liegen",
+                "en": "lying"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1144593",
+              "labels": {
+                "de": "Sitzen",
+                "en": "sitting"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1986098",
+              "labels": {
+                "de": "Stehen",
+                "en": "standing"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q8866546",
+              "labels": {
+                "de": "knien",
+                "en": "kneeling"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2540134",
+              "labels": {
+                "de": null,
+                "en": "squatting"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": null,
+                "en": "all-fours"
+              }
+            }
+          ]
+        },
+        {
+          "name": "locomotion",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1427203",
+              "labels": {
+                "de": "Krabbeln",
+                "en": "crawling"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Reiten",
+                "en": "horse-riding"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1415628",
+              "labels": {
+                "de": "Marschieren",
+                "en": "marching"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q105674",
+              "labels": {
+                "de": "Laufen",
+                "en": "running"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q6537379",
+              "labels": {
+                "de": "Gehen",
+                "en": "walking"
+              }
+            }
+          ]
+        },
+        {
+          "name": "articulation/interaction",
+          "terms": [
+            {
+              "iri": null,
+              "labels": {
+                "de": "Feiern",
+                "en": "celebrating"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Jubeln",
+                "en": "cheering"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q152247",
+              "labels": {
+                "de": "Weinen",
+                "en": "crying"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Tanzen",
+                "en": "dancing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Schmücken",
+                "en": "decorating"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7307",
+              "labels": {
+                "de": "Küssen",
+                "en": "kissing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q170579",
+              "labels": {
+                "de": "Lachen",
+                "en": "laughing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Musizieren",
+                "en": "making music"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Spielen",
+                "en": "playing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q858893",
+              "labels": {
+                "de": "Grüßen",
+                "en": "saluting"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q27939",
+              "labels": {
+                "de": "Singen",
+                "en": "singing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Sprechen",
+                "en": "talking"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Winken",
+                "en": "waving"
+              }
+            }
+          ]
+        },
+        {
+          "name": "consumption",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q876776",
+              "labels": {
+                "de": "Trinken",
+                "en": "drinking"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q213449",
+              "labels": {
+                "de": "Essen",
+                "en": "eating"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q662860",
+              "labels": {
+                "de": "Rauchen",
+                "en": "smoking"
+              }
+            }
+          ]
+        },
+        {
+          "name": "record/capture/trace",
+          "terms": [
+            {
+              "iri": null,
+              "labels": {
+                "de": "Filmen",
+                "en": "filming"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q11629",
+              "labels": {
+                "de": "Malen",
+                "en": "paint"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q11633",
+              "labels": {
+                "de": "Fotografieren",
+                "en": "photographing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Zeichnen",
+                "en": "sketch"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q37260",
+              "labels": {
+                "de": "Schreiben",
+                "en": "writing"
+              }
+            }
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1403016",
+              "labels": {
+                "de": "Verhaften",
+                "en": "arrest"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Schlagen",
+                "en": "beating"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Tragen",
+                "en": "carrying"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q22857",
+              "labels": {
+                "de": "Klettern",
+                "en": "climbing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q38695",
+              "labels": {
+                "de": "Kochen",
+                "en": "cooking"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Graben",
+                "en": "digging"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Ankleiden",
+                "en": "dressing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Hacken",
+                "en": "hoeing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1151752",
+              "labels": {
+                "de": "Springen",
+                "en": "jumping"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Zuhören",
+                "en": "listening"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Werfen",
+                "en": "pitching"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q199657",
+              "labels": {
+                "de": "Lesen",
+                "en": "reading"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Ausruhen",
+                "en": "rest"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q35831",
+              "labels": {
+                "de": "Schlafen",
+                "en": "sleep"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Entkleiden",
+                "en": "undressing"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Warten",
+                "en": "waiting"
+              }
+            },
+            {
+              "iri": null,
+              "labels": {
+                "de": "Schauen",
+                "en": "watching"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "persons(action)"
+    },
+    {
+      "groups": [
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1352349",
+              "labels": {
+                "de": "Architektonisches Modell",
+                "en": "architectural model"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q4006",
+              "labels": {
+                "de": "Plan",
+                "en": "map"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q507141",
+              "labels": {
+                "de": "Kinderwagen",
+                "en": "pram"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q191931",
+              "labels": {
+                "de": "Rollstuhl",
+                "en": "wheelchair"
+              }
+            }
+          ]
+        },
+        {
+          "name": "well",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1630622",
+              "labels": {
+                "de": "Trinkbrunnen",
+                "en": "drinking fountain"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q483453",
+              "labels": {
+                "de": "Zierbrunnen",
+                "en": "fountain"
+              }
+            }
+          ]
+        },
+        {
+          "name": "street furniture",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q204776",
+              "labels": {
+                "de": "Sitzbank",
+                "en": "bench"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q376",
+              "labels": {
+                "de": "Uhr",
+                "en": "clock"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1143785",
+              "labels": {
+                "de": "Telefon(Zelle)",
+                "en": "phone box"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q49844",
+              "labels": {
+                "de": "Briefkasten",
+                "en": "post box"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q503958",
+              "labels": {
+                "de": "Straßenlaterne",
+                "en": "street lamps"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q634299",
+              "labels": {
+                "de": "Hydrant",
+                "en": "fire hydrant"
+              }
+            }
+          ]
+        },
+        {
+          "name": "street furniture",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q216530",
+              "labels": {
+                "de": "Mistkübel",
+                "en": "trash can"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q8004",
+              "labels": {
+                "de": "Ampel",
+                "en": "traffic light"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q250429",
+              "labels": {
+                "de": "Stoppschild",
+                "en": "Stop sign"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q953960",
+              "labels": {
+                "de": "Parkuhr",
+                "en": "Parking meter"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q170285",
+              "labels": {
+                "de": null,
+                "en": "traffic sign"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q22706",
+              "labels": {
+                "de": null,
+                "en": "Number plate"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "objects"
+    },
+    {
+      "groups": [
+        {
+          "name": 1.0,
+          "terms": []
+        }
+      ],
+      "name": "audio event(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q806880",
+              "labels": {
+                "de": "Transparent",
+                "en": "banner"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Boundary_marker",
+              "labels": {
+                "de": "Ortstafel",
+                "en": "boundary sign"
+              }
+            },
+            {
+              "iri": "https://en.wikipedia.org/wiki/Signage",
+              "labels": {
+                "de": "Geschäftsschild",
+                "en": "commercial sign"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q14660",
+              "labels": {
+                "de": "Fahne",
+                "en": "flag"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1886349",
+              "labels": {
+                "de": "Logo",
+                "en": "logo"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q6006",
+              "labels": {
+                "de": "Leuchtschrift",
+                "en": "neon sign"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q22706",
+              "labels": {
+                "de": "Nummerntafel",
+                "en": "numberplate"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1969455",
+              "labels": {
+                "de": "Straßenschild",
+                "en": "poster"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Property:P670",
+              "labels": {
+                "de": null,
+                "en": "street sign"
+              }
+            }
+          ]
+        },
+        {
+          "name": "other",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q45513",
+              "labels": {
+                "de": "Hakenkreuzfahnen",
+                "en": "swastika flags"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "signs & symbols"
+    },
+    {
+      "groups": [
+        {
+          "name": "season",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1314",
+              "labels": {
+                "de": "Herbst",
+                "en": "fall"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1312",
+              "labels": {
+                "de": "Frühling",
+                "en": "spring"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1313",
+              "labels": {
+                "de": "Sommer",
+                "en": "summer"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1311",
+              "labels": {
+                "de": "Winter",
+                "en": "winter"
+              }
+            }
+          ]
+        },
+        {
+          "name": "daytime",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q52643",
+              "labels": {
+                "de": "Tag",
+                "en": "day"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q575",
+              "labels": {
+                "de": "Nacht",
+                "en": "night"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q164160",
+              "labels": {
+                "de": "Dämmerung",
+                "en": "twilight"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7722",
+              "labels": {
+                "de": "Morgen",
+                "en": "Morning"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q193294",
+              "labels": {
+                "de": "Sonnenaufgang",
+                "en": "Sunrise"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q166564",
+              "labels": {
+                "de": "Sonnenuntergang",
+                "en": "Sunset"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7725",
+              "labels": {
+                "de": "Abend",
+                "en": "Evening"
+              }
+            }
+          ]
+        },
+        {
+          "name": null,
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7269",
+              "labels": {
+                "de": null,
+                "en": "Monarchy"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7270",
+              "labels": {
+                "de": null,
+                "en": "Republic"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q317",
+              "labels": {
+                "de": null,
+                "en": "Dictatorship"
+              }
+            }
+          ]
+        }
+      ],
+      "name": "time & period"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
+          "terms": []
+        }
+      ],
+      "name": "weather(type)"
+    },
+    {
+      "groups": [
+        {
+          "name": null,
           "terms": [
             {
               "iri": "https://www.wikidata.org/wiki/Q860447",
@@ -2864,11 +3914,46 @@
                 "de": "Gewerkschaft",
                 "en": "union"
               }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7188",
+              "labels": {
+                "de": "Regierung",
+                "en": "Government"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q18193",
+              "labels": {
+                "de": "Klasse",
+                "en": "Class (education)"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q8434",
+              "labels": {
+                "de": "Bildung",
+                "en": "Educational "
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q9174",
+              "labels": {
+                "de": null,
+                "en": "Religion"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q4830453",
+              "labels": {
+                "de": null,
+                "en": "Business"
+              }
             }
           ]
         }
       ],
-      "name": "organisation"
+      "name": "organisations & movements"
     },
     {
       "groups": [
@@ -2876,59 +3961,24 @@
           "name": "shot size",
           "terms": [
             {
-              "iri": "https://www.wikidata.org/wiki/Q3391185",
+              "iri": null,
               "labels": {
-                "de": "American Shot",
-                "en": "american shot"
+                "de": "american shot",
+                "en": "https://www.wikidata.org/wiki/Q3391185"
               }
             },
             {
-              "iri": "https://www.wikidata.org/wiki/Q296001",
+              "iri": null,
               "labels": {
                 "de": "close-up (CU)",
-                "en": "close-up (CU)"
+                "en": "https://www.wikidata.org/wiki/Q296001"
               }
             },
             {
-              "iri": "",
+              "iri": null,
               "labels": {
-                "de": "extreme close-up (ECU)",
-                "en": "extreme close-up (ECU)"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "extreme long shot (ELS)",
-                "en": "extreme long shot (ELS)"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q3294287",
-              "labels": {
-                "de": "Long Shot (LS)",
-                "en": "long shot (LS)"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "medium close shot (MCS)",
-                "en": "medium close shot (MCS)"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "medium full shot (MFS)",
-                "en": "medium full shot (MFS)"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Medium Shot (MS)",
-                "en": "medium shot (MS)"
+                "de": "long shot (LS)",
+                "en": "https://www.wikidata.org/wiki/Q3294287"
               }
             }
           ]
@@ -2937,157 +3987,27 @@
           "name": "camera angle",
           "terms": [
             {
-              "iri": "",
+              "iri": null,
               "labels": {
-                "de": "Luftaufnahme",
-                "en": "aerial shot"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "high angle",
-                "en": "high angle"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "low angle",
-                "en": "low angle"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "straight on angle",
-                "en": "straight on angle"
-              }
-            }
-          ]
-        },
-        {
-          "name": "camera movement",
-          "terms": [
-            {
-              "iri": "",
-              "labels": {
-                "de": "cross fade",
-                "en": "cross fade"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Panoramaschwenk",
-                "en": "panning shot"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Pantom-ride",
-                "en": "phantom-ride"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Schwenk",
-                "en": "tilt"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Kamerafahrt",
-                "en": "tracking"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Zoom",
-                "en": "zoom"
-              }
-            }
-          ]
-        },
-        {
-          "name": "transition",
-          "terms": [
-            {
-              "iri": "",
-              "labels": {
-                "de": "black frame",
-                "en": "black frame"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Zwischentitel",
-                "en": "intertitle"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Kamerastopp",
-                "en": "stop"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "white frame",
-                "en": "white frame"
-              }
-            },
-            {
-              "iri": "",
-              "labels": {
-                "de": "Trickblende",
-                "en": "wipe"
+                "de": "aerial shot",
+                "en": "https://www.wikidata.org/wiki/Q4688031"
               }
             }
           ]
         }
       ],
-      "name": "shot"
+      "name": "shot(type)"
     },
     {
       "groups": [
         {
-          "name": "phases",
-          "terms": [
-            {
-              "iri": "https://www.wikidata.org/wiki/Q6008603",
-              "labels": {
-                "de": "Kameraschnitt",
-                "en": "in-camera editing"
-              }
-            },
-            {
-              "iri": "https://www.wikidata.org/wiki/Q648877",
-              "labels": {
-                "de": "Nachträglicher Schnitt",
-                "en": "post-production editing"
-              }
-            },
-            {
-              "iri": "https://en.wikipedia.org/wiki/Film_splicer",
-              "labels": {
-                "de": "Klebestelle",
-                "en": "splice"
-              }
-            }
-          ]
+          "name": null,
+          "terms": []
         }
       ],
-      "name": "editing"
+      "name": "editing(type)"
     }
   ],
-  "created": "2017-09-08 11:32:19.936898",
+  "created": "2017-10-12 12:37:04.821239",
   "vocabulary": "IMC controlled vocabulary"
 }
