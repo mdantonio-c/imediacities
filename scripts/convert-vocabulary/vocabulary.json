@@ -2301,38 +2301,52 @@
           "name": "Number",
           "terms": [
             {
+              "iri": "https://www.wikidata.org/wiki/Q13430821",
+              "labels": {
+                "de": "Masse",
+                "en": "crowd"
+              }
+            },
+            {
               "iri": null,
               "labels": {
-                "de": "crowd",
-                "en": "https://www.wikidata.org/wiki/Q13430821"
+                "de": "Verstreute Gruppen",
+                "en": "dispersed groups"
               }
             },
             {
-              "iri": "and add number",
+              "iri": null,
               "labels": {
-                "de": "large group",
-                "en": "https://www.wikidata.org/wiki/Q16334295"
+                "de": "Verstreute Einzelpersonen",
+                "en": "dispersed individuals"
               }
             },
             {
-              "iri": "and add number",
+              "iri": "https://www.wikidata.org/wiki/Q16334295",
               "labels": {
-                "de": "pair",
-                "en": "https://www.wikidata.org/wiki/Q15618652"
+                "de": "Großgruppe",
+                "en": "large group"
               }
             },
             {
-              "iri": "and add number",
+              "iri": "https://www.wikidata.org/wiki/Q15618652",
               "labels": {
-                "de": "single person",
-                "en": "https://www.wikidata.org/wiki/Q5"
+                "de": "Paar",
+                "en": "pair"
               }
             },
             {
-              "iri": "and add number",
+              "iri": "https://www.wikidata.org/wiki/Q5",
               "labels": {
-                "de": "small group",
-                "en": "https://www.wikidata.org/wiki/Q16334295"
+                "de": "Einzelperson",
+                "en": "single person"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q16334295",
+              "labels": {
+                "de": "Kleingruppe",
+                "en": "small group"
               }
             }
           ]
@@ -2341,24 +2355,31 @@
           "name": "Gender",
           "terms": [
             {
-              "iri": null,
+              "iri": "https://www.wikidata.org/wiki/Q6581072",
               "labels": {
-                "de": "female",
-                "en": "https://www.wikidata.org/wiki/Q6581072"
+                "de": "weiblich",
+                "en": "female"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q6581097",
+              "labels": {
+                "de": "männlich",
+                "en": "male"
               }
             },
             {
               "iri": null,
               "labels": {
-                "de": "male",
-                "en": "https://www.wikidata.org/wiki/Q6581097"
+                "de": "männlich und weiblich",
+                "en": "male and female"
               }
             },
             {
-              "iri": null,
+              "iri": "https://www.wikidata.org/wiki/Q51415",
               "labels": {
                 "de": "queer",
-                "en": "https://www.wikidata.org/wiki/Q51415"
+                "en": "queer"
               }
             }
           ]
@@ -2367,31 +2388,111 @@
           "name": "Age",
           "terms": [
             {
-              "iri": null,
+              "iri": "https://www.wikidata.org/wiki/Q80994",
               "labels": {
-                "de": "adults",
-                "en": "https://www.wikidata.org/wiki/Q80994"
+                "de": "Erwachsene",
+                "en": "adults"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q7569",
+              "labels": {
+                "de": "Kinder",
+                "en": "children"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2191986",
+              "labels": {
+                "de": "Alte",
+                "en": "elderly persons"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q190007",
+              "labels": {
+                "de": "Jugendliche",
+                "en": "youth"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Position",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2268776",
+              "labels": {
+                "de": "Liegen",
+                "en": "lying"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1144593",
+              "labels": {
+                "de": "Sitzen",
+                "en": "sitting"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q1986098",
+              "labels": {
+                "de": "Stehen",
+                "en": "standing"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q8866546",
+              "labels": {
+                "de": "knien",
+                "en": "kneeling"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q2540134",
+              "labels": {
+                "de": null,
+                "en": "squatting"
               }
             },
             {
               "iri": null,
               "labels": {
-                "de": "children",
-                "en": "https://www.wikidata.org/wiki/Q7569"
+                "de": null,
+                "en": "all-fours"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Profession",
+          "terms": [
+            {
+              "iri": "https://www.wikidata.org/wiki/Q82955",
+              "labels": {
+                "de": null,
+                "en": "Politician"
               }
             },
             {
               "iri": null,
               "labels": {
-                "de": "elderly persons",
-                "en": "https://www.wikidata.org/wiki/Q2191986"
+                "de": null,
+                "en": "Royalty"
               }
             },
             {
-              "iri": null,
+              "iri": "https://www.wikidata.org/wiki/Q39631",
               "labels": {
-                "de": "youth",
-                "en": "https://www.wikidata.org/wiki/Q190007"
+                "de": null,
+                "en": "Doctor"
+              }
+            },
+            {
+              "iri": "https://www.wikidata.org/wiki/Q182436",
+              "labels": {
+                "de": null,
+                "en": "Librarian"
               }
             }
           ]
@@ -2402,62 +2503,8 @@
             {
               "iri": null,
               "labels": {
-                "de": "lying",
-                "en": "https://www.wikidata.org/wiki/Q2268776"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "sitting",
-                "en": "https://www.wikidata.org/wiki/Q1144593"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "standing",
-                "en": "https://www.wikidata.org/wiki/Q1986098"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "kneeling",
-                "en": "https://www.wikidata.org/wiki/Q8866546"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "squatting",
-                "en": "https://www.wikidata.org/wiki/Q2540134"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Profession",
-          "terms": [
-            {
-              "iri": null,
-              "labels": {
-                "de": "Politician",
-                "en": "https://www.wikidata.org/wiki/Q82955"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "Doctor",
-                "en": "https://www.wikidata.org/wiki/Q39631"
-              }
-            },
-            {
-              "iri": null,
-              "labels": {
-                "de": "Librarian",
-                "en": "https://www.wikidata.org/wiki/Q182436"
+                "de": "Gaffer (Blick in Kamera)",
+                "en": "gazer (looking straight into the camera)"
               }
             }
           ]
@@ -2466,10 +2513,10 @@
           "name": "Number",
           "terms": [
             {
-              "iri": null,
+              "iri": "https://www.wikidata.org/wiki/Q221488",
               "labels": {
-                "de": "pedestrians",
-                "en": "https://www.wikidata.org/wiki/Q221488"
+                "de": "Passanten",
+                "en": "pedestrians"
               }
             }
           ]
@@ -3766,17 +3813,24 @@
               }
             },
             {
+              "iri": "https://www.wikidata.org/wiki/Q429785",
+              "labels": {
+                "de": "Plakat",
+                "en": "poster"
+              }
+            },
+            {
               "iri": "https://www.wikidata.org/wiki/Q1969455",
               "labels": {
                 "de": "Straßenschild",
-                "en": "poster"
+                "en": "street sign "
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Property:P670",
               "labels": {
                 "de": null,
-                "en": "street sign"
+                "en": "street number"
               }
             },
             {
@@ -3858,28 +3912,28 @@
               "iri": "https://www.wikidata.org/wiki/Q7722",
               "labels": {
                 "de": "Morgen",
-                "en": "Morning"
+                "en": "morning"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q193294",
               "labels": {
                 "de": "Sonnenaufgang",
-                "en": "Sunrise"
+                "en": "sunrise"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q166564",
               "labels": {
                 "de": "Sonnenuntergang",
-                "en": "Sunset"
+                "en": "sunset"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q7725",
               "labels": {
                 "de": "Abend",
-                "en": "Evening"
+                "en": "evening"
               }
             }
           ]
@@ -3891,21 +3945,21 @@
               "iri": "https://www.wikidata.org/wiki/Q7269",
               "labels": {
                 "de": null,
-                "en": "Monarchy"
+                "en": "monarchy"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q7270",
               "labels": {
                 "de": null,
-                "en": "Republic"
+                "en": "republic"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q317",
               "labels": {
                 "de": null,
-                "en": "Dictatorship"
+                "en": "dictatorship"
               }
             }
           ]
@@ -3994,35 +4048,35 @@
               "iri": "https://www.wikidata.org/wiki/Q7188",
               "labels": {
                 "de": "Regierung",
-                "en": "Government"
+                "en": "government"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q18193",
               "labels": {
                 "de": "Klasse",
-                "en": "Class (education)"
+                "en": "class (education)"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q8434",
               "labels": {
                 "de": "Bildung",
-                "en": "Educational "
+                "en": "educational "
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q9174",
               "labels": {
                 "de": null,
-                "en": "Religion"
+                "en": "religion"
               }
             },
             {
               "iri": "https://www.wikidata.org/wiki/Q4830453",
               "labels": {
                 "de": null,
-                "en": "Business"
+                "en": "business"
               }
             }
           ]
@@ -4087,6 +4141,6 @@
       "name": "editing(type)"
     }
   ],
-  "created": "2017-10-12 13:47:09.202905",
+  "created": "2017-10-12 14:11:46.632544",
   "vocabulary": "IMC controlled vocabulary"
 }
