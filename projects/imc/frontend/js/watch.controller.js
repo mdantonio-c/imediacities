@@ -226,21 +226,21 @@
 				    });
 				    return filtered;
 				};
-			}])
-			.filter('timefilter',[ function () {
-				return function(items, currentTime) {
+			}]);
+			/*.filter('timefilter',[ function () {
+				return function(items, ctime) {
 				    var filtered = [];            
 
 				    angular.forEach(items, function(item) {
 			    		var startT = item.startT;
 			    		var endT = item.endT;						    		
-			        	if((currentTime >= startT) && (currentTime <= endT)){ 
+			        	if((ctime.currentTime >= startT) && (ctime.currentTime <= endT)){ 
 			            	filtered.push(item);						        
 			        	}
 				    });
 				    return filtered;
 				};
-		}]);
+		}]);*/
 
 
 	app.directive('scrollStoryOnClick', function() {
@@ -464,7 +464,7 @@
 		}
 	]);
 
-	app.directive('multiselect',['$document', function($document){
+	/*app.directive('multiselect',['$document', function($document){
 	return {
 	  restrict: 'E',
 	  require: '?ngModel',
@@ -503,7 +503,7 @@
 	        });
 	  }
 	};
-	}]);
+	}]);*/
 
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
@@ -538,6 +538,7 @@
 		};
 		/*to visualize annotations in tab table*/
 		self.annotations = [];
+		$rootScope.currentTime = 0;
 
 		/*$scope.expand = function(mitem) {
 				mitem.show = !mitem.show;
@@ -581,22 +582,23 @@
 
 		var myVid = angular.element(window.document.querySelector('#videoarea'));
 
-		self.currentTime = myVid[0].currentTime; //initialize current time
-		self.startTagTime = self.currentTime;
+		$rootScope.currentTime = parseInt(myVid[0].currentTime); //initialize current time
+		self.startTagTime = $rootScope.currentTime;
 		self.currentvidDur = 0;
 
 		// On video playing toggle values
 		myVid[0].onplaying = function() {
 			self.onplaying = true;
 			self.onpause = false;
-			self.currentTime = myVid[0].currentTime; //always update current time
+			$rootScope.currentTime = parseInt(myVid[0].currentTime); //always update current time
+			$scope.$digest(); //refresh scope
 			if (!paused) {
 				myVid[0].pause();
 				paused = true;
 			}
 
 			/*updating subtitles*/
-			//if (self.videoTimeline != null) $rootScope.$emit('updateSubtitles');
+			if (self.videoTimeline != null) $rootScope.$emit('updateSubtitles');
 
 		};
 
@@ -661,7 +663,7 @@
 
 		self.manualtag = function(group, labelterm, tiri, alternatives) {
 			if (self.onpause && !self.onplaying) {
-				self.startTagTime = myVid[0].currentTime; //set initial tag frame current time
+				self.startTagTime = parseInt(myVid[0].currentTime); //set initial tag frame current time
 
 				for (var i = 0; i <= self.items.length - 1; i++) {
 					var pngshot = self.items[i][6];
@@ -974,15 +976,15 @@
 		});
 
 		$rootScope.$on('updateSubtitles', function() {
-
-			/*for (var elems in self.videoTimeline.data.rows)
-			{
-				for (var line in elems.c)
+			self.filtered = [];				
+			angular.forEach(self.annotations, function(ann) {
+				var startT = ann.startT;
+				var endT = ann.endT;
+				if (($rootScope.currentTime >= startT) && ($rootScope.currentTime <= endT))
 				{
-					alert(line[1]);
+					self.filtered.push(ann);
 				}
-			}*/
-
+			});
 		});
 
 	}
