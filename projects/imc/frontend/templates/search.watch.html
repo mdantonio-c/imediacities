@@ -29,9 +29,12 @@
 				</video>
 
     	 		<div class="overlay-desc" ng-model="watchCtrl.locSubtitle">
-    	 		<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:watchCtrl.currentTime as filtered_annotations track by $index">
-        			<h2>{{annotation.name}} {{watchCtrl.currentTime}}</h2>
-        		</div>
+    	 		<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
+        			<h2>{{annotation.name}} {{currentTime}}</h2>
+        		</div>-->
+        		<div ng-repeat="annotation in watchCtrl.filtered | groupfilter:[options,selectedOptions] as filtered_annotations track by $index">
+        			<h2>{{annotation.name}}</h2>
+        		</div>	
     	 		</div>
 
 				</div>

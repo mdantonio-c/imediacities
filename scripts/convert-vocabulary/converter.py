@@ -22,10 +22,10 @@ for ws in wb.worksheets:
     group_terms = []
     for row_index in range(2, ws.max_row + 1):
         entry = {'iri': '', 'labels': {}}
-        en_term = ws['K' + str(row_index)].value
-        de_term = ws['L' + str(row_index)].value
+        en_term = ws['L' + str(row_index)].value
+        de_term = ws['K' + str(row_index)].value
         iri = ws['M' + str(row_index)].value
-        group = ws['H' + str(row_index)].value
+        group = ws['I' + str(row_index)].value
         if en_term is None:
             # ignore also groups without entry value
             continue
