@@ -134,7 +134,7 @@
       <th ts-criteria="name">Filename</th>
       <th ts-criteria="type">Type</th>
       <th ts-criteria="size | parseInt">Size</th>
-      <th ts-criteria="creation | parseInt">Uploaded</th>
+      <th ts-criteria="modification | parseInt">Uploaded</th>
       <!-- <th ts-criteria="modification | parseInt">Modified</th> -->
       <th ts-criteria="status">Status</th>
       <th></th>
@@ -162,8 +162,8 @@
       <td>{{data.size | bytes}}</td>
 
       <td>
-        <span uib-tooltip='{{data.creation | unix_date}}'>
-          {{data.creation | moment_unix: 'fromNow'}}
+        <span uib-tooltip='{{data.modification | unix_date}}'>
+          {{data.modification | moment_unix: 'fromNow'}}
         </span>
       </td>
 
