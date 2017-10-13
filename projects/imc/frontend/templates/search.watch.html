@@ -32,9 +32,9 @@
     	 		<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
         			<h2>{{annotation.name}} {{currentTime}}</h2>
         		</div>-->
-        		<div ng-repeat="annotation in watchCtrl.filtered | groupfilter:[options,selectedOptions] as filtered_annotations track by $index">
+        		<!--<div ng-repeat="annotation in watchCtrl.filtered | groupfilter:[options,selectedOptions] as filtered_annotations track by $index">
         			<h2>{{annotation.name}}</h2>
-        		</div>	
+        		</div>-->
     	 		</div>
 
 				</div>
@@ -158,7 +158,7 @@
 				</div>
 
 				</div>
-			<multiselect class="btn pull-right" choices="options" selected="selectedOptions" placeholder="filter subtitles"></multiselect>	<!-- Selected: {{selectedOptions}} -->				
+			<!--<multiselect class="btn pull-right" choices="options" selected="selectedOptions" placeholder="filter subtitles"></multiselect>-->	<!-- Selected: {{selectedOptions}} -->				
 		    </uib-tab>
 		    <uib-tab class="Storyboard" heading="Storyboard">
 		   <div class="container storyboard">

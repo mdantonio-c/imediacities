@@ -464,7 +464,7 @@
 		}
 	]);
 
-	app.directive('multiselect',['$document', function($document){
+	/*app.directive('multiselect',['$document', function($document){
 	return {
 	  restrict: 'E',
 	  require: '?ngModel',
@@ -503,7 +503,7 @@
 	        });
 	  }
 	};
-	}]);
+	}]);*/
 
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
