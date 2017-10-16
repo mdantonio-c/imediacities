@@ -9,14 +9,14 @@ log = get_logger(__name__)
 
 class TestApp:
 
-    def test_get(self, client): #client e' una fixture di pytest-flask
+    def test_POST(self, client): #client e' una fixture di pytest-flask
         """
-            Test GET method of /api/annotations
+            Test POST method of /api/search
         """
-        log.info("*** Testing GET annotations")
+        log.info("*** Testing POST search")
 
         # try without log in
-        res = client.get('/api/annotations')
+        res = client.post('/api/search')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
         log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
@@ -25,42 +25,18 @@ class TestApp:
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
 
-        # GET all annotations of type TVS, with pagination parameters
-        res = client.get('/api/annotations?type=VIM&pageSize=10&pageNumber=1', headers=headers)
+        # search all item of type video with pagination parameters
+        post_data = {'type': 'video', 'term': '*'}
+        res = client.post('/api/search?perpage=10&currentpage=1', headers=headers, data=json.dumps(post_data))
+
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        content = json.loads(res.data.decode('utf-8'))
-        #log.debug("*** Response of GET annotations: "+json.dumps(content))
+        response = json.loads(res.data.decode('utf-8'))
+        #log.debug("*** Response of search: "+json.dumps(response))
 
-        anno_id = None
-
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None and data[0] is not None:
-                # data e' una lista
-                anno_id = data[0].get("id")
-                log.debug("*** annotations[0] id: " + anno_id)
-
-        # GET an annotations with a specific id
-        if anno_id is not None:
-            res = client.get('/api/annotations/'+anno_id, headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
-            content = json.loads(res.data.decode('utf-8'))
-            log.debug("*** Response of GET annotations with id: "+json.dumps(content))
-
-
-    # TODO post
-    #def test_post(self, client):
-    #    """
-    #        Test POST method of /api/annotations
-    #    """
-    #    log.info("*** Testing POST annotations")
-        
-    #TODO delete
-    #def test_delete(self, client):
-    #    """
-    #        Test DELETE method of /api/annotations
-    #    """
-    #    log.info("*** Testing DELETE annotations")
+        if response is not None:
+            videos_data = response.get('Response', {}).get('data', {})
+            if videos_data is not None:
+                log.debug("*** Number of videos found: " + str(len(videos_data)))
 
 
 ##############################################################################
