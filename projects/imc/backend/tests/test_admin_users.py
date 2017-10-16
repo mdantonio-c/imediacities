@@ -9,14 +9,16 @@ log = get_logger(__name__)
 
 class TestApp:
 
+    # non e' prevista la possibilita' di fare get con uno specifico group_id
+
     def test_get(self, client): #client e' una fixture di pytest-flask
         """
-            Test GET method of /api/annotations
+            Test GET method of /api/admin/users
         """
-        log.info("*** Testing GET annotations")
+        log.info("*** Testing GET users")
 
         # try without log in
-        res = client.get('/api/annotations')
+        res = client.get('/api/admin/users')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
         log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
@@ -25,42 +27,44 @@ class TestApp:
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
 
-        # GET all annotations of type TVS, with pagination parameters
-        res = client.get('/api/annotations?type=VIM&pageSize=10&pageNumber=1', headers=headers)
+        # GET groups without a specific id, get all groups
+        res = client.get('/api/admin/users', headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        content = json.loads(res.data.decode('utf-8'))
-        #log.debug("*** Response of GET annotations: "+json.dumps(content))
+        contents = json.loads(res.data.decode('utf-8'))
+        log.debug("*** Response of GET users: "+json.dumps(contents))
 
-        anno_id = None
+        user_id = None
 
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None and data[0] is not None:
-                # data e' una lista
-                anno_id = data[0].get("id")
-                log.debug("*** annotations[0] id: " + anno_id)
-
-        # GET an annotations with a specific id
-        if anno_id is not None:
-            res = client.get('/api/annotations/'+anno_id, headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
-            content = json.loads(res.data.decode('utf-8'))
-            log.debug("*** Response of GET annotations with id: "+json.dumps(content))
+        if contents is not None:
+            datas = contents.get('Response', {}).get('data', {})
+            if datas is not None and datas[0] is not None:
+                # datas e' una lista
+                user_id = datas[0].get("id")
+                log.debug("*** users[0] id: " + user_id)
 
 
     # TODO post
     #def test_post(self, client):
     #    """
-    #        Test POST method of /api/annotations
+    #        Test POST method of /api/admin/users
     #    """
-    #    log.info("*** Testing POST annotations")
+    #    log.info("*** Testing POST user")
+
+    # TODO put
+    #def test_put(self, client):
+    #    """
+    #        Test POST method of /api/admin/users
+    #    """
+    #    log.info("*** Testing PUT user")
         
     #TODO delete
     #def test_delete(self, client):
     #    """
-    #        Test DELETE method of /api/annotations
+    #        Test DELETE method of /api/admin/users
     #    """
-    #    log.info("*** Testing DELETE annotations")
+    #    log.info("*** Testing DELETE user")
+
+    # TODO test get UserRole  (???)
 
 
 ##############################################################################

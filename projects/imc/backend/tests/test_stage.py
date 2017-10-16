@@ -11,56 +11,58 @@ class TestApp:
 
     def test_get(self, client): #client e' una fixture di pytest-flask
         """
-            Test GET method of /api/annotations
+            Test GET method of /api/stage
         """
-        log.info("*** Testing GET annotations")
+        log.info("*** Testing GET stage")
 
         # try without log in
-        res = client.get('/api/annotations')
+        res = client.get('/api/stage')
         # This endpoint requires a valid authorization token
-        assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
+        assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
         log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
 
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
+        #log.debug("*** headers="+json.dumps(headers))
 
-        # GET all annotations of type TVS, with pagination parameters
-        res = client.get('/api/annotations?type=VIM&pageSize=10&pageNumber=1', headers=headers)
+        # GET all stage files
+        res = client.get('/api/stage', headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        content = json.loads(res.data.decode('utf-8'))
-        #log.debug("*** Response of GET annotations: "+json.dumps(content))
+        stage_content = json.loads(res.data.decode('utf-8'))
+        #log.debug("*** Response of GET stage: "+json.dumps(stage_content))
+        if stage_content is not None:
+            element_list = stage_content.get('Response', {}).get('data', {})
+            if element_list is not None:
+                log.debug("*** Number of stage elements: " + str(len(element_list)))
 
-        anno_id = None
+        # GET all stage files by group
+        #group_id="bacbafac-3dd3-4ea5-9d11-04e416326191"
+        #res = client.get('/api/stage/'+group_id, headers=headers)
+        #assert res.status_code == hcodes.HTTP_OK_BASIC
+        #stage_content = json.loads(res.data.decode('utf-8'))
+        #log.debug("*** Response of GET stage with group id: "+json.dumps(stage_content))
+        #if stage_content is not None:
+        #    element_list = stage_content.get('Response', {}).get('data', {})
+        #    if element_list is not None:
+        #        log.debug("*** Number of stage elements of group id: " + str(len(element_list)))
 
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None and data[0] is not None:
-                # data e' una lista
-                anno_id = data[0].get("id")
-                log.debug("*** annotations[0] id: " + anno_id)
-
-        # GET an annotations with a specific id
-        if anno_id is not None:
-            res = client.get('/api/annotations/'+anno_id, headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
-            content = json.loads(res.data.decode('utf-8'))
-            log.debug("*** Response of GET annotations with id: "+json.dumps(content))
 
 
     # TODO post
     #def test_post(self, client):
     #    """
-    #        Test POST method of /api/annotations
+    #        Test POST method of /api/stage
     #    """
-    #    log.info("*** Testing POST annotations")
+    #    log.info("*** Testing POST")
         
     #TODO delete
     #def test_delete(self, client):
     #    """
-    #        Test DELETE method of /api/annotations
+    #        Test DELETE method of /api/stage
     #    """
-    #    log.info("*** Testing DELETE annotations")
+    #    log.info("*** Testing DELETE file")
+
 
 
 ##############################################################################

@@ -1,4 +1,4 @@
-Come lanciare i test
+## Come lanciare i test ##
 
 Dalla directory root del repository git:
 .../imediacity/
@@ -28,3 +28,7 @@ aggiungere alla riga di comando l'opzione --cov
 
 py.test -s --cov=imc.apis tests/custom/test_videos.py
 
+
+## Dove si trovano i file dei test delle rest apis del backend ##
+
+.../imediacity/projects/imc/backend/tests/
