@@ -159,9 +159,9 @@ class Annotations(GraphBaseOperations):
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        repo.create_manual_annotation(user, body, targetNode, selector)
+        created_anno = repo.create_manual_annotation(user, body, targetNode, selector)
 
-        return self.force_response("", code=hcodes.HTTP_OK_CREATED)
+        return self.force_response(created_anno.uuid, code=hcodes.HTTP_OK_CREATED)
 
     @decorate.catch_error()
     @catch_graph_exceptions

@@ -8,13 +8,17 @@ import json
 log = get_logger(__name__)
 
 class TestApp:
-
+    #
+    # Al momento il metodo POST (Create a new video description) non
+    #  fa nulla, quindi non faccio il test.
+    # Non potendo creare una new video description non posso nemmeno
+    #  testare la DELETE.
+    #
     def test_get(self, client): #client e' una fixture di pytest-flask
         """
             Test GET method of /api/videos
         """
         log.info("*** Testing GET videos")
-
         # try without log in
         res = client.get('/api/videos')
         # This endpoint requires a valid authorization token
@@ -32,30 +36,25 @@ class TestApp:
         #log.debug("*** Response of GET videos: "+json.dumps(contents))
 
         video_id = None
-
         if contents is not None:
             datas = contents.get('Response', {}).get('data', {})
             if datas is not None and datas[0] is not None:
                 # datas e' una lista
                 video_id = datas[0].get("id")
-                log.debug("*** videos[0] id: " + video_id)
-
+                #log.debug("*** videos[0] id: " + video_id)
         video_content = None
-
         # GET a video with a specific id
         if video_id is not None:
             res = client.get('/api/videos/' + video_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC
             video_content = json.loads(res.data.decode('utf-8'))
-            log.debug("*** Response of GET videos with id: "+json.dumps(video_content))
+            #log.debug("*** Response of GET videos with id: "+json.dumps(video_content))
             if video_content is not None:
                 data = video_content.get('Response', {}).get('data', {})
                 if data is not None and data[0] is not None:
                    # data e' una lista
                    video_title = data[0].get("attributes").get("identifying_title")
-                   log.debug("*** video title: " + video_title)
-
-
+                   #log.debug("*** video title: " + video_title)
         log.info("*** Testing GET video shots")
         if video_id is not None:
             # try without log in
@@ -63,13 +62,11 @@ class TestApp:
             # This endpoint requires a valid authorization token
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
             log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
-
             # GET shots 
             res = client.get('/api/videos/' + video_id + '/shots', headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC
             shots_res = json.loads(res.data.decode('utf-8'))
             #log.debug("*** Response of GET video shots: "+json.dumps(shots_res))
-
             if shots_res is not None:
                 shots_list = shots_res.get('Response', {}).get('data', {})
                 if shots_list is not None:
@@ -83,13 +80,11 @@ class TestApp:
             res = client.get('/api/videos/' + video_id + '/annotations')
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED # This endpoint requires a valid authorization token
             log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
-
             # GET annotations 
             res = client.get('/api/videos/' + video_id + '/annotations', headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC
             anno_res = json.loads(res.data.decode('utf-8'))
             log.debug("*** Response of GET video annotations: "+json.dumps(anno_res))
-
             if anno_res is not None:
                 anno_list = anno_res.get('Response', {}).get('data', {})
                 if anno_list is not None:
@@ -103,23 +98,7 @@ class TestApp:
             # at the moment authorization token not required
             res = client.get('/api/videos/' + video_id + '/content?type=thumbnail')
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
-
-
-    # TODO post
-    #def test_post(self, client):
-    #    """
-    #        Test POST method of /api/videos
-    #    """
-    #    log.info("*** Testing POST videos")
-        
-    #TODO delete
-    #def test_delete(self, client):
-    #    """
-    #        Test DELETE method of /api/videos
-    #    """
-    #    log.info("*** Testing DELETE videos")
-
+            #log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
 
 ##############################################################################
 
