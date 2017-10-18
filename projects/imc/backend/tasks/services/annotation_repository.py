@@ -70,6 +70,7 @@ class AnnotationRepository():
             # should never be reached
             raise ValueError('Invalid body: {}'.format(body['type']))
         anno.bodies.connect(bodyNode)
+        return anno
 
     def delete_manual_annotation(self, anno):
         body = anno.bodies.single()
