@@ -56,7 +56,7 @@ bower_components:
   font-awesome:
     - css/font-awesome.min.css
   lodash:
-    - lodash.min.js
+    - dist/lodash.min.js
 
 css: 
   - "custom/imc.css"
