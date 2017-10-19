@@ -41,7 +41,7 @@ class TestApp:
             content = json.loads(res.data.decode('utf-8'))
             #log.debug("*** Response of GET annotations with id: "+json.dumps(content))
 
-        # POST creation of a new annotation
+        # POST creation of a new annotation on a video
         #  Prima devo fare una ricerca sui video esistenti per avere l'id dell'item di un video
         #    a cui associare la annotazione 
         video_id = None
@@ -90,21 +90,71 @@ class TestApp:
                 content = json.loads(res.data.decode('utf-8'))
                 #log.debug("*** Response of GET della annotations appena creata: "+json.dumps(content))
 
+                #creo una annotazione sulla annotazione appena creata
+                log.info("*** Testing annotation on an annotation")
+                target_data2 = 'anno:'+anno_id
+                body_data2 = {'type':'TextualBody','value':'testo della annotazione di annotazione','language':'de'}
+                post_data2 = {'target':target_data2,'body':body_data2}
+                res2 = client.post('/api/annotations', headers=headers, data=json.dumps(post_data2))
+                assert res2.status_code == hcodes.HTTP_OK_CREATED
+                response2 = json.loads(res2.data.decode('utf-8'))
+                #log.debug("*** Response of post: "+json.dumps(response2))
+                if response2 is not None:
+                    data2 = response2.get('Response', {}).get('data', {})
+                    if data2 is not None:
+                        anno_id2 = data2
+                # cancello la annotazione di annotazione
+                if anno_id2 is not None:
+                    res2 = client.delete('/api/annotations/'+anno_id2, headers=headers)
+                    assert res2.status_code == hcodes.HTTP_OK_NORESPONSE
+
         # cancello la annotation appena creata
         if anno_id is not None:
             log.info("*** Testing DELETE annotation")
             res = client.delete('/api/annotations/'+anno_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
-    #################################################################
-    # TODO mancano i test di creazione di una annotazione di uno shot 
-    #       e di annotazione su una annotazione
-    #################################################################
-
+        # creo annotazione su uno shot
+        # prima devo trovare l'id di uno shot
+        # lo cerco sul video che avevo usato prima
+        log.info("*** Testing annotation on a shot")
+        if video_id is not None:
+            # GET shots 
+            res = client.get('/api/videos/' + video_id + '/shots', headers=headers)
+            assert res.status_code == hcodes.HTTP_OK_BASIC
+            shots_res = json.loads(res.data.decode('utf-8'))
+            #log.debug("*** Response of GET video shots: "+json.dumps(shots_res))
+            if shots_res is not None:
+                shots_list = shots_res.get('Response', {}).get('data', {})
+                if shots_list is not None:
+                    #log.debug("*** number of shots: " + str(len(shots_list)))
+                    if shots_list[0] is not None:
+                        #log.debug("*** shots[0]: " + json.dumps(shots_list[0]))
+                        shot_id = shots_list[0].get("id")
+                        # deve esistere lo shot_id
+                        assert shot_id is not None
+                        #log.debug("*** shot id: " + shot_id)
+                        target_data3 = 'shot:'+shot_id
+                        body_data3 = {'type':'TextualBody','value':'testo della annotazione di shot','language':'de'}
+                        post_data3 = {'target':target_data3,'body':body_data3}
+                        res3 = client.post('/api/annotations', headers=headers, data=json.dumps(post_data3))
+                        assert res3.status_code == hcodes.HTTP_OK_CREATED
+                        response3 = json.loads(res3.data.decode('utf-8'))
+                        #log.debug("*** Response of post: "+json.dumps(response3))
+                        if response3 is not None:
+                            data3 = response3.get('Response', {}).get('data', {})
+                            if data3 is not None:
+                                anno_id3 = data3
+                        # cancello la annotazione di annotazione
+                        if anno_id3 is not None:
+                            res3 = client.delete('/api/annotations/'+anno_id3, headers=headers)
+                            assert res3.status_code == hcodes.HTTP_OK_NORESPONSE
+                            
+        # a questo punto il database dovrebbe essere tornato come prima dei test
 
 ##############################################################################
 
-    # do_login is temporarily here, it will be handled in a better way 
+    # TOFIX: from version 0.5.6 this method will be in BaseTests class
     def do_login(self, client, USER, PWD, status_code=hcodes.HTTP_OK_BASIC,
                  error=None, **kwargs):
         """
