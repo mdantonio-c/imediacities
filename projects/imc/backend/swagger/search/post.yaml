@@ -15,7 +15,13 @@ search:
         properties:
           type:
             type: string
+            enum:
+              - all
+              - video
+              - image
           term:
+            type: string
+          provider:
             type: string
     - name: perpage
       in: query
