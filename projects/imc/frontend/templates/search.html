@@ -2,75 +2,127 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='SearchController as ctrl'>
+<div ng-controller='SearchController as ctrl' style="margin: 2.5em;">
 	<div class="row">
-		<div id="imaginary_container">
+		<div id="search-box">
 			<div id="search-logo" ng-show="ctrl.viewlogo">
 				<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
 			</div>
-			<div class="input-group stylish-input-group" ng-show="!ctrl.loading">
+			<span ng-if="ctrl.loadResults && ctrl.creations.length == 0"><i>No item found</i></span>
+			<div class="input-group stylish-input-group">
 				<input ng-attr-type="text" ng-model="ctrl.inputTerm" class="form-control" ng-attr-placeholder="Search video"
-				ng-keypress="($event.charCode === 13)?ctrl.searchVideos():return" autofocus>
-				<span class="input-group-addon">
-					<button ng-click="ctrl.searchVideos()">
-					<span class="glyphicon glyphicon-search"></span>
+				ng-keypress="($event.charCode === 13) ? ctrl.resetAndSearch() : return" autofocus>
+				<span class="input-group-btn">
+					<button class="btn btn-default" type="button" ng-click="ctrl.resetAndSearch()">
+						<i class="imc-icon fa fa-search" aria-hidden="true"></i>
 					</button>
 				</span>
 			</div>
-			<span ng-if="ctrl.loadResults && ctrl.videos.length == 0">No video found</span>
+			<div class="widget-box" style="border: none;">
+				<div class="widget-header" style="border-bottom: none;">
+					<h6 class="widget-title">Advanced search</h6>
+					<div class="widget-toolbar" style="float: none;">
+						<a href="" data-action="collapse" ng-click="asCollapsed = !asCollapsed; cleanupFilters()">
+							<i class="imc-icon fa" ng-class="{'fa-chevron-right': asCollapsed, 'fa-chevron-down': !asCollapsed}"></i>
+						</a>
+					</div>
+				</div>
+				<div class="widget-body" style="border: 1px solid #CCC;" uib-collapse="asCollapsed">
+					<div class="widget-main scrollable imc-scroll" style="position: relative;">
+						<div class="scroll-track"></div>
+						<div class="scroll-content" style="max-height: 125px;">
+							<div class="content">
+								<div class="row">
+									<div class="col-xs-12">
+										<form class="form-horizontal" role="form">
+											<div class="form-group">
+												<div class="col-sm-12">
+													<label class="radio-inline"> <input type="radio" name="item_type" id="all_item_types" value="all" ng-model="ctrl.inputItemType"> All </label>
+													<label class="radio-inline"> <input type="radio" name="item_type" id="video_item_types" value="video" ng-model="ctrl.inputItemType"> Video </label>
+													<label class="radio-inline"> <input type="radio" name="item_type" id="image_item_types" value="image" ng-model="ctrl.inputItemType"> Image </label>
+													<!-- <label class="radio-inline"> <input type="radio" name="item_type" id="text_item_types" value="text" ng-model="ctrl.inputItemType" disabled> Text </label> -->
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-3 no-padding-right" for="form-field-select-provider">Provider</label>
+												<div class="col-sm-9">
+													<select class="form-control" id="form-field-select-provider" ng-model="ctrl.inputProvider" ng-options="provider.code as provider.name for provider in providers">
+														<option value=""></option>
+													</select>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class='row'>
-		<!-- <div class="container" ng-show="ctrl.showmese" ng-style="{'float': 'left', 'width': '100%'}"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Searching...</div> -->
 		<div class="progress" ng-show="ctrl.showmese">
 			<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" ng-style="{'width':'100%'}">Searching</div>
 		</div>
-		<div class="list-results" ng-if="ctrl.loadResults">
-			<div class="list-results" ng-if="ctrl.videos.length > 0">
-				<ul>
-					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this)"> -->
-					<!-- <li ng-repeat="v in filteredVideos = (ctrl.videos | searchFor:searchString:this | limitTo: (vmin - vmax))"> -->
-					<li ng-repeat="v in ctrl.videos">
-						<a href ui-sref="logged.search.watch({v: v.id, meta: v})">
-							<img ng-src="{{v.links['thumbnail']}}" ng-if="v.links['thumbnail']"/>
-							<img alt="No thumbnail" ng-if="! v.links['thumbnail']"/>
-						</a>
-						<div class="primary-description">
-							<a href ui-sref="logged.search.watch({v: v.id, meta: v})"><span class="title">{{v.attributes.identifying_title}}</span></a><i>({{v.relationships.item[0].attributes.duration | parseNum}})</i>
-							<p><span ng-repeat="description in v.relationships.descriptions">
-							<br/>{{description.attributes.text}}{{$last ? '' : ', '}}</span></p>
-							<p><span ng-repeat="keyword in v.relationships.keywords">
-							{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
+		<div class="row" ng-if="ctrl.loadResults">
+			<div class="col-sm-12">
+				<!-- <div ng-if="ctrl.creations.length == 0">No item(s) found</div> -->
+				<div ng-if="ctrl.creations.length > 0">
+					<div class="row"><!-- put here headers --></div>
+					<div class="items imc-scroll">
+						<div class="itemdiv" ng-repeat="v in ctrl.creations">
+							<div class="imc-thumbnail">
+								<img ng-src="{{v.links['thumbnail']}}" ng-if="v.links['thumbnail']"/>
+								<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="v.links['thumbnail'] == null"/>
+								<div class="cn">
+									<div class="inner">
+										<i class="fa small" ng-class="{'fa-video-camera': v.relationships.item[0].attributes.item_type === 'Video', 'fa-image': v.relationships.item[0].attributes.item_type === 'Image'}">&nbsp;&nbsp;{{v.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+									</div>
+								</div>
+							</div>
+							<div class="body">
+								<div class="title">
+									<a href ui-sref="logged.search.watch({v: v.id, meta: v})" ng-if="v.type == 'nonaventity'">{{v.relationships.titles[0].attributes.text}}</a>
+									<a href ui-sref="logged.search.watch({v: v.id, meta: v})" ng-if="v.type == 'aventity'">{{v.attributes.identifying_title}}</a>
+									<i ng-if="v.attributes.production_years > 0">({{v.attributes.production_years[0]}})</i>
+									<span ng-repeat="contributor in directors = (v.relationships.contributors | contributorsByRole:'Director')">{{contributor.attributes.names[0] | nocomma}}{{$last ? '' : ', '}}</span>
+								</div>
+								<div class="duration">
+									<i class="imc-icon fa fa-clock-o"></i>
+									<span class="blue">{{v.relationships.item[0].attributes.duration | parseNum}}</span>
+								</div>
+								<div class="text">
+									<i class="imc-icon fa fa-quote-left"></i>
+									{{v.relationships.descriptions[0].attributes.text}}
+								</div>
+							</div>
 						</div>
-						<div class="secondary-description" ng-show="v.id === ctrl.selectedVideoId">
-							<p><b>Production Year(s)</b>: {{v.attributes.production_years[0]}}</p>
-							<p><b>Location</b>: {{locname}}</p>
-						</div>
-					</li>
-				</ul>
-				<hr/>
-				<div class="row">
-					<div class="col-xs-10">
-						<ul uib-pagination 
-							total-items="ctrl.totalItems"
-							items-per-page="ctrl.ItemsByPage"
-							ng-model="ctrl.currentPage"
-							ng-change="pageChanged()"
-							boundary-links="true"
-							max-size="ctrl.maxSize"
-							rotate="true"
-							force-ellipses="true"
-							previous-text="&lsaquo;"
-							next-text="&rsaquo;"
-							first-text="&laquo;"
+					</div>
+					<div class="row">
+						<div class="col-xs-10">
+							<ul uib-pagination
+								total-items="ctrl.totalItems"
+								items-per-page="ctrl.ItemsByPage"
+								ng-model="ctrl.currentPage"
+								ng-change="pageChanged()"
+								boundary-links="true"
+								max-size="ctrl.maxSize"
+								rotate="true"
+								force-ellipses="true"
+								previous-text="&lsaquo;"
+								next-text="&rsaquo;"
+								first-text="&laquo;"
 							last-text="&raquo;"></ul>
+						</div>
+						<div class="col-xs-2">
+							<select class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='option.value as option.name for option in ctrl.typeOptions' ng-change="setItemsPerPage(ctrl.ItemsByPage)" style="margin: 20px 0;"></select>
+						</div>
+						<!-- <div class="col-xs-2">
+							<span>Showing 1 to 4 of {{ctrl.totalItems}} entries</span>
+						</div> -->
 					</div>
-					<div class="col-xs-2">
-						<select class="form-control" ng-model='ctrl.ItemsByPage' required ng-options='option.value as option.name for option in ctrl.typeOptions' ng-change="setItemsPerPage(ctrl.ItemsByPage)"></select>
-					</div>
-					<!-- <div class="col-xs-2">
-						<span>Showing 1 to 4 of {{ctrl.totalItems}} entries</span>
-					</div> -->
+						
 				</div>
 			</div>
 		</div>

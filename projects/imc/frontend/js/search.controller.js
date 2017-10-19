@@ -22,7 +22,7 @@
 					});
 
 					/*pagination*/
-					self.numPerPage = 5; /*number of videos per page*/
+					self.numPerPage = 5; /*number of creations per page*/
 					$scope.noOfPages = Math.ceil(result.length / self.numPerPage);
 					$scope.currentPage = 1;
 					/*---*/
@@ -35,17 +35,55 @@
 		.filter('parseNum', function() {
 			return function(input) {
 				var secs = parseInt(input, 10);
+				if (isNaN(secs)) {
+					return "n/a";
+				}
 				var cdate = new Date(0, 0, 0, 0, 0, secs);
 				if ((cdate.getHours() === 0) && (cdate.getMinutes() > 0)) {
-					return cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+					return cdate.getMinutes() + " min " + cdate.getSeconds() + " sec";
 				} else if ((cdate.getHours() === 0) && (cdate.getMinutes() === 0)) {
-					return cdate.getSeconds() + " secs";
+					return cdate.getSeconds() + " sec";
 				} else {
-					return cdate.getHours() + " hours " + cdate.getMinutes() + " mins " + cdate.getSeconds() + " secs";
+					return cdate.getHours() + " hour " + cdate.getMinutes() + " min " + cdate.getSeconds() + " sec";
 				}
 			};
-		});
-	
+		})
+		// Filter a list of contributors by a given role
+		.filter('contributorsByRole', function() {
+			return function(inputArray, role) {
+				if (!angular.isDefined(role) || role === '') {
+					return inputArray;
+				}
+				var data = _.filter(inputArray, function(item) {
+					if (!item.attributes.activities || !item.attributes.activities.length) {
+						return false;
+					}
+
+					var isMatch = false;
+					item.attributes.activities.forEach(function(r) {
+						if (_.isObject(r)) {
+							if (r.value === role) {
+								isMatch = true;
+							}
+						} else {
+							if (r === role) {
+								isMatch = true;
+							}
+						}
+					});
+
+					return isMatch;
+				});
+				return data;
+			};
+		})
+		.filter('nocomma', function() {
+			return function(value) {
+				return (!value) ? '' : value.replace(/,/g, '');
+			};
+		})
+		;
+
 	// The controller
 	function SearchController($scope, $log, $document, $state, $stateParams, DataService, noty, $uibModal) {
 		var self = this;
@@ -71,35 +109,41 @@
 		}];
 
 		//configure pagination
-		self.ItemsByPage = self.typeOptions[0].value;
+		$scope.resetPager = function() {
+			self.currentPage = 1;
+			self.ItemsByPage = self.typeOptions[0].value;
+		};
+		$scope.resetPager();
 		self.maxSize = 5;
-		self.currentPage = 1;
-		self.numvideos = 0;
-
 		self.totalItems = 0;
 
-		self.videos = [];
+		self.creations = [];
 
 		self.loading = false;
 		self.inputTerm = "";
-		self.searchVideos = function() {
+		self.inputProvider = "";
+		self.inputItemType = "all";
+		self.searchCreations = function() {
 			var request_data = {
-				"type": "video",
+				"type": self.inputItemType,
+				"provider": self.inputProvider,
 				"term": ""
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
 			/*request_data.numpage = self.currentPage;
 			request_data.pageblock = self.ItemsByPage;*/
-			// console.log('search videos with term: ' + request_data.term);
+			// console.log('search creations with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
 			self.showmese = true;
-			DataService.searchVideos(request_data, self.currentPage, self.ItemsByPage).then(
+			DataService.searchCreations(request_data, self.currentPage, self.ItemsByPage).then(
 				function(out_data) {
-					self.numvideos = parseInt(out_data.data[out_data.data.length - 1]);
-					self.totalItems = self.numvideos;
-					out_data.data.pop();
-					self.videos = out_data.data;
+					var meta = out_data.data.Meta;
+					//console.log(res.data);
+					//self.numcreations = parseInt(out_data.data[out_data.data.length - 1]);
+					self.totalItems = meta.totalItems;
+					//out_data.data.pop();
+					self.creations = out_data.data.Response.data;
 					self.loading = false;
 					self.loadResults = true;
 					self.showmese = false;
@@ -110,8 +154,14 @@
 					self.loading = false;
 					self.studyCount = 0;
 					self.loadResults = true;
+					self.showmese = false;
 					noty.extractErrors(out_data, noty.ERROR);
 				});
+		};
+
+		self.resetAndSearch = function() {
+			$scope.resetPager();
+			self.searchCreations();
 		};
 
 		self.goToSearch = function(event, term) {
@@ -126,35 +176,34 @@
 		if (term !== undefined && term !== '') {
 			self.viewlogo = false;
 			self.inputTerm = term;
-			self.searchVideos();
+			self.searchCreations();
 		}
 
 		$scope.setPage = function() {
 			self.currentPage = this.n;
-			self.searchVideos();
+			self.searchCreations();
 		};
 
 		$scope.firstPage = function() {
 			self.currentPage = 1;
-			self.searchVideos();
+			self.searchCreations();
 		};
 
 		$scope.lastPage = function() {
-			self.currentPage = parseInt(self.numvideos / self.ItemsByPage) + 1;
-			self.searchVideos();
+			self.currentPage = parseInt(self.totalItems / self.ItemsByPage) + 1;
+			self.searchCreations();
 		};
 
 		$scope.setItemsPerPage = function(num) {
 			self.itemsPerPage = num;
 			self.currentPage = 1; //reset to first page
-			self.searchVideos();
+			self.searchCreations();
 		};
 
 		$scope.pageChanged = function() {
 			//console.log('Page changed to: ' + self.currentPage);
-			self.searchVideos();
+			self.searchCreations();
 		};
-
 
 		$scope.range = function(input, total) {
 			var ret = [];
@@ -163,11 +212,47 @@
 				input = 0;
 			}
 			for (var i = input; i < total; i++) {
-				if (i !== 0 && i !== total-1) {
+				if (i !== 0 && i !== total - 1) {
 					ret.push(i);
 				}
 			}
 			return ret;
+		};
+
+		// advanced search
+		$scope.asCollapsed = true;
+		$scope.providers = [{
+			"code": "CCB",
+			"name": "CCB - Cineteca di Bologna"
+		}, {
+			"code": "CRB",
+			"name": "CRB - Cinematheque Royale de Belgique"
+		}, {
+			"code": "DFI",
+			"name": "DFI - Det Danske Filminstitut"
+		}, {
+			"code": "DIF",
+			"name": "DIF - Deutsches Filminstitut"
+		}, {
+			"code": "FDC",
+			"name": "FDC - Filmoteca de Catalunya"
+		}, {
+			"code": "MNC",
+			"name": "MNC - Museo Nazionale del Cinema"
+		}, {
+			"code": "OFM",
+			"name": "OFM - Österreichisches Filmmuseum"
+		}, {
+			"code": "SFI",
+			"name": "SFI - Svenska Filminstitutet"
+		}, {
+			"code": "TTE",
+			"name": "TTE - Greek Film Archive"
+		}];
+		self.inputItemType = "all";
+		$scope.cleanupFilters = function() {
+			self.inputItemType = "all";
+			self.inputProvider = "";
 		};
 	}
 
