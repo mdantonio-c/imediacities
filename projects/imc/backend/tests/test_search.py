@@ -41,7 +41,7 @@ class TestApp:
 
 ##############################################################################
 
-    # do_login is temporarily here, it will be handled in a better way 
+    # TOFIX: from version 0.5.6 this method will be in BaseTests class
     def do_login(self, client, USER, PWD, status_code=hcodes.HTTP_OK_BASIC,
                  error=None, **kwargs):
         """

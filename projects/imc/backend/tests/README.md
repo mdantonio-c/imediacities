@@ -1,3 +1,30 @@
+
+## Prerequisiti per l'utilizzo dei test
+
+Devono esistere almeno un gruppo di test (cioè con nome 'test') e un 
+video (con il suo corrispondente item) nel database.
+
+
+## Dove si trovano i file dei test delle rest apis del backend ##
+
+.../imediacity/projects/imc/backend/tests/
+
+
+## Quali API sono coperte al momento ##
+admin_groups
+admin_users
+annotations
+search
+shots
+stage
+videos
+
+Non sono implementati test per:
+bulk
+upload
+vocabulary
+
+
 ## Come lanciare i test ##
 
 Dalla directory root del repository git:
@@ -29,6 +56,3 @@ aggiungere alla riga di comando l'opzione --cov
 py.test -s --cov=imc.apis tests/custom/test_videos.py
 
 
-## Dove si trovano i file dei test delle rest apis del backend ##
-
-.../imediacity/projects/imc/backend/tests/
