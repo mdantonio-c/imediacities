@@ -40,11 +40,23 @@ class TestApp:
         # deve esistere il gruppo di test
         assert group_id is not None
 
+        # cerco i Role esistenti
+        log.info("*** Search for the roles")
+        res2 = client.get('/api/role/a', headers=headers)
+        assert res2.status_code == hcodes.HTTP_OK_BASIC
+        contents2 = json.loads(res2.data.decode('utf-8'))
+        if contents2 is not None:
+            datas2 = contents2.get('Response', {}).get('data', {})
+            if datas2 is not None:
+                # datas2 e' una lista
+                roles = datas2
+                log.debug("*** roles: "+json.dumps(roles))
+
         user_id=None
         # creo un nuovo utente
         log.info("*** Testing POST user")
         group_data = {'id': group_id , 'shortname': group_shortname}
-        post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test'}
+        post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test','roles':roles}
         res = client.post('/api/admin/users', headers=headers, data=json.dumps(post_user_data))
         assert res.status_code == hcodes.HTTP_OK_BASIC
         contents = json.loads(res.data.decode('utf-8'))
@@ -58,7 +70,7 @@ class TestApp:
         if user_id is not None:
             # PUT: modify the metadata of the new user
             log.info("*** Testing PUT user")
-            put_data = { 'group': group_data, 'email':'test2@imediacities.org','name':'test2','password':'test2', 'surname':'test2'}
+            put_data = { 'group': group_data, 'email':'test2@imediacities.org','name':'test2','password':'test2', 'surname':'test2','roles':[]}
             res = client.put('/api/admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
@@ -80,8 +92,8 @@ class TestApp:
                 if datas is not None:
                     #scorro la lista per trovare l'utente nuovo e verifico il name
                     for x in datas:
-                        #log.debug("*** user: " + json.dumps(x))
                         if x.get("id") == user_id:
+                            #log.debug("*** user: " + json.dumps(x))
                             assert x.get("attributes").get("name") == 'test2'
                             break
 
@@ -92,10 +104,6 @@ class TestApp:
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test
-
-    ##############################
-    # TODO mancano i test sui Role
-    ##############################
 
 ##############################################################################
 
