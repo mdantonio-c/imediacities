@@ -10,7 +10,7 @@
 			</div>
 			<span ng-if="ctrl.loadResults && ctrl.creations.length == 0"><i>No item found</i></span>
 			<div class="input-group stylish-input-group">
-				<input ng-attr-type="text" ng-model="ctrl.inputTerm" class="form-control" ng-attr-placeholder="Search video"
+				<input ng-attr-type="text" ng-model="ctrl.inputTerm" class="form-control" ng-attr-placeholder="Search item"
 				ng-keypress="($event.charCode === 13) ? ctrl.resetAndSearch() : return" autofocus>
 				<span class="input-group-btn">
 					<button class="btn btn-default" type="button" ng-click="ctrl.resetAndSearch()">

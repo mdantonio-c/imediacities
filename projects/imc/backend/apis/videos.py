@@ -217,24 +217,29 @@ class VideoShots(GraphBaseOperations):
 
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
-        vim_query = """
-        MATCH (vim:Annotation {{annotation_type:'VIM'}})-[:HAS_TARGET]->(shot:Shot {{uuid:'{shot_id}'}})
-        MATCH (vim)-[:HAS_BODY]->(body:VIMBody)
-        RETURN body
-        """
+
         for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
             shot_url = api_url + 'api/shots/' + s.uuid
             shot['links']['self'] = shot_url
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
-            # get all shot annotations here
+            # get all shot annotations:
+            # at the moment filter by vim and tag annotations
             shot['annotations'] = []
-            # at the moment filter by vim annotation
-            result = self.graph.cypher(vim_query.format(shot_id=s.uuid))
-            if result is not None and len(result) > 0:
-                shot['annotations'].append(
-                    self.getJsonResponse(
-                        self.graph.VIMBody.inflate(result[0][0])))
+            for anno in s.annotation.all():
+                res = self.getJsonResponse(anno, max_relationship_depth=0)
+                del(res['links'])
+                if anno.annotation_type == 'TAG':
+                    res['creator'] = self.getJsonResponse(
+                        anno.creator.single(), max_relationship_depth=0)
+                # attach bodies
+                res['bodies'] = []
+                for b in anno.bodies.all():
+                    res['bodies'] .append(
+                        self.getJsonResponse(
+                            b.downcast(), max_relationship_depth=0))
+                shot['annotations'].append(res)
+
             data.append(shot)
 
         return self.force_response(data)

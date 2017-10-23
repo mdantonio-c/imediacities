@@ -130,19 +130,13 @@
 				"term": ""
 			};
 			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
-			/*request_data.numpage = self.currentPage;
-			request_data.pageblock = self.ItemsByPage;*/
-			// console.log('search creations with term: ' + request_data.term);
 			self.loadResults = false;
 			self.loading = true;
 			self.showmese = true;
 			DataService.searchCreations(request_data, self.currentPage, self.ItemsByPage).then(
 				function(out_data) {
 					var meta = out_data.data.Meta;
-					//console.log(res.data);
-					//self.numcreations = parseInt(out_data.data[out_data.data.length - 1]);
 					self.totalItems = meta.totalItems;
-					//out_data.data.pop();
 					self.creations = out_data.data.Response.data;
 					self.loading = false;
 					self.loadResults = true;

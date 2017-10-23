@@ -17,13 +17,15 @@ class AnnotationRepository():
         self.graph = graph
 
     # @graph_transactions
-    def create_manual_annotation(self, user, body, target, selector):
+    def create_tag_annotation(self, user, body, target, selector):
         log.debug("Create a new manual annotation")
 
         # create annotation node
-        anno = Annotation(annotation_type='MAN').save()
-        # add creator
-        anno.creator.connect(user)
+        anno = Annotation(annotation_type='TAG').save()
+        if user is not None:
+            # add creator
+            anno.creator.connect(user)
+
         if isinstance(target, Item):
             anno.source_item.connect(target)
         elif isinstance(target, Annotation):

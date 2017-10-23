@@ -159,7 +159,7 @@ class Annotations(GraphBaseOperations):
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        created_anno = repo.create_manual_annotation(user, body, targetNode, selector)
+        created_anno = repo.create_tag_annotation(user, body, targetNode, selector)
 
         return self.force_response(created_anno.uuid, code=hcodes.HTTP_OK_CREATED)
 

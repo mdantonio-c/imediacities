@@ -598,7 +598,7 @@
 			}
 
 			/*updating subtitles*/
-			if (self.videoTimeline != null) $rootScope.$emit('updateSubtitles');
+			if (self.videoTimeline !== null) $rootScope.$emit('updateSubtitles');
 
 		};
 
@@ -835,6 +835,7 @@
 					}
 					/*print storyboard*/
 					angular.forEach(self.shots, function(shot) {
+						// console.log(angular.toJson(shot, true));
 
 						/*self.camera = [];
 						var annotations = shot.annotations;
@@ -852,16 +853,25 @@
 
 						});*/
 
-						if ((shot.attributes != undefined) && (shot.attributes.start_frame_idx != undefined)) {
-							var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1)
-							self.storyshots.push({
+						if ((shot.attributes !== undefined) && (shot.attributes.start_frame_idx !== undefined)) {
+							var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1);
+							var sbFields = {
 								'thumb': shot.links.thumbnail,
 								'number': shot.attributes.shot_num + 1,
 								'framerange': framerange,
 								'timestamp': shot.attributes.timestamp,
 								'duration': parseInt(shot.attributes.duration),
 								'camera': shot.annotations[0].attributes
-							});
+							};
+							// add camera motion attributes
+							for (var i = 0; i < shot.annotations.length; i++){
+								var anno = shot.annotations[i];
+								if (anno.attributes.annotation_type.key === 'VIM') {
+									sbFields.camera = anno.bodies[0].attributes;
+									break;
+								}
+							}
+							self.storyshots.push(sbFields);
 						}
 					});
 				});
