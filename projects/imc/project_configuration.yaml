@@ -16,6 +16,10 @@ releases:
   '0.5.6':
     type: beta
     rapydo: 0.5.6
+    status: released
+  '0.5.7':
+    type: beta
+    rapydo: 0.5.7
     status: developing
 
 variables:
