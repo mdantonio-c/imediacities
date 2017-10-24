@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import random
-import string
-
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
@@ -82,13 +79,6 @@ class AdminUsers(GraphBaseOperations):
         if group is None:
             raise RestApiException(
                 'Group not found', status_code=hcodes.HTTP_BAD_REQUEST)
-
-        rand = random.SystemRandom()
-        charset = string.ascii_uppercase + string.digits
-
-        cert_pass = ""
-        for _ in range(12):
-            cert_pass += rand.choice(charset)
 
         # GRAPH #
         properties["authmethod"] = "credentials"
