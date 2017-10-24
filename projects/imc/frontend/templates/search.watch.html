@@ -1,13 +1,13 @@
 	<div ng-controller='SearchController as searchCtrl'>
 		<div class="row">
-			<div id="imaginary_container">
+			<div id="search-box">
 				<div class="input-group stylish-input-group">
-					<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search video"
+					<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search item"
 					ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
-					<span class="input-group-addon">
-						<a href ui-sref="logged.search({q: searchCtrl.inputTerm})">
-							<button><span class="glyphicon glyphicon-search"></span></button>
-						</a>
+					<span class="input-group-btn">
+						<button ui-sref="logged.search({q: searchCtrl.inputTerm})" class="btn btn-default" type="button">
+							<i class="imc-icon fa fa-search" aria-hidden="true"></i>
+						</button>
 					</span>
 				</div>
 			</div>
@@ -113,7 +113,7 @@
 				<div class="form-group row">
 				<div class="btn-toolbar">
 				<div class="btn-group pull-right" uib-dropdown uib-dropdown-toggle>
-					<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle> Tag a Vocabulary
+					<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle> Tag by Term
 			              <span class="caret"></span>
 			          </button>
 			          <ul uib-dropdown-menu uib-dropdown-toggle role="menu" aria-labelledby="split-button">
@@ -140,9 +140,9 @@
 					<tr>
 						<th st-sort="shotid">shot number</th>					
 						<th st-sort="group">category</th>
-						<th st-sort="name">annotation name</th>
-						<th st-sort="startT">start time <em style="color:gray;">(secs)</em></th>
-						<th st-sort="endT">end time <em style="color:gray;">(secs)</em></th>					
+						<th st-sort="name">term</th>
+						<th st-sort="startT">start time <em style="color:gray;">(sec)</em></th>
+						<th st-sort="endT">end time <em style="color:gray;">(sec)</em></th>					
 					</tr>
 					</thead>
 					<tbody>

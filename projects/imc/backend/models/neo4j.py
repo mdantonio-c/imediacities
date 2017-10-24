@@ -609,7 +609,7 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         ('VQ', 'video quality'),
         ('VIM', 'video image motion'),
         ('TVS', 'temporal video segmentation'),
-        ('MAN', 'manual')
+        ('TAG', 'tag')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
         ('FHG', 'Fraunhofer tool'),

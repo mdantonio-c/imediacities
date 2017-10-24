@@ -65,6 +65,10 @@ bower_components:
     - build/scripts/ng-map.min.js
   angular-google-chart:
     - "ng-google-chart.min.js"
+  font-awesome:
+    - css/font-awesome.min.css
+  lodash:
+    - dist/lodash.min.js
 
 css: 
-  - "custom/imc/search.css"
+  - "custom/imc.css"
