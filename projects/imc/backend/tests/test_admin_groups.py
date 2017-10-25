@@ -46,7 +46,7 @@ class TestApp:
         log.info("*** Creating user test")
         group_data = {'id': group_id , 'shortname': group_shortname}
         post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test'}
-        res = client.post('/api/admin/users', headers=headers, data=json.dumps(post_user_data))
+        res = client.post('/api/custom_admin/users', headers=headers, data=json.dumps(post_user_data))
         assert res.status_code == hcodes.HTTP_OK_BASIC
         contents = json.loads(res.data.decode('utf-8'))
         #log.debug("*** Response of post new user: "+json.dumps(contents))
@@ -108,7 +108,7 @@ class TestApp:
         # cancello l'utente creato per questi test
         if user_id is not None:
             log.info("*** DELETE user test")
-            res = client.delete('/api/admin/users/'+user_id, headers=headers)
+            res = client.delete('/api/custom_admin/users/'+user_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test

@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 
-class AdminUsers(GraphBaseOperations):
+class CustomAdminUsers(GraphBaseOperations):
 
     def link_role(self, user, properties):
         ids = self.parseAutocomplete(

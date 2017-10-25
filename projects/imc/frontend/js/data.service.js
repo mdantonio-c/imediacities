@@ -61,12 +61,11 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.getUserSchema = function(study) {
-        // return api.apiCall('admin/users', 'POST');
-        return self.getParametersSchema('admin/users');
+        return self.getParametersSchema('custom_admin/users');
     };
 
     self.getUsers = function() {
-        var endpoint = 'admin/users';
+        var endpoint = 'custom_admin/users';
         return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
     };
 
