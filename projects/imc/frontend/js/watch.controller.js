@@ -5,7 +5,8 @@
 		.controller('geoTagController', geoTagController)
 		.controller('geoResultController', geoResultController)
 		.controller('WatchController', WatchController)
-		.controller('MapController', MapController);
+		.controller('MapController', MapController)
+		.controller('ModalConfirmController', ModalConfirmController);
 
 	/*modal view storyboard factory definition*/
 	app.factory('modalFactory', function($uibModal) {
@@ -248,6 +249,7 @@
 			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
+					console.log('scroll on click');
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: ($elm[0].offsetLeft - ($elm[0].parentNode.parentNode.scrollWidth / 2))
@@ -275,6 +277,7 @@
 			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
+					console.log('scroll on click');
 					//alert($elm[0].parentNode.className);
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
@@ -551,27 +554,30 @@
 
 		self.vocabularyFinal = [];
 		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-		self.vocabularyFinal = data;
-		self.onlyterms = [];
+			self.vocabularyFinal = data;
+			self.onlyterms = [];
 
-		var pushloc = {Value:0,Display:'location'};
-		$scope.options.push(pushloc);
+			var pushloc = {
+				Value: 0,
+				Display: 'location'
+			};
+			$scope.options.push(pushloc);
 
-		for (var i=0; i<=self.vocabularyFinal.classes.length-1; i++)
-		{
-			self.vocabularyFinal.classes[i]["show"] = true;
-			for (var k=0; k<=self.vocabularyFinal.classes[i].groups.length-1; k++)
-			{
-				self.vocabularyFinal.classes[i].groups[k]["show"] = true;
-				var topush = {Value:k+1,Display:self.vocabularyFinal.classes[i].groups[k].name};
-				$scope.options.push(topush);
-				for (var j=0; j<=self.vocabularyFinal.classes[i].groups[k].terms.length-1; j++)
-				{
-					self.vocabularyFinal.classes[i].groups[k].terms[j]["show"] = true;
-					self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
+			for (var i = 0; i <= self.vocabularyFinal.classes.length - 1; i++) {
+				self.vocabularyFinal.classes[i].show = true;
+				for (var k = 0; k <= self.vocabularyFinal.classes[i].groups.length - 1; k++) {
+					self.vocabularyFinal.classes[i].groups[k].show = true;
+					var topush = {
+						Value: k + 1,
+						Display: self.vocabularyFinal.classes[i].groups[k].name
+					};
+					$scope.options.push(topush);
+					for (var j = 0; j <= self.vocabularyFinal.classes[i].groups[k].terms.length - 1; j++) {
+						self.vocabularyFinal.classes[i].groups[k].terms[j].show = true;
+						self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
+					}
 				}
 			}
-		}
 		});
 
 		// Initializing values
@@ -610,6 +616,7 @@
 
 		// Play video function
 		function playVid(video) {
+			console.log('play video');
 			if (myVid[0].paused && !self.onplaying) {
 				self.onpause = false;
 				self.onplaying = true;
@@ -620,6 +627,7 @@
 
 		// Pause video function
 		self.pauseVid = function() {
+			console.log('pause video');
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
 				self.onplaying = false;
@@ -671,6 +679,7 @@
 					var shotnum = self.items[i][4];
 
 					var time1 = self.items[i][5];
+					var times2;
 					if (i < self.items.length - 1) {
 						var time2 = self.items[i + 1][5];
 						var currtime2 = time2.split("-")[0];
@@ -678,9 +687,9 @@
 						var mins2 = currtime2.split(":")[1];
 						var secs2 = currtime2.split(":")[2];
 						//var cdate = new Date(0, 0, 0, hours, mins, secs);
-						var times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+						times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
 					} else {
-						var times2 = self.items[i][1];
+						times2 = self.items[i][1];
 					}
 
 					var currtime1 = time1.split("-")[0];
@@ -718,6 +727,33 @@
 			}
 		};
 
+		self.deleteAnnotation = function(annoId) {
+			var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
+			var modalInstance = $uibModal.open({
+				templateUrl: 'confirmModal.html',
+				animation: false,
+				size: 'sm',
+				controller: 'ModalConfirmController',
+				appendTo: parentElem
+			});
+			modalInstance.result.then(function() {
+				// YES: delete annotation
+				DataService.deleteAnnotation(annoId).then(function() {
+					console.log('Annotation [' + annoId + '] deleted successfully');
+					angular.forEach(self.annotations, function(anno, index){
+						if(anno.id === annoId) {
+							self.annotations.splice(index, 1);
+						}
+					});
+					$rootScope.$emit('updateTimeline', '', null, null);
+				}, function(err) {
+					// TODO
+				});
+			}, function() {
+				// NO: do nothing
+			});
+		};
+
 		self.items = [];
 		self.shots = [];
 		self.slideSize = 0;
@@ -746,13 +782,13 @@
 						self.showmesb = true; //enable storyboard button
 						self.showmeli = false; //hide loading video bar
 
-						if (i === 0) {
-							/*once we have all data and metadata the video start playing*/
+						// once we have all data and metadata the video start playing
+						/*if (i === 0) {
 							var myVid = angular.element(window.document.querySelector('#videoarea'));
 							playVid(myVid[0]);
-						}
+						}*/
 
-						//timeline definition
+						// timeline definition
 						self.vduration = vduration;
 
 						var minutes = 0,
@@ -783,8 +819,8 @@
 							format = 'HH:mm:ss';
 						}
 
-						/*configuration*/
-						var videoTimeline = {
+						// configuration
+						self.videoTimeline = {
 							"type": "Timeline",
 							"cssStyle": "height: 100%; width: 100%;",
 							//"displayed": false,
@@ -803,7 +839,7 @@
 						};
 
 						// add data to the timeline
-						videoTimeline.data = {
+						self.videoTimeline.data = {
 							"cols": [{
 								id: "category",
 								label: "Category",
@@ -823,45 +859,19 @@
 							}],
 							"rows": []
 						};
+					} // end loop for shots in the response
 
-						/*videoTimeline.data.rows.push({c: [
-					    	   {v: "area"},
-					    	   {v: "Porta Saragozza"},
-					   	       {v: new Date(0,0,0,0,0,self.outside.split('-')[0])},
-					   		   {v: new Date(0,0,0,0,0,self.outside.split('-')[1])}
-							]});*/
-
-						self.videoTimeline = videoTimeline;
-					}
-					/*print storyboard*/
+					// build storyboard
 					angular.forEach(self.shots, function(shot) {
-						// console.log(angular.toJson(shot, true));
-
-						/*self.camera = [];
-						var annotations = shot.annotations;
-						var camattr = annotations[0].attributes;
-						var first = true;
-
-						angular.forEach(camattr, function(value,key) {
-
-							var motion = value;	
-
-							var cv = parseFloat(value[1]).toFixed(2);
-			    			var av = parseFloat(0.3).toFixed(2);
-
-							if ((cv < av) && first) {first = false; self.camera.push(key+' '+motion);}
-
-						});*/
-
 						if ((shot.attributes !== undefined) && (shot.attributes.start_frame_idx !== undefined)) {
 							var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1);
 							var sbFields = {
-								'thumb': shot.links.thumbnail,
-								'number': shot.attributes.shot_num + 1,
-								'framerange': framerange,
-								'timestamp': shot.attributes.timestamp,
-								'duration': parseInt(shot.attributes.duration),
-								'camera': shot.annotations[0].attributes
+								thumb: shot.links.thumbnail,
+								number: shot.attributes.shot_num + 1,
+								framerange: framerange,
+								timestamp: shot.attributes.timestamp,
+								duration: parseInt(shot.attributes.duration),
+								camera: shot.annotations[0].attributes
 							};
 							// add camera motion attributes
 							for (var i = 0; i < shot.annotations.length; i++){
@@ -869,6 +879,23 @@
 								if (anno.attributes.annotation_type.key === 'VIM') {
 									sbFields.camera = anno.bodies[0].attributes;
 									break;
+								} else if (anno.attributes.annotation_type.key === 'TAG') {
+									// annotation info
+									var annoInfo = {
+										uuid: anno.id,
+										name: anno.bodies[0].attributes.name,
+										group: 'location'
+									};
+									// shot info
+									var startT = convertTime(shot.attributes.timestamp);
+									var endT = startT + shot.attributes.duration;
+									var shotInfo = {
+										uuid: shot.id,
+										shotNum: shot.attributes.shot_num + 1,
+										startT: startT,
+										endT: endT
+									};
+									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}
 							self.storyshots.push(sbFields);
@@ -877,19 +904,19 @@
 				});
 		};
 
-		self.loadVideoAnnotations = function(vid, vduration) {
+		/*self.loadVideoAnnotations = function(vid, vduration) {
 			DataService.getVideoAnnotations(vid).then(
 				function(response) {
 
 					var resp = response;
 
 				});
-		};
+		};*/
 
 
 		self.loadMetadataContent = function(vid) {
+			// console.log("loading metadata content for vid: " + vid);
 			self.loading = true;
-			// console.log('loading metadata content');
 			DataService.getVideoMetadata(vid).then(
 				function(response) {
 					self.video = response.data[0];
@@ -899,10 +926,9 @@
 						$scope.$apply(function() {
 							self.loading = false;
 							self.loadVideoShots(vid, self.currentvidDur);
-							self.loadVideoAnnotations(vid, self.currentvidDur);
 						});
 					}, 2000);
-
+					noty.extractErrors(response, noty.WARNING);
 				},
 				function(error) {
 					self.loading = false;
@@ -913,14 +939,15 @@
 		if (!$stateParams.meta) {
 			self.loadMetadataContent(vid);
 		} else {
-			var vidDur = $stateParams.meta.relationships.item[0].attributes.duration;
-			self.loadVideoShots(vid, vidDur);
+			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
+			self.loadVideoShots(vid, videoDuration);
 		}
 
 		self.selectedVideoId = vid;
 		self.animationsEnabled = true;
 
 		self.jumpToShot = function(selectedShot) {
+			console.log('jump to shot');
 			var row = selectedShot.row;
 
 			var time1 = self.videoTimeline.data.rows[row].c[2].v;
@@ -938,6 +965,7 @@
 		};
 
 		self.jumpToShotFromAnnotation = function(startT) {
+			console.log('jump to shot from annotation. startT: ' + startT);
 			// play video from selected shot
 			var myVid = angular.element(window.document.querySelector('#videoarea'));
 			myVid[0].currentTime = parseInt(startT);
@@ -963,26 +991,42 @@
 			return new Date(0, 0, 0, hours, minutes, seconds);
 		};
 
-		$rootScope.$on('updateTimeline', function(event, locname, startT, endT, group, labelTerm, shotId, shotNum) {
-			if (locname != '') var locn = locname;
-			else var locn = labelTerm;
-			var startTime = self.getDateTime(startT);
-			var endTime = self.getDateTime(endT);
+		$rootScope.$on('updateTimeline', function(event, locname, annoInfo, shotInfo) {
+			var startTime, endTime;
+			if (annoInfo === null) {
+				// just refresh the timeline
+				self.videoTimeline.data.rows = [];
+				angular.forEach(self.annotations, function(anno){
+					startTime = self.getDateTime(anno.startT);
+					endTime = self.getDateTime(anno.endT);
+					self.videoTimeline.data.rows.push({c: [
+						  {v: anno.group},
+						  {v: anno.name},
+						  {v: startTime},
+						  {v: endTime}
+					]});
+				});
+				return;
+			}
+			var locn = (locname !== '') ? locname : annoInfo.name;
+			startTime = self.getDateTime(shotInfo.startT);
+			endTime = self.getDateTime(shotInfo.endT);
 			self.videoTimeline.data.rows.push({c: [
-				  {v: group},
+				  {v: annoInfo.group},
 				  {v: locn},
 				  {v: startTime},
 				  {v: endTime}
 			]});
-			var ann = {
-					group: group,
+			var anno = {
+					id: annoInfo.uuid,
+					group: annoInfo.group,
 					name: locn,
-					shotid: shotId,
-					shotNum: shotNum,
-					startT: startT,
-					endT: endT
+					shotid: shotInfo.uuid,
+					shotNum: shotInfo.shotNum,
+					startT: shotInfo.startT,
+					endT: shotInfo.endT
 				};						
-			self.annotations.push(ann);
+			self.annotations.push(anno);
 		});
 
 		$rootScope.$on('updateSubtitles', function() {
@@ -1156,10 +1200,10 @@
 				var locality = '';
 				var country = '';
 
-				if ($scope.vm.address.route != null) var route = $scope.vm.address.route;
-				if ($scope.vm.address.locality != null) var locality = $scope.vm.address.locality;
-				if ($scope.vm.address.country != null) var country = $scope.vm.address.country;
-				if ($scope.vm.address.photo_reference != null) var photo_reference = $scope.vm.address.photo_reference;
+				if ($scope.vm.address.route !== null) {route = $scope.vm.address.route;}
+				if ($scope.vm.address.locality !== null) {locality = $scope.vm.address.locality;}
+				if ($scope.vm.address.country !== null) {country = $scope.vm.address.country;}
+				if ($scope.vm.address.photo_reference !== null) {var photo_reference = $scope.vm.address.photo_reference;}
 
 				var stringloc = route + ' ' + locality + ' ' + country;
 
@@ -1173,6 +1217,7 @@
 						sharedProperties.setLat(locationlat);
 						sharedProperties.setLong(locationlng);
 						sharedProperties.setIRI(locationiri); //actually the google one
+						sharedProperties.setLabelTerm(stringloc);
 						sharedProperties.setPhotoRef(photo_reference);
 						var locname = result[0].formatted_address; //result[0].address_components[0].long_name;
 						sharedProperties.setFormAddr(locname);
@@ -1200,13 +1245,29 @@
 							"en": $scope.alternatives.en
 						}
 					};
-					//save the annotation into the database
-					//DataService.saveAnnotation(target, source);
-
-					$rootScope.$emit('updateTimeline', '', $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID, $scope.shotNum);
+					// save the annotation into the database
+					DataService.saveAnnotation(target, source).then(
+						function(resp) {
+							var annoId = resp.data;
+							console.log('Annotation saved successfully. ID: ' + annoId);
+							var annoInfo = {
+								"uuid": annoId,
+								"name": $scope.labelTerm,
+								"group": $scope.group
+							};
+							var shotInfo = {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						},
+						function(err){
+							// TODO
+						});
 				}
 				$uibModalInstance.close(null);
-
 			}
 		};
 
@@ -1241,6 +1302,7 @@
 			console.log($scope.IRI);
 			console.log(res);
 			console.log(rarr);
+			console.log($scope.labelTerm);
 			var source = {
 				// "iri": $scope.IRI,
 				"iri": $scope.IRI,
@@ -1254,21 +1316,51 @@
 					"long": $scope.longitude
 				}
 			};
-			//save the annotation into the database
-			//DataService.saveAnnotation(target, source);
+			
 
 			var foundterm = false;
 			foundterm = $rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format);
 
 			if (!foundterm) { //the annotation has not been found
-				$rootScope.$emit('updateTimeline', $scope.format, $scope.startT, $scope.endT, $scope.group, $scope.labelTerm, $scope.shotID, $scope.shotNum);
-				$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
+				// save the annotation into the database
+				DataService.saveAnnotation(target, source).then(
+						function(resp) {
+							var annoId = resp.data;
+							console.log('Annotation saved successfully. ID: ' + annoId);
+							var annoInfo = {
+								"uuid": annoId,
+								"name": $scope.labelTerm,
+								"group": $scope.group
+							};
+							var shotInfo = {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+							$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
+						},
+						function(err){
+							// TODO
+						});
 			}
 
 			$uibModalInstance.close($scope.geocodingResult);
 		};
 
 		$scope.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+		};
+
+	}
+
+	function ModalConfirmController($scope, $uibModalInstance) {
+		$scope.yes = function() {
+			$uibModalInstance.close();
+		};
+
+		$scope.no = function() {
 			$uibModalInstance.dismiss('cancel');
 		};
 

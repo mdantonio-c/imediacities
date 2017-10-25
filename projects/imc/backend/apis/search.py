@@ -128,6 +128,7 @@ class Search(GraphBaseOperations):
             item = v.item.single()
             video_url = api_url + 'api/videos/' + v.uuid
             # use depth 2 to get provider info from record source
+            # TO BE FIXED
             video = self.getJsonResponse(v, max_relationship_depth=2)
             logger.info("links %s" % video['links'])
             video['links']['self'] = video_url

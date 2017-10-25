@@ -2,7 +2,7 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='SearchController as ctrl' style="margin: 2.5em;">
+<div ng-controller='SearchController as ctrl' style="margin: 0 2.5em;">
 	<div class="row">
 		<div id="search-box">
 			<div id="search-logo" ng-show="ctrl.viewlogo">
@@ -18,7 +18,7 @@
 					</button>
 				</span>
 			</div>
-			<div class="widget-box" style="border: none;">
+			<div class="widget-box" style="border: none; margin-bottom: 15px;">
 				<div class="widget-header" style="border-bottom: none;">
 					<h6 class="widget-title">Advanced search</h6>
 					<div class="widget-toolbar" style="float: none;">
@@ -83,12 +83,12 @@
 							</div>
 							<div class="body">
 								<div class="title">
-									<a href ui-sref="logged.search.watch({v: v.id, meta: v})" ng-if="v.type == 'nonaventity'">{{v.relationships.titles[0].attributes.text}}</a>
+									<span ng-if="v.type == 'nonaventity'">{{v.relationships.titles[0].attributes.text}}</span>
 									<a href ui-sref="logged.search.watch({v: v.id, meta: v})" ng-if="v.type == 'aventity'">{{v.attributes.identifying_title}}</a>
 									<i ng-if="v.attributes.production_years > 0">({{v.attributes.production_years[0]}})</i>
 									<span ng-repeat="contributor in directors = (v.relationships.contributors | contributorsByRole:'Director')">{{contributor.attributes.names[0] | nocomma}}{{$last ? '' : ', '}}</span>
 								</div>
-								<div class="duration">
+								<div class="duration" ng-if="v.type == 'aventity'">
 									<i class="imc-icon fa fa-clock-o"></i>
 									<span class="blue">{{v.relationships.item[0].attributes.duration | parseNum}}</span>
 								</div>

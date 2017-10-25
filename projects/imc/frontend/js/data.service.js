@@ -73,14 +73,18 @@ function DataService($log, api, $q, jsonapi_parser) {
     // self.saveAnnotation = function(videoId, data) {
     //     return api.apiCall('videos/'+videoId+'/annotations', 'POST', data);
     self.saveAnnotation = function(target, source) {
-        var data = {}
-        data["target"] = target;
-        data["body"] = {}
-        data['body']['type'] = "ResourceBody";
-        data['body']['purpose'] = "tagging";
-        data['body']['source'] = source;
+        var data = {};
+        data.target = target;
+        data.body = {};
+        data.body.type = "ResourceBody";
+        data.body.purpose = "tagging";
+        data.body.source = source;
 
         return api.apiCall('annotations', 'POST', data);
+    };
+
+    self.deleteAnnotation = function (annoId) {
+        return api.apiCall('annotations/'+annoId, 'DELETE');
     };
 
     self.saveUser = function(data) {
