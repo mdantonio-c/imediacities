@@ -1,7 +1,7 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.1"
+    version: "1.0.0"
     rapydo: "0.5.6"
 tags:
     file: "All endpoints to handle files"
@@ -9,15 +9,15 @@ tags:
     miscellaneous: "Endpoints not classified in other specific sections"
 
 releases:
-  '0.5.5':
+  '0.9':
     type: beta
     rapydo: 0.5.5
     status: discontinued
-  '0.5.6':
+  '1.0.0':
     type: beta
     rapydo: 0.5.6
     status: released
-  '0.5.7':
+  '1.0.1':
     type: beta
     rapydo: 0.5.7
     status: developing
