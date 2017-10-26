@@ -83,15 +83,15 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.saveUser = function(data) {
-        return api.apiCall('admin/users', 'POST', data);
+        return api.apiCall('custom_admin/users', 'POST', data);
     };
 
     self.deleteUser = function(user) {
-        return api.apiCall('admin/users/'+user, 'DELETE');
+        return api.apiCall('custom_admin/users/'+user, 'DELETE');
     };
 
     self.updateUser = function(user, data) {
-        return api.apiCall('admin/users/'+user, 'PUT', data);
+        return api.apiCall('custom_admin/users/'+user, 'PUT', data);
     };
 
     self.getGroupSchema = function(study) {
