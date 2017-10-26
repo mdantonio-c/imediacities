@@ -19,7 +19,7 @@ class CustomAdminUsers(GraphBaseOperations):
     def link_role(self, user, properties):
         ids = self.parseAutocomplete(
             properties, 'roles', id_key='name', split_char=',')
-        logger.critical(ids)
+        # logger.critical(ids)
 
         if ids is None:
             return
