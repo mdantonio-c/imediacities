@@ -76,7 +76,7 @@ class Stage(GraphBaseOperations):
                 return self.force_response(
                     [], errors=["Upload dir not found"])
 
-        resources = group.stage_files.all()
+        # resources = group.stage_files.all()
 
         data = []
         for f in os.listdir(upload_dir):
@@ -96,12 +96,18 @@ class Stage(GraphBaseOperations):
             row['type'] = self.getType(f)
             row['status'] = "-"
 
-            for res in resources:
-                if res.path != path:
-                    continue
+            res = self.graph.Stage.nodes.get_or_none(filename=f)
+            if res is not None:
                 row['status'] = res.status
                 row['status_message'] = res.status_message
                 row['task_id'] = res.task_id
+                row['warnings'] = res.warnings
+            # for res in resources:
+            #     if res.path != path:
+            #         continue
+            #     row['status'] = res.status
+            #     row['status_message'] = res.status_message
+            #     row['task_id'] = res.task_id
             data.append(row)
 
         return self.force_response(data)
