@@ -36,6 +36,10 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('stage', 'DELETE', data);
     };
 
+    self.downloadStageFile = function(filename) {
+        return api.apiCall('download/'+filename, 'GET', {}, undefined, true);
+    };
+
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }

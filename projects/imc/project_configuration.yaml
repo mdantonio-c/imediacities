@@ -57,6 +57,8 @@ bower_components:
     - css/font-awesome.min.css
   lodash:
     - dist/lodash.min.js
+  angular-file-saver:
+    - dist/angular-file-saver.bundle.min.js
 
 css: 
   - "custom/imc.css"

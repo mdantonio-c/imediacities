@@ -80,7 +80,7 @@
                 <h4 class='panel-title'>Your files
               </div>
               <div class='col-xs-1'>
-                <a ng-click="ctrl.loadFiles()">
+                <a href="" ng-click="ctrl.loadFiles()">
                   <h4 class='text-right'>
                   <span class="glyphicon glyphicon-refresh" aria-hidden="true" uib-tooltip='Refresh'></span>
                   </h4>
@@ -159,16 +159,24 @@
                     <td ng-if='!data.status_message'>
                       {{data.status}}
                     </td>
-                    <td
-                      ng-if='data.status != "IMPORTING"'
-                      ng-click='ctrl.deleteFile(data.name)'>
-                      <i class='material-icons palette-Red-500 text'>delete</i>
+                    <td>
+                      <a href="" ng-if='data.status != "IMPORTING"'
+                         ng-click='ctrl.deleteFile(data.name)'>
+                        <i class='material-icons palette-Red-500 text'>delete</i>
+                      </a>
+                      <a href="" ng-if='data.status == "IMPORTING"'
+                         uib-tooltip='Unable to delete a file during the import'>
+                        <i class='material-icons palette-Grey-500 text'>delete</i>
+                      </a>
+                      <a href="" ng-click='ctrl.downloadFile(data.name)'>
+                        <i class="material-icons">file_download</i>
+                      </a>
                     </td>
-                    <td
+                    <!-- <td
                       ng-if='data.status == "IMPORTING"'
                       uib-tooltip='Unable to delete a file during the import'>
                       <i class='material-icons palette-Grey-500 text'>delete</i>
-                    </td>
+                    </td> -->
                   </tr>
                 </tbody>
               </table>
