@@ -119,7 +119,11 @@
                       <i ng-if="!data.isSelected" class='material-icons'>check_box_outline_blank</i>
                       <i ng-if="data.isSelected" class='material-icons'>check_box</i>
                     </td>
-                    <td><b>{{data.name}}</b></td>
+                    <td ng-switch on="data.type">
+                      <span uib-popover-template="'bindingPopoverTemplate.html'"
+                            popover-title="Content Binding"
+                            popover-trigger="'mouseenter'" ng-switch-when="metadata"><b>{{data.name}}</b></span>
+                      <span ng-switch-default><b>{{data.name}}</b></span>
                     <td>
                       {{data.type}}
                       <button
@@ -209,6 +213,24 @@
         <ul style="padding-left: 0px" ng-if="data.warnings.length > 0">
           <li ng-repeat="warning in data.warnings">{{warning}}</li>
         </ul>
+      </script>
+      <script type="text/ng-template" id="bindingPopoverTemplate.html">
+        <!-- <div>ciao</div>
+        <div class="form-group">
+          <label>Popup Title:</label>
+          <input type="text" ng-model="dynamicPopover.title" class="form-control">
+        </div> -->
+        <table>
+          <tr>
+            <td>Source ID: </td><td>{{data.binding.source_id}}</td>
+          </tr>
+          <tr>
+            <td>Filename: </td><td>{{data.binding.filename}}</td>
+          </tr>
+          <tr>
+            <td>Status: </td><td>{{data.binding.status}}</td>
+          </tr>
+        </table>
       </script>
     </div>
   </div>

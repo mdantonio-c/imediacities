@@ -117,7 +117,7 @@ class Group(IdentifiedNode):
         'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
 
 
-class Stage(TimestampedNode):
+class Stage(TimestampedNode, HeritableStructuredNode):
     # __abstract_node__ = True
     filename = StringProperty(required=True, show=True)
     path = StringProperty(required=True, unique_index=True, show=True)
