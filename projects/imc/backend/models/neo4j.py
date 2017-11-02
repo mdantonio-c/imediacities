@@ -263,7 +263,8 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         show=True)
     coverages = RelationshipTo(
         'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
-    rights_status = StringProperty(required=True, show=True)
+    rights_status = StringProperty(
+        choices=codelists.RIGHTS_STATUS, required=True, show=True)
     rightholders = RelationshipTo(
         'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
     collection_title = StringProperty(show=True)
