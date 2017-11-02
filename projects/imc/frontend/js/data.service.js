@@ -37,7 +37,8 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.downloadStageFile = function(filename) {
-        return api.apiCall('download/'+filename, 'GET', {}, undefined, true);
+        var config = {'responseType': 'arraybuffer'};
+        return api.apiCall('download/'+filename, 'GET', {}, undefined, true, false, false, config);
     };
 
     // self.getVideos = function() {

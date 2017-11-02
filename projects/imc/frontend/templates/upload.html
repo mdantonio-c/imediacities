@@ -121,8 +121,8 @@
                     </td>
                     <td ng-switch on="data.type">
                       <span uib-popover-template="'bindingPopoverTemplate.html'"
-                            popover-title="Content Binding"
-                            popover-trigger="'mouseenter'" ng-switch-when="metadata"><b>{{data.name}}</b></span>
+                            popover-trigger="'mouseenter'" 
+                            ng-switch-when="metadata"><b>{{data.name}}</b></span>
                       <span ng-switch-default><b>{{data.name}}</b></span>
                     <td>
                       {{data.type}}
@@ -215,22 +215,20 @@
         </ul>
       </script>
       <script type="text/ng-template" id="bindingPopoverTemplate.html">
-        <!-- <div>ciao</div>
-        <div class="form-group">
-          <label>Popup Title:</label>
-          <input type="text" ng-model="dynamicPopover.title" class="form-control">
-        </div> -->
-        <table>
-          <tr>
-            <td>Source ID: </td><td>{{data.binding.source_id}}</td>
-          </tr>
-          <tr>
-            <td>Filename: </td><td>{{data.binding.filename}}</td>
-          </tr>
-          <tr>
-            <td>Status: </td><td>{{data.binding.status}}</td>
-          </tr>
-        </table>
+        <div id="cb-popover">
+          <h3 class="popover-title">Content Binding <i class="imc-icon fa" ng-class="data.binding.filename ? 'fa-chain' : 'fa-chain-broken'"></i></h3>
+          <table>
+            <tr>
+              <td>Source ID:</td><td>{{data.binding.source_id || 'n/a'}}</td>
+            </tr>
+            <tr>
+              <td>Filename:</td><td>{{data.binding.filename || 'n/a'}}</td>
+            </tr>
+            <tr>
+              <td>Status:</td><td>{{data.binding.status || 'PENDING'}}</td>
+            </tr>
+          </table>
+        </div>
       </script>
     </div>
   </div>
