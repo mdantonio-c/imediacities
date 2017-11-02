@@ -2,7 +2,6 @@ project:
     title: "iMediaCities Repository"
     description": "..."
     version: "1.0.1"
-    rapydo: "0.5.6"
 tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
