@@ -1,13 +1,14 @@
-from utilities.logs import get_logger
-from restapi.services.authentication import BaseAuthentication as ba
-from utilities import htmlcodes as hcodes
-from restapi.tests.utilities import AUTH_URI
-import json
+# -*- coding: utf-8 -*-
 
+import json
+from restapi.tests import BaseTests
+from utilities import htmlcodes as hcodes
+from utilities.logs import get_logger
 
 log = get_logger(__name__)
 
-class TestApp:
+
+class TestApp(BaseTests):
 
     def test_admin_users(self, client): #client e' una fixture di pytest-flask
         """
@@ -104,43 +105,3 @@ class TestApp:
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test
-
-##############################################################################
-
-    # TOFIX: from version 0.5.6 this method will be in BaseTests class
-    def do_login(self, client, USER, PWD, status_code=hcodes.HTTP_OK_BASIC,
-                 error=None, **kwargs):
-        """
-            Make login and return both token and authorization header
-        """
-        if USER is None or PWD is None:
-            ba.myinit()
-            if USER is None:
-                USER = ba.default_user
-            if PWD is None:
-                PWD = ba.default_password
-
-        data = {'username': USER, 'password': PWD}
-        for v in kwargs:
-            data[v] = kwargs[v]
-        r = client.post(AUTH_URI + '/login', data=json.dumps(data))
-
-        if r.status_code != hcodes.HTTP_OK_BASIC:
-            # VERY IMPORTANT FOR DEBUGGING WHEN ADVANCED AUTH OPTIONS ARE ON
-            c = json.loads(r.data.decode('utf-8'))
-            log.error(c['Response']['errors'])
-
-        assert r.status_code == status_code
-
-        content = json.loads(r.data.decode('utf-8'))
-        if error is not None:
-            errors = content['Response']['errors']
-            if errors is not None:
-                assert errors[0] == error
-
-        token = ''
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None:
-                token = data.get('token', '')
-        return {'Authorization': 'Bearer ' + token}, token
