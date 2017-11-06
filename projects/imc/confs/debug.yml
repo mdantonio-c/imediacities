@@ -11,9 +11,6 @@ services:
       ACTIVATE: 1
     ports:
       - 8080:5000
-    volumes:
-      - ../submodules/http-api/restapi:/usr/local/lib/python3.6/dist-packages/restapi
-      - ../submodules/utils/utilities:/usr/local/lib/python3.6/dist-packages/utilities
 
   frontend:
     ports:
@@ -28,14 +25,6 @@ services:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
       ACTIVATE: 1
-    volumes:
-      - ../submodules/http-api/restapi:/usr/local/lib/python3.6/dist-packages/restapi
-      - ../submodules/utils/utilities:/usr/local/lib/python3.6/dist-packages/utilities
-
-  celeryui:
-    volumes:
-      - ../submodules/http-api/restapi:/usr/local/lib/python3.6/dist-packages/restapi
-      - ../submodules/utils/utilities:/usr/local/lib/python3.6/dist-packages/utilities
 
   ftp:
     environment:

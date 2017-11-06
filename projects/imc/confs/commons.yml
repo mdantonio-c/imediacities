@@ -44,6 +44,12 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
+      SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+
   neo4j:
     volumes:
       - ../data/graphdata:/data
@@ -87,6 +93,12 @@ services:
       CELERY_BROKER: ${CELERY_BROKER}
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+
+      SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
 
   celeryui:
     build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery

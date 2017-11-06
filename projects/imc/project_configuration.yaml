@@ -1,7 +1,7 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.0.1"
+    version: "1.1.0"
 tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
@@ -19,6 +19,10 @@ releases:
   '1.0.1':
     type: beta
     rapydo: 0.5.7
+    status: released
+  '1.1.0':
+    type: beta
+    rapydo: 0.6.0
     status: developing
 
 variables:
@@ -46,6 +50,12 @@ variables:
     # AUTH_SECOND_FACTOR_AUTHENTICATION: TOTP
 
     GRAPHDB_PASSWORD: chooseapassword
+
+    SMTP_ADMIN: m.dantonio@cineca.it
+    SMTP_HOST: mail.cineca.it 
+    SMTP_PORT: 587
+    SMTP_USERNAME: hpc-service-noreply@cineca.it
+    SMTP_PASSWORD: dnt%01u
 
   backend:
     credentials:

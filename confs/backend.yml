@@ -55,13 +55,19 @@ services:
   ########################
   backend:
     # command: sleep infinity
-    build: ../submodules/build-templates/backend
-    image: ${COMPOSE_PROJECT_NAME}/backend:template
+    build:
+      context: ../submodules/build-templates/backend
+      args:
+        RAPYDO_VERSION: ${RAPYDO_VERSION}
+
+    # image: ${COMPOSE_PROJECT_NAME}/backend:template
+    image: rapydo/backend:${RAPYDO_VERSION}
     # hostname: restapi
     hostname: rapydo_server
     environment:
       ACTIVATE: 0  # activate me inside your Blueprint
       FLASK_APP: ${COMPOSE_PROJECT_NAME}/${PYTHON_MAIN_FILE}.py
+      # FLASK_APP: /usr/local/lib/python3.6/dist-packages/restapi/__main__.py
       UWSGI_APP: ${COMPOSE_PROJECT_NAME}.${PYTHON_MAIN_FILE}
       VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
       JWT_APP_SECRETS: ${JWT_APP_SECRETS}
@@ -91,7 +97,8 @@ services:
   ##############################
   proxy:
     build: ../submodules/build-templates/proxy
-    image: ${COMPOSE_PROJECT_NAME}/proxy:template
+    # image: ${COMPOSE_PROJECT_NAME}/proxy:template
+    image: rapydo/proxy:${RAPYDO_VERSION}
     hostname: reverseproxy
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
@@ -165,8 +172,12 @@ services:
   #########################
 
   celery:
-    build: ../submodules/build-templates/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:template
+    build:
+      context: ../submodules/build-templates/celery
+      args:
+        RAPYDO_VERSION: ${RAPYDO_VERSION}
+    # image: ${COMPOSE_PROJECT_NAME}/celery:template
+    image: rapydo/celery:${RAPYDO_VERSION}
     # hostname: celworker
     # command: celery worker -c 1 -A rapydo.flask_ext.flask_celery.worker.celery_app
     user: root
@@ -206,8 +217,12 @@ services:
   ##########################
 
   celeryui:
-    build: ../submodules/build-templates/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:template
+    build:
+      context: ../submodules/build-templates/celery
+      args:
+        RAPYDO_VERSION: ${RAPYDO_VERSION}
+    # image: ${COMPOSE_PROJECT_NAME}/celery:template
+    image: rapydo/celery:${RAPYDO_VERSION}
     hostname: flower
     user: root
     working_dir: /code
@@ -235,13 +250,15 @@ services:
 
   swaggerui:
     build: ../submodules/build-templates/swaggerui
-    image: ${COMPOSE_PROJECT_NAME}/swaggerui:template
+    # image: ${COMPOSE_PROJECT_NAME}/swaggerui:template
+    image: rapydo/swaggerui:${RAPYDO_VERSION}
     environment:
       ACTIVATE: 0
 
   sqlalchemyui:
     build: ../submodules/build-templates/sqlalchemyui
-    image: ${COMPOSE_PROJECT_NAME}/sqlalchemyui:template
+    # image: ${COMPOSE_PROJECT_NAME}/sqlalchemyui:template
+    image: rapydo/sqlalchemyui:${RAPYDO_VERSION}
     # NOTE: this image let you access sqllite/postgres/mysql
     # with a phpmyadmin-like web page
     networks:
@@ -260,8 +277,12 @@ services:
   #############
   # REST API client (wget, curl, httpie, http-prompt)
   restclient:
-    build: ../submodules/build-templates/restclient
-    image: ${COMPOSE_PROJECT_NAME}/restclient:template
+    build:
+      context: ../submodules/build-templates/restclient
+      args:
+        RAPYDO_VERSION: ${RAPYDO_VERSION}
+    # image: ${COMPOSE_PROJECT_NAME}/restclient:template
+    image: rapydo/restclient:${RAPYDO_VERSION}
     hostname: rapydo_client
     environment:
       MAIN_ENDPOINT: ${API_MAIN_ENDPOINT}
@@ -277,7 +298,8 @@ services:
   ftp:
     # image: stilliard/pure-ftpd:latest
     build: ../submodules/build-templates/ftp
-    image: ${COMPOSE_PROJECT_NAME}/ftp:template
+    # image: ${COMPOSE_PROJECT_NAME}/ftp:template
+    image: rapydo/ftp:${RAPYDO_VERSION}
     volumes:
       - pureftpd:/etc/pure-ftpd/passwd
   # /etc/ssl/private/ A directory containing a single pure-ftpd.pem file
@@ -296,7 +318,8 @@ services:
   icat:
     # B2safe instance on irods
     build: ../submodules/build-templates/icat
-    image: ${COMPOSE_PROJECT_NAME}/icat:template
+    # image: ${COMPOSE_PROJECT_NAME}/icat:template
+    image: rapydo/icat:${RAPYDO_VERSION}
     # image: b2safe:rapydo
     hostname: ${IRODS_HOST}
     # command: sleep infinity
