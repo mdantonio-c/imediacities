@@ -37,4 +37,4 @@ job:
     # - rapydo --project imc test
     
   only:
-    - NO_ONE
+    - 0.6.0
