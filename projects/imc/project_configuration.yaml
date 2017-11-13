@@ -1,24 +1,24 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.0.1"
+    version: "1.1.1"
 tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
     miscellaneous: "Endpoints not classified in other specific sections"
 
 releases:
-  '0.9':
+  '1.1.0':
     type: beta
     rapydo: 0.5.5
     status: discontinued
-  '1.0.0':
-    type: beta
-    rapydo: 0.5.6
-    status: released
-  '1.0.1':
+  '1.1.1':
     type: beta
     rapydo: 0.5.7
+    status: released
+  '1.1.2':
+    type: beta
+    rapydo: 0.6.0
     status: developing
 
 variables:
