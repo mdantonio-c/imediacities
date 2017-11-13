@@ -2,7 +2,7 @@
 	'use strict';
 
 	var app = angular.module('web')
-		.controller('geoTagController', geoTagController)
+		.controller('TagController', TagController)
 		.controller('geoResultController', geoResultController)
 		.controller('WatchController', WatchController)
 		.controller('MapController', MapController)
@@ -26,14 +26,17 @@
 				});
 			}
 		};
-	}).factory('myModalGeoFactory', function($uibModal) { /*modal view add location tag definition*/
+	}).factory('myModalGeoFactory', function($uibModal, $document) { /*modal view add location tag definition*/
+		var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
 					animation: true,
 					templateUrl: template || 'myModalGeoCode.html',
-					controller: 'geoTagController',
+					controller: 'TagController',
+					controllerAs: '$tagCtrl',
 					size: size,
+					appendTo: parentElem,
 					resolve: {
 						params: function() {
 							return params;
@@ -58,6 +61,16 @@
 				});
 			}
 		};
+	});
+
+	app.config(function(ivhTreeviewOptionsProvider) {
+		ivhTreeviewOptionsProvider.set({
+			defaultSelectedState: false,
+			twistieExpandedTpl: '<i class="fa fa-minus-square-o imc-icon" aria-hidden="true"></i>',
+			twistieCollapsedTpl: '<i class="fa fa-plus-square-o imc-icon" aria-hidden="true"></i>',
+			twistieLeafTpl: '',
+			validate: true
+		});
 	});
 
 	app.service('sharedProperties', function() {
@@ -227,7 +240,30 @@
 				    });
 				    return filtered;
 				};
-			}]);
+			}])
+		.filter('matchTerms', function() {
+			return function(terms, query) {
+				if (terms === undefined || terms.length === 0) {
+					return [];
+				}
+				var filtered = [];
+				var recursiveFilter = function(terms, query) {
+					angular.forEach(terms, function(item) {
+						if (!item.hasOwnProperty('children')) {
+							if (item.label.startsWith(query)) {
+								// console.log(angular.toJson(item, true));
+								filtered.push({iri: item.id, label: item.label});
+							}
+						} else {
+							recursiveFilter(item.children, query);
+						}
+					});
+				};
+				recursiveFilter(terms, query);
+				return filtered;
+			};
+		})
+		;
 			/*.filter('timefilter',[ function () {
 				return function(items, ctime) {
 				    var filtered = [];            
@@ -249,7 +285,7 @@
 			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
-					console.log('scroll on click');
+					// console.log('scroll on click');
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: ($elm[0].offsetLeft - ($elm[0].parentNode.parentNode.scrollWidth / 2))
@@ -277,7 +313,7 @@
 			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
-					console.log('scroll on click');
+					// console.log('scroll on click');
 					//alert($elm[0].parentNode.className);
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
@@ -522,7 +558,6 @@
 		var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
 
 		return times;
-
 	}
 
 	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
@@ -552,7 +587,7 @@
 		$scope.selectedOptions = [];
 		self.locSubtitle = "";
 
-		self.vocabularyFinal = [];
+		/*self.vocabularyFinal = [];
 		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
 			self.vocabularyFinal = data;
 			self.onlyterms = [];
@@ -563,22 +598,22 @@
 			};
 			$scope.options.push(pushloc);
 
-			for (var i = 0; i <= self.vocabularyFinal.classes.length - 1; i++) {
-				self.vocabularyFinal.classes[i].show = true;
-				for (var k = 0; k <= self.vocabularyFinal.classes[i].groups.length - 1; k++) {
-					self.vocabularyFinal.classes[i].groups[k].show = true;
+			for (var i = 0; i <= self.vocabularyFinal.terms.length - 1; i++) {
+				self.vocabularyFinal.terms[i].show = true;
+				for (var k = 0; k <= self.vocabularyFinal.terms[i].items.length - 1; k++) {
+					self.vocabularyFinal.terms[i].items[k].show = true;
 					var topush = {
 						Value: k + 1,
-						Display: self.vocabularyFinal.classes[i].groups[k].name
+						Display: self.vocabularyFinal.terms[i].items[k].label
 					};
 					$scope.options.push(topush);
-					for (var j = 0; j <= self.vocabularyFinal.classes[i].groups[k].terms.length - 1; j++) {
-						self.vocabularyFinal.classes[i].groups[k].terms[j].show = true;
-						self.onlyterms.push(self.vocabularyFinal.classes[i].groups[k].terms[j]);
+					for (var j = 0; j <= self.vocabularyFinal.terms[i].items[k].items.length - 1; j++) {
+						self.vocabularyFinal.terms[i].items[k].items[j].show = true;
+						self.onlyterms.push(self.vocabularyFinal.terms[i].items[k].items[j]);
 					}
 				}
 			}
-		});
+		});*/
 
 		// Initializing values
 		self.onplaying = false;
@@ -605,7 +640,6 @@
 
 			/*updating subtitles*/
 			if (self.videoTimeline !== null) $rootScope.$emit('updateSubtitles');
-
 		};
 
 		// On video pause toggle values
@@ -616,7 +650,7 @@
 
 		// Play video function
 		function playVid(video) {
-			console.log('play video');
+			// console.log('play video');
 			if (myVid[0].paused && !self.onplaying) {
 				self.onpause = false;
 				self.onplaying = true;
@@ -627,7 +661,7 @@
 
 		// Pause video function
 		self.pauseVid = function() {
-			console.log('pause video');
+			// console.log('pause video');
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
 				self.onplaying = false;
@@ -712,15 +746,12 @@
 						sharedProperties.setShotId(shotid);
 						sharedProperties.setShotNum(shotnum+1);
 
-						var foundterm = false;
-
 						if (group != 'location') {
-							foundterm = $rootScope.checkAnnotation(times1, times2, group, labelterm);
-							/*if the term is a new term*/
-							if (!foundterm) {
+							// a new term
+							if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
 								myModalGeoFactory.open('lg', 'myModalVocab.html');
 							}
-						} //if group is not location
+						}
 						else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 					}
 				}
@@ -903,15 +934,6 @@
 					});
 				});
 		};
-
-		/*self.loadVideoAnnotations = function(vid, vduration) {
-			DataService.getVideoAnnotations(vid).then(
-				function(response) {
-
-					var resp = response;
-
-				});
-		};*/
 
 
 		self.loadMetadataContent = function(vid) {
@@ -1181,7 +1203,11 @@
 
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $uibModal service used above.
-	function geoTagController($scope, $rootScope, $uibModalInstance, myGeoConfirmFactory, GeoCoder, DataService, sharedProperties) {
+	function TagController($scope, $rootScope, $uibModalInstance, $filter, ivhTreeviewMgr, 
+		myGeoConfirmFactory, GeoCoder, DataService, sharedProperties, VocabularyService) {
+
+		var self = this;
+		
 		$scope.geocodingResult = "";
 		$scope.startT = sharedProperties.getStartTime();
 		$scope.endT = sharedProperties.getEndTime();
@@ -1192,9 +1218,57 @@
 		$scope.shotID = sharedProperties.getShotId();
 		$scope.shotNum = sharedProperties.getShotNum();
 
-		$scope.ok = function() {
+		self.vocabulary = [];
+		VocabularyService.loadTerms().then(function(data) {
+			self.vocabulary = data;
+		});
+
+		self.tags = [];
+		self.loadVocabularyTerms = function(query) {
+			return $filter('matchTerms')(self.vocabulary, query);
+		};
+
+		// custom treeview tpl
+		self.treeviewTpl = [
+			'<div>',
+			  '<span ivh-treeview-toggle>',
+			    '<span ivh-treeview-twistie></span>',
+			  '</span>',
+			  '<span ng-if="trvw.useCheckboxes() && trvw.isLeaf(node)" ivh-treeview-checkbox></span>',
+			  '<span class="ivh-treeview-node-label" ivh-treeview-toggle>',
+			    '{{:: trvw.label(node)}}',
+			  '</span>',
+			  '<div ivh-treeview-children class="ivh-treeview-children"></div>',
+			'</div>'
+		].join('\n');
+
+		self.toggleTerm = function(node) {
+			if (node.selected) {
+				// add tag
+				self.tags.push({iri: node.id, label: node.label});
+			} else {
+				self.tags = _.reject(self.tags, function(el) { return el.label === node.label; });
+			}
+		};
+
+		self.selectTreeviewNode = function(tag) {
+			if (tag.iri !== undefined) {
+				// console.log('select treeview by node id: ' + tag.iri);
+				ivhTreeviewMgr.select(self.vocabulary, tag.iri);
+			}
+		};
+
+		self.deselectTreeviewNode = function(tag) {
+			if (tag.iri !== undefined) {
+				// console.log('deselect treeview by node id: ' + tag.iri);
+				ivhTreeviewMgr.deselect(self.vocabulary, tag.iri);
+			}
+		};
+
+		self.ok = function() {
 
 			if (!angular.isUndefined($scope.vm)) {
+				// console.log('vm : ' + angular.toJson($scope.vm, true))
 
 				var route = '';
 				var locality = '';
@@ -1232,27 +1306,19 @@
 				//$uibModalInstance.close($scope.searchTerm);
 			} else {
 				var vid = sharedProperties.getVideoId();
-				$scope.alternatives = sharedProperties.getAlternatives();
+				// $scope.alternatives = sharedProperties.getAlternatives();
 				var target = 'shot:' + $scope.shotID;
-				//alternatives mechanism should be of course generalized
+				// alternatives mechanism should be of course generalized
 
-				if ($scope.labelTerm !== "") {
-					var source = {
-						"iri": $scope.IRI,
-						"name": $scope.labelTerm,
-						"alternativeNames": {
-							"de": $scope.alternatives.de,
-							"en": $scope.alternatives.en
-						}
-					};
+				if (self.tags.length > 0) {
 					// save the annotation into the database
-					DataService.saveAnnotation(target, source).then(
+					DataService.saveTagAnnotations(target, self.tags).then(
 						function(resp) {
 							var annoId = resp.data;
 							console.log('Annotation saved successfully. ID: ' + annoId);
 							var annoInfo = {
 								"uuid": annoId,
-								"name": $scope.labelTerm,
+								"name": self.tags[0].label,
 								"group": $scope.group
 							};
 							var shotInfo = {
@@ -1268,11 +1334,15 @@
 						});
 				}
 				$uibModalInstance.close(null);
+				ivhTreeviewMgr.deselectAll(self.vocabulary);
+				ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
 			}
 		};
 
-		$scope.cancel = function() {
+		self.cancel = function() {
 			$uibModalInstance.dismiss('cancel');
+			ivhTreeviewMgr.deselectAll(self.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
 		};
 
 	}
@@ -1299,10 +1369,10 @@
 
 			var target = 'shot:' + $scope.shotID;
 			// alternatives mechanism should be of course generalized
-			console.log($scope.IRI);
+			/*console.log($scope.IRI);
 			console.log(res);
 			console.log(rarr);
-			console.log($scope.labelTerm);
+			console.log($scope.labelTerm);*/
 			var source = {
 				// "iri": $scope.IRI,
 				"iri": $scope.IRI,
@@ -1316,14 +1386,11 @@
 					"long": $scope.longitude
 				}
 			};
-			
 
-			var foundterm = false;
-			foundterm = $rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format);
-
-			if (!foundterm) { //the annotation has not been found
+			if (!$rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format)) { 
+				// the annotation has not been found
 				// save the annotation into the database
-				DataService.saveAnnotation(target, source).then(
+				DataService.saveGeoAnnotation(target, source).then(
 						function(resp) {
 							var annoId = resp.data;
 							console.log('Annotation saved successfully. ID: ' + annoId);
@@ -1363,7 +1430,6 @@
 		$scope.no = function() {
 			$uibModalInstance.dismiss('cancel');
 		};
-
 	}
 
 })();

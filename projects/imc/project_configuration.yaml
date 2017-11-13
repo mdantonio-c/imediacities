@@ -59,6 +59,12 @@ bower_components:
     - dist/lodash.min.js
   angular-file-saver:
     - dist/angular-file-saver.bundle.min.js
+  angular-ivh-treeview:
+    - dist/ivh-treeview.min.js
+    - dist/ivh-treeview.min.css
+  ng-tags-input:
+    - ng-tags-input.min.css
+    - ng-tags-input.min.js
 
 css: 
   - "custom/imc.css"
