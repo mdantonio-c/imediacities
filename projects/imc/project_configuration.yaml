@@ -11,7 +11,7 @@ releases:
   '1.1.0':
     type: beta
     rapydo: 0.5.5
-    status: discontinued
+    status: released
   '1.1.1':
     type: beta
     rapydo: 0.5.7
