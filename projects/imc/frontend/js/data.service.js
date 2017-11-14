@@ -86,11 +86,11 @@ function DataService($log, api, $q, jsonapi_parser) {
                 body.source = {
                     iri: tags[0].iri,
                     name: tags[0].label
-                }
+                };
             } else {
-                value: tags[0].label
+                body.value = tags[0].label;
             }
-            data.body = body
+            data.body = body;
         } else {
             var bodies = [];
             angular.forEach(tags, function(tag){
@@ -102,11 +102,11 @@ function DataService($log, api, $q, jsonapi_parser) {
                     body.source = {
                         iri: tag.iri,
                         name: tag.label
-                    }
+                    };
                 } else {
                     body.value = tag.label;
                 }
-                bodies.push(body)
+                bodies.push(body);
             });
             data.body = bodies;
         }
@@ -114,15 +114,18 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations', 'POST', data);
     };
 
-    self.saveGeoAnnotation = function(target, source) {
-        var data = {};
-        data.target = target;
-        data.body = {};
-        data.body.type = "ResourceBody";
-        data.body.purpose = "tagging";
-        data.body.source = source;
+    self.saveGeoAnnotation = function(target, source, spatial) {
+        var data = {
+            target: target,
+            body: {
+                type: "ResourceBody",
+                purpose: "tagging",
+                source: source,
+                spatial: spatial
+            }
+        };
         return api.apiCall('annotations', 'POST', data);  
-    }
+    };
 
     self.deleteAnnotation = function (annoId) {
         return api.apiCall('annotations/'+annoId, 'DELETE');

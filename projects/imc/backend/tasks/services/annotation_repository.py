@@ -17,8 +17,8 @@ class AnnotationRepository():
         self.graph = graph
 
     # @graph_transactions
-    def create_tag_annotation(self, user, body, target, selector):
-        log.debug("Create a new manual annotation")
+    def create_tag_annotations(self, user, bodies, target, selector):
+        log.debug("Create new tag annotations")
 
         # create annotation node
         anno = Annotation(annotation_type='TAG').save()
@@ -47,31 +47,35 @@ class AnnotationRepository():
             anno.targets.connect(segment)
         else:
             anno.targets.connect(target)
-        # add body
-        if body['type'] == 'ResourceBody':
-            source = body['source']
-            iri = source if isinstance(source, str) \
-                else source.get('iri')
-            log.debug('ResourceBody with IRI:{}'.format(iri))
-            # look for existing Resource
-            # do not update the existing resource
-            bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
-            if bodyNode is None:
-                bodyNode = ResourceBody(iri=iri)
-                if not isinstance(source, str):
-                    bodyNode.name = source.get('name')
-                if 'spatial' in body:
-                    coord = [body['spatial']['lat'], body['spatial']['long']]
-                    log.debug('lat: {}, long:{}'.format(coord[0], coord[1]))
-                    bodyNode.spatial = coord
+        # add bodies
+        for body in bodies:
+            if body['type'] == 'ResourceBody':
+                source = body['source']
+                iri = source if isinstance(source, str) \
+                    else source.get('iri')
+                log.debug('ResourceBody with IRI:{}'.format(iri))
+                # look for existing Resource
+                # do not update the existing resource
+                bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
+                if bodyNode is None:
+                    log.debug('new ResourceBody')
+                    bodyNode = ResourceBody(iri=iri)
+                    if not isinstance(source, str):
+                        bodyNode.name = source.get('name')
+                    if 'spatial' in body:
+                        coord = [body['spatial']['lat'], body['spatial']['long']]
+                        log.debug('lat: {}, long:{}'.format(coord[0], coord[1]))
+                        bodyNode.spatial = coord
+                    bodyNode.save()
+            elif body['type'] == 'TextualBody':
+                text_lang = body.get('language', 'en')
+                bodyNode = TextualBody(
+                    value=body['value'], language=text_lang).save()
                 bodyNode.save()
-        elif body['type'] == 'TextualBody':
-            bodyNode = TextualBody(
-                value=body['value'], language=body['language']).save()
-        else:
-            # should never be reached
-            raise ValueError('Invalid body: {}'.format(body['type']))
-        anno.bodies.connect(bodyNode)
+            else:
+                # should never be reached
+                raise ValueError('Invalid body: {}'.format(body['type']))
+            anno.bodies.connect(bodyNode)
         return anno
 
     def delete_manual_annotation(self, anno):

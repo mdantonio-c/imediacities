@@ -912,10 +912,14 @@
 									break;
 								} else if (anno.attributes.annotation_type.key === 'TAG') {
 									// annotation info
+									var spatial = anno.bodies[0].attributes.spatial;
+									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+									var name = (anno.bodies[0].type === 'textualbody') ? 
+										anno.bodies[0].attributes.value : anno.bodies[0].attributes.name;
 									var annoInfo = {
 										uuid: anno.id,
-										name: anno.bodies[0].attributes.name,
-										group: 'location'
+										name: name,
+										group: group
 									};
 									// shot info
 									var startT = convertTime(shot.attributes.timestamp);
@@ -1374,23 +1378,18 @@
 			console.log(rarr);
 			console.log($scope.labelTerm);*/
 			var source = {
-				// "iri": $scope.IRI,
 				"iri": $scope.IRI,
-				"name": $scope.labelTerm,
-				// "alternativeNames": {
-				// 	"de": $scope.alternatives.de,
-				// 	"en": $scope.alternatives.en
-				// },
-				"spatial": {
-					"lat": $scope.latitude,
-					"long": $scope.longitude
-				}
+				"name": $scope.labelTerm
+			};
+			var spatial = {
+				"lat": $scope.latitude,
+				"long": $scope.longitude
 			};
 
 			if (!$rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format)) { 
 				// the annotation has not been found
 				// save the annotation into the database
-				DataService.saveGeoAnnotation(target, source).then(
+				DataService.saveGeoAnnotation(target, source, spatial).then(
 						function(resp) {
 							var annoId = resp.data;
 							console.log('Annotation saved successfully. ID: ' + annoId);

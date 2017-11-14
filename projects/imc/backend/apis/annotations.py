@@ -131,35 +131,39 @@ class Annotations(GraphBaseOperations):
                     'Invalid selector value for: ' + s_val,
                     status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # check body
-        body = data['body']
-        b_type = body.get('type')
-        if b_type == 'ResourceBody':
-            source = body.get('source')
-            if source is None:
-                raise RestApiException(
-                    'Missing Source in the ResourceBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-            # here we expect the source as an IRI or a structured object
-            # 1) just the IRI
-            if isinstance(source, str):
-                pass
-            # 2) structured object
-            elif 'iri' not in source or 'name' not in source:
-                raise RestApiException(
-                    'Invalid ResourceBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-        elif b_type == 'TextualBody':
-            if 'value' not in body or 'language' not in body:
-                raise RestApiException(
-                    'Invalid TextualBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-        else:
-            raise RestApiException('Invalid body type for: {}'.format(b_type))
+        # check bodies
+        bodies = data['body']
+        if not isinstance(bodies, list):
+            bodies = [bodies]
+        for body in bodies:
+            b_type = body.get('type')
+            if b_type == 'ResourceBody':
+                source = body.get('source')
+                if source is None:
+                    raise RestApiException(
+                        'Missing Source in the ResourceBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                # here we expect the source as an IRI or a structured object
+                # 1) just the IRI
+                if isinstance(source, str):
+                    pass
+                # 2) structured object
+                elif 'iri' not in source or 'name' not in source:
+                    raise RestApiException(
+                        'Invalid ResourceBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'TextualBody':
+                if 'value' not in body:  # or 'language' not in body:
+                    raise RestApiException(
+                        'Invalid TextualBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+            else:
+                raise RestApiException('Invalid body type for: {}'.format(b_type))
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        created_anno = repo.create_tag_annotation(user, body, targetNode, selector)
+        created_anno = repo.create_tag_annotations(
+            user, bodies, targetNode, selector)
 
         return self.force_response(created_anno.uuid, code=hcodes.HTTP_OK_CREATED)
 
