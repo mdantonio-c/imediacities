@@ -129,7 +129,7 @@
                       <button
                       class='btn btn-success btn-xs'
                       ng-click="ctrl.importStageFiles(data.name)"
-                      ng-if="data.type == 'metadata' && data.status != 'IMPORTING'">
+                      ng-if="profile.isAdmin && data.type == 'metadata' && data.status != 'IMPORTING'">
                       IMPORT
                       </button>
                     </td>
