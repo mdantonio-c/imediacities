@@ -15,8 +15,19 @@ class TestApp(BaseTests):
             Test the API /api/custom_admin/users
         """
         #
-        # non e' prevista la possibilita' di fare get con uno specifico user_id
+        # 1- cerca il gruppo di test (che deve già esistere nel db)
+        # 2- cerca i Role esistenti
+        # 3- creo un nuovo utente
+        # 4- modifica il nuovo utente
+        # 5- fa get di tutti gli utenti gruppi, scorre la lista per trovare
+        #     il nuovo utente e verifica che la precedente modifica 
+        #     abbia funzionato
+        # 6- cancella il nuovo utente
         #
+        # A questo punto il database dovrebbe essere tornato 
+        #  come prima dei test
+        #
+
 
         # log in
         log.debug("*** Do login")
@@ -24,10 +35,14 @@ class TestApp(BaseTests):
 
         group_id = None
         group_shortname = None
+
         # /api/group viene usato per cercare i gruppi per nome, per 
         #  l'autocompletamento nel form dove si crea un nuovo user.
         # Chiamo prima questo per ottenere l'id del gruppo di test.
         # Infatti per creare uno nuovo user ci vuole un gruppo esistente...
+        #
+        # Non e' prevista la possibilita' di fare get con uno specifico user_id
+        #
         log.info("*** Search for the test group")
         res = client.get('/api/group/test', headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
@@ -79,7 +94,7 @@ class TestApp(BaseTests):
             log.info("*** Testing GET users")
             # GET: try without log in
             res = client.get('/api/custom_admin/users')
-                # This endpoint requires a valid authorization token
+            # This endpoint requires a valid authorization token
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
             log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # GET all users

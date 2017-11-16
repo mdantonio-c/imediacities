@@ -3,10 +3,9 @@
 
 ### Prerequisiti per l'utilizzo dei test
 
-Devono esistere almeno:
-- un gruppo di test (cioè ricercabile con nome 'test') 
-- un video (con il suo corrispondente item) nel database.
-
+Nel database devono già esistere almeno:
+- un gruppo di test (cioè ricercabile con nome 'test')
+- i seguenti Role: admin_root, Archive, Researcher
 
 ### Dove si trovano i file dei test delle REST APIs del backend
 

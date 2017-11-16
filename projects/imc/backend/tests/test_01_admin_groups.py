@@ -15,7 +15,18 @@ class TestApp(BaseTests):
             Test the API /api/admin/groups
         """
         #
-        # non e' prevista la possibilita' di fare get con uno specifico group_id
+        # 1- cerca il gruppo di test (che deve già esistere nel db)
+        # 2- crea un nuovo utente associato al gruppo di test
+        # 3- crea un nuovo gruppo associato al nuovo utente
+        # 4- modifica il nuovo gruppo
+        # 5- fa get di tutti i gruppi, scorre la lista per trovare
+        #     il nuovo gruppo e verifica che la precedente modifica 
+        #     abbia funzionato
+        # 6- cancella il nuovo gruppo
+        # 7- cancella il nuovo utente
+        #
+        # A questo punto il database dovrebbe essere tornato 
+        #  come prima dei test
         #
 
         # log in
@@ -24,11 +35,15 @@ class TestApp(BaseTests):
 
         group_id = None
         group_shortname = None
+
         # /api/group viene usato per cercare i gruppi per nome, per 
         #  l'autocompletamento nel form dove si crea un nuovo user.
         # Chiamo prima questo per ottenere l'id del gruppo di test.
         # Infatti per creare un nuovo gruppo ci vuole uno user esistente e per
         #  creare uno nuovo user ci vuole un gruppo esistente...
+
+        # Non e' prevista la possibilita' di fare get con uno specifico group_id
+
         log.info("*** Testing get /api/group/")
         res = client.get('/api/group/test', headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
