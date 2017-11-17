@@ -69,3 +69,7 @@ aggiungere alla riga di comando l'opzione --cov
 ```
 py.test -s --cov=imc.apis tests/custom/test_videos.py
 ```
+perché vengano generati tutti i file di report del coverage usare questo comando
+```
+py.test -s --cov-report html:cov_html --cov-report xml:cov.xml --cov-report annotate:cov_annotate --cov=imc.apis tests/custom
+```
