@@ -73,7 +73,7 @@ class TestApp(BaseTests):
 
         log.info("*** Testing post /api/upload/")
 
-        post_md_data = {'file': ('tests/custom/data/test_md_1234.xml', 'test_md_1234.xml'),
+        post_md_data = {'file': ('tests/custom/testdata/test_md_1234.xml', 'test_md_1234.xml'),
             'flowChunkNumber':1,
             'flowFilename':'test_md_1234.xml',
             'flowTotalChunks':1,
@@ -83,7 +83,7 @@ class TestApp(BaseTests):
         contents = json.loads(res.data.decode('utf-8'))
         #log.debug("*** Response of post md file: "+json.dumps(contents))
 
-        post_video_data = {'file': ('tests/custom/data/test_video_1234.mp4', 'test_video_1234.mp4'),
+        post_video_data = {'file': ('tests/custom/testdata/test_video_1234.mp4', 'test_video_1234.mp4'),
             'flowChunkNumber':1,
             'flowFilename':'test_video_1234.mp4',
             'flowTotalChunks':1,
@@ -93,7 +93,7 @@ class TestApp(BaseTests):
         contents2 = json.loads(res2.data.decode('utf-8'))
         #log.debug("*** Response of post video file: "+json.dumps(contents2))
 
-        post_filetodel_data = {'file': ('tests/custom/data/to_del.txt', 'to_del.txt'),
+        post_filetodel_data = {'file': ('tests/custom/testdata/to_del.txt', 'to_del.txt'),
             'flowChunkNumber':1,
             'flowFilename':'to_del.txt',
             'flowTotalChunks':1,

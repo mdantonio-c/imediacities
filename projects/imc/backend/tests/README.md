@@ -16,7 +16,7 @@ Nel database devono già esistere almeno:
 
 Nella sottodir 
 ```
-data
+testdata
 ```
 si trovano i file necessari ai test: un video, un xml e un txt.
 
