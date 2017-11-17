@@ -14,6 +14,12 @@ Nel database devono già esistere almeno:
 .../imediacity/projects/imc/backend/tests/
 ```
 
+Nella sottodir 
+```
+data
+```
+si trovano i file necessari ai test: un video, un xml e un txt.
+
 
 ### Quali API sono coperte al momento
 - admin_groups
@@ -48,6 +54,12 @@ Lanciare poi:
 rapydo shell backend
 ```
 che apre una shell dentro il container backend, cioè mi trovo l'ambiente in cui girerà il backend, che al momento ancora non gira essendo modalità debug.
+
+Lanciare poi:
+```
+restapi init
+```
+che inizializza il database con i dati minimi necessari ai test.
 
 I test possono essere lanciati singolarmente:
 ```
