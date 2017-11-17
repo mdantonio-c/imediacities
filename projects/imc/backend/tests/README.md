@@ -5,6 +5,7 @@
 
 Nel database devono già esistere almeno:
 - un gruppo di test (cioè ricercabile con nome 'test')
+- l'utente di default per potersi autenticare
 - i seguenti Role: admin_root, Archive, Researcher
 
 ### Dove si trovano i file dei test delle REST APIs del backend
@@ -17,15 +18,15 @@ Nel database devono già esistere almeno:
 ### Quali API sono coperte al momento
 - admin_groups
 - admin_users
-- annotations
-- search
-- shots
+- upload
 - stage
+- annotations
+- shots
 - videos
+- search
 
 Non sono implementati test per:
 - bulk
-- upload
 - vocabulary
 
 

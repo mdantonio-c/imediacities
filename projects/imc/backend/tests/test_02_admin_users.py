@@ -19,10 +19,11 @@ class TestApp(BaseTests):
         # 2- cerca i Role esistenti
         # 3- creo un nuovo utente
         # 4- modifica il nuovo utente
-        # 5- fa get di tutti gli utenti gruppi, scorre la lista per trovare
+        # 5- fa GET di tutti gli utenti senza authorization token
+        # 6- fa get di tutti gli utenti con authorization token, scorre la lista per trovare
         #     il nuovo utente e verifica che la precedente modifica 
         #     abbia funzionato
-        # 6- cancella il nuovo utente
+        # 7- cancella il nuovo utente
         #
         # A questo punto il database dovrebbe essere tornato 
         #  come prima dei test
@@ -66,13 +67,13 @@ class TestApp(BaseTests):
             if datas2 is not None:
                 # datas2 e' una lista
                 roles = datas2
-                log.debug("*** roles: "+json.dumps(roles))
+                #log.debug("*** roles: "+json.dumps(roles))
 
         user_id=None
         # creo un nuovo utente
         log.info("*** Testing POST user")
         group_data = {'id': group_id , 'shortname': group_shortname}
-        post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test','roles':roles}
+        post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test','roles':[]}
         res = client.post('/api/custom_admin/users', headers=headers, data=json.dumps(post_user_data))
         assert res.status_code == hcodes.HTTP_OK_BASIC
         contents = json.loads(res.data.decode('utf-8'))
@@ -86,7 +87,7 @@ class TestApp(BaseTests):
         if user_id is not None:
             # PUT: modify the metadata of the new user
             log.info("*** Testing PUT user")
-            put_data = { 'group': group_data, 'email':'test2@imediacities.org','name':'test2','password':'test2', 'surname':'test2','roles':[]}
+            put_data = { 'group': group_data, 'email':'test2@imediacities.org','name':'test2','password':'test2', 'surname':'test2','roles':roles}
             res = client.put('/api/custom_admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
@@ -96,7 +97,7 @@ class TestApp(BaseTests):
             res = client.get('/api/custom_admin/users')
             # This endpoint requires a valid authorization token
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-            log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+            #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # GET all users
             res = client.get('/api/custom_admin/users', headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC

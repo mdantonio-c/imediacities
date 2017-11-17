@@ -17,13 +17,15 @@ class TestApp(BaseTests):
         #
         # 1- cerca il gruppo di test (che deve già esistere nel db)
         # 2- crea un nuovo utente associato al gruppo di test
-        # 3- crea un nuovo gruppo associato al nuovo utente
-        # 4- modifica il nuovo gruppo
-        # 5- fa get di tutti i gruppi, scorre la lista per trovare
+        # 3- crea un nuovo gruppo associato al nuovo utente senza authorization token
+        # 4- crea un nuovo gruppo associato al nuovo utente con authorization token
+        # 5- modifica il nuovo gruppo
+        # 6- fa GET di tutti i gruppi senza authorization token
+        # 7- fa GET di tutti i gruppi con authorization token, scorre la lista per trovare
         #     il nuovo gruppo e verifica che la precedente modifica 
         #     abbia funzionato
-        # 6- cancella il nuovo gruppo
-        # 7- cancella il nuovo utente
+        # 8- cancella il nuovo gruppo
+        # 9- cancella il nuovo utente
         #
         # A questo punto il database dovrebbe essere tornato 
         #  come prima dei test
@@ -78,7 +80,7 @@ class TestApp(BaseTests):
             # POST: try without log in
             res = client.post('/api/admin/groups', headers=None, data=json.dumps(post_data))
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-            log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+            #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # POST: create a new group
             res = client.post('/api/admin/groups', headers=headers, data=json.dumps(post_data))
             assert res.status_code == hcodes.HTTP_OK_BASIC
@@ -99,7 +101,7 @@ class TestApp(BaseTests):
                 res = client.get('/api/admin/groups')
                 # This endpoint requires a valid authorization token
                 assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-                log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+                #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
                 # GET all groups
                 res = client.get('/api/admin/groups', headers=headers)
                 assert res.status_code == hcodes.HTTP_OK_BASIC
