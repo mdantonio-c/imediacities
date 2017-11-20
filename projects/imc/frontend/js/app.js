@@ -16,7 +16,10 @@
             'flow',
             'tableSort',
             'ngMap',
-            'googlechart'
+            'googlechart',
+            'ngFileSaver',
+            'ivh.treeview',
+            'ngTagsInput'
         ]);
 
 })();

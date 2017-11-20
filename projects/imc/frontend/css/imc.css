@@ -671,28 +671,14 @@ element.style {
 .widget-box>.widget-header>.widget-toolbar>[data-action=collapse], .widget-color-dark>.widget-header>.widget-toolbar>[data-action=collapse], .widget-box>.widget-header>.widget-toolbar>.widget-menu>[data-action=collapse], .widget-color-dark>.widget-header>.widget-toolbar>.widget-menu>[data-action=collapse] { color: #AAA }
 .widget-box>.widget-header>.widget-toolbar>[data-action=close], .widget-color-dark>.widget-header>.widget-toolbar>[data-action=close], .widget-box>.widget-header>.widget-toolbar>.widget-menu>[data-action=close], .widget-color-dark>.widget-header>.widget-toolbar>.widget-menu>[data-action=close] { color: #E09E96 }
 
-.scroll-track {
-	position: absolute;
-    top: auto;
-    bottom: auto;
-    right: 0;
-    height: auto;
-    background-color: #E7E7E7;
-    z-index: 99;
-    width: 0;
-    opacity: 0;
-}
 .scroll-content {
 	position: static;
 	overflow: hidden;
 }
+
 .content {
 	padding: 8px 20px 8px;
 }
-/*.imc-scroll {
-	overflow: hidden;
-	&:hover {width: auto; height: 6px; width: 6px;}
-}*/
 
 .form-group>label[class*=col-] {
 	margin-bottom: 4px;
@@ -736,5 +722,157 @@ element.style {
 
 .space { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0 }
 [class*=vspace-] { display: none }
+.space-8 { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 8px 0 7px }
+[class*=vspace-8] { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 8px 0 7px 0 }
 .space-4 { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 4px 0 3px }
 [class*=vspace-4] { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 4px 0 3px 0 }
+.space-2 { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 2px 0 1px }
+[class*=vspace-2] { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 2px 0 1px 0 }
+.space-0, [class*=vspace-0] { max-height: 1px; min-height: 1px; overflow: hidden; margin: 12px 0; margin: 0 }
+
+.label.label-app {
+    position: relative;
+}
+
+.badge {
+	position: absolute!important;
+    top: -4px;
+    right: -15px;
+    padding: 1px 3px;
+    text-align: center;
+    font-size: 12px;
+    color: #FFF;
+    border-radius: 4px;
+}
+.badge-warning, .badge.badge-warning { background-color: #f89406 }
+
+#cb-popover table tr td:first-child {
+	text-align: right;
+	font-size: small;
+	font-weight: bold;
+}
+
+#cb-popover table tr td:nth-child(2) {
+	padding-left: 5px;
+}
+
+.anno-tools-container { 
+	position: absolute; 
+	right: 0; 
+	top: auto;
+	z-index: 12;
+	margin-top: 10px;
+}
+
+.btn.btn-app.btn-xs {
+    width: 64px;
+    font-size: 15px;
+    border-radius: 8px;
+    padding-bottom: 7px;
+    padding-top: 8px;
+    line-height: 1.45;
+}
+
+.btn.btn-app.anno-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.anno-tools-btn {
+	display: block;
+	text-align: center;
+	border-radius: 6px 0 0 6px;
+	opacity: .45;
+	vertical-align: top;
+	margin: 0;
+}
+
+/* custom viewtree */
+ul.ivh-treeview {
+  list-style-type: none;
+  padding-left: 0;
+}
+ul.ivh-treeview ul.ivh-treeview {
+  padding-left: 15px;
+}
+ul.ivh-treeview .ivh-treeview-toggle {
+  cursor: pointer;
+}
+ul.ivh-treeview .ivh-treeview-node-leaf .ivh-treeview-toggle {
+  cursor: auto;
+}
+
+.widget-main.padding-8 {
+	padding: 8px;
+}
+
+.tree-container {
+	background-color: #FFF;
+    //border: 1px solid #DDD;
+    //border-left-color: #67B2DD;
+    display: block;
+    padding: 0;
+    max-width: 280px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.imc-icon { text-align: center }
+
+ul.ivh-treeview {
+	margin: auto;
+    padding: 0 0 0 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+}
+
+ul.ivh-treeview::before {
+	display: inline-block;
+    content: "";
+    position: absolute;
+    top: -20px;
+    bottom: 6px;
+    left: 0;
+    z-index: 1;
+    border: 1px dotted #67B2DD;
+    border-width: 0 0 0 1px;
+}
+
+.ivh-treeview .ivh-treeview-node:last-child:after { 
+	display: inline-block;
+	content: "";
+	position: absolute;
+	z-index: 1;
+	top: 10px;
+	bottom: 0;
+	left: -16px;
+	border-left: 1px solid #FFF
+}
+
+.ivh-treeview-children {
+	margin-left: 6px;
+}
+
+li.ivh-treeview-node {
+	padding: 0px !important;
+	position: relative;
+	list-style: none;
+    border-left: 1px solid #FFF;
+    margin: 1px 0;
+}
+
+li.ivh-treeview-node::before {
+	display: inline-block;
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: -16px;
+    width: 16px;
+    height: 0;
+    border-top: 1px dotted #67B2DD;
+    z-index: 1;
+}
+
+.ivh-treeview-twistie {
+	position: relative;
+    list-style: none;
+    border-left: 1px solid #FFF;
+    margin: 1px 0;
+}
