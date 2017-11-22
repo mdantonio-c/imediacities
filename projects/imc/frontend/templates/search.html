@@ -30,7 +30,7 @@
 				<div class="widget-body" style="border: 1px solid #CCC;" uib-collapse="asCollapsed">
 					<div class="widget-main scrollable imc-scroll" style="position: relative;">
 						<div class="scroll-track"></div>
-						<div class="scroll-content" style="max-height: 125px;">
+						<div class="scroll-content" style="max-height: 190px;">
 							<div class="content">
 								<div class="row">
 									<div class="col-xs-12">
@@ -51,6 +51,17 @@
 													</select>
 												</div>
 											</div>
+											<form class="form-horizontal" role="form">
+											<div class="form-group">
+											  	<div class="input-group date-range">
+  													<span style="max-width: 26%;" class="input-group-addon" id="basic-addon1">Year range</span>
+  													<input class="input-num" style="max-width: 26%;" type="number" ng-model="search.year_min"/>
+  													<input class="input-num" style="max-width: 26%;" type="number" ng-model="search.year_max"/>
+												</div>
+												<p>&nbsp;</p>
+  												<slider-range min="1900" max="2000" step="1" value-min="search.year_min" value-max="search.year_max"></slider-range>
+											</div>
+										</form>
 										</form>
 									</div>
 								</div>

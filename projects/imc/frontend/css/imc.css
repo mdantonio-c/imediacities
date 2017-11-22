@@ -876,3 +876,78 @@ li.ivh-treeview-node::before {
     border-left: 1px solid #FFF;
     margin: 1px 0;
 }
+
+
+/*slide range*/
+
+/*.slider {
+  position: relative;
+  text-align: left;
+  border: 1px solid gray;
+  height: 0.6em;
+}*/
+
+.slider {
+    position: relative;
+    text-align: left;
+    border: 1px solid gray;
+    height: 0.6em;
+    max-width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 10px;
+}
+
+.slider .handle {
+  position: absolute;
+  z-index: 2;
+  width: 1.2em;
+  height: 1.2em;
+  background-color: gray;
+}
+
+.handle {
+  top: -0.3em;
+  background: #de2d40;
+  color: #FFFFFF;  
+  cursor: pointer;
+  display: inline-block;
+  width: 5.2em;
+  height: 2.2em;
+  position: absolute;    
+  -moz-border-radius: 22px;
+  -webkit-border-radius: 22px;
+  border-radius: 22px;    
+  line-height: 2.2em;
+  text-align: center;
+}
+
+.slider .range {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  font-size: .7em;
+  background-color: red;
+  top: 0;
+  height: 100%;
+}
+
+.date-range {
+  margin-left: 10%;
+}
+
+/* Medium devices (desktops, 900px and up) */
+@media (max-width: 640px) {
+.input-group-addon{
+    	display: none;
+	}
+.input-num {
+  max-width: 100%;
+	}
+}
+
+.input-num {
+  max-width: 80%;
+}
+
+/*end slide range*/
