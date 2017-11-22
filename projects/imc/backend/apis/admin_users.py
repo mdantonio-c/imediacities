@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import random
-import string
-
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
@@ -17,12 +14,12 @@ logger = get_logger(__name__)
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 
-class AdminUsers(GraphBaseOperations):
+class CustomAdminUsers(GraphBaseOperations):
 
     def link_role(self, user, properties):
         ids = self.parseAutocomplete(
             properties, 'roles', id_key='name', split_char=',')
-        logger.critical(ids)
+        # logger.critical(ids)
 
         if ids is None:
             return
@@ -76,18 +73,12 @@ class AdminUsers(GraphBaseOperations):
 
         group_id = groups.pop()
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
 
         if group is None:
             raise RestApiException(
                 'Group not found', status_code=hcodes.HTTP_BAD_REQUEST)
-
-        rand = random.SystemRandom()
-        charset = string.ascii_uppercase + string.digits
-
-        cert_pass = ""
-        for _ in range(12):
-            cert_pass += rand.choice(charset)
 
         # GRAPH #
         properties["authmethod"] = "credentials"
@@ -118,7 +109,8 @@ class AdminUsers(GraphBaseOperations):
 
         v = self.get_input()
 
-        user = self.getNode(self.graph.User, user_id, field='uuid')
+        user = self.graph.User.nodes.get_or_none(uuid=user_id)
+        # user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise RestApiException("User not found")
 
@@ -135,7 +127,8 @@ class AdminUsers(GraphBaseOperations):
         if groups is not None:
             group_id = groups.pop()
 
-            group = self.getNode(self.graph.Group, group_id, field='uuid')
+            group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+            # group = self.getNode(self.graph.Group, group_id, field='uuid')
 
             p = None
             for p in user.belongs_to.all():
@@ -163,7 +156,8 @@ class AdminUsers(GraphBaseOperations):
 
         self.initGraph()
 
-        user = self.getNode(self.graph.User, user_id, field='uuid')
+        user = self.graph.User.nodes.get_or_none(uuid=user_id)
+        # user = self.getNode(self.graph.User, user_id, field='uuid')
         if user is None:
             raise RestApiException('This user cannot be found')
 

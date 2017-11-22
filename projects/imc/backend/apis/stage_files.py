@@ -80,7 +80,8 @@ class Stage(GraphBaseOperations):
         if group is None:
             group = self.getSingleLinkedNode(self._current_user.belongs_to)
         else:
-            group = self.getNode(self.graph.Group, group, field='uuid')
+            group = self.graph.Group.nodes.get_or_none(uuid=group)
+            # group = self.getNode(self.graph.Group, group, field='uuid')
 
         if group is None:
             raise RestApiException(

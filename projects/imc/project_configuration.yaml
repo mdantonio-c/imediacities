@@ -1,7 +1,7 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.1.0"
+    version: "1.1.1"
 tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
@@ -22,15 +22,15 @@ releases:
     status: developing
 
 variables:
-  repos:
-    rapydo:
-      branch: 0.5.5
-    utils:
-      branch: 0.5.5
-    backend:
-      branch: 0.5.5
-    build-templates:
-      branch: 0.5.5
+  # repos:
+  #   rapydo:
+  #     branch: master
+  #   utils:
+  #     branch: master
+  #   backend:
+  #     branch: master
+  #   build-templates:
+  #     branch: master
 
   env:
     COMPOSE_PROJECT_NAME: imc
@@ -74,6 +74,12 @@ bower_components:
     - dist/lodash.min.js
   angular-file-saver:
     - dist/angular-file-saver.bundle.min.js
+  angular-ivh-treeview:
+    - dist/ivh-treeview.min.js
+    - dist/ivh-treeview.min.css
+  ng-tags-input:
+    - ng-tags-input.min.css
+    - ng-tags-input.min.js
 
 css: 
   - "custom/imc.css"

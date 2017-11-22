@@ -1,20 +1,34 @@
-from utilities.logs import get_logger
-from restapi.services.authentication import BaseAuthentication as ba
-from utilities import htmlcodes as hcodes
-from restapi.tests.utilities import AUTH_URI
-import json
+# -*- coding: utf-8 -*-
 
+import json
+from restapi.tests import BaseTests
+from utilities import htmlcodes as hcodes
+from utilities.logs import get_logger
 
 log = get_logger(__name__)
 
-class TestApp:
+
+class TestApp(BaseTests):
 
     def test_admin_groups(self, client): #client e' una fixture di pytest-flask
         """
             Test the API /api/admin/groups
         """
         #
-        # non e' prevista la possibilita' di fare get con uno specifico group_id
+        # 1- cerca il gruppo di test (che deve già esistere nel db)
+        # 2- crea un nuovo utente associato al gruppo di test
+        # 3- crea un nuovo gruppo associato al nuovo utente senza authorization token
+        # 4- crea un nuovo gruppo associato al nuovo utente con authorization token
+        # 5- modifica il nuovo gruppo
+        # 6- fa GET di tutti i gruppi senza authorization token
+        # 7- fa GET di tutti i gruppi con authorization token, scorre la lista per trovare
+        #     il nuovo gruppo e verifica che la precedente modifica 
+        #     abbia funzionato
+        # 8- cancella il nuovo gruppo
+        # 9- cancella il nuovo utente
+        #
+        # A questo punto il database dovrebbe essere tornato 
+        #  come prima dei test
         #
 
         # log in
@@ -23,11 +37,15 @@ class TestApp:
 
         group_id = None
         group_shortname = None
+
         # /api/group viene usato per cercare i gruppi per nome, per 
         #  l'autocompletamento nel form dove si crea un nuovo user.
         # Chiamo prima questo per ottenere l'id del gruppo di test.
         # Infatti per creare un nuovo gruppo ci vuole uno user esistente e per
         #  creare uno nuovo user ci vuole un gruppo esistente...
+
+        # Non e' prevista la possibilita' di fare get con uno specifico group_id
+
         log.info("*** Testing get /api/group/")
         res = client.get('/api/group/test', headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
@@ -46,7 +64,7 @@ class TestApp:
         log.info("*** Creating user test")
         group_data = {'id': group_id , 'shortname': group_shortname}
         post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test'}
-        res = client.post('/api/admin/users', headers=headers, data=json.dumps(post_user_data))
+        res = client.post('/api/custom_admin/users', headers=headers, data=json.dumps(post_user_data))
         assert res.status_code == hcodes.HTTP_OK_BASIC
         contents = json.loads(res.data.decode('utf-8'))
         #log.debug("*** Response of post new user: "+json.dumps(contents))
@@ -62,7 +80,7 @@ class TestApp:
             # POST: try without log in
             res = client.post('/api/admin/groups', headers=None, data=json.dumps(post_data))
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-            log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+            #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # POST: create a new group
             res = client.post('/api/admin/groups', headers=headers, data=json.dumps(post_data))
             assert res.status_code == hcodes.HTTP_OK_BASIC
@@ -83,7 +101,7 @@ class TestApp:
                 res = client.get('/api/admin/groups')
                 # This endpoint requires a valid authorization token
                 assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-                log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+                #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
                 # GET all groups
                 res = client.get('/api/admin/groups', headers=headers)
                 assert res.status_code == hcodes.HTTP_OK_BASIC
@@ -108,47 +126,7 @@ class TestApp:
         # cancello l'utente creato per questi test
         if user_id is not None:
             log.info("*** DELETE user test")
-            res = client.delete('/api/admin/users/'+user_id, headers=headers)
+            res = client.delete('/api/custom_admin/users/'+user_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test
-   
-##############################################################################
-
-    # TOFIX: from version 0.5.6 this method will be in BaseTests class
-    def do_login(self, client, USER, PWD, status_code=hcodes.HTTP_OK_BASIC,
-                 error=None, **kwargs):
-        """
-            Make login and return both token and authorization header
-        """
-        if USER is None or PWD is None:
-            ba.myinit()
-            if USER is None:
-                USER = ba.default_user
-            if PWD is None:
-                PWD = ba.default_password
-
-        data = {'username': USER, 'password': PWD}
-        for v in kwargs:
-            data[v] = kwargs[v]
-        r = client.post(AUTH_URI + '/login', data=json.dumps(data))
-
-        if r.status_code != hcodes.HTTP_OK_BASIC:
-            # VERY IMPORTANT FOR DEBUGGING WHEN ADVANCED AUTH OPTIONS ARE ON
-            c = json.loads(r.data.decode('utf-8'))
-            log.error(c['Response']['errors'])
-
-        assert r.status_code == status_code
-
-        content = json.loads(r.data.decode('utf-8'))
-        if error is not None:
-            errors = content['Response']['errors']
-            if errors is not None:
-                assert errors[0] == error
-
-        token = ''
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None:
-                token = data.get('token', '')
-        return {'Authorization': 'Bearer ' + token}, token

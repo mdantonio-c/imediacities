@@ -1,24 +1,45 @@
-from utilities.logs import get_logger
-from restapi.services.authentication import BaseAuthentication as ba
-from utilities import htmlcodes as hcodes
-from restapi.tests.utilities import AUTH_URI
-import json
+# -*- coding: utf-8 -*-
 
+import json
+from restapi.tests import BaseTests
+from utilities import htmlcodes as hcodes
+from utilities.logs import get_logger
 
 log = get_logger(__name__)
 
-class TestApp:
+
+class TestApp(BaseTests):
 
     def test_annotations(self, client): #client e' una fixture di pytest-flask
         """
             Test the API /api/annotations
         """
+        #
+        # 1- fa GET di tutte le annotation senza authorization token
+        # 2- fa GET di tutte le annotation di tipo TVS, with pagination parameters
+        # 3- fa GET di una annotations con uno specifico id
+        # 4- fa una ricerca sui video esistenti per avere l'id dell'item di un video
+        # 5- crea una nuova annotation sul video trovato senza authorization token
+        # 6- crea una nuova annotation sul video trovato
+        # 7- fa GET annotation by id con id della annotation appena creata
+        # 8- crea una annotazione sulla annotazione appena creata
+        # 9- cancella la annotazione di annotazione
+        # 10- cancello la annotation sul video
+        # 11- fa GET shots by video_id
+        # 12- se trova almeno uno shot, prende il primo che trova e crea una 
+        #      annotazione sullo shot
+        # 13- cancella la annotazione sullo shot
+        #
+        # A questo punto il database dovrebbe essere tornato 
+        #  come prima dei test
+        #
+
         log.info("*** Testing GET annotations")
         # try without log in
         res = client.get('/api/annotations')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-        log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
@@ -73,7 +94,7 @@ class TestApp:
         # POST: try without log in
         res = client.post('/api/annotations', headers=None, data=json.dumps(post_data))
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-        log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
         # POST: create a new annotation
         res = client.post('/api/annotations', headers=headers, data=json.dumps(post_data))
         assert res.status_code == hcodes.HTTP_OK_CREATED
@@ -134,6 +155,7 @@ class TestApp:
                         # deve esistere lo shot_id
                         assert shot_id is not None
                         #log.debug("*** shot id: " + shot_id)
+                        # creo annotazione sullo shot
                         target_data3 = 'shot:'+shot_id
                         body_data3 = {'type':'TextualBody','value':'testo della annotazione di shot','language':'de'}
                         post_data3 = {'target':target_data3,'body':body_data3}
@@ -145,49 +167,9 @@ class TestApp:
                             data3 = response3.get('Response', {}).get('data', {})
                             if data3 is not None:
                                 anno_id3 = data3
-                        # cancello la annotazione di annotazione
+                        # cancello la annotazione sullo shot
                         if anno_id3 is not None:
                             res3 = client.delete('/api/annotations/'+anno_id3, headers=headers)
                             assert res3.status_code == hcodes.HTTP_OK_NORESPONSE
-                            
+          
         # a questo punto il database dovrebbe essere tornato come prima dei test
-
-##############################################################################
-
-    # TOFIX: from version 0.5.6 this method will be in BaseTests class
-    def do_login(self, client, USER, PWD, status_code=hcodes.HTTP_OK_BASIC,
-                 error=None, **kwargs):
-        """
-            Make login and return both token and authorization header
-        """
-        if USER is None or PWD is None:
-            ba.myinit()
-            if USER is None:
-                USER = ba.default_user
-            if PWD is None:
-                PWD = ba.default_password
-
-        data = {'username': USER, 'password': PWD}
-        for v in kwargs:
-            data[v] = kwargs[v]
-        r = client.post(AUTH_URI + '/login', data=json.dumps(data))
-
-        if r.status_code != hcodes.HTTP_OK_BASIC:
-            # VERY IMPORTANT FOR DEBUGGING WHEN ADVANCED AUTH OPTIONS ARE ON
-            c = json.loads(r.data.decode('utf-8'))
-            log.error(c['Response']['errors'])
-
-        assert r.status_code == status_code
-
-        content = json.loads(r.data.decode('utf-8'))
-        if error is not None:
-            errors = content['Response']['errors']
-            if errors is not None:
-                assert errors[0] == error
-
-        token = ''
-        if content is not None:
-            data = content.get('Response', {}).get('data', {})
-            if data is not None:
-                token = data.get('token', '')
-        return {'Authorization': 'Bearer ' + token}, token
