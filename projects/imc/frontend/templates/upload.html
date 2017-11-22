@@ -129,21 +129,23 @@
                       <button
                       class='btn btn-success btn-xs'
                       ng-click="ctrl.importStageFiles(data.name)"
-                      ng-if="data.type == 'metadata' && data.status != 'IMPORTING'">
+                      ng-if="profile.isAdmin && data.type == 'metadata' && data.status != 'IMPORTING'">
                       IMPORT
                       </button>
                     </td>
                     <td>{{data.size | bytes}}</td>
+<!-- 
                     <td>
                       <span uib-tooltip='{{data.creation | unix_date}}'>
                         {{data.creation | moment_unix: 'fromNow'}}
                       </span>
                     </td>
-                    <!--       <td>
+ -->
+                    <td>
                       <span uib-tooltip='{{data.modification | unix_date}}'>
                         {{data.modification | moment_unix: 'fromNow'}}
                       </span>
-                    </td> -->
+                    </td>
                     <td ng-if='data.status_message'>
                       <span uib-tooltip-template="'statusTooltipTemplate.html'"
                         class="label label-info label-app"
