@@ -45,13 +45,15 @@
 				});
 			}
 		};
-	}).factory('myGeoConfirmFactory', function($uibModal) {
+	}).factory('myGeoConfirmFactory', function($uibModal, $document) {
+		var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
 					animation: true,
 					templateUrl: template || 'result.html',
 					controller: 'geoResultController',
+					controllerAs: '$geoCtrl',
 					size: size,
 					resolve: {
 						params: function() {
@@ -370,6 +372,8 @@
 				var result;
 				if (place) {
 					result = {};
+					result.place_id = place.place_id;
+					result.name = place.name;
 					for (var i = 0, l = place.address_components.length; i < l; i++) {
 						if (i === 0) {
 							result.searchedBy = place.address_components[i].types[0];
@@ -437,6 +441,11 @@
 							google.maps.event.addListener(gPlace, 'place_changed', function() {
 								$scope.$apply(function() {
 									var place = gPlace.getPlace();
+									if (!place.geometry) {
+										// User entered the name of a Place that was not suggested and
+      									// pressed the Enter key, or the Place Details request failed.
+      									return;
+									}
 									var details = convertPlaceToFriendlyObject(place);
 									setDetails($scope, details);
 									$ctrl.$setViewValue(details.formattedAddress);
@@ -1269,78 +1278,64 @@
 			}
 		};
 
-		self.ok = function() {
-
-			if (!angular.isUndefined($scope.vm)) {
-				// console.log('vm : ' + angular.toJson($scope.vm, true))
-
-				var route = '';
-				var locality = '';
-				var country = '';
-
-				if ($scope.vm.address.route !== null) {route = $scope.vm.address.route;}
-				if ($scope.vm.address.locality !== null) {locality = $scope.vm.address.locality;}
-				if ($scope.vm.address.country !== null) {country = $scope.vm.address.country;}
-				if ($scope.vm.address.photo_reference !== null) {var photo_reference = $scope.vm.address.photo_reference;}
-
-				var stringloc = route + ' ' + locality + ' ' + country;
-
-				GeoCoder.geocode({
-						address: stringloc
-					})
-					.then(function(result) {
-						var locationlat = result[0].geometry.location.lat();
-						var locationlng = result[0].geometry.location.lng();
-						var locationiri = result[0].place_id;
-						sharedProperties.setLat(locationlat);
-						sharedProperties.setLong(locationlng);
-						sharedProperties.setIRI(locationiri); //actually the google one
-						sharedProperties.setLabelTerm(stringloc);
-						sharedProperties.setPhotoRef(photo_reference);
-						var locname = result[0].formatted_address; //result[0].address_components[0].long_name;
-						sharedProperties.setFormAddr(locname);
-						var restring = '(lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locname + '\')';
-						myGeoConfirmFactory.open('lg', 'result.html', {
-							result: restring,
-							resarr: result
-						});
-
-						$uibModalInstance.close($scope.vm.address.locality);
-					});
-				//$uibModalInstance.close($scope.searchTerm);
-			} else {
-				var vid = sharedProperties.getVideoId();
-				// $scope.alternatives = sharedProperties.getAlternatives();
-				var target = 'shot:' + $scope.shotID;
-				// alternatives mechanism should be of course generalized
-
-				if (self.tags.length > 0) {
-					// save the annotation into the database
-					DataService.saveTagAnnotations(target, self.tags).then(
-						function(resp) {
-							var annoId = resp.data;
-							console.log('Annotation saved successfully. ID: ' + annoId);
-							var annoInfo = {
-								"uuid": annoId,
-								"name": self.tags[0].label,
-								"group": $scope.group
-							};
-							var shotInfo = {
-								"uuid": $scope.shotID,
-								"shotNum": $scope.shotNum,
-								"startT": $scope.startT,
-								"endT": $scope.endT
-							};
-							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
-						},
-						function(err){
-							// TODO
-						});
-				}
-				$uibModalInstance.close(null);
-				ivhTreeviewMgr.deselectAll(self.vocabulary);
-				ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
+		self.confirmLocation = function() {
+			console.log('confirm geo location term');
+			if (angular.isUndefined($scope.vm)) {
+				console.error('Invalid place selection');
+				// TODO manage no match selection
+				return;
 			}
+			console.log('vm : ' + angular.toJson($scope.vm, true));
+			var locationlat = $scope.vm.address.lat;
+			var locationlng = $scope.vm.address.lng;
+			var locname = $scope.vm.address.name;
+			var locaddr = $scope.vm.address.formattedAddress;
+			sharedProperties.setLat($scope.vm.address.lat);
+			sharedProperties.setLong($scope.vm.address.lng);
+			sharedProperties.setIRI($scope.vm.address.place_id); // at the moment the google place id
+			sharedProperties.setLabelTerm($scope.vm.address.name);
+			sharedProperties.setPhotoRef($scope.vm.address.photo_reference);
+			sharedProperties.setFormAddr($scope.vm.address.formattedAddress);
+			var restring = locname + ' (lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locaddr + '\')';
+			$uibModalInstance.close($scope.vm.address.locality);
+			myGeoConfirmFactory.open('lg', 'result.html', {
+				result: restring
+			});
+
+		};
+
+		self.confirmVocabularyTerms = function() {
+			var vid = sharedProperties.getVideoId();
+			// $scope.alternatives = sharedProperties.getAlternatives();
+			var target = 'shot:' + $scope.shotID;
+			// alternatives mechanism should be of course generalized
+
+			if (self.tags.length > 0) {
+				// save the annotation into the database
+				DataService.saveTagAnnotations(target, self.tags).then(
+					function(resp) {
+						var annoId = resp.data;
+						console.log('Annotation saved successfully. ID: ' + annoId);
+						var annoInfo = {
+							"uuid": annoId,
+							"name": self.tags[0].label,
+							"group": $scope.group
+						};
+						var shotInfo = {
+							"uuid": $scope.shotID,
+							"shotNum": $scope.shotNum,
+							"startT": $scope.startT,
+							"endT": $scope.endT
+						};
+						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+					},
+					function(err) {
+						// TODO
+					});
+			}
+			$uibModalInstance.close(null);
+			ivhTreeviewMgr.deselectAll(self.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
 		};
 
 		self.cancel = function() {
@@ -1352,12 +1347,10 @@
 	}
 
 	function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
-		$scope.geocodingResult = params.result;
-		$scope.geoResArray = params.resarr;
+
+		$scope.geoResult = params.result;
 
 		$scope.ok = function() {
-			var res = $scope.geocodingResult;
-			var rarr = $scope.geoResArray;
 
 			$scope.startT = sharedProperties.getStartTime();
 			$scope.endT = sharedProperties.getEndTime();
@@ -1375,7 +1368,6 @@
 			// alternatives mechanism should be of course generalized
 			/*console.log($scope.IRI);
 			console.log(res);
-			console.log(rarr);
 			console.log($scope.labelTerm);*/
 			var source = {
 				"iri": $scope.IRI,
@@ -1412,7 +1404,7 @@
 						});
 			}
 
-			$uibModalInstance.close($scope.geocodingResult);
+			$uibModalInstance.close($scope.geoResult);
 		};
 
 		$scope.cancel = function() {

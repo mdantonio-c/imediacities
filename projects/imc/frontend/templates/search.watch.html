@@ -220,11 +220,11 @@
 			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
-			<form name="formAutocomplete" ng-submit="ok()">
+			<form name="formAutocomplete">
 				<div class="input-group animated fadeIn">
-					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
+					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Enter location: City, State..."/>
 					<span class="input-group-btn">
-						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.ok()">Confirm</button>
+						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
 					</span>
 				</div>
 			</form>
@@ -239,8 +239,8 @@
 			<button type="button" class="close" ng-click="cancel()">x</button>
 			<h4 class="modal-title">This location has been found</h4>
 		</div>
-		<div class="modal-body" ng-model="geocodingResult">
-			<p><b>You searched for: </b>{{geocodingResult}}</p>
+		<div class="modal-body">
+			<p><b>You searched for: </b>{{geoResult}}</p>
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-primary" type="button" ng-click="ok()">Confirm</button>
@@ -291,7 +291,7 @@
 		<div class="modal-footer">
 			<!-- <p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p> -->
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.ok()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
 		</div>
 	</script>
 
