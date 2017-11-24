@@ -288,43 +288,6 @@ class VideoContent(GraphBaseOperations):
                     "Video not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-            # ############################################
-            # ############################################
-            # VERY TEMPORARY!
-            # ############################################
-            # ############################################
-            if video_id=='61b0bfa1-bdc6-4bd8-9331-4edad5418f94':
-                # 10 mb
-                MAX_LENGTH = 1048576
-
-                byte1, byte2 = 0, None
-
-                range_header = request.headers.get('Range', None)
-
-                import re
-                import os
-                from flask import Response
-                if range_header:
-                    m = re.search('(\d+)-(\d*)', range_header)
-                    g = m.groups()
-
-                    if g[0]:
-                        byte1 = int(g[0])
-                    if g[1]:
-                        byte2 = int(g[1])
-
-                    size = os.path.getsize(video_uri)
-                    if byte2 is not None:
-                        length = byte2 + 1 - byte1
-                    else:
-                        length = size - byte1
-
-                    if length > MAX_LENGTH:
-                        # log.warning("Length exceding!")
-                        return Response('', 413)
-            # ############################################
-            # ############################################
-
             # mime = item.digital_format[2]
             # TO FIX: stored mime is MOV, non MP4, overwriting
             mime = "video/mp4"
