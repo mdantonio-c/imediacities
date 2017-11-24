@@ -35,12 +35,13 @@ def tag(tag):
               help='Path of destination folder')
 @click.option('--log_file', prompt='Name of log file',
               help='Name of log file')
-def harvest(metadata_set, dest_folder, log_file):
+@click.option('--content-type',
+              help='Type of content, e.g. video')
+def harvest(metadata_set, dest_folder, log_file, content_type):
 
     #############################
     # ### FILESYSTEM CHECKS ### #
     #############################
-
     try:
         if not os.path.isdir(dest_folder):
             os.makedirs(dest_folder)
@@ -96,12 +97,15 @@ def harvest(metadata_set, dest_folder, log_file):
         'filtered': 0,
         'saved': 0,
         'saved_files': [],
-        'missing_sourceid': []
+        'missing_sourceid': [],
+        'wrong_content_type': []
     }
     timestamp = int(1000 * time.time())
-    for record in client.listRecords(
-            metadataPrefix=metadata_prefix,
-            set=metadata_set):
+    log.info("Retrieving records for %s..." % metadata_set)
+    records = client.listRecords(
+        metadataPrefix=metadata_prefix, set=metadata_set)
+    log.info("Records retrieved, extracting...")
+    for record in records:
         element = record[1].element()
         # Obtained eTree is based on namespaced XML
         # Read: 19.7.1.6. Parsing XML with Namespaces
@@ -118,6 +122,16 @@ def harvest(metadata_set, dest_folder, log_file):
         #   in document order.
 
         report_data['downloaded'] += 1
+
+        if report_data['downloaded'] % 100 == 0:
+            print('.', end='', flush=True)
+
+            if report_data['downloaded'] % 5000 == 0:
+                print(
+                    ' %s downloaded - %s saved' % (
+                        report_data['downloaded'],
+                        report_data['saved']
+                    ), flush=True)
 
         efgEntity = element.find(tag("efgEntity"))
         if efgEntity is None:
@@ -163,6 +177,26 @@ def harvest(metadata_set, dest_folder, log_file):
             # log.warning("avManifestation not found, skipping record")
             continue
 
+        if content_type is not None:
+            content_type = content_type.lower()
+
+            item = manifestation.find(tag("item"))
+            if item is None:
+                # missing <item> => type cannot be found
+                report_data['wrong_content_type'].append(title)
+                continue
+
+            item_type = item.find(tag("type"))
+            if item_type is None:
+                # missing <type>
+                report_data['wrong_content_type'].append(title)
+                continue
+
+            if item_type.text.lower() != content_type:
+                # wrong type
+                report_data['wrong_content_type'].append(title)
+                continue
+
         recordSource = manifestation.find(tag("recordSource"))
         if recordSource is None:
             report_data['missing_sourceid'].append(title)
@@ -202,6 +236,9 @@ def harvest(metadata_set, dest_folder, log_file):
         json.dump(report_data, f)
 
     f.close()
+
+    # Just to close previous dot line
+    print("")
 
     log.info("""
 
