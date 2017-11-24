@@ -124,22 +124,24 @@ class Stage(GraphBaseOperations):
                 # cast down to Meta or Content stage
                 subres = res.downcast()
                 if 'MetaStage' in subres.labels():
-                    binding = {}
                     item = subres.item.single()
-                    creation = item.creation.single()
-                    source_id = None
-                    if creation is not None:
-                        sources = creation.record_sources.all()
-                        source_id = sources[0].source_id
-                        binding['source_id'] = source_id
-                    content_stage = item.content_source.single()
-                    if content_stage is not None:
-                        binding['filename'] = content_stage.filename
-                        binding['status'] = content_stage.status
-                    else:
-                        binding['filename'] = self.lookup_content(upload_dir, source_id)
-                        binding['status'] = 'PENDING'
-                    row['binding'] = binding
+                    # add binding info ONLY for processed record
+                    if item is not None:
+                        binding = {}
+                        source_id = None
+                        creation = item.creation.single()
+                        if creation is not None:
+                            sources = creation.record_sources.all()
+                            source_id = sources[0].source_id
+                            binding['source_id'] = source_id
+                        content_stage = item.content_source.single()
+                        if content_stage is not None:
+                            binding['filename'] = content_stage.filename
+                            binding['status'] = content_stage.status
+                        else:
+                            binding['filename'] = self.lookup_content(upload_dir, source_id)
+                            binding['status'] = 'PENDING'
+                        row['binding'] = binding
 
             # for res in resources:
             #     if res.path != path:
