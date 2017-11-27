@@ -38,7 +38,7 @@
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.pauseVid()" controls>
+					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.playAndPause()" controls>
 					</video>
 					<div class="overlay-desc" ng-model="watchCtrl.locSubtitle">
 						<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
@@ -220,14 +220,20 @@
 			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
-			<form name="formAutocomplete" ng-submit="ok()">
+			<form name="formAutocomplete">
 				<div class="input-group animated fadeIn">
-					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
+					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Enter location: City, State..."/>
 					<span class="input-group-btn">
-						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.ok()">Confirm</button>
+						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
 					</span>
 				</div>
 			</form>
+			<div class="space-8"></div>
+			<div uib-alert 
+				ng-repeat="alert in $tagCtrl.alerts"
+				ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="5000" 
+				close="$tagCtrl.closeAlert($index)">{{alert.msg}}</div>
+			<p>{{items}}</p>
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-default" ng-click="$tagCtrl.cancel()">Cancel</button>
@@ -239,8 +245,8 @@
 			<button type="button" class="close" ng-click="cancel()">x</button>
 			<h4 class="modal-title">This location has been found</h4>
 		</div>
-		<div class="modal-body" ng-model="geocodingResult">
-			<p><b>You searched for: </b>{{geocodingResult}}</p>
+		<div class="modal-body">
+			<p><b>You searched for: </b>{{geoResult}}</p>
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-primary" type="button" ng-click="ok()">Confirm</button>
@@ -291,7 +297,7 @@
 		<div class="modal-footer">
 			<!-- <p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p> -->
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.ok()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
 		</div>
 	</script>
 
