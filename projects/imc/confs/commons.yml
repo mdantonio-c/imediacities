@@ -44,6 +44,9 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
+      CELERY_HOST: ${CELERY_BROKER_HOST}
+      CELERY_PORT: ${CELERY_BROKER_PORT}
+
   neo4j:
     # volumes:
     #   - ../data/graphdata:/data
