@@ -1,7 +1,7 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.1.1"
+    version: "1.1.0"
 tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
@@ -22,15 +22,17 @@ releases:
     status: developing
 
 variables:
-  # repos:
-  #   rapydo:
-  #     branch: master
-  #   utils:
-  #     branch: master
-  #   backend:
-  #     branch: master
-  #   build-templates:
-  #     branch: master
+  # From next version delete me from HERE... 
+  repos:
+    rapydo:
+      branch: 0.5.5
+    utils:
+      branch: 0.5.5
+    backend:
+      branch: 0.5.5
+    build-templates:
+      branch: 0.5.5
+  # ... to HERE!
 
   env:
     COMPOSE_PROJECT_NAME: imc
