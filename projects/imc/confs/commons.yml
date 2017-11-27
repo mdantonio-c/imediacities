@@ -45,8 +45,8 @@ services:
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
   neo4j:
-    volumes:
-      - ../data/graphdata:/data
+    # volumes:
+    #   - ../data/graphdata:/data
     ports:
       - 9090:7474
       - 7687:7687
