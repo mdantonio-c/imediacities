@@ -8,7 +8,7 @@
 		.controller('MapController', MapController)
 		.controller('ModalConfirmController', ModalConfirmController);
 
-	/*modal view storyboard factory definition*/
+	// modal view storyboard factory definition
 	app.factory('modalFactory', function($uibModal) {
 		return {
 			open: function(size, template, params) {
@@ -569,7 +569,8 @@
 		return times;
 	}
 
-	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, DataService, noty, myModalGeoFactory, sharedProperties) {
+	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, 
+		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
 
 		var self = this;
 		self.showmesb = false;
@@ -668,8 +669,7 @@
 			}
 		}
 
-		// Pause video function
-		self.pauseVid = function() {
+		self.playAndPause = function() {
 			// console.log('pause video');
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
@@ -681,6 +681,13 @@
 				self.showtagtxt = false;
 				myVid[0].play();
 			}
+		};
+
+		// Pause video
+		self.pauseVid = function() {
+			self.onpause = true;
+			self.onplaying = false;
+			myVid[0].pause();
 		};
 
 		$rootScope.checkAnnotation = function(times1, times2, group, labelterm) {
@@ -713,56 +720,66 @@
 		};
 
 		self.manualtag = function(group, labelterm, tiri, alternatives) {
-			if (self.onpause && !self.onplaying) {
-				self.startTagTime = parseInt(myVid[0].currentTime); //set initial tag frame current time
+			console.log('manual tag - group: ' + group + '; term: ' + labelterm + '; iri: ' + tiri + '; alternatives: ' + alternatives);
+			// console.log('current annotations: ' + angular.toJson(self.annotations, true));
 
-				for (var i = 0; i <= self.items.length - 1; i++) {
-					var pngshot = self.items[i][6];
-					var shotid = self.items[i][7];
-					var shotnum = self.items[i][4];
+			// force pause
+			self.pauseVid();
 
-					var time1 = self.items[i][5];
-					var times2;
-					if (i < self.items.length - 1) {
-						var time2 = self.items[i + 1][5];
-						var currtime2 = time2.split("-")[0];
-						var hours2 = currtime2.split(":")[0];
-						var mins2 = currtime2.split(":")[1];
-						var secs2 = currtime2.split(":")[2];
-						//var cdate = new Date(0, 0, 0, hours, mins, secs);
-						times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
-					} else {
-						times2 = self.items[i][1];
-					}
+			self.startTagTime = parseInt(myVid[0].currentTime); //set initial tag frame current time
 
-					var currtime1 = time1.split("-")[0];
-					var hours1 = currtime1.split(":")[0];
-					var mins1 = currtime1.split(":")[1];
-					var secs1 = currtime1.split(":")[2];
+			for (var i = 0; i <= self.shots.length - 1; i++) {
+				var shotThumbnail = self.shots[i].links.thumbnail;
+				var shotId = self.shots[i].id;
+				var shotNum = self.shots[i].attributes.shot_num;
+
+				var time1 = self.shots[i].attributes.timestamp;
+				var times2;
+				if (i < self.shots.length - 1) {
+					// get timestamp from next shot
+					var time2 = self.shots[i + 1].attributes.timestamp;
+					var currtime2 = time2.split("-")[0];
+					var hours2 = currtime2.split(":")[0];
+					var mins2 = currtime2.split(":")[1];
+					var secs2 = currtime2.split(":")[2];
 					//var cdate = new Date(0, 0, 0, hours, mins, secs);
-					var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
+					times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+				} else {
+					// last shot: use duration instead
+					times2 = self.shots[i].attributes.duration;
+				}
 
-					if (self.startTagTime >= times1 && self.startTagTime <= times2) {
+				var currtime1 = time1.split("-")[0];
+				var hours1 = currtime1.split(":")[0];
+				var mins1 = currtime1.split(":")[1];
+				var secs1 = currtime1.split(":")[2];
+				//var cdate = new Date(0, 0, 0, hours, mins, secs);
+				var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
 
-						sharedProperties.setVideoId($stateParams.v);
-						sharedProperties.setStartTime(times1);
-						sharedProperties.setEndTime(times2);
-						sharedProperties.setGroup(group);
-						sharedProperties.setLabelTerm(labelterm);
-						sharedProperties.setAlternatives(alternatives);
-						sharedProperties.setIRI(tiri);
-						sharedProperties.setShotPNG(pngshot);
-						sharedProperties.setShotId(shotid);
-						sharedProperties.setShotNum(shotnum+1);
+				if (self.startTagTime >= times1 && self.startTagTime <= times2) {
 
-						if (group != 'location') {
-							// a new term
-							if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
-								myModalGeoFactory.open('lg', 'myModalVocab.html');
-							}
+					sharedProperties.setVideoId($stateParams.v);
+					sharedProperties.setStartTime(times1);
+					sharedProperties.setEndTime(times2);
+					sharedProperties.setGroup(group);
+					sharedProperties.setLabelTerm(labelterm);
+					sharedProperties.setAlternatives(alternatives);
+					sharedProperties.setIRI(tiri);
+					sharedProperties.setShotPNG(shotThumbnail);
+					sharedProperties.setShotId(shotId);
+					sharedProperties.setShotNum(shotNum+1);
+
+					// filter actual manual annotations for this shot
+					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
+					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+
+					if (group != 'location') {
+						// a new term
+						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
+							myModalGeoFactory.open('lg', 'myModalVocab.html');
 						}
-						else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html');
 					}
+					else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
 				}
 			}
 		};
@@ -925,9 +942,11 @@
 									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
 									var name = (anno.bodies[0].type === 'textualbody') ? 
 										anno.bodies[0].attributes.value : anno.bodies[0].attributes.name;
+									var termIRI = anno.bodies[0].attributes.iri;
 									var annoInfo = {
 										uuid: anno.id,
 										name: name,
+										iri: termIRI,
 										group: group
 									};
 									// shot info
@@ -1055,6 +1074,7 @@
 			var anno = {
 					id: annoInfo.uuid,
 					group: annoInfo.group,
+					iri: annoInfo.iri,
 					name: locn,
 					shotid: shotInfo.uuid,
 					shotNum: shotInfo.shotNum,
@@ -1217,7 +1237,7 @@
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $uibModal service used above.
 	function TagController($scope, $rootScope, $uibModalInstance, $filter, ivhTreeviewMgr, 
-		myGeoConfirmFactory, GeoCoder, DataService, sharedProperties, VocabularyService) {
+		myGeoConfirmFactory, DataService, sharedProperties, VocabularyService, params) {
 
 		var self = this;
 		
@@ -1279,13 +1299,17 @@
 		};
 
 		self.confirmLocation = function() {
-			console.log('confirm geo location term');
 			if (angular.isUndefined($scope.vm)) {
-				console.error('Invalid place selection');
-				// TODO manage no match selection
+				self.alerts.push({msg: 'Invalid place selection. Only values from a controlled list is allowed.'});
 				return;
 			}
-			console.log('vm : ' + angular.toJson($scope.vm, true));
+			var matched = $filter('filter')(params.annotations, {iri: $scope.vm.address.place_id})[0];
+			if (typeof matched !== "undefined") {
+				self.alerts.push({msg: 'Invalid place selection. "' + $scope.vm.address.name + '" already selected.'});
+				return;
+			}
+			// check deplication
+			// console.log('vm : ' + angular.toJson($scope.vm, true));
 			var locationlat = $scope.vm.address.lat;
 			var locationlng = $scope.vm.address.lng;
 			var locname = $scope.vm.address.name;
@@ -1301,7 +1325,6 @@
 			myGeoConfirmFactory.open('lg', 'result.html', {
 				result: restring
 			});
-
 		};
 
 		self.confirmVocabularyTerms = function() {
@@ -1313,12 +1336,14 @@
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags).then(
+					// FIXME manage multiple tags
 					function(resp) {
 						var annoId = resp.data;
 						console.log('Annotation saved successfully. ID: ' + annoId);
 						var annoInfo = {
 							"uuid": annoId,
 							"name": self.tags[0].label,
+							"iri": self.tags[0].iri,
 							"group": $scope.group
 						};
 						var shotInfo = {
@@ -1342,6 +1367,11 @@
 			$uibModalInstance.dismiss('cancel');
 			ivhTreeviewMgr.deselectAll(self.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
+		};
+
+		self.alerts = [];
+		self.closeAlert = function(index) {
+			self.alerts.splice(index, 1);
 		};
 
 	}
@@ -1384,10 +1414,12 @@
 				DataService.saveGeoAnnotation(target, source, spatial).then(
 						function(resp) {
 							var annoId = resp.data;
+							var termIRI = source.iri;
 							console.log('Annotation saved successfully. ID: ' + annoId);
 							var annoInfo = {
 								"uuid": annoId,
 								"name": $scope.labelTerm,
+								"iri": termIRI,
 								"group": $scope.group
 							};
 							var shotInfo = {

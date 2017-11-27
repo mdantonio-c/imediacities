@@ -38,7 +38,7 @@
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.pauseVid()" controls>
+					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.playAndPause()" controls>
 					</video>
 					<div class="overlay-desc" ng-model="watchCtrl.locSubtitle">
 						<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
@@ -228,6 +228,12 @@
 					</span>
 				</div>
 			</form>
+			<div class="space-8"></div>
+			<div uib-alert 
+				ng-repeat="alert in $tagCtrl.alerts"
+				ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="5000" 
+				close="$tagCtrl.closeAlert($index)">{{alert.msg}}</div>
+			<p>{{items}}</p>
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-default" ng-click="$tagCtrl.cancel()">Cancel</button>
