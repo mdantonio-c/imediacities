@@ -7,7 +7,9 @@ sudo pip3 install pyoai
 import click
 import json
 import os
+import codecs
 import urllib
+import html
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from lxml import etree
@@ -218,8 +220,10 @@ def harvest(metadata_set, dest_folder, log_file, content_type):
             id_text,
             timestamp
         )
-        with open(os.path.join(dest_folder, filename), 'wb') as f:
-            f.write(content)
+        filepath = os.path.join(dest_folder, filename)
+        # with open(filepath, 'wb') as f:
+        with codecs.open(filepath, 'wb', "utf-8") as f:
+            f.write(html.unescape(content.decode('utf-8')))
 
         report_data['saved'] += 1
         report_data['saved_files'].append(filename)
