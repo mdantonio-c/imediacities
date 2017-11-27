@@ -211,7 +211,8 @@ def harvest(metadata_set, dest_folder, log_file, content_type):
 
         content = etree.tostring(efgEntity, pretty_print=True)
 
-        id_text = urllib.parse.quote_plus(sourceID.text)
+        id_text = urllib.parse.quote_plus(sourceID.text.strip())
+
         filename = "%s_%s_%s.xml" % (
             metadata_set,
             id_text,
