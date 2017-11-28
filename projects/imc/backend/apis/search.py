@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 class Search(GraphBaseOperations):
 
     allowed_item_types = ('all', 'video', 'image')
+    allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -42,31 +43,42 @@ class Search(GraphBaseOperations):
             raise RestApiException('Page size cannot be a negative value',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # check item type
-        item_type = input_parameters.get('type', 'all').strip().lower()
-        if item_type not in self.__class__.allowed_item_types:
-            raise RestApiException(
-                "Bad item type parameter: expected one of %s" %
-                (self.__class__.allowed_item_types, ),
-                status_code=hcodes.HTTP_BAD_REQUEST)
-        if item_type == 'all':
-            entity = 'Creation'
-        elif item_type == 'video':
-            entity = 'AVEntity'
-        elif item_type == 'image':
-            entity = 'NonAVEntity'
-        else:
-            # should never be reached
-            raise RestApiException(
-                'Unexpected item type',
-                status_code=hcodes.HTTP_SERVER_ERROR)
+        # check request for term matching
+        match = input_parameters.get('match')
+        if match is not None:
+            term = match.get('term', '').strip()
+            if not term:
+                raise RestApiException('Term input cannot be empty',
+                                       status_code=hcodes.HTTP_BAD_REQUEST)
+            fields = match.get('fields')
+            if fields is None or len(fields) == 0:
+                raise RestApiException('Fields input cannot be empty',
+                                       status_code=hcodes.HTTP_BAD_REQUEST)
 
-        term = input_parameters.get('term', '').strip()
-        if not term:
-            raise RestApiException('Term input cannot be empty',
-                                   status_code=hcodes.HTTP_BAD_REQUEST)
+        # check request for filtering
+        filtering = input_parameters.get('filter')
+        if filtering is not None:
+            # check item type
+            item_type = filtering.get('type', 'all').strip().lower()
+            if item_type not in self.__class__.allowed_item_types:
+                raise RestApiException(
+                    "Bad item type parameter: expected one of %s" %
+                    (self.__class__.allowed_item_types, ),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if item_type == 'all':
+                entity = 'Creation'
+            elif item_type == 'video':
+                entity = 'AVEntity'
+            elif item_type == 'image':
+                entity = 'NonAVEntity'
+            else:
+                # should never be reached
+                raise RestApiException(
+                    'Unexpected item type',
+                    status_code=hcodes.HTTP_SERVER_ERROR)
 
-        provider = input_parameters.get('provider', '').strip()
+            provider = filtering.get('provider', '').strip()
+
         filters = ''
         if provider:
             filters = "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider) \

@@ -99,8 +99,6 @@ definitions:
         format: double
 
   SearchCriteria:
-    required:
-      - match
     properties:
       match:
         $ref: "#/definitions/SearchMatch"
