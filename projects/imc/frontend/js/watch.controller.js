@@ -720,7 +720,7 @@
 		};
 
 		self.manualtag = function(group, labelterm, tiri, alternatives) {
-			console.log('manual tag - group: ' + group + '; term: ' + labelterm + '; iri: ' + tiri + '; alternatives: ' + alternatives);
+			// console.log('manual tag - group: ' + group + '; term: ' + labelterm + '; iri: ' + tiri + '; alternatives: ' + alternatives);
 			// console.log('current annotations: ' + angular.toJson(self.annotations, true));
 
 			// force pause
@@ -771,12 +771,12 @@
 
 					// filter actual manual annotations for this shot
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
-					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 
 					if (group != 'location') {
 						// a new term
 						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
-							myModalGeoFactory.open('lg', 'myModalVocab.html');
+							myModalGeoFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
 						}
 					}
 					else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
