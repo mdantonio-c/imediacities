@@ -45,16 +45,16 @@
 												</div>
 											</div>
         									<div class="form-group">
-        									<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-provider">Search content by</label>
-        										<div class="col-sm-6 pull-left">
-										            <label class="checkbox-inline">
-										                <input type="checkbox" name="favoriteColors" ng-model="formData.colors.red"> Title
-										            </label>
-										            <label class="checkbox-inline">
-										                <input type="checkbox" name="favoriteColors" ng-model="formData.colors.blue"> Description
-										            </label>
-										            <label class="checkbox-inline">
-										                <input type="checkbox" name="favoriteColors" ng-model="formData.colors.green"> Annotation
+        									<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-provider">Match term in</label>
+        										<div class="col-sm-9 pull-left">
+										            <label class="checkbox-inline" ng-repeat="matchField in ctrl.matchFields">
+										                <input 
+										                	type="checkbox"
+										                	name="selectedMatchFields[]"
+										                	value="{{matchField}}"
+										                	ng-checked="ctrl.selectedMatchFields.indexOf(matchField) > -1"
+										                	ng-click="ctrl.toggleMatchFieldSelection(matchField)"
+										                	> {{matchField}}
 										            </label>
 									            </div>
 									        </div>
@@ -66,17 +66,33 @@
 													</select>
 												</div>
 											</div>
-											<form class="form-horizontal" role="form">
 											<div class="form-group">
-											  	<div class="input-group date-range">
-  													<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
-  													<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_min"/>
-  													<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_max"/>
+												<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-iprstatus">IPR Status</label>
+												<div class="col-sm-9 pull-left">
+													<select class="form-control pull-left" id="form-field-select-iprstatus" ng-model="ctrl.inputIPRStatus" ng-options="iprstatus.code as iprstatus.name for iprstatus in ctrl.iprstatuses">
+														<option value=""></option>
+													</select>
 												</div>
-												<p>&nbsp;</p>
-  												<slider-range min="1900" max="2000" step="1" value-min="search.year_min" value-max="search.year_max"></slider-range>
 											</div>
-										</form>
+											<div class="form-group">
+												<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-country">Production Country</label>
+												<div class="col-sm-9 pull-left">
+													<select class="form-control pull-left" id="form-field-select-country" ng-model="ctrl.inputCountry" ng-options="country.code as country.name for country in ctrl.countries">
+														<option value=""></option>
+													</select>
+												</div>
+											</div>
+											<form class="form-horizontal" role="form">
+												<div class="form-group">
+													<div class="input-group date-range">
+														<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
+														<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_min"/>
+														<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_max"/>
+													</div>
+													<div class="space-4"></div>
+													<slider-range min="1900" max="{{'' | currentYear}}" step="1" value-min="search.year_min" value-max="search.year_max"></slider-range>
+												</div>
+											</form>
 										</form>
 									</div>
 								</div>
