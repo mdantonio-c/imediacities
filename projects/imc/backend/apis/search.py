@@ -98,7 +98,11 @@ class Search(GraphBaseOperations):
         filtering = input_parameters.get('filter')
         if filtering is not None:
             # check item type
-            item_type = filtering.get('type', 'all').strip().lower()
+            item_type = filtering.get('type', 'all')
+            if item_type is None:
+                item_type = 'all'
+            else:
+                item_type = item_type.strip().lower()
             if item_type not in self.__class__.allowed_item_types:
                 raise RestApiException(
                     "Bad item type parameter: expected one of %s" %
@@ -116,14 +120,15 @@ class Search(GraphBaseOperations):
                     'Unexpected item type',
                     status_code=hcodes.HTTP_SERVER_ERROR)
             # PROVIDER
-            provider = filtering.get('provider', '').strip()
-            if provider != '':
+            provider = filtering.get('provider')
+            if provider is not None:
                 filters.append(
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
-                    " WHERE p.identifier='{provider}'".format(provider=provider))
+                    " WHERE p.identifier='{provider}'".format(provider=provider.strip()))
             # COUNTRY
-            country = filtering.get('country', '').strip().upper()
-            if country != '':
+            country = filtering.get('country')
+            if country is not None:
+                country = country.strip().upper()
                 if codelists.fromCode(country, codelists.COUNTRY) is None:
                     raise RestApiException(
                         'Invalid country code for: ' + country)
@@ -131,8 +136,9 @@ class Search(GraphBaseOperations):
                     "MATCH (n)-[:COUNTRY_OF_REFERENCE]->(c:Country) WHERE c.code='{country_ref}'".format(
                         country_ref=country))
             # IPR STATUS
-            iprstatus = filtering.get('iprstatus', '').strip()
-            if iprstatus != '':
+            iprstatus = filtering.get('iprstatus')
+            if iprstatus is not None:
+                iprstatus = iprstatus.strip()
                 if codelists.fromCode(iprstatus, codelists.RIGHTS_STATUS) is None:
                     raise RestApiException(
                         'Invalid IPR status code for: ' + iprstatus)
@@ -140,12 +146,12 @@ class Search(GraphBaseOperations):
                     "MATCH (n) WHERE n.rights_status = '{iprstatus}'".format(
                         iprstatus=iprstatus))
             # PRODUCTION YEAR RANGE
-            year_from = filtering.get('yearfrom', '').strip()
-            year_to = filtering.get('yearto', '').strip()
-            if year_from != '' or year_to != '':
+            year_from = filtering.get('yearfrom')
+            year_to = filtering.get('yearto')
+            if year_from is not None or year_to is not None:
                 # set defaults if year is missing
-                year_from = '1900' if year_from == '' else year_from
-                year_to = datetime.now().year if year_to == '' else year_to
+                year_from = '1900' if year_from is None else year_from.strip()
+                year_to = datetime.now().year if year_to is None else year_to.strip()
                 filters.append(
                     "MATCH (n) WHERE ANY(item in n.production_years where item >= '{yfrom}') \
                     and ANY(item in n.production_years where item <= '{yto}')".format(
