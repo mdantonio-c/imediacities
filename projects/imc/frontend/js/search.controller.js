@@ -126,7 +126,7 @@
 
 		self.loading = false;
 		self.inputTerm = "";
-		self.inputProvider = "";
+		self.inputProvider = null;
 		self.inputItemType = "all";
 		self.advancedSearch = false;
 
