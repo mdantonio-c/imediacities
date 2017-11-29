@@ -22,7 +22,7 @@
 				<div class="widget-header" style="border-bottom: none;">
 					<h6 class="widget-title">Advanced search</h6>
 					<div class="widget-toolbar" style="float: none;">
-						<a href="" data-action="collapse" ng-click="asCollapsed = !asCollapsed; cleanupFilters()">
+						<a href="" data-action="collapse" ng-click="asCollapsed = !asCollapsed; ctrl.toggleAdvancedSearch()">
 							<i class="imc-icon fa" ng-class="{'fa-chevron-right': asCollapsed, 'fa-chevron-down': !asCollapsed}"></i>
 						</a>
 					</div>
@@ -30,27 +30,69 @@
 				<div class="widget-body" style="border: 1px solid #CCC;" uib-collapse="asCollapsed">
 					<div class="widget-main scrollable imc-scroll" style="position: relative;">
 						<div class="scroll-track"></div>
-						<div class="scroll-content" style="max-height: 125px;">
+						<div class="scroll-content" style="min-height: 250px;">
 							<div class="content">
 								<div class="row">
 									<div class="col-xs-12">
 										<form class="form-horizontal" role="form">
 											<div class="form-group">
-												<div class="col-sm-12">
+											<label class="col-sm-1 no-padding-right" style="text-align: left;" for="form-field-select-provider">Type</label>
+												<div class="col-sm-9 pull-left">
 													<label class="radio-inline"> <input type="radio" name="item_type" id="all_item_types" value="all" ng-model="ctrl.inputItemType"> All </label>
 													<label class="radio-inline"> <input type="radio" name="item_type" id="video_item_types" value="video" ng-model="ctrl.inputItemType"> Video </label>
 													<label class="radio-inline"> <input type="radio" name="item_type" id="image_item_types" value="image" ng-model="ctrl.inputItemType"> Image </label>
 													<!-- <label class="radio-inline"> <input type="radio" name="item_type" id="text_item_types" value="text" ng-model="ctrl.inputItemType" disabled> Text </label> -->
 												</div>
 											</div>
+        									<div class="form-group">
+        									<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-provider">Match term in</label>
+        										<div class="col-sm-9 pull-left">
+										            <label class="checkbox-inline" ng-repeat="matchField in ctrl.matchFields">
+										                <input 
+										                	type="checkbox"
+										                	name="selectedMatchFields[]"
+										                	value="{{matchField}}"
+										                	ng-checked="ctrl.selectedMatchFields.indexOf(matchField) > -1"
+										                	ng-click="ctrl.toggleMatchFieldSelection(matchField)"
+										                	> {{matchField}}
+										            </label>
+									            </div>
+									        </div>
 											<div class="form-group">
-												<label class="col-sm-3 no-padding-right" for="form-field-select-provider">Provider</label>
-												<div class="col-sm-9">
-													<select class="form-control" id="form-field-select-provider" ng-model="ctrl.inputProvider" ng-options="provider.code as provider.name for provider in providers">
+												<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-provider">Provider</label>
+												<div class="col-sm-9 pull-left">
+													<select class="form-control pull-left" id="form-field-select-provider" ng-model="ctrl.inputProvider" ng-options="provider.code as provider.name for provider in providers">
 														<option value=""></option>
 													</select>
 												</div>
 											</div>
+											<div class="form-group">
+												<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-iprstatus">IPR Status</label>
+												<div class="col-sm-9 pull-left">
+													<select class="form-control pull-left" id="form-field-select-iprstatus" ng-model="ctrl.inputIPRStatus" ng-options="iprstatus.code as iprstatus.name for iprstatus in ctrl.iprstatuses">
+														<option value=""></option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-2 no-padding-right" style="text-align: left;" for="form-field-select-country">Production Country</label>
+												<div class="col-sm-9 pull-left">
+													<select class="form-control pull-left" id="form-field-select-country" ng-model="ctrl.inputCountry" ng-options="country.code as country.name for country in ctrl.countries">
+														<option value=""></option>
+													</select>
+												</div>
+											</div>
+											<form class="form-horizontal" role="form">
+												<div class="form-group">
+													<div class="input-group date-range">
+														<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
+														<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_min"/>
+														<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="search.year_max"/>
+													</div>
+													<div class="space-4"></div>
+													<slider-range min="1900" max="{{'' | currentYear}}" step="1" value-min="search.year_min" value-max="search.year_max"></slider-range>
+												</div>
+											</form>
 										</form>
 									</div>
 								</div>

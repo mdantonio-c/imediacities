@@ -82,6 +82,11 @@
 				return (!value) ? '' : value.replace(/,/g, '');
 			};
 		})
+		.filter('currentYear', ['$filter', function($filter) {
+			return function() {
+				return $filter('date')(new Date(), 'yyyy');
+			};
+		}])
 		;
 
 	// The controller
@@ -123,13 +128,51 @@
 		self.inputTerm = "";
 		self.inputProvider = "";
 		self.inputItemType = "all";
+		self.advancedSearch = false;
+
+		// list of match field
+		self.matchFields = ["title", "keyword", "description", "contributor"];
+		// Selected fields
+		self.selectedMatchFields = ["title"];
+		// Toggle selection for a given field by name
+		self.toggleMatchFieldSelection = function(matchField) {
+			var idx = self.selectedMatchFields.indexOf(matchField);
+			// Is currently selected
+			if (idx > -1) {
+				self.selectedMatchFields.splice(idx, 1);
+			}
+			// Is newly selected
+			else {
+				self.selectedMatchFields.push(matchField);
+			}
+		};
+
 		self.searchCreations = function() {
-			var request_data = {
-				"type": self.inputItemType,
-				"provider": self.inputProvider,
-				"term": ""
-			};
-			request_data.term = self.inputTerm === '' ? '*' : self.inputTerm;
+			var request_data = {};
+			if (self.advancedSearch) {
+				request_data = {
+					"match": {
+						"term": "",
+						"fields": self.selectedMatchFields,
+					},
+					"filter": {
+						"type": self.inputItemType,
+						"provider": self.inputProvider,
+						"country": self.inputCountry,
+						"iprstatus": self.inputIPRStatus,
+						"yearfrom": $scope.search.year_min.toString(),
+						"yearto": $scope.search.year_max.toString(),
+					}
+				};
+			} else {
+				request_data = {
+					"match": {
+						"term": "",
+						"fields": ["title"],
+					},
+				};
+			}
+			request_data.match.term = self.inputTerm === '' ? '*' : self.inputTerm;
 			self.loadResults = false;
 			self.loading = true;
 			self.showmese = true;
@@ -214,6 +257,14 @@
 		};
 
 		// advanced search
+		self.toggleAdvancedSearch = function() {
+			if ($scope.asCollapsed) {
+				self.advancedSearch = false;
+			} else {
+				self.advancedSearch = true;
+			}
+		};
+
 		$scope.asCollapsed = true;
 		$scope.providers = [{
 			"code": "CCB",
@@ -248,6 +299,68 @@
 			self.inputItemType = "all";
 			self.inputProvider = "";
 		};
+
+		// move codelist provision in a service
+		self.iprstatuses = [{
+			"code": "01",
+			"name": "In copyright"
+		}, {
+			"code": "02",
+			"name": "EU Orphan Work"
+		}, {
+			"code": "03",
+			"name": "In copyright - Educational use permitted"
+		}, {
+			"code": "04",
+			"name": "In copyright - Non-commercial use permitted"
+		}, {
+			"code": "05",
+			"name": "Public Domain"
+		}, {
+			"code": "06",
+			"name": "No Copyright - Contractual Restrictions"
+		}, {
+			"code": "07",
+			"name": "No Copyright - Non-Commercial Use Only"
+		}, {
+			"code": "08",
+			"name": "No Copyright - Non-Commercial Use Only"
+		}, {
+			"code": "09",
+			"name": "No Copyright - United States"
+		}, {
+			"code": "10",
+			"name": "Copyright Undetermined"
+		}];
+
+		self.countries = [{
+			"code": "IT",
+			"name": "Italy"
+		}, {
+			"code": "AT",
+			"name": "Austria"
+		}, {
+			"code": "BE",
+			"name": "Belgium"
+		}, {
+			"code": "DE",
+			"name": "Germany"
+		}, {
+			"code": "ES",
+			"name": "Spain"
+		}, {
+			"code": "FI",
+			"name": "Finland"
+		}, {
+			"code": "FR",
+			"name": "France"
+		}, {
+			"code": "GB",
+			"name": "United Kingdom"
+		}, {
+			"code": "GR",
+			"name": "Greece"
+		}];
 	}
 
 })();
