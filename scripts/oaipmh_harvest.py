@@ -7,7 +7,9 @@ sudo pip3 install pyoai
 import click
 import json
 import os
+import codecs
 import urllib
+import html
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
 from lxml import etree
@@ -35,12 +37,13 @@ def tag(tag):
               help='Path of destination folder')
 @click.option('--log_file', prompt='Name of log file',
               help='Name of log file')
-def harvest(metadata_set, dest_folder, log_file):
+@click.option('--content-type',
+              help='Type of content, e.g. video')
+def harvest(metadata_set, dest_folder, log_file, content_type):
 
     #############################
     # ### FILESYSTEM CHECKS ### #
     #############################
-
     try:
         if not os.path.isdir(dest_folder):
             os.makedirs(dest_folder)
@@ -96,12 +99,15 @@ def harvest(metadata_set, dest_folder, log_file):
         'filtered': 0,
         'saved': 0,
         'saved_files': [],
-        'missing_sourceid': []
+        'missing_sourceid': [],
+        'wrong_content_type': []
     }
     timestamp = int(1000 * time.time())
-    for record in client.listRecords(
-            metadataPrefix=metadata_prefix,
-            set=metadata_set):
+    log.info("Retrieving records for %s..." % metadata_set)
+    records = client.listRecords(
+        metadataPrefix=metadata_prefix, set=metadata_set)
+    log.info("Records retrieved, extracting...")
+    for record in records:
         element = record[1].element()
         # Obtained eTree is based on namespaced XML
         # Read: 19.7.1.6. Parsing XML with Namespaces
@@ -118,6 +124,16 @@ def harvest(metadata_set, dest_folder, log_file):
         #   in document order.
 
         report_data['downloaded'] += 1
+
+        if report_data['downloaded'] % 100 == 0:
+            print('.', end='', flush=True)
+
+            if report_data['downloaded'] % 5000 == 0:
+                print(
+                    ' %s downloaded - %s saved' % (
+                        report_data['downloaded'],
+                        report_data['saved']
+                    ), flush=True)
 
         efgEntity = element.find(tag("efgEntity"))
         if efgEntity is None:
@@ -163,6 +179,26 @@ def harvest(metadata_set, dest_folder, log_file):
             # log.warning("avManifestation not found, skipping record")
             continue
 
+        if content_type is not None:
+            content_type = content_type.lower()
+
+            item = manifestation.find(tag("item"))
+            if item is None:
+                # missing <item> => type cannot be found
+                report_data['wrong_content_type'].append(title)
+                continue
+
+            item_type = item.find(tag("type"))
+            if item_type is None:
+                # missing <type>
+                report_data['wrong_content_type'].append(title)
+                continue
+
+            if item_type.text.lower() != content_type:
+                # wrong type
+                report_data['wrong_content_type'].append(title)
+                continue
+
         recordSource = manifestation.find(tag("recordSource"))
         if recordSource is None:
             report_data['missing_sourceid'].append(title)
@@ -177,14 +213,17 @@ def harvest(metadata_set, dest_folder, log_file):
 
         content = etree.tostring(efgEntity, pretty_print=True)
 
-        id_text = urllib.parse.quote_plus(sourceID.text)
+        id_text = urllib.parse.quote_plus(sourceID.text.strip())
+
         filename = "%s_%s_%s.xml" % (
             metadata_set,
             id_text,
             timestamp
         )
-        with open(os.path.join(dest_folder, filename), 'wb') as f:
-            f.write(content)
+        filepath = os.path.join(dest_folder, filename)
+        # with open(filepath, 'wb') as f:
+        with codecs.open(filepath, 'wb', "utf-8") as f:
+            f.write(html.unescape(content.decode('utf-8')))
 
         report_data['saved'] += 1
         report_data['saved_files'].append(filename)
@@ -202,6 +241,9 @@ def harvest(metadata_set, dest_folder, log_file):
         json.dump(report_data, f)
 
     f.close()
+
+    # Just to close previous dot line
+    print("")
 
     log.info("""
 
