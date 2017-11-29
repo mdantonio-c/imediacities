@@ -10,19 +10,7 @@ search:
       in: body
       description: Criteria for the search.
       schema:
-        required:
-          - term
-        properties:
-          type:
-            type: string
-            enum:
-              - all
-              - video
-              - image
-          term:
-            type: string
-          provider:
-            type: string
+        $ref: "#/definitions/SearchCriteria"
     - name: perpage
       in: query
       description: Number of videos returned

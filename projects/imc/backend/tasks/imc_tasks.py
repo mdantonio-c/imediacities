@@ -131,10 +131,22 @@ def import_file(self, path, resource_id, mode):
                     return 1
                 fast = (mode == 'fast')
 
+            # at the moment SKIP pipeline for NON-AV Entity
+            if item_type != 'Video':
+                if content_node is not None:
+                    content_node.status = 'SKIPPED'
+                    content_node.status_message = 'Pipeline for Non AV entity not yet implemented'
+                    content_node.save()
+
+                xml_resource.status = 'COMPLETED'
+                xml_resource.status_message = 'Nothing to declare'
+                xml_resource.save()
+                return 1
+
             if content_node is None:
                 raise Exception(
-                    "Pipeline cannot be started: \
-                    content does not exist in the path {0} for source ID {1}"
+                    "Pipeline cannot be started: " +
+                    "content does not exist in the path {0} for source ID {1}"
                     .format(content_path, source_id))
 
             content_node.status = "IMPORTING"
