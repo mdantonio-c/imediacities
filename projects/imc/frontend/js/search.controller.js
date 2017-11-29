@@ -128,6 +128,7 @@
 		self.inputTerm = "";
 		self.inputProvider = "";
 		self.inputItemType = "all";
+		self.advancedSearch = false;
 
 		// list of match field
 		self.matchFields = ["title", "keyword", "description", "contributor"];
@@ -147,18 +148,30 @@
 		};
 
 		self.searchCreations = function() {
-			var request_data = {
-				"match": {
-					"term": "",
-					"fields": ["title"]
-				},
-				"filter": {
-					"type": self.inputItemType,
-					"provider": self.inputProvider,
-					"yearfrom": $scope.search.year_min,
-					"yearto": $scope.search.year_max,
-				}
-			};
+			var request_data = {};
+			if (self.advancedSearch) {
+				request_data = {
+					"match": {
+						"term": "",
+						"fields": self.selectedMatchFields,
+					},
+					"filter": {
+						"type": self.inputItemType,
+						"provider": self.inputProvider,
+						"country": self.inputCountry,
+						"iprstatus": self.inputIPRStatus,
+						"yearfrom": $scope.search.year_min.toString(),
+						"yearto": $scope.search.year_max.toString(),
+					}
+				};
+			} else {
+				request_data = {
+					"match": {
+						"term": "",
+						"fields": ["title"],
+					},
+				};
+			}
 			request_data.match.term = self.inputTerm === '' ? '*' : self.inputTerm;
 			self.loadResults = false;
 			self.loading = true;
@@ -244,6 +257,14 @@
 		};
 
 		// advanced search
+		self.toggleAdvancedSearch = function() {
+			if ($scope.asCollapsed) {
+				self.advancedSearch = false;
+			} else {
+				self.advancedSearch = true;
+			}
+		};
+
 		$scope.asCollapsed = true;
 		$scope.providers = [{
 			"code": "CCB",
