@@ -127,7 +127,6 @@
 		self.loading = false;
 		self.inputTerm = "";
 		self.inputProvider = null;
-		self.inputItemType = "video";
 		self.advancedSearch = false;
 
 		// list of match field
@@ -294,9 +293,9 @@
 			"code": "TTE",
 			"name": "TTE - Greek Film Archive"
 		}];
-		self.inputItemType = "all";
+		self.inputItemType = "video";
 		$scope.cleanupFilters = function() {
-			self.inputItemType = "all";
+			self.inputItemType = "video";
 			self.inputProvider = "";
 		};
 
