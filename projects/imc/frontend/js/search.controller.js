@@ -127,7 +127,7 @@
 		self.loading = false;
 		self.inputTerm = "";
 		self.inputProvider = null;
-		self.inputItemType = "all";
+		self.inputItemType = "video";
 		self.advancedSearch = false;
 
 		// list of match field

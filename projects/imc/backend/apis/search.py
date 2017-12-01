@@ -94,31 +94,38 @@ class Search(GraphBaseOperations):
 
         # check request for filtering
         filters = []
-        entity = 'Creation'
+        # add filter for processed content with COMPLETE status
+        filters.append(
+            "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+            "WHERE content.status = 'COMPLETED'")
+        # ONLY for v1.1: force filter by video type
+        # default AVEntity instead of Creation and ignore item_type
+        entity = 'AVEntity'
         filtering = input_parameters.get('filter')
         if filtering is not None:
             # check item type
-            item_type = filtering.get('type', 'all')
-            if item_type is None:
-                item_type = 'all'
-            else:
-                item_type = item_type.strip().lower()
-            if item_type not in self.__class__.allowed_item_types:
-                raise RestApiException(
-                    "Bad item type parameter: expected one of %s" %
-                    (self.__class__.allowed_item_types, ),
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-            if item_type == 'all':
-                entity = 'Creation'
-            elif item_type == 'video':
-                entity = 'AVEntity'
-            elif item_type == 'image':
-                entity = 'NonAVEntity'
-            else:
-                # should never be reached
-                raise RestApiException(
-                    'Unexpected item type',
-                    status_code=hcodes.HTTP_SERVER_ERROR)
+            # UNCOMMENT in the next versions from v1.2
+            # item_type = filtering.get('type', 'all')
+            # if item_type is None:
+            #     item_type = 'all'
+            # else:
+            #     item_type = item_type.strip().lower()
+            # if item_type not in self.__class__.allowed_item_types:
+            #     raise RestApiException(
+            #         "Bad item type parameter: expected one of %s" %
+            #         (self.__class__.allowed_item_types, ),
+            #         status_code=hcodes.HTTP_BAD_REQUEST)
+            # if item_type == 'all':
+            #     entity = 'Creation'
+            # elif item_type == 'video':
+            #     entity = 'AVEntity'
+            # elif item_type == 'image':
+            #     entity = 'NonAVEntity'
+            # else:
+            #     # should never be reached
+            #     raise RestApiException(
+            #         'Unexpected item type',
+            #         status_code=hcodes.HTTP_SERVER_ERROR)
             # PROVIDER
             provider = filtering.get('provider')
             if provider is not None:
