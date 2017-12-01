@@ -116,6 +116,51 @@
 						<p><b>Rightholder(s)</b>:
 							<span ng-repeat="rightholder in watchCtrl.video.relationships.rightholders">
 							{{rightholder.attributes.name | nocomma}}{{$last ? '' : ', '}}</span></p>
+						<!-- cinzia start -->
+
+						<p ng-if="watchCtrl.video.relationships.languages && watchCtrl.video.relationships.languages[0].attributes"><b>Language(s)</b>:
+							<span ng-repeat="lang in watchCtrl.video.relationships.languages">
+							{{lang.attributes.code.description}} ({{lang.attributes.usage.description}}) {{$last ? '' : ', '}}</span></p>
+
+						<p ng-if="watchCtrl.video.relationships.titles && watchCtrl.video.relationships.titles[0].attributes"><b>Other title(s)</b>:
+							<span ng-repeat="otitle in watchCtrl.video.relationships.titles">
+							{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}</span></p>
+
+
+						<uib-accordion close-others="false" ng-if="watchCtrl.video.relationships.video_format &&
+																	watchCtrl.video.relationships.video_format[0].attributes &&
+																	(watchCtrl.video.relationships.video_format[0].attributes.sound  ||
+																	watchCtrl.video.relationships.video_format[0].attributes.colour  ||
+																	watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
+																	watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
+							<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
+								<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+								</uib-accordion-heading>
+								<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
+									<p ng-if="format.attributes.sound"><b>Sound</b>: 
+										<span>
+											{{format.attributes.sound.description | attributesFilter}}
+										</span>
+									</p>
+									<p ng-if="format.attributes.colour"><b>Colour</b>: 
+										<span>
+											{{format.attributes.colour.description | attributesFilter}}
+										</span>
+									</p>
+									<p ng-if="format.attributes.gauge"><b>Gauge</b>: 
+										<span>
+											{{format.attributes.gauge | attributesFilter}}
+										</span>
+									</p>
+									<p ng-if="format.attributes.aspect_ratio"><b>Aspect ratio</b>: 
+										<span>
+											{{format.attributes.aspect_ratio | attributesFilter}}
+										</span>
+									</p>
+								</div>
+							</div>
+						</uib-accordion>
+						<!-- cinzia end -->
 					</div>
 					<!-- <button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying">
 					<span class="glyphicon glyphicon-hand-up" ng-click="watchCtrl.manualtag();"></span>

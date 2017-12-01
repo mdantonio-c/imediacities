@@ -720,6 +720,17 @@
 
 		return times;
 	}
+	/* start cinzia*/
+	/* obj può essere direttamente il valore oppure può essere una struttura key,description */
+	angular.module('web').filter('attributesFilter', function() {
+		return function(obj) {
+			if(obj && obj.description){
+				return obj.description;
+			}
+			return obj;
+		};
+	});
+	/* end cinzia*/
 
 	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, 
 		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
@@ -731,7 +742,10 @@
 		self.video = $stateParams.meta;
 
 		self.inputVocTerm = "";
-
+		/*inizialize status of video format accordion -- cinzia */
+		$scope.statusAccor = {
+    		isOpen: false
+  		};
 		/*inizialize address for automplete input tag for geolocation*/
 		$scope.vm = {
 			address: {}
