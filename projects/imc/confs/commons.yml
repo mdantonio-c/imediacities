@@ -3,11 +3,11 @@ version: '3'
 
 services:
   backend:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
     image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
     volumes:
-      - ../data/imediastuff:/uploads
-      - ../scripts:/code/scripts
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${VANILLA_DIR}/scripts:/code/scripts
     networks:
       worker_net:
       ftp_net:
@@ -52,7 +52,7 @@ services:
 
   neo4j:
     volumes:
-      - ../data/graphdata:/data
+      - ${VANILLA_DIR}/data/graphdata:/data
     ports:
       - 9090:7474
       - 7687:7687
@@ -63,14 +63,14 @@ services:
       # NEO4J_dbms_allowFormatMigration: "true"
 
   celery:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
-      - ../data/imediastuff:/uploads
-      - ../submodules/imedia-pipeline:/imedia-pipeline
-      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
+      # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
-      - ../scripts:/code/scripts
+      - ${VANILLA_DIR}/scripts:/code/scripts
     depends_on:
       - rabbit
       - neo4j
@@ -101,10 +101,10 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
   celeryui:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
-      - ../data/imediastuff:/uploads
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
     environment:
       AUTH_ENABLE: 1
       # putting this here because it should not be configurable in .env
@@ -131,6 +131,6 @@ services:
       - "21:21"
       - "30000-30019:30000-30019"
     volumes:
-      - ../data/imediastuff:/home/ftpusers/
+      - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
     environment:
       ACTIVATE: 1
