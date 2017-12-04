@@ -18,8 +18,16 @@ class AnnotationRepository():
 
     # @graph_transactions
     def create_tag_annotations(self, user, bodies, target, selector):
-        log.debug("Create new tag annotations")
+        # deduplicate body annotations
+        warnings, bodies = self.deduplicate_tags(bodies, target, selector)
+        if len(warnings) > 0:
+            for msg in warnings:
+                log.warning(msg)
+        if len(bodies) == 0:
+            raise DuplicatedAnnotationError(
+                "Annotation cannot be created.", warnings)
 
+        log.debug("Create new tag annotations")
         # create annotation node
         anno = Annotation(annotation_type='TAG').save()
         if user is not None:
@@ -190,3 +198,40 @@ class AnnotationRepository():
             log.info(original_vim_body.__class__)
             original_vim_body.delete()
         annotation.delete()
+
+    def deduplicate_tags(self, bodies, target, selector):
+        ''' Check for esisting bodies for the given target. If all bodies
+        already exist, throw a duplication exception exception. If the
+        annotation contains some duplicates, report them as warnings.
+        '''
+        warnings = []
+        filtered_bodies = []
+        for body in bodies:
+            if body['type'] != 'ResourceBody':
+                filtered_bodies.append(body)
+                continue
+            if selector is not None:
+                # TODO manage deduplication with selector
+                filtered_bodies.append(body)
+                continue
+            source = body['source']
+            iri = source if isinstance(source, str) else source.get('iri')
+            query = "MATCH (a:Annotation) WHERE a.annotation_type='TAG' " \
+                "match (a)-[:HAS_TARGET]-(t:AnnotationTarget) where t.uuid='{target_uuid}' " \
+                "match (a)-[:HAS_BODY]->(b:ResourceBody) where b.iri='{body_iri}' " \
+                "return count(b)"
+            results = self.graph.cypher(query.format(
+                target_uuid=target.uuid, body_iri=iri))
+            count = [row[0] for row in results][0]
+            log.debug("Duplicated found: {0}".format(count))
+            if count > 0:
+                warnings.append("Duplicated tag: '{name}' - '{iri}'".format(
+                    name=source.get('name', ''), iri=iri))
+                continue
+            filtered_bodies.append(body)
+        log.debug("Filtered bodies: {0}".format(filtered_bodies))
+        return warnings, filtered_bodies
+
+
+class DuplicatedAnnotationError(Exception):
+    pass

@@ -13,6 +13,7 @@ from utilities.logs import get_logger
 from utilities import htmlcodes as hcodes
 # from imc.tasks.services.xml_result_parser import XMLResultParser
 from imc.tasks.services.annotation_repository import AnnotationRepository
+from imc.tasks.services.annotation_repository import DuplicatedAnnotationError
 
 import re
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
@@ -158,12 +159,18 @@ class Annotations(GraphBaseOperations):
                         'Invalid TextualBody',
                         status_code=hcodes.HTTP_BAD_REQUEST)
             else:
-                raise RestApiException('Invalid body type for: {}'.format(b_type))
+                raise RestApiException(
+                    'Invalid body type for: {}'.format(b_type))
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        created_anno = repo.create_tag_annotations(
-            user, bodies, targetNode, selector)
+        try:
+            created_anno = repo.create_tag_annotations(
+                user, bodies, targetNode, selector)
+        except DuplicatedAnnotationError as error:
+            raise RestApiException(
+                error.args[0] + " " + '; '.join(error.args[1]),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
 
         return self.force_response(created_anno.uuid, code=hcodes.HTTP_OK_CREATED)
 

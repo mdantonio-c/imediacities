@@ -742,54 +742,22 @@
 		self.video = $stateParams.meta;
 
 		self.inputVocTerm = "";
-		/*inizialize status of video format accordion -- cinzia */
+		// inizialize status of video format accordion
 		$scope.statusAccor = {
     		isOpen: false
   		};
-		/*inizialize address for automplete input tag for geolocation*/
+		// inizialize address for automplete input tag for geolocation
 		$scope.vm = {
 			address: {}
 		};
-		/*to visualize annotations in tab table*/
+		// to visualize annotations in tab table
 		self.annotations = [];
 		$rootScope.currentTime = 0;
 
-		/*$scope.expand = function(mitem) {
-				mitem.show = !mitem.show;
-		}*/
-
-		/*initialize multiselect to filter subtitles*/
+		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
 		self.locSubtitle = "";
-
-		/*self.vocabularyFinal = [];
-		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-			self.vocabularyFinal = data;
-			self.onlyterms = [];
-
-			var pushloc = {
-				Value: 0,
-				Display: 'location'
-			};
-			$scope.options.push(pushloc);
-
-			for (var i = 0; i <= self.vocabularyFinal.terms.length - 1; i++) {
-				self.vocabularyFinal.terms[i].show = true;
-				for (var k = 0; k <= self.vocabularyFinal.terms[i].items.length - 1; k++) {
-					self.vocabularyFinal.terms[i].items[k].show = true;
-					var topush = {
-						Value: k + 1,
-						Display: self.vocabularyFinal.terms[i].items[k].label
-					};
-					$scope.options.push(topush);
-					for (var j = 0; j <= self.vocabularyFinal.terms[i].items[k].items.length - 1; j++) {
-						self.vocabularyFinal.terms[i].items[k].items[j].show = true;
-						self.onlyterms.push(self.vocabularyFinal.terms[i].items[k].items[j]);
-					}
-				}
-			}
-		});*/
 
 		// Initializing values
 		self.onplaying = false;
@@ -813,8 +781,7 @@
 				myVid[0].pause();
 				paused = true;
 			}
-
-			/*updating subtitles*/
+			// updating subtitles
 			if (self.videoTimeline !== null) $rootScope.$emit('updateSubtitles');
 		};
 
@@ -869,17 +836,16 @@
 				var time1c = convertTime(t1);
 				var time2c = convertTime(t2);
 
-				/*same interval of this annotation set*/
+				// same interval of this annotation set
 				if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)) {
 					var acategory = timelinerows[k].c[0].v;
 					var aterm = timelinerows[k].c[1].v;
 					if ((acategory == group) && (aterm == labelterm)) {
-						/*the term has been already added in the timeline cache*/
+						// the term has been already added in the timeline cache
 						foundterm = true;
 						if (group == 'location') myModalGeoFactory.open('lg', 'locationFoundModal.html');
 						else myModalGeoFactory.open('lg', 'termFoundModal.html');
 					}
-
 				}
 			}
 			return foundterm;
@@ -938,7 +904,7 @@
 					// filter actual manual annotations for this shot
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
 					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
-
+					
 					if (group != 'location') {
 						// a new term
 						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
