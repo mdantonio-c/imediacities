@@ -252,7 +252,7 @@
 				var recursiveFilter = function(terms, query) {
 					angular.forEach(terms, function(item) {
 						if (!item.hasOwnProperty('children')) {
-							if (item.label.startsWith(query)) {
+							if (item.label.startsWith(query.toLowerCase())) {
 								// console.log(angular.toJson(item, true));
 								filtered.push({iri: item.id, label: item.label});
 							}
