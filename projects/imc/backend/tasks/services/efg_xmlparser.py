@@ -22,14 +22,14 @@ class EFG_XMLParser():
         record = root.find('efg:avcreation', self.ns)
         if record is not None:
             nodes = record.findall(
-                './efg:avManifestation/efg:recordSource/efg:sourceID', self.ns)
+                './efg:recordSource/efg:sourceID', self.ns)
             if len(nodes) <= 0:
                 return None
             return nodes[0].text.strip()
         record = root.find('efg:nonavcreation', self.ns)
         if record is not None:
             nodes = record.findall(
-                './efg:nonAVManifestation/efg:recordSource/efg:sourceID', self.ns)
+                './efg:recordSource/efg:sourceID', self.ns)
             if len(nodes) <= 0:
                 return None
             return nodes[0].text.strip()
@@ -51,8 +51,8 @@ class EFG_XMLParser():
     def get_av_creation_by_ref(self, filepath, ref_id):
         root = ET.parse(filepath)
         nodes = root.findall(
-            "./efg:avcreation/efg:avManifestation/efg:recordSource/[efg:sourceID='" +
-            ref_id + "']/../..", self.ns)
+            "./efg:avcreation/efg:recordSource/[efg:sourceID='" +
+            ref_id + "']/..", self.ns)
         if len(nodes) <= 0:
             return None
         return nodes[0]
@@ -121,8 +121,7 @@ class EFG_XMLParser():
         """
         record_sources = []
         bind_url = False
-        inpath = 'efg:avManifestation' if audio_visual else 'efg:nonAVManifestation'
-        for node in record.findall("./" + inpath + "/efg:recordSource", self.ns):
+        for node in record.findall("./efg:recordSource", self.ns):
             rs = {}
             rs['source_id'] = node.find('efg:sourceID', self.ns).text.strip()
             log.debug('record source [ID]: %s' % rs['source_id'])
