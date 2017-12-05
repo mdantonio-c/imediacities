@@ -1069,28 +1069,30 @@
 									sbFields.camera = anno.bodies[0].attributes;
 									break;
 								} else if (anno.attributes.annotation_type.key === 'TAG') {
-									// annotation info
-									var spatial = anno.bodies[0].attributes.spatial;
-									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
-									var name = (anno.bodies[0].type === 'textualbody') ? 
-										anno.bodies[0].attributes.value : anno.bodies[0].attributes.name;
-									var termIRI = anno.bodies[0].attributes.iri;
-									var annoInfo = {
-										uuid: anno.id,
-										name: name,
-										iri: termIRI,
-										group: group
-									};
-									// shot info
-									var startT = convertTime(shot.attributes.timestamp);
-									var endT = startT + shot.attributes.duration;
-									var shotInfo = {
-										uuid: shot.id,
-										shotNum: shot.attributes.shot_num + 1,
-										startT: startT,
-										endT: endT
-									};
-									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									for (var j=0; j < anno.bodies.length; j++) {
+										// annotation info
+										var spatial = anno.bodies[j].attributes.spatial;
+										var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+										var name = (anno.bodies[j].type === 'textualbody') ? 
+											anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
+										var termIRI = anno.bodies[0].attributes.iri;
+										var annoInfo = {
+											uuid: anno.id,
+											name: name,
+											iri: termIRI,
+											group: group
+										};
+										// shot info
+										var startT = convertTime(shot.attributes.timestamp);
+										var endT = startT + shot.attributes.duration;
+										var shotInfo = {
+											uuid: shot.id,
+											shotNum: shot.attributes.shot_num + 1,
+											startT: startT,
+											endT: endT
+										};
+										$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									}
 								}
 							}
 							self.storyshots.push(sbFields);
