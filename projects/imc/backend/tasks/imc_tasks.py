@@ -3,6 +3,8 @@
 import os
 import json
 import random
+import re
+
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
@@ -63,6 +65,7 @@ def import_file(self, path, resource_id, mode):
             if source_id is None:
                 raise Exception(
                     "No source ID found importing metadata file %s" % path)
+
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
                 raise Exception("Invalid content type for: " + item_type)
@@ -290,6 +293,13 @@ def lookup_content(self, path, source_id):
     Look for a filename in the form of:
     ARCHIVE_SOURCEID.[extension]
     '''
+    #cinzia: nel source_id i caratteri che non sono lettere  
+    # o numeri vanno sostituiti con trattino per la ricerca 
+    # del file del contenuto
+    source_id_encoded = re.sub(r'[\W_]+', '-', source_id)
+    log.debug('source_id_encoded: ' + source_id_encoded)
+    # fine cinzia
+
     content_path = None
     content_filename = None
     files = [f for f in os.listdir(path) if not f.endswith('.xml')]
@@ -297,7 +307,7 @@ def lookup_content(self, path, source_id):
         tokens = os.path.splitext(f)[0].split('_')
         if len(tokens) == 0:
             continue
-        if tokens[-1] == source_id:
+        if tokens[-1] == source_id_encoded:
             log.info('Content file FOUND: {0}'.format(f))
             content_path = os.path.join(path, f)
             content_filename = f
