@@ -71,8 +71,10 @@ class AnnotationRepository():
                     if not isinstance(source, str):
                         bodyNode.name = source.get('name')
                     if 'spatial' in body:
-                        coord = [body['spatial']['lat'], body['spatial']['long']]
-                        log.debug('lat: {}, long:{}'.format(coord[0], coord[1]))
+                        coord = [body['spatial']['lat'],
+                                 body['spatial']['long']]
+                        log.debug('lat: {}, long:{}'.format(
+                            coord[0], coord[1]))
                         bodyNode.spatial = coord
                     bodyNode.save()
             elif body['type'] == 'TextualBody':
@@ -86,27 +88,73 @@ class AnnotationRepository():
             anno.bodies.connect(bodyNode)
         return anno
 
-    def delete_manual_annotation(self, anno):
-        body = anno.bodies.single()
-        if body:
+    def delete_manual_annotation(self, anno, btype, bid):
+        '''
+        b_type and b_id can be used to delete only a single body in the
+        annotation if multiple bodies exist.
+        '''
+        log.debug('Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]'.format(
+            anno_id=anno.uuid, btype=btype, bid=bid))
+        bodies = anno.bodies.all()
+        body_list_size_before = len(bodies)
+        log.debug('body list size before deletion: {}'.format(
+            body_list_size_before))
+        single_body = True if btype is not None and bid is not None else False
+        log.debug('Deleting single body?: {}'.format(single_body))
+        body_found = False
+        for body in bodies:
             original_body = body.downcast()
             log.debug('body instance of {}'.format(original_body.__class__))
-            # at moment never remove a ResourceBody
-            if isinstance(original_body, TextualBody):
-                original_body.delete()
-        # delete any orphan video segments (NOT SHOT!)
-        targets = anno.targets.all()
-        for t in targets:
-            target_labels = t.labels()
-            log.debug("Target label(s): {}".format(target_labels))
-            if 'VideoSegment' in target_labels and \
-                    'Shot' not in target_labels and \
-                    self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
-                t.delete()
-                log.debug('Deleted orphan segment')
-        anno.delete()
-        log.debug('Manual annotation with ID:{} successfully deleted'
-                  .format(anno.uuid))
+            if single_body:
+                # ONLY the referenced body
+                if isinstance(original_body, ResourceBody) and btype == 'resource':
+                    if bid == original_body.iri:
+                        # disconnect that node
+                        body_found = True
+                        anno.bodies.disconnect(body)
+                elif isinstance(original_body, TextualBody) and btype == 'textual':
+                    if bid == original_body.value:
+                        # remove the textual node
+                        body_found = True
+                        original_body.delete()
+                if body_found:
+                    break
+            else:
+                if isinstance(original_body, ResourceBody):
+                    # never remove a ResourceBody
+                    anno.bodies.disconnect(body)
+                else:
+                    original_body.delete()
+        # refresh the list of bodies
+        bodies = anno.bodies.all()
+        body_list_size_after = len(bodies)
+        log.debug('body list size after deletion: {}'.format(
+            body_list_size_after))
+        if single_body and not body_found:
+            raise ReferenceError("Annotation ID:{anno_id} cannot be deleted."
+                                 " No body found for {btype}:{bid}".format(
+                                     anno_id=anno.uuid, btype=btype, bid=bid))
+        if body_list_size_after == 0:
+            # delete any orphan video segments (NOT SHOT!)
+            targets = anno.targets.all()
+            for t in targets:
+                target_labels = t.labels()
+                log.debug("Target label(s): {}".format(target_labels))
+                if 'VideoSegment' in target_labels and \
+                        'Shot' not in target_labels and \
+                        self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
+                    t.delete()
+                    log.debug('Deleted orphan segment')
+            anno.delete()
+            single_body_removed = ''
+            if single_body:
+                single_body_removed = ' Body {body_type}:{body_id}'.format(
+                    body_type=btype, body_id=bid)
+            log.info('Annotation with ID:{anno_id} successfully deleted.{msg}'.format(
+                anno_id=anno.uuid, msg=single_body_removed))
+        else:
+            log.info('Annotation with ID:{anno_id}. ONLY body {body_type}:{body_id} removed'.format(
+                anno_id=anno.uuid, body_type=btype, body_id=bid))
 
     @staticmethod
     def is_orphan_segment(node):

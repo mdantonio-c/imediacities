@@ -732,7 +732,7 @@
 	});
 	/* end cinzia*/
 
-	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, 
+	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, 
 		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
 
 		var self = this;
@@ -916,7 +916,8 @@
 			}
 		};
 
-		self.deleteAnnotation = function(annoId) {
+		self.deleteAnnotation = function(anno) {
+			//console.log(angular.toJson(anno, true));
 			var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmModal.html',
@@ -925,12 +926,18 @@
 				controller: 'ModalConfirmController',
 				appendTo: parentElem
 			});
+			var annoId = anno.id;
+			var bodyIRI = anno.iri;
+			var bodyName = anno.name;
+			var bodyRef = (anno.iri !== undefined) ? 'resource:'+bodyIRI : 'textual:'+bodyName;
 			modalInstance.result.then(function() {
 				// YES: delete annotation
-				DataService.deleteAnnotation(annoId).then(function() {
-					console.log('Annotation [' + annoId + '] deleted successfully');
-					angular.forEach(self.annotations, function(anno, index){
-						if(anno.id === annoId) {
+				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
+					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					angular.forEach(self.annotations, function(anno, index) {
+						if (anno.id === annoId &&
+							((anno.iri !== undefined && anno.iri === bodyIRI) ||
+								anno.name === bodyName)) {
 							self.annotations.splice(index, 1);
 						}
 					});
@@ -1076,11 +1083,13 @@
 										var name = (anno.bodies[j].type === 'textualbody') ? 
 											anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
 										var termIRI = anno.bodies[0].attributes.iri;
+										var user_creator = anno.creator.id;
 										var annoInfo = {
 											uuid: anno.id,
 											name: name,
 											iri: termIRI,
-											group: group
+											group: group,
+											creator: user_creator
 										};
 										// shot info
 										var startT = convertTime(shot.attributes.timestamp);
@@ -1210,6 +1219,7 @@
 					group: annoInfo.group,
 					iri: annoInfo.iri,
 					name: locn,
+					creator: annoInfo.creator,
 					shotid: shotInfo.uuid,
 					shotNum: shotInfo.shotNum,
 					startT: shotInfo.startT,
@@ -1470,23 +1480,27 @@
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags).then(
-					// FIXME manage multiple tags
 					function(resp) {
-						var annoId = resp.data;
+						// console.log(resp.data);
+						var annoId = resp.data.id;
+						var creatorId = resp.data.relationships.creator[0].id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
-						var annoInfo = {
-							"uuid": annoId,
-							"name": self.tags[0].label,
-							"iri": self.tags[0].iri,
-							"group": $scope.group
-						};
-						var shotInfo = {
-							"uuid": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
-						};
-						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						for (var i=0; i < self.tags.length; i++) {
+							var annoInfo = {
+								"uuid": annoId,
+								"name": self.tags[i].label,
+								"iri": self.tags[i].iri,
+								"group": $scope.group,
+								"creator": creatorId
+							};
+							var shotInfo = {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						}
 					},
 					function(err) {
 						// TODO

@@ -126,8 +126,12 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations', 'POST', data);  
     };
 
-    self.deleteAnnotation = function (annoId) {
-        return api.apiCall('annotations/'+annoId, 'DELETE');
+    self.deleteAnnotation = function (annoId, bodyRef) {
+        if (bodyRef !== undefined) {
+            return api.apiCall('annotations/'+annoId+'?body_ref='+encodeURIComponent(bodyRef), 'DELETE');
+        } else {
+            return api.apiCall('annotations/'+annoId, 'DELETE');
+        }
     };
 
     self.saveUser = function(data) {
