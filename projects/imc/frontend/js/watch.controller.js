@@ -1561,14 +1561,16 @@
 				// save the annotation into the database
 				DataService.saveGeoAnnotation(target, source, spatial).then(
 						function(resp) {
-							var annoId = resp.data;
+							var annoId = resp.data.id;
+							var creatorId = resp.data.relationships.creator[0].id;
 							var termIRI = source.iri;
 							console.log('Annotation saved successfully. ID: ' + annoId);
 							var annoInfo = {
 								"uuid": annoId,
 								"name": $scope.labelTerm,
 								"iri": termIRI,
-								"group": $scope.group
+								"group": $scope.group,
+								"creator": creatorId
 							};
 							var shotInfo = {
 								"uuid": $scope.shotID,
