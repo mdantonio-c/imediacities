@@ -732,7 +732,7 @@
 	});
 	/* end cinzia*/
 
-	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, 
+	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, 
 		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
 
 		var self = this;
@@ -742,54 +742,22 @@
 		self.video = $stateParams.meta;
 
 		self.inputVocTerm = "";
-		/*inizialize status of video format accordion -- cinzia */
+		// inizialize status of video format accordion
 		$scope.statusAccor = {
     		isOpen: false
   		};
-		/*inizialize address for automplete input tag for geolocation*/
+		// inizialize address for automplete input tag for geolocation
 		$scope.vm = {
 			address: {}
 		};
-		/*to visualize annotations in tab table*/
+		// to visualize annotations in tab table
 		self.annotations = [];
 		$rootScope.currentTime = 0;
 
-		/*$scope.expand = function(mitem) {
-				mitem.show = !mitem.show;
-		}*/
-
-		/*initialize multiselect to filter subtitles*/
+		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
 		self.locSubtitle = "";
-
-		/*self.vocabularyFinal = [];
-		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-			self.vocabularyFinal = data;
-			self.onlyterms = [];
-
-			var pushloc = {
-				Value: 0,
-				Display: 'location'
-			};
-			$scope.options.push(pushloc);
-
-			for (var i = 0; i <= self.vocabularyFinal.terms.length - 1; i++) {
-				self.vocabularyFinal.terms[i].show = true;
-				for (var k = 0; k <= self.vocabularyFinal.terms[i].items.length - 1; k++) {
-					self.vocabularyFinal.terms[i].items[k].show = true;
-					var topush = {
-						Value: k + 1,
-						Display: self.vocabularyFinal.terms[i].items[k].label
-					};
-					$scope.options.push(topush);
-					for (var j = 0; j <= self.vocabularyFinal.terms[i].items[k].items.length - 1; j++) {
-						self.vocabularyFinal.terms[i].items[k].items[j].show = true;
-						self.onlyterms.push(self.vocabularyFinal.terms[i].items[k].items[j]);
-					}
-				}
-			}
-		});*/
 
 		// Initializing values
 		self.onplaying = false;
@@ -813,8 +781,7 @@
 				myVid[0].pause();
 				paused = true;
 			}
-
-			/*updating subtitles*/
+			// updating subtitles
 			if (self.videoTimeline !== null) $rootScope.$emit('updateSubtitles');
 		};
 
@@ -869,17 +836,16 @@
 				var time1c = convertTime(t1);
 				var time2c = convertTime(t2);
 
-				/*same interval of this annotation set*/
+				// same interval of this annotation set
 				if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)) {
 					var acategory = timelinerows[k].c[0].v;
 					var aterm = timelinerows[k].c[1].v;
 					if ((acategory == group) && (aterm == labelterm)) {
-						/*the term has been already added in the timeline cache*/
+						// the term has been already added in the timeline cache
 						foundterm = true;
 						if (group == 'location') myModalGeoFactory.open('lg', 'locationFoundModal.html');
 						else myModalGeoFactory.open('lg', 'termFoundModal.html');
 					}
-
 				}
 			}
 			return foundterm;
@@ -938,7 +904,7 @@
 					// filter actual manual annotations for this shot
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
 					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
-
+					
 					if (group != 'location') {
 						// a new term
 						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
@@ -950,7 +916,8 @@
 			}
 		};
 
-		self.deleteAnnotation = function(annoId) {
+		self.deleteAnnotation = function(anno) {
+			//console.log(angular.toJson(anno, true));
 			var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmModal.html',
@@ -959,12 +926,18 @@
 				controller: 'ModalConfirmController',
 				appendTo: parentElem
 			});
+			var annoId = anno.id;
+			var bodyIRI = anno.iri;
+			var bodyName = anno.name;
+			var bodyRef = (anno.iri !== undefined) ? 'resource:'+bodyIRI : 'textual:'+bodyName;
 			modalInstance.result.then(function() {
 				// YES: delete annotation
-				DataService.deleteAnnotation(annoId).then(function() {
-					console.log('Annotation [' + annoId + '] deleted successfully');
-					angular.forEach(self.annotations, function(anno, index){
-						if(anno.id === annoId) {
+				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
+					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					angular.forEach(self.annotations, function(anno, index) {
+						if (anno.id === annoId &&
+							((anno.iri !== undefined && anno.iri === bodyIRI) ||
+								anno.name === bodyName)) {
 							self.annotations.splice(index, 1);
 						}
 					});
@@ -1103,28 +1076,32 @@
 									sbFields.camera = anno.bodies[0].attributes;
 									break;
 								} else if (anno.attributes.annotation_type.key === 'TAG') {
-									// annotation info
-									var spatial = anno.bodies[0].attributes.spatial;
-									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
-									var name = (anno.bodies[0].type === 'textualbody') ? 
-										anno.bodies[0].attributes.value : anno.bodies[0].attributes.name;
-									var termIRI = anno.bodies[0].attributes.iri;
-									var annoInfo = {
-										uuid: anno.id,
-										name: name,
-										iri: termIRI,
-										group: group
-									};
-									// shot info
-									var startT = convertTime(shot.attributes.timestamp);
-									var endT = startT + shot.attributes.duration;
-									var shotInfo = {
-										uuid: shot.id,
-										shotNum: shot.attributes.shot_num + 1,
-										startT: startT,
-										endT: endT
-									};
-									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									for (var j=0; j < anno.bodies.length; j++) {
+										// annotation info
+										var spatial = anno.bodies[j].attributes.spatial;
+										var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+										var name = (anno.bodies[j].type === 'textualbody') ? 
+											anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
+										var termIRI = anno.bodies[0].attributes.iri;
+										var user_creator = anno.creator.id;
+										var annoInfo = {
+											uuid: anno.id,
+											name: name,
+											iri: termIRI,
+											group: group,
+											creator: user_creator
+										};
+										// shot info
+										var startT = convertTime(shot.attributes.timestamp);
+										var endT = startT + shot.attributes.duration;
+										var shotInfo = {
+											uuid: shot.id,
+											shotNum: shot.attributes.shot_num + 1,
+											startT: startT,
+											endT: endT
+										};
+										$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									}
 								}
 							}
 							self.storyshots.push(sbFields);
@@ -1242,6 +1219,7 @@
 					group: annoInfo.group,
 					iri: annoInfo.iri,
 					name: locn,
+					creator: annoInfo.creator,
 					shotid: shotInfo.uuid,
 					shotNum: shotInfo.shotNum,
 					startT: shotInfo.startT,
@@ -1502,23 +1480,27 @@
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags).then(
-					// FIXME manage multiple tags
 					function(resp) {
-						var annoId = resp.data;
+						// console.log(resp.data);
+						var annoId = resp.data.id;
+						var creatorId = resp.data.relationships.creator[0].id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
-						var annoInfo = {
-							"uuid": annoId,
-							"name": self.tags[0].label,
-							"iri": self.tags[0].iri,
-							"group": $scope.group
-						};
-						var shotInfo = {
-							"uuid": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
-						};
-						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						for (var i=0; i < self.tags.length; i++) {
+							var annoInfo = {
+								"uuid": annoId,
+								"name": self.tags[i].label,
+								"iri": self.tags[i].iri,
+								"group": $scope.group,
+								"creator": creatorId
+							};
+							var shotInfo = {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						}
 					},
 					function(err) {
 						// TODO
@@ -1579,14 +1561,16 @@
 				// save the annotation into the database
 				DataService.saveGeoAnnotation(target, source, spatial).then(
 						function(resp) {
-							var annoId = resp.data;
+							var annoId = resp.data.id;
+							var creatorId = resp.data.relationships.creator[0].id;
 							var termIRI = source.iri;
 							console.log('Annotation saved successfully. ID: ' + annoId);
 							var annoInfo = {
 								"uuid": annoId,
 								"name": $scope.labelTerm,
 								"iri": termIRI,
-								"group": $scope.group
+								"group": $scope.group,
+								"creator": creatorId
 							};
 							var shotInfo = {
 								"uuid": $scope.shotID,
