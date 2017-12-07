@@ -1255,7 +1255,8 @@
 
 		vm.init = function(location) {
 			// FIXME what is the default?
-			vm.location = location === undefined ? 'Bologna, IT' : location;
+			vm.location = location === undefined ? 'Strasburgo, FR' : location;
+            vm.zoom = 4;
 		};
 
 		NgMap.getMap("videomap").then(function(map) {
@@ -1279,8 +1280,11 @@
 				var currCenter = map.getCenter();
 				google.maps.event.trigger(map, 'resize');
 				map.setCenter(currCenter);
+				
+				var newzoom = vm.location === 'Strasburgo, FR' ? 4 : 15;
+                map.setZoom(newzoom);
 
-				map.addListener('zoom_changed', function() {
+				/*map.addListener('zoom_changed', function() {
 					var mapZ = map.getZoom();
 					/*if (mapZ >= 16){
 						for (var i=0; i<=vm.markers.length;i++)
@@ -1290,10 +1294,10 @@
 							    vm.markers[i].icon.scaledSize = new google.maps.Size(440, 340);
 						}
 					}*/
-				});
+				//});
 
 			});
-		}, 3000);
+		}, 1000);
 
 		vm.openInfoWindow = function(e, selectedMarker) {
 			e.preventDefault();
