@@ -1279,8 +1279,8 @@
 				google.maps.event.trigger(map, 'resize');
 				map.setCenter(currCenter);
 				
-				vm.zoom = vm.location === 'Strasburgo, FR' ? '4' : '15';
-                map.setZoom(vm.zoom);
+				var newzoom = vm.location === 'Strasburgo, FR' ? 4 : 15;
+                map.setZoom(newzoom);
 
 				/*map.addListener('zoom_changed', function() {
 					var mapZ = map.getZoom();
