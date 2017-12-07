@@ -1118,6 +1118,7 @@
 				function(response) {
 					self.video = response.data[0];
 					self.currentvidDur = self.video.relationships.item[0].attributes.duration;
+					self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 
 					setTimeout(function() {
 						$scope.$apply(function() {
@@ -1137,6 +1138,7 @@
 			self.loadMetadataContent(vid);
 		} else {
 			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
+			self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 			self.loadVideoShots(vid, videoDuration);
 		}
 
