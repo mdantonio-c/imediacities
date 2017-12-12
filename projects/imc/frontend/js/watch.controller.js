@@ -757,7 +757,6 @@
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
-		self.locSubtitle = "";
 
 		// Initializing values
 		self.onplaying = false;
@@ -802,7 +801,7 @@
 			}
 		}
 
-		self.playAndPause = function() {
+		self.playPause = function() {
 			// console.log('pause video');
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
@@ -851,52 +850,56 @@
 			return foundterm;
 		};
 
-		self.manualtag = function(group, labelterm, tiri, alternatives) {
-			// console.log('manual tag - group: ' + group + '; term: ' + labelterm + '; iri: ' + tiri + '; alternatives: ' + alternatives);
-			// console.log('current annotations: ' + angular.toJson(self.annotations, true));
+		/**
+		 * Convert a shot timecode (e.g 00:00:50-f21) to seconds 
+		 */
+		function convertoToSeconds(timecode) {
+			var time = timecode.split('-')[0].split(':');
+			return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
+		}
 
-			// force pause
+		/**
+		 * Convert a shot timecode (e.g 00:00:50-f21) to milliseconds 
+		 */
+		function convertToMilliseconds(timecode, framerate) {
+			if (framerate === undefined) framerate = 24;
+			var frames = Number(timecode.split('-')[1].substring(1, 3));
+			var milliseconds = (1000 / framerate) * (isNaN(frames) ? 0 : frames);
+			return Math.floor((convertoToSeconds(timecode) * 1000) + milliseconds);
+		}
+
+		self.manualtag = function(mode) {
+			console.log('manual tag: ' + mode);
+
+			// force the video to pause
 			self.pauseVid();
-
-			self.startTagTime = parseInt(myVid[0].currentTime); //set initial tag frame current time
+			// set the initial tag frame with current time
+			self.startTagTime = Math.floor(myVid[0].currentTime * 1000);
+			console.log('Stop video at time (ms): ' + self.startTagTime);
 
 			for (var i = 0; i <= self.shots.length - 1; i++) {
 				var shotThumbnail = self.shots[i].links.thumbnail;
 				var shotId = self.shots[i].id;
 				var shotNum = self.shots[i].attributes.shot_num;
+				var shotTimestamp = self.shots[i].attributes.timestamp;
+				var shotDuration = self.shots[i].attributes.duration;
+				// console.log(shotNum + '\t' + shotTimestamp + '\t' + shotDuration);
 
-				var time1 = self.shots[i].attributes.timestamp;
-				var times2;
+				var shotStartTime = convertToMilliseconds(shotTimestamp);
+				var nextStartTime = null;
 				if (i < self.shots.length - 1) {
-					// get timestamp from next shot
-					var time2 = self.shots[i + 1].attributes.timestamp;
-					var currtime2 = time2.split("-")[0];
-					var hours2 = currtime2.split(":")[0];
-					var mins2 = currtime2.split(":")[1];
-					var secs2 = currtime2.split(":")[2];
-					//var cdate = new Date(0, 0, 0, hours, mins, secs);
-					times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+					// get start time from the next shot
+					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
 				} else {
-					// last shot: use duration instead
-					times2 = self.shots[i].attributes.duration;
+					// last shot: use the shot duration instead
+					nextStartTime = shotStartTime + (shotDuration * 1000);
 				}
-
-				var currtime1 = time1.split("-")[0];
-				var hours1 = currtime1.split(":")[0];
-				var mins1 = currtime1.split(":")[1];
-				var secs1 = currtime1.split(":")[2];
-				//var cdate = new Date(0, 0, 0, hours, mins, secs);
-				var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
-
-				if (self.startTagTime >= times1 && self.startTagTime <= times2) {
-
+				if (self.startTagTime >= shotStartTime && self.startTagTime < nextStartTime) {
+					console.log('found shot number: ' + (shotNum+1) + ' from start time: ' + shotStartTime + ' (ms)');
 					sharedProperties.setVideoId($stateParams.v);
-					sharedProperties.setStartTime(times1);
-					sharedProperties.setEndTime(times2);
-					sharedProperties.setGroup(group);
-					sharedProperties.setLabelTerm(labelterm);
-					sharedProperties.setAlternatives(alternatives);
-					sharedProperties.setIRI(tiri);
+					sharedProperties.setStartTime(shotStartTime);
+					sharedProperties.setEndTime(nextStartTime);
+					sharedProperties.setGroup(mode);
 					sharedProperties.setShotPNG(shotThumbnail);
 					sharedProperties.setShotId(shotId);
 					sharedProperties.setShotNum(shotNum+1);
@@ -905,13 +908,14 @@
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
 					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 					
-					if (group != 'location') {
-						// a new term
-						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
-							myModalGeoFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
-						}
+					if (mode != 'location') {
+						myModalGeoFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
 					}
-					else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+					else if (mode == 'location') {
+						myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+					}
+					// exit loop
+					break;
 				}
 			}
 		};

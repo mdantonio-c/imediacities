@@ -25,37 +25,30 @@
 				<div class="video-container">
 					<div class="anno-tools-container" id="anno-tools-container">
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
-							ng-click="watchCtrl.manualtag('location','');"
+							ng-click="watchCtrl.manualtag('location');"
 							tooltip-placement="right"
 							uib-tooltip="Tag by location">
 							<i class="imc-icon fa fa-globe fa-lg"></i>
 						</div>
 						<div class="space-0"></div>
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
-							ng-click="watchCtrl.manualtag('term','');"
+							ng-click="watchCtrl.manualtag('term');"
 							tooltip-placement="right"
 							uib-tooltip="Tag&nbsp;by term">
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.playAndPause()" controls>
+					<video id="videoarea"
+						data-setup='{ "controlBar": { "muteToggle": false } }'
+						preload="none"
+						ng-src="{{watchCtrl.video.links['content'] | trustUrl }}"
+						ng-attr-type="video/mp4"
+						ng-click="watchCtrl.playPause()" controls>
+						Your browser does not support HTML5 video.
 					</video>
-					<div class="overlay-desc" ng-model="watchCtrl.locSubtitle">
-						<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
-								<h2>{{annotation.name}} {{currentTime}}</h2>
-						</div>-->
-						<!--<div ng-repeat="annotation in watchCtrl.filtered | groupfilter:[options,selectedOptions] as filtered_annotations track by $index">
-									<h2>{{annotation.name}}</h2>
-						</div>-->
-					</div>
 				</div>
 				<div class="container" ng-show="watchCtrl.showmeli" ng-style="{'float': 'left', 'width': '100%'}"><br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
-			<!--<div class="scrollmenu" ng-style="{'float': 'left'}">
-						<a ng-repeat="item in watchCtrl.items" ng-style="{'width': '13%'}" scroll-on-click>
-									<img ng-style="{'width': '90%', 'height': '90%'}" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" shotd="{{item[3]}}" progr="{{item[4]}}" timestamp="{{item[5]}}" ng-src="{{item[6]}}" />
-						</a>
-			</div>-->
 			
 			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
 			<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
@@ -93,10 +86,6 @@
 						<i class="imc-icon fa fa-quote-left"></i>
 						{{description.attributes.text}}
 					</div>
-					<!-- <p><b>Description(s)</b>:
-						<p ng-repeat="description in watchCtrl.video.relationships.descriptions">
-						{{description.attributes.text}}</p>
-					</p> -->
 					<p><b>Keyword(s)</b>:
 						<span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
 						{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
@@ -130,45 +119,40 @@
 							<span ng-repeat="otitle in watchCtrl.video.relationships.titles">
 							{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}</span></p>
 
-
 						<uib-accordion close-others="false" ng-if="watchCtrl.video.relationships.video_format &&
-																	watchCtrl.video.relationships.video_format[0].attributes &&
-																	(watchCtrl.video.relationships.video_format[0].attributes.sound  ||
-																	watchCtrl.video.relationships.video_format[0].attributes.colour  ||
-																	watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
-																	watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
-							<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
-								<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
-								</uib-accordion-heading>
-								<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
-									<p ng-if="format.attributes.sound"><b>Sound</b>: 
-										<span>
-											{{format.attributes.sound.description | attributesFilter}}
-										</span>
-									</p>
-									<p ng-if="format.attributes.colour"><b>Colour</b>: 
-										<span>
-											{{format.attributes.colour.description | attributesFilter}}
-										</span>
-									</p>
-									<p ng-if="format.attributes.gauge"><b>Gauge</b>: 
-										<span>
-											{{format.attributes.gauge | attributesFilter}}
-										</span>
-									</p>
-									<p ng-if="format.attributes.aspect_ratio"><b>Aspect ratio</b>: 
-										<span>
-											{{format.attributes.aspect_ratio | attributesFilter}}
-										</span>
-									</p>
-								</div>
+						watchCtrl.video.relationships.video_format[0].attributes &&
+						(watchCtrl.video.relationships.video_format[0].attributes.sound  ||
+						watchCtrl.video.relationships.video_format[0].attributes.colour  ||
+						watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
+						watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
+						<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
+							<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+							</uib-accordion-heading>
+							<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
+								<p ng-if="format.attributes.sound"><b>Sound</b>:
+									<span>
+										{{format.attributes.sound.description | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.colour"><b>Colour</b>:
+									<span>
+										{{format.attributes.colour.description | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.gauge"><b>Gauge</b>:
+									<span>
+										{{format.attributes.gauge | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.aspect_ratio"><b>Aspect ratio</b>:
+									<span>
+										{{format.attributes.aspect_ratio | attributesFilter}}
+									</span>
+								</p>
 							</div>
+						</div>
 						</uib-accordion>
-						<!-- cinzia end -->
 					</div>
-					<!-- <button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying">
-					<span class="glyphicon glyphicon-hand-up" ng-click="watchCtrl.manualtag();"></span>
-					</button> -->
 				</li>
 			</ul>
 			<div class="sb-modal-parent"></div>
@@ -208,7 +192,6 @@
 						</tbody>
 					</table>
 				</div>
-			<!--<multiselect class="btn pull-right" choices="options" selected="selectedOptions" placeholder="filter subtitles"></multiselect>-->	<!-- Selected: {{selectedOptions}} -->
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
 			<div class="container storyboard">
@@ -312,7 +295,7 @@
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p>Shot starting time (sec): <b>{{startT}}</b> ending: <b>{{endT}}</b></p>
+					<p>Shot starting time (sec): <b>{{startT | date:'mm:ss'}}</b> ending: <b>{{endT | date:'mm:ss'}}</b></p>
 					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
 				<div class="col-sm-4">
@@ -345,7 +328,6 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-			<!-- <p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p> -->
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
 			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
 		</div>
@@ -382,19 +364,6 @@
 			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		</div>
 	</script>
-
-	<!-- <script type="text/ng-template" id="multiselect.html">
-		<div class="multiselect">
-		<button class="btn" ng-click="toggleSelect()"><span class="pull-left">Select</span>&nbsp;<span class="caret pull-right"></span></button>
-		<div class="multiselect-wrapper" ng-show="isVisible">
-			<input type="text"  ng-model="searchText" autofocus="autofocus" />
-			<ul>
-				<li ng-repeat="c in choices | filter: searchText">
-					<label class="checkbox"><input type="checkbox" ng-click="toggleCheck(c.Value)" ng-checked="isChecked(c.Value)" />{{c.Display}}</label></li>
-				</ul>
-			</div>
-		</div>
-	</script> -->
 
 	<script type="text/ng-template" id="confirmModal.html">
 		<div class="modal-header modal-header-confirm">
