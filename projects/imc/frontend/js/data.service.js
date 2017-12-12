@@ -178,6 +178,11 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall(endpoint, 'GET');
     };
 
+    self.getFcodelist = function(name,lang) {
+        var endpoint = 'fcodelist/'+name+'?lang='+lang;
+        return api.apiCall(endpoint, 'GET');
+    };
+
 }
 
 })();

@@ -90,7 +90,7 @@
 		;
 
 	// The controller
-	function SearchController($scope, $log, $document, $state, $stateParams, DataService, noty, $uibModal) {
+	function SearchController($scope, $log, $document, $state, $stateParams, DataService, CodelistService, noty, $uibModal) {
 		var self = this;
 
 		self.showmesb = false;
@@ -145,6 +145,13 @@
 				self.selectedMatchFields.push(matchField);
 			}
 		};
+
+        // initialise countries list
+        self.countries = [];
+		var lang = 'en'; // put here the language chosen by the user
+		CodelistService.loadTerms(lang,"countries").then(function(data) {
+			self.countries = data;
+		});
 
 		self.searchCreations = function() {
 			var request_data = {};
@@ -332,34 +339,6 @@
 			"name": "Copyright Undetermined"
 		}];
 
-		self.countries = [{
-			"code": "IT",
-			"name": "Italy"
-		}, {
-			"code": "AT",
-			"name": "Austria"
-		}, {
-			"code": "BE",
-			"name": "Belgium"
-		}, {
-			"code": "DE",
-			"name": "Germany"
-		}, {
-			"code": "ES",
-			"name": "Spain"
-		}, {
-			"code": "FI",
-			"name": "Finland"
-		}, {
-			"code": "FR",
-			"name": "France"
-		}, {
-			"code": "GB",
-			"name": "United Kingdom"
-		}, {
-			"code": "GR",
-			"name": "Greece"
-		}];
 	}
 
 })();
