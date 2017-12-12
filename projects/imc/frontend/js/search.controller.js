@@ -90,7 +90,7 @@
 		;
 
 	// The controller
-	function SearchController($scope, $log, $document, $state, $stateParams, DataService, noty, $uibModal) {
+	function SearchController($scope, $log, $document, $state, $stateParams, DataService, CodelistService, noty, $uibModal) {
 		var self = this;
 
 		self.showmesb = false;
@@ -146,20 +146,12 @@
 			}
 		};
 
-		// initialise countries list
-		self.countries = [];
-		function loadCountriesList() {
-            // get the countries codelist from backend
-            var lang = 'en'; // put here the language chosen by the user
-			DataService.getFcodelist('countries',lang).then(
-				function(response) {
-					self.countries = response.data;
-				},
-				function(response) {
-					self.countries = self.countriesMinimalList;
-				});
-        }
-        loadCountriesList();
+        // initialise countries list
+        self.countries = [];
+		var lang = 'en'; // put here the language chosen by the user
+		CodelistService.loadTerms(lang,"countries").then(function(data) {
+			self.countries = data;
+		});
 
 		self.searchCreations = function() {
 			var request_data = {};
@@ -345,36 +337,6 @@
 		}, {
 			"code": "10",
 			"name": "Copyright Undetermined"
-		}];
-
-		// if the backend service does not work
-		self.countriesMinimalList = [{
-			"code": "IT",
-			"name": "Italy"
-		}, {
-			"code": "AT",
-			"name": "Austria"
-		}, {
-			"code": "BE",
-			"name": "Belgium"
-		}, {
-			"code": "DE",
-			"name": "Germany"
-		}, {
-			"code": "ES",
-			"name": "Spain"
-		}, {
-			"code": "FI",
-			"name": "Finland"
-		}, {
-			"code": "FR",
-			"name": "France"
-		}, {
-			"code": "GB",
-			"name": "United Kingdom"
-		}, {
-			"code": "GR",
-			"name": "Greece"
 		}];
 
 	}
