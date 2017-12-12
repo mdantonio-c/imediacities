@@ -146,6 +146,21 @@
 			}
 		};
 
+		// initialise countries list
+		self.countries = [];
+		function loadCountriesList() {
+            // get the countries codelist from backend
+            var lang = 'en'; // put here the language chosen by the user
+			DataService.getFcodelist('countries',lang).then(
+				function(response) {
+					self.countries = response.data;
+				},
+				function(response) {
+					self.countries = self.countriesMinimalList;
+				});
+        }
+        loadCountriesList();
+
 		self.searchCreations = function() {
 			var request_data = {};
 			if (self.advancedSearch) {
@@ -332,7 +347,8 @@
 			"name": "Copyright Undetermined"
 		}];
 
-		self.countries = [{
+		// if the backend service does not work
+		self.countriesMinimalList = [{
 			"code": "IT",
 			"name": "Italy"
 		}, {
@@ -360,6 +376,7 @@
 			"code": "GR",
 			"name": "Greece"
 		}];
+
 	}
 
 })();
