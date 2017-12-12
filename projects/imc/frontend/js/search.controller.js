@@ -130,9 +130,9 @@
 		self.advancedSearch = false;
 
 		// list of match field
-		self.matchFields = ["title", "keyword", "description", "contributor"];
+		self.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
-		self.selectedMatchFields = ["title"];
+		self.selectedMatchFields = [];
 		// Toggle selection for a given field by name
 		self.toggleMatchFieldSelection = function(matchField) {
 			var idx = self.selectedMatchFields.indexOf(matchField);
@@ -146,6 +146,11 @@
 			}
 		};
 
+		self.alerts = [];
+		self.closeAlert = function(index) {
+			self.alerts.splice(index, 1);
+		};
+
         // initialise countries list
         self.countries = [];
 		var lang = 'en'; // put here the language chosen by the user
@@ -155,12 +160,9 @@
 
 		self.searchCreations = function() {
 			var request_data = {};
+			var isValid = true;
 			if (self.advancedSearch) {
 				request_data = {
-					"match": {
-						"term": "",
-						"fields": self.selectedMatchFields,
-					},
 					"filter": {
 						"type": self.inputItemType,
 						"provider": self.inputProvider,
@@ -170,15 +172,28 @@
 						"yearto": $scope.search.year_max.toString(),
 					}
 				};
+				if (self.inputTerm !== '') {
+					if (self.selectedMatchFields.length === 0) {
+						isValid = false;
+					}
+					request_data.match = {
+						"term": self.inputTerm,
+						"fields": self.selectedMatchFields
+					};
+				}
 			} else {
+				var simple_match_term = self.inputTerm === '' ? '*' : self.inputTerm;
 				request_data = {
 					"match": {
-						"term": "",
+						"term": simple_match_term,
 						"fields": ["title"],
 					},
 				};
 			}
-			request_data.match.term = self.inputTerm === '' ? '*' : self.inputTerm;
+			/*if (!isValid) {
+				self.alerts.push({msg: 'Invalid search request.'});
+				return;
+			}*/
 			self.loadResults = false;
 			self.loading = true;
 			self.showmese = true;
@@ -194,9 +209,13 @@
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
+					var errors = out_data.data.Response.errors;
+					angular.forEach(errors, function(error){
+						self.alerts.push({msg: error});
+					});
 					self.loading = false;
 					self.studyCount = 0;
-					self.loadResults = true;
+					self.loadResults = false;
 					self.showmese = false;
 					noty.extractErrors(out_data, noty.ERROR);
 				});

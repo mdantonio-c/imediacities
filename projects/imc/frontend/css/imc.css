@@ -685,6 +685,12 @@ element.style {
 	text-align: right;
 	padding-top: 7px;
 }
+.form-error {
+    float: left;
+    color: red;
+    font-size: small;
+    padding-left: 20px;
+}
 
 .no-padding { padding: 0 !important }
 .no-padding-bottom { padding-bottom: 0 !important }

@@ -60,7 +60,7 @@ class Search(GraphBaseOperations):
 
             fields = match.get('fields')
             if fields is None or len(fields) == 0:
-                raise RestApiException('Fields input cannot be empty',
+                raise RestApiException('Match term fields cannot be empty',
                                        status_code=hcodes.HTTP_BAD_REQUEST)
             for f in fields:
                 if f not in self.__class__.allowed_term_fields:
