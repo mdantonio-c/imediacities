@@ -330,7 +330,7 @@
 			"name": "No Copyright - Non-Commercial Use Only"
 		}, {
 			"code": "08",
-			"name": "No Copyright - Non-Commercial Use Only"
+			"name": "No Copyright - Other Known Legal Restrictions"
 		}, {
 			"code": "09",
 			"name": "No Copyright - United States"
