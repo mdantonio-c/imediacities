@@ -184,7 +184,7 @@ class Search(GraphBaseOperations):
                     entity=entity,
                     filters=' '.join(filters),
                     match=multi_match_query,
-                    offset=offset,
+                    offset=offset * limit,
                     limit=limit)
         # logger.debug(query)
 
