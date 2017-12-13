@@ -198,13 +198,15 @@ class Annotations(GraphBaseOperations):
         uid = self._current_user.uuid
         logger.debug('current user: {email} - {uuid}'.format(
             email=self._current_user.email, uuid=self._current_user.uuid))
+        iamadmin = self.auth.verify_admin()
+        logger.debug('current user is admin? {0}'.format(iamadmin))
 
         creator = anno.creator.single()
         if creator is None:
             raise RestApiException(
                 'Annotation with no creator',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
-        if uid != creator.uuid:
+        if uid != creator.uuid or not iamadmin:
             raise RestApiException(
                 'You cannot delete an annotation that does not belong to you',
                 status_code=hcodes.HTTP_BAD_FORBIDDEN)
