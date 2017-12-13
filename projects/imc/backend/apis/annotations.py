@@ -206,7 +206,7 @@ class Annotations(GraphBaseOperations):
             raise RestApiException(
                 'Annotation with no creator',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
-        if uid != creator.uuid or not iamadmin:
+        if uid != creator.uuid and not iamadmin:
             raise RestApiException(
                 'You cannot delete an annotation that does not belong to you',
                 status_code=hcodes.HTTP_BAD_FORBIDDEN)
