@@ -1,0 +1,17 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+fcodelist:
+  summary: GET codelists
+  description: Returns a codelist
+  parameters:
+    - name: lang
+      in: query
+      description: Language of the codelist
+      type: string
+  responses:
+    '200':
+      description: A codelist.
+    '404':
+      description: Codelist does not exist.

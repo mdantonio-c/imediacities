@@ -39,6 +39,7 @@ for ws in wb.worksheets:
         if en_term is None:
             # ignore groups without entry value
             continue
+        en_term = en_term
         iri = ws['M' + str(row_index)].value
         if iri is None:
             iri = generate_iri(en_term)
@@ -46,7 +47,7 @@ for ws in wb.worksheets:
 
         group = ws['I' + str(row_index)].value
         if group is not None:
-            g = group.strip()
+            g = group.strip().capitalize()
             # print("adding entry to group '{}'".format(g))
             actual_terms = group_terms.get(g, None)
             if actual_terms is None:

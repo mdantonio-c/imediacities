@@ -139,8 +139,7 @@ class Stage(GraphBaseOperations):
                             binding['filename'] = content_stage.filename
                             binding['status'] = content_stage.status
                         else:
-                            binding['filename'] = self.lookup_content(
-                                upload_dir, source_id)
+                            binding['filename'] = self.lookup_content(upload_dir, source_id)
                             binding['status'] = 'PENDING'
                         row['binding'] = binding
 

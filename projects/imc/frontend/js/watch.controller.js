@@ -252,7 +252,7 @@
 				var recursiveFilter = function(terms, query) {
 					angular.forEach(terms, function(item) {
 						if (!item.hasOwnProperty('children')) {
-							if (item.label.startsWith(query)) {
+							if (item.label.startsWith(query.toLowerCase())) {
 								// console.log(angular.toJson(item, true));
 								filtered.push({iri: item.id, label: item.label});
 							}
@@ -553,6 +553,158 @@
 	};
 	}]);*/
 
+	/* Range Slider
+	    Input with default values:
+	    -min=0      // Min slider value
+	    -max=100    // Max slider value
+	    -step=1     // Steps
+
+	    Output / Input model
+	    -value-min    // Default value @min
+	    -value-max    // Default value @max
+
+	    example:
+	    <slider-range min="0" max="100" step="5" value-min="scope.form.slider_value_min" value-max="scope.form.slider_value_max"></slider-range>
+	*/
+	app.directive('sliderRange', ['$document',function($document) {
+
+	// Move slider handle and range line
+	  var moveHandle = function(handle, elem, posX) {
+	    $(elem).find('.handle.'+handle).css("left",posX +'%');
+	  };
+	  var moveRange = function(elem,posMin,posMax) {
+	    $(elem).find('.range').css("left",posMin +'%');
+	    $(elem).find('.range').css("width",posMax - posMin +'%');
+	  };
+
+	return {
+	    template: '<div class="slider horizontal">'+
+	                '<div class="range"></div>'+
+	                '<a class="handle min" ng-mousedown="mouseDownMin($event)"></a>'+
+	                '<a class="handle max" ng-mousedown="mouseDownMax($event)"></a>'+
+	              '</div>',
+	    replace: true,
+	    restrict: 'E',
+	    scope:{
+	      valueMin:"=",
+	      valueMax:"="
+	    },
+	    link: function postLink(scope, element, attrs) {
+	        // Initilization
+	        var dragging = false;
+	        var startPointXMin = 0;
+	        var startPointXMax = 0;
+	        var xPosMin = 0;
+	        var xPosMax = 0;
+	        var settings = {
+	                "min"   : (typeof(attrs.min) !== "undefined"  ? parseInt(attrs.min,10) : 0),
+	                "max"   : (typeof(attrs.max) !== "undefined"  ? parseInt(attrs.max,10) : 100),
+	                "step"  : (typeof(attrs.step) !== "undefined" ? parseInt(attrs.step,10) : 1)
+	            };
+	        if ( typeof(scope.valueMin) == "undefined" || scope.valueMin === '' ) 
+	            scope.valueMin = settings.min;
+	            
+	        if ( typeof(scope.valueMax) == "undefined" || scope.valueMax === '' ) 
+	            scope.valueMax = settings.max;
+	            
+	        // Track changes only from the outside of the directive
+	        scope.$watch('valueMin', function() {
+	          if (dragging) return;
+	          xPosMin = ( scope.valueMin - settings.min ) / (settings.max - settings.min ) * 100;
+	          if(xPosMin < 0) {
+	              xPosMin = 0;
+	          } else if(xPosMin > 100)  {
+	              xPosMin = 100;
+	          }
+	          moveHandle("min",element,xPosMin);
+	          moveRange(element,xPosMin,xPosMax);
+	        });
+
+	        scope.$watch('valueMax', function() {
+	          if (dragging) return;
+	          xPosMax = ( scope.valueMax - settings.min ) / (settings.max - settings.min ) * 100;
+	          if(xPosMax < 0) {
+	              xPosMax = 0;
+	          } else if(xPosMax > 100)  {
+	              xPosMax = 100;
+	          }
+	          moveHandle("max",element,xPosMax);
+	          moveRange(element,xPosMin,xPosMax);
+	        });
+
+	        // Real action control is here
+	        scope.mouseDownMin = function($event) {
+	            dragging = true;
+	            startPointXMin = $event.pageX;
+	        
+	            // Bind to full document, to make move easiery (not to lose focus on y axis)
+	            $document.on('mousemove', function($event) {
+	                if(!dragging) return;
+
+	                //Calculate handle position
+	                var moveDelta = $event.pageX - startPointXMin;
+
+	                xPosMin = xPosMin + ( (moveDelta / element.outerWidth()) * 100 );
+	                if(xPosMin < 0) {
+	                    xPosMin = 0;
+	                } else if(xPosMin > xPosMax) {
+	                  xPosMin = xPosMax;
+	                } else {
+	                    // Prevent generating "lag" if moving outside window
+	                    startPointXMin = $event.pageX;
+	                }
+	                scope.valueMin = Math.round((((settings.max - settings.min ) * (xPosMin / 100))+settings.min)/settings.step ) * settings.step;
+	                scope.$apply();
+	                
+	                // Move the Handle
+	                moveHandle("min", element,xPosMin);
+	                moveRange(element,xPosMin,xPosMax);
+	            });
+	        $document.mouseup(function(){
+	                dragging = false;
+	                $document.unbind('mousemove');
+	                $document.unbind('mousemove');
+	            });
+	        };
+
+	        scope.mouseDownMax = function($event) {
+	            dragging = true;
+	            startPointXMax = $event.pageX;
+	        
+	            // Bind to full document, to make move easiery (not to lose focus on y axis)
+	            $document.on('mousemove', function($event) {
+	                if(!dragging) return;
+
+	                //Calculate handle position
+	                var moveDelta = $event.pageX - startPointXMax;
+
+	                xPosMax = xPosMax + ( (moveDelta / element.outerWidth()) * 100 );
+	                if(xPosMax > 100)  {
+	                    xPosMax = 100;
+	                } else if(xPosMax < xPosMin) {
+	                  xPosMax = xPosMin;
+	                } else {
+	                    // Prevent generating "lag" if moving outside window
+	                    startPointXMax = $event.pageX;
+	                }
+	                scope.valueMax = Math.round((((settings.max - settings.min ) * (xPosMax / 100))+settings.min)/settings.step ) * settings.step;
+	                scope.$apply();
+	                
+	                // Move the Handle
+	                moveHandle("max", element,xPosMax);
+	                moveRange(element,xPosMin,xPosMax);
+	            });
+
+	            $document.mouseup(function(){
+	                dragging = false;
+	                $document.unbind('mousemove');
+	                $document.unbind('mousemove');
+	            });
+	        };
+	    	}
+	  	};
+	}]);
+
 	function getElement(event) {
 		return angular.element(event.srcElement || event.target);
 	}
@@ -568,8 +720,19 @@
 
 		return times;
 	}
+	/* start cinzia*/
+	/* obj può essere direttamente il valore oppure può essere una struttura key,description */
+	angular.module('web').filter('attributesFilter', function() {
+		return function(obj) {
+			if(obj && obj.description){
+				return obj.description;
+			}
+			return obj;
+		};
+	});
+	/* end cinzia*/
 
-	function WatchController($scope, $http, $rootScope, $log, $document, $uibModal, $stateParams, 
+	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, 
 		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
 
 		var self = this;
@@ -579,51 +742,21 @@
 		self.video = $stateParams.meta;
 
 		self.inputVocTerm = "";
-
-		/*inizialize address for automplete input tag for geolocation*/
+		// inizialize status of video format accordion
+		$scope.statusAccor = {
+    		isOpen: false
+  		};
+		// inizialize address for automplete input tag for geolocation
 		$scope.vm = {
 			address: {}
 		};
-		/*to visualize annotations in tab table*/
+		// to visualize annotations in tab table
 		self.annotations = [];
 		$rootScope.currentTime = 0;
 
-		/*$scope.expand = function(mitem) {
-				mitem.show = !mitem.show;
-		}*/
-
-		/*initialize multiselect to filter subtitles*/
+		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
-		self.locSubtitle = "";
-
-		/*self.vocabularyFinal = [];
-		self.vocabularyFinal = $http.get('static/assets/vocabulary/vocabulary.json').success(function(data) {
-			self.vocabularyFinal = data;
-			self.onlyterms = [];
-
-			var pushloc = {
-				Value: 0,
-				Display: 'location'
-			};
-			$scope.options.push(pushloc);
-
-			for (var i = 0; i <= self.vocabularyFinal.terms.length - 1; i++) {
-				self.vocabularyFinal.terms[i].show = true;
-				for (var k = 0; k <= self.vocabularyFinal.terms[i].items.length - 1; k++) {
-					self.vocabularyFinal.terms[i].items[k].show = true;
-					var topush = {
-						Value: k + 1,
-						Display: self.vocabularyFinal.terms[i].items[k].label
-					};
-					$scope.options.push(topush);
-					for (var j = 0; j <= self.vocabularyFinal.terms[i].items[k].items.length - 1; j++) {
-						self.vocabularyFinal.terms[i].items[k].items[j].show = true;
-						self.onlyterms.push(self.vocabularyFinal.terms[i].items[k].items[j]);
-					}
-				}
-			}
-		});*/
 
 		// Initializing values
 		self.onplaying = false;
@@ -647,8 +780,7 @@
 				myVid[0].pause();
 				paused = true;
 			}
-
-			/*updating subtitles*/
+			// updating subtitles
 			if (self.videoTimeline !== null) $rootScope.$emit('updateSubtitles');
 		};
 
@@ -669,7 +801,7 @@
 			}
 		}
 
-		self.playAndPause = function() {
+		self.playPause = function() {
 			// console.log('pause video');
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
@@ -703,88 +835,93 @@
 				var time1c = convertTime(t1);
 				var time2c = convertTime(t2);
 
-				/*same interval of this annotation set*/
+				// same interval of this annotation set
 				if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)) {
 					var acategory = timelinerows[k].c[0].v;
 					var aterm = timelinerows[k].c[1].v;
 					if ((acategory == group) && (aterm == labelterm)) {
-						/*the term has been already added in the timeline cache*/
+						// the term has been already added in the timeline cache
 						foundterm = true;
 						if (group == 'location') myModalGeoFactory.open('lg', 'locationFoundModal.html');
 						else myModalGeoFactory.open('lg', 'termFoundModal.html');
 					}
-
 				}
 			}
 			return foundterm;
 		};
 
-		self.manualtag = function(group, labelterm, tiri, alternatives) {
-			console.log('manual tag - group: ' + group + '; term: ' + labelterm + '; iri: ' + tiri + '; alternatives: ' + alternatives);
-			// console.log('current annotations: ' + angular.toJson(self.annotations, true));
+		/**
+		 * Convert a shot timecode (e.g 00:00:50-f21) to seconds 
+		 */
+		function convertoToSeconds(timecode) {
+			var time = timecode.split('-')[0].split(':');
+			return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
+		}
 
-			// force pause
+		/**
+		 * Convert a shot timecode (e.g 00:00:50-f21) to milliseconds 
+		 */
+		function convertToMilliseconds(timecode, framerate) {
+			if (framerate === undefined) framerate = 24;
+			var frames = Number(timecode.split('-')[1].substring(1, 3));
+			var milliseconds = (1000 / framerate) * (isNaN(frames) ? 0 : frames);
+			return Math.floor((convertoToSeconds(timecode) * 1000) + milliseconds);
+		}
+
+		self.manualtag = function(mode) {
+			console.log('manual tag: ' + mode);
+
+			// force the video to pause
 			self.pauseVid();
-
-			self.startTagTime = parseInt(myVid[0].currentTime); //set initial tag frame current time
+			// set the initial tag frame with current time
+			self.startTagTime = Math.floor(myVid[0].currentTime * 1000);
+			console.log('Stop video at time (ms): ' + self.startTagTime);
 
 			for (var i = 0; i <= self.shots.length - 1; i++) {
 				var shotThumbnail = self.shots[i].links.thumbnail;
 				var shotId = self.shots[i].id;
 				var shotNum = self.shots[i].attributes.shot_num;
+				var shotTimestamp = self.shots[i].attributes.timestamp;
+				var shotDuration = self.shots[i].attributes.duration;
+				// console.log(shotNum + '\t' + shotTimestamp + '\t' + shotDuration);
 
-				var time1 = self.shots[i].attributes.timestamp;
-				var times2;
+				var shotStartTime = convertToMilliseconds(shotTimestamp);
+				var nextStartTime = null;
 				if (i < self.shots.length - 1) {
-					// get timestamp from next shot
-					var time2 = self.shots[i + 1].attributes.timestamp;
-					var currtime2 = time2.split("-")[0];
-					var hours2 = currtime2.split(":")[0];
-					var mins2 = currtime2.split(":")[1];
-					var secs2 = currtime2.split(":")[2];
-					//var cdate = new Date(0, 0, 0, hours, mins, secs);
-					times2 = (secs2 * 1) + (mins2 * 60) + (hours2 * 3600); //convert to seconds
+					// get start time from the next shot
+					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
 				} else {
-					// last shot: use duration instead
-					times2 = self.shots[i].attributes.duration;
+					// last shot: use the shot duration instead
+					nextStartTime = shotStartTime + (shotDuration * 1000);
 				}
-
-				var currtime1 = time1.split("-")[0];
-				var hours1 = currtime1.split(":")[0];
-				var mins1 = currtime1.split(":")[1];
-				var secs1 = currtime1.split(":")[2];
-				//var cdate = new Date(0, 0, 0, hours, mins, secs);
-				var times1 = (secs1 * 1) + (mins1 * 60) + (hours1 * 3600); //convert to seconds
-
-				if (self.startTagTime >= times1 && self.startTagTime <= times2) {
-
+				if (self.startTagTime >= shotStartTime && self.startTagTime < nextStartTime) {
+					console.log('found shot number: ' + (shotNum+1) + ' from start time: ' + shotStartTime + ' (ms)');
 					sharedProperties.setVideoId($stateParams.v);
-					sharedProperties.setStartTime(times1);
-					sharedProperties.setEndTime(times2);
-					sharedProperties.setGroup(group);
-					sharedProperties.setLabelTerm(labelterm);
-					sharedProperties.setAlternatives(alternatives);
-					sharedProperties.setIRI(tiri);
+					sharedProperties.setStartTime(shotStartTime);
+					sharedProperties.setEndTime(nextStartTime);
+					sharedProperties.setGroup(mode);
 					sharedProperties.setShotPNG(shotThumbnail);
 					sharedProperties.setShotId(shotId);
 					sharedProperties.setShotNum(shotNum+1);
 
 					// filter actual manual annotations for this shot
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
-					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
-
-					if (group != 'location') {
-						// a new term
-						if (!$rootScope.checkAnnotation(times1, times2, group, labelterm)) {
-							myModalGeoFactory.open('lg', 'myModalVocab.html');
-						}
+					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+					
+					if (mode != 'location') {
+						myModalGeoFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
 					}
-					else if (group == 'location') myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+					else if (mode == 'location') {
+						myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+					}
+					// exit loop
+					break;
 				}
 			}
 		};
 
-		self.deleteAnnotation = function(annoId) {
+		self.deleteAnnotation = function(anno) {
+			//console.log(angular.toJson(anno, true));
 			var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmModal.html',
@@ -793,12 +930,18 @@
 				controller: 'ModalConfirmController',
 				appendTo: parentElem
 			});
+			var annoId = anno.id;
+			var bodyIRI = anno.iri;
+			var bodyName = anno.name;
+			var bodyRef = (anno.iri !== undefined) ? 'resource:'+bodyIRI : 'textual:'+bodyName;
 			modalInstance.result.then(function() {
 				// YES: delete annotation
-				DataService.deleteAnnotation(annoId).then(function() {
-					console.log('Annotation [' + annoId + '] deleted successfully');
-					angular.forEach(self.annotations, function(anno, index){
-						if(anno.id === annoId) {
+				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
+					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					angular.forEach(self.annotations, function(anno, index) {
+						if (anno.id === annoId &&
+							((anno.iri !== undefined && anno.iri === bodyIRI) ||
+								anno.name === bodyName)) {
 							self.annotations.splice(index, 1);
 						}
 					});
@@ -937,28 +1080,32 @@
 									sbFields.camera = anno.bodies[0].attributes;
 									break;
 								} else if (anno.attributes.annotation_type.key === 'TAG') {
-									// annotation info
-									var spatial = anno.bodies[0].attributes.spatial;
-									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
-									var name = (anno.bodies[0].type === 'textualbody') ? 
-										anno.bodies[0].attributes.value : anno.bodies[0].attributes.name;
-									var termIRI = anno.bodies[0].attributes.iri;
-									var annoInfo = {
-										uuid: anno.id,
-										name: name,
-										iri: termIRI,
-										group: group
-									};
-									// shot info
-									var startT = convertTime(shot.attributes.timestamp);
-									var endT = startT + shot.attributes.duration;
-									var shotInfo = {
-										uuid: shot.id,
-										shotNum: shot.attributes.shot_num + 1,
-										startT: startT,
-										endT: endT
-									};
-									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									for (var j=0; j < anno.bodies.length; j++) {
+										// annotation info
+										var spatial = anno.bodies[j].attributes.spatial;
+										var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+										var name = (anno.bodies[j].type === 'textualbody') ? 
+											anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
+										var termIRI = anno.bodies[0].attributes.iri;
+										var user_creator = anno.creator.id;
+										var annoInfo = {
+											uuid: anno.id,
+											name: name,
+											iri: termIRI,
+											group: group,
+											creator: user_creator
+										};
+										// shot info
+										var startT = convertTime(shot.attributes.timestamp);
+										var endT = startT + shot.attributes.duration;
+										var shotInfo = {
+											uuid: shot.id,
+											shotNum: shot.attributes.shot_num + 1,
+											startT: startT,
+											endT: endT
+										};
+										$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+									}
 								}
 							}
 							self.storyshots.push(sbFields);
@@ -975,6 +1122,7 @@
 				function(response) {
 					self.video = response.data[0];
 					self.currentvidDur = self.video.relationships.item[0].attributes.duration;
+					self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 
 					setTimeout(function() {
 						$scope.$apply(function() {
@@ -994,6 +1142,7 @@
 			self.loadMetadataContent(vid);
 		} else {
 			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
+			self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 			self.loadVideoShots(vid, videoDuration);
 		}
 
@@ -1076,6 +1225,7 @@
 					group: annoInfo.group,
 					iri: annoInfo.iri,
 					name: locn,
+					creator: annoInfo.creator,
 					shotid: shotInfo.uuid,
 					shotNum: shotInfo.shotNum,
 					startT: shotInfo.startT,
@@ -1109,7 +1259,8 @@
 
 		vm.init = function(location) {
 			// FIXME what is the default?
-			vm.location = location === undefined ? 'Bologna, IT' : location;
+			vm.location = location === undefined ? 'Strasburgo, FR' : location;
+            vm.zoom = 4;
 		};
 
 		NgMap.getMap("videomap").then(function(map) {
@@ -1133,8 +1284,11 @@
 				var currCenter = map.getCenter();
 				google.maps.event.trigger(map, 'resize');
 				map.setCenter(currCenter);
+				
+				var newzoom = vm.location === 'Strasburgo, FR' ? 4 : 15;
+                map.setZoom(newzoom);
 
-				map.addListener('zoom_changed', function() {
+				/*map.addListener('zoom_changed', function() {
 					var mapZ = map.getZoom();
 					/*if (mapZ >= 16){
 						for (var i=0; i<=vm.markers.length;i++)
@@ -1144,10 +1298,10 @@
 							    vm.markers[i].icon.scaledSize = new google.maps.Size(440, 340);
 						}
 					}*/
-				});
+				//});
 
 			});
-		}, 3000);
+		}, 1000);
 
 		vm.openInfoWindow = function(e, selectedMarker) {
 			e.preventDefault();
@@ -1336,23 +1490,27 @@
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags).then(
-					// FIXME manage multiple tags
 					function(resp) {
-						var annoId = resp.data;
+						// console.log(resp.data);
+						var annoId = resp.data.id;
+						var creatorId = resp.data.relationships.creator[0].id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
-						var annoInfo = {
-							"uuid": annoId,
-							"name": self.tags[0].label,
-							"iri": self.tags[0].iri,
-							"group": $scope.group
-						};
-						var shotInfo = {
-							"uuid": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
-						};
-						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						for (var i=0; i < self.tags.length; i++) {
+							var annoInfo = {
+								"uuid": annoId,
+								"name": self.tags[i].label,
+								"iri": self.tags[i].iri,
+								"group": $scope.group,
+								"creator": creatorId
+							};
+							var shotInfo = {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						}
 					},
 					function(err) {
 						// TODO
@@ -1413,14 +1571,16 @@
 				// save the annotation into the database
 				DataService.saveGeoAnnotation(target, source, spatial).then(
 						function(resp) {
-							var annoId = resp.data;
+							var annoId = resp.data.id;
+							var creatorId = resp.data.relationships.creator[0].id;
 							var termIRI = source.iri;
 							console.log('Annotation saved successfully. ID: ' + annoId);
 							var annoInfo = {
 								"uuid": annoId,
 								"name": $scope.labelTerm,
 								"iri": termIRI,
-								"group": $scope.group
+								"group": $scope.group,
+								"creator": creatorId
 							};
 							var shotInfo = {
 								"uuid": $scope.shotID,
