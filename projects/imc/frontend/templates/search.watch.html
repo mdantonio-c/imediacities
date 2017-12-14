@@ -215,7 +215,7 @@
 							<td data-title="'Camera motion'" align="center">
 								<dl class="dl-horizontal">
 									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-										<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
+                                         <dt>{{e_attr}}:</dt><dd>{{e_val * 100 | number:1}}%</dd>
 									</div>
 								</dl>
 							</td>
