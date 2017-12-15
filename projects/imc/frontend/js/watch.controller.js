@@ -26,10 +26,11 @@
 				});
 			}
 		};
-	}).factory('myModalGeoFactory', function($uibModal, $document) { /*modal view add location tag definition*/
-		var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
+	}).factory('myTagModalFactory', function($uibModal, $document) {
+		/* modal view for adding location and term tags */
 		return {
 			open: function(size, template, params) {
+				var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
 				return $uibModal.open({
 					animation: true,
 					templateUrl: template || 'myModalGeoCode.html',
@@ -733,7 +734,7 @@
 	/* end cinzia*/
 
 	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, 
-		$filter, DataService, noty, myModalGeoFactory, sharedProperties) {
+		$filter, DataService, noty, myTagModalFactory, sharedProperties) {
 
 		var self = this;
 		self.showmesb = false;
@@ -842,8 +843,8 @@
 					if ((acategory == group) && (aterm == labelterm)) {
 						// the term has been already added in the timeline cache
 						foundterm = true;
-						if (group == 'location') myModalGeoFactory.open('lg', 'locationFoundModal.html');
-						else myModalGeoFactory.open('lg', 'termFoundModal.html');
+						if (group == 'location') myTagModalFactory.open('lg', 'locationFoundModal.html');
+						else myTagModalFactory.open('lg', 'termFoundModal.html');
 					}
 				}
 			}
@@ -895,7 +896,7 @@
 					nextStartTime = shotStartTime + (shotDuration * 1000);
 				}
 				if (self.startTagTime >= shotStartTime && self.startTagTime < nextStartTime) {
-					console.log('found shot number: ' + (shotNum+1) + ' from start time: ' + shotStartTime + ' (ms)');
+					console.log('found shot number ' + (shotNum+1) + ', from start time ' + shotStartTime + ' (ms)');
 					sharedProperties.setVideoId($stateParams.v);
 					sharedProperties.setStartTime(shotStartTime);
 					sharedProperties.setEndTime(nextStartTime);
@@ -906,13 +907,13 @@
 
 					// filter actual manual annotations for this shot
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
-					//console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 					
 					if (mode != 'location') {
-						myModalGeoFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
 					}
 					else if (mode == 'location') {
-						myModalGeoFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
 					}
 					// exit loop
 					break;
@@ -1144,6 +1145,10 @@
 			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
 			self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 			self.loadVideoShots(vid, videoDuration);
+			/*setTimeout(function() {
+				self.loading = false;
+				self.loadVideoShots(vid, videoDuration);
+			}, 2000);*/
 		}
 
 		self.selectedVideoId = vid;
