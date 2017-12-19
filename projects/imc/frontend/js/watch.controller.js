@@ -1203,7 +1203,7 @@
 			angular.forEach(self.annotations, function(anno) {
 				if (($rootScope.currentTime >= anno.startT) && ($rootScope.currentTime <= anno.endT))
 				{
-					self.filtered.push(ann);
+					self.filtered.push(anno);
 				}
 			});
 		});
