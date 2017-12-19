@@ -47,7 +47,7 @@
 			}
 		};
 	}).factory('myGeoConfirmFactory', function($uibModal, $document) {
-		var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
+		var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
@@ -266,22 +266,16 @@
 				return filtered;
 			};
 		})
+		/* obj può essere direttamente il valore oppure può essere una struttura key,description */
+		.filter('attributesFilter', function() {
+			return function(obj) {
+				if(obj && obj.description){
+					return obj.description;
+				}
+				return obj;
+			};
+		})
 		;
-			/*.filter('timefilter',[ function () {
-				return function(items, ctime) {
-				    var filtered = [];            
-
-				    angular.forEach(items, function(item) {
-			    		var startT = item.startT;
-			    		var endT = item.endT;						    		
-			        	if((ctime.currentTime >= startT) && (ctime.currentTime <= endT)){ 
-			            	filtered.push(item);						        
-			        	}
-				    });
-				    return filtered;
-				};
-		}]);*/
-
 
 	app.directive('scrollStoryOnClick', function() {
 		return {
@@ -295,51 +289,37 @@
 						}, "slow");
 					}
 					// play video from selected shot
-					var duration = $elm[0].firstElementChild.attributes.duration.value;
-					var nshots = $elm[0].firstElementChild.attributes.nshots.value;
-					var progr = $elm[0].firstElementChild.attributes.progr.value;
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
-					var currtime = $elm[0].firstElementChild.attributes.timestamp.value;
+					var startTime = convertToMilliseconds($elm[0].firstElementChild.attributes.timestamp.value);
 
-					var times = convertTime(currtime);
+					//var times = convertTime(startTime);
 
 					//myVid[0].pause();
-					myVid[0].currentTime = times;
+					var seekTime = ((Number(startTime) / 1000) + 0.001);
+					myVid[0].currentTime = seekTime;
 					myVid[0].play();
 
 				});
 			}
 		};
 	});
-	app.directive('scrollOnClick', function() { //carousel version
+	app.directive('scrollOnClick', function() {
 		return {
-			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
 					// console.log('scroll on click');
-					//alert($elm[0].parentNode.className);
+					// alert($elm[0].parentNode.className);
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: $elm[0].offsetLeft
 						}, "slow");
 					}
 					// play video from selected shot
-					var duration = $elm[0].attributes.duration.value;
-					var nshots = $elm[0].attributes.nshots.value;
-					var progr = $elm[0].attributes.progr.value;
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
-					var currtime = $elm[0].attributes.timestamp.value;
-					currtime = currtime.split("-")[0];
-					var hours = currtime.split(":")[0];
-					var mins = currtime.split(":")[1];
-					var secs = currtime.split(":")[2];
-					var cdate = new Date(0, 0, 0, hours, mins, secs);
-					var times = (secs * 1) + (mins * 60) + (hours * 3600); //convert to seconds
-
-					//myVid[0].pause();
-					myVid[0].currentTime = times;
+					var startTime = convertToMilliseconds($elm[0].attributes.timestamp.value);
+					var seekTime = ((Number(startTime) / 1000) + 0.001);
+					myVid[0].currentTime = seekTime;
 					myVid[0].play();
-
 				});
 			}
 		};
@@ -569,7 +549,7 @@
 	*/
 	app.directive('sliderRange', ['$document',function($document) {
 
-	// Move slider handle and range line
+	  // Move slider handle and range line
 	  var moveHandle = function(handle, elem, posX) {
 	    $(elem).find('.handle.'+handle).css("left",posX +'%');
 	  };
@@ -713,6 +693,7 @@
 	function convertTime(currtime) {
 
 		currtime = currtime.split("-")[0];
+		console.log(currtime);
 		var hours = currtime.split(":")[0];
 		var mins = currtime.split(":")[1];
 		var secs = currtime.split(":")[2];
@@ -721,25 +702,42 @@
 
 		return times;
 	}
-	/* start cinzia*/
-	/* obj può essere direttamente il valore oppure può essere una struttura key,description */
-	angular.module('web').filter('attributesFilter', function() {
-		return function(obj) {
-			if(obj && obj.description){
-				return obj.description;
-			}
-			return obj;
-		};
-	});
-	/* end cinzia*/
 
-	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, 
-		$filter, DataService, noty, myTagModalFactory, sharedProperties) {
+	/**
+	 * Convert a shot timecode (e.g 00:00:50-f21) to seconds 
+	 */
+	function convertoToSeconds(timecode) {
+		var time = timecode.split('-')[0].split(':');
+		return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
+	}
+
+	/**
+	 * Convert a shot timecode (e.g 00:00:50-f21) to milliseconds
+	 */
+	function convertToMilliseconds(timecode, framerate) {
+		if (framerate === undefined) framerate = 24;
+		var frames = Number(timecode.split('-')[1].substring(1, 3));
+		var milliseconds = (1000 / framerate) * (isNaN(frames) ? 0 : frames);
+		return Math.floor((convertoToSeconds(timecode) * 1000) + milliseconds);
+	}
+
+	/**
+	 * Covert a Date object to milliseconds. Consider only the part HH:mm:ss.sss
+	 */
+	function convertDateToMilliseconds(time) {
+		var hours = time.getHours();
+		var minutes = time.getMinutes();
+		var seconds = time.getSeconds();
+		var milliseconds = time.getMilliseconds();
+		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
+	}
+
+	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
+			DataService, noty, myTagModalFactory, sharedProperties) {
 
 		var self = this;
-		self.showmesb = false;
-		self.showmeli = true;
 		var vid = $stateParams.v;
+		self.showmeli = true;
 		self.video = $stateParams.meta;
 
 		self.inputVocTerm = "";
@@ -753,7 +751,6 @@
 		};
 		// to visualize annotations in tab table
 		self.annotations = [];
-		$rootScope.currentTime = 0;
 
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
@@ -765,9 +762,9 @@
 		var paused = false; //warning, this is a one shot variable, we need it only once loading the search page
 		self.showtagtxt = false;
 
-		var myVid = angular.element(window.document.querySelector('#videoarea'));
+		var myVid = angular.element($document[0].querySelector('#videoarea'));
+		$rootScope.currentTime = myVid[0].currentTime;
 
-		$rootScope.currentTime = parseInt(myVid[0].currentTime); //initialize current time
 		self.startTagTime = $rootScope.currentTime;
 		self.currentvidDur = 0;
 
@@ -817,63 +814,17 @@
 		};
 
 		// Pause video
-		self.pauseVid = function() {
+		self.pauseVideo = function() {
 			self.onpause = true;
 			self.onplaying = false;
 			myVid[0].pause();
 		};
 
-		$rootScope.checkAnnotation = function(times1, times2, group, labelterm) {
-			/*first check if this annotation already esists in the timeline cache array*/
-			var timelinerows = self.videoTimeline.data.rows;
-			var foundterm = false;
-			for (var k = 0; k <= timelinerows.length - 1; k++) {
-				var timel1 = timelinerows[k].c[2].v;
-				var timel2 = timelinerows[k].c[3].v;
-
-				var t1 = timel1.getHours() + ':' + timel1.getMinutes() + ':' + timel1.getSeconds();
-				var t2 = timel2.getHours() + ':' + timel2.getMinutes() + ':' + timel2.getSeconds();
-				var time1c = convertTime(t1);
-				var time2c = convertTime(t2);
-
-				// same interval of this annotation set
-				if ((parseInt(times1) == time1c) && (parseInt(times2) == time2c)) {
-					var acategory = timelinerows[k].c[0].v;
-					var aterm = timelinerows[k].c[1].v;
-					if ((acategory == group) && (aterm == labelterm)) {
-						// the term has been already added in the timeline cache
-						foundterm = true;
-						if (group == 'location') myTagModalFactory.open('lg', 'locationFoundModal.html');
-						else myTagModalFactory.open('lg', 'termFoundModal.html');
-					}
-				}
-			}
-			return foundterm;
-		};
-
-		/**
-		 * Convert a shot timecode (e.g 00:00:50-f21) to seconds 
-		 */
-		function convertoToSeconds(timecode) {
-			var time = timecode.split('-')[0].split(':');
-			return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
-		}
-
-		/**
-		 * Convert a shot timecode (e.g 00:00:50-f21) to milliseconds 
-		 */
-		function convertToMilliseconds(timecode, framerate) {
-			if (framerate === undefined) framerate = 24;
-			var frames = Number(timecode.split('-')[1].substring(1, 3));
-			var milliseconds = (1000 / framerate) * (isNaN(frames) ? 0 : frames);
-			return Math.floor((convertoToSeconds(timecode) * 1000) + milliseconds);
-		}
-
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
 
 			// force the video to pause
-			self.pauseVid();
+			self.pauseVideo();
 			// set the initial tag frame with current time
 			self.startTagTime = Math.floor(myVid[0].currentTime * 1000);
 			console.log('Stop video at time (ms): ' + self.startTagTime);
@@ -923,7 +874,7 @@
 
 		self.deleteAnnotation = function(anno) {
 			//console.log(angular.toJson(anno, true));
-			var parentElem = angular.element($document[0].querySelector('#video-wrapper .modal-parent'));
+			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmModal.html',
 				animation: false,
@@ -934,7 +885,7 @@
 			var annoId = anno.id;
 			var bodyIRI = anno.iri;
 			var bodyName = anno.name;
-			var bodyRef = (anno.iri !== undefined) ? 'resource:'+bodyIRI : 'textual:'+bodyName;
+			var bodyRef = (anno.iri !== undefined) ? 'resource:' + bodyIRI : 'textual:' + bodyName;
 			modalInstance.result.then(function() {
 				// YES: delete annotation
 				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
@@ -946,6 +897,7 @@
 							self.annotations.splice(index, 1);
 						}
 					});
+					// update the timeline with the remaining annotations
 					$rootScope.$emit('updateTimeline', '', null, null);
 				}, function(err) {
 					// TODO
@@ -964,157 +916,155 @@
 					self.shots = response.data;
 					self.storyshots = [];
 					self.slideSize = self.shots.length / 9;
-					for (var i = 0; i < self.shots.length; i++) {
-						var thumblink = self.shots[i].links.thumbnail;
-						var start_frame = self.shots[i].attributes.start_frame_idx;
-						var timestamp = self.shots[i].attributes.timestamp;
-						var frameshot = [];
-						frameshot[0] = start_frame;
-						frameshot[1] = self.video.relationships.item[0].attributes.duration;
-						frameshot[2] = parseInt(self.shots[i].attributes.duration);
-						frameshot[3] = self.shots.length;
-						frameshot[4] = i;
-						frameshot[5] = timestamp;
-						frameshot[6] = thumblink;
-						frameshot[7] = self.shots[i].id;
+					self.vduration = vduration;
+					console.log('video duration: ' + vduration);
 
+					// timeline definition
+					var minutes = 0,
+						hours = 0;
+					var seconds = parseInt(vduration);
+					if (seconds / 60 > 0) {
+						minutes = parseInt(seconds / 60, 10);
+						seconds = seconds % 60;
+					}
+					if (minutes / 60 > 0) {
+						hours = parseInt(minutes / 60, 10);
+						minutes = minutes % 60;
+					}
+
+					var format = 'mm:ss';
+
+					self.tlineW = '100%';
+					if (seconds >= 60) {
+						self.tlineW = '100%';
+						format = 'ss';
+					}
+					if (minutes >= 15) {
+						self.tlineW = '200%';
+						format = 'mm:ss';
+					}
+					if (minutes >= 60) {
+						self.tlineW = '200%';
+						format = 'HH:mm:ss';
+					}
+
+					// configuration
+					self.videoTimeline = {
+						"type": "Timeline",
+						"cssStyle": "height: 100%; width: 100%;",
+						//"displayed": false,
+						"options": {
+							timeline: {
+								showRowLabels: true,
+								colorByRowLabel: true
+							},
+							avoidOverlappingGridLines: false,
+							hAxis: {
+								minValue: new Date(0, 0, 0, 0, 0, 0),
+								maxValue: new Date(0, 0, 0, hours, minutes, seconds),
+								format: format
+							}
+						}
+					};
+
+					// add data to the timeline
+					self.videoTimeline.data = {
+						"cols": [{
+							id: "category",
+							label: "Category",
+							type: "string"
+						}, {
+							id: "tag",
+							label: "Tag",
+							type: "string"
+						}, {
+							id: "start",
+							label: "Start",
+							type: "date"
+						}, {
+							id: "end",
+							label: "End",
+							type: "date"
+						}],
+						"rows": []
+					};
+
+					// build items for the carousel and the storyboard
+					var numberOfShots = self.shots.length;
+					angular.forEach(self.shots, function(shot, idx) {
+						// for the carousel
+						var frameshot = [];
+						frameshot[0] = shot.attributes.start_frame_idx;
+						frameshot[1] = self.video.relationships.item[0].attributes.duration;
+						frameshot[2] = shot.attributes.duration;
+						frameshot[3] = numberOfShots;
+						frameshot[4] = idx;
+						frameshot[5] = shot.attributes.timestamp;
+						frameshot[6] = shot.links.thumbnail;
+						frameshot[7] = shot.id;
 						self.items.push(frameshot);
 
-						self.showmesb = true; //enable storyboard button
-						self.showmeli = false; //hide loading video bar
-
-						// once we have all data and metadata the video start playing
-						/*if (i === 0) {
-							var myVid = angular.element(window.document.querySelector('#videoarea'));
-							playVid(myVid[0]);
-						}*/
-
-						// timeline definition
-						self.vduration = vduration;
-
-						var minutes = 0,
-							hours = 0;
-						var seconds = vduration;
-						if (seconds / 60 > 0) {
-							minutes = parseInt(seconds / 60, 10);
-							seconds = seconds % 60;
-						}
-						if (minutes / 60 > 0) {
-							hours = parseInt(minutes / 60, 10);
-							minutes = minutes % 60;
-						}
-
-						var format = 'mm:ss';
-
-						self.tlineW = '100%';
-						if (seconds >= 60) {
-							self.tlineW = '100%';
-							format = 'ss';
-						}
-						if (minutes >= 15) {
-							self.tlineW = '200%';
-							format = 'mm:ss';
-						}
-						if (minutes >= 60) {
-							self.tlineW = '200%';
-							format = 'HH:mm:ss';
-						}
-
-						// configuration
-						self.videoTimeline = {
-							"type": "Timeline",
-							"cssStyle": "height: 100%; width: 100%;",
-							//"displayed": false,
-							"options": {
-								timeline: {
-									showRowLabels: true,
-									colorByRowLabel: true
-								},
-								avoidOverlappingGridLines: false,
-								hAxis: {
-									minValue: new Date(0, 0, 0, 0, 0, 0),
-									maxValue: new Date(0, 0, 0, hours, minutes, seconds),
-									format: format
-								}
-							}
+						// for the storyboard
+						var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1);
+						var sbFields = {
+							number: shot.attributes.shot_num + 1,
+							timestamp: shot.attributes.timestamp,
+							duration: parseInt(shot.attributes.duration),
+							thumb: shot.links.thumbnail,
+							framerange: framerange
 						};
 
-						// add data to the timeline
-						self.videoTimeline.data = {
-							"cols": [{
-								id: "category",
-								label: "Category",
-								type: "string"
-							}, {
-								id: "tag",
-								label: "Tag",
-								type: "string"
-							}, {
-								id: "start",
-								label: "Start",
-								type: "date"
-							}, {
-								id: "end",
-								label: "End",
-								type: "date"
-							}],
-							"rows": []
+						// shot info for the timeline
+						var shotStartTime = convertToMilliseconds(shot.attributes.timestamp);
+						var shortEndTime = shotStartTime + (shot.attributes.duration * 1000);
+						var shotInfo = {
+							uuid: shot.id,
+							shotNum: shot.attributes.shot_num + 1,
+							startT: shotStartTime,
+							endT: shortEndTime
 						};
-					} // end loop for shots in the response
-
-					// build storyboard
-					angular.forEach(self.shots, function(shot) {
-						if ((shot.attributes !== undefined) && (shot.attributes.start_frame_idx !== undefined)) {
-							var framerange = shot.attributes.start_frame_idx + ' - ' + (shot.attributes.end_frame_idx - 1);
-							var sbFields = {
-								thumb: shot.links.thumbnail,
-								number: shot.attributes.shot_num + 1,
-								framerange: framerange,
-								timestamp: shot.attributes.timestamp,
-								duration: parseInt(shot.attributes.duration),
-								camera: shot.annotations[0].attributes
-							};
-							// add camera motion attributes
-							for (var i = 0; i < shot.annotations.length; i++){
-								var anno = shot.annotations[i];
-								if (anno.attributes.annotation_type.key === 'VIM') {
-									sbFields.camera = anno.bodies[0].attributes;
-									break;
-								} else if (anno.attributes.annotation_type.key === 'TAG') {
-									for (var j=0; j < anno.bodies.length; j++) {
-										// annotation info
-										var spatial = anno.bodies[j].attributes.spatial;
-										var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
-										var name = (anno.bodies[j].type === 'textualbody') ? 
-											anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
-										var termIRI = anno.bodies[0].attributes.iri;
-										var user_creator = anno.creator.id;
-										var annoInfo = {
-											uuid: anno.id,
-											name: name,
-											iri: termIRI,
-											group: group,
-											creator: user_creator
-										};
-										// shot info
-										var startT = convertTime(shot.attributes.timestamp);
-										var endT = startT + shot.attributes.duration;
-										var shotInfo = {
-											uuid: shot.id,
-											shotNum: shot.attributes.shot_num + 1,
-											startT: startT,
-											endT: endT
-										};
-										$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
-									}
+						
+						// loop annotations
+						for (var i = 0; i < shot.annotations.length; i++) {
+							var anno = shot.annotations[i];
+							if (anno.attributes.annotation_type.key === 'VIM') {
+								// add camera motion attributes
+								sbFields.camera = anno.bodies[0].attributes;
+								continue;
+							} else if (anno.attributes.annotation_type.key === 'TAG') {
+								for (var j=0; j < anno.bodies.length; j++) {
+									// annotation info
+									var spatial = anno.bodies[j].attributes.spatial;
+									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+									var name = (anno.bodies[j].type === 'textualbody') ? 
+										anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
+									var termIRI = anno.bodies[0].attributes.iri;
+									var user_creator = anno.creator.id;
+									var annoInfo = {
+										uuid: anno.id,
+										name: name,
+										iri: termIRI,
+										group: group,
+										creator: user_creator
+									};
+									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}
-							self.storyshots.push(sbFields);
 						}
+						self.storyshots.push(sbFields);
+						
 					});
+
+				})
+				.catch(function(response) {
+					console.error('Error loading video shots');
+					// TODO
+				})
+				.finally(function() {
+  					// hide loading video bar
+					self.showmeli = false;
 				});
 		};
-
 
 		self.loadMetadataContent = function(vid) {
 			// console.log("loading metadata content for vid: " + vid);
@@ -1145,38 +1095,39 @@
 			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
 			self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
 			self.loadVideoShots(vid, videoDuration);
-			/*setTimeout(function() {
-				self.loading = false;
-				self.loadVideoShots(vid, videoDuration);
-			}, 2000);*/
 		}
 
 		self.selectedVideoId = vid;
 		self.animationsEnabled = true;
 
+		/**
+		 * Jump to shot from the timeline.
+		 * @param selectedShot - selected cell in the timeline with row and col.
+		 */
 		self.jumpToShot = function(selectedShot) {
-			console.log('jump to shot');
+			// console.log('jump to shot: ' + angular.toJson(selectedShot, true));
 			var row = selectedShot.row;
-
-			var time1 = self.videoTimeline.data.rows[row].c[2].v;
-			var time2 = self.videoTimeline.data.rows[row].c[3].v;
-
-			var t1 = time1.getHours() + ':' + time1.getMinutes() + ':' + time1.getSeconds();
-			var t2 = time2.getHours() + ':' + time2.getMinutes() + ':' + time2.getSeconds();
-			var time1c = convertTime(t1);
-			var time2c = convertTime(t2);
+			var startTime = convertDateToMilliseconds(
+				self.videoTimeline.data.rows[row].c[2].v);
+			// console.log('jump to shot: Start time: ' + startTime);
 
 			// play video from selected shot
 			var myVid = angular.element($document[0].querySelector('#videoarea'));
-			myVid[0].currentTime = time1c;
+			var seekTime = ((Number(startTime) / 1000) + 0.001);
+			myVid[0].currentTime = seekTime;
 			myVid[0].play();
 		};
 
-		self.jumpToShotFromAnnotation = function(startT) {
-			console.log('jump to shot from annotation. startT: ' + startT);
+		/**
+		 * Jump to shot from the Annotation Tab.
+		 * @param startTime - start time in milliseconds.
+		 */
+		self.jumpToShotFromAnnotation = function(startTime) {
+			// console.log('jump to shot from annotation. Start time: ' + startTime);
 			// play video from selected shot
 			var myVid = angular.element(window.document.querySelector('#videoarea'));
-			myVid[0].currentTime = parseInt(startT);
+			var seekTime = ((Number(startTime) / 1000) + 0.001);
+			myVid[0].currentTime = seekTime;
 			myVid[0].play();
 		};
 
@@ -1185,9 +1136,17 @@
 			alert(props);
 		};
 
-		self.getDateTime = function(seconds) {
+		/*
+		 * Convert time value in milliseconds to a Date object to be passed into the timeline.
+		 * 
+		 * @param timestamp - time value in milliseconds.
+		 * Not needed from the view. Make it private for this controller at the moment.
+		 */
+		function timelineToDate(timestamp) {
 			var minutes = 0,
-				hours = 0;
+				hours = 0,
+				seconds = Math.floor(timestamp / 1000),
+				milliseconds = timestamp % 1000;
 			if (seconds / 60 > 0) {
 				minutes = parseInt(seconds / 60, 10);
 				seconds = seconds % 60;
@@ -1196,8 +1155,8 @@
 				hours = parseInt(minutes / 60, 10);
 				minutes = minutes % 60;
 			}
-			return new Date(0, 0, 0, hours, minutes, seconds);
-		};
+			return new Date(0, 0, 0, hours, minutes, seconds, milliseconds);
+		}
 
 		$rootScope.$on('updateTimeline', function(event, locname, annoInfo, shotInfo) {
 			var startTime, endTime;
@@ -1205,8 +1164,8 @@
 				// just refresh the timeline
 				self.videoTimeline.data.rows = [];
 				angular.forEach(self.annotations, function(anno){
-					startTime = self.getDateTime(anno.startT);
-					endTime = self.getDateTime(anno.endT);
+					startTime = timelineToDate(anno.startT);
+					endTime = timelineToDate(anno.endT);
 					self.videoTimeline.data.rows.push({c: [
 						  {v: anno.group},
 						  {v: anno.name},
@@ -1217,8 +1176,8 @@
 				return;
 			}
 			var locn = (locname !== '') ? locname : annoInfo.name;
-			startTime = self.getDateTime(shotInfo.startT);
-			endTime = self.getDateTime(shotInfo.endT);
+			startTime = timelineToDate(shotInfo.startT);
+			endTime = timelineToDate(shotInfo.endT);
 			self.videoTimeline.data.rows.push({c: [
 				  {v: annoInfo.group},
 				  {v: locn},
@@ -1241,10 +1200,8 @@
 
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
-			angular.forEach(self.annotations, function(ann) {
-				var startT = ann.startT;
-				var endT = ann.endT;
-				if (($rootScope.currentTime >= startT) && ($rootScope.currentTime <= endT))
+			angular.forEach(self.annotations, function(anno) {
+				if (($rootScope.currentTime >= anno.startT) && ($rootScope.currentTime <= anno.endT))
 				{
 					self.filtered.push(ann);
 				}
@@ -1386,7 +1343,7 @@
 			self.jumpToShot = function(selectedShot, startT) {
 				// play video from selected shot
 				var myVid = angular.element(window.document.querySelector('#videoarea'));
-				myVid[0].currentTime = parseInt(startT);
+				myVid[0].currentTime = startT /1000;
 				myVid[0].play();
 			};
 
@@ -1571,35 +1528,32 @@
 				"long": $scope.longitude
 			};
 
-			if (!$rootScope.checkAnnotation($scope.startT, $scope.endT, $scope.group, $scope.format)) { 
-				// the annotation has not been found
-				// save the annotation into the database
-				DataService.saveGeoAnnotation(target, source, spatial).then(
-						function(resp) {
-							var annoId = resp.data.id;
-							var creatorId = resp.data.relationships.creator[0].id;
-							var termIRI = source.iri;
-							console.log('Annotation saved successfully. ID: ' + annoId);
-							var annoInfo = {
-								"uuid": annoId,
-								"name": $scope.labelTerm,
-								"iri": termIRI,
-								"group": $scope.group,
-								"creator": creatorId
-							};
-							var shotInfo = {
-								"uuid": $scope.shotID,
-								"shotNum": $scope.shotNum,
-								"startT": $scope.startT,
-								"endT": $scope.endT
-							};
-							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
-							$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
-						},
-						function(err){
-							// TODO
-						});
-			}
+			// save the annotation into the database
+			DataService.saveGeoAnnotation(target, source, spatial).then(
+				function(resp) {
+					var annoId = resp.data.id;
+					var creatorId = resp.data.relationships.creator[0].id;
+					var termIRI = source.iri;
+					console.log('Annotation saved successfully. ID: ' + annoId);
+					var annoInfo = {
+						"uuid": annoId,
+						"name": $scope.labelTerm,
+						"iri": termIRI,
+						"group": $scope.group,
+						"creator": creatorId
+					};
+					var shotInfo = {
+						"uuid": $scope.shotID,
+						"shotNum": $scope.shotNum,
+						"startT": $scope.startT,
+						"endT": $scope.endT
+					};
+					$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
+				},
+				function(err){
+					// TODO
+				});
 
 			$uibModalInstance.close($scope.geoResult);
 		};
