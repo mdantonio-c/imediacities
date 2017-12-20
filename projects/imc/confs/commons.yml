@@ -45,6 +45,7 @@ services:
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
   neo4j:
+    restart: on-failure:5
     volumes:
       - ../data/graphdata:/data
     ports:
@@ -123,5 +124,3 @@ services:
     environment:
       ACTIVATE: 1
 
-  neo4j:
-    restart: on-failure:5
