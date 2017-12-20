@@ -9,6 +9,7 @@ from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+# from restapi.services.mail import send_mail
 from utilities import htmlcodes as hcodes
 
 from restapi.flask_ext.flask_celery import CeleryExt
@@ -54,6 +55,10 @@ class Stage(GraphBaseOperations):
     def get(self, group=None):
 
         self.initGraph()
+
+        # body = "Test"
+        # subject = "IMC test"
+        # send_mail(body, subject)
 
         if not self.auth.verify_admin():
             # Only admins can specify a different group to be inspected
