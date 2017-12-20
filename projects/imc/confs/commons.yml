@@ -122,3 +122,6 @@ services:
       - ../data/imediastuff:/home/ftpusers/
     environment:
       ACTIVATE: 1
+
+   neo4j:
+     restart: on-failure:5
