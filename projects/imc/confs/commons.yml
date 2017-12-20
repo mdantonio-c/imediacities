@@ -51,6 +51,7 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
   neo4j:
+    restart: on-failure:5
     volumes:
       - ${VANILLA_DIR}/data/graphdata:/data
     ports:
@@ -134,6 +135,3 @@ services:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
     environment:
       ACTIVATE: 1
-
-  neo4j:
-    restart: on-failure:5
