@@ -47,7 +47,10 @@
 						Your browser does not support HTML5 video.
 					</video>
 				</div>
-				<div class="container" ng-show="watchCtrl.showmeli" ng-style="{'float': 'left', 'width': '100%'}"><br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+				<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
 			
 			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
@@ -176,8 +179,8 @@
 								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT)">{{anno.shotNum}}</a></td>
 								<td>{{ anno.group }}</td>
 								<td>{{ anno.name }}</td>
-								<td>{{ anno.startT | number:2 }}</td>
-								<td>{{ anno.endT | number:2 }}</td>
+								<td>{{ anno.startT | date:'mm:ss' }}</td>
+								<td>{{ anno.endT | date:'mm:ss' }}</td>
 								<td>
 									<a class="btn btn-danger btn-xs"
 										ng-click="watchCtrl.deleteAnnotation(anno)"
@@ -209,13 +212,17 @@
 							<td data-title="'Number'" align="center">{{shot.number}}</td>
 							<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
 							<td data-title="'Shot'" scroll-story-on-click>
-							<img ng-style="{'width': '40%'}" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
+								<img ng-style="{'width': '40%'}"
+								id="{{shot.id}}"
+								timestamp="{{shot.timestamp}}"
+								ng-src="{{shot.thumb}}">
+							</td>
 							<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
 							<td data-title="'Duration'" align="center">{{shot.duration}}</td>
 							<td data-title="'Camera motion'" align="center">
 								<dl class="dl-horizontal">
 									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-										<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
+										<dt>{{e_attr}}:</dt><dd>{{e_val * 100 | number:1}}%</dd>
 									</div>
 								</dl>
 							</td>
@@ -376,6 +383,6 @@
 			<button class="btn btn-warning" ng-click="no()">No</button>
 		</div>
 	</script>
-	<div class="modal-parent">
+	<div class="tag-modal-parent">
     </div>
 </div>

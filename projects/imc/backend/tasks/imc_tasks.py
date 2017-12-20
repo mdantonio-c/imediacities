@@ -179,7 +179,7 @@ def import_file(self, path, resource_id, mode):
             if analize(movie, out_folder, fast):
                 log.info('Analize done')
             else:
-                log.error('Analize terminated with errors')
+                raise Exception('Analize terminated with errors')
 
             # params = []
             # params.append("/code/scripts/analysis/analyze.py")
