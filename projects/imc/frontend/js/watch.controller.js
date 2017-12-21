@@ -1216,7 +1216,7 @@
 
 	}
 
-	function MapController($scope, $rootScope, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
+	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
 
 		var vm = this;
 		vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
@@ -1316,6 +1316,7 @@
 				map.setCenter(currCenter);
 				});
 		}, 2000);
+		$window.scrollTo(0, 0);
 
 		vm.openInfoWindow = function(e, selectedMarker) {
 			e.preventDefault();
