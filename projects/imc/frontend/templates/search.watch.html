@@ -235,8 +235,13 @@
 		</div>
 	</div>
 	<hr/>
-	<div ng-controller="MapController as vm" ng-init="vm.init(watchCtrl.video.relationships.coverages[0].attributes.spatial[0])">
+	<div ng-controller="MapController as vm"
+		 >
 		<div class="row">
+			<div class="container" 
+					ng-show="vm.mapLoading"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
 				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}" street-view-control="false">
 				<!--<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>-->

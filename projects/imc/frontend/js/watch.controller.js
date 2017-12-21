@@ -76,7 +76,7 @@
 		});
 	});
 
-	app.service('sharedProperties', function() {
+	app.service('sharedProperties', function($q) {
 		var startTime = 'test start value';
 		var endTime = 'test end value';
 		var labelTerm = 'test label value';
@@ -85,12 +85,13 @@
 		var videoId = '';
 		var IRI = '';
 		var shotId = '';
-		var alternatives = null;
 		var latitude = '';
 		var longitude = '';
 		var formatted = '';
 		var photoref = '';
 		var shotnum = '';
+		var recordProvider,
+			defer = $q.defer();
 
 		return {
 			getStartTime: function() {
@@ -128,9 +129,6 @@
 			},
 			getLongitude: function() {
 				return longitude;
-			},
-			getAlternatives: function() {
-				return alternatives;
 			},
 	        getShotNum: function() {
 	            return shotnum;
@@ -174,8 +172,12 @@
 			setPhotoRef: function(value) {
 				photoref = value;
 			},
-			setAlternatives: function(value) {
-				alternatives = value;
+			getRecordProvider: function() { 
+				return defer.promise;
+			},
+			setRecordProvider: function(value) {
+				recordProvider = value;
+				defer.notify(recordProvider);
 			}
 		};
 	});
@@ -1074,6 +1076,8 @@
 					self.video = response.data[0];
 					self.currentvidDur = self.video.relationships.item[0].attributes.duration;
 					self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
+					sharedProperties.setRecordProvider(
+						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 
 					setTimeout(function() {
 						$scope.$apply(function() {
@@ -1094,6 +1098,8 @@
 		} else {
 			var videoDuration = $stateParams.meta.relationships.item[0].attributes.duration;
 			self.isShownAt = self.video.relationships.record_sources[0].attributes.is_shown_at;
+			sharedProperties.setRecordProvider(
+						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 			self.loadVideoShots(vid, videoDuration);
 		}
 
@@ -1213,19 +1219,76 @@
 	function MapController($scope, $rootScope, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
 
 		var vm = this;
+		vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
 		vm.videolat = null;
 		vm.videolng = null;
 		vm.locname = null;
-		vm.zoom = 15;
 		vm.markers = [];
+		vm.mapLoading = $scope.$parent.watchCtrl.video === undefined ? true : false;
 
-		vm.init = function(location) {
-			// FIXME what is the default?
+		// default location
+		vm.location = 'Strasburgo, FR';
+		vm.zoom = 4;
+
+		// load the map ONLY when the provider info is available
+		sharedProperties.getRecordProvider().then(null, null, function(provider) {
+			var customLocation = $scope.$parent.watchCtrl.video.relationships.coverages[0].attributes.spatial[0];
+			if (customLocation === undefined) {
+				//console.log('provider: ' + provider);
+				switch (provider) {
+					case "CCB":
+						vm.location = 'Bologna, Italy';
+						vm.zoom = 15;
+						break;
+					case "CRB":
+						vm.location = 'Brussels, Belgium';
+						vm.zoom = 15;
+						break;
+					case "DFI":
+						vm.location = 'Copenhagen, Denmark';
+						vm.zoom = 15;
+						break;
+					case "DIF":
+						vm.location = 'Frankfurt am Main, German';
+						vm.zoom = 15;
+						break;
+					case "FDC":
+						vm.location = 'Barcelona, Spain';
+						vm.zoom = 15;
+						break;
+					case "MNC":
+						vm.location = 'Turin, Italy';
+						vm.zoom = 15;
+						break;
+					case "OFM":
+						vm.location = 'Vienna, Austria';
+						vm.zoom = 15;
+						break;
+					case "SFI":
+						vm.location = 'Stockholm, Sweden';
+						vm.zoom = 15;
+						break;
+					case "TTE":
+						vm.location = 'Athens, Greece';
+						vm.zoom = 15;
+						break;
+				}
+			} else {
+				vm.location = customLocation;
+				vm.zoom = 15;
+			}
+			// console.log('location: ' + vm.location);
+			vm.mapLoading = false;
+		});
+
+		/*vm.init = function(location) {
+			console.log('location from init: ' + location);
 			vm.location = location === undefined ? 'Strasburgo, FR' : location;
             vm.zoom = 4;
-		};
+		};*/
 
 		NgMap.getMap("videomap").then(function(map) {
+			// console.log('get map for location: ' + vm.location);
 			// start geocoding and get video coordinates
 			GeoCoder.geocode({
 					address: vm.location
@@ -1235,7 +1298,6 @@
 					vm.videolng = result[0].geometry.location.lng();
 					vm.locname = result[0].address_components[0].long_name;
 				});
-
 		});
 
 		// force map resize
@@ -1246,31 +1308,13 @@
 				var currCenter = map.getCenter();
 				google.maps.event.trigger(map, 'resize');
 				map.setCenter(currCenter);
-				
-				var newzoom = vm.location === 'Strasburgo, FR' ? 4 : 15;
-                map.setZoom(newzoom);
-
-				/*map.addListener('zoom_changed', function() {
-					var mapZ = map.getZoom();
-					/*if (mapZ >= 16){
-						for (var i=0; i<=vm.markers.length;i++)
-						{
-							//vm.markerStyle={'width': '500px','height': '500px'};
-							    //change the size of the icon
-							    vm.markers[i].icon.scaledSize = new google.maps.Size(440, 340);
-						}
-					}*/
-				//});
-
-			});
-		}, 1000);
+				});
+		}, 2000);
 
 		vm.openInfoWindow = function(e, selectedMarker) {
 			e.preventDefault();
 			google.maps.event.trigger(selectedMarker, 'click');
 		};
-
-		vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
 
 		$rootScope.$on('updateMap', function(event, locname, lat, lng, group, labelTerm, shotId, startT) {
 
@@ -1445,9 +1489,7 @@
 
 		self.confirmVocabularyTerms = function() {
 			var vid = sharedProperties.getVideoId();
-			// $scope.alternatives = sharedProperties.getAlternatives();
 			var target = 'shot:' + $scope.shotID;
-			// alternatives mechanism should be of course generalized
 
 			if (self.tags.length > 0) {
 				// save the annotation into the database
@@ -1509,13 +1551,11 @@
 			$scope.shotID = sharedProperties.getShotId();
 			$scope.shotNum = sharedProperties.getShotNum();
 			$scope.IRI = sharedProperties.getIRI();
-			// $scope.alternatives = sharedProperties.getAlternatives();
 			$scope.latitude = sharedProperties.getLatitude();
 			$scope.longitude = sharedProperties.getLongitude();
 			$scope.format = sharedProperties.getFormAddr();
 
 			var target = 'shot:' + $scope.shotID;
-			// alternatives mechanism should be of course generalized
 			/*console.log($scope.IRI);
 			console.log(res);
 			console.log($scope.labelTerm);*/
