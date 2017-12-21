@@ -1232,7 +1232,13 @@
 
 		// load the map ONLY when the provider info is available
 		sharedProperties.getRecordProvider().then(null, null, function(provider) {
-			var customLocation = $scope.$parent.watchCtrl.video.relationships.coverages[0].attributes.spatial[0];
+			// look for existing custom location
+			var customLocation,
+				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+			if (coverage !== undefined) {
+				customLocation = coverage.attributes.spatial[0];
+			}
+
 			if (customLocation === undefined) {
 				//console.log('provider: ' + provider);
 				switch (provider) {
