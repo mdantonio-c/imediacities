@@ -923,8 +923,9 @@
 
 					// timeline definition
 					var minutes = 0,
-						hours = 0;
-					var seconds = parseInt(vduration);
+						hours = 0,
+						seconds = parseInt(vduration),
+						milliseconds = (vduration % 1) * 1000;
 					if (seconds / 60 > 0) {
 						minutes = parseInt(seconds / 60, 10);
 						seconds = seconds % 60;
@@ -958,16 +959,19 @@
 						"options": {
 							timeline: {
 								showRowLabels: true,
-								colorByRowLabel: true
+								colorByRowLabel: true,
+								tooltipDateFormat: format+'.SSS'
 							},
+							colors: ['#cbb69d', '#603913'],
 							avoidOverlappingGridLines: false,
 							hAxis: {
-								minValue: new Date(0, 0, 0, 0, 0, 0),
-								maxValue: new Date(0, 0, 0, hours, minutes, seconds),
+								minValue: new Date(0, 0, 0, 0, 0, 0, 0),
+								maxValue: new Date(0, 0, 0, hours, minutes, seconds, milliseconds),
 								format: format
 							}
 						}
 					};
+					//console.log('max timeline value: ' + moment(self.videoTimeline.options.hAxis.maxValue).format(format+'.SSS'));
 
 					// add data to the timeline
 					self.videoTimeline.data = {
