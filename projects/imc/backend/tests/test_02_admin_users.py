@@ -12,7 +12,7 @@ class TestApp(BaseTests):
 
     def test_admin_users(self, client): #client e' una fixture di pytest-flask
         """
-            Test the API /api/custom_admin/users
+            Test the API /api/admin/users
         """
         #
         # 1- cerca il gruppo di test (che deve già esistere nel db)
@@ -74,7 +74,7 @@ class TestApp(BaseTests):
         log.info("*** Testing POST user")
         group_data = {'id': group_id , 'shortname': group_shortname}
         post_user_data = { 'group': group_data, 'email':'test@imediacities.org','name':'test','password':'test', 'surname':'test','roles':[]}
-        res = client.post('/api/custom_admin/users', headers=headers, data=json.dumps(post_user_data))
+        res = client.post('/api/admin/users', headers=headers, data=json.dumps(post_user_data))
         assert res.status_code == hcodes.HTTP_OK_BASIC
         contents = json.loads(res.data.decode('utf-8'))
         #log.debug("*** Response of post new user: "+json.dumps(contents))
@@ -88,18 +88,18 @@ class TestApp(BaseTests):
             # PUT: modify the metadata of the new user
             log.info("*** Testing PUT user")
             put_data = { 'group': group_data, 'email':'test2@imediacities.org','name':'test2','password':'test2', 'surname':'test2','roles':roles}
-            res = client.put('/api/custom_admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
+            res = client.put('/api/admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
             # faccio il test della get e intanto verifico che la put abbia funzionato
             log.info("*** Testing GET users")
             # GET: try without log in
-            res = client.get('/api/custom_admin/users')
+            res = client.get('/api/admin/users')
             # This endpoint requires a valid authorization token
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
             #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # GET all users
-            res = client.get('/api/custom_admin/users', headers=headers)
+            res = client.get('/api/admin/users', headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC
             contents = json.loads(res.data.decode('utf-8'))
             #log.debug("*** Response of GET users: "+json.dumps(contents))
@@ -117,7 +117,7 @@ class TestApp(BaseTests):
         # cancello l'utente
         if user_id is not None:
             log.info("*** Testing DELETE user")
-            res = client.delete('/api/custom_admin/users/'+user_id, headers=headers)
+            res = client.delete('/api/admin/users/'+user_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test

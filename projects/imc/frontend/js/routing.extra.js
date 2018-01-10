@@ -55,7 +55,6 @@ angular.module('web').constant('customRoutes',
         url: "/admin",
         views: {
             "loggedview@logged": {
-                dir: 'blueprint',
                 templateUrl: 'admin.html'
             }
         }
@@ -65,7 +64,6 @@ angular.module('web').constant('customRoutes',
         url: "/users",
         views: {
             "admin@logged.admin": {
-                dir: 'blueprint',
                 templateUrl: 'admin.users.html'
             }
         }

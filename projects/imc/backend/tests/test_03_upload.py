@@ -68,7 +68,7 @@ class TestApp(BaseTests):
         ]
         group_data = {'id': group_id , 'shortname': group_shortname}
         put_data = { 'group': group_data, 'email':'user@nomail.org','name':'Default','password':'test', 'surname':'User','roles':roles}
-        res_put = client.put('/api/custom_admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
+        res_put = client.put('/api/admin/users/'+user_id, headers=headers, data=json.dumps(put_data))
         assert res_put.status_code == hcodes.HTTP_OK_NORESPONSE
 
         log.info("*** Testing post /api/upload/")

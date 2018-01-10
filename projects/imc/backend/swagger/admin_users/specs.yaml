@@ -1,9 +1,0 @@
-file: admin_users
-class: CustomAdminUsers
-schema:
-  expose: true
-mapping:
-  users: "/custom_admin/users"
-  user: "/custom_admin/users/<user_id>"
-labels:
-  - admin 
