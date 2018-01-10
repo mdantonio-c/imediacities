@@ -29,8 +29,7 @@
         </a>
       </li>
 
-
-      <li ng-if="profile.isAdmin">
+      <li ng-if="profile.isAdmin || profile.isGroupAdmin">
         <a href ui-sref="logged.admin.users" >
           Users
         </a>

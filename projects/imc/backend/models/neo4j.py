@@ -102,7 +102,7 @@ class User(UserBase):
         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
-        'Group', 'PI_FOR', cardinality=ZeroOrMore)
+        'Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
 
 
 class Group(IdentifiedNode):
