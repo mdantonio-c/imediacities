@@ -3,10 +3,10 @@
 
 ### Prerequisiti per l'utilizzo dei test
 
-Devono esistere almeno:
-- un gruppo di test (cioè ricercabile con nome 'test') 
-- un video (con il suo corrispondente item) nel database.
-
+Nel database devono già esistere almeno:
+- un gruppo di test (cioè ricercabile con nome 'test')
+- l'utente di default per potersi autenticare
+- i seguenti Role: admin_root, Archive, Researcher
 
 ### Dove si trovano i file dei test delle REST APIs del backend
 
@@ -14,19 +14,25 @@ Devono esistere almeno:
 .../imediacity/projects/imc/backend/tests/
 ```
 
+Nella sottodir 
+```
+testdata
+```
+si trovano i file necessari ai test: un video, un xml e un txt.
+
 
 ### Quali API sono coperte al momento
 - admin_groups
 - admin_users
-- annotations
-- search
-- shots
+- upload
 - stage
+- annotations
+- shots
 - videos
+- search
 
 Non sono implementati test per:
 - bulk
-- upload
 - vocabulary
 
 
@@ -49,6 +55,12 @@ rapydo shell backend
 ```
 che apre una shell dentro il container backend, cioè mi trovo l'ambiente in cui girerà il backend, che al momento ancora non gira essendo modalità debug.
 
+Lanciare poi:
+```
+restapi init
+```
+che inizializza il database con i dati minimi necessari ai test.
+
 I test possono essere lanciati singolarmente:
 ```
 py.test -s tests/custom/test_videos.py
@@ -68,4 +80,8 @@ Nel container è già installato il plugin pytest-coverage, quindi per calcolare
 aggiungere alla riga di comando l'opzione --cov
 ```
 py.test -s --cov=imc.apis tests/custom/test_videos.py
+```
+perché vengano generati tutti i file di report del coverage usare questo comando
+```
+py.test -s --cov-report html:cov_html --cov-report xml:cov.xml --cov-report annotate:cov_annotate --cov=imc.apis tests/custom
 ```

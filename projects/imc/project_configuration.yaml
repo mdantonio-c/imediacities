@@ -11,7 +11,7 @@ releases:
   '1.1.0':
     type: beta
     rapydo: 0.5.5
-    status: released
+    status: discontinued
   '1.1.1':
     type: beta
     rapydo: 0.5.7
@@ -20,17 +20,12 @@ releases:
     type: beta
     rapydo: 0.6.0
     status: developing
+  '1.2.0':
+    type: beta
+    rapydo: 0.5.7
+    status: developing
 
 variables:
-  # repos:
-  #   rapydo:
-  #     branch: master
-  #   utils:
-  #     branch: master
-  #   backend:
-  #     branch: master
-  #   build-templates:
-  #     branch: master
 
   env:
     COMPOSE_PROJECT_NAME: imc

@@ -14,12 +14,32 @@ class TestApp(BaseTests):
         """
             Test the API /api/annotations
         """
+        #
+        # 1- fa GET di tutte le annotation senza authorization token
+        # 2- fa GET di tutte le annotation di tipo TVS, with pagination parameters
+        # 3- fa GET di una annotations con uno specifico id
+        # 4- fa una ricerca sui video esistenti per avere l'id dell'item di un video
+        # 5- crea una nuova annotation sul video trovato senza authorization token
+        # 6- crea una nuova annotation sul video trovato
+        # 7- fa GET annotation by id con id della annotation appena creata
+        # 8- crea una annotazione sulla annotazione appena creata
+        # 9- cancella la annotazione di annotazione
+        # 10- cancello la annotation sul video
+        # 11- fa GET shots by video_id
+        # 12- se trova almeno uno shot, prende il primo che trova e crea una 
+        #      annotazione sullo shot
+        # 13- cancella la annotazione sullo shot
+        #
+        # A questo punto il database dovrebbe essere tornato 
+        #  come prima dei test
+        #
+
         log.info("*** Testing GET annotations")
         # try without log in
         res = client.get('/api/annotations')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-        log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
@@ -74,7 +94,7 @@ class TestApp(BaseTests):
         # POST: try without log in
         res = client.post('/api/annotations', headers=None, data=json.dumps(post_data))
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED 
-        log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
         # POST: create a new annotation
         res = client.post('/api/annotations', headers=headers, data=json.dumps(post_data))
         assert res.status_code == hcodes.HTTP_OK_CREATED
@@ -135,6 +155,7 @@ class TestApp(BaseTests):
                         # deve esistere lo shot_id
                         assert shot_id is not None
                         #log.debug("*** shot id: " + shot_id)
+                        # creo annotazione sullo shot
                         target_data3 = 'shot:'+shot_id
                         body_data3 = {'type':'TextualBody','value':'testo della annotazione di shot','language':'de'}
                         post_data3 = {'target':target_data3,'body':body_data3}
@@ -146,7 +167,7 @@ class TestApp(BaseTests):
                             data3 = response3.get('Response', {}).get('data', {})
                             if data3 is not None:
                                 anno_id3 = data3
-                        # cancello la annotazione di annotazione
+                        # cancello la annotazione sullo shot
                         if anno_id3 is not None:
                             res3 = client.delete('/api/annotations/'+anno_id3, headers=headers)
                             assert res3.status_code == hcodes.HTTP_OK_NORESPONSE

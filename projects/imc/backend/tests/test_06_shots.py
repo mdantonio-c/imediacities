@@ -14,6 +14,12 @@ class TestApp(BaseTests):
         """
             Test GET method of /api/shots
         """
+        #
+        # 1- fa GET di tutti i video
+        # 2- fa GET di tutti gli shot by video_id
+        # 3- fa GET shot by id
+        # 4- fa GET shot thumbnail
+        #
 
         #  Prima devo fare una ricerca sui video esistenti per trovare un video
         #    di cui prendere uno shot per avere lo shot_id
@@ -67,4 +73,4 @@ class TestApp(BaseTests):
             # GET shot thumbnail
             res = client.get('/api/shots/' + shot_id + '?content=thumbnail')
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
+            #log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))

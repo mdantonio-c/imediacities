@@ -14,13 +14,18 @@ class TestApp(BaseTests):
         """
             Test POST method of /api/search
         """
+        #
+        # 1- fa POST search senza authorization token
+        # 2- fa POST search con parametri type e term e pagination
+        #
+
         log.info("*** Testing POST search")
 
         # try without log in
         res = client.post('/api/search')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-        log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
 
         # log in
         log.debug("*** Do login")
@@ -36,5 +41,5 @@ class TestApp(BaseTests):
 
         if response is not None:
             videos_data = response.get('Response', {}).get('data', {})
-            if videos_data is not None:
-                log.debug("*** Number of videos found: " + str(len(videos_data)))
+            #if videos_data is not None:
+                #log.debug("*** Number of videos found: " + str(len(videos_data)))
