@@ -356,7 +356,7 @@ RIGHTS_STATUS = (
     ('05', 'Public Domain'),
     ('06', 'No Copyright - Contractual Restrictions'),
     ('07', 'No Copyright - Non-Commercial Use Only'),
-    ('08', 'No Copyright - Non-Commercial Use Only'),
+    ('08', 'No Copyright - Other Known Legal Restrictions'),
     ('09', 'No Copyright - United States'),
     ('10', 'Copyright Undetermined')
 )

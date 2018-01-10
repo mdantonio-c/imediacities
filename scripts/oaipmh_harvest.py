@@ -9,6 +9,7 @@ import json
 import os
 import codecs
 import urllib
+import re
 import html
 from oaipmh.client import Client
 from oaipmh.metadata import MetadataRegistry, oai_dc_reader
@@ -144,6 +145,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type):
 
         if avcreation is not None:
             manifestation = avcreation.find(tag("avManifestation"))
+            # recordSource = avcreation.find(tag("recordSource"))
             keywords = avcreation.findall(tag("keywords"))
             title_el = avcreation.find(tag("identifyingTitle"))
             title = (title_el.text
@@ -151,6 +153,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type):
                      else "Unknown title")
         elif nonavcreation is not None:
             manifestation = nonavcreation.find(tag("nonAVManifestation"))
+            # recordSource = nonavcreation.find(tag("recordSource"))
             keywords = nonavcreation.findall(tag("keywords"))
             title_el = nonavcreation.find(tag("title"))
             title = (title_el.find(tag("text")).text
@@ -213,7 +216,13 @@ def harvest(metadata_set, dest_folder, log_file, content_type):
 
         content = etree.tostring(efgEntity, pretty_print=True)
 
-        id_text = urllib.parse.quote_plus(sourceID.text.strip())
+        # old
+        # id_text = urllib.parse.quote_plus(sourceID.text.strip())
+
+        # cinzia
+        # caratteri che non sono lettere o numeri vanno sostituiti con trattino
+        id_text = re.sub(r'[\W_]+', '-', sourceID.text.strip())
+        # fine cinzia
 
         filename = "%s_%s_%s.xml" % (
             metadata_set,

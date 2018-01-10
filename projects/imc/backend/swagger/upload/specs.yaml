@@ -3,5 +3,6 @@ class: Upload
 # baseuri: "/api"
 mapping:
   upload: "/upload"
+  download: "/download/<filename>"
 labels:
   - file 

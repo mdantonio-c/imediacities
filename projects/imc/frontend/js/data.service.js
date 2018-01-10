@@ -36,6 +36,11 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('stage', 'DELETE', data);
     };
 
+    self.downloadStageFile = function(filename) {
+        var config = {'responseType': 'arraybuffer'};
+        return api.apiCall('download/'+filename, 'GET', {}, undefined, true, false, false, config);
+    };
+
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }
@@ -69,21 +74,64 @@ function DataService($log, api, $q, jsonapi_parser) {
         return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
     };
 
-    // self.saveAnnotation = function(videoId, data) {
-    //     return api.apiCall('videos/'+videoId+'/annotations', 'POST', data);
-    self.saveAnnotation = function(target, source) {
+    self.saveTagAnnotations = function(target, tags) {
         var data = {};
         data.target = target;
-        data.body = {};
-        data.body.type = "ResourceBody";
-        data.body.purpose = "tagging";
-        data.body.source = source;
+        if (tags.length === 1) {
+            var body = {};
+            body.type = (tags[0].iri !== undefined) ? "ResourceBody" : "TextualBody";
+            body.purpose = "tagging";
+            if (body.type === "ResourceBody") {
+                body.source = {
+                    iri: tags[0].iri,
+                    name: tags[0].label
+                };
+            } else {
+                body.value = tags[0].label;
+            }
+            data.body = body;
+        } else {
+            var bodies = [];
+            angular.forEach(tags, function(tag){
+                var body = {
+                    type: (tag.iri !== undefined) ? "ResourceBody" : "TextualBody",
+                    purpose: "tagging"
+                };
+                if (body.type === "ResourceBody") {
+                    body.source = {
+                        iri: tag.iri,
+                        name: tag.label
+                    };
+                } else {
+                    body.value = tag.label;
+                }
+                bodies.push(body);
+            });
+            data.body = bodies;
+        }
 
         return api.apiCall('annotations', 'POST', data);
     };
 
-    self.deleteAnnotation = function (annoId) {
-        return api.apiCall('annotations/'+annoId, 'DELETE');
+    self.saveGeoAnnotation = function(target, source, spatial) {
+        var data = {
+            target: target,
+            body: {
+                type: "ResourceBody",
+                purpose: "tagging",
+                source: source,
+                spatial: spatial
+            }
+        };
+        return api.apiCall('annotations', 'POST', data);  
+    };
+
+    self.deleteAnnotation = function (annoId, bodyRef) {
+        if (bodyRef !== undefined) {
+            return api.apiCall('annotations/'+annoId+'?body_ref='+encodeURIComponent(bodyRef), 'DELETE');
+        } else {
+            return api.apiCall('annotations/'+annoId, 'DELETE');
+        }
     };
 
     self.saveUser = function(data) {
@@ -127,6 +175,11 @@ function DataService($log, api, $q, jsonapi_parser) {
 
     self.getUserRoles = function(query) {
         var endpoint = 'role/'+query;
+        return api.apiCall(endpoint, 'GET');
+    };
+
+    self.getFcodelist = function(name,lang) {
+        var endpoint = 'fcodelist/'+name+'?lang='+lang;
         return api.apiCall(endpoint, 'GET');
     };
 

@@ -50,6 +50,24 @@ class Stage(GraphBaseOperations):
 
         return "unknown"
 
+    def lookup_content(self, path, source_id):
+        '''
+        Look for a filename in the form of:
+        ARCHIVE_SOURCEID.[extension]
+        '''
+        content_filename = None
+        files = [f for f in os.listdir(path) if not f.endswith('.xml')]
+        for f in files:
+            tokens = os.path.splitext(f)[0].split('_')
+            if len(tokens) == 0:
+                continue
+            if tokens[-1] == source_id:
+                log.info('Content file FOUND: {0}'.format(f))
+                # content_path = os.path.join(path, f)
+                content_filename = f
+                break
+        return content_filename
+
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, group=None):
@@ -82,7 +100,7 @@ class Stage(GraphBaseOperations):
                 return self.force_response(
                     [], errors=["Upload dir not found"])
 
-        resources = group.stage_files.all()
+        # resources = group.stage_files.all()
 
         data = []
         for f in os.listdir(upload_dir):
@@ -102,12 +120,40 @@ class Stage(GraphBaseOperations):
             row['type'] = self.getType(f)
             row['status'] = "-"
 
-            for res in resources:
-                if res.path != path:
-                    continue
+            res = self.graph.Stage.nodes.get_or_none(filename=f)
+            if res is not None:
                 row['status'] = res.status
                 row['status_message'] = res.status_message
                 row['task_id'] = res.task_id
+                row['warnings'] = res.warnings
+                # cast down to Meta or Content stage
+                subres = res.downcast()
+                if 'MetaStage' in subres.labels():
+                    item = subres.item.single()
+                    # add binding info ONLY for processed record
+                    if item is not None:
+                        binding = {}
+                        source_id = None
+                        creation = item.creation.single()
+                        if creation is not None:
+                            sources = creation.record_sources.all()
+                            source_id = sources[0].source_id
+                            binding['source_id'] = source_id
+                        content_stage = item.content_source.single()
+                        if content_stage is not None:
+                            binding['filename'] = content_stage.filename
+                            binding['status'] = content_stage.status
+                        else:
+                            binding['filename'] = self.lookup_content(upload_dir, source_id)
+                            binding['status'] = 'PENDING'
+                        row['binding'] = binding
+
+            # for res in resources:
+            #     if res.path != path:
+            #         continue
+            #     row['status'] = res.status
+            #     row['status_message'] = res.status_message
+            #     row['task_id'] = res.task_id
             data.append(row)
 
         return self.force_response(data)

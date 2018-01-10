@@ -4,7 +4,7 @@
 var app = angular.module('web').controller('StageController', StageController);
 
 // The controller
-function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormDialogService, noty)
+function StageController($scope, $rootScope, $log, $auth, $q, $window, DataService, FormDialogService, noty, FileSaver)
 {
 	var self = this;
 
@@ -110,6 +110,21 @@ function StageController($scope, $rootScope, $log, $auth, $q, DataService, FormD
 			}, function() {
 			}
 		);
+	};
+	self.downloadFile = function(name) {
+		DataService.downloadStageFile(name).then(
+			function(out_data) {
+				var headers = out_data.headers();
+				var contentType = headers['content-type'] || 'application/octet-stream';
+				//console.log('content-type: ' + contentType);
+				var data = new Blob([out_data.data], { type: contentType });
+				FileSaver.saveAs(data, name);
+
+	            noty.extractErrors(out_data, noty.WARNING);
+			}, function(out_data) {
+				// self.loading = false;
+	            noty.extractErrors(out_data, noty.ERROR);
+			});
 	};
 	
 }

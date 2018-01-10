@@ -4,6 +4,7 @@
 Handle annotations
 """
 
+from flask import request
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
@@ -13,9 +14,11 @@ from utilities.logs import get_logger
 from utilities import htmlcodes as hcodes
 # from imc.tasks.services.xml_result_parser import XMLResultParser
 from imc.tasks.services.annotation_repository import AnnotationRepository
+from imc.tasks.services.annotation_repository import DuplicatedAnnotationError
 
 import re
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
+BODY_PATTERN = re.compile("(resource|textual):.+")
 SELECTOR_PATTERN = re.compile("t=\d+,\d+")
 
 logger = get_logger(__name__)
@@ -131,37 +134,48 @@ class Annotations(GraphBaseOperations):
                     'Invalid selector value for: ' + s_val,
                     status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # check body
-        body = data['body']
-        b_type = body.get('type')
-        if b_type == 'ResourceBody':
-            source = body.get('source')
-            if source is None:
+        # check bodies
+        bodies = data['body']
+        if not isinstance(bodies, list):
+            bodies = [bodies]
+        for body in bodies:
+            b_type = body.get('type')
+            if b_type == 'ResourceBody':
+                source = body.get('source')
+                if source is None:
+                    raise RestApiException(
+                        'Missing Source in the ResourceBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                # here we expect the source as an IRI or a structured object
+                # 1) just the IRI
+                if isinstance(source, str):
+                    pass
+                # 2) structured object
+                elif 'iri' not in source or 'name' not in source:
+                    raise RestApiException(
+                        'Invalid ResourceBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'TextualBody':
+                if 'value' not in body:  # or 'language' not in body:
+                    raise RestApiException(
+                        'Invalid TextualBody',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+            else:
                 raise RestApiException(
-                    'Missing Source in the ResourceBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-            # here we expect the source as an IRI or a structured object
-            # 1) just the IRI
-            if isinstance(source, str):
-                pass
-            # 2) structured object
-            elif 'iri' not in source or 'name' not in source:
-                raise RestApiException(
-                    'Invalid ResourceBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-        elif b_type == 'TextualBody':
-            if 'value' not in body or 'language' not in body:
-                raise RestApiException(
-                    'Invalid TextualBody',
-                    status_code=hcodes.HTTP_BAD_REQUEST)
-        else:
-            raise RestApiException('Invalid body type for: {}'.format(b_type))
+                    'Invalid body type for: {}'.format(b_type))
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        created_anno = repo.create_tag_annotation(user, body, targetNode, selector)
+        try:
+            created_anno = repo.create_tag_annotations(
+                user, bodies, targetNode, selector)
+        except DuplicatedAnnotationError as error:
+            raise RestApiException(
+                error.args[0] + " " + '; '.join(error.args[1]),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
 
-        return self.force_response(created_anno.uuid, code=hcodes.HTTP_OK_CREATED)
+        return self.force_response(
+            self.getJsonResponse(created_anno), code=hcodes.HTTP_OK_CREATED)
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -181,7 +195,40 @@ class Annotations(GraphBaseOperations):
                 'Annotation not found',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        uid = self._current_user.uuid
+        logger.debug('current user: {email} - {uuid}'.format(
+            email=self._current_user.email, uuid=self._current_user.uuid))
+        iamadmin = self.auth.verify_admin()
+        logger.debug('current user is admin? {0}'.format(iamadmin))
+
+        creator = anno.creator.single()
+        if creator is None:
+            raise RestApiException(
+                'Annotation with no creator',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        if uid != creator.uuid and not iamadmin:
+            raise RestApiException(
+                'You cannot delete an annotation that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
+        body_type = None
+        bid = None
+        # body_ref = self.get_input(single_parameter='body_ref')
+        body_ref = request.args.get('body_ref')
+        logger.debug(body_ref)
+        if body_ref is not None:
+            if not BODY_PATTERN.match(body_ref):
+                raise RestApiException(
+                    'Invalid Body format: textual:your_term or resource:your_iri',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            body_type, bid = body_ref.split(':', 1)
+            logger.debug('[body type]: {0}, [body id]: {1}'.format(
+                body_type, bid))
+
         repo = AnnotationRepository(self.graph)
-        repo.delete_manual_annotation(anno)
+        try:
+            repo.delete_manual_annotation(anno, body_type, bid)
+        except ReferenceError as error:
+            raise RestApiException(error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
 
         return self.empty_response()
