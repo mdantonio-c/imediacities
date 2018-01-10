@@ -72,7 +72,7 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, group=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         # body = "Test"
         # subject = "IMC test"
@@ -83,7 +83,7 @@ class Stage(GraphBaseOperations):
             group = None
 
         if group is None:
-            group = self.getSingleLinkedNode(self._current_user.belongs_to)
+            group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
             # group = self.getNode(self.graph.Group, group, field='uuid')
@@ -162,9 +162,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -225,9 +225,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def delete(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(

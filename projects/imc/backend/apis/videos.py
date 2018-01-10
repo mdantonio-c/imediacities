@@ -31,7 +31,7 @@ class Videos(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, video_id=None):
         logger.debug("getting AVEntity id: %s", video_id)
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         if video_id is not None:
@@ -73,7 +73,7 @@ class Videos(GraphBaseOperations):
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
         if len(v) == 0:
@@ -97,7 +97,7 @@ class Videos(GraphBaseOperations):
         Delete existing video description.
         """
         logger.debug("deliting AVEntity id: %s", video_id)
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         if video_id is None:
             raise RestApiException(
@@ -119,7 +119,7 @@ class Videos(GraphBaseOperations):
     # @graph_transactions
     # def post(self, video_id=None):
 
-    #     self.initGraph()
+    #     self.graph = self.get_service_instance('neo4j')
 
     #     try:
     #         data = request.get_json(force=True)
@@ -172,7 +172,7 @@ class VideoAnnotations(GraphBaseOperations):
         input_parameters = self.get_input()
         logger.debug("inputs %s" % input_parameters)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         video = None
@@ -205,7 +205,7 @@ class VideoShots(GraphBaseOperations):
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         video = None
@@ -269,7 +269,7 @@ class VideoContent(GraphBaseOperations):
                 "Bad type parameter: expected 'video' or 'thumbnail'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)

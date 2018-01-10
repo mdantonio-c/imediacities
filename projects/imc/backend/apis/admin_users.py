@@ -38,7 +38,7 @@ class CustomAdminUsers(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, id=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         nodeset = self.graph.User.nodes
 
         data = []
@@ -53,7 +53,7 @@ class CustomAdminUsers(GraphBaseOperations):
     @graph_transactions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
         if len(v) == 0:
@@ -105,7 +105,7 @@ class CustomAdminUsers(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
 
@@ -154,7 +154,7 @@ class CustomAdminUsers(GraphBaseOperations):
                 "Please specify a user id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         user = self.graph.User.nodes.get_or_none(uuid=user_id)
         # user = self.getNode(self.graph.User, user_id, field='uuid')
@@ -171,7 +171,7 @@ class UserRole(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, query=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         data = []
         cypher = "MATCH (r:Role)"

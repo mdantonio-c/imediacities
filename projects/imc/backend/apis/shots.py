@@ -33,7 +33,7 @@ class Shots(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a valid shot uuid",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         input_parameters = self.get_input()
         content_type = input_parameters['content']
