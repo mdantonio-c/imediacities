@@ -155,6 +155,14 @@ class UserGroup(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
 
         data = []
+
+        if not self.auth.verify_admin():
+
+            current_user = self.get_current_user()
+            for g in current_user.belongs_to.all():
+                data.append({"id": g.uuid, "shortname": g.shortname})
+                return self.force_response(data)
+
         cypher = "MATCH (g:Group)"
 
         if query is not None:
