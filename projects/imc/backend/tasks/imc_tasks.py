@@ -177,7 +177,7 @@ def import_file(self, path, resource_id, mode):
             log.info("Analize " + movie)
 
             if analize(movie, out_folder, fast):
-                log.info('Analize done')
+                log.info('Analize executed')
             else:
                 raise Exception('Analize terminated with errors')
 

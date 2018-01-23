@@ -31,7 +31,7 @@ class Annotations(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, anno_id=None):
         """Get an annotation if its id is passed as an argument."""
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
         logger.debug('input: {}'.format(params))
@@ -93,10 +93,10 @@ class Annotations(GraphBaseOperations):
         logger.debug('target type: {}, target id: {}'.format(
             target_type, tid))
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         # check user
-        user = self._current_user
+        user = self.get_current_user()
         if user is None:
             raise RestApiException(
                 'Invalid user',
@@ -186,7 +186,7 @@ class Annotations(GraphBaseOperations):
                 "Please specify an annotation id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         # anno = self.getNode(self.graph.Annotation, anno_id, field='uuid')
@@ -195,9 +195,10 @@ class Annotations(GraphBaseOperations):
                 'Annotation not found',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-        uid = self._current_user.uuid
+        user = self.get_current_user()
+
         logger.debug('current user: {email} - {uuid}'.format(
-            email=self._current_user.email, uuid=self._current_user.uuid))
+            email=user.email, uuid=user.uuid))
         iamadmin = self.auth.verify_admin()
         logger.debug('current user is admin? {0}'.format(iamadmin))
 
@@ -206,7 +207,7 @@ class Annotations(GraphBaseOperations):
             raise RestApiException(
                 'Annotation with no creator',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
-        if uid != creator.uuid and not iamadmin:
+        if user.uuid != creator.uuid and not iamadmin:
             raise RestApiException(
                 'You cannot delete an annotation that does not belong to you',
                 status_code=hcodes.HTTP_BAD_FORBIDDEN)

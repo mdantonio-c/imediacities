@@ -20,7 +20,7 @@ class AdminGroups(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, id=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         nodeset = self.graph.Group.nodes
 
         data = []
@@ -35,7 +35,7 @@ class AdminGroups(GraphBaseOperations):
     @graph_transactions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
         if len(v) == 0:
@@ -92,7 +92,7 @@ class AdminGroups(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
 
@@ -134,7 +134,7 @@ class AdminGroups(GraphBaseOperations):
                 "Please specify a group id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         group = self.graph.Group.nodes.get_or_none(uuid=group_id)
         # group = self.getNode(self.graph.Group, group_id, field='uuid')
@@ -152,9 +152,17 @@ class UserGroup(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, query=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         data = []
+
+        if not self.auth.verify_admin():
+
+            current_user = self.get_current_user()
+            for g in current_user.belongs_to.all():
+                data.append({"id": g.uuid, "shortname": g.shortname})
+                return self.force_response(data)
+
         cypher = "MATCH (g:Group)"
 
         if query is not None:

@@ -66,11 +66,13 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.getUserSchema = function(study) {
-        return self.getParametersSchema('custom_admin/users');
+        return self.getParametersSchema('admin/users');
+        //return self.getParametersSchema('admin/users');
     };
 
     self.getUsers = function() {
-        var endpoint = 'custom_admin/users';
+        // var endpoint = 'admin/users';
+        var endpoint = 'admin/users';
         return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
     };
 
@@ -135,15 +137,15 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.saveUser = function(data) {
-        return api.apiCall('custom_admin/users', 'POST', data);
+        return api.apiCall('admin/users', 'POST', data);
     };
 
     self.deleteUser = function(user) {
-        return api.apiCall('custom_admin/users/'+user, 'DELETE');
+        return api.apiCall('admin/users/'+user, 'DELETE');
     };
 
     self.updateUser = function(user, data) {
-        return api.apiCall('custom_admin/users/'+user, 'PUT', data);
+        return api.apiCall('admin/users/'+user, 'PUT', data);
     };
 
     self.getGroupSchema = function(study) {

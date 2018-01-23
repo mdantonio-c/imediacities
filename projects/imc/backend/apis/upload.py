@@ -31,9 +31,9 @@ class Upload(Uploader, GraphBaseOperations):
     @graph_transactions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -55,17 +55,6 @@ class Upload(Uploader, GraphBaseOperations):
             overwrite=True
         )
 
-        # if chunk_number == chunk_total:
-
-        #     properties = {}
-        #     properties["filename"] = secure_name
-        #     properties["title"] = filename
-        #     video = self.graph.Video(**properties).save()
-        #     if self._current_user is not None:
-        #         video.ownership.connect(self._current_user)
-
-        #     return self.force_response(video.uuid)
-
         return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)
 
     @decorate.catch_error()
@@ -78,9 +67,9 @@ class Upload(Uploader, GraphBaseOperations):
                 "Please specify a stage filename",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(

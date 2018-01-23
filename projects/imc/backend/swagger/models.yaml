@@ -158,3 +158,18 @@ definitions:
             - 08
             - 09
             - 10
+
+FormDataParameters:
+  AdminUsers:
+    - name: group
+      in: formData
+      type: string
+      required: true
+      description: Select a group
+      custom:
+        autocomplete: true
+        islink: true
+        label: Group
+        model_key: _belongs_to
+        select_label: shortname
+        select_id: id

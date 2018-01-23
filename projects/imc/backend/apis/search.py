@@ -32,7 +32,7 @@ class Search(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         input_parameters = self.get_input()
         offset, limit = self.get_paging()

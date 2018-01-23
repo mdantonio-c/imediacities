@@ -39,7 +39,7 @@ class Bulk(GraphBaseOperations):
     def post(self):
         logger.debug("Start bulk procedure...")
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
         logger.debug('input: {}'.format(params))

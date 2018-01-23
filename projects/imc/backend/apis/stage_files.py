@@ -9,6 +9,7 @@ from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+# from restapi.services.mail import send_mail
 from utilities import htmlcodes as hcodes
 
 from restapi.flask_ext.flask_celery import CeleryExt
@@ -71,14 +72,18 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, group=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
+
+        # body = "Test"
+        # subject = "IMC test"
+        # send_mail(body, subject)
 
         if not self.auth.verify_admin():
             # Only admins can specify a different group to be inspected
             group = None
 
         if group is None:
-            group = self.getSingleLinkedNode(self._current_user.belongs_to)
+            group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
             # group = self.getNode(self.graph.Group, group, field='uuid')
@@ -157,9 +162,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -220,9 +225,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def delete(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
