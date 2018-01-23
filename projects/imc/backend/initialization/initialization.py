@@ -18,7 +18,7 @@ class Initializer(object):
             log.debug("Archive role already exists")
         except Role.DoesNotExist:
             archiver = Role()
-            archiver.name ='Archive'
+            archiver.name = 'Archive'
             archiver.description = \
                 'Role allowed to upload contents and metadata'
             archiver.save()
@@ -29,14 +29,14 @@ class Initializer(object):
             log.debug("Researcher role already exists")
         except Role.DoesNotExist:
             researcher = Role()
-            researcher.name ='Researcher'
-            researcher.description ='Researcher'
+            researcher.name = 'Researcher'
+            researcher.description = 'Researcher'
             researcher.save()
             log.info("Researcher role successfully created")
 
         try:
             admin = Role.nodes.get(name='admin_root')
-            admin.description ='Admin'
+            admin.description = 'Admin'
             admin.save()
             log.info("Admin role successfully updated")
         except Role.DoesNotExist:
