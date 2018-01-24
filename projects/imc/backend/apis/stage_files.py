@@ -199,7 +199,19 @@ class Stage(GraphBaseOperations):
 
         try:
             resource = self.graph.MetaStage.nodes.get(**properties)
-            log.debug("Resource already exist for %s" % path)
+            # if ContentStage exists and status is COMPLETED
+            #  then the importing task is not created
+            if resource is not None:
+                log.debug("Resource already exists for %s" % path)
+                item = resource.item.single()
+                if item is not None:
+                    #log.debug("Item already exists with uri: " + item.uri)
+                    content_stage = item.content_source.single()
+                    if content_stage is not None and content_stage.status == 'COMPLETED':
+                        log.debug("Content resource already exists with status: " + content_stage.status + ", import not allowed")
+                        return self.force_response(
+                            [], errors=["It is not possible to import a content already COMPLETED."])
+
         except self.graph.MetaStage.DoesNotExist:
             resource = self.graph.MetaStage(**properties).save()
             resource.ownership.connect(group)
