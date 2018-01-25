@@ -1,6 +1,5 @@
 
-# FROM imc/backend:template 
-FROM rapydo/backend:0.6.0
+FROM rapydo/backend:0.6.1
 
 MAINTAINER "Mattia D'Antonio <m.dantonio@cineca.it>"
 
