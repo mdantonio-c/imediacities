@@ -51,7 +51,11 @@ RUN pip install --upgrade --force-reinstall --no-cache-dir -r /tmp/requirements.
 ###################
 # main user for launching the apis
 ENV APIUSER developer
-RUN useradd -r -M -d $CERTDIR/home -s /bin/bash -p ! $APIUSER
+ENV APIUID 990
+RUN useradd \
+    -r -M -d /home/$APIUSER -s /bin/bash -p ! \
+    --uid $APIUID $APIUSER \
+    && mkdir -p /home/$APIUSER && chown $APIUID /home/$APIUSER
 ###################
 
 
