@@ -33,6 +33,7 @@ idmt_py      = root_dir + 'imedia-pipeline/scripts/idmt'
 # default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
 # default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
 default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
+default_movie    = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
 default_filename = os.path.join(stage_area, default_movie)
 
 logfile = None
@@ -218,8 +219,8 @@ def tvs(filename, out_folder):
     prg_filename = os.path.join(idmt_bin,   'idmtvideoanalysis')
     out_filename = os.path.join(out_folder, 'tvs.xml')
     cmd_filename = os.path.join(out_folder, 'tvs.sh')
-    sht_filename = os.path.join(out_folder, 'tvs_s_%05d.jpg')
-    key_filename = os.path.join(out_folder, 'tvs_k_%05d.jpg')
+    sht_filename = os.path.join(out_folder, 'tvs_s_%06d.jpg')
+    key_filename = os.path.join(out_folder, 'tvs_k_%06d.jpg')
 
     f = open(cmd_filename, 'w')
     # f.write( 'export LC_ALL="en_US.UTF-8"\n')
@@ -311,6 +312,25 @@ def summary(filename, out_folder):
 def thumbs_index_storyboard(filename, out_folder, num_frames):
 
     movie_name = os.path.basename(out_folder)
+
+    # framenumber in shot filenames may be 5 or 6 digit long
+    # force them to 6 digit, so that the following filenames.sort
+    # will work as expected
+    lst = glob.glob(out_folder + '/tvs_s_*.jpg')
+    for name in lst:
+        num = int(name.replace(out_folder + '/tvs_s_','').replace('.jpg',''))
+        name2 = out_folder + '/tvs_s_{:06d}.jpg'.format(num)
+        if name != name2:
+            os.rename( name,  name2 )
+
+    # the same for tvs_k_*.jpg
+    lst = glob.glob(out_folder + '/tvs_k_*.jpg')
+    for name in lst:
+        num = int(name.replace(out_folder + '/tvs_k_','').replace('.jpg',''))
+        name2 = out_folder + '/tvs_k_{:06d}.jpg'.format(num)
+        if name != name2:
+            os.rename( name,  name2 )
+    
 
     # retrieve shot frames
     lst = glob.glob(out_folder + '/tvs_s_*.jpg')
@@ -557,6 +577,15 @@ def main(args):
             clean = False  # fast is stronger than clean
         else:
             movie = a
+
+
+
+
+    fast = True
+    clan = False
+
+
+
 
     filename = os.path.join(stage_area, movie)
     if not os.path.exists(filename):
