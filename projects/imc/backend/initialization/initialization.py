@@ -19,8 +19,7 @@ class Initializer(object):
         except Role.DoesNotExist:
             archiver = Role()
             archiver.name = 'Archive'
-            archiver.description = \
-                'Role allowed to upload contents and metadata'
+            archiver.description = 'Archive'
             archiver.save()
             log.info("Archive role successfully created")
 
