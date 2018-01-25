@@ -65,6 +65,9 @@ variables:
         internal: "staff_user"
         admin: "admin_root"
         default: "normal_user"
+    allowed_roles:
+      - Researcher
+      - Archive
   frontend:
       enable: true
 bower_components:
