@@ -577,10 +577,14 @@
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
 								    // key: the name of the object keyvar position = getPosition(provider);
 									var position = getPosition(key);
-									var latLng = new google.maps.LatLng(position[0], position[1]);
-									var count = meta.countByProviders[key];
-									for (var i = 0; i < count; i++) {
-										sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
+									if (position === undefined) {
+										console.warn("Cannot get position by given key: '" + key + "'");
+									} else {
+										var latLng = new google.maps.LatLng(position[0], position[1]);
+										var count = meta.countByProviders[key];
+										for (var i = 0; i < count; i++) {
+											sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
+										}
 									}
 								});
 							} else {
