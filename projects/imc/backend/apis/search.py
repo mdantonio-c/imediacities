@@ -9,7 +9,6 @@ Search endpoint
 from flask import request
 from utilities.helpers import get_api_url
 from restapi.confs import PRODUCTION
-from datetime import datetime
 
 from utilities.logs import get_logger
 from restapi import decorators as decorate
@@ -25,7 +24,7 @@ logger = get_logger(__name__)
 #####################################
 class Search(GraphBaseOperations):
 
-    allowed_item_types = ('all', 'video', 'image')
+    allowed_item_types = ('all', 'video', 'image')  # , 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
     @decorate.catch_error()
@@ -46,6 +45,7 @@ class Search(GraphBaseOperations):
                                    status_code=hcodes.HTTP_BAD_REQUEST)
 
         # check request for term matching
+        provider = None
         multi_match_query = ''
         multi_match = []
         multi_match_where = []
@@ -73,16 +73,21 @@ class Search(GraphBaseOperations):
                     break
                 if f == 'title':
                     multi_match.append("(n)-[:HAS_TITLE]->(t:Title)")
-                    multi_match_where.append("t.text =~ '(?i).*{term}.*'".format(term=term))
+                    multi_match_where.append(
+                        "t.text =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'description':
-                    multi_match.append("(n)-[:HAS_DESCRIPTION]->(d:Description)")
-                    multi_match_where.append("d.text =~ '(?i).*{term}.*'".format(term=term))
+                    multi_match.append(
+                        "(n)-[:HAS_DESCRIPTION]->(d:Description)")
+                    multi_match_where.append(
+                        "d.text =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'keyword':
                     multi_match.append("(n)-[:HAS_KEYWORD]->(k:Keyword)")
-                    multi_match_where.append("k.term =~ '(?i).*{term}.*'".format(term=term))
+                    multi_match_where.append(
+                        "k.term =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'contributor':
                     multi_match.append("(n)-[:CONTRIBUTED_BY]->(a:Agent)")
-                    multi_match_where.append("ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
+                    multi_match_where.append(
+                        "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                 else:
                     # should never be reached
                     raise RestApiException(
@@ -95,37 +100,35 @@ class Search(GraphBaseOperations):
         # check request for filtering
         filters = []
         # add filter for processed content with COMPLETE status
-        filters.append(
-            "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
-            "WHERE content.status = 'COMPLETED'")
-        # ONLY for v1.1: force filter by video type
-        # default AVEntity instead of Creation and ignore item_type
-        entity = 'AVEntity'
+        # FIXME remove the following comment
+        # filters.append(
+        #     "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+        #     "WHERE content.status = 'COMPLETED'")
+        entity = 'Creation'
         filtering = input_parameters.get('filter')
         if filtering is not None:
             # check item type
-            # UNCOMMENT in the next versions from v1.2
-            # item_type = filtering.get('type', 'all')
-            # if item_type is None:
-            #     item_type = 'all'
-            # else:
-            #     item_type = item_type.strip().lower()
-            # if item_type not in self.__class__.allowed_item_types:
-            #     raise RestApiException(
-            #         "Bad item type parameter: expected one of %s" %
-            #         (self.__class__.allowed_item_types, ),
-            #         status_code=hcodes.HTTP_BAD_REQUEST)
-            # if item_type == 'all':
-            #     entity = 'Creation'
-            # elif item_type == 'video':
-            #     entity = 'AVEntity'
-            # elif item_type == 'image':
-            #     entity = 'NonAVEntity'
-            # else:
-            #     # should never be reached
-            #     raise RestApiException(
-            #         'Unexpected item type',
-            #         status_code=hcodes.HTTP_SERVER_ERROR)
+            item_type = filtering.get('type', 'all')
+            if item_type is None:
+                item_type = 'all'
+            else:
+                item_type = item_type.strip().lower()
+            if item_type not in self.__class__.allowed_item_types:
+                raise RestApiException(
+                    "Bad item type parameter: expected one of %s" %
+                    (self.__class__.allowed_item_types, ),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if item_type == 'all':
+                entity = 'Creation'
+            elif item_type == 'video':
+                entity = 'AVEntity'
+            elif item_type == 'image':
+                entity = 'NonAVEntity'
+            else:
+                # should never be reached
+                raise RestApiException(
+                    'Unexpected item type',
+                    status_code=hcodes.HTTP_SERVER_ERROR)
             # PROVIDER
             provider = filtering.get('provider')
             if provider is not None:
@@ -157,12 +160,22 @@ class Search(GraphBaseOperations):
             year_to = filtering.get('yearto')
             if year_from is not None or year_to is not None:
                 # set defaults if year is missing
-                year_from = '1900' if year_from is None else year_from.strip()
-                year_to = datetime.now().year if year_to is None else year_to.strip()
-                filters.append(
-                    "MATCH (n) WHERE ANY(item in n.production_years where item >= '{yfrom}') \
-                    and ANY(item in n.production_years where item <= '{yto}')".format(
-                        yfrom=year_from, yto=year_to))
+                year_from = '1900' if year_from is None else str(year_from)
+                year_to = '2000' if year_to is None else str(year_to)
+                # FIXME: this DO NOT work with image
+                date_clauses = []
+                if item_type == 'video' or item_type == 'all':
+                    date_clauses.append(
+                        "ANY(item in n.production_years where item >= '{yfrom}') \
+                        and ANY(item in n.production_years where item <= '{yto}')".format(
+                            yfrom=year_from, yto=year_to))
+                if item_type == 'image' or item_type == 'all':
+                    date_clauses.append(
+                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') \
+                        and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
+                            yfrom=year_from, yto=year_to))
+                filters.append("MATCH (n) WHERE {clauses}".format(
+                    clauses=' or '.join(date_clauses)))
 
         # first request to get the number of elements to be returned
         countv = "MATCH (n:{entity})" \
@@ -218,4 +231,37 @@ class Search(GraphBaseOperations):
             data.append(video)
 
         # return also the total number of elements
-        return self.force_response(data, meta={"totalItems": numels})
+        meta_response = {"totalItems": numels}
+
+        # count result by provider if provider == null
+        if provider is None:
+            count_by_provider_query = "MATCH (n:{entity})" \
+                " {filters} " \
+                " {match} " \
+                "MATCH (n)-[:RECORD_SOURCE]->(r:RecordSource)-[:PROVIDED_BY]->(p:Provider) " \
+                "WITH distinct p, count(n) as numberOfCreations " \
+                "RETURN p.identifier, numberOfCreations".format(
+                    entity=entity,
+                    filters=' '.join(filters),
+                    match=multi_match_query)
+            logger.debug(count_by_provider_query)
+            result_p_count = self.graph.cypher(count_by_provider_query)
+            group_by_providers = {}
+            for row in result_p_count:
+                group_by_providers[row[0]] = row[1]
+            # logger.debug(group_by_providers)
+            meta_response["countByProviders"] = group_by_providers
+
+        # count result by year
+        count_by_year_query = "match (n:AVEntity) with collect({year: substring(head(n.production_years), 0, 3)}) as rows " \
+            "match (n:NonAVEntity) WITH rows + collect({year: substring(head(n.date_created), 0, 3)}) as allRows " \
+            "UNWIND allRows as row " \
+            "RETURN row.year + '0' as decade, count(row) as count order by decade"
+        result_y_count = self.graph.cypher(count_by_year_query)
+        group_by_years = {}
+        for row in result_y_count:
+            group_by_years[row[0]] = row[1]
+        logger.debug(group_by_years)
+        meta_response["countByYears"] = group_by_years
+
+        return self.force_response(data, meta=meta_response)

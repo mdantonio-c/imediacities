@@ -5,7 +5,7 @@
 				<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search item"
 				ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
 				<span class="input-group-btn">
-					<button ui-sref="logged.search({q: searchCtrl.inputTerm})" class="btn btn-default" type="button">
+					<button type="button" ui-sref="logged.new-search({q: searchCtrl.inputTerm})" class="btn btn-default btn-sm">
 					<i class="imc-icon fa fa-search" aria-hidden="true"></i>
 					</button>
 				</span>
