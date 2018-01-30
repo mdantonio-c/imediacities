@@ -80,6 +80,8 @@ bower_components:
   ng-tags-input:
     - ng-tags-input.min.css
     - ng-tags-input.min.js
+  google-marker-cluster:
+    - markerclusterer.js
 
 css: 
   - "custom/imc.css"

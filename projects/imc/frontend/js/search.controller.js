@@ -1,8 +1,124 @@
 (function() {
 	'use strict';
 
+	var providers = [{
+			"code": "CCB",
+			"name": "CCB - Cineteca di Bologna",
+			"city": {
+				// Bologna, Italy
+				"position": [44.494887, 11.3426162],
+				"name": "Bologna"
+			}
+		}, {
+			"code": "CRB",
+			"name": "CRB - Cinematheque Royale de Belgique",
+			"city": {
+				// Brussels, Belgium
+				"position": [50.8503463, 4.3517211],
+				"name": "Brussels"
+			}
+		}, {
+			"code": "DFI",
+			"name": "DFI - Det Danske Filminstitut",
+			"city": {
+				// Copenhagen, Denmark
+				"position": [55.6760968, 12.568337199999974],
+				"name": "Copenhagen"
+			}
+		}, {
+			"code": "DIF",
+			"name": "DIF - Deutsches Filminstitut",
+			"city": {
+				// Frankfurt am Main, German
+				"position": [50.1109221, 8.682126700000026],
+				"name": "Frankfurt am Main"
+			}
+		}, {
+			"code": "FDC",
+			"name": "FDC - Filmoteca de Catalunya",
+			"city": {
+				// Barcelona, Spain
+				"position": [41.3850639, 2.1734034999999494],
+				"name": "Barcelona"
+			}
+		}, {
+			"code": "MNC",
+			"name": "MNC - Museo Nazionale del Cinema",
+			"city": {
+				// Turin, Italy
+				"position": [45.070312, 7.686856499999976],
+				"name": "Turin"
+			}
+		}, {
+			"code": "OFM",
+			"name": "OFM - Österreichisches Filmmuseum",
+			"city": {
+				// Vienna, Austria
+				"position": [48.2081743, 16.37381890000006],
+				"name": "Vienna"
+			}
+		}, {
+			"code": "SFI",
+			"name": "SFI - Svenska Filminstitutet",
+			"city": {
+				// Stockholm, Sweden
+				"position": [59.32932349999999, 18.068580800000063],
+				"name": "Stockholm"
+			}
+		}, {
+			"code": "TTE",
+			"name": "TTE - Greek Film Archive",
+			"city": {
+				// Athens, Greece
+				"position": [37.9838096, 23.727538800000048],
+				"name": "Athens"
+			}
+		}];
+
+	function getPosition(provider) {
+		for (var i = 0; i < providers.length; i++) {
+			if (providers[i].code === provider) {
+				return providers[i].city.position;
+			}
+		}
+	}
+
+	var iprstatuses = [{
+			"code": "01",
+			"name": "In copyright"
+		}, {
+			"code": "02",
+			"name": "EU Orphan Work"
+		}, {
+			"code": "03",
+			"name": "In copyright - Educational use permitted"
+		}, {
+			"code": "04",
+			"name": "In copyright - Non-commercial use permitted"
+		}, {
+			"code": "05",
+			"name": "Public Domain"
+		}, {
+			"code": "06",
+			"name": "No Copyright - Contractual Restrictions"
+		}, {
+			"code": "07",
+			"name": "No Copyright - Non-Commercial Use Only"
+		}, {
+			"code": "08",
+			"name": "No Copyright - Other Known Legal Restrictions"
+		}, {
+			"code": "09",
+			"name": "No Copyright - United States"
+		}, {
+			"code": "10",
+			"name": "Copyright Undetermined"
+		}];
+
 	var app = angular.module('web')
-		.controller('SearchController', SearchController);
+		.constant('GOOGLE_API_KEY', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI')
+		.controller('SearchController', SearchController)
+		.controller('NewSearchController', NewSearchController);
 
 	// create a simple search filter
 	app.filter('searchFor', function() {
@@ -87,6 +203,20 @@
 				return $filter('date')(new Date(), 'yyyy');
 			};
 		}])
+		.filter('providerToCity', function() {
+			return function(provider) {
+				if (provider === 'CCB') return 'Bologna';
+				else if (provider === 'CRB') return 'Brussels';
+				else if (provider === 'DFI') return 'Copenhagen';
+				else if (provider === 'DIF') return 'Frankfurt am Main';
+				else if (provider === 'FDC') return 'Barcelona';
+				else if (provider === 'MNC') return 'Turin';
+				else if (provider === 'OFM') return 'Vienna';
+				else if (provider === 'SFI') return 'Stockholm';
+				else if (provider === 'TTE') return 'Athens';
+				else return provider;
+			};
+		})
 		;
 
 	// The controller
@@ -151,10 +281,10 @@
 			self.alerts.splice(index, 1);
 		};
 
-        // initialise countries list
-        self.countries = [];
+		// initialise countries list
+		self.countries = [];
 		var lang = 'en'; // put here the language chosen by the user
-		CodelistService.loadTerms(lang,"countries").then(function(data) {
+		CodelistService.loadTerms(lang, "countries").then(function(data) {
 			self.countries = data;
 		});
 
@@ -210,8 +340,10 @@
 				},
 				function(out_data) {
 					var errors = out_data.data.Response.errors;
-					angular.forEach(errors, function(error){
-						self.alerts.push({msg: error});
+					angular.forEach(errors, function(error) {
+						self.alerts.push({
+							msg: error
+						});
 					});
 					self.loading = false;
 					self.studyCount = 0;
@@ -291,34 +423,7 @@
 		};
 
 		$scope.asCollapsed = true;
-		$scope.providers = [{
-			"code": "CCB",
-			"name": "CCB - Cineteca di Bologna"
-		}, {
-			"code": "CRB",
-			"name": "CRB - Cinematheque Royale de Belgique"
-		}, {
-			"code": "DFI",
-			"name": "DFI - Det Danske Filminstitut"
-		}, {
-			"code": "DIF",
-			"name": "DIF - Deutsches Filminstitut"
-		}, {
-			"code": "FDC",
-			"name": "FDC - Filmoteca de Catalunya"
-		}, {
-			"code": "MNC",
-			"name": "MNC - Museo Nazionale del Cinema"
-		}, {
-			"code": "OFM",
-			"name": "OFM - Österreichisches Filmmuseum"
-		}, {
-			"code": "SFI",
-			"name": "SFI - Svenska Filminstitutet"
-		}, {
-			"code": "TTE",
-			"name": "TTE - Greek Film Archive"
-		}];
+		$scope.providers = providers;
 		self.inputItemType = "video";
 		$scope.cleanupFilters = function() {
 			self.inputItemType = "video";
@@ -326,38 +431,231 @@
 		};
 
 		// move codelist provision in a service
-		self.iprstatuses = [{
-			"code": "01",
-			"name": "In copyright"
-		}, {
-			"code": "02",
-			"name": "EU Orphan Work"
-		}, {
-			"code": "03",
-			"name": "In copyright - Educational use permitted"
-		}, {
-			"code": "04",
-			"name": "In copyright - Non-commercial use permitted"
-		}, {
-			"code": "05",
-			"name": "Public Domain"
-		}, {
-			"code": "06",
-			"name": "No Copyright - Contractual Restrictions"
-		}, {
-			"code": "07",
-			"name": "No Copyright - Non-Commercial Use Only"
-		}, {
-			"code": "08",
-			"name": "No Copyright - Other Known Legal Restrictions"
-		}, {
-			"code": "09",
-			"name": "No Copyright - United States"
-		}, {
-			"code": "10",
-			"name": "Copyright Undetermined"
-		}];
+		self.iprstatuses = iprstatuses;
 
+	}
+
+	function NewSearchController($scope, DataService, NgMap, $timeout, GOOGLE_API_KEY, VocabularyService, noty) {
+		var sc = this;
+		sc.displayMode = "Grid";
+		sc.loading = false;
+		sc.cities = {
+			options:  [],
+			selected: null
+		};
+		angular.forEach(providers, function(p){
+			sc.cities.options.push(p.city.name);
+		});
+
+		sc.inputTerm = "";
+		// list of match field
+		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
+		// Selected fields
+		sc.selectedMatchFields = ['title'];
+		// Toggle selection for a given field by name
+		sc.toggleMatchFieldSelection = function(matchField) {
+			var idx = self.selectedMatchFields.indexOf(matchField);
+			// Is currently selected
+			if (idx > -1) {
+				sc.selectedMatchFields.splice(idx, 1);
+			}
+			// Is newly selected
+			else {
+				sc.selectedMatchFields.push(matchField);
+			}
+		};
+
+		// move codelist provision in a service
+		sc.iprstatuses = {
+			options:  iprstatuses,
+			selected: null
+		};
+
+		sc.resetFilters = function() {
+			sc.inputTerm = "";
+			sc.selectedMatchFields = ['title'];
+			sc.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				iprstatus: null,
+				yearfrom: 1900,
+				yearto: 2000
+			};
+		};
+		sc.resetFilters();
+
+		sc.itemType = {
+			video: true,
+			image: true,
+			text: false
+		};
+		$scope.$watch('sc.itemType', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (newValue.video && newValue.image) sc.filter.type='all';
+				else if (newValue.video) sc.filter.type='video';
+				else if (newValue.image) sc.filter.type='image';
+				else if (newValue.text) sc.filter.type='text';
+			}
+		}, true);
+		$scope.$watch('sc.cities.selected', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				var res = null;
+				// "Athens", "Bologna", "Brussels", "Copenhagen", "Frankfurt am Main", "Barcelona", "Turin", "Vienna", "Stockholm"
+				if (newValue === 'Athens') { res = 'TTE'; }
+				else if(newValue === 'Bologna') { res = 'CCB'; }
+				else if(newValue === 'Brussels') { res = 'CRB'; }
+				else if(newValue === 'Copenhagen') { res = 'DFI'; }
+				else if(newValue === 'Frankfurt am Main') { res = 'DIF'; }
+				else if(newValue === 'Barcelona') { res = 'FDC'; }
+				else if(newValue === 'Turin') { res = 'MNC'; }
+				else if(newValue === 'Vienna') { res = 'OFM'; }
+				else if(newValue === 'Stockholm') { res = 'SFI'; }
+				sc.filter.provider = res;
+				// console.log('filter by city for archive: ' + sc.filter.provider);
+			}
+		});
+		$scope.$watch('sc.iprstatuses.selected', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				sc.filter.iprstatus = newValue;
+			}
+		});
+
+		// pagination
+		sc.pager = {
+			options: [12, 24, 36, 48],
+			maxSize: 5
+		};
+		sc.resetPager = function() {
+			sc.pager.currentPage = 1;
+			sc.pager.itemsPerPage = sc.pager.options[0];
+		};
+		sc.resetPager();
+
+		sc.googleMapsUrl = GOOGLE_API_KEY;
+		sc.mapLoaded = false;
+		sc.mapZoom = 3;
+		sc.mapCenter = [53.00,20.34];
+		sc.dynMarkers = [];
+
+		sc.search = function() {
+			sc.loading = true;
+			// at the moment search term ONLY in the title
+			var request_data = {
+				"match": {
+					term: "*",
+					fields: sc.selectedMatchFields
+				}
+			};
+			// Add filters
+			request_data.filter = sc.filter;
+			if (sc.inputTerm !== '') {
+				request_data.match.term = sc.inputTerm;
+			}
+			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
+				function(out_data){
+					var meta = out_data.data.Meta;
+					sc.totalItems = meta.totalItems;
+					sc.countByYears = meta.countByYears;
+					sc.creations = out_data.data.Response.data;
+					NgMap.getMap().then(function(map) {
+						sc.map = map;
+						// clean up current marker list
+						if (sc.markerClusterer !== undefined) {
+							sc.markerClusterer.clearMarkers();
+						}
+						sc.dynMarkers = [];
+						if (sc.filter.provider !== null) {
+							sc.mapZoom = 14;
+							sc.mapCenter = getPosition(sc.filter.provider);
+						} else {
+							// content from all cities represented on a map of Europe
+							sc.mapZoom = 4;
+							sc.mapCenter = [50.00,20.34];
+							// expected content count by providers (i.e. cities)
+							if (meta.countByProviders !== undefined) {
+								Object.keys(meta.countByProviders).forEach(function(key,index) {
+								    // key: the name of the object keyvar position = getPosition(provider);
+									var position = getPosition(key);
+									var latLng = new google.maps.LatLng(position[0], position[1]);
+									var count = meta.countByProviders[key];
+									for (var i = 0; i < count; i++) {
+										sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
+									}
+								});
+							} else {
+								console.warn('expected content count by provider');
+							}
+						}
+						sc.markerClusterer = new MarkerClusterer(
+							map, sc.dynMarkers, {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+						sc.mapLoaded = true;
+					});
+				},
+				function(out_data) {
+					var errors = out_data.data.Response.errors;
+					angular.forEach(errors, function(error) {
+						sc.alerts.push({
+							msg: error
+						});
+					});
+					noty.extractErrors(out_data, noty.ERROR);
+				}).finally(function() {
+					sc.loading = false;
+				});
+		};
+		sc.search();
+
+		// force map resize
+		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
+			if (newValue === 'Map') {
+				$timeout(function() {
+					var currCenter = sc.map.getCenter();
+					google.maps.event.trigger(sc.map, 'resize');
+					sc.map.setCenter(currCenter);
+				}, 500);
+			}
+		}, true);
+
+		sc.setItemsPerPage = function(num) {
+			sc.pager.itemsPerPage = num;
+			sc.pager.currentPage = 1; //reset to first page
+			sc.search();
+		};
+		sc.pageChanged = function() {
+			sc.search();
+		};
+
+		sc.vocabulary = [];
+		VocabularyService.loadTerms().then(function(data) {
+			sc.vocabulary = data;
+		});
+
+		// custom treeview tpl
+		sc.treeviewTpl = [
+			'<div>',
+			  '<span ivh-treeview-toggle>',
+			    '<span ivh-treeview-twistie></span>',
+			  '</span>',
+			  '<span ng-if="trvw.useCheckboxes() && trvw.isLeaf(node)" ivh-treeview-checkbox></span>',
+			  '<span class="ivh-treeview-node-label" ivh-treeview-toggle>',
+			    '{{:: trvw.label(node)}}',
+			  '</span>',
+			  '<div ivh-treeview-children class="ivh-treeview-children"></div>',
+			'</div>'
+		].join('\n');
+
+		sc.toggleTerm = function(node) {
+			console.log(node);
+		};
+
+		// timeline
+		sc.timeline = {};
+		sc.timeline.range = [1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990];
+		sc.updateFilterByDecade = function(decade) {
+			sc.filter.yearfrom = decade;
+			sc.filter.yearto = decade + 9;
+		};
 	}
 
 })();
