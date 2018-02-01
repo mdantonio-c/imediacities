@@ -60,12 +60,21 @@
 						<div class="hr hr-dotted"></div>
 						<h4 class="blue smaller">
 						<i class="fa fa-tags"></i>Terms</h4>
-						<div class="tree-container">
-							<div
-								ivh-treeview="sc.vocabulary"
-								ivh-treeview-filter="sc.termSearch"
-								ivh-treeview-node-tpl="sc.treeviewTpl"
-								ivh-treeview-on-cb-change="sc.toggleTerm(ivhNode)">
+						<div class="widget-main" style="max-width: 280px;">
+							<tags-input ng-model="sc.terms"
+								placeholder="Search a term" 
+								display-property="label" add-on-paste="true"
+								on-tag-removed="sc.deselectTreeviewNode($tag)"
+								on-tag-added="sc.selectTreeviewNode($tag)">
+						      <auto-complete source="sc.loadVocabularyTerms($query)"></auto-complete>
+						    </tags-input>
+							<div class="space-4"></div>
+							<div class="tree-container">
+								<div
+									ivh-treeview="sc.vocabulary"
+									ivh-treeview-node-tpl="sc.treeviewTpl"
+									ivh-treeview-on-cb-change="sc.toggleTerm(ivhNode)">
+								</div>
 							</div>
 						</div>
 						<div class="hr hr-dotted"></div>

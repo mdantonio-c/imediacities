@@ -435,7 +435,7 @@
 
 	}
 
-	function NewSearchController($scope, DataService, NgMap, $timeout, GOOGLE_API_KEY, VocabularyService, noty) {
+	function NewSearchController($scope, DataService, NgMap, $timeout, $filter, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
@@ -471,16 +471,65 @@
 			selected: null
 		};
 
+		sc.vocabulary = [];
+		VocabularyService.loadTerms().then(function(data) {
+			sc.vocabulary = data;
+		});
+
+		sc.terms = [];
+		sc.loadVocabularyTerms = function(query) {
+			return $filter('matchTerms')(sc.vocabulary, query);
+		};
+
+		// custom treeview tpl
+		sc.treeviewTpl = [
+			'<div>',
+			  '<span ivh-treeview-toggle>',
+			    '<span ivh-treeview-twistie></span>',
+			  '</span>',
+			  '<span ng-if="trvw.useCheckboxes() && trvw.isLeaf(node)" ivh-treeview-checkbox></span>',
+			  '<span class="ivh-treeview-node-label" ivh-treeview-toggle>',
+			    '{{:: trvw.label(node)}}',
+			  '</span>',
+			  '<div ivh-treeview-children class="ivh-treeview-children"></div>',
+			'</div>'
+		].join('\n');
+
+		sc.toggleTerm = function(node) {
+			if (node.selected) {
+				// add tag
+				sc.terms.push({iri: node.id, label: node.label});
+			} else {
+				sc.terms = _.reject(sc.terms, function(el) { return el.label === node.label; });
+			}
+		};
+
+		sc.selectTreeviewNode = function(tag) {
+			if (tag.iri !== undefined) {
+				// console.log('select treeview by node id: ' + tag.iri);
+				ivhTreeviewMgr.select(sc.vocabulary, tag.iri);
+			}
+		};
+
+		self.deselectTreeviewNode = function(tag) {
+			if (tag.iri !== undefined) {
+				// console.log('deselect treeview by node id: ' + tag.iri);
+				ivhTreeviewMgr.deselect(sc.vocabulary, tag.iri);
+			}
+		};
+
 		sc.resetFilters = function() {
 			sc.inputTerm = "";
 			sc.selectedMatchFields = ['title'];
+			sc.terms = [];
 			sc.filter = {
 				type: 'all',
 				provider: null,
 				country: null,
 				iprstatus: null,
 				yearfrom: 1900,
-				yearto: 2000
+				yearto: 2000,
+				terms: sc.terms
 			};
 		};
 		sc.resetFilters();
@@ -628,29 +677,6 @@
 		};
 		sc.pageChanged = function() {
 			sc.search();
-		};
-
-		sc.vocabulary = [];
-		VocabularyService.loadTerms().then(function(data) {
-			sc.vocabulary = data;
-		});
-
-		// custom treeview tpl
-		sc.treeviewTpl = [
-			'<div>',
-			  '<span ivh-treeview-toggle>',
-			    '<span ivh-treeview-twistie></span>',
-			  '</span>',
-			  '<span ng-if="trvw.useCheckboxes() && trvw.isLeaf(node)" ivh-treeview-checkbox></span>',
-			  '<span class="ivh-treeview-node-label" ivh-treeview-toggle>',
-			    '{{:: trvw.label(node)}}',
-			  '</span>',
-			  '<div ivh-treeview-children class="ivh-treeview-children"></div>',
-			'</div>'
-		].join('\n');
-
-		sc.toggleTerm = function(node) {
-			console.log(node);
 		};
 
 		// timeline
