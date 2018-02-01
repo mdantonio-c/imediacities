@@ -253,10 +253,16 @@ class Search(GraphBaseOperations):
             meta_response["countByProviders"] = group_by_providers
 
         # count result by year
-        count_by_year_query = "match (n:AVEntity) with collect({year: substring(head(n.production_years), 0, 3)}) as rows " \
-            "match (n:NonAVEntity) WITH rows + collect({year: substring(head(n.date_created), 0, 3)}) as allRows " \
-            "UNWIND allRows as row " \
-            "RETURN row.year + '0' as decade, count(row) as count order by decade"
+        count_by_year_query = "MATCH (n:{entity})" \
+                " {filters} " \
+                " {match} " \
+            "WITH n, collect(substring(head(n.production_years), 0, 3)) + collect(substring(head(n.date_created), 0, 3)) as years " \
+            "UNWIND years as row " \
+            "RETURN row + '0' as decade, count(row) as count order by decade".format(
+                entity=entity,
+                filters=' '.join(filters),
+                match=multi_match_query)
+        # logger.debug(count_by_year_query)
         result_y_count = self.graph.cypher(count_by_year_query)
         group_by_years = {}
         for row in result_y_count:
