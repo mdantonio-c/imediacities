@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-loggedLandingPage = "logged.search";
+loggedLandingPage = "logged.new-search";
 
 angular.module('web').constant('customRoutes',
 {
@@ -11,6 +11,16 @@ angular.module('web').constant('customRoutes',
             "loggedview@logged": {
                 dir: 'blueprint',
                 templateUrl: 'search.html',
+            }
+        }
+    },
+
+    'logged.new-search': {
+        url: "/new-search?q",
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'new-search.html',
             }
         }
     },

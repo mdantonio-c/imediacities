@@ -130,7 +130,7 @@ definitions:
         enum:               
           - all               
           - video               
-          - image         
+          - image       
       provider:             
           type: string
       country:
@@ -140,10 +140,12 @@ definitions:
           description: production year range, start year of the range
           type: integer
           minimum: 1900
+          maximum: 2000
       yearto:
-          description: production year range, end year of the range, maximum=current year, yearto>=yearfrom
+          description: production year range, end year of the range, maximum=2000, yearto>=yearfrom
           type: integer
           minimum: 1900
+          maximum: 2000
       iprstatus:
           description: IPR status
           type: string

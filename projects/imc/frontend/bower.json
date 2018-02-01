@@ -36,7 +36,8 @@
     "bootstrap-treeview": "^1.2.0",
     "angular-ui-tree": "^2.22.6",
     "ng-tags-input": "^3.2.0",
-    "angular-ivh-treeview": "^1.1.0"
+    "angular-ivh-treeview": "^1.1.0",
+    "google-marker-cluster": "*"
   },
   "devDependencies": {
     "angular-mocks": "~1.5.5"
