@@ -1,8 +1,6 @@
 (function() {
 'use strict';
 
-loggedLandingPage = "logged.search";
-
 angular.module('web').constant('customRoutes',
 {
     'logged.search': {

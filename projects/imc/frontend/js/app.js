@@ -1,25 +1,25 @@
 (function() {
     'use strict';
 
-    angular
-        .module('web', [
-            'ngSanitize',
-            'ngAnimate',
-            'ngMessages',
-            'ui.router',
-            'ui.bootstrap',
-            'satellizer',
-            'cfp.hotkeys',
-            'formly',
-            'formlyBootstrap',
-            'angular.chips',
-            'flow',
-            'tableSort',
-            'ngMap',
-            'googlechart',
-            'ngFileSaver',
-            'ivh.treeview',
-            'ngTagsInput'
-        ]);
+    angular.module('web', [
+        'ngSanitize',
+        'ngAnimate',
+        'ngMessages',
+        'ui.router',
+        'ui.bootstrap',
+        'satellizer',
+        'cfp.hotkeys',
+        'formly',
+        'formlyBootstrap',
+/*        'angular.chips',*/
+        'tableSort',
+/*        'flow',*/
+        'ngFileSaver',
+
+        'ngMap',
+        'googlechart',
+        'ivh.treeview',
+        'ngTagsInput'
+    ]);
 
 })();
