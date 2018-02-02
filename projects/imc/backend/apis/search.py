@@ -179,12 +179,19 @@ class Search(GraphBaseOperations):
             # TERMS
             terms = filtering.get('terms')
             if terms:
+                term_clauses = []
                 iris = [term['iri'] for term in terms if 'iri' in term]
-                logger.debug(iris)
-                filters.append(
-                    "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) \
-                    WHERE body.iri IN {iris}".format(
-                        iris=iris))
+                if iris:
+                    term_clauses.append('body.iri IN {iris}'.format(iris=iris))
+                free_terms = [term['label'] for term in terms if 'iri' not in term and 'label' in term]
+                if free_terms:
+                    term_clauses.append('body.value IN {free_terms}'.format(
+                        free_terms=free_terms))
+                if term_clauses:
+                    filters.append(
+                        "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) \
+                        WHERE {clauses}".format(
+                            clauses=' or '.join(term_clauses)))
 
         # first request to get the number of elements to be returned
         countv = "MATCH (n:{entity})" \
