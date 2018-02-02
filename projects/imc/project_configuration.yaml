@@ -35,6 +35,11 @@ releases:
 
 variables:
 
+variables:
+  repos:
+    frontend:
+      branch: 0.6.1
+
   env:
     COMPOSE_PROJECT_NAME: imc
     PROJECT_DOMAIN: imediacities.hpc.cineca.it
