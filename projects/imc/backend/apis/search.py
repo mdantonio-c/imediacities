@@ -176,6 +176,15 @@ class Search(GraphBaseOperations):
                             yfrom=year_from, yto=year_to))
                 filters.append("MATCH (n) WHERE {clauses}".format(
                     clauses=' or '.join(date_clauses)))
+            # TERMS
+            terms = filtering.get('terms')
+            if terms:
+                iris = [term['iri'] for term in terms if 'iri' in term]
+                logger.debug(iris)
+                filters.append(
+                    "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) \
+                    WHERE body.iri IN {iris}".format(
+                        iris=iris))
 
         # first request to get the number of elements to be returned
         countv = "MATCH (n:{entity})" \
@@ -239,12 +248,12 @@ class Search(GraphBaseOperations):
                 " {filters} " \
                 " {match} " \
                 "MATCH (n)-[:RECORD_SOURCE]->(r:RecordSource)-[:PROVIDED_BY]->(p:Provider) " \
-                "WITH distinct p, count(n) as numberOfCreations " \
+                "WITH distinct p, count(distinct n) as numberOfCreations " \
                 "RETURN p.identifier, numberOfCreations".format(
                     entity=entity,
                     filters=' '.join(filters),
                     match=multi_match_query)
-            logger.debug(count_by_provider_query)
+            # logger.debug(count_by_provider_query)
             result_p_count = self.graph.cypher(count_by_provider_query)
             group_by_providers = {}
             for row in result_p_count:
@@ -256,7 +265,7 @@ class Search(GraphBaseOperations):
         count_by_year_query = "MATCH (n:{entity})" \
                 " {filters} " \
                 " {match} " \
-            "WITH n, collect(substring(head(n.production_years), 0, 3)) + collect(substring(head(n.date_created), 0, 3)) as years " \
+            "WITH distinct n WITH collect(substring(head(n.production_years), 0, 3)) + collect(substring(head(n.date_created), 0, 3)) as years " \
             "UNWIND years as row " \
             "RETURN row + '0' as decade, count(row) as count order by decade".format(
                 entity=entity,
@@ -267,7 +276,6 @@ class Search(GraphBaseOperations):
         group_by_years = {}
         for row in result_y_count:
             group_by_years[row[0]] = row[1]
-        logger.debug(group_by_years)
         meta_response["countByYears"] = group_by_years
 
         return self.force_response(data, meta=meta_response)

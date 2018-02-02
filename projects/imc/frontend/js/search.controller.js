@@ -531,6 +531,8 @@
 				yearto: 2000,
 				terms: sc.terms
 			};
+			ivhTreeviewMgr.deselectAll(sc.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
 		sc.resetFilters();
 
