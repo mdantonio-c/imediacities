@@ -1,0 +1,343 @@
+<div ng-controller='NewSearchController as sc'>
+	<!-- PAGE CONTENT BEGINS -->
+	<div class="row search-page">
+		<div class="col-xs-12">
+			<div class="row">
+				<div class="col-xs-12 col-sm-4 col-md-3">
+					<div class="search-area well well-sm">
+						<div class="search-filter-header bg-primary">
+							<h5 class="smaller no-margin-bottom">
+							<i class="imc-icon fa fa-sliders light-green bigger-130"></i>&nbsp; Refine your Search
+							</h5>
+						</div>
+						<div class="space-8"></div>
+						<form>
+							<div class="row">
+								<div class="col-xs-12 col-sm-11 col-md-10">
+									<div class="input-group">
+										<input ng-attr-type="text" 
+											class="form-control"
+											ng-model="sc.inputTerm"
+											ng-attr-placeholder="Look within results"
+											ng-trim="true"
+											name="input-term">
+										<div class="input-group-btn">
+											<button type="button" class="btn btn-default no-border btn-sm" ng-click="sc.search()">
+												<i class="imc-icon fa fa-search icon-on-right bigger-110"></i>
+											</button>
+										</div>
+									</div>
+									<!-- <div class="form-group">
+										<label class="checkbox-inline" ng-repeat="matchField in sc.matchFields">
+							                <input 
+							                	type="checkbox"
+							                	name="selectedMatchFields[]"
+							                	value="{{matchField}}"
+							                	ng-checked="sc.selectedMatchFields.indexOf(matchField) > -1"
+							                	ng-click="sc.toggleMatchFieldSelection(matchField)"
+							                	> {{matchField}}
+							            </label>
+							        </div> -->
+								</div>
+							</div>
+						</form>
+						<div class="hr hr-dotted"></div>
+						<h4 class="blue smaller">
+						<i class="fa fa-filter bigger-110"></i>
+						Content type
+						</h4>
+						<div id="toggle-item-type" class="btn-group btn-overlap" data-toggle="buttons" style="height: 2.4em;">
+							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.video" uib-btn-checkbox>
+								<i class="icon-only imc-icon fa fa-video-camera bigger-110" ng-class="{'bigger-180': sc.itemType.video}"></i>
+							</label>
+							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.image" uib-btn-checkbox>
+								<i class="icon-only imc-icon fa fa-camera bigger-110" ng-class="{'bigger-180': sc.itemType.image}"></i>
+							</label>
+							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.text" uib-btn-checkbox ng-disabled="true">
+								<i class="icon-only imc-icon fa fa-align-left bigger-110" ng-class="{'bigger-180': sc.itemType.text}"></i>
+							</label>
+						</div>
+						<div class="hr hr-dotted"></div>
+						<h4 class="blue smaller">
+						<i class="fa fa-tags"></i>Terms</h4>
+						<div class="widget-main" style="max-width: 280px;">
+							<tags-input ng-model="sc.terms"
+								placeholder="Search a term" 
+								display-property="label" add-on-paste="true"
+								on-tag-removed="sc.deselectTreeviewNode($tag)"
+								on-tag-added="sc.selectTreeviewNode($tag)">
+						      <auto-complete source="sc.loadVocabularyTerms($query)"></auto-complete>
+						    </tags-input>
+							<div class="space-4"></div>
+							<div class="tree-container">
+								<div
+									ivh-treeview="sc.vocabulary"
+									ivh-treeview-node-tpl="sc.treeviewTpl"
+									ivh-treeview-on-cb-change="sc.toggleTerm(ivhNode)">
+								</div>
+							</div>
+						</div>
+						<div class="hr hr-dotted"></div>
+						<h4 class="blue smaller">
+						<i class="fa fa-map-marker light-orange bigger-110"></i>
+						City
+						</h4>
+						<div>
+							<select class="form-control" ng-model="sc.cities.selected" ng-options="o as o for o in sc.cities.options | orderBy">
+								<option value=""></option>
+							</select>
+						</div>
+						<div class="hr hr-dotted"></div>
+						<h4 class="blue smaller">
+						<i class="fa fa-calendar light-grey bigger-110"></i>
+						Production Date
+						</h4>
+						<div class="search-filter-element">
+							<div class="form-group">
+								<div class="input-group date-range">
+									<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
+									<input class="input-num" style="min-width: 50px;" 
+										type="number" ng-model="sc.filter.yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+									<input class="input-num" style="min-width: 50px;"
+										type="number" ng-model="sc.filter.yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+								</div>
+								<div class="space-4"></div>
+								<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="sc.filter.yearfrom" value-max="sc.filter.yearto"></slider-range>
+							</div>
+						</div>
+						<div class="hr hr-dotted"></div>
+						<h4 class="blue smaller">
+						<i class="fa fa-copyright light-grey bigger-110"></i>
+						Rights Status
+						</h4>
+						<div>
+							<select class="form-control" ng-model="sc.iprstatuses.selected" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
+								<option value=""></option>
+							</select>
+						</div>
+						<div class="hr hr-dotted hr-24"></div>
+						<div class="text-center">
+							<button type="button" class="btn btn-default btn-sm btn-white" ng-click="sc.resetFilters()">
+							<i class="imc-icon fa fa-remove red2"></i>
+							Reset
+							</button>
+							<button type="button" class="btn btn-default btn-white" ng-click="sc.search()">
+							<i class="imc-icon fa fa-refresh green"></i>
+							Update
+							</button>
+						</div>
+						<div class="space-4"></div>
+					</div>
+				</div>
+				<!-- results list-->
+				<div class="col-xs-12 col-sm-8 col-md-9">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="search-area well col-xs-12">
+								<div class="pull-left">
+									<b class="text-primary">
+									  <span ng-hide="sc.loading">{{sc.totalItems}}</span>
+									  <span ng-show="sc.loading">
+									  	<i class="fa fa-spinner fa-spin blue" aria-hidden="true" style="font-size:12px"></i>
+									  </span>
+									  results</b>
+								</div>
+								<div class="pull-right" ng-if="sc.creations.length > 0">
+									<b class="text-primary">Display</b>
+									&nbsp;
+									<div id="toggle-result-format" class="btn-group btn-overlap" data-toggle="buttons">
+										<label class="btn btn-lg btn-white" ng-class="{'btn-success': sc.displayMode==='Grid', 'btn-grey': sc.displayMode!=='Grid'}" uib-tooltip="Thumbnail view" ng-model="sc.displayMode" uib-btn-radio="'Grid'">
+											<i class="icon-only imc-icon fa fa-th"></i>
+										</label>
+										<label class="btn btn-lg btn-white" ng-class="{'btn-primary': sc.displayMode==='List', 'btn-grey': sc.displayMode!=='List'}" uib-tooltip="List view" ng-model="sc.displayMode" uib-btn-radio="'List'">
+											<i class="icon-only imc-icon fa fa-list"></i>
+										</label>
+										<label class="btn btn-lg btn-white " ng-class="{'btn-warning': sc.displayMode==='Map', 'btn-grey': sc.displayMode!=='Map'}" uib-tooltip="Map&nbsp;view" ng-model="sc.displayMode" uib-btn-radio="'Map'">
+											<i class="icon-only imc-icon fa fa-crosshairs"></i>
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="loader col-xs-12" ng-show="sc.loading" style="text-align: center">
+								<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
+							</div>
+						</div>
+					</div>
+					<div class="row" ng-if="!sc.loading && sc.creations.length == 0">
+						<div class="col-xs-12">
+							<div class="no-results">
+								<h2>No Results</h2>
+								<p>Your search returned no results</p>
+							</div>
+						</div>
+					</div>
+					<div class="row" ng-if="!sc.loading && sc.creations.length > 0">
+						<div class="col-xs-12">
+							<div class="row" ng-hide="sc.displayMode != 'Map'">
+								<div class="col-xs-12">
+									<div class="panel">
+										<!-- <div class="panel-heading"></div> -->
+										<div class="panel-content">
+											<div class="map-view">
+												<div class="view-header">
+													<!--loader block-->
+													<div class="loader" ng-show="!sc.mapLoaded"></div>
+													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
+														<ng-map ng-show="sc.mapLoaded" default-style="true" center="{{sc.mapCenter}}" zoom="{{sc.mapZoom}}" disable-default-u-i="true"
+														zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
+															<info-window id="tag-iw">
+																<div ng-non-bindable="">
+																	id: {{sc.markerTag.id}}<br/>
+																	name: {{sc.markerTag.name}}<br/>
+																	Position : {{sc.markerTag.position}}
+																</div>
+															</info-window>
+														</ng-map>
+													</div>
+												</div>
+												<div class="view-content">
+													<div style="display:inline-block;width:100%;overflow-y:auto;">
+													<ul class="timeline timeline-horizontal">
+														<li class="timeline-item" ng-repeat="decade in sc.timeline.range | orderBy">
+															<div class="timeline-badge info">
+																<i class="imc-icon fa fa-circle-o"></i>
+																<time class="text-primary timeline-time" datetime="{{decade}}">{{decade}}</time>
+															</div>
+															<div class="timeline-panel" ng-if="sc.countByYears[decade]" ng-click="sc.updateFilterByDecade(decade)">
+																<div class="timeline-body"><b>{{sc.countByYears[decade]}}</b></div>
+															</div>
+														</li>
+													</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row" ng-hide="sc.displayMode != 'Grid'">
+								<div ng-if="sc.creations.length > 0">
+									<div ng-repeat-start="media in sc.creations track by $index" class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+									<div class="media-thumbnail search-thumbnail">
+										<div class="media-image-wrapper">
+											<span class="search-item label bigger-180">
+												<!-- <i class="imc-icon fa fa-camera light-blue"></i> -->
+												<span class="fa-stack">
+												  <i class="imc-icon fa fa-circle-thin fa-stack-2x"></i>
+												  <i class="imc-icon fa fa-stack-1x light-blue" ng-class="{'fa-video-camera': media.relationships.item[0].attributes.item_type === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type === 'Text'}"></i>
+												</span>
+											</span>
+											<img class="media-object" data-src="holder.js/100px200?theme=gray" alt="100%x200" style="height: 200px; width: 100%; display: block;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22234%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20234%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_160c140bbf2%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A12pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_160c140bbf2%22%3E%3Crect%20width%3D%22234%22%20height%3D%22200%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2284.8046875%22%20y%3D%22105.1%22%3E234x200%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true">
+										</div>
+										<div class="caption">
+											<div class="clearfix">
+												<span class="pull-right label label-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+												<div class="pull-left bigger-110">
+													<i class="imc-icon fa fa-eye light-blue"></i>
+													<i class="imc-icon fa fa-asterisk light-blue"></i>
+													<i class="imc-icon fa fa-heart light-blue"></i>
+												</div>
+											</div>
+											<h3 class="search-title">
+											<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
+											<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+											</h3>
+											<p class="text">
+												<i class="imc-icon fa fa-quote-left"></i>
+												{{media.relationships.descriptions[0].attributes.text}}
+											</p>
+										</div>
+									</div>
+									</div>
+									<div ng-repeat-end>
+										<div class="clearfix visible-lg-block" ng-if="($index+1) % 4 == 0"></div>
+										<div class="clearfix visible-md-block" ng-if="($index+1) % 3 == 0"></div>
+										<div class="clearfix visible-sm-block" ng-if="($index+1) % 2 == 0"></div>
+										<div class="clearfix visible-xs-block" ng-if="($index+1) % 1 == 0"></div>
+									</div>
+								</div>
+							</div>
+							<div class="row" ng-hide="sc.displayMode != 'List'">
+								<div class="col-xs-12">
+									<div ng-if="sc.creations.length > 0">
+										<div class="media search-media" ng-repeat="media in sc.creations">
+											<div class="media-left">
+												<img ng-src="{{media.links['thumbnail']}}" ng-if="media.links['thumbnail']"/>
+												<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="media.links['thumbnail'] == null"/>
+												<div class="cn">
+													<div class="inner">
+														<i class="fa small" ng-class="{'fa-video-camera': media.relationships.item[0].attributes.item_type === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+													</div>
+												</div>
+											</div>
+											<div class="media-body">
+												<div>
+													<h4 class="media-heading">
+													<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
+													<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+													</h4>
+													<span>
+														<i ng-if="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
+														<i ng-if="media.attributes.date_created > 0">({{media.attributes.date_created[0]}})</i>
+													</span>
+											<!--<span ng-repeat="contributor in directors = (media.relationships.contributors | contributorsByRole:'Director')">{{contributor.attributes.names[0] | nocomma}}{{$last ? '' : ', '}}</span>
+													-->
+												</div>
+												<div class="space-4"></div>
+												<p class="text">
+													<i class="imc-icon fa fa-quote-left"></i>
+													{{media.relationships.descriptions[0].attributes.text}}
+												</p>
+												<div class="search-actions text-center">
+													<div class="duration" ng-if="media.type == 'aventity'">
+														<i class="imc-icon fa fa-clock-o"></i>
+														<span class="blue">{{media.relationships.item[0].attributes.duration | parseNum}}</span>
+													</div>
+													<span class="label label-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+													<div class="action-buttons bigger-125 pull-down">
+														<a href="#">
+															<i class="imc-icon fa fa-eye light-blue"></i>
+														</a>
+														<a href="#">
+															<i class="imc-icon fa fa-asterisk light-blue"></i>
+														</a>
+														<a href="#">
+															<i class="imc-icon fa fa-heart light-blue"></i>
+														</a>
+													</div>
+													<!-- <a class="search-btn-action btn btn-sm btn-block btn-info">Tag it!</a> -->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="space-8"></div>
+							<!-- pagination -->
+							<div class="row" ng-show="sc.displayMode != 'Map'">
+								<div class="col-xs-12">
+									<div class="search-area well well-sm text-center">
+										<ul uib-pagination
+											total-items="sc.totalItems"
+											items-per-page="sc.pager.itemsPerPage"
+											ng-model="sc.pager.currentPage"
+											ng-change="sc.pageChanged()"
+											boundary-links="true"
+											max-size="sc.pager.maxSize"
+											rotate="true"
+											force-ellipses="true"
+											previous-text="&lsaquo;"
+											next-text="&rsaquo;"
+											first-text="&laquo;"
+										last-text="&raquo;"></ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
