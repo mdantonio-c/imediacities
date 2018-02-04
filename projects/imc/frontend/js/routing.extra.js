@@ -13,6 +13,16 @@ angular.module('web').constant('customRoutes',
         }
     },
 
+    'logged.new-search': {
+        url: "/new-search?q",
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'new-search.html',
+            }
+        }
+    },
+
     'logged.search.watch': {
         url: "/watch?v",
         params: {

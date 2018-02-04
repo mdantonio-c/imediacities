@@ -1,0 +1,4 @@
+file: annotations_search
+class: SearchAnnotations
+mapping:
+  search_annotations: "/annotations/search"

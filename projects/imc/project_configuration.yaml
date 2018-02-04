@@ -56,7 +56,7 @@ variables:
     GRAPHDB_PASSWORD: chooseapassword
 
     SMTP_ADMIN: m.dantonio@cineca.it
-    SMTP_HOST: mail.cineca.it 
+    SMTP_HOST: mail.cineca.it
     SMTP_PORT: 587
     SMTP_USERNAME: hpc-service-noreply@cineca.it
     SMTP_PASSWORD: dnt%01u
@@ -97,6 +97,8 @@ bower_components:
   ng-tags-input:
     - ng-tags-input.min.css
     - ng-tags-input.min.js
+  google-marker-cluster:
+    - markerclusterer.js
 
 css: 
   - "custom/imc.css"

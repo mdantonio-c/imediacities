@@ -125,6 +125,38 @@ function DataService($log, api, $q, jsonapi_parser) {
         }
     };
 
+    self.getGeoDistanceAnnotations = function (distance, pin, cFilter) {
+        var filter = {
+            filter: {
+                type: "TAG",
+                geo_distance: {
+                    distance: distance,
+                    location: {
+                        lat: pin[0],
+                        long: pin[1]
+                    }
+                }
+            }
+        };
+        if (cFilter !== undefined) {
+            filter.filter.creation = cFilter;
+        }
+        console.log(angular.toJson(filter, true));
+        return api.apiCall('annotations/search', 'POST', filter, undefined, true);
+    };
+
+    self.saveUser = function(data) {
+        return api.apiCall('admin/users', 'POST', data);
+    };
+
+    self.deleteUser = function(user) {
+        return api.apiCall('admin/users/'+user, 'DELETE');
+    };
+
+    self.updateUser = function(user, data) {
+        return api.apiCall('admin/users/'+user, 'PUT', data);
+    };
+
     self.getGroupSchema = function(study) {
         var data = {'get_schema': true};
         return api.apiCall('admin/groups', 'POST', data);
