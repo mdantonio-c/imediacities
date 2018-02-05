@@ -23,11 +23,11 @@ releases:
   '1.2.0':
     type: beta
     rapydo: 0.5.7
-    status: developing
+    status: released 
   '1.2.1':
     type: beta
     rapydo: 0.6.0
-    status: developing
+    status: released 
   '1.2.2':
     type: beta
     rapydo: 0.6.1
