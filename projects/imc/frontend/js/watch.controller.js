@@ -1220,10 +1220,10 @@
 
 	}
 
-	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
+	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 
 		var vm = this;
-		vm.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI&sensor=false&callback=initializeMap&libraries=places";
+		vm.googleMapsUrl = GOOGLE_API_KEY;
 		vm.videolat = null;
 		vm.videolng = null;
 		vm.locname = null;
