@@ -64,11 +64,15 @@ function DataService($log, api, $q, jsonapi_parser) {
     self.getVideoShots = function(videoId) {
         return api.apiCall('videos/'+videoId+'/shots', 'GET');
     };
-
+/*
     self.getUserSchema = function(study) {
         return self.getParametersSchema('admin/users');
-        //return self.getParametersSchema('admin/users');
     };
+*/
+    self.getUserSchema = function(study) {
+        return api.apiCall('admin/users', 'POST', {'get_schema': true});
+    }
+
 
     self.getUsers = function() {
         // var endpoint = 'admin/users';
