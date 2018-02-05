@@ -742,6 +742,24 @@
 		self.showmeli = true;
 		self.video = $stateParams.meta;
 
+		var intervalRewind;
+
+		$scope.rew = function() {
+        // Don't start a new rewind if we are already doing it
+        if ( angular.isDefined(intervalRewind) ) return;
+
+		intervalRewind = $interval(function(){
+       		myVid[0].playbackRate = 1.0;
+       		if(myVid[0].currentTime == 0){
+				$scope.stopBack();
+           			myVid[0].pause();
+      			}
+       			else{
+           			myVid[0].currentTime += -.1;
+       			}
+            },20);
+        };
+
 		self.inputVocTerm = "";
 		// inizialize status of video format accordion
 		$scope.statusAccor = {
@@ -793,6 +811,7 @@
 		// Play video function
 		function playVid(video) {
 			// console.log('play video');
+			$scope.stopBack();
 			if (myVid[0].paused && !self.onplaying) {
 				self.onpause = false;
 				self.onplaying = true;
@@ -803,6 +822,8 @@
 
 		self.playPause = function() {
 			// console.log('pause video');
+			//myVid[0].playbackRate = 1.0;
+			$scope.stopBack();
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
 				self.onplaying = false;
@@ -817,9 +838,53 @@
 
 		// Pause video
 		self.pauseVideo = function() {
+
+			//myVid[0].playbackRate = 1.0;
+			$scope.stopBack();
+
 			self.onpause = true;
 			self.onplaying = false;
 			myVid[0].pause();
+		};
+
+		/*video controllers*/
+
+        $scope.stopBack = function() {
+          if (angular.isDefined(intervalRewind)) {
+            $interval.cancel(intervalRewind);
+            intervalRewind = undefined;
+          }
+        };
+
+		self.fastForward = function() {
+				myVid[0].playbackRate = 4.0;
+				playVid(myVid[0]);
+		};
+
+		self.backward = function() {
+			$scope.rew();
+		};
+
+		self.stepForward = function() {
+       		myVid[0].playbackRate = 1.0;
+       			if(myVid[0].currentTime == 0){
+					$scope.stopBack();
+           			myVid[0].pause();
+      			}
+       			else{
+           			myVid[0].currentTime -= -.1;
+       			}
+		};
+
+		self.stepBackward = function() {
+       		myVid[0].playbackRate = 1.0;
+       			if(myVid[0].currentTime == 0){
+					$scope.stopBack();
+           			//myVid[0].pause();
+      			}
+       			else{
+           			myVid[0].currentTime += -.1;
+       			}
 		};
 
 		self.manualtag = function(mode) {

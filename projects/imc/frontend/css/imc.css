@@ -1230,6 +1230,14 @@ button.btn:active {
 	margin-top: 10px;
 }
 
+.video-tools-container { 
+	position: absolute; 
+	right: 0; 
+	top: auto;
+	z-index: 12;
+	margin-top: 100px;
+}
+
 .btn.btn-app.btn-xs {
     width: 64px;
     font-size: 15px;
@@ -1241,6 +1249,17 @@ button.btn:active {
 
 .btn.btn-app.anno-tools-btn.btn-xs { width: 42px }
 .btn.btn-app.anno-tools-btn {
+	display: block;
+	text-align: center;
+	border-radius: 6px 0 0 6px;
+	opacity: .45;
+	vertical-align: top;
+	margin: 0;
+}
+
+/*for video tools*/
+.btn.btn-app.video-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.video-tools-btn {
 	display: block;
 	text-align: center;
 	border-radius: 6px 0 0 6px;
