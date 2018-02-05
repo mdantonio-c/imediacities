@@ -1044,7 +1044,7 @@
 									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
 									var name = (anno.bodies[j].type === 'textualbody') ? 
 										anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
-									var termIRI = anno.bodies[0].attributes.iri;
+									var termIRI = anno.bodies[j].attributes.iri;
 									var user_creator = anno.creator.id;
 									var annoInfo = {
 										uuid: anno.id,
