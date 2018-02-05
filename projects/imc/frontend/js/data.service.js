@@ -64,21 +64,6 @@ function DataService($log, api, $q, jsonapi_parser) {
     self.getVideoShots = function(videoId) {
         return api.apiCall('videos/'+videoId+'/shots', 'GET');
     };
-/*
-    self.getUserSchema = function(study) {
-        return self.getParametersSchema('admin/users');
-    };
-*/
-    self.getUserSchema = function(study) {
-        return api.apiCall('admin/users', 'POST', {'get_schema': true});
-    }
-
-
-    self.getUsers = function() {
-        // var endpoint = 'admin/users';
-        var endpoint = 'admin/users';
-        return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
-    };
 
     self.saveTagAnnotations = function(target, tags) {
         var data = {};
@@ -157,18 +142,6 @@ function DataService($log, api, $q, jsonapi_parser) {
             filter.filter.creation = cFilter;
         }
         return api.apiCall('annotations/search', 'POST', filter, undefined, true);
-    };
-
-    self.saveUser = function(data) {
-        return api.apiCall('admin/users', 'POST', data);
-    };
-
-    self.deleteUser = function(user) {
-        return api.apiCall('admin/users/'+user, 'DELETE');
-    };
-
-    self.updateUser = function(user, data) {
-        return api.apiCall('admin/users/'+user, 'PUT', data);
     };
 
     self.getGroupSchema = function(study) {
