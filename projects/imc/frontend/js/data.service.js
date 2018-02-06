@@ -144,6 +144,32 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations/search', 'POST', filter, undefined, true);
     };
 
+    self.getRelavantCreations = function(relevantCreations) {
+        var data = {
+            'relevant-list': []
+        };
+        for (var uuid of relevantCreations.keys()) {
+            var item = {
+                'creation-id': uuid,
+                'place-ids': Array.from(relevantCreations.get(uuid))
+            };
+            data['relevant-list'].push(item);
+        }
+        return api.apiCall('search_place', 'POST', data, undefined, true);
+    };
+
+    self.saveUser = function(data) {
+        return api.apiCall('custom_admin/users', 'POST', data);
+    };
+
+    self.deleteUser = function(user) {
+        return api.apiCall('custom_admin/users/'+user, 'DELETE');
+    };
+
+    self.updateUser = function(user, data) {
+        return api.apiCall('custom_admin/users/'+user, 'PUT', data);
+    };
+
     self.getGroupSchema = function(study) {
         var data = {'get_schema': true};
         return api.apiCall('admin/groups', 'POST', data);
