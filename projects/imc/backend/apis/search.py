@@ -183,7 +183,8 @@ class Search(GraphBaseOperations):
                 iris = [term['iri'] for term in terms if 'iri' in term]
                 if iris:
                     term_clauses.append('body.iri IN {iris}'.format(iris=iris))
-                free_terms = [term['label'] for term in terms if 'iri' not in term and 'label' in term]
+                free_terms = [term['label']
+                              for term in terms if 'iri' not in term and 'label' in term]
                 if free_terms:
                     term_clauses.append('body.value IN {free_terms}'.format(
                         free_terms=free_terms))
@@ -270,8 +271,8 @@ class Search(GraphBaseOperations):
 
         # count result by year
         count_by_year_query = "MATCH (n:{entity})" \
-                " {filters} " \
-                " {match} " \
+            " {filters} " \
+            " {match} " \
             "WITH distinct n WITH collect(substring(head(n.production_years), 0, 3)) + collect(substring(head(n.date_created), 0, 3)) as years " \
             "UNWIND years as row " \
             "RETURN row + '0' as decade, count(row) as count order by decade".format(

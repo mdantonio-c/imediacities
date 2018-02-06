@@ -588,6 +588,7 @@
 		sc.mapZoom = 3;
 		sc.mapCenter = [53.00,20.34];
 		sc.dynMarkers = [];
+		sc.mapTags = [];
 
 		sc.search = function() {
 			sc.loading = true;
@@ -619,6 +620,21 @@
 						if (sc.filter.provider !== null) {
 							sc.mapZoom = 14;
 							sc.mapCenter = getPosition(sc.filter.provider);
+							DataService.getGeoDistanceAnnotations(2, sc.mapCenter).then(
+								function(response) {
+									sc.mapTags = response.data.Response.data;
+									angular.forEach(sc.mapTags, function(tag, index){
+										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
+										var marker = new google.maps.Marker({ position: latLng, id: tag.iri, name: tag.name });
+										google.maps.event.addListener(marker, 'click', function() {
+								            sc.markerTag = marker;
+								            sc.map.showInfoWindow('tag-iw', sc.markerTag);
+								        });
+								        sc.dynMarkers.push(marker);
+									});
+									updateMarkers(map);
+								}
+							);
 						} else {
 							// content from all cities represented on a map of Europe
 							sc.mapZoom = 4;
@@ -641,10 +657,9 @@
 							} else {
 								console.warn('expected content count by provider');
 							}
+							updateMarkers(map);
 						}
-						sc.markerClusterer = new MarkerClusterer(
-							map, sc.dynMarkers, {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
-						sc.mapLoaded = true;
+						
 					});
 				},
 				function(out_data) {
@@ -660,6 +675,14 @@
 				});
 		};
 		sc.search();
+
+		function updateMarkers(map) {
+			sc.markerClusterer = new MarkerClusterer(
+				map, sc.dynMarkers, {
+					imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
+				});
+			sc.mapLoaded = true;
+		}
 
 		// force map resize
 		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
