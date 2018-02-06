@@ -134,6 +134,22 @@ function DataService($log, api, $q, jsonapi_parser) {
         }
     };
 
+    self.getGeoDistanceAnnotations = function (distance, pin) {
+        var filter = {
+            filter: {
+                type: "TAG",
+                geo_distance: {
+                    distance: distance,
+                    location: {
+                        lat: pin[0],
+                        long: pin[1]
+                    }
+                }
+            }
+        };
+        return api.apiCall('annotations/search', 'POST', filter, undefined, true);
+    };
+
     self.saveUser = function(data) {
         return api.apiCall('custom_admin/users', 'POST', data);
     };

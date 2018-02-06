@@ -183,6 +183,13 @@
 													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
 														<ng-map ng-show="sc.mapLoaded" default-style="true" center="{{sc.mapCenter}}" zoom="{{sc.mapZoom}}" disable-default-u-i="true"
 														zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
+															<info-window id="tag-iw">
+																<div ng-non-bindable="">
+																	id: {{sc.markerTag.id}}<br/>
+																	name: {{sc.markerTag.name}}<br/>
+																	Position : {{sc.markerTag.position}}
+																</div>
+															</info-window>
 														</ng-map>
 													</div>
 												</div>
