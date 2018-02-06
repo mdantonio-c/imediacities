@@ -1446,9 +1446,9 @@ li.ivh-treeview-node::before {
   height: 100%;
 }
 
-.date-range {
+/*.date-range {
   margin-left: 10%;
-}
+}*/
 
 /* Medium devices (desktops, 900px and up) */
 @media (max-width: 640px) {
@@ -1592,6 +1592,16 @@ li.ivh-treeview-node::before {
 	padding: 12px;
 	background-color: #FFF;
 	border: 1px solid #C9DDE7
+}
+
+.search-filter-element .date-range {
+	/*margin: 0 auto;
+    width: 15.4em;*/
+    margin-left: 10%;
+}
+
+.date-range input {
+	min-width: 50px;
 }
 
 .search-results {

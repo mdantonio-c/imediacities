@@ -518,6 +518,8 @@
 			}
 		};
 
+		sc.minProductionYear = 1890;
+		sc.maxProductionYear = 1999;
 		sc.resetFilters = function() {
 			sc.inputTerm = "";
 			sc.selectedMatchFields = ['title'];
@@ -527,8 +529,8 @@
 				provider: null,
 				country: null,
 				iprstatus: null,
-				yearfrom: 1900,
-				yearto: 2000,
+				yearfrom: sc.minProductionYear,
+				yearto: sc.maxProductionYear,
 				terms: sc.terms
 			};
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);

@@ -3,7 +3,7 @@
 	<div class="row search-page">
 		<div class="col-xs-12">
 			<div class="row">
-				<div class="col-xs-12 col-sm-3">
+				<div class="col-xs-12 col-sm-4 col-md-3">
 					<div class="search-area well well-sm">
 						<div class="search-filter-header bg-primary">
 							<h5 class="smaller no-margin-bottom">
@@ -96,11 +96,13 @@
 							<div class="form-group">
 								<div class="input-group date-range">
 									<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
-									<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="sc.filter.yearfrom"/>
-									<input class="input-num" style="max-width: 36%; max-height: 30%;" type="number" ng-model="sc.filter.yearto"/>
+									<input class="input-num" style="min-width: 50px;" 
+										type="number" ng-model="sc.filter.yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+									<input class="input-num" style="min-width: 50px;"
+										type="number" ng-model="sc.filter.yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
 								</div>
 								<div class="space-4"></div>
-								<slider-range min="1900" max="2000" step="1" value-min="sc.filter.yearfrom" value-max="sc.filter.yearto"></slider-range>
+								<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="sc.filter.yearfrom" value-max="sc.filter.yearto"></slider-range>
 							</div>
 						</div>
 						<div class="hr hr-dotted"></div>
@@ -128,7 +130,7 @@
 					</div>
 				</div>
 				<!-- results list-->
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-12 col-sm-8 col-md-9">
 					<div class="row">
 						<div class="col-xs-12">
 							<div class="search-area well col-xs-12">
@@ -215,7 +217,7 @@
 							</div>
 							<div class="row" ng-hide="sc.displayMode != 'Grid'">
 								<div ng-if="sc.creations.length > 0">
-									<div ng-repeat-start="media in sc.creations track by $index" class="col-md-3 col-sm-4 col-xs-6">
+									<div ng-repeat-start="media in sc.creations track by $index" class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
 									<div class="media-thumbnail search-thumbnail">
 										<div class="media-image-wrapper">
 											<span class="search-item label bigger-180">
@@ -248,9 +250,10 @@
 									</div>
 									</div>
 									<div ng-repeat-end>
-										<div class="clearfix visible-md-block visible-lg-block" ng-if="($index+1) % 4 == 0"></div>
-										<div class="clearfix visible-sm-block" ng-if="($index+1) % 3 == 0"></div>
-										<div class="clearfix visible-xs-block" ng-if="($index+1) % 2 == 0"></div>
+										<div class="clearfix visible-lg-block" ng-if="($index+1) % 4 == 0"></div>
+										<div class="clearfix visible-md-block" ng-if="($index+1) % 3 == 0"></div>
+										<div class="clearfix visible-sm-block" ng-if="($index+1) % 2 == 0"></div>
+										<div class="clearfix visible-xs-block" ng-if="($index+1) % 1 == 0"></div>
 									</div>
 								</div>
 							</div>
