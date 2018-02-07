@@ -46,15 +46,15 @@
 						<i class="fa fa-filter bigger-110"></i>
 						Content type
 						</h4>
-						<div id="toggle-item-type" class="btn-group btn-overlap" data-toggle="buttons">
+						<div id="toggle-item-type" class="btn-group btn-overlap" data-toggle="buttons" style="height: 2.4em;">
 							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.video" uib-btn-checkbox>
-								<i class="icon-only imc-icon fa fa-video-camera bigger-110"></i>
+								<i class="icon-only imc-icon fa fa-video-camera bigger-110" ng-class="{'bigger-180': sc.itemType.video}"></i>
 							</label>
 							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.image" uib-btn-checkbox>
-								<i class="icon-only imc-icon fa fa-camera bigger-110"></i>
+								<i class="icon-only imc-icon fa fa-camera bigger-110" ng-class="{'bigger-180': sc.itemType.image}"></i>
 							</label>
 							<label class="btn btn-sm btn-white btn-info" ng-model="sc.itemType.text" uib-btn-checkbox ng-disabled="true">
-								<i class="icon-only imc-icon fa fa-align-left bigger-110"></i>
+								<i class="icon-only imc-icon fa fa-align-left bigger-110" ng-class="{'bigger-180': sc.itemType.text}"></i>
 							</label>
 						</div>
 						<div class="hr hr-dotted"></div>
