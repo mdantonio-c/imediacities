@@ -518,12 +518,28 @@
 			}
 		};
 
+		sc.itemType = {
+			video: true,
+			image: true,
+			text: false
+		};
+		$scope.$watch('sc.itemType', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (newValue.video && newValue.image) sc.filter.type='all';
+				else if (newValue.video) sc.filter.type='video';
+				else if (newValue.image) sc.filter.type='image';
+				else if (newValue.text) sc.filter.type='text';
+			}
+		}, true);
+
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 		sc.resetFilters = function() {
 			sc.inputTerm = "";
 			sc.selectedMatchFields = ['title'];
 			sc.terms = [];
+			sc.itemType.video = true;
+			sc.itemType.image = true;
 			sc.filter = {
 				type: 'all',
 				provider: null,
@@ -538,19 +554,6 @@
 		};
 		sc.resetFilters();
 
-		sc.itemType = {
-			video: true,
-			image: true,
-			text: false
-		};
-		$scope.$watch('sc.itemType', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) sc.filter.type='all';
-				else if (newValue.video) sc.filter.type='video';
-				else if (newValue.image) sc.filter.type='image';
-				else if (newValue.text) sc.filter.type='text';
-			}
-		}, true);
 		$scope.$watch('sc.cities.selected', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				var res = null;
