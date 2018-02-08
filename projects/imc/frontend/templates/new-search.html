@@ -242,10 +242,10 @@
 											<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
 											<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 											</h3>
-											<div class="text">
+											<p class="text">
 												<i class="imc-icon fa fa-quote-left"></i>
 												{{media.relationships.descriptions[0].attributes.text}}
-											</div>
+											</p>
 										</div>
 									</div>
 									</div>
@@ -262,9 +262,16 @@
 									<div ng-if="sc.creations.length > 0">
 										<div class="media search-media" ng-repeat="media in sc.creations">
 											<div class="media-left">
-												<a href="#">
+												<!-- <a href="#">
 													<img class="media-object" data-src="holder.js/72x72" alt="72x72" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2272%22%20height%3D%2272%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2072%2072%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_160b6cab263%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_160b6cab263%22%3E%3Crect%20width%3D%2272%22%20height%3D%2272%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2216.6796875%22%20y%3D%2240.5%22%3E72x72%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E" data-holder-rendered="true" style="width: 72px; height: 72px;">
-												</a>
+												</a> -->
+												<img ng-src="{{media.links['thumbnail']}}" ng-if="media.links['thumbnail']"/>
+												<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="media.links['thumbnail'] == null"/>
+												<div class="cn">
+													<div class="inner">
+														<i class="fa small" ng-class="{'fa-video-camera': media.relationships.item[0].attributes.item_type === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+													</div>
+												</div>
 											</div>
 											<div class="media-body">
 												<div>
@@ -272,20 +279,25 @@
 													<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
 													<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 													</h4>
-													<!--
-													<i ng-if="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
-											<span ng-repeat="contributor in directors = (media.relationships.contributors | contributorsByRole:'Director')">{{contributor.attributes.names[0] | nocomma}}{{$last ? '' : ', '}}</span>
+													<span>
+														<i ng-if="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
+														<i ng-if="media.attributes.date_created > 0">({{media.attributes.date_created[0]}})</i>
+													</span>
+											<!--<span ng-repeat="contributor in directors = (media.relationships.contributors | contributorsByRole:'Director')">{{contributor.attributes.names[0] | nocomma}}{{$last ? '' : ', '}}</span>
 													-->
 												</div>
-												<div class="text">
+												<div class="space-4"></div>
+												<p class="text">
 													<i class="imc-icon fa fa-quote-left"></i>
 													{{media.relationships.descriptions[0].attributes.text}}
-												</div>
+												</p>
 												<div class="search-actions text-center">
-													<!-- <span class="text-info">$</span>
-													<span class="blue bolder bigger-150">300</span>
-													monthly -->
-													<div class="action-buttons bigger-125">
+													<div class="duration" ng-if="media.type == 'aventity'">
+														<i class="imc-icon fa fa-clock-o"></i>
+														<span class="blue">{{media.relationships.item[0].attributes.duration | parseNum}}</span>
+													</div>
+													<span class="label label-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+													<div class="action-buttons bigger-125 pull-down">
 														<a href="#">
 															<i class="imc-icon fa fa-eye light-blue"></i>
 														</a>
@@ -296,7 +308,7 @@
 															<i class="imc-icon fa fa-heart light-blue"></i>
 														</a>
 													</div>
-													<a class="search-btn-action btn btn-sm btn-block btn-info">Tag it!</a>
+													<!-- <a class="search-btn-action btn btn-sm btn-block btn-info">Tag it!</a> -->
 												</div>
 											</div>
 										</div>
