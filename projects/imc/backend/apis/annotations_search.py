@@ -10,6 +10,7 @@ from restapi.exceptions import RestApiException
 from utilities import htmlcodes as hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from imc.models import codelists
 
 logger = get_logger(__name__)
 
@@ -17,6 +18,8 @@ logger = get_logger(__name__)
 class SearchAnnotations(GraphBaseOperations):
 
     allowed_anno_types = ('TAG', 'VIM', 'TVS')
+    allowed_item_types = ('all', 'video', 'image', 'text')
+    allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -52,8 +55,10 @@ class SearchAnnotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             filters.append("WHERE anno.annotation_type='{anno_type}'".format(
                 anno_type=anno_type))
-            filters.append('MATCH (creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
-            projections.append('collect({title:creation.identifying_title, uuid:creation.uuid}) AS creations')
+            filters.append(
+                'MATCH (creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
+            projections.append(
+                'collect(distinct {title:creation.identifying_title, uuid:creation.uuid, year:head(creation.production_years)}) AS creations')
             if anno_type == 'TAG':
                 # look for geo distance filter
                 geo_distance = filtering.get('geo_distance')
@@ -67,8 +72,123 @@ class SearchAnnotations(GraphBaseOperations):
                     filters.append("MATCH (anno)-[:HAS_BODY]-(body:ResourceBody) "
                                    "WHERE body.spatial IS NOT NULL AND "
                                    "distance(cityPosition, point({latitude:body.spatial[0], longitude:body.spatial[1]})) < (distanceInKm * 1000)")
-                    projections.append("distance(cityPosition, point({longitude:body.spatial[0],latitude:body.spatial[1]})) as distance")
+                    projections.append(
+                        "distance(cityPosition, point({longitude:body.spatial[0],latitude:body.spatial[1]})) as distance")
                     order_by = "ORDER BY distance"
+            creation = filtering.get('creation')
+            if creation is not None:
+                c_match = creation.get('match')
+                if c_match is not None:
+                    term = c_match.get('term', '').strip()
+                    if not term:
+                        raise RestApiException('Term input cannot be empty',
+                                               status_code=hcodes.HTTP_BAD_REQUEST)
+                    multi_match = []
+                    multi_match_where = []
+                    multi_match_query = ''
+                    # clean up term from '*'
+                    term = term.replace("*", "")
+
+                    fields = c_match.get('fields')
+                    if fields is None or len(fields) == 0:
+                        raise RestApiException('Match term fields cannot be empty',
+                                               status_code=hcodes.HTTP_BAD_REQUEST)
+                    for f in fields:
+                        if f not in self.__class__.allowed_term_fields:
+                            raise RestApiException(
+                                "Bad field: expected one of %s" %
+                                (self.__class__.allowed_term_fields, ),
+                                status_code=hcodes.HTTP_BAD_REQUEST)
+                        if not term:
+                            # catch '*'
+                            break
+                        if f == 'title':
+                            multi_match.append("(creation)-[:HAS_TITLE]->(t:Title)")
+                            multi_match_where.append(
+                                "t.text =~ '(?i).*{term}.*'".format(term=term))
+                        elif f == 'description':
+                            multi_match.append(
+                                "(creation)-[:HAS_DESCRIPTION]->(d:Description)")
+                            multi_match_where.append(
+                                "d.text =~ '(?i).*{term}.*'".format(term=term))
+                        elif f == 'keyword':
+                            multi_match.append("(creation)-[:HAS_KEYWORD]->(k:Keyword)")
+                            multi_match_where.append(
+                                "k.term =~ '(?i){term}'".format(term=term))
+                        elif f == 'contributor':
+                            multi_match.append("(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
+                            multi_match_where.append(
+                                "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
+                        else:
+                            # should never be reached
+                            raise RestApiException(
+                                'Unexpected field type',
+                                status_code=hcodes.HTTP_SERVER_ERROR)
+                    if len(multi_match) > 0:
+                        multi_match_query = "MATCH " + ', '.join(multi_match) \
+                            + " WHERE " + ' OR '.join(multi_match_where)
+                        # logger.debug(multi_match_query)
+                        filters.append(multi_match_query)
+
+                c_filter = creation.get('filter')
+                # TYPE
+                c_type = c_filter.get('type', 'all')
+                c_type = c_type.strip().lower()
+                if c_type not in self.__class__.allowed_item_types:
+                    raise RestApiException(
+                        "Bad item type parameter: expected one of %s" %
+                        (self.__class__.allowed_item_types, ),
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                if c_type != 'all':
+                    filters.append("MATCH (i) WHERE i.item_type =~ '(?i){c_type}'"
+                                   .format(c_type=c_type))
+                # IPR STATUS
+                c_iprstatus = c_filter.get('iprstatus')
+                if c_iprstatus is not None:
+                    c_iprstatus = c_iprstatus.strip()
+                    if codelists.fromCode(c_iprstatus, codelists.RIGHTS_STATUS) is None:
+                        raise RestApiException(
+                            'Invalid IPR status code for: ' + c_iprstatus)
+                    filters.append(
+                        "MATCH (creation) WHERE creation.rights_status = '{iprstatus}'".format(
+                            iprstatus=c_iprstatus))
+                # PRODUCTION YEAR
+                c_year_from = c_filter.get('yearfrom')
+                c_year_to = c_filter.get('yearto')
+                if c_year_from is not None or c_year_to is not None:
+                    # set defaults if year is missing
+                    c_year_from = '1890' if c_year_from is None else str(c_year_from)
+                    c_year_to = '1999' if c_year_to is None else str(c_year_to)
+                    date_clauses = []
+                    if c_type == 'video' or c_type == 'all':
+                        date_clauses.append(
+                            "ANY(item IN creation.production_years WHERE item >= '{yfrom}') \
+                            and ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
+                                yfrom=c_year_from, yto=c_year_to))
+                    if c_type == 'image' or c_type == 'text' or c_type == 'all':
+                        date_clauses.append(
+                            "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') \
+                            and ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
+                                yfrom=c_year_from, yto=c_year_to))
+                    filters.append("MATCH (creation) WHERE {clauses}".format(
+                        clauses=' or '.join(date_clauses)))
+                # ANNOTATED TERMS
+                terms = c_filter.get('terms')
+                if terms:
+                    term_clauses = []
+                    iris = [term['iri'] for term in terms if 'iri' in term]
+                    if iris:
+                        term_clauses.append('term.iri IN {iris}'.format(iris=iris))
+                    free_terms = [term['label']
+                                  for term in terms if 'iri' not in term and 'label' in term]
+                    if free_terms:
+                        term_clauses.append('term.value IN {free_terms}'.format(
+                            free_terms=free_terms))
+                    if term_clauses:
+                        filters.append(
+                            "MATCH (i)<-[:SOURCE]-(anno2)-[:HAS_BODY]-(term) WHERE {clauses}"
+                            .format(
+                                clauses=' or '.join(term_clauses)))
 
         # first request to get the number of elements to be returned
         countv = "{starters} MATCH (anno:Annotation)" \

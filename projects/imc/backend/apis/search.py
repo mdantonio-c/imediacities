@@ -87,7 +87,7 @@ class Search(GraphBaseOperations):
                 elif f == 'contributor':
                     multi_match.append("(n)-[:CONTRIBUTED_BY]->(a:Agent)")
                     multi_match_where.append(
-                        "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
+                        "ANY(item in a.names where item =~ '(?i){term}')".format(term=term))
                 else:
                     # should never be reached
                     raise RestApiException(
@@ -160,8 +160,8 @@ class Search(GraphBaseOperations):
             year_to = filtering.get('yearto')
             if year_from is not None or year_to is not None:
                 # set defaults if year is missing
-                year_from = '1900' if year_from is None else str(year_from)
-                year_to = '2000' if year_to is None else str(year_to)
+                year_from = '1890' if year_from is None else str(year_from)
+                year_to = '1999' if year_to is None else str(year_to)
                 # FIXME: this DO NOT work with image
                 date_clauses = []
                 if item_type == 'video' or item_type == 'all':
