@@ -627,7 +627,16 @@
 						if (sc.filter.provider !== null) {
 							sc.mapZoom = 14;
 							sc.mapCenter = getPosition(sc.filter.provider);
-							DataService.getGeoDistanceAnnotations(2, sc.mapCenter).then(
+							var cFilter = {
+								filter: sc.filter
+							};
+							if (sc.inputTerm !== '') {
+								cFilter.match = {
+									term: sc.inputTerm,
+									fields: sc.selectedMatchFields
+								};
+							}
+							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
 								function(response) {
 									sc.mapTags = response.data.Response.data;
 									angular.forEach(sc.mapTags, function(tag, index){
