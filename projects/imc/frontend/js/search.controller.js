@@ -540,6 +540,8 @@
 			sc.terms = [];
 			sc.itemType.video = true;
 			sc.itemType.image = true;
+			sc.iprstatuses.selected = null;
+			sc.cities.selected = null;
 			sc.filter = {
 				type: 'all',
 				provider: null,
