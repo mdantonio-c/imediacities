@@ -592,10 +592,18 @@
 
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
-		sc.mapZoom = 3;
-		sc.mapCenter = [53.00,20.34];
+		sc.mapZoom = 4;
+		sc.mapCenter = [50.00,20.34];
 		sc.dynMarkers = [];
 		sc.mapTags = [];
+
+		sc.centerEurope = function() {
+			sc.mapZoom = 4;
+			sc.mapCenter = [50.00,20.34];
+			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
+			sc.map.setCenter(pt);
+			sc.map.setZoom(sc.mapZoom);
+		};
 
 		sc.search = function() {
 			sc.loading = true;

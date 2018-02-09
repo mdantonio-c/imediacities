@@ -570,6 +570,7 @@ element.style {
 .orange { color: #ff892a !important }
 .orange2 { color: #feb902 !important }
 .light-orange { color: #fcac6f !important }
+.grey { color: #8c8c8c !important }
 .light-grey { color: #bbb !important }
 .blue { color: #478fca !important }
 .light-blue { color: #93CBF9 !important }
@@ -578,6 +579,8 @@ element.style {
 .bigger-180 { font-size: 180% !important }
 
 /* Button */
+button:focus {outline:0;}
+
 .btn {
     color: #FFF!important;
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
@@ -1767,6 +1770,10 @@ li.ivh-treeview-node::before {
 	background-color: #d0d0d0;
 	border-color: #d6e1ea;
     padding: .35em;
+}
+
+.map-view .map .imc-icon:hover {
+	color: #333 !important
 }
 
 /* Timeline */
