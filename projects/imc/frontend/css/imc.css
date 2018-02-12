@@ -1766,6 +1766,7 @@ li.ivh-treeview-node::before {
     text-overflow: ellipsis;
 }
 
+/* Map */
 .map-view {
 	background-color: #d0d0d0;
 	border-color: #d6e1ea;
@@ -1774,6 +1775,56 @@ li.ivh-treeview-node::before {
 
 .map-view .map .imc-icon:hover {
 	color: #333 !important
+}
+
+.map-view .map #custom-control {
+	user-select: none;
+	box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+	border-radius: 2px;
+	cursor: pointer;
+	background-color: rgb(255, 255, 255);
+	width: 28px;
+	height: 28px;
+	margin: 10px;
+}
+
+.map-view .map #custom-control button {
+	background: none;
+	display: block;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	width: 28px;
+	height: 28px;
+	top: 0px;
+	left: 0px;
+}
+
+#infowindow-content .place-info .title {
+	color: #6e7a7f;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#infowindow-content .place-item-list {
+	border-top: 1px solid rgb(204, 204, 204);
+	margin-top: 9px;
+	padding: 6px;
+	font-size: 13px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	font-family: Roboto, Arial;
+}
+
+#infowindow-content .place-item-list a {
+	cursor: pointer;
+	color: rgb(66, 127, 237);
+	text-decoration: none;
+	padding: 0px 4px;
 }
 
 /* Timeline */

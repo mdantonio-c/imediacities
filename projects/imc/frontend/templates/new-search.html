@@ -185,18 +185,26 @@
 													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
 														<ng-map ng-show="sc.mapLoaded" default-style="true" center="{{sc.mapCenter}}" zoom="{{sc.mapZoom}}" disable-default-u-i="true"
 														zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
-															<custom-control id="custom-control" position="TOP_RIGHT" index="1" draggable="false" style="user-select: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px; border-radius: 2px; cursor: pointer; background-color: rgb(255, 255, 255); width: 28px; height: 28px; margin: 10px;">
+															<custom-control id="custom-control" position="TOP_RIGHT" index="1" draggable="false">
 																<div>
-																	<button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" style="background: none; display: block; border: 0px; margin: 0px; padding: 0px; position: relative; cursor: pointer; user-select: none; width: 28px; height: 28px; top: 0px; left: 0px;" ng-click="sc.centerEurope()">
+																	<button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" ng-click="sc.centerEurope()">
 																		<i class="imc-icon fa fa-crosshairs fa-2x grey"></i>
 																	</button>
 																</div>
 															</custom-control>
 															<info-window id="tag-iw">
-																<div ng-non-bindable="">
-																	id: {{sc.markerTag.id}}<br/>
-																	name: {{sc.markerTag.name}}<br/>
-																	Position : {{sc.markerTag.position}}
+																<div ng-non-bindable="" id="infowindow-content">
+																	<div class="place-info">
+																		<span id="place-name" class="title">{{sc.markerTag.name}}</span>
+																		<br/>
+																		<span id="place-address">{{sc.markerTag.address}}</span>
+																	</div>
+																	<div class="place-item-list">
+																		<div ng-repeat="source in sc.markerTag.sources" style="display:list-item;">
+																			<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
+																			<a href ui-sref="logged.search.watch({v: source.uuid})">{{source.title}}</a><i ng-if="source.year">({{source.year}})</i>
+																		</div>
+																	</div>
 																</div>
 															</info-window>
 														</ng-map>

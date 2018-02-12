@@ -58,7 +58,7 @@ class SearchAnnotations(GraphBaseOperations):
             filters.append(
                 'MATCH (creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
             projections.append(
-                'collect(distinct {title:creation.identifying_title, uuid:creation.uuid, year:head(creation.production_years)}) AS creations')
+                'collect(distinct {title:creation.identifying_title, uuid:creation.uuid, year:head(creation.production_years), item:i.item_type}) AS creations')
             if anno_type == 'TAG':
                 # look for geo distance filter
                 geo_distance = filtering.get('geo_distance')

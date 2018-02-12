@@ -116,7 +116,6 @@
 		}];
 
 	var app = angular.module('web')
-		.constant('GOOGLE_API_KEY', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI')
 		.controller('SearchController', SearchController)
 		.controller('NewSearchController', NewSearchController);
 
@@ -435,7 +434,7 @@
 
 	}
 
-	function NewSearchController($scope, DataService, NgMap, $timeout, $filter, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
+	function NewSearchController($scope, DataService, NgMap, $timeout, $filter, GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
@@ -647,14 +646,35 @@
 							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
 								function(response) {
 									sc.mapTags = response.data.Response.data;
-									angular.forEach(sc.mapTags, function(tag, index){
+									angular.forEach(sc.mapTags, function(tag, index) {
 										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
-										var marker = new google.maps.Marker({ position: latLng, id: tag.iri, name: tag.name });
+										var marker = new google.maps.Marker({
+											position: latLng,
+											id: tag.iri,
+											name: tag.name,
+											sources: tag.sources
+										});
 										google.maps.event.addListener(marker, 'click', function() {
-								            sc.markerTag = marker;
-								            sc.map.showInfoWindow('tag-iw', sc.markerTag);
-								        });
-								        sc.dynMarkers.push(marker);
+											sc.markerTag = marker;
+											GeoCoder.geocode({
+												'placeId': marker.id
+											}).then(function(results) {
+												// look outside in order to enrich details for that given place id
+												if (results[0]) {
+													sc.markerTag.address = results[0].formatted_address;
+												} else {
+													noty.showWarning('No results found');
+												}
+											}).catch(function(error) {
+												noty.showWarning('Unable to get info for place ID: ' + marker.id);
+											}).finally(function(){
+												// should we move the center to tag position?
+												sc.map.setCenter(sc.markerTag.position);
+												sc.map.showInfoWindow('tag-iw', sc.markerTag);
+											});
+
+										});
+										sc.dynMarkers.push(marker);
 									});
 									updateMarkers(map);
 								}
@@ -707,6 +727,12 @@
 				});
 			sc.mapLoaded = true;
 		}
+
+		sc.showInfoWindow = function(marker) {
+			console.log(marker);
+			sc.markerTag = marker;
+			sc.map.showInfoWindow('tag-iw', sc.markerTag);
+		};
 
 		// force map resize
 		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
