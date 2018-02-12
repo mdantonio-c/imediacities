@@ -202,7 +202,7 @@
 																	<div class="place-item-list">
 																		<div ng-repeat="source in sc.markerTag.sources" style="display:list-item;">
 																			<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
-																			<a href ui-sref="logged.search.watch({v: source.uuid})">{{source.title}}</a><i ng-if="source.year">({{source.year}})</i>
+																			<a href ui-sref="logged.search.watch({v: source.uuid})">{{source.title || 'n/a'}}</a><i ng-if="source.year">({{source.year | limitTo:4}})</i>
 																		</div>
 																	</div>
 																</div>
@@ -218,7 +218,7 @@
 																<i class="imc-icon fa fa-circle-o"></i>
 																<time class="text-primary timeline-time" datetime="{{decade}}">{{decade}}</time>
 															</div>
-															<div class="timeline-panel" ng-if="sc.countByYears[decade]" ng-click="sc.updateFilterByDecade(decade)">
+															<div class="timeline-panel" ng-if="sc.countByYears[decade]">
 																<div class="timeline-body"><b>{{sc.countByYears[decade]}}</b></div>
 															</div>
 														</li>

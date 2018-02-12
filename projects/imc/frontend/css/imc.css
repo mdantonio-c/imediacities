@@ -1773,11 +1773,11 @@ li.ivh-treeview-node::before {
     padding: .35em;
 }
 
-.map-view .map .imc-icon:hover {
+.map #custom-control .imc-icon:hover {
 	color: #333 !important
 }
 
-.map-view .map #custom-control {
+.map #custom-control {
 	user-select: none;
 	box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
 	border-radius: 2px;
@@ -1788,7 +1788,7 @@ li.ivh-treeview-node::before {
 	margin: 10px;
 }
 
-.map-view .map #custom-control button {
+.map #custom-control button {
 	background: none;
 	display: block;
 	border: 0px;
@@ -1814,8 +1814,9 @@ li.ivh-treeview-node::before {
 	margin-top: 9px;
 	padding: 6px;
 	font-size: 13px;
+	max-height: 80px;
+    overflow: auto;
 	text-overflow: ellipsis;
-	overflow: hidden;
 	white-space: nowrap;
 	font-family: Roboto, Arial;
 }
@@ -1977,7 +1978,7 @@ li.ivh-treeview-node::before {
   left: 0 !important;
   right: 0 !important;
   width: 100%;
-  cursor: pointer;
+  /*cursor: pointer;*/
 }
 .timeline-horizontal .timeline-item .timeline-panel:before {
   top: auto;
