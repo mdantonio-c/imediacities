@@ -862,8 +862,11 @@
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
 					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 					
-					if (mode != 'location') {
+					if (mode == 'term') {
 						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+					}
+					else if (mode == 'notes') {
+						myTagModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
 					}
 					else if (mode == 'location') {
 						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
@@ -1044,7 +1047,7 @@
 									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
 									var name = (anno.bodies[j].type === 'textualbody') ? 
 										anno.bodies[j].attributes.value : anno.bodies[j].attributes.name;
-									var termIRI = anno.bodies[0].attributes.iri;
+									var termIRI = anno.bodies[j].attributes.iri;
 									var user_creator = anno.creator.id;
 									var annoInfo = {
 										uuid: anno.id,

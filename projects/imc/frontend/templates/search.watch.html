@@ -37,6 +37,13 @@
 							uib-tooltip="Tag&nbsp;by term">
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('notes');"
+							tooltip-placement="right"
+							uib-tooltip="Notes">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+						</div>
 					</div>
 					<video id="videoarea"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
@@ -344,7 +351,33 @@
 			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
 		</div>
 	</script>
+	<!-- notes modal -->
+	<script type="text/ng-template" id="myModalNotes.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
+			<h4 class="modal-title">Add a free text to this shot</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-4">
+					<p>Shot starting time (sec): <b>{{startT | date:'mm:ss'}}</b> ending: <b>{{endT | date:'mm:ss'}}</b></p>
+					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+				</div>
+				<div class="col-sm-4">
+					
 
+				</div>
+				<div class="col-sm-4">
+					
+
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmNotes()">Confirm</button>
+		</div>
+	</script>
 	<script type="text/ng-template" id="termFoundModal.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="cancel()">x</button>
