@@ -56,9 +56,9 @@ class SearchAnnotations(GraphBaseOperations):
             filters.append("WHERE anno.annotation_type='{anno_type}'".format(
                 anno_type=anno_type))
             filters.append(
-                'MATCH (creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
+                'MATCH (title:Title)<-[:HAS_TITLE]-(creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
             projections.append(
-                'collect(distinct {title:creation.identifying_title, uuid:creation.uuid, year:head(creation.production_years), item:i.item_type}) AS creations')
+                'collect(distinct creation{.*, type:i.item_type, titles }) AS creations')
             if anno_type == 'TAG':
                 # look for geo distance filter
                 geo_distance = filtering.get('geo_distance')
@@ -103,7 +103,8 @@ class SearchAnnotations(GraphBaseOperations):
                             # catch '*'
                             break
                         if f == 'title':
-                            multi_match.append("(creation)-[:HAS_TITLE]->(t:Title)")
+                            multi_match.append(
+                                "(creation)-[:HAS_TITLE]->(t:Title)")
                             multi_match_where.append(
                                 "t.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'description':
@@ -112,11 +113,13 @@ class SearchAnnotations(GraphBaseOperations):
                             multi_match_where.append(
                                 "d.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'keyword':
-                            multi_match.append("(creation)-[:HAS_KEYWORD]->(k:Keyword)")
+                            multi_match.append(
+                                "(creation)-[:HAS_KEYWORD]->(k:Keyword)")
                             multi_match_where.append(
                                 "k.term =~ '(?i){term}'".format(term=term))
                         elif f == 'contributor':
-                            multi_match.append("(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
+                            multi_match.append(
+                                "(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
                             multi_match_where.append(
                                 "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                         else:
@@ -157,7 +160,8 @@ class SearchAnnotations(GraphBaseOperations):
                 c_year_to = c_filter.get('yearto')
                 if c_year_from is not None or c_year_to is not None:
                     # set defaults if year is missing
-                    c_year_from = '1890' if c_year_from is None else str(c_year_from)
+                    c_year_from = '1890' if c_year_from is None else str(
+                        c_year_from)
                     c_year_to = '1999' if c_year_to is None else str(c_year_to)
                     date_clauses = []
                     if c_type == 'video' or c_type == 'all':
@@ -178,7 +182,8 @@ class SearchAnnotations(GraphBaseOperations):
                     term_clauses = []
                     iris = [term['iri'] for term in terms if 'iri' in term]
                     if iris:
-                        term_clauses.append('term.iri IN {iris}'.format(iris=iris))
+                        term_clauses.append(
+                            'term.iri IN {iris}'.format(iris=iris))
                     free_terms = [term['label']
                                   for term in terms if 'iri' not in term and 'label' in term]
                     if free_terms:
@@ -203,12 +208,13 @@ class SearchAnnotations(GraphBaseOperations):
 
         query = "{starters} MATCH (anno:Annotation)" \
                 " {filters} " \
+                "WITH body, i, cityPosition, creation, collect(distinct title) AS titles " \
                 "RETURN DISTINCT body, {projections} {orderBy}".format(
                     starters=' '.join(starters),
                     filters=' '.join(filters),
                     projections=', '.join(projections),
                     orderBy=order_by)
-        logger.debug(query)
+        # logger.debug(query)
 
         data = []
         result = self.graph.cypher(query)
@@ -220,7 +226,28 @@ class SearchAnnotations(GraphBaseOperations):
                 'name': body.name,
                 'spatial': body.spatial
             }
-            res['sources'] = row[1]
+            res['sources'] = []
+            for source in row[1]:
+                creation = {
+                    'uuid': source['uuid'],
+                    'external_ids': source['external_ids'],
+                    'rights_status': source['rights_status'],
+                    'type': source['type']
+                }
+                # PRODUCTION YEAR: get the first year in the array
+                if 'production_years' in source:
+                    creation['year'] = source['production_years'][0]
+                elif 'date_created' in source:
+                    creation['year'] = source['date_created'][0]
+                # TITLE
+                if 'identifying_title' in source:
+                    creation['title'] = source['identifying_title']
+                elif 'titles' in source and len(source['titles']) > 0:
+                    # at the moment get the first always!
+                    title_node = self.graph.Title.inflate(source['titles'][0])
+                    creation['title'] = title_node.text
+                res['sources'].append(creation)
+
             res['distance'] = row[2]
             # creator = self.graph.User.inflate(row[3])
             # res['creator'] = {
