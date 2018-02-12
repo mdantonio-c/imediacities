@@ -150,7 +150,6 @@ function DataService($log, api, $q, jsonapi_parser) {
         if (cFilter !== undefined) {
             filter.filter.creation = cFilter;
         }
-        console.log(angular.toJson(filter, true));
         return api.apiCall('annotations/search', 'POST', filter, undefined, true);
     };
 
