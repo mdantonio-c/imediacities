@@ -229,6 +229,18 @@
 										</div>
 									</div>
 								</div>
+								<div class="col-xs-12">
+									<div class="loader col-xs-12" ng-show="sc.loadingMapResults" style="text-align: center">
+										<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
+									</div>
+									<div ng-repeat="res in sc.mapResults track by $index" ng-show="!sc.loadingMapResults" class="col-md-6 col-sm-12">
+										<h4>{{res.source.title}}</h4>
+									</div>
+									<div ng-repeat-end>
+										<div class="clearfix visible-md-block visible-lg-block" ng-if="($index+1) % 2 == 0"></div>
+										<div class="clearfix visible-sm-block visible-xs-block" ng-if="($index+1) % 1 == 0"></div>
+									</div>
+								</div>
 							</div>
 							<div class="row" ng-hide="sc.displayMode != 'Grid'">
 								<div ng-if="sc.creations.length > 0">
