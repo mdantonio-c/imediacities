@@ -757,7 +757,7 @@
        			else{
            			myVid[0].currentTime += -.1;
        			}
-            },20);
+            },30);
         };
 
 		self.inputVocTerm = "";
