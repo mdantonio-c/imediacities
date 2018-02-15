@@ -734,7 +734,7 @@
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
 
-	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
+	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, sharedProperties) {
 
 		var self = this;
