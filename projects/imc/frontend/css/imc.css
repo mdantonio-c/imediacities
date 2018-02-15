@@ -1958,3 +1958,112 @@ li.ivh-treeview-node::before {
   padding-right: 1.5%;
 }
 
+
+/*----------------------------------------------
+       The modal of the free text -- cinzia
+-----------------------------------------------*/
+.modal-div-1
+{
+	height: 200px;
+    padding-top: 20px;
+}
+.modal-div-select-0{
+	display: inline-block;
+}
+.modal-div-select-1
+{
+	display: inline-block;
+}
+.modal-div-select-2
+{
+	display: inline-block;
+}
+.modal-select-0{
+	padding: 3px;
+	background-color: #f5f5f5;
+}
+.modal-select-1
+{
+	padding: 3px;
+	background-color: #f5f5f5;
+}
+.modal-select-2
+{
+	padding: 3px;
+	background-color: #f5f5f5;
+}
+
+
+/*----------------------------------------------
+       The tab with the free texts -- cinzia
+-----------------------------------------------*/
+.tab-notes
+{
+	overflow: hidden;
+}
+.tab-notes-title
+{
+	color: #6e7a7f;
+    font-weight: bold;
+    font-size: 20px;
+}
+.tab-list-notes
+{
+	display: inline-block;
+	border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    width: 70%;
+    height: 500px;
+    vertical-align: top;
+    overflow-y: scroll;
+}
+.tab-list-note
+{
+	padding: 10px;
+}
+.tab-list-shots
+{
+	display: inline-block;
+    width: 100px;
+    height: 500px;
+    overflow-y: scroll;
+}
+.note-user-icon
+{
+	color: #ddd;
+}
+.note-user-name
+{
+	color: #aaa;
+    font-size: large;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+.note-date{
+	margin-left: 30px;
+    color: #aaa;
+}
+.note-text{
+	color: #aaa;
+}
+.tab-list-notes>.note-text>.imc-icon:first-child {
+    padding-right:  10px;
+}
+.tab-list-shot
+{
+	border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 5px;
+    background-color: #eee;
+}
+.tab-list-shot-selected
+{
+	border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 5px;
+    background-color: #fff;
+}

@@ -113,6 +113,20 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations', 'POST', data);
     };
 
+    self.saveFreeText = function(target, note) {
+        var data = {};
+        data.target = target;
+        var body = {};
+        body.type = "TextualBody";
+        body.purpose = "commenting"; // TODO nella form però ho tre categorie: notes, description, bibliography
+        body.value = note.text;
+        body.language = note.language;
+        // TODO public / private ???
+        data.body = body;
+        
+        return api.apiCall('annotations', 'POST', data);  // TODO manca la gestione nella API stessa di questo nuovo caso
+    };
+
     self.saveGeoAnnotation = function(target, source, spatial) {
         var data = {
             target: target,

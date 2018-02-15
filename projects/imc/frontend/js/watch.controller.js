@@ -3,6 +3,7 @@
 
 	var app = angular.module('web')
 		.controller('TagController', TagController)
+		.controller('NotesController', NotesController)
 		.controller('geoResultController', geoResultController)
 		.controller('WatchController', WatchController)
 		.controller('MapController', MapController)
@@ -36,6 +37,27 @@
 					templateUrl: template || 'myModalGeoCode.html',
 					controller: 'TagController',
 					controllerAs: '$tagCtrl',
+					size: size,
+					appendTo: parentElem,
+					resolve: {
+						params: function() {
+							return params;
+						}
+					}
+				});
+			}
+		};
+	}).factory('myNotesModalFactory', function($uibModal, $document) {
+		/* modal view for adding free text */
+		return {
+			open: function(size, template, params) {
+				console.log("opening notes modal");
+				var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+				return $uibModal.open({
+					animation: true,
+					templateUrl: template,
+					controller: 'NotesController',
+					controllerAs: '$notesCtrl',
 					size: size,
 					appendTo: parentElem,
 					resolve: {
@@ -735,7 +757,7 @@
 	}
 
 	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
-			DataService, noty, myTagModalFactory, sharedProperties) {
+			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
 		var self = this;
 		var vid = $stateParams.v;
@@ -753,6 +775,9 @@
 		};
 		// to visualize annotations in tab table
 		self.annotations = [];
+
+		// to visualize notes in tab table
+		self.notes = [];		
 
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
@@ -866,7 +891,7 @@
 						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
 					}
 					else if (mode == 'notes') {
-						myTagModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
+						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
 					}
 					else if (mode == 'location') {
 						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
@@ -1058,7 +1083,25 @@
 									};
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
+							}else if (anno.attributes.annotation_type.key === 'COMMENTING') {
+								// mi aspetto che il free text/notes abbia un solo body
+								var text = anno.bodies[0].attributes.value;
+								var user_creator1 = anno.creator.id;
+								// TODO manca la categoria: notes, description, bibliography
+								// TODO manca la lingua
+								// TODO manca la gestione public/private ? 
+								//       ma forse è il backend che mi manda solo quelle che posso vedere ?
+								var noteInfo = {
+									uuid: anno.id,
+									text: text,
+									creator: user_creator1
+								};
+								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+
+							}else{
+								console.log('not handled annotation type = '+anno.attributes.annotation_type.key);
 							}
+
 						}
 						self.storyshots.push(sbFields);
 						
@@ -1210,7 +1253,26 @@
 				};						
 			self.annotations.push(anno);
 		});
-
+		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
+			var startTime, endTime;
+			if (noteInfo === null) {
+				// just refresh the notes tab
+				// TODO
+			}
+			// update the notes tab
+			startTime = timelineToDate(shotInfo.startT);
+			endTime = timelineToDate(shotInfo.endT);
+			var note = {
+					id: noteInfo.uuid,
+					text: noteInfo.text,
+					creator: noteInfo.creator,
+					shotid: shotInfo.uuid,
+					shotNum: shotInfo.shotNum,
+					startT: shotInfo.startT,
+					endT: shotInfo.endT
+				};						
+			self.notes.push(note);
+		});
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
 			angular.forEach(self.annotations, function(anno) {
@@ -1551,7 +1613,78 @@
 		};
 
 	}
+	// Please note that $modalInstance represents a modal window (instance) dependency.
+	// It is not the same as the $uibModal service used above.
+	function NotesController($scope, $rootScope, $uibModalInstance, $filter, DataService, sharedProperties, params) {
 
+		var self = this;
+		
+		$scope.startT = sharedProperties.getStartTime();
+		$scope.endT = sharedProperties.getEndTime();
+		$scope.group = sharedProperties.getGroup();
+		$scope.labelTerm = sharedProperties.getLabelTerm();
+		$scope.shotPNGImage = sharedProperties.getShotPNG();
+		$scope.IRI = sharedProperties.getIRI();
+		$scope.shotID = sharedProperties.getShotId();
+		$scope.shotNum = sharedProperties.getShotNum();
+		// free text/notes
+		// all the existing notes for the video
+		self.notes = [];
+		// the new note the user is creating
+		self.note = {};
+		self.note.audience = "private"; // mandatory
+		self.note.category = "notes"; // mandatory
+		self.note.language = ""; // optional
+		self.note.text = ""; // mandatory
+		self.note.purpose = "commenting"; // mandatory 
+		
+		self.confirmNote = function() {
+			var vid = sharedProperties.getVideoId();
+			var target = 'shot:' + $scope.shotID;
+
+			if (self.note.text && self.note.text.length > 0) {
+				// save the free text into the database
+				DataService.saveFreeText(target, self.note).then(
+					function(resp) {
+						console.log(resp.data);
+						var noteId = resp.data.id;
+						var creatorId = resp.data.relationships.creator[0].id;
+						console.log('Note saved successfully. ID: ' + noteId);
+						// TODO manca la categoria: notes, description, bibliography
+						// TODO manca la lingua
+						// TODO manca la gestione public/private ?
+						var noteInfo = {
+							"uuid": noteId,
+							"text": self.note.text,
+							"creator": creatorId
+						};
+						var shotInfo = {
+							"uuid": $scope.shotID,
+							"shotNum": $scope.shotNum,
+							"startT": $scope.startT,
+							"endT": $scope.endT
+						};
+						$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+					},
+					function(err) {
+						// TODO
+					});
+			}
+			$uibModalInstance.close(null);
+		};
+
+		self.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+			ivhTreeviewMgr.deselectAll(self.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
+		};
+
+		self.alerts = [];
+		self.closeAlert = function(index) {
+			self.alerts.splice(index, 1);
+		};
+
+	}
 	function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
 
 		$scope.geoResult = params.result;
