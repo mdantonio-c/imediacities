@@ -1,0 +1,5 @@
+file: search_place 
+class: SearchPlace 
+# baseuri: "/api"
+mapping:
+  search_place: "/search_place"

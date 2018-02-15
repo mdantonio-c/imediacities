@@ -646,6 +646,7 @@
 							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
 								function(response) {
 									sc.mapTags = response.data.Response.data;
+									var relevantCreations = new Map();
 									angular.forEach(sc.mapTags, function(tag, index) {
 										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
 										var marker = new google.maps.Marker({
@@ -654,6 +655,16 @@
 											name: tag.name,
 											sources: tag.sources
 										});
+										// update relavant creations
+										for (var i=0; i<tag.sources.length; i++) {
+											var uuid = tag.sources[i].uuid;
+											if(!relevantCreations.has(uuid)) {
+												relevantCreations.set(uuid, new Set([tag.iri]));
+											} else {
+											    relevantCreations.get(uuid).add(tag.iri);
+											}
+										}
+
 										google.maps.event.addListener(marker, 'click', function() {
 											sc.markerTag = marker;
 											GeoCoder.geocode({
@@ -677,6 +688,15 @@
 										sc.dynMarkers.push(marker);
 									});
 									updateMarkers(map);
+									sc.loadingMapResults = true;
+									DataService.getRelavantCreations(relevantCreations).then(function(response) {
+										sc.mapResults = response.data.Response.data;
+										console.log(sc.mapResults);
+									}).catch(function(error) {
+										noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
+									}).finally(function() {
+										sc.loadingMapResults = false;
+									});
 								}
 							);
 						} else {
