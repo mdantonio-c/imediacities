@@ -811,7 +811,6 @@
 		// Play video function
 		function playVid(video) {
 			// console.log('play video');
-			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 			if (myVid[0].paused && !self.onplaying) {
 				self.onpause = false;
