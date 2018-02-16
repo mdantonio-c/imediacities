@@ -128,7 +128,7 @@
 								<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="v.links['thumbnail'] == null"/>
 								<div class="cn">
 									<div class="inner">
-										<i class="fa small" ng-class="{'fa-video-camera': v.relationships.item[0].attributes.item_type === 'Video', 'fa-image': v.relationships.item[0].attributes.item_type === 'Image'}">&nbsp;&nbsp;{{v.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+										<i class="fa small" ng-class="{'fa-video-camera': v.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': v.relationships.item[0].attributes.item_type.key === 'Image'}">&nbsp;&nbsp;{{v.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
 									</div>
 								</div>
 							</div>
