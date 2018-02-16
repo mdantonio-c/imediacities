@@ -811,6 +811,7 @@
 		// Play video function
 		function playVid(video) {
 			// console.log('play video');
+			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 			if (myVid[0].paused && !self.onplaying) {
 				self.onpause = false;
@@ -822,7 +823,7 @@
 
 		self.playPause = function() {
 			// console.log('pause video');
-			//myVid[0].playbackRate = 1.0;
+			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
@@ -839,7 +840,7 @@
 		// Pause video
 		self.pauseVideo = function() {
 
-			//myVid[0].playbackRate = 1.0;
+			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 
 			self.onpause = true;
