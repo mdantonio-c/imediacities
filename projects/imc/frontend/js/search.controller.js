@@ -721,6 +721,8 @@
 							} else {
 								console.warn('expected content count by provider');
 							}
+							// clean up relevant creations under the map
+							sc.mapResults = [];
 							updateMarkers(map);
 						}
 						
