@@ -691,7 +691,7 @@
 									sc.loadingMapResults = true;
 									DataService.getRelavantCreations(relevantCreations).then(function(response) {
 										sc.mapResults = response.data.Response.data;
-										console.log(sc.mapResults);
+										// console.log(sc.mapResults);
 									}).catch(function(error) {
 										noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
 									}).finally(function() {

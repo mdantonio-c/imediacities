@@ -234,7 +234,7 @@
 									<div class="loader col-xs-12" ng-show="sc.loadingMapResults" style="text-align: center">
 										<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
 									</div>
-									<div ng-repeat="media in sc.mapResults track by $index" ng-show="!sc.loadingMapResults" class="col-md-6 col-sm-12">
+									<div ng-repeat-start="media in sc.mapResults track by $index" ng-show="!sc.loadingMapResults" class="col-md-6 col-sm-12">
 										<div class="media-thumbnail search-thumbnail">
 											<div class="row">
 												<div class="col-sm-4" style="padding-right: 5px;">
