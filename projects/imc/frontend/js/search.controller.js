@@ -604,6 +604,31 @@
 			sc.map.setZoom(sc.mapZoom);
 		};
 
+		function centerMap(place) {
+			if (place === undefined) { return; }
+			// console.log(place);
+			var lat = place.lat,
+				lng = place.lng;
+			/*sc.mapCenter = [lat, lng];
+			sc.mapZoom = 14;*/
+			if (lat === undefined || lng === undefined) { return; }
+			var pt = new google.maps.LatLng(lat, lng);
+			sc.map.setCenter(pt);
+			//sc.map.setZoom(sc.mapZoom);
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < place.viewport.length; i++) {
+				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
+				bounds.extend(latlng);
+			}
+			sc.map.fitBounds(bounds);
+		}
+
+		$scope.$watch('sc.inputPlaceDetails', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				centerMap(sc.inputPlaceDetails);
+			}
+		}, true);
+
 		sc.search = function() {
 			sc.loading = true;
 			// at the moment search term ONLY in the title

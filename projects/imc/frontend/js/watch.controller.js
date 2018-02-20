@@ -374,6 +374,10 @@
 					} else {
 						result.photo_reference = '';
 					}
+					result.viewport = [
+						place.geometry.viewport.getNorthEast(),
+						place.geometry.viewport.getSouthWest()
+					];
 				}
 				return result;
 			}
