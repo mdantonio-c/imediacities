@@ -60,7 +60,6 @@ services:
     volumes:
       - ${VANILLA_DIR}/data/graphdata:/data
     ports:
-      - 9090:7474
       - 7687:7687
     environment:
       # NEO4J_dbms_memory_pagecache_size: 1024M
