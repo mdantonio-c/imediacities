@@ -1837,6 +1837,17 @@ li.ivh-treeview-node::before {
 	left: 0px;
 }
 
+.map #place-control {
+	margin: 10px;
+	line-height: 24px;
+}
+
+.map #place-control input {
+	width: 280px;
+	font-size: small;
+	padding-left: 5px;
+}
+
 #infowindow-content .place-info .title {
 	color: #6e7a7f;
     font-weight: bold;

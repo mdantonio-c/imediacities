@@ -604,6 +604,31 @@
 			sc.map.setZoom(sc.mapZoom);
 		};
 
+		function centerMap(place) {
+			if (place === undefined) { return; }
+			// console.log(place);
+			var lat = place.lat,
+				lng = place.lng;
+			/*sc.mapCenter = [lat, lng];
+			sc.mapZoom = 14;*/
+			if (lat === undefined || lng === undefined) { return; }
+			var pt = new google.maps.LatLng(lat, lng);
+			sc.map.setCenter(pt);
+			//sc.map.setZoom(sc.mapZoom);
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < place.viewport.length; i++) {
+				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
+				bounds.extend(latlng);
+			}
+			sc.map.fitBounds(bounds);
+		}
+
+		$scope.$watch('sc.inputPlaceDetails', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				centerMap(sc.inputPlaceDetails);
+			}
+		}, true);
+
 		sc.search = function() {
 			sc.loading = true;
 			// at the moment search term ONLY in the title
@@ -691,7 +716,7 @@
 									sc.loadingMapResults = true;
 									DataService.getRelavantCreations(relevantCreations).then(function(response) {
 										sc.mapResults = response.data.Response.data;
-										console.log(sc.mapResults);
+										// console.log(sc.mapResults);
 									}).catch(function(error) {
 										noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
 									}).finally(function() {
@@ -721,6 +746,8 @@
 							} else {
 								console.warn('expected content count by provider');
 							}
+							// clean up relevant creations under the map
+							sc.mapResults = [];
 							updateMarkers(map);
 						}
 						

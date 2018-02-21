@@ -100,10 +100,9 @@ class Search(GraphBaseOperations):
         # check request for filtering
         filters = []
         # add filter for processed content with COMPLETE status
-        # FIXME remove the following comment
-        # filters.append(
-        #     "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
-        #     "WHERE content.status = 'COMPLETED'")
+        filters.append(
+            "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+            "WHERE content.status = 'COMPLETED'")
         entity = 'Creation'
         filtering = input_parameters.get('filter')
         if filtering is not None:

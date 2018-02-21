@@ -55,8 +55,12 @@ class SearchAnnotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             filters.append("WHERE anno.annotation_type='{anno_type}'".format(
                 anno_type=anno_type))
+            # add filter for processed content with COMPLETE status
             filters.append(
-                'MATCH (title:Title)<-[:HAS_TITLE]-(creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
+                "MATCH (creation:Creation)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+                "WHERE content.status = 'COMPLETED' ")
+            filters.append(
+                'MATCH (title:Title)<-[:HAS_TITLE]-(creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
             projections.append(
                 'collect(distinct creation{.*, type:i.item_type, titles }) AS creations')
             if anno_type == 'TAG':

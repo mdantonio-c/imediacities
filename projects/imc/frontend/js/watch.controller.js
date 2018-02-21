@@ -374,6 +374,10 @@
 					} else {
 						result.photo_reference = '';
 					}
+					result.viewport = [
+						place.geometry.viewport.getNorthEast(),
+						place.geometry.viewport.getSouthWest()
+					];
 				}
 				return result;
 			}
@@ -822,7 +826,7 @@
 
 		self.playPause = function() {
 			// console.log('pause video');
-			//myVid[0].playbackRate = 1.0;
+			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 			if ((!myVid[0].paused || !self.onpause)) {
 				self.onpause = true;
@@ -839,7 +843,7 @@
 		// Pause video
 		self.pauseVideo = function() {
 
-			//myVid[0].playbackRate = 1.0;
+			myVid[0].playbackRate = 1.0;
 			$scope.stopBack();
 
 			self.onpause = true;
