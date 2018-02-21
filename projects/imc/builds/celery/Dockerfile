@@ -13,3 +13,5 @@ RUN pip install --upgrade --force-reinstall --no-cache-dir numpy Pillow
 ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
 RUN chmod a+r /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
 
+RUN ln -s /usr/bin/python3.6 /usr/bin/python3
+
