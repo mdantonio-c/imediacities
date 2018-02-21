@@ -26,7 +26,7 @@ services:
 
   neo4j:
     ports:
-      - 9090:7473
+      - 9090:7474
     volumes:
       - letsencrypt_certs:/ssl
 
