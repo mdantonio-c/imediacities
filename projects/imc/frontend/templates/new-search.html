@@ -183,8 +183,14 @@
 													<!--loader block-->
 													<div class="loader" ng-show="!sc.mapLoaded"></div>
 													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
-														<ng-map ng-show="sc.mapLoaded" default-style="true" center="{{sc.mapCenter}}" zoom="{{sc.mapZoom}}" disable-default-u-i="true"
-														zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
+														<ng-map ng-show="sc.mapLoaded"
+														  default-style="true"
+														  center="{{sc.mapCenter}}"
+														  zoom="{{sc.mapZoom}}"
+														  on-center-changed="sc.centerChanged()"
+														  on-zoom_changed="sc.zoomChanged()"
+														  disable-default-u-i="true"
+														  zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
 															<custom-control id="custom-control" position="TOP_RIGHT" index="1" draggable="false">
 																<div>
 																	<button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" ng-click="sc.centerEurope()">
@@ -195,7 +201,7 @@
 															<custom-control id="place-control" position="TOP_LEFT" index="1" draggable="false">
 																<div>
 																	<input type="text" name="lookup-place" 
-																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place">
+																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place"> <p>{{sc.mapCenter}}</p>
 																</div>
 															</custom-control>
 															<info-window id="tag-iw">

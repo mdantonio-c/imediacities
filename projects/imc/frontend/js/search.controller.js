@@ -604,17 +604,28 @@
 			sc.map.setZoom(sc.mapZoom);
 		};
 
+		sc.centerChanged = function(event) {
+			if (!angular.isDefined(sc.map)) { return; }
+			$timeout(function() {
+				//sc.map.panTo(sc.map.getCenter());
+				sc.mapCenter = sc.map.getCenter();
+			}, 2000);
+		};
+
+		sc.zoomChanged = function(event) {
+			if (!angular.isDefined(sc.map)) { return; }
+			/*console.log('zoom ' + sc.map.getZoom());*/
+		};
+
 		function centerMap(place) {
 			if (place === undefined) { return; }
 			// console.log(place);
 			var lat = place.lat,
 				lng = place.lng;
-			/*sc.mapCenter = [lat, lng];
-			sc.mapZoom = 14;*/
 			if (lat === undefined || lng === undefined) { return; }
 			var pt = new google.maps.LatLng(lat, lng);
 			sc.map.setCenter(pt);
-			//sc.map.setZoom(sc.mapZoom);
+			sc.mapCenter = [lat, lng];
 			var bounds = new google.maps.LatLngBounds();
 			for (var i = 0; i < place.viewport.length; i++) {
 				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
