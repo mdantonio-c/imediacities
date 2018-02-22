@@ -24,6 +24,12 @@ services:
         aliases:
           - ${FLASK_HOST}
 
+  neo4j:
+    ports:
+      - 9090:7474
+    volumes:
+      - letsencrypt_certs:/ssl
+
   frontend:
     environment:
       - APP_MODE=production

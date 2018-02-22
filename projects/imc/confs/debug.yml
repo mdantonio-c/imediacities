@@ -12,6 +12,10 @@ services:
     ports:
       - 8080:5000
 
+  neo4j:
+    ports:
+      - 9090:7474
+
   frontend:
     ports:
       - 80:5000

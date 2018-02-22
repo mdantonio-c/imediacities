@@ -1,98 +1,20 @@
 
-# Backend/Celery build merged with:
-# https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline/blob/master/scripts/docker_python_runtime/Dockerfile
-###################
-# FROM eudatb2stage/apiserver:neo4j3
-FROM ubuntu:16.04
-# FROM ubuntu:17.04
+FROM rapydo/celery:0.6.0
 MAINTAINER "Mattia D'Antonio <m.dantonio@cineca.it>"
 
-##################################
-# FROM Fraunhofer
-#up to date system 
-RUN apt-get -y update \
- && apt-get -y upgrade 
-##################################
+# Backend/Celery build merged with:
+# https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline/blob/master/scripts/docker_python_runtime/Dockerfile
 
-###################
-# APT
-RUN apt-get update && apt-get install -y \
-    # utils
-    bash less vim curl wget telnet git jq \
-    # required by http-api
-    build-essential libkrb5-dev python3-dev \
-    libglobus-gssapi-gsi-dev \
+RUN apt-get install -y ffmpeg libavcodec-extra libv4l-0 libsm6 libxext6
 
-    ##################################
-    # Fraunhofer libraries
-    python3 \
-    ffmpeg \
-    libavcodec-extra \
-    libv4l-0 \
-    ##################################
-    # latest python
-    # python3.6 \
-    # make this version the official python for anyone
-    # && cd /usr/bin && ln -s python3.6 python \
-##################################
-    && apt-get autoremove && apt-get clean \
-    && echo "done"
+RUN pip install --upgrade --force-reinstall --no-cache-dir numpy Pillow opencv-python
 
-###################
-# PIP
-
-RUN wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py \
-    && python3 get-pip.py && rm *.py
-
-# for Fraunhofer: in requirements.txt added numpy
-COPY requirements.txt /tmp/
-RUN pip install --upgrade --force-reinstall --no-cache-dir -r /tmp/requirements.txt
-
-###################
-# main user for launching the apis
-ENV APIUSER developer
-ENV APIUID 990
-RUN useradd \
-    -r -M -d /home/$APIUSER -s /bin/bash -p ! \
-    --uid $APIUID $APIUSER \
-    && mkdir -p /home/$APIUSER && chown $APIUID /home/$APIUSER
-###################
-
-
-##################################
-# FROM Fraunhofer
 # download and install pre-compiled python opencv wrapper
-ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
-RUN chmod a+r /usr/lib/python3/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so
+# ADD https://seafile.idmt.fraunhofer.de/f/46f83876ef/?raw=1 /usr/local/lib/python3.6/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so 
+# RUN chmod a+r /usr/local/lib/python3.6/dist-packages/cv2.cpython-35m-x86_64-linux-gnu.so 
 
-# copy test script
-# COPY ./test_python_installation.py /
-# run the test script - if that fails, something went wrong
-# RUN python3 /test_python_installation.py
-##################################
+# REMOVE ME ON RAPYDO:0.6.1
+RUN ln -s /usr/bin/python3.6 /usr/bin/python3
 
 RUN export LD_LIBRARY_PATH=/opt/idmt/lib/:$LD_LIBRARY_PATH
-
-ENV PAGER less
-ENV TERM=xterm-256color
-ENV LC_ALL C.UTF-8
-ENV LANG C.UTF-8
-ENV PYTHONIOENCODING="utf-8"
-
-
-######################
-RUN echo "alias dev=\"HOME=/tmp su -p \$APIUSER\"" >> /root/.bash_aliases
-RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; celery worker -c 1 -A restapi.flask_ext.flask_celery.worker.celery_app -n \${HOSTNAME}@\${VANILLA_PACKAGE}'" > /usr/local/bin/mycelery && chmod +x /usr/local/bin/mycelery
-RUN echo "#!/bin/bash\\nsu -p \$APIUSER -c 'export HOME=/tmp; cd /code; flower --port=5555 persistent=True -A restapi.flask_ext.flask_celery.worker.celery_app -n flower_monitor'" > /usr/local/bin/start_flower && chmod +x /usr/local/bin/start_flower
-
-
-# closing entrypoint
-
-RUN mkdir /code
-WORKDIR /code
-RUN mkdir /docker-entrypoint.d/
-COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-ENTRYPOINT ["docker-entrypoint"]
-
-CMD ["mycelery"]
 
