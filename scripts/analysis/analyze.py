@@ -318,19 +318,18 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     # will work as expected
     lst = glob.glob(out_folder + '/tvs_s_*.jpg')
     for name in lst:
-        num = int(name.replace(out_folder + '/tvs_s_','').replace('.jpg',''))
+        num = int(name.replace(out_folder + '/tvs_s_', '').replace('.jpg', ''))
         name2 = out_folder + '/tvs_s_{:06d}.jpg'.format(num)
         if name != name2:
-            os.rename( name,  name2 )
+            os.rename(name,  name2)
 
     # the same for tvs_k_*.jpg
     lst = glob.glob(out_folder + '/tvs_k_*.jpg')
     for name in lst:
-        num = int(name.replace(out_folder + '/tvs_k_','').replace('.jpg',''))
+        num = int(name.replace(out_folder + '/tvs_k_', '').replace('.jpg', ''))
         name2 = out_folder + '/tvs_k_{:06d}.jpg'.format(num)
         if name != name2:
-            os.rename( name,  name2 )
-    
+            os.rename(name,  name2)
 
     # retrieve shot frames
     lst = glob.glob(out_folder + '/tvs_s_*.jpg')
@@ -529,15 +528,15 @@ def analize(filename, out_folder, fast=False):
             return False
         log('vimotion ----------- ok ')
 
-    summary_out = os.path.join(out_folder, 'summary.jpg')
+    # summary_out = os.path.join(out_folder, 'summary.jpg')
 
-    if fast and os.path.exists(summary_out):
-        log('summary ------------ skipped ')
-    else:
-        log('summary ------------ begin ')
-        if not summary(tr_movie, out_folder):
-            return False
-        log('summary ------------ ok ')
+    # if fast and os.path.exists(summary_out):
+    #     log('summary ------------ skipped ')
+    # else:
+    #     log('summary ------------ begin ')
+    #     if not summary(tr_movie, out_folder):
+    #         return False
+    #     log('summary ------------ ok ')
 
     log('index/storyboard---- begin ')
     if not thumbs_index_storyboard(tr_movie, out_folder, nf):
@@ -578,14 +577,8 @@ def main(args):
         else:
             movie = a
 
-
-
-
     fast = True
     clan = False
-
-
-
 
     filename = os.path.join(stage_area, movie)
     if not os.path.exists(filename):
