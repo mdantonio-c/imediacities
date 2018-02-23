@@ -1960,7 +1960,7 @@ li.ivh-treeview-node::before {
 
 
 /*----------------------------------------------
-       The modal of the free text -- cinzia
+       The modal of the Notes -- cinzia
 -----------------------------------------------*/
 .modal-div-1
 {
@@ -1995,7 +1995,7 @@ li.ivh-treeview-node::before {
 
 
 /*----------------------------------------------
-       The tab with the free texts -- cinzia
+       The tab with the Notes -- cinzia
 -----------------------------------------------*/
 .tab-notes
 {
@@ -2016,7 +2016,7 @@ li.ivh-treeview-node::before {
     width: 70%;
     height: 500px;
     vertical-align: top;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .tab-list-note
 {
@@ -2027,7 +2027,7 @@ li.ivh-treeview-node::before {
 	display: inline-block;
     width: 100px;
     height: 500px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .note-user-icon
 {
@@ -2053,17 +2053,17 @@ li.ivh-treeview-node::before {
 }
 .tab-list-shot
 {
-	border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
+	border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
     padding: 5px;
     background-color: #eee;
 }
 .tab-list-shot-selected
 {
-	border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
+	border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
     padding: 5px;
     background-color: #fff;
 }

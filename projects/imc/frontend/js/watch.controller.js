@@ -48,7 +48,7 @@
 			}
 		};
 	}).factory('myNotesModalFactory', function($uibModal, $document) {
-		/* modal view for adding free text */
+		/* modal view for adding notes */
 		return {
 			open: function(size, template, params) {
 				console.log("opening notes modal");
@@ -329,15 +329,17 @@
 	});
 	app.directive('scrollOnClick', function() {
 		return {
-			link: function($scope, $elm) {
+			link: function(scope, $elm) {
 				$elm.on('click', function() {
-					// console.log('scroll on click');
-					// alert($elm[0].parentNode.className);
+					//console.log('scroll on click');
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: $elm[0].offsetLeft
 						}, "slow");
 					}
+					// set the shot selected in notes tab
+					var shotSelectedForNotes = parseInt($elm[0].attributes.progr.value) + 1;
+					scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 					// play video from selected shot
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].attributes.timestamp.value);
@@ -755,7 +757,13 @@
 		var milliseconds = time.getMilliseconds();
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
-
+	function encodeLanguage(language) {
+		// TODO da completare 
+		var code=null;
+		if (language === 'English') { code = 'en'; }
+		else if(language === 'Italian') { code = 'it'; }
+		return code;
+	}
 	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
@@ -776,8 +784,27 @@
 		// to visualize annotations in tab table
 		self.annotations = [];
 
-		// to visualize notes in tab table
-		self.notes = [];		
+		// to visualize notes in notes tab 
+		self.notes = [];
+		// to visualize shots in notes tab table
+		self.notesShots = [];
+		// current shot in notes tab table
+		self.notesShotSelected=1;
+
+		// inizio TODEL
+		// visto che non ci sono ancora note salvate 
+		//  metto dei dati fake per la visualizzazione
+		var nota={};
+		nota.creatorName="Cinzia Caroli";
+		nota.text="questo e' il testo della nota di Cinzia";
+		nota.shotNum=1;
+		self.notes.push(nota);
+		nota={};
+		nota.creatorName="Giuse";
+		nota.text="questo e' il testo della nota di Giuse";
+		nota.shotNum=2;
+		self.notes.push(nota);
+		// fine TODEL
 
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
@@ -1061,6 +1088,7 @@
 						// loop annotations
 						for (var i = 0; i < shot.annotations.length; i++) {
 							var anno = shot.annotations[i];
+							//console.log("anno=" + angular.toJson(anno, true));
 							if (anno.attributes.annotation_type.key === 'VIM') {
 								// add camera motion attributes
 								sbFields.camera = anno.bodies[0].attributes;
@@ -1084,17 +1112,20 @@
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}else if (anno.attributes.annotation_type.key === 'COMMENTING') {
-								// mi aspetto che il free text/notes abbia un solo body
+								// mi aspetto che la note abbia un solo body di tipo textual
 								var text = anno.bodies[0].attributes.value;
-								var user_creator1 = anno.creator.id;
-								// TODO manca la categoria: notes, description, bibliography
-								// TODO manca la lingua
+								var textLanguage = anno.bodies[0].attributes.language;
+								var creatorId = anno.creator.id;
+								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
+								// TODO manca la categoria: notes, description
 								// TODO manca la gestione public/private ? 
 								//       ma forse è il backend che mi manda solo quelle che posso vedere ?
 								var noteInfo = {
 									uuid: anno.id,
 									text: text,
-									creator: user_creator1
+									textLanguage: textLanguage,
+									creator: creatorId,
+									creatorName: creatorName
 								};
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
 
@@ -1106,6 +1137,8 @@
 						self.storyshots.push(sbFields);
 						
 					});
+					// noteShots serve per il tab Notes a destra
+					self.notesShots = self.storyshots;
 
 				})
 				.catch(function(response) {
@@ -1116,6 +1149,16 @@
   					// hide loading video bar
 					self.showmeli = false;
 				});
+		};
+
+		/**
+		 * When the user selects a shot in the Notes Tab then
+		 *  the tab must displays the notes of the selected shot
+		 * @param selectedShotNum
+		 */
+		self.viewNotesOfSelectedShot = function(selectedShotNum) {
+			//console.log('selectedShotNum=' + selectedShotNum);			
+			self.notesShotSelected = selectedShotNum;
 		};
 
 		self.loadMetadataContent = function(vid) {
@@ -1142,7 +1185,6 @@
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
-
 		if (!$stateParams.meta) {
 			self.loadMetadataContent(vid);
 		} else {
@@ -1161,12 +1203,10 @@
 		 * @param selectedShot - selected cell in the timeline with row and col.
 		 */
 		self.jumpToShot = function(selectedShot) {
-			// console.log('jump to shot: ' + angular.toJson(selectedShot, true));
 			var row = selectedShot.row;
 			var startTime = convertDateToMilliseconds(
 				self.videoTimeline.data.rows[row].c[2].v);
 			// console.log('jump to shot: Start time: ' + startTime);
-
 			// play video from selected shot
 			var myVid = angular.element($document[0].querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
@@ -1253,25 +1293,35 @@
 				};						
 			self.annotations.push(anno);
 		});
-		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
-			var startTime, endTime;
-			if (noteInfo === null) {
-				// just refresh the notes tab
-				// TODO
+		$rootScope.$on('updateShotSelectedForNotes', function(event, newShotSelected) {
+			if (newShotSelected === null) {
+				return;
 			}
-			// update the notes tab
-			startTime = timelineToDate(shotInfo.startT);
-			endTime = timelineToDate(shotInfo.endT);
+			if(self.notesShotSelected != newShotSelected){
+				//console.log("updateShotSelectedForNotes start: " + angular.toJson(newShotSelected, true));
+				self.notesShotSelected = newShotSelected;
+			}
+			return;
+		});		
+		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
+			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
+			if (noteInfo === null) {
+				return;
+			}
+			// add the new note to self.notes
 			var note = {
-					id: noteInfo.uuid,
-					text: noteInfo.text,
-					creator: noteInfo.creator,
-					shotid: shotInfo.uuid,
-					shotNum: shotInfo.shotNum,
-					startT: shotInfo.startT,
-					endT: shotInfo.endT
-				};						
+				id: noteInfo.uuid,
+				text: noteInfo.text,
+				creatorName: noteInfo.creatorName,
+				creation_datetime: noteInfo.creation_datetime,
+				shotId: shotInfo.uuid,
+				shotNum: shotInfo.shotNum,
+				shotStartT: shotInfo.startT,
+				shotEndT: shotInfo.endT
+			};				
 			self.notes.push(note);
+			//console.log(angular.toJson(self.notes, true));
+			return;
 		});
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
@@ -1282,7 +1332,6 @@
 				}
 			});
 		});
-
 	}
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
@@ -1627,36 +1676,48 @@
 		$scope.IRI = sharedProperties.getIRI();
 		$scope.shotID = sharedProperties.getShotId();
 		$scope.shotNum = sharedProperties.getShotNum();
-		// free text/notes
-		// all the existing notes for the video
-		self.notes = [];
+		
+		// serve per la select nella modale
+		// audience = public or private
+		self.audience = {
+			options:  ["private","public"],
+			selected: "private"
+		};
+		// serve per la select nella modale
+		// TODO da dove prendo le lingue?
+		self.language = {
+			options:  ["English","Italian"],
+			selected: null
+		};
 		// the new note the user is creating
 		self.note = {};
-		self.note.audience = "private"; // mandatory
-		self.note.category = "notes"; // mandatory
-		self.note.language = ""; // optional
+		// serve per la select nella modale		
+		self.note.category = "notes"; // mandatory, notes description ...
+		// textarea nella modale
 		self.note.text = ""; // mandatory
-		self.note.purpose = "commenting"; // mandatory 
-		
+		//self.note.purpose = "commenting"; // mandatory 
 		self.confirmNote = function() {
-			var vid = sharedProperties.getVideoId();
 			var target = 'shot:' + $scope.shotID;
-
 			if (self.note.text && self.note.text.length > 0) {
-				// save the free text into the database
-				DataService.saveFreeText(target, self.note).then(
+				var langCode = encodeLanguage(self.language.selected);
+				self.note.language = langCode;
+				// save the Note into the database
+				DataService.saveNote(target, self.note).then(
 					function(resp) {
-						console.log(resp.data);
+						//console.log("saveNote: resp.data=" + angular.toJson(resp.data, true));
 						var noteId = resp.data.id;
 						var creatorId = resp.data.relationships.creator[0].id;
-						console.log('Note saved successfully. ID: ' + noteId);
-						// TODO manca la categoria: notes, description, bibliography
-						// TODO manca la lingua
-						// TODO manca la gestione public/private ?
+						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
+							resp.data.relationships.creator[0].attributes.surname;
+						// TODO manca la categoria: notes, description
+						// TODO manca public/private
 						var noteInfo = {
 							"uuid": noteId,
 							"text": self.note.text,
-							"creator": creatorId
+							"textLanguage": self.language.selected,
+							"creatorId": creatorId,
+							"creatorName": creatorName,
+							"creation_datetime": resp.data.attributes.creation_datetime
 						};
 						var shotInfo = {
 							"uuid": $scope.shotID,
@@ -1672,11 +1733,11 @@
 			}
 			$uibModalInstance.close(null);
 		};
-
 		self.cancel = function() {
 			$uibModalInstance.dismiss('cancel');
-			ivhTreeviewMgr.deselectAll(self.vocabulary);
-			ivhTreeviewMgr.collapseRecursive(self.vocabulary, self.vocabulary);
+			self.audience.selected = "private";
+			self.language.selected=null;
+			self.note.text = "";
 		};
 
 		self.alerts = [];

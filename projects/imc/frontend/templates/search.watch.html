@@ -90,212 +90,34 @@
 				<div class="space-4"></div>
 				<div class="tab-notes">
 					<div class="tab-notes-title">
-						Notes on shot number 1
+						Notes on shot {{watchCtrl.notesShotSelected}}
 					</div>
 					<!-- list of the notes of the selected shot -->
 					<div class="tab-list-notes">
-						<div class="tab-list-note">
+
+						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }">
 							<p>
 								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Cinzia Caroli</span>
-								<span class="note-date">1 month ago</span>
+								<span class="note-user-name">{{note.creatorName}}</span>
+								<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
 							</p>
 							<p>
 								<span class="note-text">
 									<i class="imc-icon fa fa-quote-left"></i>
-									In questo shot ho visto che blah....
+									{{note.text}}
 								</span>
 							</p>
 						</div>
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-						<div class="tab-list-note">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">Giuse</span>
-								<span class="note-date">1 year ago</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									Do you think that... ?
-								</span>
-							</p>
-						</div>
-
-
-
 					</div>
-
 					<!-- list of the shots -->
 					<div class="tab-list-shots">
-
-						<div class="tab-list-shot-selected">
-							<span>Shot 1</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 2</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
-						</div>
-						<div class="tab-list-shot">
-							<span>Shot 3</span>
-							<img style="width: 75%;height: 100%;" id="0" duration="35.291667" nshots="0.17" shotd="12" progr="0" timestamp="00:00:00-f00" ng-src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail" scroll-on-click="" class="ng-scope" src="http://localhost:8080/api/shots/a25ecc9e-ab26-4309-aa0e-5b2268925608?content=thumbnail">
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot-selected' : 'tab-list-shot'">
+							<span><a ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
+							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
 						</div>
 					</div>
-
-<!--
-
-					<table st-table="watchCtrl.notes" class="table table-striped">
-						<thead>
-							<tr>
-								<th st-sort="shotid">shot number</th>
-								<th st-sort="group">category</th>
-								<th st-sort="name">text</th>
-								<th st-sort="startT">start time <em style="color:gray;">(sec)</em></th>
-								<th st-sort="endT">end time <em style="color:gray;">(sec)</em></th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="note in watchCtrl.notes | orderBy:'-note.shotNum'">
-								<td><a ng-click="watchCtrl.jumpToShotFromNote(note.startT)">{{note.shotNum}}</a></td>
-								<td>{{ note.category }}</td>
-								<td>{{ note.text }}</td>
-								<td>{{ note.startT | date:'mm:ss' }}</td>
-								<td>{{ note.endT | date:'mm:ss' }}</td>
-								<td>
-									<a class="btn btn-danger btn-xs"
-										ng-click="watchCtrl.deleteNotes(note)"
-										ng-confirm-click="Are you sure you want to delete this note?"
-										tooltip-placement="left"
-										uib-tooltip="Delete note"
-										ng-if="profile.uuid == note.creator">
-										<i class="fa fa-trash-o"> </i>
-									</a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-
--->
-
-
 				</div>
 			</uib-tab>
-
 			<uib-tab heading="Metadata">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
@@ -570,7 +392,7 @@
 	<script type="text/ng-template" id="myModalNotes.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$notesCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a free text to this shot</h4>
+			<h4 class="modal-title">Add a note to this shot</h4>
 		</div>
 		<div class="modal-body">
 			<div class="row">
@@ -585,23 +407,20 @@
 				<div class="col-sm-8">
 					<div class="modal-div-1">
 						<div class="modal-div-select-0">
-							<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.note.audience">
-								<option value="private" >private</option>
-								<option value="public">public</option>
+							<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.audience.selected"
+							ng-options="o as o for o in $notesCtrl.audience.options">
 							</select>
 						</div>
 						<div class="modal-div-select-1">
 							<select id="form-field-select-1" class="modal-select-1" ng-model="$notesCtrl.note.category">
 								<option value="notes" >notes</option>
 								<option value="desc">description</option>
-								<option value="biblio">bibliography</option>
 							</select>
 						</div>
 						<div class="modal-div-select-2">
-							<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.note.language">
+							<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
+							ng-options="o as o for o in $notesCtrl.language.options">
 								<option value="">language of text</option>
-								<option value="en">English</option>
-								<option value="it">Italian</option>
 							</select>
 						</div>
 
