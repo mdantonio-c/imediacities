@@ -186,7 +186,6 @@
 														<ng-map ng-show="sc.mapLoaded"
 														  default-style="true"
 														  center="{{sc.mapCenter}}"
-														  zoom="{{sc.mapZoom}}"
 														  on-center-changed="sc.centerChanged()"
 														  on-zoom_changed="sc.zoomChanged()"
 														  disable-default-u-i="true"
@@ -219,6 +218,13 @@
 																	</div>
 																</div>
 															</info-window>
+															<shape name="circle"
+																stroke-color="#FF0000"
+																stroke-opacity="0.8"
+      															stroke-weight="2"
+      															center="{{sc.mapCenter}}"
+      															radius="{{sc.radius}}">
+															</shape>
 														</ng-map>
 													</div>
 												</div>

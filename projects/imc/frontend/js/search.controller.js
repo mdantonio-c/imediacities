@@ -589,32 +589,47 @@
 		};
 		sc.resetPager();
 
+		var europeCenter = [45, 14];
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
 		sc.mapZoom = 4;
-		sc.mapCenter = [50.00,20.34];
+		// initial radius in meters
+		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
+		sc.radius = 1600 * 1000;	// for zoom level 4
+		sc.mapCenter = europeCenter;
 		sc.dynMarkers = [];
 		sc.mapTags = [];
 
 		sc.centerEurope = function() {
-			sc.mapZoom = 4;
-			sc.mapCenter = [50.00,20.34];
+			sc.mapCenter = europeCenter;
 			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
 			sc.map.setCenter(pt);
-			sc.map.setZoom(sc.mapZoom);
+			sc.map.setZoom(4);
 		};
 
 		sc.centerChanged = function(event) {
 			if (!angular.isDefined(sc.map)) { return; }
 			$timeout(function() {
 				//sc.map.panTo(sc.map.getCenter());
-				sc.mapCenter = sc.map.getCenter();
-			}, 2000);
+				var latLng = sc.map.getCenter();
+				sc.mapCenter = [latLng.lat(), latLng.lng()];
+			}, 1000);
 		};
 
-		sc.zoomChanged = function(event) {
+		sc.zoomChanged = function() {
 			if (!angular.isDefined(sc.map)) { return; }
-			/*console.log('zoom ' + sc.map.getZoom());*/
+			var oldZoom = sc.mapZoom;
+			var newZoom = sc.map.getZoom();
+			//console.log('changed zoom level:' + zoom);
+			if (newZoom !== oldZoom) {
+				// zoom changed
+				// console.log('zoom change from ' + oldZoom + ' to ' + newZoom);
+				// change the circle radius properly
+				var r = sc.radius;
+				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
+				console.log('new radius: ' + sc.radius + ' meters');
+				sc.mapZoom = newZoom;
+			}
 		};
 
 		function centerMap(place) {
@@ -668,7 +683,8 @@
 						}
 						sc.dynMarkers = [];
 						if (sc.filter.provider !== null) {
-							sc.mapZoom = 14;
+							map.setZoom(14);
+							//sc.mapZoom = 14;
 							sc.mapCenter = getPosition(sc.filter.provider);
 							var cFilter = {
 								filter: sc.filter
@@ -737,8 +753,9 @@
 							);
 						} else {
 							// content from all cities represented on a map of Europe
-							sc.mapZoom = 4;
-							sc.mapCenter = [50.00,20.34];
+							map.setZoom(4);
+							// sc.mapZoom = 4;
+							sc.mapCenter = europeCenter;
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
