@@ -184,6 +184,8 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall(endpoint, 'GET');
     };
 
-}
+};
+
+DataService.$inject = ["$log", "api", "$q", "jsonapi_parser"];
 
 })();

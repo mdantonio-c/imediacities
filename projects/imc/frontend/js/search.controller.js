@@ -220,7 +220,10 @@
 		;
 
 	// The controller
-	function SearchController($scope, $log, $document, $state, $stateParams, DataService, CodelistService, noty, $uibModal) {
+	function SearchController(
+		$scope, $log, $state, $stateParams,
+		DataService, CodelistService, noty, $uibModal) 
+	{
 		var self = this;
 
 		self.showmesb = false;
@@ -433,9 +436,17 @@
 		// move codelist provision in a service
 		self.iprstatuses = iprstatuses;
 
-	}
+	};
 
-	function NewSearchController($scope, DataService, NgMap, $timeout, $filter, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
+	SearchController.$inject = [
+		"$scope", "$log", "$state", "$stateParams",
+		"DataService", "CodelistService", "noty", "$uibModal"
+	];
+
+	function NewSearchController(
+		$scope, DataService, NgMap, $timeout, $filter, 
+		GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) 
+	{
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
@@ -727,6 +738,11 @@
 			sc.filter.yearfrom = decade;
 			sc.filter.yearto = decade + 9;
 		};
-	}
+	};
+
+	NewSearchController.$inject = [
+		"$scope", "DataService", "NgMap", "$timeout", "$filter",
+		"GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
+	];
 
 })();

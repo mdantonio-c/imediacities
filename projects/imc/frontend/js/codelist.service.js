@@ -1,7 +1,9 @@
 (function() {
 	'use strict';
 
-	angular.module('web').service('CodelistService', function($http, $q, DataService) {
+	angular.module('web').service('CodelistService', CodelistService);
+
+	function CodelistService($http, $q, DataService) {
 		var codelist = {};
 
 		// this is the structure of the codelist object
@@ -39,7 +41,9 @@
 			return d.promise;
 		};
 		return codelist;
-	});
+	};
+
+	CodelistService.$inject = ["$http", "$q", "DataService"];
 
 
 // if the backend api does not work
