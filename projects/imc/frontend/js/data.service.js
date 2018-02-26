@@ -144,7 +144,13 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations/search', 'POST', filter, undefined, true);
     };
 
+    /* Retrieve a list of relevant creations for given creation uuids and related place ids. */
     self.getRelavantCreations = function(relevantCreations) {
+        if (relevantCreations === undefined || relevantCreations.size === 0) { 
+            var d = $q.defer();
+            d.resolve({'data': {'Response': {'data': []}}});
+            return d.promise; 
+        }
         var data = {
             'relevant-list': []
         };

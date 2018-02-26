@@ -183,19 +183,27 @@
 													<!--loader block-->
 													<div class="loader" ng-show="!sc.mapLoaded"></div>
 													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
-														<ng-map ng-show="sc.mapLoaded" default-style="true" center="{{sc.mapCenter}}" zoom="{{sc.mapZoom}}" disable-default-u-i="true"
-														zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
+														<ng-map ng-show="sc.mapLoaded"
+														  default-style="true"
+														  center="{{sc.mapCenter}}"
+														  on-center-changed="sc.centerChanged()"
+														  on-zoom_changed="sc.zoomChanged()"
+														  disable-default-u-i="true"
+														  zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
 															<custom-control id="custom-control" position="TOP_RIGHT" index="1" draggable="false">
 																<div>
 																	<button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" ng-click="sc.centerEurope()">
 																		<i class="imc-icon fa fa-crosshairs fa-2x grey"></i>
+																	</button>
+																	<button draggable="false" title="Show/Hide Boundary" aria-label="Show/Hide Boundary" type="button" ng-click="sc.toggleBoundary()">
+																		<i class="imc-icon fa fa-circle fa-2x grey"></i>
 																	</button>
 																</div>
 															</custom-control>
 															<custom-control id="place-control" position="TOP_LEFT" index="1" draggable="false">
 																<div>
 																	<input type="text" name="lookup-place" 
-																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place">
+																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place"><!--  <p>{{sc.mapCenter}}</p> -->
 																</div>
 															</custom-control>
 															<info-window id="tag-iw">
@@ -213,6 +221,13 @@
 																	</div>
 																</div>
 															</info-window>
+															<shape name="circle"
+																stroke-color="#FF0000"
+																stroke-opacity="0.8"
+      															stroke-weight="2"
+      															center="{{sc.mapCenter}}"
+      															radius="{{sc.radius}}">
+															</shape>
 														</ng-map>
 													</div>
 												</div>
