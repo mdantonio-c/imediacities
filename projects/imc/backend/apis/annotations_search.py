@@ -71,11 +71,11 @@ class SearchAnnotations(GraphBaseOperations):
                     location = geo_distance['location']
                     starters.append(
                         "WITH point({{longitude: {lon}, latitude: {lat} }}) as cityPosition, "
-                        "{dist} as distanceInKm"
+                        "{dist} as distanceInMeters"
                         .format(lon=location['long'], lat=location['lat'], dist=distance))
                     filters.append("MATCH (anno)-[:HAS_BODY]-(body:ResourceBody) "
                                    "WHERE body.spatial IS NOT NULL AND "
-                                   "distance(cityPosition, point({latitude:body.spatial[0], longitude:body.spatial[1]})) < (distanceInKm * 1000)")
+                                   "distance(cityPosition, point({latitude:body.spatial[0], longitude:body.spatial[1]})) < distanceInMeters")
                     projections.append(
                         "distance(cityPosition, point({longitude:body.spatial[0],latitude:body.spatial[1]})) as distance")
                     order_by = "ORDER BY distance"
