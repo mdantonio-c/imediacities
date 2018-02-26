@@ -599,12 +599,27 @@
 		sc.mapCenter = europeCenter;
 		sc.dynMarkers = [];
 		sc.mapTags = [];
+		sc.showMapBoundary = false;
 
 		sc.centerEurope = function() {
 			sc.mapCenter = europeCenter;
 			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
 			sc.map.setCenter(pt);
 			sc.map.setZoom(4);
+		};
+
+		sc.toggleBoundary = function() {
+			sc.showMapBoundary = !sc.showMapBoundary;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(sc.showMapBoundary);
+		};
+
+		sc.setBoundaryVisible = function(val) {
+			sc.showMapBoundary = val;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(val);
 		};
 
 		sc.centerChanged = function(event) {
@@ -687,6 +702,7 @@
 					sc.creations = out_data.data.Response.data;
 					NgMap.getMap().then(function(map) {
 						sc.map = map;
+						sc.setBoundaryVisible(sc.showMapBoundary);
 						sc.initialMapLoad = true;
 						if (sc.filter.provider !== null) {
 							map.setZoom(14);

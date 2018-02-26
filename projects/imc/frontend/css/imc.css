@@ -1818,7 +1818,7 @@ li.ivh-treeview-node::before {
 	cursor: pointer;
 	background-color: rgb(255, 255, 255);
 	width: 28px;
-	height: 28px;
+	height: 56px;
 	margin: 10px;
 }
 
