@@ -1,6 +1,8 @@
 (function() {
 	'use strict';
 
+	var $ = require('jquery');
+
 	var app = angular.module('web')
 		.controller('TagController', TagController)
 		.controller('geoResultController', geoResultController)
