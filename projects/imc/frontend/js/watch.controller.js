@@ -66,7 +66,9 @@
 		};
 	});
 
-	app.config(function(ivhTreeviewOptionsProvider) {
+	app.config(ivhTreeviewConf);
+
+	function ivhTreeviewConf(ivhTreeviewOptionsProvider) {
 		ivhTreeviewOptionsProvider.set({
 			defaultSelectedState: false,
 			twistieExpandedTpl: '<i class="fa fa-minus-square-o imc-icon" aria-hidden="true"></i>',
@@ -74,7 +76,8 @@
 			twistieLeafTpl: '',
 			validate: true
 		});
-	});
+	};
+	ivhTreeviewConf.$inject = ["ivhTreeviewOptionsProvider"];
 
 	app.service('sharedProperties', function($q) {
 		var startTime = 'test start value';
