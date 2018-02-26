@@ -51,7 +51,7 @@ variables:
     GRAPHDB_PASSWORD: chooseapassword
 
     SMTP_ADMIN: m.dantonio@cineca.it
-    SMTP_NOREPLY: imc-noreply@cineca.it
+    SMTP_NOREPLY: I-Media-Cities@cinematek.be
     SMTP_HOST: mail.cineca.it
     SMTP_PORT: 587
     SMTP_USERNAME: hpc-service-noreply@cineca.it
