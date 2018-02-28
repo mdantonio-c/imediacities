@@ -762,6 +762,13 @@
 		var code=null;
 		if (language === 'English') { code = 'en'; }
 		else if(language === 'Italian') { code = 'it'; }
+		else if(language === 'Greek') { code = 'el'; }
+		else if(language === 'Spanish') { code = 'es'; }
+		else if(language === 'Dutch') { code = 'nl'; }
+		else if(language === 'French') { code = 'fr'; }
+		else if(language === 'Danish') { code = 'da'; }
+		else if(language === 'German') { code = 'de'; }
+		else if(language === 'Swedish') { code = 'sv'; }
 		return code;
 	}
 	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
@@ -791,21 +798,6 @@
 		// current shot in notes tab table
 		self.notesShotSelected=1;
 
-		// inizio TODEL
-		// visto che non ci sono ancora note salvate 
-		//  metto dei dati fake per la visualizzazione
-		var nota={};
-		nota.creatorName="Cinzia Caroli";
-		nota.text="questo e' il testo della nota di Cinzia";
-		nota.shotNum=1;
-		self.notes.push(nota);
-		nota={};
-		nota.creatorName="Giuse";
-		nota.text="questo e' il testo della nota di Giuse";
-		nota.shotNum=2;
-		self.notes.push(nota);
-		// fine TODEL
-
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
@@ -821,6 +813,18 @@
 
 		self.startTagTime = $rootScope.currentTime;
 		self.currentvidDur = 0;
+
+		// On video time update: update the selected shot on the Notes tab
+		myVid[0].ontimeupdate = function() {
+			//console.log('ontimeupdate start');
+			var currentTime = parseInt(myVid[0].currentTime);
+			// calculate the shot at current time
+			var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
+			//console.log('current shot: ' + angular.toJson(currentShotNotes, true));
+			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
+			$scope.$digest(); //refresh scope  // serve in questo caso? SI
+			//console.log('ontimeupdate end');
+		};
 
 		// On video playing toggle values
 		myVid[0].onplaying = function() {
@@ -874,6 +878,35 @@
 			myVid[0].pause();
 		};
 
+		// Returns the shot corresponding to the time in input
+		function getShotFromVideoCurrentTime(currtime) {
+			//console.log('getShotFromVideoCurrentTime: currtime=' + currtime);
+			var currentShot = null;
+			var currentTime = Math.floor(currtime * 1000);
+			//console.log('Current time video (ms): ' + currentTime);
+			for (var i = 0; i <= self.shots.length - 1; i++) {
+				var shotNum = self.shots[i].attributes.shot_num;
+				var shotTimestamp = self.shots[i].attributes.timestamp;
+				var shotDuration = self.shots[i].attributes.duration;
+				var shotStartTime = convertToMilliseconds(shotTimestamp);
+				var nextStartTime = null;
+				if (i < self.shots.length - 1) {
+					// get start time from the next shot
+					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
+				} else {
+					// last shot: use the shot duration instead
+					nextStartTime = shotStartTime + (shotDuration * 1000);
+				}
+				if (currentTime >= shotStartTime && currentTime < nextStartTime) {
+					//console.log('found shot number ' + (shotNum+1) + ', from start time ' + shotStartTime + ' (ms)');
+					currentShot = shotNum+1;
+					// exit loop
+					break;
+				}
+			}
+			return currentShot;
+		}
+		//  TODO it could use the function above 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
 
@@ -1029,6 +1062,7 @@
 					//console.log('max timeline value: ' + moment(self.videoTimeline.options.hAxis.maxValue).format(format+'.SSS'));
 
 					// add data to the timeline
+					// cinzia: ho aggiunto lo shot num come ultima colonna
 					self.videoTimeline.data = {
 						"cols": [{
 							id: "category",
@@ -1203,10 +1237,15 @@
 		 * @param selectedShot - selected cell in the timeline with row and col.
 		 */
 		self.jumpToShot = function(selectedShot) {
+			//console.log('jump to shot: selectedShot: ' + angular.toJson(selectedShot, true));
 			var row = selectedShot.row;
 			var startTime = convertDateToMilliseconds(
 				self.videoTimeline.data.rows[row].c[2].v);
 			// console.log('jump to shot: Start time: ' + startTime);
+			// set the shot selected in notes tab
+			var shotSelectedForNotes = self.videoTimeline.data.rows[row].c[4].v;
+			//console.log('jump to shot: selectedShot: ' + angular.toJson(shotSelectedForNotes, true));
+			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 			// play video from selected shot
 			var myVid = angular.element($document[0].querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
@@ -1218,8 +1257,14 @@
 		 * Jump to shot from the Annotation Tab.
 		 * @param startTime - start time in milliseconds.
 		 */
-		self.jumpToShotFromAnnotation = function(startTime) {
+		self.jumpToShotFromAnnotation = function(startTime,selectedShot) {
 			// console.log('jump to shot from annotation. Start time: ' + startTime);
+			//console.log('jump to shot from annotation. shot num: ' + selectedShot);
+
+			// set the shot selected in notes tab
+			var shotSelectedForNotes = selectedShot;
+			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
+
 			// play video from selected shot
 			var myVid = angular.element(window.document.querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
@@ -1255,6 +1300,9 @@
 		}
 
 		$rootScope.$on('updateTimeline', function(event, locname, annoInfo, shotInfo) {
+			//console.log("start updateTimeline");
+			//console.log("annoInfo=" +angular.toJson(annoInfo,true));
+			//console.log("shotInfo=" +angular.toJson(shotInfo,true));
 			var startTime, endTime;
 			if (annoInfo === null) {
 				// just refresh the timeline
@@ -1266,7 +1314,8 @@
 						  {v: anno.group},
 						  {v: anno.name},
 						  {v: startTime},
-						  {v: endTime}
+						  {v: endTime},
+						  {v: anno.shotNum}
 					]});
 				});
 				return;
@@ -1278,7 +1327,8 @@
 				  {v: annoInfo.group},
 				  {v: locn},
 				  {v: startTime},
-				  {v: endTime}
+				  {v: endTime},
+				  {v: shotInfo.shotNum}
 			]});
 			var anno = {
 					id: annoInfo.uuid,
@@ -1686,16 +1736,20 @@
 		// serve per la select nella modale
 		// TODO da dove prendo le lingue?
 		self.language = {
-			options:  ["English","Italian"],
+			options:  ["Danish","Dutch","English","French","German","Greek","Italian","Spanish","Swedish"],
 			selected: null
 		};
+		// serve per la select nella modale
+		// TODO quali sono le categorie?
+		self.category = {
+			options:  ["notes","description"],
+			selected: "notes"
+		};
+		//self.note.purpose = "commenting"; // TODO serve ancora?
 		// the new note the user is creating
 		self.note = {};
-		// serve per la select nella modale		
-		self.note.category = "notes"; // mandatory, notes description ...
 		// textarea nella modale
 		self.note.text = ""; // mandatory
-		//self.note.purpose = "commenting"; // mandatory 
 		self.confirmNote = function() {
 			var target = 'shot:' + $scope.shotID;
 			if (self.note.text && self.note.text.length > 0) {
@@ -1709,15 +1763,16 @@
 						var creatorId = resp.data.relationships.creator[0].id;
 						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
 							resp.data.relationships.creator[0].attributes.surname;
+						var creationDatetime = resp.data.attributes.creation_datetime;
 						// TODO manca la categoria: notes, description
 						// TODO manca public/private
 						var noteInfo = {
 							"uuid": noteId,
 							"text": self.note.text,
-							"textLanguage": self.language.selected,
+							"textLanguage": self.note.language,
 							"creatorId": creatorId,
 							"creatorName": creatorName,
-							"creation_datetime": resp.data.attributes.creation_datetime
+							"creation_datetime": creationDatetime
 						};
 						var shotInfo = {
 							"uuid": $scope.shotID,
@@ -1737,6 +1792,7 @@
 			$uibModalInstance.dismiss('cancel');
 			self.audience.selected = "private";
 			self.language.selected=null;
+			self.category.selected="notes";
 			self.note.text = "";
 		};
 

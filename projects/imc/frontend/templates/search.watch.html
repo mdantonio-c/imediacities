@@ -44,7 +44,7 @@
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
 							ng-click="watchCtrl.manualtag('notes');"
 							tooltip-placement="right"
-							uib-tooltip="Add free&nbsp;text">
+							uib-tooltip="Add a&nbsp;note">
 							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
 						</div>
 					</div>
@@ -85,39 +85,6 @@
 		<div class="col-xs-12 col-md-6">
 			<uib-tabset>
 
-			<!-- notes -->
-			<uib-tab heading="Notes">
-				<div class="space-4"></div>
-				<div class="tab-notes">
-					<div class="tab-notes-title">
-						Notes on shot {{watchCtrl.notesShotSelected}}
-					</div>
-					<!-- list of the notes of the selected shot -->
-					<div class="tab-list-notes">
-
-						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">{{note.creatorName}}</span>
-								<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									{{note.text}}
-								</span>
-							</p>
-						</div>
-					</div>
-					<!-- list of the shots -->
-					<div class="tab-list-shots">
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot-selected' : 'tab-list-shot'">
-							<span><a ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
-							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
-						</div>
-					</div>
-				</div>
-			</uib-tab>
 			<uib-tab heading="Metadata">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
@@ -204,6 +171,43 @@
 			</ul>
 			<div class="sb-modal-parent"></div>
 			</uib-tab>
+
+			<!-- notes -->
+			<uib-tab heading="Notes">
+				<div class="space-4"></div>
+				<div class="tab-notes">
+					<div class="tab-notes-title">
+						Notes on shot {{watchCtrl.notesShotSelected}}
+					</div>
+					<!-- list of the notes of the selected shot -->
+					<div class="tab-list-notes">
+
+						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }">
+							<p>
+								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
+								<span class="note-user-name">{{note.creatorName}}</span>
+								<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
+							</p>
+							<p>
+								<span class="note-text">
+									<i class="imc-icon fa fa-quote-left"></i>
+									{{note.text}}
+								</span>
+							</p>
+						</div>
+					</div>
+					<!-- list of the shots -->
+					<div class="tab-list-shots" data-spy="scroll" data-target="#navbar-hidden">
+
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot-selected' : 'tab-list-shot'">
+							<span><a ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
+							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
+						</div>
+					</div>
+				</div>
+			</uib-tab>
+
+
 			<uib-tab heading="Annotations">
 				<div class="space-4"></div>
 				<div>
@@ -220,7 +224,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'-anno.shotNum'">
-								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT)">{{anno.shotNum}}</a></td>
+								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT,anno.shotNum)">{{anno.shotNum}}</a></td>
 								<td>{{ anno.group }}</td>
 								<td>{{ anno.name }}</td>
 								<td>{{ anno.startT | date:'mm:ss' }}</td>
@@ -305,7 +309,9 @@
 			<h4 class="modal-title">Add a location to this shot</h4>
 		</div>
 		<div class="modal-body">
-			<p>Shot starting time (sec): <b>{{startT}}</b> ending: <b>{{endT}}</b></p>
+			<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+			<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+			<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
@@ -351,7 +357,9 @@
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p>Shot starting time (sec): <b>{{startT | date:'mm:ss'}}</b> ending: <b>{{endT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
 				<div class="col-sm-4">
@@ -397,7 +405,9 @@
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p>Shot starting time (sec): <b>{{startT | date:'mm:ss'}}</b> ending: <b>{{endT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
 				<div class="col-sm-4">
@@ -406,24 +416,41 @@
 				</div>
 				<div class="col-sm-8">
 					<div class="modal-div-1">
-						<div class="modal-div-select-0">
-							<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.audience.selected"
-							ng-options="o as o for o in $notesCtrl.audience.options">
-							</select>
-						</div>
-						<div class="modal-div-select-1">
-							<select id="form-field-select-1" class="modal-select-1" ng-model="$notesCtrl.note.category">
-								<option value="notes" >notes</option>
-								<option value="desc">description</option>
-							</select>
-						</div>
-						<div class="modal-div-select-2">
-							<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
-							ng-options="o as o for o in $notesCtrl.language.options">
-								<option value="">language of text</option>
-							</select>
-						</div>
 
+						<!--
+
+						<div class="modal-div-select-0">
+							<i class="imc-icon fa fa-lock fa-lg" title="private"></i>
+							<i class="imc-icon fa fa-lock-open fa-lg" title="public"></i>
+							</select>
+						</div>
+						-->
+
+						<div class="modal-div-options">
+							<div class="modal-div-select-0">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.audience.selected"
+								ng-options="o as o for o in $notesCtrl.audience.options">
+								</select>
+							</div>
+
+
+							<div class="modal-div-select-1">
+								<select id="form-field-select-1" class="modal-select-1" ng-model="$notesCtrl.category.selected"
+								ng-options="o as o for o in $notesCtrl.category.options">
+								</select>
+							</div>
+							<div class="modal-div-select-2">
+								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
+								ng-options="o as o for o in $notesCtrl.language.options">
+									<option value="">language of text</option>
+								</select>
+							</div>
+							<!--
+							<div class="modal-div-select-3">
+								<i class="imc-icon fa fa-cog fa-lg" title="options"></i>
+							</div>
+							-->
+						</div>
 						<textarea id="form-field-11" ng-model="$notesCtrl.note.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..."></textarea>
 
 					</div>
