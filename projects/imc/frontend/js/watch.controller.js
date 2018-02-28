@@ -1,6 +1,8 @@
 (function() {
 	'use strict';
 
+	var noteMaxLenght = 500;
+
 	var app = angular.module('web')
 		.controller('TagController', TagController)
 		.controller('NotesController', NotesController)
@@ -1753,6 +1755,8 @@
 		self.confirmNote = function() {
 			var target = 'shot:' + $scope.shotID;
 			if (self.note.text && self.note.text.length > 0) {
+				// text max lenght = noteMaxLenght
+				self.note.text = self.note.text.substring(0, noteMaxLenght);
 				var langCode = encodeLanguage(self.language.selected);
 				self.note.language = langCode;
 				// save the Note into the database
