@@ -4,7 +4,7 @@
 angular.module('web').controller('GroupsController', GroupsController);
 angular.module('web').controller('GroupDialogController', GroupDialogController);
 
-function GroupsController($scope, $log, DataService, noty, FormDialogService)
+function GroupsController($log, DataService, noty, FormDialogService)
 {
 	var self = this;
 
@@ -69,7 +69,10 @@ function GroupsController($scope, $log, DataService, noty, FormDialogService)
 			}
 		);
 	}
-}
+};
+GroupsController.$inject = [
+	"$log", "DataService", "noty", "FormDialogService"
+];
 
 function GroupDialogController($scope, $controller, $log, $uibModalInstance, DataService, noty)
 {
@@ -99,6 +102,10 @@ function GroupDialogController($scope, $controller, $log, $uibModalInstance, Dat
 
 		return $scope.closeDialog(promise)
 	}
-}
+};
+
+GroupDialogController.$inject = [
+	"$scope", "$controller", "$log", "$uibModalInstance", "DataService", "noty"
+];
 
 })();
