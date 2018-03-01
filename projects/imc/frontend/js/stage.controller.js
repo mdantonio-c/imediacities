@@ -10,9 +10,8 @@ function StageController($scope, $rootScope, $log, AuthService2, $q, $window, Da
 
 	self.files = [];
 
-	const globalConfig = require('globalConfig');
 	$scope.flowOptions = {
-        target: globalConfig.apiUrl + '/upload',
+        target: process.env.apiUrl + '/upload',
         chunkSize: 10*1024*1024,
         simultaneousUploads: 1,
         testChunks: false,

@@ -30,6 +30,7 @@ services:
     environment:
       - APP_MODE=production
       - APP_DEBUG=false 
+      - BACKEND_HOST = ${PROJECT_DOMAIN}
     networks:
       proxy_net:
         aliases:
