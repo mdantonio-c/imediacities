@@ -4,7 +4,7 @@
 var app = angular.module('web').controller('ArchiveController', ArchiveController);
 
 // The controller
-function ArchiveController($scope, $rootScope, $log, $auth, $q, DataService, FormDialogService, noty)
+function ArchiveController($scope, $rootScope, $log, $q, DataService, FormDialogService, noty)
 {
 	var self = this;
 	self.files = [];

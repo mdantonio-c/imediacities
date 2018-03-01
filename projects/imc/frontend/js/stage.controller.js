@@ -4,7 +4,7 @@
 var app = angular.module('web').controller('StageController', StageController);
 
 // The controller
-function StageController($scope, $rootScope, $log, $auth, $q, $window, DataService, FormDialogService, noty, FileSaver)
+function StageController($scope, $rootScope, $log, AuthService2, $q, $window, DataService, FormDialogService, noty, FileSaver)
 {
 	var self = this;
 
@@ -17,7 +17,7 @@ function StageController($scope, $rootScope, $log, $auth, $q, $window, DataServi
         simultaneousUploads: 1,
         testChunks: false,
         permanentErrors: [ 401, 405, 500, 501 ],
-        headers: {Authorization : 'Bearer ' + $auth.getToken()}
+        headers: {Authorization : 'Bearer ' + AuthService2.getToken()}
     };
 
     self.importStageFiles = function(file) {
@@ -128,7 +128,12 @@ function StageController($scope, $rootScope, $log, $auth, $q, $window, DataServi
 			});
 	};
 	
-}
+};
+
+StageController.$inject = [
+	"$scope", "$rootScope", "$log", "AuthService2", "$q", "$window",
+	"DataService", "FormDialogService", "noty", "FileSaver"
+];
 
 
 })();
