@@ -5,7 +5,7 @@ MAINTAINER "Mattia D'Antonio <m.dantonio@cineca.it>"
 # Backend/Celery build merged with:
 # https://gitlab.hpc.cineca.it/usermanager/imedia-pipeline/blob/master/scripts/docker_python_runtime/Dockerfile
 
-RUN apt-get install -y ffmpeg libavcodec-extra libv4l-0 libsm6 libxext6
+RUN apt-get install -y ffmpeg libavcodec-extra libv4l-0 libsm6 libxext6 imagemagick
 
 RUN pip install --upgrade --force-reinstall --no-cache-dir numpy Pillow opencv-python
 
