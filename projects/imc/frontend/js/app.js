@@ -9,9 +9,9 @@
         'ui.bootstrap',
         'formly',
         'formlyBootstrap',
-/*        'angular.chips',*/
+        'angular.chips',
         'tableSort',
-/*        'flow',*/
+        'flow',
         'ngFileSaver',
 
         'ngMap',

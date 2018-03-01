@@ -55,7 +55,8 @@ class Upload(Uploader, GraphBaseOperations):
             overwrite=True
         )
 
-        return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)
+        # return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)
+        return self.force_response("")
 
     @decorate.catch_error()
     @catch_graph_exceptions
