@@ -589,19 +589,72 @@
 		};
 		sc.resetPager();
 
+		var europeCenter = [45, 14];
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
 		sc.mapZoom = 4;
-		sc.mapCenter = [50.00,20.34];
+		// initial radius in meters
+		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
+		sc.radius = 1600 * 1000;	// for zoom level 4
+		sc.mapCenter = europeCenter;
 		sc.dynMarkers = [];
 		sc.mapTags = [];
+		sc.showMapBoundary = false;
 
 		sc.centerEurope = function() {
-			sc.mapZoom = 4;
-			sc.mapCenter = [50.00,20.34];
+			sc.mapCenter = europeCenter;
 			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
 			sc.map.setCenter(pt);
-			sc.map.setZoom(sc.mapZoom);
+			sc.map.setZoom(4);
+		};
+
+		sc.toggleBoundary = function() {
+			sc.showMapBoundary = !sc.showMapBoundary;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(sc.showMapBoundary);
+		};
+
+		sc.setBoundaryVisible = function(val) {
+			sc.showMapBoundary = val;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(val);
+		};
+
+		sc.centerChanged = function(event) {
+			if (!angular.isDefined(sc.map)) { return; }
+			sc.inputPlaceName = '';
+			$timeout(function() {
+				//sc.map.panTo(sc.map.getCenter());
+				var latLng = sc.map.getCenter();
+				var newCenter = [latLng.lat(), latLng.lng()];
+				if (!_.isEqual(sc.mapCenter, newCenter)) {
+					sc.mapCenter = newCenter;
+					// console.log('center changed to: ' + sc.mapCenter);
+					if (sc.filter.provider !== null && !sc.initialMapLoad) {
+						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+					}
+				}
+			}, 1000);
+		};
+
+		sc.zoomChanged = function() {
+			if (!angular.isDefined(sc.map)) { return; }
+			var oldZoom = sc.mapZoom;
+			var newZoom = sc.map.getZoom();
+			if (newZoom !== oldZoom) {
+				// zoom changed
+				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+				// fit the circle radius properly
+				var r = sc.radius;
+				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
+				// console.log('new radius: ' + sc.radius + ' meters');
+				sc.mapZoom = newZoom;
+				if (sc.filter.provider !== null && !sc.initialMapLoad) {
+					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+				}
+			}
 		};
 
 		function centerMap(place) {
@@ -609,12 +662,10 @@
 			// console.log(place);
 			var lat = place.lat,
 				lng = place.lng;
-			/*sc.mapCenter = [lat, lng];
-			sc.mapZoom = 14;*/
 			if (lat === undefined || lng === undefined) { return; }
 			var pt = new google.maps.LatLng(lat, lng);
 			sc.map.setCenter(pt);
-			//sc.map.setZoom(sc.mapZoom);
+			sc.mapCenter = [lat, lng];
 			var bounds = new google.maps.LatLngBounds();
 			for (var i = 0; i < place.viewport.length; i++) {
 				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
@@ -651,83 +702,23 @@
 					sc.creations = out_data.data.Response.data;
 					NgMap.getMap().then(function(map) {
 						sc.map = map;
-						// clean up current marker list
-						if (sc.markerClusterer !== undefined) {
-							sc.markerClusterer.clearMarkers();
-						}
-						sc.dynMarkers = [];
+						sc.setBoundaryVisible(sc.showMapBoundary);
+						sc.initialMapLoad = true;
 						if (sc.filter.provider !== null) {
-							sc.mapZoom = 14;
+							map.setZoom(14);
 							sc.mapCenter = getPosition(sc.filter.provider);
-							var cFilter = {
-								filter: sc.filter
-							};
-							if (sc.inputTerm !== '') {
-								cFilter.match = {
-									term: sc.inputTerm,
-									fields: sc.selectedMatchFields
-								};
-							}
-							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
-								function(response) {
-									sc.mapTags = response.data.Response.data;
-									var relevantCreations = new Map();
-									angular.forEach(sc.mapTags, function(tag, index) {
-										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
-										var marker = new google.maps.Marker({
-											position: latLng,
-											id: tag.iri,
-											name: tag.name,
-											sources: tag.sources
-										});
-										// update relavant creations
-										for (var i=0; i<tag.sources.length; i++) {
-											var uuid = tag.sources[i].uuid;
-											if(!relevantCreations.has(uuid)) {
-												relevantCreations.set(uuid, new Set([tag.iri]));
-											} else {
-											    relevantCreations.get(uuid).add(tag.iri);
-											}
-										}
-
-										google.maps.event.addListener(marker, 'click', function() {
-											sc.markerTag = marker;
-											GeoCoder.geocode({
-												'placeId': marker.id
-											}).then(function(results) {
-												// look outside in order to enrich details for that given place id
-												if (results[0]) {
-													sc.markerTag.address = results[0].formatted_address;
-												} else {
-													noty.showWarning('No results found');
-												}
-											}).catch(function(error) {
-												noty.showWarning('Unable to get info for place ID: ' + marker.id);
-											}).finally(function(){
-												// should we move the center to tag position?
-												sc.map.setCenter(sc.markerTag.position);
-												sc.map.showInfoWindow('tag-iw', sc.markerTag);
-											});
-
-										});
-										sc.dynMarkers.push(marker);
-									});
-									updateMarkers(map);
-									sc.loadingMapResults = true;
-									DataService.getRelavantCreations(relevantCreations).then(function(response) {
-										sc.mapResults = response.data.Response.data;
-										// console.log(sc.mapResults);
-									}).catch(function(error) {
-										noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
-									}).finally(function() {
-										sc.loadingMapResults = false;
-									});
-								}
-							);
+							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
+							sc.initialMapLoad = false;
 						} else {
 							// content from all cities represented on a map of Europe
-							sc.mapZoom = 4;
-							sc.mapCenter = [50.00,20.34];
+							map.setZoom(4);
+							sc.mapCenter = europeCenter;
+
+							// clean up current marker list
+							if (sc.markerClusterer !== undefined) {
+								sc.markerClusterer.clearMarkers();
+							}
+							sc.dynMarkers = [];
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
@@ -766,6 +757,85 @@
 				});
 		};
 		sc.search();
+
+		function loadGeoDistanceAnnotations(distance, center, isLocated) {
+			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
+				center[1] + '] within distance: ' + distance + ' (meters)');*/
+			// clean up current marker list
+			if (sc.markerClusterer !== undefined) {
+				sc.markerClusterer.clearMarkers();
+			}
+			sc.dynMarkers = [];
+			// clean up relevant creations under the map
+			sc.mapResults = [];
+
+			// load annotations
+			var cFilter = {
+				filter: sc.filter
+			};
+			if (sc.inputTerm !== '') {
+				cFilter.match = {
+					term: sc.inputTerm,
+					fields: sc.selectedMatchFields
+				};
+			}
+			DataService.getGeoDistanceAnnotations(distance, center, cFilter).then(
+				function(response) {
+					sc.mapTags = response.data.Response.data;
+					var relevantCreations = new Map();
+					angular.forEach(sc.mapTags, function(tag, index) {
+						var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
+						var marker = new google.maps.Marker({
+							position: latLng,
+							id: tag.iri,
+							name: tag.name,
+							sources: tag.sources
+						});
+						// update relavant creations
+						for (var i=0; i<tag.sources.length; i++) {
+							var uuid = tag.sources[i].uuid;
+							if(!relevantCreations.has(uuid)) {
+								relevantCreations.set(uuid, new Set([tag.iri]));
+							} else {
+							    relevantCreations.get(uuid).add(tag.iri);
+							}
+						}
+
+						google.maps.event.addListener(marker, 'click', function() {
+							sc.markerTag = marker;
+							GeoCoder.geocode({
+								'placeId': marker.id
+							}).then(function(results) {
+								// look outside in order to enrich details for that given place id
+								if (results[0]) {
+									sc.markerTag.address = results[0].formatted_address;
+								} else {
+									noty.showWarning('No results found');
+								}
+							}).catch(function(error) {
+								noty.showWarning('Unable to get info for place ID: ' + marker.id);
+							}).finally(function(){
+								// should we move the center to tag position?
+								// sc.map.setCenter(sc.markerTag.position);
+								sc.map.showInfoWindow('tag-iw', sc.markerTag);
+							});
+
+						});
+						sc.dynMarkers.push(marker);
+					});
+					updateMarkers(sc.map);
+					sc.loadingMapResults = true;
+					DataService.getRelavantCreations(relevantCreations).then(function(response) {
+						sc.mapResults = response.data.Response.data;
+						// console.log(sc.mapResults);
+					}).catch(function(error) {
+						noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
+					}).finally(function() {
+						sc.loadingMapResults = false;
+					});
+				}
+			);
+		}
 
 		function updateMarkers(map) {
 			sc.markerClusterer = new MarkerClusterer(
