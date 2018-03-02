@@ -2080,8 +2080,13 @@ li.ivh-treeview-node::before {
     font-weight: bold;
 }
 .note-date{
-	margin-left: 30px;
+	margin-left: 15px;
     color: #aaa;
+}
+.note-bin{
+	float: right;
+    padding-right: 15px;
+    padding-top: 10px;
 }
 .note-text{
 	color: #aaa;

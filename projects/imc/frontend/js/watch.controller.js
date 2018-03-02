@@ -998,7 +998,37 @@
 				// NO: do nothing
 			});
 		};
-
+		self.deleteNote = function(note) {
+			console.log(angular.toJson(note, true));
+			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+			var modalInstance = $uibModal.open({
+				templateUrl: 'confirmNoteModal.html',
+				animation: false,
+				size: 'sm',
+				controller: 'ModalConfirmController',
+				appendTo: parentElem
+			});
+			var noteId = note.id;
+			modalInstance.result.then(function() {
+				// YES: delete annotation
+				DataService.deleteNote(noteId).then(function() {
+					console.log('Note [' + noteId + '] deleted successfully');
+					angular.forEach(self.notes, function(note, index) {
+						if (note.id === noteId ) {
+							self.notes.splice(index, 1);
+						}
+					});
+					// update the notes tab with the remaining annotations
+					// Non c'e' bisogno viene aggiornata in automatico 
+					//  perche' cambia la variabile self.notes
+					//$rootScope.$emit('updateNotes', null, null);
+				}, function(err) {
+					// TODO
+				});
+			}, function() {
+				// NO: do nothing
+			});
+		};
 		self.items = [];
 		self.shots = [];
 		self.slideSize = 0;
@@ -1365,6 +1395,7 @@
 				id: noteInfo.uuid,
 				text: noteInfo.text,
 				creatorName: noteInfo.creatorName,
+				creator: noteInfo.creator,
 				creation_datetime: noteInfo.creation_datetime,
 				shotId: shotInfo.uuid,
 				shotNum: shotInfo.shotNum,
@@ -1774,7 +1805,7 @@
 							"uuid": noteId,
 							"text": self.note.text,
 							"textLanguage": self.note.language,
-							"creatorId": creatorId,
+							"creator": creatorId,
 							"creatorName": creatorName,
 							"creation_datetime": creationDatetime
 						};

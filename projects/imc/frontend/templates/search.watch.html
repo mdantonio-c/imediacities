@@ -187,6 +187,17 @@
 								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
 								<span class="note-user-name">{{note.creatorName}}</span>
 								<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
+								<span class="note-bin">
+								<a class="btn btn-danger btn-xs"
+									ng-click="watchCtrl.deleteNote(note)"
+									ng-confirm-click="Are you sure you want to delete this note?"
+									tooltip-placement="left"
+									uib-tooltip="Delete note"
+									ng-if="profile.uuid == note.creator">
+									<i class="fa fa-trash-o"> </i>
+								</a>
+								</span>
+
 							</p>
 							<p>
 								<span class="note-text">
@@ -502,6 +513,17 @@
 			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
 		</div>
 		<div class="modal-body">Do you really want to remove this annotation?</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="yes()">Yes</button>
+			<button class="btn btn-warning" ng-click="no()">No</button>
+		</div>
+	</script>
+	<script type="text/ng-template" id="confirmNoteModal.html">
+		<div class="modal-header modal-header-confirm">
+			<button type="button" class="close" ng-click="no()">x</button>
+			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
+		</div>
+		<div class="modal-body">Do you really want to remove this note?</div>
 		<div class="modal-footer">
 			<button class="btn btn-primary" ng-click="yes()">Yes</button>
 			<button class="btn btn-warning" ng-click="no()">No</button>

@@ -147,6 +147,9 @@ function DataService($log, api, $q, jsonapi_parser) {
             return api.apiCall('annotations/'+annoId, 'DELETE');
         }
     };
+    self.deleteNote = function (noteId) {
+        return api.apiCall('annotations/'+noteId, 'DELETE');
+    };
 
     self.getGeoDistanceAnnotations = function (distance, pin, cFilter) {
         var filter = {
