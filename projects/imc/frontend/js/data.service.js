@@ -118,12 +118,16 @@ function DataService($log, api, $q, jsonapi_parser) {
         data.target = target;
         var body = {};
         body.type = "TextualBody";
-        body.purpose = "commenting"; // TODO nella form però ho due categorie: notes, description
         body.value = note.text;
         body.language = note.language;
-        // TODO public / private ???
         data.body = body;
-        // TODO manca la gestione nella API stessa di questo nuovo caso
+        if(note.privacy == "public"){
+            data.private = false;
+        }else{
+            data.private = true;            
+        }
+        // TODO manca embargo
+        data.motivation = "describing";
         return api.apiCall('annotations', 'POST', data);
     };
 

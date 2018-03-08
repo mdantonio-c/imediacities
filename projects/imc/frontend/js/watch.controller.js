@@ -1029,6 +1029,23 @@
 				// NO: do nothing
 			});
 		};
+
+		// ritorna le classi css da applicare agli elementi
+		//  della lista degli shot nel tab delle note
+		self.computeCssClass = function(last,shot) {
+		    var cssClass = "tab-list-shot";
+		    if(last){
+		    	cssClass += " tab-list-shot-last";
+		    }
+		    if(shot == self.notesShotSelected){
+		    	cssClass += " tab-list-shot-selected";
+		    }else{
+		    	cssClass += " tab-list-shot-no-selected";		    	
+		    }
+		    //console.log('computeCssClass=' + cssClass);
+		    return cssClass;
+		};
+
 		self.items = [];
 		self.shots = [];
 		self.slideSize = 0;
@@ -1177,22 +1194,26 @@
 									};
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
-							}else if (anno.attributes.annotation_type.key === 'COMMENTING') {
+							}else if (anno.attributes.annotation_type.key === 'describing') { // note
 								// mi aspetto che la note abbia un solo body di tipo textual
+								// TODO il backend mi manda solo quelle che posso vedere?
 								var text = anno.bodies[0].attributes.value;
 								var textLanguage = anno.bodies[0].attributes.language;
 								var creatorId = anno.creator.id;
 								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
-								// TODO manca la categoria: notes, description
-								// TODO manca la gestione public/private ? 
-								//       ma forse è il backend che mi manda solo quelle che posso vedere ?
+								var privacy = "private";
+								if(!anno.private){
+									privacy = "public";
+								}
 								var noteInfo = {
 									uuid: anno.id,
 									text: text,
 									textLanguage: textLanguage,
 									creator: creatorId,
-									creatorName: creatorName
+									creatorName: creatorName,
+									privacy: privacy
 								};
+								console.log('nota=' + angula.toJson(noteInfo));
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
 
 							}else{
@@ -1397,6 +1418,7 @@
 				creatorName: noteInfo.creatorName,
 				creator: noteInfo.creator,
 				creation_datetime: noteInfo.creation_datetime,
+				privacy: noteInfo.privacy,
 				shotId: shotInfo.uuid,
 				shotNum: shotInfo.shotNum,
 				shotStartT: shotInfo.startT,
@@ -1761,8 +1783,8 @@
 		$scope.shotNum = sharedProperties.getShotNum();
 		
 		// serve per la select nella modale
-		// audience = public or private
-		self.audience = {
+		// privacy = public or private
+		self.privacy = {
 			options:  ["private","public"],
 			selected: "private"
 		};
@@ -1772,13 +1794,6 @@
 			options:  ["Danish","Dutch","English","French","German","Greek","Italian","Spanish","Swedish"],
 			selected: null
 		};
-		// serve per la select nella modale
-		// TODO quali sono le categorie?
-		self.category = {
-			options:  ["notes","description"],
-			selected: "notes"
-		};
-		//self.note.purpose = "commenting"; // TODO serve ancora?
 		// the new note the user is creating
 		self.note = {};
 		// textarea nella modale
@@ -1790,6 +1805,7 @@
 				self.note.text = self.note.text.substring(0, noteMaxLenght);
 				var langCode = encodeLanguage(self.language.selected);
 				self.note.language = langCode;
+				self.note.privacy = self.privacy.selected;
 				// save the Note into the database
 				DataService.saveNote(target, self.note).then(
 					function(resp) {
@@ -1799,15 +1815,14 @@
 						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
 							resp.data.relationships.creator[0].attributes.surname;
 						var creationDatetime = resp.data.attributes.creation_datetime;
-						// TODO manca la categoria: notes, description
-						// TODO manca public/private
 						var noteInfo = {
 							"uuid": noteId,
 							"text": self.note.text,
 							"textLanguage": self.note.language,
 							"creator": creatorId,
 							"creatorName": creatorName,
-							"creation_datetime": creationDatetime
+							"creation_datetime": creationDatetime,
+							"privacy": self.note.privacy
 						};
 						var shotInfo = {
 							"uuid": $scope.shotID,
@@ -1825,7 +1840,7 @@
 		};
 		self.cancel = function() {
 			$uibModalInstance.dismiss('cancel');
-			self.audience.selected = "private";
+			self.privacy.selected = "private";
 			self.language.selected=null;
 			self.category.selected="notes";
 			self.note.text = "";

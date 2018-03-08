@@ -182,7 +182,7 @@
 					<!-- list of the notes of the selected shot -->
 					<div class="tab-list-notes">
 
-						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }">
+						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
 							<p>
 								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
 								<span class="note-user-name">{{note.creatorName}}</span>
@@ -200,6 +200,9 @@
 
 							</p>
 							<p>
+								<span class="note-privacy" ng-if="note.privacy == 'private'"><i class="imc-icon fa fa-lock"></i></span>
+							</p>
+							<p>
 								<span class="note-text">
 									<i class="imc-icon fa fa-quote-left"></i>
 									{{note.text}}
@@ -210,9 +213,18 @@
 					<!-- list of the shots -->
 					<div class="tab-list-shots" data-spy="scroll" data-target="#navbar-hidden">
 
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot-selected' : 'tab-list-shot'">
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="watchCtrl.computeCssClass($last,shot.number)">
+
+						<!--
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot tab-list-shot-selected' : 'tab-list-shot tab-list-shot-no-selected'">
+						-->
+
+
 							<span><a ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
+
+							<!--
 							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
+							-->
 						</div>
 					</div>
 				</div>
@@ -428,41 +440,24 @@
 				<div class="col-sm-8">
 					<div class="modal-div-1">
 
-						<!--
-
-						<div class="modal-div-select-0">
-							<i class="imc-icon fa fa-lock fa-lg" title="private"></i>
-							<i class="imc-icon fa fa-lock-open fa-lg" title="public"></i>
-							</select>
-						</div>
-						-->
-
 						<div class="modal-div-options">
 							<div class="modal-div-select-0">
-								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.audience.selected"
-								ng-options="o as o for o in $notesCtrl.audience.options">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.privacy.selected"
+								ng-options="o as o for o in $notesCtrl.privacy.options">
 								</select>
 							</div>
 
-
-							<div class="modal-div-select-1">
-								<select id="form-field-select-1" class="modal-select-1" ng-model="$notesCtrl.category.selected"
-								ng-options="o as o for o in $notesCtrl.category.options">
-								</select>
-							</div>
 							<div class="modal-div-select-2">
 								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
 								ng-options="o as o for o in $notesCtrl.language.options">
-									<option value="">language of text</option>
+									<option value="">language</option>
 								</select>
 							</div>
-							<!--
-							<div class="modal-div-select-3">
-								<i class="imc-icon fa fa-cog fa-lg" title="options"></i>
-							</div>
-							-->
+
 						</div>
-						<textarea id="form-field-11" ng-model="$notesCtrl.note.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500"></textarea>
+
+						<textarea id="form-field-11" ng-model="$notesCtrl.note.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
+						</textarea>
 
 					</div>
 

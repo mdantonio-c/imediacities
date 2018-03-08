@@ -1972,10 +1972,9 @@ li.ivh-treeview-node::before {
 	width: 450px;
 }
 .modal-div-select-0{
-	display: inline-block;
-	width: 33%;
-	color: #999;
-    font-weight: bold;
+    display: inline-block;
+    color: #999;
+    font-size: small;
 }
 .modal-div-select-1
 {
@@ -1987,20 +1986,17 @@ li.ivh-treeview-node::before {
 .modal-div-select-2
 {
 	display: inline-block;
-	width: 32%;
-	color: #999;
-    font-weight: bold;
+    color: #999;
+    float: right;
+    font-size: small;
 }
 .modal-select-0{
-	-moz-appearance: none;
+    -moz-appearance: none;
     -webkit-appearance: none;
     width: 100%;
     background-color: #f5f5f5;
     border-color: #f5f5f5;
-    padding-left: 10px;
-   	padding-right: 3px;
-   	padding-top: 3px;
-   	padding-bottom: 3px;
+    padding: 3px;
 }
 .modal-select-1
 {
@@ -2021,10 +2017,7 @@ li.ivh-treeview-node::before {
     width: 100%;
     background-color: #f5f5f5;
     border-color: #f5f5f5;
-    padding-left: 10px;
-   	padding-right: 3px;
-   	padding-top: 3px;
-   	padding-bottom: 3px;
+    padding: 3px;
 }
 
 .modal-shot_info
@@ -2091,6 +2084,9 @@ li.ivh-treeview-node::before {
 .note-text{
 	color: #aaa;
 }
+.note-privacy{
+	color: #FFD700; // gold
+}
 .tab-list-notes>.note-text>.imc-icon:first-child {
     padding-right:  10px;
 }
@@ -2100,13 +2096,17 @@ li.ivh-treeview-node::before {
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
     padding: 5px;
+} 
+.tab-list-shot-last
+{
+	border-bottom: 1px solid #aaa;
+}
+.tab-list-shot-no-selected
+{
     background-color: #eee;
 }
+
 .tab-list-shot-selected
 {
-	border-top: 1px solid #aaa;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
-    padding: 5px;
     background-color: #fff;
 }
