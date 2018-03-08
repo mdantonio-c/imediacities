@@ -16,6 +16,7 @@ from utilities import htmlcodes as hcodes
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.annotation_repository import DuplicatedAnnotationError
 
+import datetime
 import re
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
 BODY_PATTERN = re.compile("(resource|textual):.+")
@@ -26,6 +27,10 @@ logger = get_logger(__name__)
 
 #####################################
 class Annotations(GraphBaseOperations):
+
+    # the following list is a subset of the annotation_type list in neo4j
+    # module
+    allowed_motivations = ('tagging', 'describing', 'commenting', 'replying')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -82,6 +87,30 @@ class Annotations(GraphBaseOperations):
             raise RestApiException(
                 'Body is mandatory',
                 status_code=hcodes.HTTP_BAD_REQUEST)
+        if 'motivation' not in data:
+            raise RestApiException(
+                'Motivation is mandatory',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        motivation = data['motivation']
+        if motivation not in self.__class__.allowed_motivations:
+            raise RestApiException(
+                "Bad motivation parameter: expected one of %s" %
+                (self.__class__.allowed_motivations, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        # check for private and embargo date
+        is_private = True if (
+            'private' in data and data['private'] is True) else False
+        embargo_date = None
+        if data['embargo'] is not None:
+            try:
+                embargo_date = datetime.datetime.strptime(data['embargo'], '%Y-%m-%d').date()
+            except ValueError:
+                raise RestApiException('Incorrect embargo date format, should be YYYY-MM-DD',
+                                       status_code=hcodes.HTTP_BAD_REQUEST)
+        if embargo_date is not None and not is_private:
+            raise RestApiException('Embargo date is not allowed for public annotations. '
+                                   'Explicitly set the \'private\' parameter to true',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
         # check the target
         target = data['target']
         logger.debug('Annotate target: {}'.format(target))
@@ -166,13 +195,17 @@ class Annotations(GraphBaseOperations):
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
-        try:
-            created_anno = repo.create_tag_annotations(
-                user, bodies, targetNode, selector)
-        except DuplicatedAnnotationError as error:
-            raise RestApiException(
-                error.args[0] + " " + '; '.join(error.args[1]),
-                status_code=hcodes.HTTP_BAD_CONFLICT)
+        if motivation == 'describing':
+            created_anno = repo.create_dsc_annotation(
+                user, bodies, targetNode, selector, is_private, embargo_date)
+        else:
+            try:
+                created_anno = repo.create_tag_annotation(
+                    user, bodies, targetNode, selector, is_private, embargo_date)
+            except DuplicatedAnnotationError as error:
+                raise RestApiException(
+                    error.args[0] + " " + '; '.join(error.args[1]),
+                    status_code=hcodes.HTTP_BAD_CONFLICT)
 
         return self.force_response(
             self.getJsonResponse(created_anno), code=hcodes.HTTP_OK_CREATED)
@@ -230,6 +263,7 @@ class Annotations(GraphBaseOperations):
         try:
             repo.delete_manual_annotation(anno, body_type, bid)
         except ReferenceError as error:
-            raise RestApiException(error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException(
+                error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
 
         return self.empty_response()

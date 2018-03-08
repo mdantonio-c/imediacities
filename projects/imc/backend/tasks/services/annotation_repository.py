@@ -17,17 +17,17 @@ class AnnotationRepository():
         self.graph = graph
 
     # @graph_transactions
-    def create_tag_annotations(self, user, bodies, target, selector):
+    def create_tag_annotation(self, user, bodies, target, selector,
+                              is_private=False, embargo_date=None):
         # deduplicate body annotations
         warnings, bodies = self.deduplicate_tags(bodies, target, selector)
         if len(warnings) > 0:
             for msg in warnings:
                 log.warning(msg)
         if len(bodies) == 0:
-            raise DuplicatedAnnotationError(
-                "Annotation cannot be created.", warnings)
+            raise ValueError("Annotation cannot be created.", warnings)
 
-        log.debug("Create new tag annotations")
+        log.debug("Create a new tag annotation")
         # create annotation node
         anno = Annotation(annotation_type='TAG').save()
         if user is not None:
@@ -78,7 +78,7 @@ class AnnotationRepository():
                         bodyNode.spatial = coord
                     bodyNode.save()
             elif body['type'] == 'TextualBody':
-                text_lang = body.get('language', 'en')
+                text_lang = body.get('language')
                 bodyNode = TextualBody(
                     value=body['value'], language=text_lang).save()
                 bodyNode.save()
@@ -86,6 +86,43 @@ class AnnotationRepository():
                 # should never be reached
                 raise ValueError('Invalid body: {}'.format(body['type']))
             anno.bodies.connect(bodyNode)
+        return anno
+
+    def create_dsc_annotation(self, user, bodies, target, selector,
+                              is_private=False, embargo_date=None):
+        '''
+        Create a "description" annotation used for private and public notes.
+        '''
+        visibility = 'private' if is_private else 'public'
+        log.debug("Create a new {} description annotation".format(visibility))
+        # create annotation node
+        anno = Annotation(annotation_type='DSC', private=is_private).save()
+        if embargo_date is not None:
+            anno.embargo = embargo_date
+            anno.save()
+        # should we allow to create anno without a user of the system?
+        if user is not None:
+            anno.creator.connect(user)
+
+        if isinstance(target, Item):
+            anno.source_item.connect(target)
+        elif isinstance(target, Annotation):
+            anno.source_item.connect(target.source_item.single())
+        elif isinstance(target, Shot):
+            anno.source_item.connect(target.item.single())
+
+        # ignore at the moment segment selector
+        anno.targets.connect(target)
+
+        for body in bodies:
+            if body['type'] != 'TextualBody':
+                raise ValueError('Invalid body for description annotation: {}'
+                                 .format(body['type']))
+            text_lang = body.get('language')
+            bodyNode = TextualBody(
+                value=body['value'], language=text_lang).save()
+            anno.bodies.connect(bodyNode)
+
         return anno
 
     def delete_manual_annotation(self, anno, btype, bid):

@@ -13,7 +13,7 @@ from datetime import datetime
 import pytz
 
 from restapi.services.neo4j.models import (
-    StringProperty, ArrayProperty, IntegerProperty,
+    StringProperty, ArrayProperty, IntegerProperty, BooleanProperty,
     FloatProperty, DateTimeProperty, DateProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
@@ -592,11 +592,6 @@ class NonAVEntity(Creation):
 # ANNOTATION
 ##############################################################################
 
-# class Annotation(IdentifiedNode):
-#    key = StringProperty(required=True)
-#    value = StringProperty(required=True)
-#    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
-
 
 class AnnotationCreatorRel(StructuredRel):
     when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
@@ -605,12 +600,17 @@ class AnnotationCreatorRel(StructuredRel):
 class Annotation(IdentifiedNode, AnnotationTarget):
     """Annotation class"""
     ANNOTATION_TYPES = (
-        ('OD', 'object detection'),
-        ('OR', 'object recognition'),
         ('VQ', 'video quality'),
         ('VIM', 'video image motion'),
         ('TVS', 'temporal video segmentation'),
-        ('TAG', 'tag')
+        ('TAG', 'tagging'),
+        ('COM', 'commenting'),
+        ('RPL', 'replying'),
+        ('LNK', 'linking'),
+        ('REP', 'reporting'),
+        ('ASS', 'assessing'),
+        ('DSC', 'describing'),
+        ('BMK', 'bookmarking')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
         ('FHG', 'Fraunhofer tool'),
@@ -621,6 +621,8 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
         default=lambda: datetime.now(pytz.utc), show=True)
+    private = BooleanProperty(default=False, show=True)
+    embargo = DateProperty(show=True)
     source_item = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
         'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
@@ -638,7 +640,7 @@ class AnnotationBody(HeritableStructuredNode):
 
 class TextualBody(AnnotationBody):
     value = StringProperty(required=True, show=True)
-    language = StringProperty(default='en', show=True)
+    language = StringProperty(show=True)
 
 
 class ResourceBody(AnnotationBody):
