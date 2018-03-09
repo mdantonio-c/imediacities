@@ -102,9 +102,19 @@ class ShotAnnotations(GraphBaseOperations):
                 "Please specify a valid shot id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         for a in shot.annotation:
             if anno_type is not None and a.annotation_type != anno_type:
                 continue
+            if a.private:
+                if a.creator is None:
+                    logger.warn('Invalid state: missing creator for private '
+                                'note [UUID:{}]'.format(a.uuid))
+                    continue
+                creator = a.creator.single()
+                if creator.uuid != user.uuid:
+                    continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
             del(res['links'])
             if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:

@@ -146,10 +146,20 @@ class VideoAnnotations(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         item = video.item.single()
         for a in item.targeting_annotations:
             if anno_type is not None and a.annotation_type != anno_type:
                 continue
+            if a.private:
+                if a.creator is None:
+                    logger.warn('Invalid state: missing creator for private '
+                                'note [UUID:{}]'.format(a.uuid))
+                    continue
+                creator = a.creator.single()
+                if creator.uuid != user.uuid:
+                    continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
             del(res['links'])
             if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
@@ -201,6 +211,8 @@ class VideoShots(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
 
@@ -213,6 +225,14 @@ class VideoShots(GraphBaseOperations):
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
             for anno in s.annotation.all():
+                if anno.private:
+                    if anno.creator is None:
+                        logger.warn('Invalid state: missing creator for private '
+                                    'note [UUID:{}]'.format(anno.uuid))
+                        continue
+                creator = anno.creator.single()
+                if creator.uuid != user.uuid:
+                    continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
                 if (anno.annotation_type in ('TAG', 'DSC') and
