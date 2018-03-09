@@ -183,10 +183,25 @@
 					<div class="tab-list-notes">
 
 						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
-							<p>
-								<span class="note-user-icon"><i class="imc-icon fa fa-3x fa-user"></i></span>
-								<span class="note-user-name">{{note.creatorName}}</span>
-								<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
+							<div>
+								<span class="note-user-icon">
+									<i class="imc-icon fa fa-user fa-4x pull-left"></i>
+								</span>
+							</div>
+							<div style="display: inline-block;height: 60px;">
+								<p style="margin: 0;">
+									<span class="note-user-name">{{note.creatorName}}</span>
+								</p>
+								<p style="margin: 0;">
+									<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
+								</p>
+								<p style="margin: 0;">
+									<span class="note-privacy" ng-if="note.privacy == 'private'">
+										<i class="imc-icon fa fa-lock"></i>
+									</span>
+								</p>
+							</div>
+							<div style="display:  inline-block;float: right;">
 								<span class="note-bin">
 								<a class="btn btn-danger btn-xs"
 									ng-click="watchCtrl.deleteNote(note)"
@@ -197,17 +212,15 @@
 									<i class="fa fa-trash-o"> </i>
 								</a>
 								</span>
-
-							</p>
-							<p>
-								<span class="note-privacy" ng-if="note.privacy == 'private'"><i class="imc-icon fa fa-lock"></i></span>
-							</p>
-							<p>
-								<span class="note-text">
-									<i class="imc-icon fa fa-quote-left"></i>
-									{{note.text}}
-								</span>
-							</p>
+							</div>
+							<div style="margin: 5px;">
+								<p>
+									<span class="note-text">
+										<i class="imc-icon fa fa-quote-left"></i>
+										{{note.text}}
+									</span>
+								</p>
+							</div>
 						</div>
 					</div>
 					<!-- list of the shots -->

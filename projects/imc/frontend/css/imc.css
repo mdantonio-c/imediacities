@@ -1987,7 +1987,6 @@ li.ivh-treeview-node::before {
 {
 	display: inline-block;
     color: #999;
-    float: right;
     font-size: small;
 }
 .modal-select-0{
@@ -2067,13 +2066,13 @@ li.ivh-treeview-node::before {
 .note-user-name
 {
 	color: #aaa;
-    font-size: large;
     margin-left: 5px;
     margin-right: 5px;
     font-weight: bold;
 }
 .note-date{
-	margin-left: 15px;
+	margin-left: 5px;
+    margin-right: 5px;
     color: #aaa;
 }
 .note-bin{
@@ -2083,9 +2082,12 @@ li.ivh-treeview-node::before {
 }
 .note-text{
 	color: #aaa;
+	font-size: larger;
 }
 .note-privacy{
-	color: #FFD700; // gold
+	margin-left: 5px;
+    margin-right: 5px;
+	color: #FFD700;
 }
 .tab-list-notes>.note-text>.imc-icon:first-child {
     padding-right:  10px;
