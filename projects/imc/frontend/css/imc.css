@@ -2110,3 +2110,156 @@ li.ivh-treeview-node::before {
 	padding-left: 18px;
 }
 
+/*----------------------------------------------
+       The modal of the Notes -- cinzia
+-----------------------------------------------*/
+.modal-div-1
+{
+	height: 200px;
+    padding-top: 20px;
+}
+.modal-div-options
+{
+	width: 450px;
+}
+.modal-div-select-0{
+    display: inline-block;
+    color: #999;
+    font-size: small;
+}
+.modal-div-select-1
+{
+	display: inline-block;
+	width: 33%;
+	color: #999;
+    font-weight: bold;
+}
+.modal-div-select-2
+{
+	display: inline-block;
+    color: #999;
+    font-size: small;
+}
+.modal-select-0{
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding: 3px;
+}
+.modal-select-1
+{
+	-moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding-left: 10px;
+   	padding-right: 3px;
+   	padding-top: 3px;
+   	padding-bottom: 3px;
+}
+.modal-select-2
+{
+	-moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding: 3px;
+}
+
+.modal-shot_info
+{
+	margin-bottom: 2px;
+}
+
+/*----------------------------------------------
+       The tab with the Notes -- cinzia
+-----------------------------------------------*/
+.tab-notes
+{
+	overflow: hidden;
+}
+.tab-notes-title
+{
+	color: #6e7a7f;
+    font-weight: bold;
+    font-size: 20px;
+}
+.tab-list-notes
+{
+	display: inline-block;
+	border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    width: 70%;
+    height: 500px;
+    vertical-align: top;
+    overflow-y: auto;
+}
+.tab-list-note
+{
+	padding: 10px;
+}
+.tab-list-shots
+{
+	display: inline-block;
+    width: 100px;
+    height: 500px;
+    overflow-y: auto;
+}
+.note-user-icon
+{
+	color: #ddd;
+}
+.note-user-name
+{
+	color: #aaa;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+.note-date{
+	margin-left: 5px;
+    margin-right: 5px;
+    color: #aaa;
+}
+.note-bin{
+	float: right;
+    padding-right: 15px;
+    padding-top: 10px;
+}
+.note-text{
+	color: #aaa;
+	font-size: larger;
+}
+.note-privacy{
+	margin-left: 5px;
+    margin-right: 5px;
+	color: #FFD700;
+}
+.tab-list-notes>.note-text>.imc-icon:first-child {
+    padding-right:  10px;
+}
+.tab-list-shot
+{
+	border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    padding: 5px;
+} 
+.tab-list-shot-last
+{
+	border-bottom: 1px solid #aaa;
+}
+.tab-list-shot-no-selected
+{
+    background-color: #eee;
+}
+
+.tab-list-shot-selected
+{
+    background-color: #fff;
+}

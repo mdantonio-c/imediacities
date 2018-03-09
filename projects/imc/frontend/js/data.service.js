@@ -104,6 +104,24 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations', 'POST', data);
     };
 
+    self.saveNote = function(target, note) {
+        var data = {};
+        data.target = target;
+        var body = {};
+        body.type = "TextualBody";
+        body.value = note.text;
+        body.language = note.language;
+        data.body = body;
+        if(note.privacy == "public"){
+            data.private = false;
+        }else{
+            data.private = true;            
+        }
+        // TODO manca embargo
+        data.motivation = "describing";
+        return api.apiCall('annotations', 'POST', data);
+    };
+
     self.saveGeoAnnotation = function(target, source, spatial) {
         var data = {
             target: target,
@@ -123,6 +141,9 @@ function DataService($log, api, $q, jsonapi_parser) {
         } else {
             return api.apiCall('annotations/'+annoId, 'DELETE');
         }
+    };
+    self.deleteNote = function (noteId) {
+        return api.apiCall('annotations/'+noteId, 'DELETE');
     };
 
     self.getGeoDistanceAnnotations = function (distance, pin, cFilter) {

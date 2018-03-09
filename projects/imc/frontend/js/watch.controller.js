@@ -1,8 +1,11 @@
 (function() {
 	'use strict';
 
+	var noteMaxLenght = 500;
+
 	var app = angular.module('web')
 		.controller('TagController', TagController)
+		.controller('NotesController', NotesController)
 		.controller('geoResultController', geoResultController)
 		.controller('WatchController', WatchController)
 		.controller('MapController', MapController)
@@ -36,6 +39,27 @@
 					templateUrl: template || 'myModalGeoCode.html',
 					controller: 'TagController',
 					controllerAs: '$tagCtrl',
+					size: size,
+					appendTo: parentElem,
+					resolve: {
+						params: function() {
+							return params;
+						}
+					}
+				});
+			}
+		};
+	}).factory('myNotesModalFactory', function($uibModal, $document) {
+		/* modal view for adding notes */
+		return {
+			open: function(size, template, params) {
+				console.log("opening notes modal");
+				var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+				return $uibModal.open({
+					animation: true,
+					templateUrl: template,
+					controller: 'NotesController',
+					controllerAs: '$notesCtrl',
 					size: size,
 					appendTo: parentElem,
 					resolve: {
@@ -307,15 +331,17 @@
 	});
 	app.directive('scrollOnClick', function() {
 		return {
-			link: function($scope, $elm) {
+			link: function(scope, $elm) {
 				$elm.on('click', function() {
-					// console.log('scroll on click');
-					// alert($elm[0].parentNode.className);
+					//console.log('scroll on click');
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: $elm[0].offsetLeft
 						}, "slow");
 					}
+					// set the shot selected in notes tab
+					var shotSelectedForNotes = parseInt($elm[0].attributes.progr.value) + 1;
+					scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 					// play video from selected shot
 					var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].attributes.timestamp.value);
@@ -737,9 +763,23 @@
 		var milliseconds = time.getMilliseconds();
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
+	function encodeLanguage(language) {
+		// TODO da completare 
+		var code=null;
+		if (language === 'English') { code = 'en'; }
+		else if(language === 'Italian') { code = 'it'; }
+		else if(language === 'Greek') { code = 'el'; }
+		else if(language === 'Spanish') { code = 'es'; }
+		else if(language === 'Dutch') { code = 'nl'; }
+		else if(language === 'French') { code = 'fr'; }
+		else if(language === 'Danish') { code = 'da'; }
+		else if(language === 'German') { code = 'de'; }
+		else if(language === 'Swedish') { code = 'sv'; }
+		return code;
+	}
 
 	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
-			DataService, noty, myTagModalFactory, sharedProperties) {
+			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
 		var self = this;
 		var vid = $stateParams.v;
@@ -776,6 +816,13 @@
 		// to visualize annotations in tab table
 		self.annotations = [];
 
+		// to visualize notes in notes tab 
+		self.notes = [];
+		// to visualize shots in notes tab table
+		self.notesShots = [];
+		// current shot in notes tab table
+		self.notesShotSelected=1;
+
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
 		$scope.selectedOptions = [];
@@ -791,6 +838,18 @@
 
 		self.startTagTime = $rootScope.currentTime;
 		self.currentvidDur = 0;
+
+		// On video time update: update the selected shot on the Notes tab
+		myVid[0].ontimeupdate = function() {
+			//console.log('ontimeupdate start');
+			var currentTime = parseInt(myVid[0].currentTime);
+			// calculate the shot at current time
+			var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
+			//console.log('current shot: ' + angular.toJson(currentShotNotes, true));
+			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
+			$scope.$digest(); //refresh scope  // serve in questo caso? SI
+			//console.log('ontimeupdate end');
+		};
 
 		// On video playing toggle values
 		myVid[0].onplaying = function() {
@@ -889,8 +948,37 @@
        			else{
            			myVid[0].currentTime += -.1;
        			}
-		};
+		};		
 
+		// Returns the shot corresponding to the time in input
+		function getShotFromVideoCurrentTime(currtime) {
+			//console.log('getShotFromVideoCurrentTime: currtime=' + currtime);
+			var currentShot = null;
+			var currentTime = Math.floor(currtime * 1000);
+			//console.log('Current time video (ms): ' + currentTime);
+			for (var i = 0; i <= self.shots.length - 1; i++) {
+				var shotNum = self.shots[i].attributes.shot_num;
+				var shotTimestamp = self.shots[i].attributes.timestamp;
+				var shotDuration = self.shots[i].attributes.duration;
+				var shotStartTime = convertToMilliseconds(shotTimestamp);
+				var nextStartTime = null;
+				if (i < self.shots.length - 1) {
+					// get start time from the next shot
+					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
+				} else {
+					// last shot: use the shot duration instead
+					nextStartTime = shotStartTime + (shotDuration * 1000);
+				}
+				if (currentTime >= shotStartTime && currentTime < nextStartTime) {
+					//console.log('found shot number ' + (shotNum+1) + ', from start time ' + shotStartTime + ' (ms)');
+					currentShot = shotNum+1;
+					// exit loop
+					break;
+				}
+			}
+			return currentShot;
+		}
+		//  TODO it could use the function above 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
 
@@ -931,8 +1019,11 @@
 					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
 					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 					
-					if (mode != 'location') {
+					if (mode == 'term') {
 						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+					}
+					else if (mode == 'notes') {
+						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
 					}
 					else if (mode == 'location') {
 						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
@@ -976,6 +1067,53 @@
 			}, function() {
 				// NO: do nothing
 			});
+		};
+		self.deleteNote = function(note) {
+			console.log(angular.toJson(note, true));
+			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+			var modalInstance = $uibModal.open({
+				templateUrl: 'confirmNoteModal.html',
+				animation: false,
+				size: 'sm',
+				controller: 'ModalConfirmController',
+				appendTo: parentElem
+			});
+			var noteId = note.id;
+			modalInstance.result.then(function() {
+				// YES: delete annotation
+				DataService.deleteNote(noteId).then(function() {
+					console.log('Note [' + noteId + '] deleted successfully');
+					angular.forEach(self.notes, function(note, index) {
+						if (note.id === noteId ) {
+							self.notes.splice(index, 1);
+						}
+					});
+					// update the notes tab with the remaining annotations
+					// Non c'e' bisogno viene aggiornata in automatico 
+					//  perche' cambia la variabile self.notes
+					//$rootScope.$emit('updateNotes', null, null);
+				}, function(err) {
+					// TODO
+				});
+			}, function() {
+				// NO: do nothing
+			});
+		};
+
+		// ritorna le classi css da applicare agli elementi
+		//  della lista degli shot nel tab delle note
+		self.computeCssClass = function(last,shot) {
+		    var cssClass = "tab-list-shot";
+		    if(last){
+		    	cssClass += " tab-list-shot-last";
+		    }
+		    if(shot == self.notesShotSelected){
+		    	cssClass += " tab-list-shot-selected";
+		    }else{
+		    	cssClass += " tab-list-shot-no-selected";		    	
+		    }
+		    //console.log('computeCssClass=' + cssClass);
+		    return cssClass;
 		};
 
 		self.items = [];
@@ -1043,6 +1181,7 @@
 					//console.log('max timeline value: ' + moment(self.videoTimeline.options.hAxis.maxValue).format(format+'.SSS'));
 
 					// add data to the timeline
+					// cinzia: ho aggiunto lo shot num come ultima colonna
 					self.videoTimeline.data = {
 						"cols": [{
 							id: "category",
@@ -1102,6 +1241,7 @@
 						// loop annotations
 						for (var i = 0; i < shot.annotations.length; i++) {
 							var anno = shot.annotations[i];
+							//console.log("anno=" + angular.toJson(anno, true));
 							if (anno.attributes.annotation_type.key === 'VIM') {
 								// add camera motion attributes
 								sbFields.camera = anno.bodies[0].attributes;
@@ -1124,11 +1264,38 @@
 									};
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
+							}else if (anno.attributes.annotation_type.key === 'describing') { // note
+								// mi aspetto che la note abbia un solo body di tipo textual
+								// TODO il backend mi manda solo quelle che posso vedere?
+								var text = anno.bodies[0].attributes.value;
+								var textLanguage = anno.bodies[0].attributes.language;
+								var creatorId = anno.creator.id;
+								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
+								var privacy = "private";
+								if(!anno.private){
+									privacy = "public";
+								}
+								var noteInfo = {
+									uuid: anno.id,
+									text: text,
+									textLanguage: textLanguage,
+									creator: creatorId,
+									creatorName: creatorName,
+									privacy: privacy
+								};
+								console.log('nota=' + angula.toJson(noteInfo));
+								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+
+							}else{
+								console.log('not handled annotation type = '+anno.attributes.annotation_type.key);
 							}
+
 						}
 						self.storyshots.push(sbFields);
 						
 					});
+					// noteShots serve per il tab Notes a destra
+					self.notesShots = self.storyshots;
 
 				})
 				.catch(function(response) {
@@ -1139,6 +1306,16 @@
   					// hide loading video bar
 					self.showmeli = false;
 				});
+		};
+
+		/**
+		 * When the user selects a shot in the Notes Tab then
+		 *  the tab must displays the notes of the selected shot
+		 * @param selectedShotNum
+		 */
+		self.viewNotesOfSelectedShot = function(selectedShotNum) {
+			//console.log('selectedShotNum=' + selectedShotNum);			
+			self.notesShotSelected = selectedShotNum;
 		};
 
 		self.loadMetadataContent = function(vid) {
@@ -1165,7 +1342,6 @@
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
-
 		if (!$stateParams.meta) {
 			self.loadMetadataContent(vid);
 		} else {
@@ -1184,12 +1360,15 @@
 		 * @param selectedShot - selected cell in the timeline with row and col.
 		 */
 		self.jumpToShot = function(selectedShot) {
-			// console.log('jump to shot: ' + angular.toJson(selectedShot, true));
+			//console.log('jump to shot: selectedShot: ' + angular.toJson(selectedShot, true));
 			var row = selectedShot.row;
 			var startTime = convertDateToMilliseconds(
 				self.videoTimeline.data.rows[row].c[2].v);
 			// console.log('jump to shot: Start time: ' + startTime);
-
+			// set the shot selected in notes tab
+			var shotSelectedForNotes = self.videoTimeline.data.rows[row].c[4].v;
+			//console.log('jump to shot: selectedShot: ' + angular.toJson(shotSelectedForNotes, true));
+			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 			// play video from selected shot
 			var myVid = angular.element($document[0].querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
@@ -1201,8 +1380,14 @@
 		 * Jump to shot from the Annotation Tab.
 		 * @param startTime - start time in milliseconds.
 		 */
-		self.jumpToShotFromAnnotation = function(startTime) {
+		self.jumpToShotFromAnnotation = function(startTime,selectedShot) {
 			// console.log('jump to shot from annotation. Start time: ' + startTime);
+			//console.log('jump to shot from annotation. shot num: ' + selectedShot);
+
+			// set the shot selected in notes tab
+			var shotSelectedForNotes = selectedShot;
+			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
+
 			// play video from selected shot
 			var myVid = angular.element(window.document.querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
@@ -1238,6 +1423,9 @@
 		}
 
 		$rootScope.$on('updateTimeline', function(event, locname, annoInfo, shotInfo) {
+			//console.log("start updateTimeline");
+			//console.log("annoInfo=" +angular.toJson(annoInfo,true));
+			//console.log("shotInfo=" +angular.toJson(shotInfo,true));
 			var startTime, endTime;
 			if (annoInfo === null) {
 				// just refresh the timeline
@@ -1249,7 +1437,8 @@
 						  {v: anno.group},
 						  {v: anno.name},
 						  {v: startTime},
-						  {v: endTime}
+						  {v: endTime},
+						  {v: anno.shotNum}
 					]});
 				});
 				return;
@@ -1261,7 +1450,8 @@
 				  {v: annoInfo.group},
 				  {v: locn},
 				  {v: startTime},
-				  {v: endTime}
+				  {v: endTime},
+				  {v: shotInfo.shotNum}
 			]});
 			var anno = {
 					id: annoInfo.uuid,
@@ -1276,7 +1466,38 @@
 				};						
 			self.annotations.push(anno);
 		});
-
+		$rootScope.$on('updateShotSelectedForNotes', function(event, newShotSelected) {
+			if (newShotSelected === null) {
+				return;
+			}
+			if(self.notesShotSelected != newShotSelected){
+				//console.log("updateShotSelectedForNotes start: " + angular.toJson(newShotSelected, true));
+				self.notesShotSelected = newShotSelected;
+			}
+			return;
+		});		
+		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
+			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
+			if (noteInfo === null) {
+				return;
+			}
+			// add the new note to self.notes
+			var note = {
+				id: noteInfo.uuid,
+				text: noteInfo.text,
+				creatorName: noteInfo.creatorName,
+				creator: noteInfo.creator,
+				creation_datetime: noteInfo.creation_datetime,
+				privacy: noteInfo.privacy,
+				shotId: shotInfo.uuid,
+				shotNum: shotInfo.shotNum,
+				shotStartT: shotInfo.startT,
+				shotEndT: shotInfo.endT
+			};				
+			self.notes.push(note);
+			//console.log(angular.toJson(self.notes, true));
+			return;
+		});
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
 			angular.forEach(self.annotations, function(anno) {
@@ -1286,7 +1507,6 @@
 				}
 			});
 		});
-
 	}
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
@@ -1617,7 +1837,91 @@
 		};
 
 	}
+	// Please note that $modalInstance represents a modal window (instance) dependency.
+	// It is not the same as the $uibModal service used above.
+	function NotesController($scope, $rootScope, $uibModalInstance, $filter, DataService, sharedProperties, params) {
 
+		var self = this;
+		
+		$scope.startT = sharedProperties.getStartTime();
+		$scope.endT = sharedProperties.getEndTime();
+		$scope.group = sharedProperties.getGroup();
+		$scope.labelTerm = sharedProperties.getLabelTerm();
+		$scope.shotPNGImage = sharedProperties.getShotPNG();
+		$scope.IRI = sharedProperties.getIRI();
+		$scope.shotID = sharedProperties.getShotId();
+		$scope.shotNum = sharedProperties.getShotNum();
+		
+		// serve per la select nella modale
+		// privacy = public or private
+		self.privacy = {
+			options:  ["private","public"],
+			selected: "private"
+		};
+		// serve per la select nella modale
+		// TODO da dove prendo le lingue?
+		self.language = {
+			options:  ["Danish","Dutch","English","French","German","Greek","Italian","Spanish","Swedish"],
+			selected: null
+		};
+		// the new note the user is creating
+		self.note = {};
+		// textarea nella modale
+		self.note.text = ""; // mandatory
+		self.confirmNote = function() {
+			var target = 'shot:' + $scope.shotID;
+			if (self.note.text && self.note.text.length > 0) {
+				// text max lenght = noteMaxLenght
+				self.note.text = self.note.text.substring(0, noteMaxLenght);
+				var langCode = encodeLanguage(self.language.selected);
+				self.note.language = langCode;
+				self.note.privacy = self.privacy.selected;
+				// save the Note into the database
+				DataService.saveNote(target, self.note).then(
+					function(resp) {
+						//console.log("saveNote: resp.data=" + angular.toJson(resp.data, true));
+						var noteId = resp.data.id;
+						var creatorId = resp.data.relationships.creator[0].id;
+						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
+							resp.data.relationships.creator[0].attributes.surname;
+						var creationDatetime = resp.data.attributes.creation_datetime;
+						var noteInfo = {
+							"uuid": noteId,
+							"text": self.note.text,
+							"textLanguage": self.note.language,
+							"creator": creatorId,
+							"creatorName": creatorName,
+							"creation_datetime": creationDatetime,
+							"privacy": self.note.privacy
+						};
+						var shotInfo = {
+							"uuid": $scope.shotID,
+							"shotNum": $scope.shotNum,
+							"startT": $scope.startT,
+							"endT": $scope.endT
+						};
+						$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+					},
+					function(err) {
+						// TODO
+					});
+			}
+			$uibModalInstance.close(null);
+		};
+		self.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+			self.privacy.selected = "private";
+			self.language.selected=null;
+			self.category.selected="notes";
+			self.note.text = "";
+		};
+
+		self.alerts = [];
+		self.closeAlert = function(index) {
+			self.alerts.splice(index, 1);
+		};
+
+	}
 	function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
 
 		$scope.geoResult = params.result;
@@ -1695,3 +1999,4 @@
 	}
 
 })();
+
