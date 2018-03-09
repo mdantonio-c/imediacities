@@ -1,6 +1,6 @@
-video_annotations:
-  summary: Gets video annotations
-  description: Returns all the annotations targeting the given video item.
+shot_annotations:
+  summary: Gets shot annotations.
+  description: Returns all the annotations targeting the given shot.
   parameters:
     - name: type
       in: query
@@ -13,8 +13,8 @@ video_annotations:
     authentication: true
   responses:
     '200':
-      description: An annotation object.
+      description: List of annotations.
     '401':
         description: This endpoint requires a valid authorzation token.
     '404':
-        description: Video does not exist.
+        description: Shot does not exist.

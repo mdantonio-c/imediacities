@@ -69,3 +69,55 @@ class Shots(GraphBaseOperations):
             'api/shots/' + node.uuid + '?content=thumbnail'
 
         return self.force_response(shot)
+
+
+class ShotAnnotations(GraphBaseOperations):
+    """
+        Get all shot annotations for a given shot.
+    """
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self, shot_id):
+        logger.info("get annotations for Shot id: %s", shot_id)
+        if shot_id is None:
+            raise RestApiException(
+                "Please specify a shot id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        params = self.get_input()
+        logger.debug("inputs %s" % params)
+        anno_type = params.get('type')
+        if anno_type is not None:
+            anno_type = anno_type.upper()
+
+        self.graph = self.get_service_instance('neo4j')
+        data = []
+
+        shot = None
+        try:
+            shot = self.graph.Shot.nodes.get(uuid=shot_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("Shot with uuid %s does not exist" % shot_id)
+            raise RestApiException(
+                "Please specify a valid shot id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        for a in shot.annotation:
+            if anno_type is not None and a.annotation_type != anno_type:
+                continue
+            res = self.getJsonResponse(a, max_relationship_depth=0)
+            del(res['links'])
+            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+                res['creator'] = self.getJsonResponse(
+                    a.creator.single(), max_relationship_depth=0)
+            # attach bodies
+            res['bodies'] = []
+            for b in a.bodies.all():
+                anno_body = b.downcast()
+                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+                if 'links' in body:
+                    del(body['links'])
+                res['bodies'] .append(body)
+            data.append(res)
+
+        return self.force_response(data)

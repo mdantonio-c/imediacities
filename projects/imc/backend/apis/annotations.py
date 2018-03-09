@@ -24,6 +24,8 @@ SELECTOR_PATTERN = re.compile("t=\d+,\d+")
 
 logger = get_logger(__name__)
 
+__author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+
 
 #####################################
 class Annotations(GraphBaseOperations):
