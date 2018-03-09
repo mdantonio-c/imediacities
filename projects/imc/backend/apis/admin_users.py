@@ -43,7 +43,7 @@ class CustomAdminUsers(GraphBaseOperations):
 
         data = []
         for n in nodeset.all():
-            user = self.getJsonResponse(n, max_relationship_depth=2)
+            user = self.getJsonResponse(n, max_relationship_depth=1)
             data.append(user)
 
         return self.force_response(data)
