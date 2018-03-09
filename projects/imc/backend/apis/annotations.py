@@ -103,7 +103,7 @@ class Annotations(GraphBaseOperations):
         is_private = True if (
             'private' in data and data['private'] is True) else False
         embargo_date = None
-        if data['embargo'] is not None:
+        if data.get('embargo') is not None:
             try:
                 embargo_date = datetime.datetime.strptime(data['embargo'], '%Y-%m-%d').date()
             except ValueError:
