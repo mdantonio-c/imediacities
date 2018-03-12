@@ -353,14 +353,11 @@ class Annotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             # expected single body for DSC annotations
             anno_body = anno.bodies.single()
-            anno_body.value = body['value']
+            textual_body = anno_body.downcast()
+            textual_body.value = body['value']
             if 'language' in body:
-                anno_body.language = body['language']
-            # FIXME !!!!
-            anno_body.save()
-            if anno.bodies.is_connected(anno_body):
-                logger.debug("body {} connected".format(anno_body.id))
-            logger.debug(anno_body)
+                textual_body.language = body['language']
+            textual_body.save()
             anno.save()
         else:
             raise RestApiException(
