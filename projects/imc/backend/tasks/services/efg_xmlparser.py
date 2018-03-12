@@ -530,8 +530,6 @@ class EFG_XMLParser():
         dates = []
         for date in record.findall('efg:dateCreated', self.ns):
             dates.append(date.text.strip())
-        if len(dates) == 0:
-            raise ValueError("Expected at least one dateCreated")
         return dates
 
     def get_colour(self, record):
