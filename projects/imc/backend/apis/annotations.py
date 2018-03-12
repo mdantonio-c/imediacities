@@ -24,6 +24,8 @@ SELECTOR_PATTERN = re.compile("t=\d+,\d+")
 
 logger = get_logger(__name__)
 
+__author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+
 
 #####################################
 class Annotations(GraphBaseOperations):
@@ -101,9 +103,10 @@ class Annotations(GraphBaseOperations):
         is_private = True if (
             'private' in data and data['private'] is True) else False
         embargo_date = None
-        if data['embargo'] is not None:
+        if data.get('embargo') is not None:
             try:
-                embargo_date = datetime.datetime.strptime(data['embargo'], '%Y-%m-%d').date()
+                embargo_date = datetime.datetime.strptime(
+                    data['embargo'], '%Y-%m-%d').date()
             except ValueError:
                 raise RestApiException('Incorrect embargo date format, should be YYYY-MM-DD',
                                        status_code=hcodes.HTTP_BAD_REQUEST)
@@ -267,3 +270,113 @@ class Annotations(GraphBaseOperations):
                 error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
 
         return self.empty_response()
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def put(self, anno_id):
+        """
+        Update an annotation.
+
+        Updates are allowed only for particular use cases. For example
+        at the moment, only annotation for notes can be updated.
+        """
+        if anno_id is None:
+            raise RestApiException(
+                "Please specify an annotation id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+
+        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        if anno is None:
+            raise RestApiException(
+                'Annotation not found',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        user = self.get_current_user()
+
+        creator = anno.creator.single()
+        if creator is None:
+            raise RestApiException(
+                'Annotation with no creator',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        if user.uuid != creator.uuid:
+            raise RestApiException(
+                'You cannot update an annotation that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
+        if anno.annotation_type not in ('DSC', 'COM', 'RPL'):
+            raise RestApiException(
+                'Operation not allowed for annotation {}'
+                .format(anno.annotation_type),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        data = self.get_input()
+        if anno.annotation_type == 'DSC':
+            if 'body' not in data:
+                raise RestApiException(
+                    'Cannot update annotation without body',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'private' in data:
+                if not isinstance(data['private'], bool):
+                    raise RestApiException(
+                        'Invalid private',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                anno.private = data['private']
+                if not anno.private:
+                    # force embargo deletion
+                    anno.embargo = None
+            if 'embargo' in data and anno.private:
+                # ignore incoming embargo for public note
+                try:
+                    anno.embargo = datetime.datetime.strptime(
+                        data['embargo'], '%Y-%m-%d').date()
+                except ValueError:
+                    raise RestApiException('Incorrect embargo date format,'
+                                           ' should be YYYY-MM-DD',
+                                           status_code=hcodes.HTTP_BAD_REQUEST)
+            # update the body
+            body = data['body']
+            if isinstance(body, list):
+                raise RestApiException(
+                    'Expected single body',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            b_type = body.get('type')
+            if b_type != 'TextualBody':
+                raise RestApiException(
+                    'Invalid body type for: {}. Expected TextualBody.'
+                    .format(b_type))
+            if 'value' not in body:
+                raise RestApiException(
+                    'Invalid TextualBody',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            # expected single body for DSC annotations
+            anno_body = anno.bodies.single()
+            anno_body.value = body['value']
+            if 'language' in body:
+                anno_body.language = body['language']
+            # FIXME !!!!
+            anno_body.save()
+            if anno.bodies.is_connected(anno_body):
+                logger.debug("body {} connected".format(anno_body.id))
+            logger.debug(anno_body)
+            anno.save()
+        else:
+            raise RestApiException(
+                'Not yet implemented',
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+        updated_anno = self.getJsonResponse(anno, max_relationship_depth=0)
+        del(updated_anno['links'])
+        if anno.creator is not None:
+            updated_anno['creator'] = self.getJsonResponse(anno.creator.single(), max_relationship_depth=0)
+
+        updated_anno['bodies'] = []
+        for b in anno.bodies.all():
+            body = self.getJsonResponse(b.downcast(), max_relationship_depth=0)
+            if 'links' in body:
+                del(body['links'])
+            updated_anno['bodies'].append(body)
+
+        return self.force_response(updated_anno)

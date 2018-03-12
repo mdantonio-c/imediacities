@@ -114,47 +114,6 @@ class Videos(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-    # @decorate.catch_error()
-    # @catch_graph_exceptions
-    # @graph_transactions
-    # def post(self, video_id=None):
-
-    #     self.graph = self.get_service_instance('neo4j')
-
-    #     try:
-    #         data = request.get_json(force=True)
-    #     except:
-    #         data = {}
-
-    #     logger.critical(data)
-
-    #     if 'title' not in data:
-    #         return self.force_response(
-    #             errors=["Missing title"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     if 'description' not in data:
-    #         return self.force_response(
-    #             errors=["Missing description"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     if 'duration' not in data:
-    #         return self.force_response(
-    #             errors=["Missing duration"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     video = self.graph.Video()
-    #     video.id = getUUID()
-    #     video.title = data["title"]
-    #     video.description = data["description"]
-    #     video.duration = data["duration"]
-    #     video.save()
-
-    #     return self.force_response(video.id)
-
 
 class VideoAnnotations(GraphBaseOperations):
     """
@@ -169,8 +128,11 @@ class VideoAnnotations(GraphBaseOperations):
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        input_parameters = self.get_input()
-        logger.debug("inputs %s" % input_parameters)
+        params = self.get_input()
+        logger.debug("inputs %s" % params)
+        anno_type = params.get('type')
+        if anno_type is not None:
+            anno_type = anno_type.upper()
 
         self.graph = self.get_service_instance('neo4j')
         data = []
@@ -184,10 +146,42 @@ class VideoAnnotations(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         item = video.item.single()
         for a in item.targeting_annotations:
-            annotation = self.getJsonResponse(a)
-            data.append(annotation)
+            if anno_type is not None and a.annotation_type != anno_type:
+                continue
+            if a.private:
+                if a.creator is None:
+                    logger.warn('Invalid state: missing creator for private '
+                                'note [UUID:{}]'.format(a.uuid))
+                    continue
+                creator = a.creator.single()
+                if creator.uuid != user.uuid:
+                    continue
+            res = self.getJsonResponse(a, max_relationship_depth=0)
+            del(res['links'])
+            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+                res['creator'] = self.getJsonResponse(
+                    a.creator.single(), max_relationship_depth=0)
+            # attach bodies
+            res['bodies'] = []
+            for b in a.bodies.all():
+                anno_body = b.downcast()
+                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+                if 'links' in body:
+                    del(body['links'])
+                if a.annotation_type == 'TVS':
+                    segments = []
+                    for segment in anno_body.segments:
+                        json_segment = self.getJsonResponse(segment, max_relationship_depth=0)
+                        if 'links' in json_segment:
+                            del(json_segment['links'])
+                        segments.append(json_segment)
+                    body['segments'] = segments
+                res['bodies'] .append(body)
+            data.append(res)
 
         return self.force_response(data)
 
@@ -217,6 +211,8 @@ class VideoShots(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
 
@@ -229,9 +225,18 @@ class VideoShots(GraphBaseOperations):
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
             for anno in s.annotation.all():
+                if anno.private:
+                    if anno.creator is None:
+                        logger.warn('Invalid state: missing creator for private '
+                                    'note [UUID:{}]'.format(anno.uuid))
+                        continue
+                creator = anno.creator.single()
+                if creator is not None and creator.uuid != user.uuid:
+                    continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
-                if anno.annotation_type == 'TAG':
+                if (anno.annotation_type in ('TAG', 'DSC') and
+                        anno.creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
                 # attach bodies
