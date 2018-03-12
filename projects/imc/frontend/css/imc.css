@@ -2130,9 +2130,8 @@ li.ivh-treeview-node::before {
 .modal-div-select-1
 {
 	display: inline-block;
-	width: 33%;
 	color: #999;
-    font-weight: bold;
+    font-size: small;
 }
 .modal-div-select-2
 {
@@ -2155,10 +2154,7 @@ li.ivh-treeview-node::before {
     width: 100%;
     background-color: #f5f5f5;
     border-color: #f5f5f5;
-    padding-left: 10px;
-   	padding-right: 3px;
-   	padding-top: 3px;
-   	padding-bottom: 3px;
+    padding: 3px;
 }
 .modal-select-2
 {
@@ -2228,7 +2224,7 @@ li.ivh-treeview-node::before {
 }
 .note-bin{
 	float: right;
-    padding-right: 15px;
+    padding-right: 10px;
     padding-top: 10px;
 }
 .note-text{

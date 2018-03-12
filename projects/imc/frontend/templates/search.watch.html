@@ -250,6 +250,16 @@
 									<i class="fa fa-trash-o"> </i>
 								</a>
 								</span>
+								<span class="note-bin">
+								<a class="btn btn-warning btn-xs"
+									ng-click="watchCtrl.editNote(note)"
+									ng-confirm-click="Are you sure you want to update this note?"
+									tooltip-placement="left"
+									uib-tooltip="Edit note"
+									ng-if="profile.uuid == note.creator">
+									<i class="fa fa-edit"> </i>
+								</a>
+								</span>
 							</div>
 							<div style="margin: 5px;">
 								<p>
@@ -497,7 +507,14 @@
 								ng-options="o as o for o in $notesCtrl.privacy.options">
 								</select>
 							</div>
-
+							<!--
+							<div class="modal-div-select-1">
+								<select id="form-field-select-1" class="modal-select-1" ng-model="
+								$notesCtrl.type.selected"
+								ng-options="o as o for o in $notesCtrl.type.options">
+								</select>
+							</div>
+							-->
 							<div class="modal-div-select-2">
 								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
 								ng-options="o as o for o in $notesCtrl.language.options">

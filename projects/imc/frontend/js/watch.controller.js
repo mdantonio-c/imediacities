@@ -1247,6 +1247,7 @@
 								sbFields.camera = anno.bodies[0].attributes;
 								continue;
 							} else if (anno.attributes.annotation_type.key === 'TAG') {
+								console.log('annotation dal db=' + angular.toJson(anno));
 								for (var j=0; j < anno.bodies.length; j++) {
 									// annotation info
 									var spatial = anno.bodies[j].attributes.spatial;
@@ -1265,6 +1266,7 @@
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}else if (anno.attributes.annotation_type.key === 'DSC') { // note
+								console.log('nota dal db=' + angular.toJson(anno));
 								// mi aspetto che la note abbia un solo body di tipo textual
 								// il backend mi manda solo quelle che posso vedere
 								var text = anno.bodies[0].attributes.value;
@@ -1862,6 +1864,11 @@
 		self.privacy = {
 			options:  ["private","public"],
 			selected: "private"
+		};
+		// serve per la select nella modale
+		self.type = {
+			options:  ["text","bibliography","link"],
+			selected: "text"
 		};
 		// serve per la select nella modale
 		// TODO da dove prendo le lingue?
