@@ -231,7 +231,7 @@ class VideoShots(GraphBaseOperations):
                                     'note [UUID:{}]'.format(anno.uuid))
                         continue
                 creator = anno.creator.single()
-                if creator.uuid != user.uuid:
+                if creator is not None and creator.uuid != user.uuid:
                     continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
