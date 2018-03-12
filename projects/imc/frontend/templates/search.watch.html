@@ -48,6 +48,44 @@
 							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
 						</div>
 					</div>
+					<div class="video-tools-container" id="video-tools-container">
+						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.stepBackward()"
+							tooltip-placement="right"
+							uib-tooltip="Step backward">
+							<i class="glyphicon glyphicon glyphicon-step-backward"></i>
+						</div>
+						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.fastBackward()"
+							tooltip-placement="right"
+							uib-tooltip="Fast backward">
+							<i class="glyphicon glyphicon glyphicon-fast-backward"></i>
+						</div>-->
+						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.backward()"
+							tooltip-placement="right"
+							uib-tooltip="Backward">
+							<i class="glyphicon glyphicon glyphicon-backward"></i>
+						</div>
+						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.forward()"
+							tooltip-placement="right"
+							uib-tooltip="Forward">
+							<i class="glyphicon glyphicon glyphicon-forward"></i>
+						</div>-->
+						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.fastForward()"
+							tooltip-placement="right"
+							uib-tooltip="Fast forward">
+							<i class="glyphicon glyphicon-fast-forward"></i>
+						</div>
+						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
+							ng-click="watchCtrl.stepForward()"
+							tooltip-placement="right"
+							uib-tooltip="Step forward">
+							<i class="glyphicon glyphicon-step-forward"></i>
+						</div>
+					</div>
 					<video id="videoarea"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"

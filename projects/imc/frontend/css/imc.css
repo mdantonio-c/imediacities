@@ -1250,19 +1250,19 @@ button.btn:active {
 	right: 0; 
 	top: auto;
 	z-index: 12;
-	margin-top: 100px;
+	margin-top: 130px;
 }
 
 .btn.btn-app.btn-xs {
     width: 64px;
     font-size: 15px;
     border-radius: 8px;
-    padding-bottom: 7px;
-    padding-top: 8px;
+    padding-bottom: 5px;
+    padding-top: 5px;
     line-height: 1.45;
 }
 
-.btn.btn-app.anno-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.anno-tools-btn.btn-xs { width: 40px }
 .btn.btn-app.anno-tools-btn {
 	display: block;
 	text-align: center;
@@ -1273,7 +1273,7 @@ button.btn:active {
 }
 
 /*for video tools*/
-.btn.btn-app.video-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.video-tools-btn.btn-xs { width: 40px }
 .btn.btn-app.video-tools-btn {
 	display: block;
 	text-align: center;

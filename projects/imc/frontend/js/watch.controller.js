@@ -1069,7 +1069,7 @@
 			});
 		};
 		self.deleteNote = function(note) {
-			console.log(angular.toJson(note, true));
+			//console.log(angular.toJson(note, true));
 			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmNoteModal.html',
@@ -1264,26 +1264,31 @@
 									};
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
-							}else if (anno.attributes.annotation_type.key === 'describing') { // note
+							}else if (anno.attributes.annotation_type.key === 'DSC') { // note
 								// mi aspetto che la note abbia un solo body di tipo textual
-								// TODO il backend mi manda solo quelle che posso vedere?
+								// il backend mi manda solo quelle che posso vedere
 								var text = anno.bodies[0].attributes.value;
 								var textLanguage = anno.bodies[0].attributes.language;
-								var creatorId = anno.creator.id;
-								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
+								//var creatorId = anno.creator.id;
+								var creatorId = "TO_DO";
+								//var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
+								var creatorName = "TO_DO";
 								var privacy = "private";
-								if(!anno.private){
+								var creation_datetime = anno.attributes.creation_datetime;
+								//console.log('anno.attributes.private=' + angular.toJson(anno.attributes.private));
+								if(!anno.attributes.private){
 									privacy = "public";
 								}
 								var noteInfo = {
 									uuid: anno.id,
 									text: text,
 									textLanguage: textLanguage,
+									creation_datetime: creation_datetime,
 									creator: creatorId,
 									creatorName: creatorName,
 									privacy: privacy
 								};
-								console.log('nota=' + angula.toJson(noteInfo));
+								//console.log('nota=' + angular.toJson(noteInfo));
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
 
 							}else{
@@ -1876,10 +1881,11 @@
 				var langCode = encodeLanguage(self.language.selected);
 				self.note.language = langCode;
 				self.note.privacy = self.privacy.selected;
+				//console.log("before saveNote: note=" + angular.toJson(self.note, true));
 				// save the Note into the database
 				DataService.saveNote(target, self.note).then(
 					function(resp) {
-						//console.log("saveNote: resp.data=" + angular.toJson(resp.data, true));
+						//console.log("after saveNote: resp.data=" + angular.toJson(resp.data, true));
 						var noteId = resp.data.id;
 						var creatorId = resp.data.relationships.creator[0].id;
 						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
