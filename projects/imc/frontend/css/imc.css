@@ -1245,12 +1245,9 @@ button.btn:active {
 	margin-top: 10px;
 }
 
-.video-tools-container { 
-	position: absolute; 
-	right: 0; 
-	top: auto;
-	z-index: 12;
-	margin-top: 100px;
+.video-tools-container {
+	/*display: inline-block;*/
+	margin-top: 5px;
 }
 
 .btn.btn-app.btn-xs {
@@ -1273,12 +1270,15 @@ button.btn:active {
 }
 
 /*for video tools*/
-.btn.btn-app.video-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.video-tools-btn.btn-xs { 
+	width: 32px;
+	height: 32px;
+}
 .btn.btn-app.video-tools-btn {
-	display: block;
+	/*display: block;*/
 	text-align: center;
 	border-radius: 6px 0 0 6px;
-	opacity: .45;
+	/*opacity: .45;*/
 	vertical-align: top;
 	margin: 0;
 }

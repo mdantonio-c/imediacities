@@ -38,52 +38,45 @@
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<div class="video-tools-container" id="video-tools-container">
-						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.stepBackward()"
-							tooltip-placement="right"
-							uib-tooltip="Step backward">
-							<i class="glyphicon glyphicon glyphicon-step-backward"></i>
-						</div>
-						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.fastBackward()"
-							tooltip-placement="right"
-							uib-tooltip="Fast backward">
-							<i class="glyphicon glyphicon glyphicon-fast-backward"></i>
-						</div>-->
-						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.backward()"
-							tooltip-placement="right"
-							uib-tooltip="Backward">
-							<i class="glyphicon glyphicon glyphicon-backward"></i>
-						</div>
-						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.forward()"
-							tooltip-placement="right"
-							uib-tooltip="Forward">
-							<i class="glyphicon glyphicon glyphicon-forward"></i>
-						</div>-->
-						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.fastForward()"
-							tooltip-placement="right"
-							uib-tooltip="Fast forward">
-							<i class="glyphicon glyphicon-fast-forward"></i>
-						</div>
-						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.stepForward()"
-							tooltip-placement="right"
-							uib-tooltip="Step forward">
-							<i class="glyphicon glyphicon-step-forward"></i>
-						</div>
-					</div>
 					<video id="videoarea"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"
-						ng-src="{{watchCtrl.video.links['content'] | trustUrl }}"
+						ng-src="{{watchCtrl.video.links['content'] | switchVideoType:watchCtrl.videoType | trustUrl }}"
 						ng-attr-type="video/mp4"
 						ng-click="watchCtrl.playPause()" controls>
 						Your browser does not support HTML5 video.
 					</video>
+					<div class="video-tools-container">
+						<div class="pull-left" style="margin: 2px 0;">
+							<div class="btn btn-xs"
+								ng-click="watchCtrl.stepBackward()"
+								tooltip-placement="top"
+								uib-tooltip="Step backward">
+								<i class="glyphicon glyphicon-step-backward"></i>
+							</div>
+							<div class="btn btn-xs"
+								ng-click="watchCtrl.backward()"
+								tooltip-placement="right"
+								uib-tooltip="Backward">
+								<i class="glyphicon glyphicon-backward"></i>
+							</div>
+							<div class="btn btn-xs"
+								ng-click="watchCtrl.fastForward()"
+								tooltip-placement="right"
+								uib-tooltip="Fast forward">
+								<i class="glyphicon glyphicon-fast-forward"></i>
+							</div>
+							<div class="btn btn-xs"
+								ng-click="watchCtrl.stepForward()"
+								tooltip-placement="right"
+								uib-tooltip="Step forward">
+								<i class="glyphicon glyphicon-step-forward"></i>
+							</div>
+						</div>
+						<div class="pull-right" style="margin: 2px 0;">
+							<div class="btn btn-xs" id="switch-type" class="pull-right" ng-click="watchCtrl.switchVideo()">switch</div>
+						</div>
+					</div>
 				</div>
 				<div class="container" 
 					ng-show="watchCtrl.showmeli"

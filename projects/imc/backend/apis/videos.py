@@ -3,6 +3,7 @@
 """
 Handle your video metadata
 """
+import os
 from flask import request, send_file
 from utilities.helpers import get_api_url
 from restapi.confs import PRODUCTION
@@ -269,7 +270,8 @@ class VideoContent(GraphBaseOperations):
         content_type = input_parameters['type']
         if content_type is None or (content_type != 'video' and
                                     content_type != 'thumbnail' and
-                                    content_type != 'summary'):
+                                    content_type != 'summary' and
+                                    content_type != 'orf'):
             raise RestApiException(
                 "Bad type parameter: expected 'video' or 'thumbnail'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
@@ -298,7 +300,15 @@ class VideoContent(GraphBaseOperations):
             mime = "video/mp4"
             download = Downloader()
             return download.send_file_partial(video_uri, mime)
-
+        elif content_type == 'orf':
+            orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
+            if orf_uri is None or not os.path.exists(orf_uri):
+                raise RestApiException(
+                    "Video ORF not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            mime = "video/mp4"
+            download = Downloader()
+            return download.send_file_partial(orf_uri, mime)
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             logger.debug("thumbnail content uri: %s" % thumbnail_uri)

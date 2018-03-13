@@ -277,6 +277,17 @@
 				return obj;
 			};
 		})
+		.filter('switchVideoType', function() {
+			return function(link, ctype) {
+				if (link === undefined) return;
+				if (ctype === undefined) { ctype = 'video'; }
+				var idx = link.lastIndexOf("?");
+				if (idx != -1) {
+					link = link.substr(0, idx) + '?type=' +ctype;
+				}
+				return link;
+			};
+		})
 		;
 
 	app.directive('scrollStoryOnClick', function() {
@@ -738,13 +749,14 @@
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
 
-	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
+	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter, $timeout,
 			DataService, noty, myTagModalFactory, sharedProperties) {
 
 		var self = this;
 		var vid = $stateParams.v;
 		self.showmeli = true;
 		self.video = $stateParams.meta;
+		self.videoType = 'video';
 
 		var intervalRewind;
 
@@ -849,6 +861,24 @@
 			self.onpause = true;
 			self.onplaying = false;
 			myVid[0].pause();
+		};
+
+		self.switchVideo = function() {
+			var atTime = myVid[0].currentTime;
+			console.log('switch video at time: '+ atTime);
+			myVid[0].pause();
+			if (self.videoType == 'video') {
+				// stream video with detected objects
+				self.videoType = 'orf';
+			} else {
+				// back to original video
+				self.videoType = 'video';
+			}
+			$timeout(function() {
+				myVid[0].currentTime = atTime;
+				myVid[0].play();
+			}, 50);
+
 		};
 
 		/*video controllers*/
