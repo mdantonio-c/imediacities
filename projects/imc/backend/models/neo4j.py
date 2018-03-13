@@ -579,7 +579,7 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
-    date_created = ArrayProperty(StringProperty(), required=True, show=True)
+    date_created = ArrayProperty(StringProperty(), show=True)
     non_av_type = StringProperty(required=True,
                                  choices=codelists.NON_AV_TYPES,
                                  show=True)
