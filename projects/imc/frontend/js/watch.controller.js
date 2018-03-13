@@ -777,7 +777,20 @@
 		else if(language === 'Swedish') { code = 'sv'; }
 		return code;
 	}
-
+	function decodeLanguageCode(code) {
+		// TODO da completare 
+		var language=null;
+		if (code === 'en') { language = 'English'; }
+		else if(code === 'it') { language = 'Italian'; }
+		else if(code === 'el') { language = 'Greek'; }
+		else if(code === 'es') { language = 'Spanish'; }
+		else if(code === 'nl') { language = 'Dutch'; }
+		else if(code === 'fr') { language = 'French'; }
+		else if(code === 'da') { language = 'Danish'; }
+		else if(code === 'de') { language = 'German'; }
+		else if(code === 'sv') { language = 'Swedish'; }
+		return language;
+	}
 	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
@@ -1275,11 +1288,14 @@
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}else if (anno.attributes.annotation_type.key === 'DSC') { // note
-								//console.log('nota dal db=' + angular.toJson(anno));
+								console.log('nota dal db=' + angular.toJson(anno));
 								// mi aspetto che la note abbia un solo body di tipo textual
 								// il backend mi manda solo quelle che posso vedere
 								var text = anno.bodies[0].attributes.value;
-								var textLanguage = anno.bodies[0].attributes.language;
+								var textLanguageCode = anno.bodies[0].attributes.language;
+								console.log('textLanguageCode=' + angular.toJson(textLanguageCode));
+								var textLanguage = decodeLanguageCode(textLanguageCode);
+								console.log('textLanguage=' + angular.toJson(textLanguage));
 								var creatorId = anno.creator.id;
 								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
 								var privacy = "private";
@@ -1292,6 +1308,7 @@
 									uuid: anno.id,
 									text: text,
 									textLanguage: textLanguage,
+									textLanguageCode: textLanguageCode,
 									creation_datetime: creation_datetime,
 									creator: creatorId,
 									creatorName: creatorName,
@@ -1502,7 +1519,8 @@
 				if (note.id === noteId ) {
 					self.notes[index].text = noteInfo.text;
 					self.notes[index].privacy = noteInfo.privacy;
-					self.notes[index].textLanguage = noteInfo.textLanguage;
+					self.notes[index].language = noteInfo.textLanguage;
+					self.notes[index].languageCode = noteInfo.textLanguageCode;
 					update = true;
 				}
 			});
@@ -1513,6 +1531,7 @@
 					id: noteInfo.uuid,
 					text: noteInfo.text,
 					language: noteInfo.textLanguage,
+					languageCode: noteInfo.textLanguageCode,
 					creatorName: noteInfo.creatorName,
 					creator: noteInfo.creator,
 					creation_datetime: noteInfo.creation_datetime,
@@ -1940,8 +1959,8 @@
 			if (self.note.text && self.note.text.length > 0) {
 				// text max lenght = noteMaxLenght
 				self.note.text = self.note.text.substring(0, noteMaxLenght);
-				var langCode = encodeLanguage(self.language.selected);
-				self.note.language = langCode;
+				self.note.language = self.language.selected;
+				self.note.languageCode = encodeLanguage(self.language.selected);
 				self.note.privacy = self.privacy.selected;
 				console.log("before saveNote: note=" + angular.toJson(self.note, true));
 				// save/update the Note into the database
@@ -1956,6 +1975,7 @@
 								"uuid": self.note.id,
 								"text": self.note.text,
 								"textLanguage": self.note.language,
+								"textLanguageCode": self.note.languageCode,
 								"privacy": self.note.privacy
 							};
 						}else{
@@ -1969,6 +1989,7 @@
 								"uuid": noteId,
 								"text": self.note.text,
 								"textLanguage": self.note.language,
+								"textLanguageCode": self.note.languageCode,
 								"creator": creatorId,
 								"creatorName": creatorName,
 								"creation_datetime": creationDatetime,

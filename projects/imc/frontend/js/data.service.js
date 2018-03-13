@@ -110,7 +110,9 @@ function DataService($log, api, $q, jsonapi_parser) {
         var body = {};
         body.type = "TextualBody";
         body.value = note.text;
-        body.language = note.language;
+        if(note.languageCode && note.languageCode !== ""){
+            body.language = note.languageCode;
+        }
         data.body = body;
         if(note.privacy == "public"){
             data.private = false;
