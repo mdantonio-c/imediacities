@@ -100,7 +100,7 @@ function DataService($log, api, $q, jsonapi_parser) {
             });
             data.body = bodies;
         }
-
+        data.motivation = "tagging";
         return api.apiCall('annotations', 'POST', data);
     };
 
@@ -119,7 +119,13 @@ function DataService($log, api, $q, jsonapi_parser) {
         }
         // TODO manca embargo
         data.motivation = "describing";
-        return api.apiCall('annotations', 'POST', data);
+        if(note && note.id){
+            // update existing note
+            return api.apiCall('annotations/'+note.id, 'PUT', data);
+        }else{
+            // create a new note
+            return api.apiCall('annotations', 'POST', data);            
+        }
     };
 
     self.saveGeoAnnotation = function(target, source, spatial) {
@@ -132,6 +138,7 @@ function DataService($log, api, $q, jsonapi_parser) {
                 spatial: spatial
             }
         };
+        data.motivation = "tagging";
         return api.apiCall('annotations', 'POST', data);  
     };
 

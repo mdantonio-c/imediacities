@@ -231,10 +231,11 @@
 									<span class="note-user-name">{{note.creatorName}}</span>
 								</p>
 								<p style="margin: 0;">
-									<span class="note-date" ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime}}</span>
+									<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
+									
 								</p>
 								<p style="margin: 0;">
-									<span class="note-privacy" ng-if="note.privacy == 'private'">
+									<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
 										<i class="imc-icon fa fa-lock"></i>
 									</span>
 								</p>
@@ -253,7 +254,6 @@
 								<span class="note-bin">
 								<a class="btn btn-warning btn-xs"
 									ng-click="watchCtrl.editNote(note)"
-									ng-confirm-click="Are you sure you want to update this note?"
 									tooltip-placement="left"
 									uib-tooltip="Edit note"
 									ng-if="profile.uuid == note.creator">
@@ -484,7 +484,7 @@
 	<script type="text/ng-template" id="myModalNotes.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$notesCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a note to this shot</h4>
+			<h4 class="modal-title">{{modalTitle}}</h4>
 		</div>
 		<div class="modal-body">
 			<div class="row">

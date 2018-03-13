@@ -1099,6 +1099,15 @@
 				// NO: do nothing
 			});
 		};
+		self.editNote = function(note) {
+			// TODO tutta da fare
+
+			var shot_annotations = null;
+			var shotInfo = self.shots[note.shotNum-1];
+
+			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});
+			
+		};
 
 		// ritorna le classi css da applicare agli elementi
 		//  della lista degli shot nel tab delle note
@@ -1247,7 +1256,7 @@
 								sbFields.camera = anno.bodies[0].attributes;
 								continue;
 							} else if (anno.attributes.annotation_type.key === 'TAG') {
-								console.log('annotation dal db=' + angular.toJson(anno));
+								//console.log('annotation dal db=' + angular.toJson(anno));
 								for (var j=0; j < anno.bodies.length; j++) {
 									// annotation info
 									var spatial = anno.bodies[j].attributes.spatial;
@@ -1266,15 +1275,13 @@
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
 							}else if (anno.attributes.annotation_type.key === 'DSC') { // note
-								console.log('nota dal db=' + angular.toJson(anno));
+								//console.log('nota dal db=' + angular.toJson(anno));
 								// mi aspetto che la note abbia un solo body di tipo textual
 								// il backend mi manda solo quelle che posso vedere
 								var text = anno.bodies[0].attributes.value;
 								var textLanguage = anno.bodies[0].attributes.language;
-								//var creatorId = anno.creator.id;
-								var creatorId = "TO_DO";
-								//var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
-								var creatorName = "TO_DO";
+								var creatorId = anno.creator.id;
+								var creatorName = anno.creator.attributes.name + " " + anno.creator.attributes.surname;
 								var privacy = "private";
 								var creation_datetime = anno.attributes.creation_datetime;
 								//console.log('anno.attributes.private=' + angular.toJson(anno.attributes.private));
@@ -1484,25 +1491,40 @@
 			return;
 		});		
 		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
-			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
+			console.log("updateNotes start: " + angular.toJson(noteInfo, true));
 			if (noteInfo === null) {
 				return;
 			}
-			// add the new note to self.notes
-			var note = {
-				id: noteInfo.uuid,
-				text: noteInfo.text,
-				creatorName: noteInfo.creatorName,
-				creator: noteInfo.creator,
-				creation_datetime: noteInfo.creation_datetime,
-				privacy: noteInfo.privacy,
-				shotId: shotInfo.uuid,
-				shotNum: shotInfo.shotNum,
-				shotStartT: shotInfo.startT,
-				shotEndT: shotInfo.endT
-			};				
-			self.notes.push(note);
-			//console.log(angular.toJson(self.notes, true));
+			// se la nota esiste gia' allora e' un update
+			var noteId = noteInfo.uuid;
+			var update = false;
+			angular.forEach(self.notes, function(note, index) {
+				if (note.id === noteId ) {
+					self.notes[index].text = noteInfo.text;
+					self.notes[index].privacy = noteInfo.privacy;
+					self.notes[index].textLanguage = noteInfo.textLanguage;
+					update = true;
+				}
+			});
+			console.log("updateNotes update=" + angular.toJson(update, true));
+			if(!update){
+				// add the new note to self.notes
+				var note = {
+					id: noteInfo.uuid,
+					text: noteInfo.text,
+					language: noteInfo.textLanguage,
+					creatorName: noteInfo.creatorName,
+					creator: noteInfo.creator,
+					creation_datetime: noteInfo.creation_datetime,
+					privacy: noteInfo.privacy,
+					shotId: shotInfo.uuid,
+					shotNum: shotInfo.shotNum,
+					shotStartT: shotInfo.startT,
+					shotEndT: shotInfo.endT
+				};				
+				self.notes.push(note);
+			}
+			console.log("situazione delle note: " + angular.toJson(self.notes, true));
 			return;
 		});
 		$rootScope.$on('updateSubtitles', function() {
@@ -1858,6 +1880,8 @@
 		$scope.IRI = sharedProperties.getIRI();
 		$scope.shotID = sharedProperties.getShotId();
 		$scope.shotNum = sharedProperties.getShotNum();
+
+		$scope.modalTitle = "Add a note to this shot";
 		
 		// serve per la select nella modale
 		// privacy = public or private
@@ -1880,7 +1904,38 @@
 		self.note = {};
 		// textarea nella modale
 		self.note.text = ""; // mandatory
+
+		// if params is not null then we are coming from the edit note
+		//  so we have to set the modal input fields with the values of
+		//  note the user is editing
+		if(params && params.note){
+			console.log("params=" + angular.toJson(params, true));
+			$scope.modalTitle = "Edit the existing note";
+			self.note = params.note;
+			if(params.note.privacy){
+				self.privacy.selected = params.note.privacy;
+			}
+			if(params.note.language){
+				self.language.selected = params.note.language;
+			}
+			if(params.note.text){
+				self.note.text = params.note.text;
+			}
+			$scope.shotNum = params.note.shotNum;
+			$scope.shotID = params.note.shotId;
+			$scope.startT = params.note.shotStartT;
+			$scope.endT = params.note.shotEndT;
+			if(params.shot && params.shot.links && params.shot.links.thumbnail){
+				$scope.shotPNGImage = params.shot.links.thumbnail;
+			}
+		}
+
 		self.confirmNote = function() {
+			if(self.note.id){
+				console.log("updating note with id " + angular.toJson(self.note.id, true));
+			}else{
+				console.log("creating a new note");
+			}
 			var target = 'shot:' + $scope.shotID;
 			if (self.note.text && self.note.text.length > 0) {
 				// text max lenght = noteMaxLenght
@@ -1888,31 +1943,44 @@
 				var langCode = encodeLanguage(self.language.selected);
 				self.note.language = langCode;
 				self.note.privacy = self.privacy.selected;
-				//console.log("before saveNote: note=" + angular.toJson(self.note, true));
-				// save the Note into the database
+				console.log("before saveNote: note=" + angular.toJson(self.note, true));
+				// save/update the Note into the database
 				DataService.saveNote(target, self.note).then(
 					function(resp) {
-						//console.log("after saveNote: resp.data=" + angular.toJson(resp.data, true));
-						var noteId = resp.data.id;
-						var creatorId = resp.data.relationships.creator[0].id;
-						var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
-							resp.data.relationships.creator[0].attributes.surname;
-						var creationDatetime = resp.data.attributes.creation_datetime;
-						var noteInfo = {
-							"uuid": noteId,
-							"text": self.note.text,
-							"textLanguage": self.note.language,
-							"creator": creatorId,
-							"creatorName": creatorName,
-							"creation_datetime": creationDatetime,
-							"privacy": self.note.privacy
-						};
-						var shotInfo = {
-							"uuid": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
-						};
+						console.log("after saveNote: resp.data=" + angular.toJson(resp.data, true));
+						var noteInfo;
+						var shotInfo;
+						if(self.note.id){
+							// updated existing note
+							noteInfo = {
+								"uuid": self.note.id,
+								"text": self.note.text,
+								"textLanguage": self.note.language,
+								"privacy": self.note.privacy
+							};
+						}else{
+							// created a new note
+							var noteId = resp.data.id;
+							var creatorId = resp.data.relationships.creator[0].id;
+							var creatorName = resp.data.relationships.creator[0].attributes.name + " " + 
+								resp.data.relationships.creator[0].attributes.surname;
+							var creationDatetime = resp.data.attributes.creation_datetime;
+							noteInfo = {
+								"uuid": noteId,
+								"text": self.note.text,
+								"textLanguage": self.note.language,
+								"creator": creatorId,
+								"creatorName": creatorName,
+								"creation_datetime": creationDatetime,
+								"privacy": self.note.privacy
+							};
+							shotInfo= {
+								"uuid": $scope.shotID,
+								"shotNum": $scope.shotNum,
+								"startT": $scope.startT,
+								"endT": $scope.endT
+							};
+						}
 						$rootScope.$emit('updateNotes', noteInfo, shotInfo);
 					},
 					function(err) {
@@ -1920,12 +1988,12 @@
 					});
 			}
 			$uibModalInstance.close(null);
-		};
+		};		
 		self.cancel = function() {
 			$uibModalInstance.dismiss('cancel');
 			self.privacy.selected = "private";
 			self.language.selected=null;
-			self.category.selected="notes";
+			self.type.selected="text";
 			self.note.text = "";
 		};
 
