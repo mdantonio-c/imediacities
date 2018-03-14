@@ -83,7 +83,7 @@
 						City
 						</h4>
 						<div>
-							<select class="form-control" ng-model="sc.cities.selected" ng-options="o as o for o in sc.cities.options | orderBy">
+							<select class="form-control" ng-model="defaultc" ng-options="o as o for o in sc.cities.options | orderBy">
 								<option value=""></option>
 							</select>
 						</div>
@@ -97,12 +97,12 @@
 								<div class="input-group date-range">
 									<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
 									<input class="input-num" style="min-width: 50px;" 
-										type="number" ng-model="sc.filter.yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+										type="number" ng-model="yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
 									<input class="input-num" style="min-width: 50px;"
-										type="number" ng-model="sc.filter.yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+										type="number" ng-model="yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
 								</div>
 								<div class="space-4"></div>
-								<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="sc.filter.yearfrom" value-max="sc.filter.yearto"></slider-range>
+								<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="yearfrom" value-max="yearto"></slider-range>
 							</div>
 						</div>
 						<div class="hr hr-dotted"></div>
@@ -111,7 +111,7 @@
 						Rights Status
 						</h4>
 						<div>
-							<select class="form-control" ng-model="sc.iprstatuses.selected" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
+							<select class="form-control" ng-model="defaultipr" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
 								<option value=""></option>
 							</select>
 						</div>
