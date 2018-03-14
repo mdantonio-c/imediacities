@@ -438,9 +438,16 @@
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
+
+		/*initialize last selected item as default value when refresh page*/
+		var city = localStorage.getItem('scity');
+		var cselected = (city!==null) ? city : null;
+
+		$scope.defaultc = city;
+
 		sc.cities = {
 			options:  [],
-			selected: null
+			selected: cselected
 		};
 		angular.forEach(providers, function(p){
 			sc.cities.options.push(p.city.name);
@@ -464,10 +471,30 @@
 			}
 		};
 
+		/*initialize last selected item as default value when refresh page*/
+		var iprstatus = localStorage.getItem('iprstatus');
+		var iprselected = (iprstatus!==null) ? iprstatus : null;
+		$scope.defaultipr = iprselected;
+
+		/*initialize year from and yearto for time constraints in advanced search*/
+		var yearfrom = parseInt(localStorage.getItem('yearfrom'));
+		var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
+		//$scope.yearfrom = yearfromselected;
+		var yearto = parseInt(localStorage.getItem('yearto'));
+		var yeartoselected = (yearto!==null) ? yearto : 1999;
+		//$scope.yearto = yeartoselected;
+
+		setTimeout(function () {
+        	$scope.$apply(function () {
+            	$scope.yearfrom = yearfromselected;
+            	$scope.yearto = yeartoselected;
+        	});
+    	}, 2000);
+
 		// move codelist provision in a service
 		sc.iprstatuses = {
 			options:  iprstatuses,
-			selected: null
+			selected: iprselected
 		};
 
 		sc.vocabulary = [];
@@ -539,8 +566,6 @@
 			sc.terms = [];
 			sc.itemType.video = true;
 			sc.itemType.image = true;
-			sc.iprstatuses.selected = null;
-			sc.cities.selected = null;
 			sc.filter = {
 				type: 'all',
 				provider: null,
@@ -555,7 +580,7 @@
 		};
 		sc.resetFilters();
 
-		$scope.$watch('sc.cities.selected', function(newValue, oldValue) {
+		$scope.$watch('defaultc', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				var res = null;
 				// "Athens", "Bologna", "Brussels", "Copenhagen", "Frankfurt am Main", "Barcelona", "Turin", "Vienna", "Stockholm"
@@ -570,11 +595,29 @@
 				else if(newValue === 'Stockholm') { res = 'SFI'; }
 				sc.filter.provider = res;
 				// console.log('filter by city for archive: ' + sc.filter.provider);
+				/*save input status for cities selected*/
+				localStorage.setItem('scity', newValue);
 			}
 		});
-		$scope.$watch('sc.iprstatuses.selected', function(newValue, oldValue) {
+		$scope.$watch('defaultipr', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				sc.filter.iprstatus = newValue;
+				/*save input status for ipr status selected*/
+				localStorage.setItem('iprstatus', newValue);
+			}
+		});
+		$scope.$watch('yearfrom', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				sc.filter.yearfrom = newValue;
+				/*save input status for ipr status selected*/
+				localStorage.setItem('yearfrom', newValue);
+			}
+		});
+		$scope.$watch('yearto', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				sc.filter.yearto = newValue;
+				/*save input status for ipr status selected*/
+				localStorage.setItem('yearto', newValue);
 			}
 		});
 
