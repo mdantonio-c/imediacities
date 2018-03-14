@@ -230,9 +230,9 @@ class VideoShots(GraphBaseOperations):
                         logger.warn('Invalid state: missing creator for private '
                                     'note [UUID:{}]'.format(anno.uuid))
                         continue
-                creator = anno.creator.single()
-                if creator is not None and creator.uuid != user.uuid:
-                    continue
+                    creator = anno.creator.single()
+                    if creator is not None and creator.uuid != user.uuid:
+                        continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
                 if (anno.annotation_type in ('TAG', 'DSC') and
