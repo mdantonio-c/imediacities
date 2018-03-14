@@ -824,6 +824,30 @@
 			self.onpause = true;
 		};
 
+		// On video error
+		myVid[0].onerror = function(event) {
+			let error = event;
+			// console.log(event);
+			var currentSrc;
+			// Chrome v60
+		    if (event.path && event.path[0]) {
+		      error = event.path[0].error;
+		      currentSrc = event.path[0].currentSrc
+		    }
+
+		    // Firefox v55
+		    if (event.originalTarget) {
+		      error = event.originalTarget.error;
+		      currentSrc = event.originalTarget.currentSrc;
+		    }
+
+		    // Here comes the error message
+		    noty.showError(`Video error: ${error.message}`);
+		    if (currentSrc.endsWith('orf')) {
+		    	self.switchVideo();
+		    }
+		};
+
 		// Play video function
 		function playVid(video) {
 			// console.log('play video');
