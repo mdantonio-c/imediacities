@@ -2206,6 +2206,12 @@ li.ivh-treeview-node::before {
     height: 500px;
     overflow-y: auto;
 }
+a.tab-list-shots-link:hover,
+a.tab-list-shots-link:focus
+{
+	text-decoration: none;
+	cursor: pointer;
+}
 .note-user-icon
 {
 	color: #ddd;
