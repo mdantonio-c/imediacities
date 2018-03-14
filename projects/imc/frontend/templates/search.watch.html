@@ -231,7 +231,13 @@
 									<span class="note-user-name">{{note.creatorName}}</span>
 								</p>
 								<p style="margin: 0;">
+									<!--
 									<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
+									-->
+									<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+										<i class="imc-icon fa fa-clock-o light-grey"></i>
+										{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+									</span>
 									
 								</p>
 								<p style="margin: 0;">
@@ -503,28 +509,28 @@
 
 						<div class="modal-div-options">
 							<div class="modal-div-select-0">
-								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.privacy.selected"
-								ng-options="o as o for o in $notesCtrl.privacy.options">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.form.privacy.selected"
+								ng-options="o as o for o in $notesCtrl.form.privacy.options">
 								</select>
 							</div>
 							<!--
 							<div class="modal-div-select-1">
 								<select id="form-field-select-1" class="modal-select-1" ng-model="
-								$notesCtrl.type.selected"
-								ng-options="o as o for o in $notesCtrl.type.options">
+								$notesCtrl.form.type.selected"
+								ng-options="o as o for o in $notesCtrl.form.type.options">
 								</select>
 							</div>
 							-->
 							<div class="modal-div-select-2">
-								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.language.selected"
-								ng-options="o as o for o in $notesCtrl.language.options">
-									<option value="">language</option>
+								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.form.language.selected"
+								ng-options="o as o for o in $notesCtrl.form.language.options">
+									<option value="">language of text</option>
 								</select>
 							</div>
 
 						</div>
 
-						<textarea id="form-field-11" ng-model="$notesCtrl.note.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
+						<textarea id="form-field-11" ng-model="$notesCtrl.form.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
 						</textarea>
 
 					</div>
