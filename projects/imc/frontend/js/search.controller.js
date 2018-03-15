@@ -254,7 +254,7 @@
 		self.creations = [];
 
 		self.loading = false;
-		self.inputTerm = "";
+		$scope.inputTerm = "";
 		self.inputProvider = null;
 		self.advancedSearch = false;
 
@@ -301,17 +301,17 @@
 						"yearto": $scope.search.year_max.toString(),
 					}
 				};
-				if (self.inputTerm !== '') {
+				if ($scope.inputTerm !== '') {
 					if (self.selectedMatchFields.length === 0) {
 						isValid = false;
 					}
 					request_data.match = {
-						"term": self.inputTerm,
+						"term": $scope.inputTerm,
 						"fields": self.selectedMatchFields
 					};
 				}
 			} else {
-				var simple_match_term = self.inputTerm === '' ? '*' : self.inputTerm;
+				var simple_match_term = $scope.inputTerm === '' ? '*' : $scope.inputTerm;
 				request_data = {
 					"match": {
 						"term": simple_match_term,
@@ -368,7 +368,7 @@
 		var term = $stateParams.q;
 		if (term !== undefined && term !== '') {
 			self.viewlogo = false;
-			self.inputTerm = term;
+			$scope.inputTerm = term;
 			self.searchCreations();
 		}
 
@@ -453,11 +453,6 @@
 			sc.cities.options.push(p.city.name);
 		});
 
-		/*initialize last selected input term as default value when refresh page*/
-		var inputT = localStorage.getItem('inputTerm');
-		var inputSelected = (inputT!==null) ? inputT : null;
-		$scope.inputTerm = inputSelected;
-
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
@@ -475,29 +470,7 @@
 			}
 		};
 
-		/*initialize last selected ipr status as default value when refresh page*/
-		var iprstatus = localStorage.getItem('iprstatus');
-		var iprselected = (iprstatus!==null) ? iprstatus : null;
-		$scope.defaultipr = iprselected;
-
-		/*initialize year from and yearto for time constraints in advanced search*/
-		var yearfrom = parseInt(localStorage.getItem('yearfrom'));
-		var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
-		var yearto = parseInt(localStorage.getItem('yearto'));
-		var yeartoselected = (yearto!==null) ? yearto : 1999;
-
-		setTimeout(function () {
-        	$scope.$apply(function () {
-            	$scope.yearfrom = yearfromselected;
-            	$scope.yearto = yeartoselected;
-        	});
-    	}, 2000);
-
-		// move codelist provision in a service
-		sc.iprstatuses = {
-			options:  iprstatuses,
-			selected: iprselected
-		};
+		//---
 
 		sc.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
@@ -563,7 +536,36 @@
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 		sc.resetFilters = function() {
-			sc.inputTerm = "";
+
+		/*initialize last selected input term as default value when refresh page*/
+		var inputT = localStorage.getItem('inputTerm');
+		var inputSelected = (inputT!==null) ? inputT : null;
+		$scope.inputTerm = inputSelected;
+
+		/*initialize last selected ipr status as default value when refresh page*/
+		var iprstatus = localStorage.getItem('iprstatus');
+		var iprselected = (iprstatus!==null) ? iprstatus : null;
+		$scope.defaultipr = iprselected;
+
+		// move codelist provision in a service
+		sc.iprstatuses = {
+			options:  iprstatuses,
+			selected: iprselected
+		};
+
+		/*initialize year from and yearto for time constraints in advanced search*/
+		var yearfrom = parseInt(localStorage.getItem('yearfrom'));
+		var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
+		var yearto = parseInt(localStorage.getItem('yearto'));
+		var yeartoselected = (yearto!==null) ? yearto : 1999;
+
+		setTimeout(function () {
+        	$scope.$apply(function () {
+            	$scope.yearfrom = yearfromselected;
+            	$scope.yearto = yeartoselected;
+        	});
+    	}, 2000);
+
 			sc.selectedMatchFields = ['title'];
 			sc.terms = [];
 			sc.itemType.video = true;
@@ -604,6 +606,7 @@
 		$scope.$watch('inputTerm', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				/*save input status for input term selected*/
+				sc.filter.inputTerm = newValue;
 				localStorage.setItem('inputTerm', newValue);
 			}
 		});
@@ -742,8 +745,8 @@
 			};
 			// Add filters
 			request_data.filter = sc.filter;
-			if (sc.inputTerm !== '') {
-				request_data.match.term = sc.inputTerm;
+			if ($scope.inputTerm !== '') {
+				request_data.match.term = $scope.inputTerm;
 			}
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
@@ -824,9 +827,9 @@
 			var cFilter = {
 				filter: sc.filter
 			};
-			if (sc.inputTerm !== '') {
+			if ($scope.inputTerm !== '') {
 				cFilter.match = {
-					term: sc.inputTerm,
+					term: $scope.inputTerm,
 					fields: sc.selectedMatchFields
 				};
 			}
