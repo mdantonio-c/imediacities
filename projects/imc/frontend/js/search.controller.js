@@ -535,36 +535,69 @@
 
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
+		//reset filters when loading page the first time
 		sc.resetFilters = function() {
 
-		/*initialize last selected input term as default value when refresh page*/
-		var inputT = localStorage.getItem('inputTerm');
-		var inputSelected = (inputT!==null) ? inputT : null;
-		$scope.inputTerm = inputSelected;
+			/*initialize last selected input term as default value when refresh page*/
+			var inputT = localStorage.getItem('inputTerm');
+			var inputSelected = (inputT!==null) ? inputT : null;
+			$scope.inputTerm = inputSelected;
 
-		/*initialize last selected ipr status as default value when refresh page*/
-		var iprstatus = localStorage.getItem('iprstatus');
-		var iprselected = (iprstatus!==null) ? iprstatus : null;
-		$scope.defaultipr = iprselected;
+			/*initialize last selected ipr status as default value when refresh page*/
+			var iprstatus = localStorage.getItem('iprstatus');
+			var iprselected = (iprstatus!==null) ? iprstatus : null;
+			$scope.defaultipr = iprselected;
 
-		// move codelist provision in a service
-		sc.iprstatuses = {
-			options:  iprstatuses,
-			selected: iprselected
+			// move codelist provision in a service
+			sc.iprstatuses = {
+				options:  iprstatuses,
+				selected: iprselected
+			};
+
+			/*initialize year from and yearto for time constraints in advanced search*/
+			var yearfrom = parseInt(localStorage.getItem('yearfrom'));
+			var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
+			var yearto = parseInt(localStorage.getItem('yearto'));
+			var yeartoselected = (yearto!==null) ? yearto : 1999;
+
+			setTimeout(function () {
+	        	$scope.$apply(function () {
+	            	$scope.yearfrom = yearfromselected;
+	            	$scope.yearto = yeartoselected;
+	        	});
+	    	}, 1000);
+
+				sc.selectedMatchFields = ['title'];
+				sc.terms = [];
+				sc.itemType.video = true;
+				sc.itemType.image = true;
+				sc.filter = {
+					type: 'all',
+					provider: null,
+					country: null,
+					iprstatus: null,
+					yearfrom: sc.minProductionYear,
+					yearto: sc.maxProductionYear,
+					terms: sc.terms
+				};
+				ivhTreeviewMgr.deselectAll(sc.vocabulary);
+				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
+		sc.resetFilters();
 
-		/*initialize year from and yearto for time constraints in advanced search*/
-		var yearfrom = parseInt(localStorage.getItem('yearfrom'));
-		var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
-		var yearto = parseInt(localStorage.getItem('yearto'));
-		var yeartoselected = (yearto!==null) ? yearto : 1999;
+		//reset filters to default values
+		sc.resetFiltersToDefault = function() {
 
-		setTimeout(function () {
-        	$scope.$apply(function () {
-            	$scope.yearfrom = yearfromselected;
-            	$scope.yearto = yeartoselected;
-        	});
-    	}, 2000);
+			$scope.defaultc = '';
+			$scope.inputTerm = '';
+			$scope.defaultipr = null;
+
+			setTimeout(function () {
+	        	$scope.$apply(function () {
+	            	$scope.yearfrom = sc.minProductionYear;
+	            	$scope.yearto = sc.maxProductionYear;
+	        	});
+	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
 			sc.terms = [];
@@ -582,7 +615,7 @@
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
-		sc.resetFilters();
+
 
 		$scope.$watch('defaultc', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
