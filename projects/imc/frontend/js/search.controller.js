@@ -453,7 +453,11 @@
 			sc.cities.options.push(p.city.name);
 		});
 
-		sc.inputTerm = "";
+		/*initialize last selected input term as default value when refresh page*/
+		var inputT = localStorage.getItem('inputTerm');
+		var inputSelected = (inputT!==null) ? inputT : null;
+		$scope.inputTerm = inputSelected;
+
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
@@ -471,7 +475,7 @@
 			}
 		};
 
-		/*initialize last selected item as default value when refresh page*/
+		/*initialize last selected ipr status as default value when refresh page*/
 		var iprstatus = localStorage.getItem('iprstatus');
 		var iprselected = (iprstatus!==null) ? iprstatus : null;
 		$scope.defaultipr = iprselected;
@@ -479,10 +483,8 @@
 		/*initialize year from and yearto for time constraints in advanced search*/
 		var yearfrom = parseInt(localStorage.getItem('yearfrom'));
 		var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
-		//$scope.yearfrom = yearfromselected;
 		var yearto = parseInt(localStorage.getItem('yearto'));
 		var yeartoselected = (yearto!==null) ? yearto : 1999;
-		//$scope.yearto = yeartoselected;
 
 		setTimeout(function () {
         	$scope.$apply(function () {
@@ -599,6 +601,12 @@
 				localStorage.setItem('scity', newValue);
 			}
 		});
+		$scope.$watch('inputTerm', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				/*save input status for input term selected*/
+				localStorage.setItem('inputTerm', newValue);
+			}
+		});
 		$scope.$watch('defaultipr', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				sc.filter.iprstatus = newValue;
@@ -609,14 +617,14 @@
 		$scope.$watch('yearfrom', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				sc.filter.yearfrom = newValue;
-				/*save input status for ipr status selected*/
+				/*save input status for year from selected*/
 				localStorage.setItem('yearfrom', newValue);
 			}
 		});
 		$scope.$watch('yearto', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				sc.filter.yearto = newValue;
-				/*save input status for ipr status selected*/
+				/*save input status for year to selected*/
 				localStorage.setItem('yearto', newValue);
 			}
 		});
