@@ -519,24 +519,25 @@
 			}
 		};
 
-		sc.itemType = {
+
+		$scope.itemType = {
 			video: true,
 			image: true,
 			text: false
 		};
-		$scope.$watch('sc.itemType', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) sc.filter.type='all';
-				else if (newValue.video) sc.filter.type='video';
-				else if (newValue.image) sc.filter.type='image';
-				else if (newValue.text) sc.filter.type='text';
-			}
-		}, true);
 
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
+
+			/*initialize last selected input type as default value when refresh page*/
+			var itemTV = localStorage.getItem('itemTypeV');
+			var itemTI = localStorage.getItem('itemTypeI');
+			var inputSelectedV = (itemTV!==null) ? itemTV : true;
+			var inputSelectedI = (itemTI!==null) ? itemTI : true;
+			$scope.itemType.video = inputSelectedV;
+			$scope.itemType.image = inputSelectedI;
 
 			/*initialize last selected input term as default value when refresh page*/
 			var inputT = localStorage.getItem('inputTerm');
@@ -567,21 +568,21 @@
 	        	});
 	    	}, 1000);
 
-				sc.selectedMatchFields = ['title'];
-				sc.terms = [];
-				sc.itemType.video = true;
-				sc.itemType.image = true;
-				sc.filter = {
-					type: 'all',
-					provider: null,
-					country: null,
-					iprstatus: null,
-					yearfrom: sc.minProductionYear,
-					yearto: sc.maxProductionYear,
-					terms: sc.terms
-				};
-				ivhTreeviewMgr.deselectAll(sc.vocabulary);
-				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+			sc.selectedMatchFields = ['title'];
+			sc.terms = [];
+
+			sc.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				iprstatus: null,
+				yearfrom: sc.minProductionYear,
+				yearto: sc.maxProductionYear,
+				terms: sc.terms
+			};
+
+			ivhTreeviewMgr.deselectAll(sc.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
 		sc.resetFilters();
 
@@ -601,8 +602,9 @@
 
 			sc.selectedMatchFields = ['title'];
 			sc.terms = [];
-			sc.itemType.video = true;
-			sc.itemType.image = true;
+
+			$scope.itemType.video = true;
+			$scope.itemType.image = true;
 			sc.filter = {
 				type: 'all',
 				provider: null,
@@ -636,6 +638,24 @@
 				localStorage.setItem('scity', newValue);
 			}
 		});
+		$scope.$watch('itemType', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (newValue.video && newValue.image) {
+					sc.filter.type='all';
+				}
+				else if (newValue.video) {
+					sc.filter.type='video';
+					var typeV = localStorage.getItem('itemTypeV');
+					localStorage.setItem('itemTypeV',!typeV);//it's a video
+				}
+				else if (newValue.image) {
+					sc.filter.type='image';
+					var typeI = localStorage.getItem('itemTypeI');
+					localStorage.setItem('itemTypeI',!typeI);//it's an image
+				}
+				else if (newValue.text) sc.filter.type='text';
+			}
+		}, true);
 		$scope.$watch('inputTerm', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				/*save input status for input term selected*/
