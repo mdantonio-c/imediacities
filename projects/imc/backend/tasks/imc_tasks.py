@@ -4,11 +4,13 @@ import os
 import json
 import random
 import re
-
+# import time
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
+from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
+from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.models.neo4j import Shot
 from imc.models import codelists
 
@@ -36,7 +38,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-def import_file(self, path, resource_id, mode):
+def import_file(self, path, resource_id, mode, metadata_update=True):
     with celery_app.app.app_context():
 
         progress(self, 'Starting import', path)
@@ -87,8 +89,12 @@ def import_file(self, path, resource_id, mode):
                 item_node.save()
                 log.debug("Item resource created")
 
-            xml_resource.warnings = extract_descriptive_metadata(
-                self, path, item_type, item_node)
+            creation = item_node.creation.single()
+            if creation is not None and not metadata_update:
+                log.info('Skip updating metadata')
+            else:
+                xml_resource.warnings = extract_descriptive_metadata(
+                    self, path, item_type, item_node)
 
             # To ensure that the content item and its metadata will be
             # correctly linked in the system and its repositories,
@@ -111,8 +117,10 @@ def import_file(self, path, resource_id, mode):
 
                 try:
                     # This is a task restart? What to do in this case?
-                    content_node = self.graph.ContentStage.nodes.get(**properties)
-                    log.debug("Content resource already exist for %s" % content_path)
+                    content_node = self.graph.ContentStage.nodes.get(
+                        **properties)
+                    log.debug("Content resource already exist for %s" %
+                              content_path)
                 except self.graph.ContentStage.DoesNotExist:
                     content_node = self.graph.ContentStage(**properties).save()
                     content_node.ownership.connect(group)
@@ -242,6 +250,12 @@ def import_file(self, path, resource_id, mode):
 
             extract_tvs_vim_annotations(self, item_node, analyze_path)
 
+            # automatic object detection
+            try:
+                extract_od_annotations(self, item_node, analyze_path)
+            except IOError:
+                log.warn('Could not find OD results file.')
+
             # TODO
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
@@ -272,6 +286,38 @@ def import_file(self, path, resource_id, mode):
         return 1
 
 
+@celery_app.task(bind=True)
+def launch_tool(self, tool_name, item_id):
+    with celery_app.app.app_context():
+        log.debug('launch tool {0} for item {1}'.format(tool_name, item_id))
+        if tool_name != 'object-detection':
+            raise ValueError('Unexpected tool for: {}'.format(tool_name))
+
+        self.graph = celery_app.get_service('neo4j')
+        try:
+            item = self.graph.Item.nodes.get(uuid=item_id)
+            content_source = GraphBaseOperations.getSingleLinkedNode(
+                item.content_source)
+            group = GraphBaseOperations.getSingleLinkedNode(
+                item.ownership)
+            movie = content_source.filename
+            analyze_path = '/uploads/Analize/' + \
+                group.uuid + '/' + movie.split('.')[0] + '/'
+            log.debug('analyze path: {0}'.format(analyze_path))
+            # call analyze for object detection ONLY
+            # if detect_objects(movie, analyze_path):
+            #     log.info('Object detection executed')
+            # else:
+            #     raise Exception('Object detection terminated with errors')
+
+            # here we expect object detection results in orf.xml
+            extract_od_annotations(self, item, analyze_path)
+        except Exception as e:
+            log.error("Task error, %s" % e)
+            raise e
+        return 1
+
+
 def extract_creation_ref(self, path):
     """
     Extract the source id reference from the incoming XML file.
@@ -293,12 +339,11 @@ def lookup_content(self, path, source_id):
     Look for a filename in the form of:
     ARCHIVE_SOURCEID.[extension]
     '''
-    #cinzia: nel source_id i caratteri che non sono lettere  
-    # o numeri vanno sostituiti con trattino per la ricerca 
+    # nel source_id i caratteri che non sono lettere
+    # o numeri vanno sostituiti con trattino per la ricerca
     # del file del contenuto
     source_id_encoded = re.sub(r'[\W_]+', '-', source_id)
     log.debug('source_id_encoded: ' + source_id_encoded)
-    # fine cinzia
 
     content_path = None
     content_filename = None
@@ -472,3 +517,148 @@ def extract_tvs_vim_annotations(self, item, analyze_dir_path):
     repo.create_vim_annotation(item, vim_estimations)
 
     log.info('Extraction of TVS and VIM info completed')
+
+
+def extract_od_annotations(self, item, analyze_dir_path):
+    '''
+    Extract object detection results given by automatic analysis tool and
+    ingest valueable annotations as 'automatic' TAGs.
+    '''
+    orf_results_filename = 'orf.xml'
+    orf_results_path = os.path.join(
+        os.path.dirname(analyze_dir_path), orf_results_filename)
+    if not os.path.exists(orf_results_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", orf_results_path)
+    log.info(
+        'get automatic object detection from file [%s]' % orf_results_path)
+    parser = ORF_XMLParser()
+    frames = parser.parse(orf_results_path)
+
+    # get the shot list of the item
+    shots = item.shots.all()
+    shot_list = {}
+    for s in shots:
+        shot_list[s.shot_num] = set()
+    object_ids = set()
+    concepts = set()
+    report = {}
+    obj_cat_report = {}
+    for timestamp, od_list in frames.items():
+        '''
+        A frame is a <dict> with timestamp<int> as key and a <list> as value.
+        Each element in the list is a <tuple> that contains:
+        (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
+
+        '''
+        for detected_object in od_list:
+            concepts.add(detected_object[1])
+            if detected_object[0] not in object_ids:
+                report[detected_object[1]] = report.get(
+                    detected_object[1], 0) + 1
+            object_ids.add(detected_object[0])
+            shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            if shot_num is not None:
+                shot_list[shot_num].add(detected_object[1])
+            # collect timestamp for keys:
+            # (obj,cat) --> [(t1, confidence1, region1), (t2, confidence2, region2), ...]
+            tmp = obj_cat_report.get(
+                (detected_object[0], detected_object[1]), [])
+            tmp.append((timestamp, detected_object[2], detected_object[3]))
+            obj_cat_report[(detected_object[0], detected_object[1])] = tmp
+
+    log.info('-----------------------------------------------------')
+    # report_filename = 'orf_import_report_{}.txt'.format(int(1000 * time.time()))
+    # f = open(report_filename, 'w')
+    # f.write('Number of distinct detected objects: {}'.format(len(object_ids)))
+    # f.write('Number of distinct concepts: {}'.format(len(concepts)))
+    # f.write('Report of detected concepts: {}'.format(report))
+    # f.write('Report of detected concepts by shot: {}'.format(shot_list))
+    # f.close()
+    log.info('Number of distinct detected objects: {}'.format(len(object_ids)))
+    log.info('Number of distinct concepts: {}'.format(len(concepts)))
+    log.info('Report of detected concepts per shot: {}'.format(shot_list))
+
+    repo = AnnotationRepository(self.graph)
+    counter = 0  # keep count of saved annotation
+    for (key, timestamps) in obj_cat_report.items():
+        if len(timestamps) < 5:
+            # discard detections for short times
+            continue
+        # detect the concept
+        concept_name = key[1]
+        concept_iri = concept_mapping.get(concept_name)
+        if concept_iri is None:
+            log.warn('Cannot find concept <{0}> in the mapping'
+                     .format(concept_name))
+            # DO NOT create this annotation
+            continue
+        concept = {
+            'iri': concept_iri,
+            'name': concept_name
+        }
+
+        # detect the segment
+        start_frame = timestamps[0][0]
+        end_frame = timestamps[-1][0]
+        selector = {
+            'type': 'FragmentSelector',
+            'value': 't=' + str(start_frame) + ',' + str(end_frame)
+        }
+
+        # detect detection confidence
+        confidence = []
+        region_sequence = []
+        for frame in list(range(start_frame, end_frame + 1)):
+            found = False
+            for value in timestamps:
+                # value is a tuple like (timestamp<int>, confidence<float>, region<list>)
+                if value[0] == frame:
+                    confidence.append(value[1])
+                    region_sequence.append(value[2])
+                    found = True
+                    break
+            if not found:
+                confidence.append(None)
+                region_sequence.append(None)
+
+        od_confidences = [e for e in confidence if e is not None]
+        avg_confidence = sum(od_confidences) / float(len(od_confidences))
+        if avg_confidence < 0.5:
+            # discard detections with low confidence
+            continue
+
+        # save annotation
+        bodies = []
+        od_body = {
+            'type': 'ODBody',
+            'object_id': key[0],
+            'confidence': avg_confidence,
+            'region_sequence': region_sequence
+        }
+        od_body['concept'] = {'type': 'ResourceBody', 'source': concept}
+        bodies.append(od_body)
+        try:
+            from neomodel import db as transaction
+            transaction.begin()
+            repo.create_tag_annotation(
+                None, bodies, item, selector, False, None, True)
+            transaction.commit()
+        except Exception as e:
+            log.verbose("Neomodel transaction ROLLBACK")
+            try:
+                transaction.rollback()
+            except Exception as rollback_exp:
+                log.warning(
+                    "Exception raised during rollback: %s" % rollback_exp)
+            raise e
+        counter += 1
+    log.info('Number of saved automatic annotations: {counter}'
+             .format(counter=counter))
+    log.info('-----------------------------------------------------')
+
+
+def shot_lookup(self, shots, timestamp):
+    for s in shots:
+        if timestamp >= s.start_frame_idx and timestamp <= s.end_frame_idx:
+            return s.uuid, s.shot_num

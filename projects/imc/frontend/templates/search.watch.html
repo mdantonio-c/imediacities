@@ -43,18 +43,19 @@
 						</div>
 						<div class="space-0"></div>
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
-							ng-click="watchCtrl.manualtag('term');"
+							ng-click="watchCtrl.manualtag('notes');"
 							tooltip-placement="right"
-							uib-tooltip="Tag&nbsp;by term">
-							<i class="imc-icon fa fa-tag fa-lg"></i>
+							uib-tooltip="Add s&nbsp;note">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
 						</div>
 					</div>
 					<video id="videoarea" style="display:none"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"
-						ng-src="{{watchCtrl.video.links['content'] | trustUrl }}"
+						ng-src="{{watchCtrl.video.links['content'] | switchVideoType:watchCtrl.videoType | trustUrl }}"
 						ng-attr-type="video/mp4"
-						ng-click="watchCtrl.playPause()" controls>
+						ng-click="watchCtrl.playPause()"
+						controls>
 						Your browser does not support HTML5 video.
 					</video>
 					<!-- TEST DEI TEST -->

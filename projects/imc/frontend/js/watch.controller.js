@@ -310,6 +310,17 @@
     			localDateTime = moment(localDateTime).format('YYYY-MM-DD HH:mm:ss');
 			    //console.log("localDateTime=" + localDateTime);
     			return localDateTime;
+    		};
+    	})
+		.filter('switchVideoType', function() {
+			return function(link, ctype) {
+				if (link === undefined) return;
+				if (ctype === undefined) { ctype = 'video'; }
+				var idx = link.lastIndexOf("?");
+				if (idx != -1) {
+					link = link.substr(0, idx) + '?type=' +ctype;
+				}
+				return link;
 			};
 		})
 		;
@@ -770,6 +781,7 @@
 		var milliseconds = time.getMilliseconds();
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
+
 	function encodeLanguage(language) {
 		// TODO da completare 
 		var code=null;
@@ -784,6 +796,7 @@
 		else if(language === 'Swedish') { code = 'sv'; }
 		return code;
 	}
+
 	function decodeLanguageCode(code) {
 		// TODO da completare 
 		var language=null;
@@ -798,13 +811,15 @@
 		else if(code === 'sv') { language = 'Swedish'; }
 		return language;
 	}
-	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
+
+	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter, $timeout,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
 		var self = this;
 		var vid = $stateParams.v;
 		self.showmeli = true;
 		self.video = $stateParams.meta;
+		self.videoType = 'video';
 
 		var intervalRewind;
 
@@ -900,6 +915,30 @@
 			self.onpause = true;
 		};
 
+		// On video error
+		myVid[0].onerror = function(event) {
+			let error = event;
+			// console.log(event);
+			var currentSrc;
+			// Chrome v60
+		    if (event.path && event.path[0]) {
+		      error = event.path[0].error;
+		      currentSrc = event.path[0].currentSrc
+		    }
+
+		    // Firefox v55
+		    if (event.originalTarget) {
+		      error = event.originalTarget.error;
+		      currentSrc = event.originalTarget.currentSrc;
+		    }
+
+		    // Here comes the error message
+		    noty.showError(`Video error: ${error.message}`);
+		    if (currentSrc.endsWith('orf')) {
+		    	self.switchVideo();
+		    }
+		};
+
 		// Play video function
 		function playVid(video) {
 			// console.log('play video');
@@ -937,6 +976,24 @@
 			self.onpause = true;
 			self.onplaying = false;
 			myVid[0].pause();
+		};
+
+		self.switchVideo = function() {
+			var atTime = myVid[0].currentTime;
+			console.log('switch video at time: '+ atTime);
+			myVid[0].pause();
+			if (self.videoType == 'video') {
+				// stream video with detected objects
+				self.videoType = 'orf';
+			} else {
+				// back to original video
+				self.videoType = 'video';
+			}
+			$timeout(function() {
+				myVid[0].currentTime = atTime;
+				myVid[0].play();
+			}, 50);
+
 		};
 
 		self.manualtag = function(mode) {
@@ -1226,7 +1283,7 @@
 								start: shot.attributes.start_frame_idx/fps,
 								end: shot.attributes.end_frame_idx/fps,
 								thumbnail: shot.links.thumbnail
-							}
+							};
 
 							//	creo scene
 							scene.push(scena);
@@ -1270,7 +1327,7 @@
 								var privacy = "private";
 								var creation_datetime = anno.attributes.creation_datetime;
 								//console.log('anno.attributes.private=' + angular.toJson(anno.attributes.private));
-								if(!anno.attributes.private){
+								if (!anno.attributes.private) {
 									privacy = "public";
 								}
 								var noteInfo = {
@@ -1301,7 +1358,7 @@
 					//	e se il video lo caricassi qui??
 					$scope.videoplayer = new VideoPlayer({
 						selector: '#videotest',
-						sources: [self.video.links['content']],
+						sources: [self.video.links.content],
 						fps: self.video.relationships.item[0].attributes.framerate.replace('/1',''),
 						scene: scene
 					});
