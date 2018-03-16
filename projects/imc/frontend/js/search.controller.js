@@ -500,9 +500,12 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				localStorage.setItem('terms',JSON.stringify($scope.terms));//it's a term array
+				var convertstring = JSON.stringify($scope.terms);
+				localStorage.setItem('terms',convertstring);//it's a term array
 			} else {
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
+				var convertstring = JSON.stringify($scope.terms);
+				localStorage.setItem('terms',convertstring);//it's a term array
 			}
 		};
 
@@ -570,8 +573,15 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
-			var savedterms = JSON.parse(localStorage.getItem('terms'));
-			$scope.terms = (savedterms!==null) ? savedterms : [];
+
+			var savedterms = localStorage.getItem('terms');
+			if (savedterms!==""){
+				var dataObj=JSON.parse(savedterms);
+				$scope.terms = (dataObj!==null) ? dataObj : [];
+			}
+			else{
+				$scope.terms = [];
+			}
 
 			sc.filter = {
 				type: 'all',
@@ -603,7 +613,17 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
+
 			$scope.terms = [];
+
+			//reset local storage
+			localStorage.setItem('iprstatus','');
+			localStorage.setItem('terms','');//it's a term array
+			localStorage.setItem('inputTerm','');
+			localStorage.setItem('yearfrom',1890);
+			localStorage.setItem('yearto',1999);
+			localStorage.setItem('itemTypeV',true);
+			localStorage.setItem('itemTypeI',true);
 
 			$scope.itemType.video = true;
 			$scope.itemType.image = true;
@@ -614,7 +634,7 @@
 				iprstatus: null,
 				yearfrom: sc.minProductionYear,
 				yearto: sc.maxProductionYear,
-				terms: $scope.terms
+				terms: []
 			};
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
