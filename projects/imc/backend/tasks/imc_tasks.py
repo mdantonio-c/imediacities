@@ -7,6 +7,7 @@ import re
 
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
+from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.models.neo4j import Shot
@@ -36,7 +37,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-def import_file(self, path, resource_id, mode):
+def import_file(self, path, resource_id, mode, metadata_update=True):
     with celery_app.app.app_context():
 
         progress(self, 'Starting import', path)
@@ -87,8 +88,12 @@ def import_file(self, path, resource_id, mode):
                 item_node.save()
                 log.debug("Item resource created")
 
-            xml_resource.warnings = extract_descriptive_metadata(
-                self, path, item_type, item_node)
+            creation = item_node.creation.single()
+            if creation is not None and not metadata_update:
+                log.info('Skip updating metadata')
+            else:
+                xml_resource.warnings = extract_descriptive_metadata(
+                    self, path, item_type, item_node)
 
             # To ensure that the content item and its metadata will be
             # correctly linked in the system and its repositories,
@@ -242,6 +247,12 @@ def import_file(self, path, resource_id, mode):
 
             extract_tvs_vim_annotations(self, item_node, analyze_path)
 
+            # automatic object detection
+            try:
+                extract_od_annotations(self, item_node, analyze_path)
+            except IOError:
+                log.warn('Could not find OD results file.')
+
             # TODO
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
@@ -272,6 +283,38 @@ def import_file(self, path, resource_id, mode):
         return 1
 
 
+@celery_app.task(bind=True)
+def launch_tool(self, tool_name, item_id):
+    with celery_app.app.app_context():
+        log.debug('launch tool {0} for item {1}'.format(tool_name, item_id))
+        if tool_name != 'object-detection':
+            raise ValueError('Unexpected tool for: {}'.format(tool_name))
+
+        self.graph = celery_app.get_service('neo4j')
+        try:
+            item = self.graph.Item.nodes.get(uuid=item_id)
+            content_source = GraphBaseOperations.getSingleLinkedNode(
+                item.content_source)
+            group = GraphBaseOperations.getSingleLinkedNode(
+                item.ownership)
+            movie = content_source.filename
+            analyze_path = '/uploads/Analize/' + \
+                group.uuid + '/' + movie.split('.')[0] + '/'
+            log.debug('analyze path: {0}'.format(analyze_path))
+            # call analyze for object detection ONLY
+            # if detect_objects(movie, analyze_path):
+            #     log.info('Object detection executed')
+            # else:
+            #     raise Exception('Object detection terminated with errors')
+
+            # here we expect object detection results in orf.xml
+            extract_od_annotations(self, item, analyze_path)
+        except Exception as e:
+            log.error("Task error, %s" % e)
+            raise e
+        return 1
+
+
 def extract_creation_ref(self, path):
     """
     Extract the source id reference from the incoming XML file.
@@ -293,12 +336,11 @@ def lookup_content(self, path, source_id):
     Look for a filename in the form of:
     ARCHIVE_SOURCEID.[extension]
     '''
-    #cinzia: nel source_id i caratteri che non sono lettere  
-    # o numeri vanno sostituiti con trattino per la ricerca 
+    # nel source_id i caratteri che non sono lettere
+    # o numeri vanno sostituiti con trattino per la ricerca
     # del file del contenuto
     source_id_encoded = re.sub(r'[\W_]+', '-', source_id)
     log.debug('source_id_encoded: ' + source_id_encoded)
-    # fine cinzia
 
     content_path = None
     content_filename = None
@@ -472,3 +514,70 @@ def extract_tvs_vim_annotations(self, item, analyze_dir_path):
     repo.create_vim_annotation(item, vim_estimations)
 
     log.info('Extraction of TVS and VIM info completed')
+
+
+def extract_od_annotations(self, item, analyze_dir_path):
+    '''
+    Extract object detection results given by automatic analysis tool and
+    ingest valueable annotations as 'automatic' TAGs.
+    '''
+    orf_results_filename = 'orf.xml'
+    orf_results_path = os.path.join(
+        os.path.dirname(analyze_dir_path), orf_results_filename)
+    if not os.path.exists(orf_results_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", orf_results_path)
+    log.debug('get automatic object detection from file [%s]' % orf_results_path)
+    parser = ORF_XMLParser()
+    frames = parser.parse(orf_results_path)
+
+    # get the shot list of the item
+    shots = item.shots.all()
+    shot_list = {}
+    for s in shots:
+        shot_list[s.shot_num] = set()
+    object_ids = set()
+    concepts = set()
+    report = {}
+    obj_cat_report = {}
+    for timestamp, od_list in frames.items():
+        '''
+        A frame is a <dict> with timestamp<int> as key and a <list> as value.
+        Each element in the list is a <tuple> that contains:
+        (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
+
+        '''
+        for detected_object in od_list:
+            concepts.add(detected_object[1])
+            if detected_object[0] not in object_ids:
+                report[detected_object[1]] = report.get(detected_object[1], 0) + 1
+            object_ids.add(detected_object[0])
+            shot_num = shot_lookup(self, shots, timestamp)
+            if shot_num is not None:
+                shot_list[shot_num].add(detected_object[1])
+            # collect timestamp for keys (obj,cat) --> [t1, t2, ...]
+            tmp = obj_cat_report.get((detected_object[0], detected_object[1]), [])
+            tmp.append(timestamp)
+            obj_cat_report[(detected_object[0], detected_object[1])] = tmp
+
+    log.debug('Number of distinct detected objects: {0}'
+              .format(len(object_ids)))
+    log.debug('Number of distinct concepts: {0}'
+              .format(len(concepts)))
+    log.debug('Report of detected concepts: {0}'
+              .format(report))
+    log.debug('Report of detected concepts by shot: {0}'
+              .format(shot_list))
+    report_path = os.path.join(
+        os.path.dirname(analyze_dir_path), "obj_cat_report.txt")
+    report_file = open(report_path, 'w')
+    for (key, values) in obj_cat_report.items():
+        # log.debug("{0}/{1}: {2}".format(key[0], key[1], values))
+        report_file.write("{0}/{1}: {2}\n".format(key[0], key[1], values))
+    report_file.close()
+
+
+def shot_lookup(self, shots, timestamp):
+    for s in shots:
+        if timestamp >= s.start_frame_idx and timestamp <= s.end_frame_idx:
+            return s.shot_num

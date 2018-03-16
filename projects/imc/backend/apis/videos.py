@@ -18,6 +18,8 @@ from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 from imc.tasks.services.creation_repository import CreationRepository
 
+from restapi.flask_ext.flask_celery import CeleryExt
+
 logger = get_logger(__name__)
 
 
@@ -330,3 +332,58 @@ class VideoContent(GraphBaseOperations):
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+
+class VideoTools(GraphBaseOperations):
+
+    __available_tools__ = ('object-detection', 'vimotion')
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def post(self, video_id):
+
+        logger.debug('launch automatic toll for video id: %s' % video_id)
+
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id.",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = video.item.single()
+        if item is None:
+            raise RestApiException(
+                "Item not available. Execute the pipeline first!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        if item.item_type != 'Video':
+            raise RestApiException(
+                "Content item is not a video. Use a valid video id.",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        params = self.get_input()
+        if 'tool' not in params:
+            raise RestApiException(
+                'Please specify the tool to be launched.',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        tool = params['tool']
+        if tool not in self.__available_tools__:
+            raise RestApiException(
+                "Please specify a valid tool. Expected one of %s." %
+                (self.__available_tools__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        task = CeleryExt.launch_tool.apply_async(
+            args=[tool, item.uuid],
+            countdown=10
+        )
+
+        return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)
