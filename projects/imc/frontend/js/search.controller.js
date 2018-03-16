@@ -500,7 +500,6 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				alert("Aggiunta!");
 				localStorage.setItem('terms',JSON.stringify($scope.terms));//it's a term array
 			} else {
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
