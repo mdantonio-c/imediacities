@@ -97,13 +97,6 @@ bower_components:
   google-marker-cluster:
     - markerclusterer.js
 
-js:
-  # - "custom/Spinner.js"
-  # - "custom/Scene.js"
-  # - "custom/Seekbar.js"
-  # - "custom/VideoPlayer.js"
-  - "https://use.fontawesome.com/releases/v5.0.8/js/all.js"
-
 css: 
   - "custom/imc.css"
   - "custom/nsi.css"
