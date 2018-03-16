@@ -477,7 +477,7 @@
 			sc.vocabulary = data;
 		});
 
-		sc.terms = [];
+		$scope.terms = [];
 		sc.loadVocabularyTerms = function(query) {
 			return $filter('matchTerms')(sc.vocabulary, query);
 		};
@@ -499,9 +499,11 @@
 		sc.toggleTerm = function(node) {
 			if (node.selected) {
 				// add tag
-				sc.terms.push({iri: node.id, label: node.label});
+				$scope.terms.push({iri: node.id, label: node.label});
+				alert("Aggiunta!");
+				localStorage.setItem('terms',JSON.stringify($scope.terms));//it's a term array
 			} else {
-				sc.terms = _.reject(sc.terms, function(el) { return el.label === node.label; });
+				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
 			}
 		};
 
@@ -569,7 +571,8 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
-			sc.terms = [];
+			var savedterms = JSON.parse(localStorage.getItem('terms'));
+			$scope.terms = (savedterms!==null) ? savedterms : [];
 
 			sc.filter = {
 				type: 'all',
@@ -578,7 +581,7 @@
 				iprstatus: null,
 				yearfrom: sc.minProductionYear,
 				yearto: sc.maxProductionYear,
-				terms: sc.terms
+				terms: $scope.terms
 			};
 
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
@@ -601,7 +604,7 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
-			sc.terms = [];
+			$scope.terms = [];
 
 			$scope.itemType.video = true;
 			$scope.itemType.image = true;
@@ -612,7 +615,7 @@
 				iprstatus: null,
 				yearfrom: sc.minProductionYear,
 				yearto: sc.maxProductionYear,
-				terms: sc.terms
+				terms: $scope.terms
 			};
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
