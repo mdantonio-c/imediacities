@@ -500,9 +500,12 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				localStorage.setItem('terms',JSON.stringify($scope.terms));//it's a term array
+				var convertstring = JSON.stringify($scope.terms);
+				localStorage.setItem('terms',convertstring);//it's a term array
 			} else {
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
+				var convertstring = JSON.stringify($scope.terms);
+				localStorage.setItem('terms',convertstring);//it's a term array
 			}
 		};
 
@@ -521,11 +524,20 @@
 		};
 
 
-		$scope.itemType = {
+		sc.itemType = {
 			video: true,
 			image: true,
 			text: false
 		};
+		$scope.$watch('sc.itemType', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (newValue.video && newValue.image) sc.filter.type='all';
+				else if (newValue.video) sc.filter.type='video';
+				else if (newValue.image) sc.filter.type='image';
+				else if (newValue.text) sc.filter.type='text';
+			}
+		}, true);
+
 
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
@@ -533,12 +545,12 @@
 		sc.resetFilters = function() {
 
 			/*initialize last selected input type as default value when refresh page*/
-			var itemTV = localStorage.getItem('itemTypeV');
+			/*var itemTV = localStorage.getItem('itemTypeV');
 			var itemTI = localStorage.getItem('itemTypeI');
 			var inputSelectedV = (itemTV!==null) ? itemTV : true;
 			var inputSelectedI = (itemTI!==null) ? itemTI : true;
 			$scope.itemType.video = inputSelectedV;
-			$scope.itemType.image = inputSelectedI;
+			$scope.itemType.image = inputSelectedI;*/
 
 			/*initialize last selected input term as default value when refresh page*/
 			var inputT = localStorage.getItem('inputTerm');
@@ -570,8 +582,15 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
-			var savedterms = JSON.parse(localStorage.getItem('terms'));
-			$scope.terms = (savedterms!==null) ? savedterms : [];
+
+			var savedterms = localStorage.getItem('terms');
+			if (savedterms!==""){
+				var dataObj=JSON.parse(savedterms);
+				$scope.terms = (dataObj!==null) ? dataObj : [];
+			}
+			else{
+				$scope.terms = [];
+			}
 
 			sc.filter = {
 				type: 'all',
@@ -603,10 +622,20 @@
 	    	}, 1000);
 
 			sc.selectedMatchFields = ['title'];
+
 			$scope.terms = [];
 
-			$scope.itemType.video = true;
-			$scope.itemType.image = true;
+			//reset local storage
+			localStorage.setItem('iprstatus','');
+			localStorage.setItem('terms','');//it's a term array
+			localStorage.setItem('inputTerm','');
+			localStorage.setItem('yearfrom',1890);
+			localStorage.setItem('yearto',1999);
+			//localStorage.setItem('itemTypeV',true);
+			//localStorage.setItem('itemTypeI',true);
+
+			sc.itemType.video = true;
+			sc.itemType.image = true;
 			sc.filter = {
 				type: 'all',
 				provider: null,
@@ -614,7 +643,7 @@
 				iprstatus: null,
 				yearfrom: sc.minProductionYear,
 				yearto: sc.maxProductionYear,
-				terms: $scope.terms
+				terms: []
 			};
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
@@ -644,16 +673,20 @@
 			if (newValue !== oldValue) {
 				if (newValue.video && newValue.image) {
 					sc.filter.type='all';
+					/*localStorage.setItem('itemTypeV',true);
+					localStorage.setItem('itemTypeI',true);*/
 				}
 				else if (newValue.video) {
 					sc.filter.type='video';
-					var typeV = localStorage.getItem('itemTypeV');
-					localStorage.setItem('itemTypeV',!typeV);//it's a video
+					/*var typeV = localStorage.getItem('itemTypeV');
+					var bool = typeV ? false : true;
+					localStorage.setItem('itemTypeV',bool);//it's a video*/
 				}
 				else if (newValue.image) {
 					sc.filter.type='image';
-					var typeI = localStorage.getItem('itemTypeI');
-					localStorage.setItem('itemTypeI',!typeI);//it's an image
+					/*var typeI = localStorage.getItem('itemTypeI');
+					var bool = typeI ? false : true;
+					localStorage.setItem('itemTypeI',bool);//it's an image*/
 				}
 				else if (newValue.text) sc.filter.type='text';
 			}
