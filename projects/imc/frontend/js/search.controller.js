@@ -552,6 +552,9 @@
 			$scope.itemType.video = inputSelectedV;
 			$scope.itemType.image = inputSelectedI;*/
 
+			$scope.yearfrom=1890;
+			$scope.yearto=1999;
+
 			/*initialize last selected input term as default value when refresh page*/
 			var inputT = localStorage.getItem('inputTerm');
 			var inputSelected = (inputT!==null) ? inputT : null;
@@ -574,12 +577,8 @@
 			var yearto = parseInt(localStorage.getItem('yearto'));
 			var yeartoselected = (yearto!==null) ? yearto : 1999;
 
-			setTimeout(function () {
-	        	$scope.$apply(function () {
-	            	$scope.yearfrom = yearfromselected;
-	            	$scope.yearto = yeartoselected;
-	        	});
-	    	}, 1000);
+	        $scope.yearfrom = yearfromselected;
+	        $scope.yearto = yeartoselected;
 
 			sc.selectedMatchFields = ['title'];
 
@@ -614,12 +613,8 @@
 			$scope.inputTerm = '';
 			$scope.defaultipr = null;
 
-			setTimeout(function () {
-	        	$scope.$apply(function () {
-	            	$scope.yearfrom = sc.minProductionYear;
-	            	$scope.yearto = sc.maxProductionYear;
-	        	});
-	    	}, 1000);
+	        $scope.yearfrom = sc.minProductionYear;
+	        $scope.yearto = sc.maxProductionYear;
 
 			sc.selectedMatchFields = ['title'];
 
@@ -887,6 +882,12 @@
 					});
 				},
 				function(out_data) {
+					var errors = out_data.data.Response.errors;
+					angular.forEach(errors, function(error) {
+						sc.alerts.push({
+							msg: error
+						});
+					});
 					noty.extractErrors(out_data, noty.ERROR);
 				}).finally(function() {
 					sc.loading = false;
@@ -969,9 +970,8 @@
 					}).finally(function() {
 						sc.loadingMapResults = false;
 					});
-				}, function(error) {
-					noty.extractErrors(error, noty.ERROR);
-				});
+				}
+			);
 		}
 
 		function updateMarkers(map) {
