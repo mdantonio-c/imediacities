@@ -98,10 +98,10 @@ bower_components:
     - markerclusterer.js
 
 js:
-  - "custom/Spinner.js"
-  - "custom/Scene.js"
-  - "custom/Seekbar.js"
-  - "custom/VideoPlayer.js"
+  # - "custom/Spinner.js"
+  # - "custom/Scene.js"
+  # - "custom/Seekbar.js"
+  # - "custom/VideoPlayer.js"
   - "https://use.fontawesome.com/releases/v5.0.8/js/all.js"
 
 css: 
