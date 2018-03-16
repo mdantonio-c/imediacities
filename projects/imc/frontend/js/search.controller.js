@@ -854,12 +854,6 @@
 					});
 				},
 				function(out_data) {
-					var errors = out_data.data.Response.errors;
-					angular.forEach(errors, function(error) {
-						sc.alerts.push({
-							msg: error
-						});
-					});
 					noty.extractErrors(out_data, noty.ERROR);
 				}).finally(function() {
 					sc.loading = false;
@@ -942,8 +936,9 @@
 					}).finally(function() {
 						sc.loadingMapResults = false;
 					});
-				}
-			);
+				}, function(error) {
+					noty.extractErrors(error, noty.ERROR);
+				});
 		}
 
 		function updateMarkers(map) {

@@ -51,17 +51,17 @@ class Search(GraphBaseOperations):
         multi_match_where = []
         match = input_parameters.get('match')
         if match is not None:
-            term = match.get('term', '').strip()
-            if not term:
-                raise RestApiException('Term input cannot be empty',
-                                       status_code=hcodes.HTTP_BAD_REQUEST)
-            # clean up term from '*'
-            term = term.replace("*", "")
+            term = match.get('term')
+            if term is not None:
+                # strip and clean up term from '*'
+                term = term.strip().replace("*", "")
 
             fields = match.get('fields')
-            if fields is None or len(fields) == 0:
+            if term is not None and (fields is None or len(fields) == 0):
                 raise RestApiException('Match term fields cannot be empty',
                                        status_code=hcodes.HTTP_BAD_REQUEST)
+            if fields is None:
+                fields = []
             for f in fields:
                 if f not in self.__class__.allowed_term_fields:
                     raise RestApiException(
@@ -165,13 +165,13 @@ class Search(GraphBaseOperations):
                 date_clauses = []
                 if item_type == 'video' or item_type == 'all':
                     date_clauses.append(
-                        "ANY(item in n.production_years where item >= '{yfrom}') \
-                        and ANY(item in n.production_years where item <= '{yto}')".format(
+                        "ANY(item in n.production_years where item >= '{yfrom}') "
+                        "and ANY(item in n.production_years where item <= '{yto}')".format(
                             yfrom=year_from, yto=year_to))
                 if item_type == 'image' or item_type == 'all':
                     date_clauses.append(
-                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') \
-                        and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
+                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') "
+                        "and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
                             yfrom=year_from, yto=year_to))
                 filters.append("MATCH (n) WHERE {clauses}".format(
                     clauses=' or '.join(date_clauses)))
@@ -189,8 +189,8 @@ class Search(GraphBaseOperations):
                         free_terms=free_terms))
                 if term_clauses:
                     filters.append(
-                        "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) \
-                        WHERE {clauses}".format(
+                        "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) "
+                        "WHERE {clauses}".format(
                             clauses=' or '.join(term_clauses)))
 
         # first request to get the number of elements to be returned

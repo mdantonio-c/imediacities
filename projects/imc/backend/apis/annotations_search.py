@@ -83,20 +83,20 @@ class SearchAnnotations(GraphBaseOperations):
             if creation is not None:
                 c_match = creation.get('match')
                 if c_match is not None:
-                    term = c_match.get('term', '').strip()
-                    if not term:
-                        raise RestApiException('Term input cannot be empty',
-                                               status_code=hcodes.HTTP_BAD_REQUEST)
+                    term = c_match.get('term')
+                    if term is not None:
+                        # strip and clean up term from '*'
+                        term = term.strip().replace("*", "")
                     multi_match = []
                     multi_match_where = []
                     multi_match_query = ''
-                    # clean up term from '*'
-                    term = term.replace("*", "")
 
                     fields = c_match.get('fields')
-                    if fields is None or len(fields) == 0:
+                    if term is not None and (fields is None or len(fields) == 0):
                         raise RestApiException('Match term fields cannot be empty',
                                                status_code=hcodes.HTTP_BAD_REQUEST)
+                    if fields is None:
+                        fields = []
                     for f in fields:
                         if f not in self.__class__.allowed_term_fields:
                             raise RestApiException(
