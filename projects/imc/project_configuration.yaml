@@ -34,8 +34,6 @@ releases:
     status: developing
 
 variables:
-
-variables:
   repos:
     frontend:
       branch: 0.6.1
