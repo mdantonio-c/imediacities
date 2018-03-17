@@ -25,6 +25,17 @@
 <div ng-controller='WatchController as watchCtrl' id="video-wrapper">
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
+			<div style="padding-left: 10px; margin-bottom: 10px;">
+				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;">{{watchCtrl.video.attributes.identifying_title}}
+				</h2>
+				<div>
+					<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
+					<span>{{watchCtrl.video.attributes.production_years[0]}}</span>
+					<span class="label label-default label-city">{{(watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}
+						<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
+					</span>
+				</div>
+			</div>
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="video-container">
 					<div class="anno-tools-container" id="anno-tools-container">
@@ -96,7 +107,7 @@
 										<i class="fa fa-fast-forward" id="goto_end"></i>
 									</div> -->
 									<label class="controls__status__anno" 
-										uib-tooltip="on/off annotations"
+										uib-tooltip="on/off automatic tags"
 										tooltip-placement="right">
 										<input type="checkbox" ng-click="watchCtrl.switchVideo()">
   										<span class="video-slider"></span>
@@ -171,7 +182,7 @@
 		<div class="col-xs-12 col-md-6">
 			<uib-tabset>
 
-			<uib-tab heading="Metadata">
+			<uib-tab heading="General Information">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
 				<div class="primary-description">
@@ -226,7 +237,7 @@
 						watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
 						watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
 						<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
-							<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+							<uib-accordion-heading>Film Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
 							</uib-accordion-heading>
 							<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
 								<p ng-if="format.attributes.sound"><b>Sound</b>:
@@ -383,38 +394,32 @@
 				</div>
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
-			<div class="container storyboard">
-				<table class="table">
-					<tr>
-						<th>Shot number</th>
-						<th>Frame range</th>
-						<th>Shots</th>
-						<th>Shot timecode</th>
-						<th>Shot duration (sec)</th>
-						<th ng-style="{'text-align': 'center'}">Camera motion</th>
-					</tr>
-					<div class="storyboard">
-						<tr ng-repeat="shot in watchCtrl.storyshots">
-							<td data-title="'Number'" align="center">{{shot.number}}</td>
-							<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-							<td data-title="'Shot'" scroll-story-on-click>
-								<img ng-style="{'width': '40%'}"
-								id="{{shot.id}}"
-								timestamp="{{shot.timestamp}}"
-								ng-src="{{shot.thumb}}">
-							</td>
-							<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
-							<td data-title="'Duration'" align="center">{{shot.duration}}</td>
-							<td data-title="'Camera motion'" align="center">
-								<dl class="dl-horizontal">
-									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-										<dt>{{e_attr}}:</dt><dd>{{e_val * 100 | number:1}}%</dd>
-									</div>
-								</dl>
-							</td>
-						</tr>
+			<div class="storyboard">
+				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
+					<div class="media-left">
+						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
+						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
 					</div>
-				</table>
+					<div class="media-body" style="margin-left: 90px; display: block;">
+						<div scroll-story-on-click>
+							<h4 style="cursor: pointer;"  
+								timestamp="{{shot.timestamp}}"
+								class="underline-on-hover"
+								>Shot {{shot.number}}</h4>
+						</div>
+						<span class="small">{{shot.framerange}}</span>
+						<div class="space-0"></div>
+						<span class="small">{{shot.timestamp}}</span>
+						
+						<div class="search-actions text-center">
+							<dl class="dl-horizontal">
+								<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
+									<dt style="width: auto;">{{e_attr}}:</dt><dd style="margin-left: 0;">{{e_val * 100 | number:1}}%</dd>
+								</div>
+							</dl>
+						</div>
+					</div>
+				</div>
 			</div>
 			</uib-tab>
 			</uib-tabset>

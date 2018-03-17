@@ -228,6 +228,8 @@ div.scrollmenu img:hover {
   	width: 50%;
 }
 
+.underline-on-hover:hover { text-decoration: underline; }
+
 .imc-logo{
   height: 80%;
   // padding: 15px;

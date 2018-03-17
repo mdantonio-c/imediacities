@@ -1239,7 +1239,7 @@
 					//	durata e fps
 					var durata = self.video.relationships.item[0].attributes.duration;
 					var fps = self.video.relationships.item[0].attributes.framerate.replace('/1','');
-					var flen = durata/fps
+					var flen = durata/fps;
 
 					angular.forEach(self.shots, function(shot, idx) {
 						// for the carousel
