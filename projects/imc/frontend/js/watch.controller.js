@@ -11,7 +11,14 @@
 		.controller('ModalConfirmController', ModalConfirmController);
 
 	// modal view storyboard factory definition
-	app.factory('modalFactory', function($uibModal) {
+	app.factory('modalFactory', modalFactory)
+	   .factory('myTagModalFactory', myTagModalFactory)
+	   .factory('myGeoConfirmFactory', myGeoConfirmFactory);
+
+	app.config(ivhTreeviewConf);
+	app.service('sharedProperties', sharedProperties);
+
+	function modalFactory($uibModal) {
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
@@ -28,7 +35,10 @@
 				});
 			}
 		};
-	}).factory('myTagModalFactory', function($uibModal, $document) {
+	};
+	modalFactory.$inject = ["$uibModal"];
+
+	function myTagModalFactory($uibModal, $document) {
 		/* modal view for adding location and term tags */
 		return {
 			open: function(size, template, params) {
@@ -48,7 +58,10 @@
 				});
 			}
 		};
-	}).factory('myGeoConfirmFactory', function($uibModal, $document) {
+	}
+	myTagModalFactory.$inject = ["$uibModal", "$document"];
+
+	function myGeoConfirmFactory($uibModal, $document) {
 		var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
 		return {
 			open: function(size, template, params) {
@@ -66,9 +79,8 @@
 				});
 			}
 		};
-	});
-
-	app.config(ivhTreeviewConf);
+	};
+	myGeoConfirmFactory.$inject = ["$uibModal", "$document"];
 
 	function ivhTreeviewConf(ivhTreeviewOptionsProvider) {
 		ivhTreeviewOptionsProvider.set({
@@ -81,7 +93,7 @@
 	};
 	ivhTreeviewConf.$inject = ["ivhTreeviewOptionsProvider"];
 
-	app.service('sharedProperties', function($q) {
+	function sharedProperties($q) {
 		var startTime = 'test start value';
 		var endTime = 'test end value';
 		var labelTerm = 'test label value';
@@ -185,13 +197,17 @@
 				defer.notify(recordProvider);
 			}
 		};
-	});
+	};
+	sharedProperties.$inject = ["$q"];
 
-	app.filter('trustUrl', function($sce) {
-			return function(url) {
-				return $sce.trustAsResourceUrl(url);
-			};
-		})
+	function trustUrl($sce) {
+		return function(url) {
+			return $sce.trustAsResourceUrl(url);
+		};
+	};
+	trustUrl.$inject = ["$sce"];
+
+	app.filter('trustUrl', trustUrl)
 		.filter('salientEstimates', function() {
 			return function(estimates, threshold) {
 				threshold = typeof threshold !== 'undefined' ? threshold : 0.5;
@@ -739,8 +755,8 @@
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
 
-	function WatchController($scope, $rootScope, $http, $log, $document, $uibModal, $stateParams, $filter,
-			DataService, noty, myTagModalFactory, sharedProperties) {
+	function WatchController($scope, $rootScope, $document, $uibModal, 
+		$stateParams, $filter, DataService, noty, myTagModalFactory, sharedProperties) {
 
 		var self = this;
 		var vid = $stateParams.v;
@@ -1065,15 +1081,15 @@
 						self.storyshots.push(sbFields);
 						
 					});
-
-				})
-				.catch(function(response) {
-					console.error('Error loading video shots');
-					// TODO
-				})
-				.finally(function() {
   					// hide loading video bar
 					self.showmeli = false;
+				})
+				.catch(function(response) {
+  					// hide loading video bar
+					self.showmeli = false;
+					console.error('Error loading video shots');
+					// TODO
+
 				});
 		};
 
@@ -1223,7 +1239,11 @@
 			});
 		});
 
-	}
+	};
+	WatchController.$inject = [
+		"$scope", "$rootScope", "$document", "$uibModal", "$stateParams",
+		"$filter", "DataService", "noty", "myTagModalFactory", "sharedProperties"
+	];
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties) {
 
@@ -1241,9 +1261,15 @@
 
 		// load the map ONLY when the provider info is available
 		sharedProperties.getRecordProvider().then(null, null, function(provider) {
+
 			// look for existing custom location
-			var customLocation,
+			var customLocation;
+			var coverage;
+
+			if ($scope.$parent.watchCtrl.video.relationships.coverages) {
 				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+			}
+
 			if (coverage !== undefined) {
 				customLocation = coverage.attributes.spatial[0];
 			}
@@ -1408,7 +1434,11 @@
 			};
 
 		});
-	}
+	};
+	MapController.$inject = [
+		"$scope", "$rootScope", "$window", "NgMap", "NavigatorGeolocation",
+		"GeoCoder", "$timeout", "sharedProperties"
+	];
 
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $uibModal service used above.

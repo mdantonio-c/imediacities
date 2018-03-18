@@ -5,6 +5,7 @@ import 'lodash'
 import 'angular-ui-tree'
 import 'ng-tags-input'
 import 'angular-ivh-treeview'
+import 'js-marker-clusterer'
 // import 'bootstrap-treeview'
 
 import '/app/frontend/css/style.css'

@@ -221,7 +221,7 @@
 
 	// The controller
 	function SearchController(
-		$scope, $log, $state, $stateParams,
+		$scope, $state, $stateParams,
 		DataService, CodelistService, noty, $uibModal) 
 	{
 		var self = this;
@@ -332,9 +332,9 @@
 			self.showmese = true;
 			DataService.searchCreations(request_data, self.currentPage, self.ItemsByPage).then(
 				function(out_data) {
-					var meta = out_data.data.Meta;
+					var meta = out_data.Meta;
 					self.totalItems = meta.totalItems;
-					self.creations = out_data.data.Response.data;
+					self.creations = out_data.Response.data;
 					self.loading = false;
 					self.loadResults = true;
 					self.showmese = false;
@@ -342,7 +342,7 @@
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
-					var errors = out_data.data.Response.errors;
+					var errors = out_data.Response.errors;
 					angular.forEach(errors, function(error) {
 						self.alerts.push({
 							msg: error
@@ -439,7 +439,7 @@
 	};
 
 	SearchController.$inject = [
-		"$scope", "$log", "$state", "$stateParams",
+		"$scope", "$state", "$stateParams",
 		"DataService", "CodelistService", "noty", "$uibModal"
 	];
 
@@ -624,10 +624,11 @@
 			}
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
-					var meta = out_data.data.Meta;
+					console.log(out_data);
+					var meta = out_data.Meta;
 					sc.totalItems = meta.totalItems;
 					sc.countByYears = meta.countByYears;
-					sc.creations = out_data.data.Response.data;
+					sc.creations = out_data.Response.data;
 					NgMap.getMap().then(function(map) {
 						sc.map = map;
 						// clean up current marker list
@@ -649,7 +650,7 @@
 							}
 							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
 								function(response) {
-									sc.mapTags = response.data.Response.data;
+									sc.mapTags = response.Response.data;
 									angular.forEach(sc.mapTags, function(tag, index){
 										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
 										var marker = new google.maps.Marker({ position: latLng, id: tag.iri, name: tag.name });
@@ -688,17 +689,17 @@
 						}
 						
 					});
+					sc.loading = false;
 				},
 				function(out_data) {
-					var errors = out_data.data.Response.errors;
+					var errors = out_data.Response.errors;
 					angular.forEach(errors, function(error) {
 						sc.alerts.push({
 							msg: error
 						});
 					});
-					noty.extractErrors(out_data, noty.ERROR);
-				}).finally(function() {
 					sc.loading = false;
+					noty.extractErrors(out_data, noty.ERROR);
 				});
 		};
 		sc.search();
