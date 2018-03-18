@@ -392,25 +392,60 @@
 						</tbody>
 					</table>
 				</div>
+				<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
+			<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			<div class="storyboard">
 				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
 					<div class="media-left">
 						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
 						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
 					</div>
-					<div class="media-body" style="margin-left: 90px; display: block;">
-						<div scroll-story-on-click>
-							<h4 style="cursor: pointer;"  
-								timestamp="{{shot.timestamp}}"
-								class="underline-on-hover"
-								>Shot {{shot.number}}</h4>
+					<div class="media-content">
+						<div class="row">
+							<div class="col-xs-3">
+								<div class="shot-info">
+									<div scroll-story-on-click>
+										<h4
+										timestamp="{{shot.timestamp}}"
+										class="underline-on-hover"
+										>Shot {{shot.number}}</h4>
+									</div>
+									<span class="small">{{shot.framerange}}</span>
+									<div class="space-0"></div>
+									<span class="small">{{shot.timestamp}}</span>
+								</div>
+							</div>
+							<div class="col-xs-9">
+								<div class="anno-info">
+									<ul class="fa-ul">
+										<li ng-if="(shot.tags | filter: {spatial:'!'}).length !== 0">
+											<i class="fa-li fa fa-tags light-brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in shot.tags | filter: {spatial:'!'}">
+													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+										<li ng-if="(shot.tags | filter: {spatial:'!!'}).length !== 0">
+											<i class="fa-li fa fa-map-marker brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in shot.tags | filter: {spatial:'!!'}">
+													<span class="label label-location">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+							</div>
 						</div>
-						<span class="small">{{shot.framerange}}</span>
-						<div class="space-0"></div>
-						<span class="small">{{shot.timestamp}}</span>
-						
 						<div class="search-actions text-center">
 							<dl class="dl-horizontal">
 								<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">

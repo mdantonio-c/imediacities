@@ -409,6 +409,19 @@ class AnnotationRepository():
                 # existing segment found
                 return s
 
+    def check_automatic_tagging(self, item_id):
+        '''
+        Check if at least one automatic annotation exists for the given content
+        item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic annotations found: {0}".format(count))
+        return True if count > 0 else False
+
 
 class DuplicatedAnnotationError(Exception):
     pass
