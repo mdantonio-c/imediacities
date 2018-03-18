@@ -136,93 +136,56 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                     xml_resource.status = 'COMPLETED'
                     xml_resource.status_message = 'Nothing to declare'
                     xml_resource.save()
-                    # content_node.status = 'SKIPPED'
-                    # content_node.status_message = 'Nothing to declare'
-                    # content_node.save()
+                    content_node.status = 'SKIPPED'
+                    content_node.status_message = 'Nothing to declare'
+                    content_node.save()
                     return 1
                 fast = (mode == 'fast')
 
             # at the moment SKIP pipeline for NON-AV Entity
-            if item_type != 'Video':
-                if content_node is not None:
-                    content_node.status = 'SKIPPED'
-                    content_node.status_message = 'Pipeline for Non AV entity not yet implemented'
-                    content_node.save()
+            # if item_type != 'Video':
+            #     if content_node is not None:
+            #         content_node.status = 'SKIPPED'
+            #         content_node.status_message = 'Pipeline for Non AV entity not yet implemented'
+            #         content_node.save()
 
-                xml_resource.status = 'COMPLETED'
-                xml_resource.status_message = 'Nothing to declare'
-                xml_resource.save()
-                return 1
+            #     xml_resource.status = 'COMPLETED'
+            #     xml_resource.status_message = 'Nothing to declare'
+            #     xml_resource.save()
+            #     return 1
 
             if content_node is None:
                 raise Exception(
                     "Pipeline cannot be started: " +
                     "content does not exist in the path {0} for source ID {1}"
-                    .format(content_path, source_id))
+                    .format(basedir, source_id))
 
             content_node.status = "IMPORTING"
-            # TO FIX: video analysis will be a new tasks
-            # task = analyze_video.apply_async(
-            #     args=[path, video_node.uuid],
-            #     countdown=20
-            # )
-            # video_node.task_id = task.id
             content_node.save()
 
             # EXECUTE AUTOMATC TOOLS
 
-            # workflow = FHG(video_path, "/uploads")
-            # workflow.analyze(fast)
+            content_item = os.path.join('/uploads', content_path)
+            if not os.path.exists(content_item):
+                raise Exception('Bad input file', content_item)
 
-            movie = os.path.join('/uploads', content_path)
-            if not os.path.exists(movie):
-                raise Exception('Bad input file', movie)
-
-            out_folder = make_movie_analize_folder(movie)
+            out_folder = make_movie_analize_folder(content_item)
             if out_folder == "":
                 raise Exception('Failed to create out_folder')
 
-            log.info("Analize " + movie)
+            log.info("Analize " + content_item)
 
-            if analize(movie, out_folder, fast):
+            if analize(content_item, item_type, out_folder, fast):
                 log.info('Analize executed')
             else:
                 raise Exception('Analize terminated with errors')
-
-            # params = []
-            # params.append("/code/scripts/analysis/analyze.py")
-            # if mode is not None:
-            #     log.info('Analyze with mode [%s]' % mode)
-            #     params.append('-%s' % mode)
-            # params.append(video_path)
-
-            # progress(self, 'Executing automatic tools', path)
-            # bash = BashCommands()
-            # try:
-            #     output = bash.execute_command(
-            #         "python3",
-            #         params,
-            #         parseException=True
-            #     )
-            #     log.info(output)
-
-            # except BaseException as e:
-            #     log.error(e)
-            #     video_node.status = 'ERROR'
-            #     video_node.status_message = str(e)
-            #     video_node.save()
-            #     raise(e)
-
-            # REMOVE ME!!
-            # video_node.status = 'ERROR'
-            # video_node.status_message = "STOP ME"
-            # video_node.save()
 
             analyze_path = '/uploads/Analize/' + \
                 group.uuid + '/' + content_filename.split('.')[0] + '/'
             log.debug('analyze path: {0}'.format(analyze_path))
 
             # SAVE AUTOMATIC ANNOTATIONS
+
             progress(self, 'Extracting automatic annotations', path)
 
             extract_tech_info(self, item_node, analyze_path)

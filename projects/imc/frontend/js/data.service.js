@@ -41,6 +41,20 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('download/'+filename, 'GET', {}, undefined, true, false, false, config);
     };
 
+    //
+    // IMAGES
+    //
+    self.getImageMetadata = function(imageId) {
+        return api.apiCall('images/'+imageId, 'GET');
+    };
+    self.getImageAnnotations = function(imageId) {
+         return api.apiCall('images/'+imageId+'/annotations', 'GET');
+    };
+
+    //
+    // VIDEOS
+    //
+
     // self.getVideos = function() {
     //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
     // }
