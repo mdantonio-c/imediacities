@@ -9,6 +9,6 @@ export class CustomNavbarComponent {
 
 	@Input() user: any;
 
-	constructor() { console.log("custom");}
+	constructor() { }
 
 }
