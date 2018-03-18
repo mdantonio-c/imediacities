@@ -9,7 +9,8 @@ flower
 
 # Temporary required for http-api
 git+https://github.com/irods/python-irodsclient.git@master
-rapydo-http==0.5.6
+rapydo-utils==0.5.7
+rapydo-http==0.5.7
 
 numpy
 Pillow     

@@ -51,17 +51,17 @@ class Search(GraphBaseOperations):
         multi_match_where = []
         match = input_parameters.get('match')
         if match is not None:
-            term = match.get('term', '').strip()
-            if not term:
-                raise RestApiException('Term input cannot be empty',
-                                       status_code=hcodes.HTTP_BAD_REQUEST)
-            # clean up term from '*'
-            term = term.replace("*", "")
+            term = match.get('term')
+            if term is not None:
+                # strip and clean up term from '*'
+                term = term.strip().replace("*", "")
 
             fields = match.get('fields')
-            if fields is None or len(fields) == 0:
+            if term is not None and (fields is None or len(fields) == 0):
                 raise RestApiException('Match term fields cannot be empty',
                                        status_code=hcodes.HTTP_BAD_REQUEST)
+            if fields is None:
+                fields = []
             for f in fields:
                 if f not in self.__class__.allowed_term_fields:
                     raise RestApiException(
@@ -100,10 +100,9 @@ class Search(GraphBaseOperations):
         # check request for filtering
         filters = []
         # add filter for processed content with COMPLETE status
-        # FIXME remove the following comment
-        # filters.append(
-        #     "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
-        #     "WHERE content.status = 'COMPLETED'")
+        filters.append(
+            "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+            "WHERE content.status = 'COMPLETED'")
         entity = 'Creation'
         filtering = input_parameters.get('filter')
         if filtering is not None:
@@ -166,13 +165,13 @@ class Search(GraphBaseOperations):
                 date_clauses = []
                 if item_type == 'video' or item_type == 'all':
                     date_clauses.append(
-                        "ANY(item in n.production_years where item >= '{yfrom}') \
-                        and ANY(item in n.production_years where item <= '{yto}')".format(
+                        "ANY(item in n.production_years where item >= '{yfrom}') "
+                        "and ANY(item in n.production_years where item <= '{yto}')".format(
                             yfrom=year_from, yto=year_to))
                 if item_type == 'image' or item_type == 'all':
                     date_clauses.append(
-                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') \
-                        and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
+                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') "
+                        "and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
                             yfrom=year_from, yto=year_to))
                 filters.append("MATCH (n) WHERE {clauses}".format(
                     clauses=' or '.join(date_clauses)))
@@ -190,8 +189,8 @@ class Search(GraphBaseOperations):
                         free_terms=free_terms))
                 if term_clauses:
                     filters.append(
-                        "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) \
-                        WHERE {clauses}".format(
+                        "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) "
+                        "WHERE {clauses}".format(
                             clauses=' or '.join(term_clauses)))
 
         # first request to get the number of elements to be returned
@@ -233,19 +232,35 @@ class Search(GraphBaseOperations):
                     status_code=hcodes.HTTP_SERVER_ERROR)
 
             item = v.item.single()
-            video_url = api_url + 'api/videos/' + v.uuid
-            # use depth 2 to get provider info from record source
-            # TO BE FIXED
-            video = self.getJsonResponse(v, max_relationship_depth=2)
-            logger.info("links %s" % video['links'])
-            video['links']['self'] = video_url
-            video['links']['content'] = video_url + '/content?type=video'
-            if item.thumbnail is not None:
-                video['links']['thumbnail'] = video_url + \
-                    '/content?type=thumbnail'
-            video['links']['summary'] = video_url + '/content?type=summary'
 
-            data.append(video)
+            if isinstance(v, self.graph.AVEntity):
+                # video 
+                video_url = api_url + 'api/videos/' + v.uuid
+                # use depth 2 to get provider info from record source
+                # TO BE FIXED
+                video = self.getJsonResponse(v, max_relationship_depth=2)
+                logger.info("links %s" % video['links'])
+                video['links']['self'] = video_url
+                video['links']['content'] = video_url + '/content?type=video'
+                if item.thumbnail is not None:
+                    video['links']['thumbnail'] = video_url + \
+                        '/content?type=thumbnail'
+                video['links']['summary'] = video_url + '/content?type=summary'
+                data.append(video)
+            elif isinstance(v, self.graph.NonAVEntity):
+                #image
+                image_url = api_url + 'api/images/' + v.uuid
+                # use depth 2 to get provider info from record source
+                # TO BE FIXED
+                image = self.getJsonResponse(v, max_relationship_depth=2)
+                logger.info("image links %s" % image['links'])
+                image['links']['self'] = image_url
+                image['links']['content'] = image_url + '/content?type=image'
+                if item.thumbnail is not None:
+                    image['links']['thumbnail'] = image_url + \
+                        '/content?type=thumbnail'
+                image['links']['summary'] = image_url + '/content?type=summary'
+                data.append(image)            
 
         # return also the total number of elements
         meta_response = {"totalItems": numels}

@@ -45,17 +45,21 @@ services:
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
       SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_NOREPLY: ${SMTP_NOREPLY}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
+
+  proxy:
+    environment:
+      SMTP_ADMIN: ${SMTP_ADMIN}
 
   neo4j:
     restart: on-failure:5
     volumes:
       - ${VANILLA_DIR}/data/graphdata:/data
     ports:
-      - 9090:7474
       - 7687:7687
     environment:
       # NEO4J_dbms_memory_pagecache_size: 1024M

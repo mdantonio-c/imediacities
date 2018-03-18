@@ -228,6 +228,8 @@ div.scrollmenu img:hover {
   	width: 50%;
 }
 
+.underline-on-hover:hover { text-decoration: underline; }
+
 .imc-logo{
   height: 80%;
   // padding: 15px;
@@ -313,10 +315,11 @@ ul li p {
 	padding-top: 4px;
 	color:#6e7a7f;
 }
-
+.image-title-container .title,
 .primary-description .title {
 	padding: 5px 0; 
 }
+.image-title-container .title,
 .primary-description .title span:nth-child(1) {
 	/*margin-left: 15px;
 	margin-right: 5px;*/
@@ -324,7 +327,14 @@ ul li p {
 	font-weight: bold;
 	font-size: 20px;
 }
-
+.image-title-container .year{
+	color:#6e7a7f;
+	font-size: 18px;
+	padding: 5px 0; 
+}
+.image-title-container .image-icon {
+	padding: 5px 0; 
+}
 .primary-description>.text {
 	padding: 5px 0;
 	color:#6e7a7f; 
@@ -348,6 +358,12 @@ ul li p {
   background-color: transparent;
   top:-200px;
   left: 200px;
+}
+
+/*image container*/
+.image-container {
+	margin-top: 10px;
+	position: relative;
 }
 
 /*video container*/
@@ -570,6 +586,7 @@ element.style {
 .orange { color: #ff892a !important }
 .orange2 { color: #feb902 !important }
 .light-orange { color: #fcac6f !important }
+.grey { color: #8c8c8c !important }
 .light-grey { color: #bbb !important }
 .blue { color: #478fca !important }
 .light-blue { color: #93CBF9 !important }
@@ -578,6 +595,8 @@ element.style {
 .bigger-180 { font-size: 180% !important }
 
 /* Button */
+button:focus {outline:0;}
+
 .btn {
     color: #FFF!important;
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
@@ -1025,6 +1044,11 @@ button.btn:active {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffaa33', endColorstr='#fffc9200', GradientType=0) !important
 }
 
+.backsearch:last-child>.btn, .backsearch:last-child>.btn-group {
+    z-index: 2;
+    margin-left: 1px;
+}
+
 .btn>.icon-only.imc-icon {
     margin: 0!important;
     text-align: center;
@@ -1103,6 +1127,9 @@ button.btn:active {
 	margin: 3px 0;
 	border: 1px solid #CCC;
 }
+.widget-box.transparent {
+	border-width: 0;
+}
 .widget-box.collapsed>.widget-header { border-bottom-width: 0 }
 .widget-box .widget-header {
 	box-sizing: content-box;
@@ -1110,6 +1137,15 @@ button.btn:active {
 	min-height: 38px;
 	padding-left: 12px;
 	border-bottom: 1px solid #DDD;
+}
+.widget-box .widget-header-small {
+	min-height: 31px;
+	padding-left: 10px
+}
+.widget-box .widget-header>.widget-title>.imc-icon {
+    margin-right: 5px;
+    font-weight: 400;
+    display: inline-block;
 }
 .widget-box .widget-header>.widget-title {
 	line-height: 36px;
@@ -1119,6 +1155,9 @@ button.btn:active {
 	font-weight: bold;
 	font-size: 13px;
 	cursor: default;
+}
+.widget-box .widget-header-small>.widget-title {
+    line-height: 30px;
 }
 .widget-box .widget-header .widget-toolbar {
 	display: inline-block;
@@ -1231,12 +1270,12 @@ button.btn:active {
     width: 64px;
     font-size: 15px;
     border-radius: 8px;
-    padding-bottom: 7px;
-    padding-top: 8px;
+    padding-bottom: 5px;
+    padding-top: 5px;
     line-height: 1.45;
 }
 
-.btn.btn-app.anno-tools-btn.btn-xs { width: 42px }
+.btn.btn-app.anno-tools-btn.btn-xs { width: 40px }
 .btn.btn-app.anno-tools-btn {
 	display: block;
 	text-align: center;
@@ -1763,10 +1802,77 @@ li.ivh-treeview-node::before {
     text-overflow: ellipsis;
 }
 
+/* Map */
 .map-view {
 	background-color: #d0d0d0;
 	border-color: #d6e1ea;
     padding: .35em;
+}
+
+.map #custom-control .imc-icon:hover {
+	color: #333 !important
+}
+
+.map #custom-control {
+	user-select: none;
+	box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+	border-radius: 2px;
+	cursor: pointer;
+	background-color: rgb(255, 255, 255);
+	width: 28px;
+	height: 56px;
+	margin: 10px;
+}
+
+.map #custom-control button {
+	background: none;
+	display: block;
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+	position: relative;
+	cursor: pointer;
+	user-select: none;
+	width: 28px;
+	height: 28px;
+	top: 0px;
+	left: 0px;
+}
+
+.map #place-control {
+	margin: 10px;
+	line-height: 24px;
+}
+
+.map #place-control input {
+	width: 280px;
+	font-size: small;
+	padding-left: 5px;
+}
+
+#infowindow-content .place-info .title {
+	color: #6e7a7f;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#infowindow-content .place-item-list {
+	border-top: 1px solid rgb(204, 204, 204);
+	margin-top: 9px;
+	padding: 6px;
+	font-size: 13px;
+	max-height: 80px;
+    overflow: auto;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Roboto, Arial;
+}
+
+#infowindow-content .place-item-list a {
+	cursor: pointer;
+	color: rgb(66, 127, 237);
+	text-decoration: none;
+	padding: 0px 4px;
 }
 
 /* Timeline */
@@ -1919,7 +2025,7 @@ li.ivh-treeview-node::before {
   left: 0 !important;
   right: 0 !important;
   width: 100%;
-  cursor: pointer;
+  /*cursor: pointer;*/
 }
 .timeline-horizontal .timeline-item .timeline-panel:before {
   top: auto;
@@ -1958,3 +2064,206 @@ li.ivh-treeview-node::before {
   padding-right: 1.5%;
 }
 
+/* Tag activity */
+.tag-activity {
+	padding: 4px 8px 4px 4px;
+	min-height: 60px;
+	border-bottom: 1px dotted #D0D8E0;
+	position: relative;
+	border-left: 1px dotted #FFF;
+	border-right: 1px dotted #FFF
+}
+
+.tag-activity:first-child {
+	border-top: 1px dotted transparent
+}
+
+.tag-activity:first-child:hover {
+	border-top-color: #D0D8E0
+}
+
+.tag-activity:hover {
+	background-color: #F4F9FD;
+	border-left: 1px dotted #D0D8E0;
+	border-right: 1px dotted #D0D8E0
+}
+
+.tag-activity .annotation {
+	width: 60%;
+	padding-right: 9px;
+	font-size: 13px;
+}
+
+.tag-activity .creator {
+	padding: 2px 5px;
+	border-left: 1px dotted #D0D8E0;
+	font-size: x-small;
+	position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 40%;
+    min-width: 124px;
+}
+
+.tag-activity .creator .time {
+	color: #777;
+	padding-left: 18px;
+}
+
+/*----------------------------------------------
+       The modal of the Notes -- cinzia
+-----------------------------------------------*/
+.modal-div-1
+{
+	height: 200px;
+    padding-top: 20px;
+}
+.modal-div-options
+{
+	width: 450px;
+}
+.modal-div-select-0{
+    display: inline-block;
+    color: #999;
+    font-size: small;
+}
+.modal-div-select-1
+{
+	display: inline-block;
+	color: #999;
+    font-size: small;
+}
+.modal-div-select-2
+{
+	display: inline-block;
+    color: #999;
+    font-size: small;
+}
+.modal-select-0{
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding: 3px;
+}
+.modal-select-1
+{
+	-moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding: 3px;
+}
+.modal-select-2
+{
+	-moz-appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+    padding: 3px;
+}
+
+.modal-shot_info
+{
+	margin-bottom: 2px;
+}
+
+/*----------------------------------------------
+       The tab with the Notes -- cinzia
+-----------------------------------------------*/
+.tab-notes
+{
+	overflow: hidden;
+}
+.tab-notes-title
+{
+	color: #6e7a7f;
+    font-weight: bold;
+    font-size: 20px;
+}
+.tab-list-notes
+{
+	display: inline-block;
+	border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    width: 70%;
+    height: 500px;
+    vertical-align: top;
+    overflow-y: auto;
+}
+.tab-list-note
+{
+	padding: 10px;
+}
+.tab-list-shots
+{
+	display: inline-block;
+    width: 100px;
+    height: 500px;
+    overflow-y: auto;
+}
+a.tab-list-shots-link:hover,
+a.tab-list-shots-link:focus
+{
+	text-decoration: none;
+	cursor: pointer;
+}
+.note-user-icon
+{
+	color: #ddd;
+}
+.note-user-name
+{
+	color: #aaa;
+    margin-left: 5px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+.note-date{
+	margin-left: 5px;
+    margin-right: 5px;
+    color: #aaa;
+}
+.note-bin{
+	float: right;
+    padding-right: 10px;
+    padding-top: 10px;
+}
+.note-text{
+	color: #aaa;
+	font-size: larger;
+}
+.note-privacy{
+	margin-left: 5px;
+    margin-right: 5px;
+	color: #FFD700;
+}
+.tab-list-notes>.note-text>.imc-icon:first-child {
+    padding-right:  10px;
+}
+.tab-list-shot
+{
+	border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    padding: 5px;
+} 
+.tab-list-shot-last
+{
+	border-bottom: 1px solid #aaa;
+}
+.tab-list-shot-no-selected
+{
+    background-color: #eee;
+}
+
+.tab-list-shot-selected
+{
+    background-color: #fff;
+}

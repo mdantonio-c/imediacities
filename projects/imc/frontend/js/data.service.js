@@ -34,6 +34,20 @@ function DataService(ApiService2, jsonapi_parser) {
         return ApiService2.get('download/'+filename, "", {}, {"rawResponse": true, "conf": config}).toPromise();
     };
 
+    //
+    // IMAGES
+    //
+    self.getImageMetadata = function(imageId) {
+        return ApiService2.get('images', imageId).toPromise();
+    };
+    self.getImageAnnotations = function(imageId) {
+         return ApiService2.get('images/'+imageId+'/annotations').toPromise();
+     };
+
+    //
+    // VIDEOS
+    //
+
     self.getVideoMetadata = function(videoId) {
         return ApiService2.get('videos', videoId).toPromise();
     };
@@ -90,7 +104,36 @@ function DataService(ApiService2, jsonapi_parser) {
             data.body = bodies;
         }
 
+        data.motivation = "tagging";
         return ApiService2.post('annotations', data).toPromise();
+    };
+
+    self.saveNote = function(target, note) {
+        var data = {};
+        data.target = target;
+        var body = {};
+        body.type = "TextualBody";
+        body.value = note.text;
+        if(note.languageCode && note.languageCode !== ""){
+            body.language = note.languageCode;
+        }else{
+            body.language = null;
+        }
+        data.body = body;
+        if(note.privacy == "public"){
+            data.private = false;
+        }else{
+            data.private = true;            
+        }
+        // TODO manca embargo
+        data.motivation = "describing";
+        if(note && note.id){
+            // update existing note
+            return ApiService2.put('annotations', note.id, data).toPromise();
+        }else{
+            // create a new note
+            return ApiService2.post('annotations', 'POST', data).toPromise();            
+        }
     };
 
     self.saveGeoAnnotation = function(target, source, spatial) {
@@ -103,6 +146,7 @@ function DataService(ApiService2, jsonapi_parser) {
                 spatial: spatial
             }
         };
+        data.motivation = "tagging";
         return ApiService2.post('annotations', data).toPromise();
     };
 
@@ -112,6 +156,9 @@ function DataService(ApiService2, jsonapi_parser) {
         } else {
             return ApiService2.delete('annotations/', annoId).toPromise();
         }
+    };
+    self.deleteNote = function (noteId) {
+        return ApiService2.delete('annotations', noteId).toPromise();
     };
 
     self.getGeoDistanceAnnotations = function (distance, pin, cFilter) {
@@ -130,8 +177,28 @@ function DataService(ApiService2, jsonapi_parser) {
         if (cFilter !== undefined) {
             filter.filter.creation = cFilter;
         }
-        console.log(angular.toJson(filter, true));
+        /*console.log(angular.toJson(filter, true));*/
         return ApiService2.post('annotations/search', filter, {"rawResponse": true}).toPromise();
+    };
+
+    /* Retrieve a list of relevant creations for given creation uuids and related place ids. */
+    self.getRelavantCreations = function(relevantCreations) {
+        if (relevantCreations === undefined || relevantCreations.size === 0) { 
+            var d = $q.defer();
+            d.resolve({'data': {'Response': {'data': []}}});
+            return d.promise; 
+        }
+        var data = {
+            'relevant-list': []
+        };
+        for (var uuid of relevantCreations.keys()) {
+            var item = {
+                'creation-id': uuid,
+                'place-ids': Array.from(relevantCreations.get(uuid))
+            };
+            data['relevant-list'].push(item);
+        }
+        return ApiService2.post('search_place', data, {"rawResponse": true}).toPromise();
     };
 
     self.getGroupSchema = function(study) {

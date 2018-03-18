@@ -15,6 +15,9 @@ angular.module('web').constant('customRoutes',
 
     'logged.new-search': {
         url: "/new-search?q",
+        params: {
+            type: null
+        },
         views: {
             "loggedview@logged": {
                 dir: 'blueprint',
@@ -32,6 +35,19 @@ angular.module('web').constant('customRoutes',
             "loggedview@logged": {
                 dir: 'blueprint',
                 templateUrl: 'search.watch.html'
+            }
+        }
+    },
+
+    'logged.search.watch.image': {
+        url: "/image/{id}",
+        params: {
+            meta: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'watch.image.html'
             }
         }
     },

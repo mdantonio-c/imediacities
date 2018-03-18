@@ -9,7 +9,6 @@ from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
-# from restapi.services.mail import send_mail
 from utilities import htmlcodes as hcodes
 
 from restapi.flask_ext.flask_celery import CeleryExt
@@ -73,10 +72,6 @@ class Stage(GraphBaseOperations):
     def get(self, group=None):
 
         self.graph = self.get_service_instance('neo4j')
-
-        # body = "Test"
-        # subject = "IMC test"
-        # send_mail(body, subject)
 
         if not self.auth.verify_admin():
             # Only admins can specify a different group to be inspected
@@ -213,15 +208,16 @@ class Stage(GraphBaseOperations):
                     content_stage = item.content_source.single()
                     if content_stage is not None and content_stage.status == 'COMPLETED':
                         log.debug("Content resource already exists with status: " + content_stage.status + ", then mode=skip")
-                        mode='skip'
+                        mode = 'skip'
 
         except self.graph.MetaStage.DoesNotExist:
             resource = self.graph.MetaStage(**properties).save()
             resource.ownership.connect(group)
             log.debug("Metadata Resource created for %s" % path)
 
+        metadata_update = input_parameters.get('update', True)
         task = CeleryExt.import_file.apply_async(
-            args=[path, resource.uuid, mode],
+            args=[path, resource.uuid, mode, metadata_update],
             countdown=10
         )
 

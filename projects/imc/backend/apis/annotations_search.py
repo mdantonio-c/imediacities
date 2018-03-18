@@ -55,10 +55,14 @@ class SearchAnnotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             filters.append("WHERE anno.annotation_type='{anno_type}'".format(
                 anno_type=anno_type))
+            # add filter for processed content with COMPLETE status
             filters.append(
-                'MATCH (creation:Creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
+                "MATCH (creation:Creation)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) " +
+                "WHERE content.status = 'COMPLETED' ")
+            filters.append(
+                'MATCH (title:Title)<-[:HAS_TITLE]-(creation)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno)')
             projections.append(
-                'collect(distinct {title:creation.identifying_title, uuid:creation.uuid, year:head(creation.production_years)}) AS creations')
+                'collect(distinct creation{.*, type:i.item_type, titles }) AS creations')
             if anno_type == 'TAG':
                 # look for geo distance filter
                 geo_distance = filtering.get('geo_distance')
@@ -67,11 +71,11 @@ class SearchAnnotations(GraphBaseOperations):
                     location = geo_distance['location']
                     starters.append(
                         "WITH point({{longitude: {lon}, latitude: {lat} }}) as cityPosition, "
-                        "{dist} as distanceInKm"
+                        "{dist} as distanceInMeters"
                         .format(lon=location['long'], lat=location['lat'], dist=distance))
                     filters.append("MATCH (anno)-[:HAS_BODY]-(body:ResourceBody) "
                                    "WHERE body.spatial IS NOT NULL AND "
-                                   "distance(cityPosition, point({latitude:body.spatial[0], longitude:body.spatial[1]})) < (distanceInKm * 1000)")
+                                   "distance(cityPosition, point({latitude:body.spatial[0], longitude:body.spatial[1]})) < distanceInMeters")
                     projections.append(
                         "distance(cityPosition, point({longitude:body.spatial[0],latitude:body.spatial[1]})) as distance")
                     order_by = "ORDER BY distance"
@@ -79,20 +83,20 @@ class SearchAnnotations(GraphBaseOperations):
             if creation is not None:
                 c_match = creation.get('match')
                 if c_match is not None:
-                    term = c_match.get('term', '').strip()
-                    if not term:
-                        raise RestApiException('Term input cannot be empty',
-                                               status_code=hcodes.HTTP_BAD_REQUEST)
+                    term = c_match.get('term')
+                    if term is not None:
+                        # strip and clean up term from '*'
+                        term = term.strip().replace("*", "")
                     multi_match = []
                     multi_match_where = []
                     multi_match_query = ''
-                    # clean up term from '*'
-                    term = term.replace("*", "")
 
                     fields = c_match.get('fields')
-                    if fields is None or len(fields) == 0:
+                    if term is not None and (fields is None or len(fields) == 0):
                         raise RestApiException('Match term fields cannot be empty',
                                                status_code=hcodes.HTTP_BAD_REQUEST)
+                    if fields is None:
+                        fields = []
                     for f in fields:
                         if f not in self.__class__.allowed_term_fields:
                             raise RestApiException(
@@ -103,7 +107,8 @@ class SearchAnnotations(GraphBaseOperations):
                             # catch '*'
                             break
                         if f == 'title':
-                            multi_match.append("(creation)-[:HAS_TITLE]->(t:Title)")
+                            multi_match.append(
+                                "(creation)-[:HAS_TITLE]->(t:Title)")
                             multi_match_where.append(
                                 "t.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'description':
@@ -112,11 +117,13 @@ class SearchAnnotations(GraphBaseOperations):
                             multi_match_where.append(
                                 "d.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'keyword':
-                            multi_match.append("(creation)-[:HAS_KEYWORD]->(k:Keyword)")
+                            multi_match.append(
+                                "(creation)-[:HAS_KEYWORD]->(k:Keyword)")
                             multi_match_where.append(
                                 "k.term =~ '(?i){term}'".format(term=term))
                         elif f == 'contributor':
-                            multi_match.append("(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
+                            multi_match.append(
+                                "(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
                             multi_match_where.append(
                                 "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                         else:
@@ -157,7 +164,8 @@ class SearchAnnotations(GraphBaseOperations):
                 c_year_to = c_filter.get('yearto')
                 if c_year_from is not None or c_year_to is not None:
                     # set defaults if year is missing
-                    c_year_from = '1890' if c_year_from is None else str(c_year_from)
+                    c_year_from = '1890' if c_year_from is None else str(
+                        c_year_from)
                     c_year_to = '1999' if c_year_to is None else str(c_year_to)
                     date_clauses = []
                     if c_type == 'video' or c_type == 'all':
@@ -178,7 +186,8 @@ class SearchAnnotations(GraphBaseOperations):
                     term_clauses = []
                     iris = [term['iri'] for term in terms if 'iri' in term]
                     if iris:
-                        term_clauses.append('term.iri IN {iris}'.format(iris=iris))
+                        term_clauses.append(
+                            'term.iri IN {iris}'.format(iris=iris))
                     free_terms = [term['label']
                                   for term in terms if 'iri' not in term and 'label' in term]
                     if free_terms:
@@ -203,12 +212,13 @@ class SearchAnnotations(GraphBaseOperations):
 
         query = "{starters} MATCH (anno:Annotation)" \
                 " {filters} " \
+                "WITH body, i, cityPosition, creation, collect(distinct title) AS titles " \
                 "RETURN DISTINCT body, {projections} {orderBy}".format(
                     starters=' '.join(starters),
                     filters=' '.join(filters),
                     projections=', '.join(projections),
                     orderBy=order_by)
-        logger.debug(query)
+        # logger.debug(query)
 
         data = []
         result = self.graph.cypher(query)
@@ -220,7 +230,28 @@ class SearchAnnotations(GraphBaseOperations):
                 'name': body.name,
                 'spatial': body.spatial
             }
-            res['sources'] = row[1]
+            res['sources'] = []
+            for source in row[1]:
+                creation = {
+                    'uuid': source['uuid'],
+                    'external_ids': source['external_ids'],
+                    'rights_status': source['rights_status'],
+                    'type': source['type']
+                }
+                # PRODUCTION YEAR: get the first year in the array
+                if 'production_years' in source:
+                    creation['year'] = source['production_years'][0]
+                elif 'date_created' in source:
+                    creation['year'] = source['date_created'][0]
+                # TITLE
+                if 'identifying_title' in source:
+                    creation['title'] = source['identifying_title']
+                elif 'titles' in source and len(source['titles']) > 0:
+                    # at the moment get the first always!
+                    title_node = self.graph.Title.inflate(source['titles'][0])
+                    creation['title'] = title_node.text
+                res['sources'].append(creation)
+
             res['distance'] = row[2]
             # creator = self.graph.User.inflate(row[3])
             # res['creator'] = {

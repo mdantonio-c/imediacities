@@ -23,11 +23,11 @@ releases:
   '1.2.0':
     type: beta
     rapydo: 0.5.7
-    status: developing
+    status: released 
   '1.2.1':
     type: beta
     rapydo: 0.6.0
-    status: developing
+    status: released 
   '1.2.2':
     type: beta
     rapydo: 0.6.1
@@ -54,6 +54,7 @@ variables:
     GRAPHDB_PASSWORD: chooseapassword
 
     SMTP_ADMIN: m.dantonio@cineca.it
+    SMTP_NOREPLY: I-Media-Cities@cinematek.be
     SMTP_HOST: mail.cineca.it
     SMTP_PORT: 587
     SMTP_USERNAME: hpc-service-noreply@cineca.it
@@ -100,3 +101,4 @@ bower_components:
 
 css: 
   - "custom/imc.css"
+  - "custom/nsi.css"

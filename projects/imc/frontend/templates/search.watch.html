@@ -1,3 +1,4 @@
+
 <div ng-controller='SearchController as searchCtrl'>
 	<div class="row">
 		<div id="search-box">
@@ -9,6 +10,9 @@
 					<i class="imc-icon fa fa-search" aria-hidden="true"></i>
 					</button>
 				</span>
+				<span class="input-group-btn backsearch">
+					<button type="button" ui-sref="logged.new-search({type: 'old'})" class="btn btn-default btn-sm"><i class="imc-icon glyphicon glyphicon-chevron-left" aria-hidden="true"></i>Back to search</button>
+				</span>
 			</div>
 		</div>
 	</div>
@@ -18,9 +22,20 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='WatchController as watchCtrl' id="video-wrapper">
+<div ng-controller='WatchController as watchCtrl' id="item-wrapper">
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
+			<div style="padding-left: 10px; margin-bottom: 10px;">
+				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;">{{watchCtrl.video.attributes.identifying_title}}
+				</h2>
+				<div>
+					<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
+					<span>{{watchCtrl.video.attributes.production_years[0]}}</span>
+					<span class="label label-default label-city">{{(watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}
+						<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
+					</span>
+				</div>
+			</div>
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="video-container">
 					<div class="anno-tools-container" id="anno-tools-container">
@@ -37,44 +52,137 @@
 							uib-tooltip="Tag&nbsp;by term">
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('notes');"
+							tooltip-placement="right"
+							uib-tooltip="Add a&nbsp;note">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+						</div>
 					</div>
-					<video id="videoarea"
+					<video id="videoarea" style="display:none"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"
-						ng-src="{{watchCtrl.video.links['content'] | trustUrl }}"
+						ng-src="{{watchCtrl.video.links['content'] | switchVideoType:watchCtrl.videoType | trustUrl }}"
 						ng-attr-type="video/mp4"
-						ng-click="watchCtrl.playPause()" controls>
+						ng-click="watchCtrl.playPause()"
+						controls>
 						Your browser does not support HTML5 video.
 					</video>
+					<!-- TEST DEI TEST -->
+					<div id="videotest">
+						<div class="controls__wrapper">
+
+							<div class="controls__status">
+								<div class="controls__row controls__status__info">
+									<div class="mark">Frame <span id="frame_mark"></span></div>
+									<div class="mark">SMPTE <span id="smpte_mark"></span></div>
+									<div class="mark">Time <span id="time_mark"></span></div>
+									<div class="mark">Float <span id="float_mark"></span></div>
+								</div>
+								<div class="controls__row controls__status__controls">
+									<div class="controls__status__fps">
+										<select name="fps" id="fps">
+											<option value="6">6 fps</option>
+											<option value="12">12 fps</option>
+											<option value="23" selected>24 fps</option>
+											<option value="48">48 fps</option>
+										</select>
+									</div>
+									<div class="controls__status__play" id="play">
+										<span>
+											<i class="fa fa-play"></i>
+										</span>
+										<span class="display-none">
+											<i class="fa fa-pause"></i>
+										</span>
+									</div>
+									<div class="controls__status__bar flex_spacer">
+										<input type="range" id="range" value="0" min="0" max="1">
+									</div>
+									<!-- <div class="controls__status__play">
+										<i class="fa fa-fast-backward" id="goto_start"></i>
+									</div>
+									<div class="controls__status__play">
+										<i class="fa fa-fast-forward" id="goto_end"></i>
+									</div> -->
+									<label class="controls__status__anno" 
+										uib-tooltip="on/off automatic tags"
+										tooltip-placement="right">
+										<input type="checkbox" ng-click="watchCtrl.switchVideo()">
+  										<span class="video-slider"></span>
+									</label>
+								</div>
+							</div>
+
+							<div class="controls__buttons">
+								<div class="controls__row">
+
+									<div class="controls__container mark">
+										<select id="controls_um" title="imposta unità di misura">
+											<option value="seconds">Seconds</option>
+											<option value="frames" selected>Frames</option>
+										</select>
+									</div>
+
+									<div class="mark">
+										<div class="controls__container">
+											<i class="fa fa-step-backward" id="rewind" title="indietro"></i>
+											&nbsp;
+											<input type="text" id="seek_step" value="1">
+											&nbsp;
+											<i class="fa fa-step-forward" id="fastforward" title="avanti"></i>
+										</div>
+
+									</div>
+
+									<div class="mark">
+										<div class="controls__container">
+											<input type="text" id="jump_to_value" value="1">
+											&nbsp;
+											<i class="fa fa-sign-in-alt" id="jump_to" title="salta a"></i>
+										</div>
+									</div>
+
+									<div class="mark">
+
+										<div class="controls__container">
+											&nbsp;
+											<input type="text" id="play_from" value="1" title="da">
+											-
+											<input type="text" id="play_to" value="1" title="a">
+											&nbsp;
+											<label style="font-size:.75em;" for="play_loop" title="in loop">
+												<i class="fa fa-redo"></i>
+											</label>
+											&nbsp;
+											<input type="checkbox" class="inline" id="play_loop" title="in loop">
+											&nbsp;
+											<i class="fa fa-retweet" id="play_int" title="riproduci frammento"></i>
+										</div>
+
+									</div>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<!-- FINE TEST DEI TEST -->
 				</div>
 				<div class="container" 
 					ng-show="watchCtrl.showmeli"
 					ng-style="{'float': 'left', 'width': '100%'}">
 					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
-			
-			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
-			<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
-				<div uib-slide ng-repeat="item in watchCtrl.items | limitTo: watchCtrl.slideSize+1" index="$index" style="float:left; width:100%;  height: 100%; overflow: visible;">
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9][0]}}" duration="{{watchCtrl.items[$index*9][1]}}" nshots="{{watchCtrl.items[$index*9][2]}}" shotd="{{watchCtrl.items[$index*9][3]}}" progr="{{watchCtrl.items[$index*9][4]}}" timestamp="{{watchCtrl.items[$index*9][5]}}" ng-src="{{watchCtrl.items[$index*9][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+1][0]}}" duration="{{watchCtrl.items[$index*9+1][1]}}" nshots="{{watchCtrl.items[$index*9+1][2]}}" shotd="{{watchCtrl.items[$index*9+1][3]}}" progr="{{watchCtrl.items[$index*9+1][4]}}" timestamp="{{watchCtrl.items[$index*9+1][5]}}" ng-src="{{watchCtrl.items[$index*9+1][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+2][0]}}" duration="{{watchCtrl.items[$index*9+2][1]}}" nshots="{{watchCtrl.items[$index*9+2][2]}}" shotd="{{watchCtrl.items[$index*9+2][3]}}" progr="{{watchCtrl.items[$index*9+2][4]}}" timestamp="{{watchCtrl.items[$index*9+2][5]}}" ng-src="{{watchCtrl.items[$index*9+2][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+3][0]}}" duration="{{watchCtrl.items[$index*9+3][1]}}" nshots="{{watchCtrl.items[$index*9+3][2]}}" shotd="{{watchCtrl.items[$index*9+3][3]}}" progr="{{watchCtrl.items[$index*9+3][4]}}" timestamp="{{watchCtrl.items[$index*9+3][5]}}" ng-src="{{watchCtrl.items[$index*9+3][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+4][0]}}" duration="{{watchCtrl.items[$index*9+4][1]}}" nshots="{{watchCtrl.items[$index*9+4][2]}}" shotd="{{watchCtrl.items[$index*9+4][3]}}" progr="{{watchCtrl.items[$index*9+4][4]}}" timestamp="{{watchCtrl.items[$index*9+4][5]}}" ng-src="{{watchCtrl.items[$index*9+4][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+5][0]}}" duration="{{watchCtrl.items[$index*9+5][1]}}" nshots="{{watchCtrl.items[$index*9+5][2]}}" shotd="{{watchCtrl.items[$index*9+5][3]}}" progr="{{watchCtrl.items[$index*9+5][4]}}" timestamp="{{watchCtrl.items[$index*9+5][5]}}" ng-src="{{watchCtrl.items[$index*9+5][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+6][0]}}" duration="{{watchCtrl.items[$index*9+6][1]}}" nshots="{{watchCtrl.items[$index*9+6][2]}}" shotd="{{watchCtrl.items[$index*9+6][3]}}" progr="{{watchCtrl.items[$index*9+6][4]}}" timestamp="{{watchCtrl.items[$index*9+6][5]}}" ng-src="{{watchCtrl.items[$index*9+6][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+7][0]}}" duration="{{watchCtrl.items[$index*9+7][1]}}" nshots="{{watchCtrl.items[$index*9+7][2]}}" shotd="{{watchCtrl.items[$index*9+7][3]}}" progr="{{watchCtrl.items[$index*9+7][4]}}" timestamp="{{watchCtrl.items[$index*9+7][5]}}" ng-src="{{watchCtrl.items[$index*9+7][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+8][0]}}" duration="{{watchCtrl.items[$index*9+8][1]}}" nshots="{{watchCtrl.items[$index*9+8][2]}}" shotd="{{watchCtrl.items[$index*9+8][3]}}" progr="{{watchCtrl.items[$index*9+8][4]}}" timestamp="{{watchCtrl.items[$index*9+8][5]}}" ng-src="{{watchCtrl.items[$index*9+8][6]}}" style="float:left;" scroll-on-click/>
-				</div>
-			</div>
-			</container-fluid>
 			<div id="timeline-graph" ng-show="watchCtrl.annotations.length >= 1" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
 				<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6">
 			<uib-tabset>
-			<uib-tab heading="Metadata">
+
+			<uib-tab heading="General Information">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
 				<div class="primary-description">
@@ -129,7 +237,7 @@
 						watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
 						watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
 						<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
-							<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+							<uib-accordion-heading>Film Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
 							</uib-accordion-heading>
 							<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
 								<p ng-if="format.attributes.sound"><b>Sound</b>:
@@ -160,6 +268,95 @@
 			</ul>
 			<div class="sb-modal-parent"></div>
 			</uib-tab>
+
+			<!-- notes -->
+			<uib-tab heading="Notes">
+				<div class="space-4"></div>
+				<div class="tab-notes">
+					<div class="tab-notes-title">
+						Notes on shot {{watchCtrl.notesShotSelected}}
+					</div>
+					<!-- list of the notes of the selected shot -->
+					<div class="tab-list-notes">
+
+						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
+							<div>
+								<span class="note-user-icon">
+									<i class="imc-icon fa fa-user fa-4x pull-left"></i>
+								</span>
+							</div>
+							<div style="display: inline-block;height: 60px;">
+								<p style="margin: 0;">
+									<span class="note-user-name">{{note.creatorName}}</span>
+								</p>
+								<p style="margin: 0;">
+									<!--
+									<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
+									-->
+									<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+										<i class="imc-icon fa fa-clock-o light-grey"></i>
+										{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+									</span>
+									
+								</p>
+								<p style="margin: 0;">
+									<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
+										<i class="imc-icon fa fa-lock"></i>
+									</span>
+								</p>
+							</div>
+							<div style="display:  inline-block;float: right;">
+								<span class="note-bin">
+								<a class="btn btn-danger btn-xs"
+									ng-click="watchCtrl.deleteNote(note)"
+									ng-confirm-click="Are you sure you want to delete this note?"
+									tooltip-placement="left"
+									uib-tooltip="Delete note"
+									ng-if="profile.uuid == note.creator">
+									<i class="fa fa-trash-o"> </i>
+								</a>
+								</span>
+								<span class="note-bin">
+								<a class="btn btn-warning btn-xs"
+									ng-click="watchCtrl.editNote(note)"
+									tooltip-placement="left"
+									uib-tooltip="Edit note"
+									ng-if="profile.uuid == note.creator">
+									<i class="fa fa-edit"> </i>
+								</a>
+								</span>
+							</div>
+							<div style="margin: 5px;">
+								<p>
+									<span class="note-text">
+										<i class="imc-icon fa fa-quote-left"></i>
+										{{note.text}}
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<!-- list of the shots -->
+					<div class="tab-list-shots" data-spy="scroll" data-target="#navbar-hidden">
+
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="watchCtrl.computeCssClass($last,shot.number)">
+
+						<!--
+						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot tab-list-shot-selected' : 'tab-list-shot tab-list-shot-no-selected'">
+						-->
+
+
+							<span><a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
+
+							<!--
+							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
+							-->
+						</div>
+					</div>
+				</div>
+			</uib-tab>
+
+
 			<uib-tab heading="Annotations">
 				<div class="space-4"></div>
 				<div>
@@ -176,7 +373,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'-anno.shotNum'">
-								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT)">{{anno.shotNum}}</a></td>
+								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT,anno.shotNum)">{{anno.shotNum}}</a></td>
 								<td>{{ anno.group }}</td>
 								<td>{{ anno.name }}</td>
 								<td>{{ anno.startT | date:'mm:ss' }}</td>
@@ -197,38 +394,32 @@
 				</div>
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
-			<div class="container storyboard">
-				<table class="table">
-					<tr>
-						<th>Shot number</th>
-						<th>Frame range</th>
-						<th>Shots</th>
-						<th>Shot timecode</th>
-						<th>Shot duration (sec)</th>
-						<th ng-style="{'text-align': 'center'}">Camera motion</th>
-					</tr>
-					<div class="storyboard">
-						<tr ng-repeat="shot in watchCtrl.storyshots">
-							<td data-title="'Number'" align="center">{{shot.number}}</td>
-							<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-							<td data-title="'Shot'" scroll-story-on-click>
-								<img ng-style="{'width': '40%'}"
-								id="{{shot.id}}"
-								timestamp="{{shot.timestamp}}"
-								ng-src="{{shot.thumb}}">
-							</td>
-							<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
-							<td data-title="'Duration'" align="center">{{shot.duration}}</td>
-							<td data-title="'Camera motion'" align="center">
-								<dl class="dl-horizontal">
-									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-										<dt>{{e_attr}}:</dt><dd>{{e_val * 100 | number:1}}%</dd>
-									</div>
-								</dl>
-							</td>
-						</tr>
+			<div class="storyboard">
+				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
+					<div class="media-left">
+						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
+						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
 					</div>
-				</table>
+					<div class="media-body" style="margin-left: 90px; display: block;">
+						<div scroll-story-on-click>
+							<h4 style="cursor: pointer;"  
+								timestamp="{{shot.timestamp}}"
+								class="underline-on-hover"
+								>Shot {{shot.number}}</h4>
+						</div>
+						<span class="small">{{shot.framerange}}</span>
+						<div class="space-0"></div>
+						<span class="small">{{shot.timestamp}}</span>
+						
+						<div class="search-actions text-center">
+							<dl class="dl-horizontal">
+								<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
+									<dt style="width: auto;">{{e_attr}}:</dt><dd style="margin-left: 0;">{{e_val * 100 | number:1}}%</dd>
+								</div>
+							</dl>
+						</div>
+					</div>
+				</div>
 			</div>
 			</uib-tab>
 			</uib-tabset>
@@ -261,7 +452,9 @@
 			<h4 class="modal-title">Add a location to this shot</h4>
 		</div>
 		<div class="modal-body">
-			<p>Shot starting time (sec): <b>{{startT}}</b> ending: <b>{{endT}}</b></p>
+			<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+			<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+			<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
@@ -307,7 +500,9 @@
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p>Shot starting time (sec): <b>{{startT | date:'mm:ss'}}</b> ending: <b>{{endT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
 				<div class="col-sm-4">
@@ -344,7 +539,64 @@
 			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
 		</div>
 	</script>
+	<!-- notes modal -->
+	<script type="text/ng-template" id="myModalNotes.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$notesCtrl.cancel()">x</button>
+			<h4 class="modal-title">{{modalTitle}}</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-4">
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
+					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+				</div>
+				<div class="col-sm-4">
+					
 
+				</div>
+				<div class="col-sm-8">
+					<div class="modal-div-1">
+
+						<div class="modal-div-options">
+							<div class="modal-div-select-0">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.form.privacy.selected"
+								ng-options="o as o for o in $notesCtrl.form.privacy.options">
+								</select>
+							</div>
+							<!--
+							<div class="modal-div-select-1">
+								<select id="form-field-select-1" class="modal-select-1" ng-model="
+								$notesCtrl.form.type.selected"
+								ng-options="o as o for o in $notesCtrl.form.type.options">
+								</select>
+							</div>
+							-->
+							<div class="modal-div-select-2">
+								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.form.language.selected"
+								ng-options="o as o for o in $notesCtrl.form.language.options">
+									<option value="">language of text</option>
+								</select>
+							</div>
+
+						</div>
+
+						<textarea id="form-field-11" ng-model="$notesCtrl.form.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
+						</textarea>
+
+					</div>
+
+					
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$notesCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$notesCtrl.confirmNote()">Confirm</button>
+		</div>
+	</script>
 	<script type="text/ng-template" id="termFoundModal.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="cancel()">x</button>
@@ -383,6 +635,17 @@
 			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
 		</div>
 		<div class="modal-body">Do you really want to remove this annotation?</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="yes()">Yes</button>
+			<button class="btn btn-warning" ng-click="no()">No</button>
+		</div>
+	</script>
+	<script type="text/ng-template" id="confirmNoteModal.html">
+		<div class="modal-header modal-header-confirm">
+			<button type="button" class="close" ng-click="no()">x</button>
+			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
+		</div>
+		<div class="modal-body">Do you really want to remove this note?</div>
 		<div class="modal-footer">
 			<button class="btn btn-primary" ng-click="yes()">Yes</button>
 			<button class="btn btn-warning" ng-click="no()">No</button>

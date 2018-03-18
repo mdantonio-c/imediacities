@@ -116,7 +116,6 @@
 		}];
 
 	var app = angular.module('web')
-		.constant('GOOGLE_API_KEY', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI')
 		.controller('SearchController', SearchController)
 		.controller('NewSearchController', NewSearchController);
 
@@ -258,7 +257,7 @@
 		self.creations = [];
 
 		self.loading = false;
-		self.inputTerm = "";
+		$scope.inputTerm = "";
 		self.inputProvider = null;
 		self.advancedSearch = false;
 
@@ -305,17 +304,17 @@
 						"yearto": $scope.search.year_max.toString(),
 					}
 				};
-				if (self.inputTerm !== '') {
+				if ($scope.inputTerm !== '') {
 					if (self.selectedMatchFields.length === 0) {
 						isValid = false;
 					}
 					request_data.match = {
-						"term": self.inputTerm,
+						"term": $scope.inputTerm,
 						"fields": self.selectedMatchFields
 					};
 				}
 			} else {
-				var simple_match_term = self.inputTerm === '' ? '*' : self.inputTerm;
+				var simple_match_term = $scope.inputTerm === '' ? '*' : $scope.inputTerm;
 				request_data = {
 					"match": {
 						"term": simple_match_term,
@@ -372,7 +371,7 @@
 		var term = $stateParams.q;
 		if (term !== undefined && term !== '') {
 			self.viewlogo = false;
-			self.inputTerm = term;
+			$scope.inputTerm = term;
 			self.searchCreations();
 		}
 
@@ -444,21 +443,13 @@
 	];
 
 	function NewSearchController(
-		$scope, DataService, NgMap, $timeout, $filter, 
-		GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) 
+		$scope, $stateParams, DataService, NgMap, $timeout, $filter, 
+		GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) 
 	{
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
-		sc.cities = {
-			options:  [],
-			selected: null
-		};
-		angular.forEach(providers, function(p){
-			sc.cities.options.push(p.city.name);
-		});
 
-		sc.inputTerm = "";
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
@@ -476,18 +467,12 @@
 			}
 		};
 
-		// move codelist provision in a service
-		sc.iprstatuses = {
-			options:  iprstatuses,
-			selected: null
-		};
-
 		sc.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
 			sc.vocabulary = data;
 		});
 
-		sc.terms = [];
+		$scope.terms = [];
 		sc.loadVocabularyTerms = function(query) {
 			return $filter('matchTerms')(sc.vocabulary, query);
 		};
@@ -509,9 +494,11 @@
 		sc.toggleTerm = function(node) {
 			if (node.selected) {
 				// add tag
-				sc.terms.push({iri: node.id, label: node.label});
+				$scope.terms.push({iri: node.id, label: node.label});
+				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			} else {
-				sc.terms = _.reject(sc.terms, function(el) { return el.label === node.label; });
+				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
+				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			}
 		};
 
@@ -522,12 +509,13 @@
 			}
 		};
 
-		self.deselectTreeviewNode = function(tag) {
+		sc.deselectTreeviewNode = function(tag) {
 			if (tag.iri !== undefined) {
 				// console.log('deselect treeview by node id: ' + tag.iri);
 				ivhTreeviewMgr.deselect(sc.vocabulary, tag.iri);
 			}
 		};
+
 
 		sc.itemType = {
 			video: true,
@@ -536,38 +524,15 @@
 		};
 		$scope.$watch('sc.itemType', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) sc.filter.type='all';
-				else if (newValue.video) sc.filter.type='video';
-				else if (newValue.image) sc.filter.type='image';
-				else if (newValue.text) sc.filter.type='text';
+				if (newValue.video && newValue.image) $scope.filter.type='all';
+				else if (newValue.video) $scope.filter.type='video';
+				else if (newValue.image) $scope.filter.type='image';
+				else if (newValue.text) $scope.filter.type='text';
 			}
 		}, true);
 
-		sc.minProductionYear = 1890;
-		sc.maxProductionYear = 1999;
-		sc.resetFilters = function() {
-			sc.inputTerm = "";
-			sc.selectedMatchFields = ['title'];
-			sc.terms = [];
-			sc.itemType.video = true;
-			sc.itemType.image = true;
-			sc.iprstatuses.selected = null;
-			sc.cities.selected = null;
-			sc.filter = {
-				type: 'all',
-				provider: null,
-				country: null,
-				iprstatus: null,
-				yearfrom: sc.minProductionYear,
-				yearto: sc.maxProductionYear,
-				terms: sc.terms
-			};
-			ivhTreeviewMgr.deselectAll(sc.vocabulary);
-			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
-		};
-		sc.resetFilters();
 
-		$scope.$watch('sc.cities.selected', function(newValue, oldValue) {
+		$scope.$watch('defaultc', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				var res = null;
 				// "Athens", "Bologna", "Brussels", "Copenhagen", "Frankfurt am Main", "Barcelona", "Turin", "Vienna", "Stockholm"
@@ -580,13 +545,60 @@
 				else if(newValue === 'Turin') { res = 'MNC'; }
 				else if(newValue === 'Vienna') { res = 'OFM'; }
 				else if(newValue === 'Stockholm') { res = 'SFI'; }
-				sc.filter.provider = res;
-				// console.log('filter by city for archive: ' + sc.filter.provider);
+				$scope.filter.provider = res;
+				// console.log('filter by city for archive: ' + $scope.filter.provider);
+				/*save input status for cities selected*/
+				localStorage.setItem('scity', newValue);
 			}
 		});
-		$scope.$watch('sc.iprstatuses.selected', function(newValue, oldValue) {
+		$scope.$watch('itemType', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				sc.filter.iprstatus = newValue;
+				if (newValue.video && newValue.image) {
+					$scope.filter.type='all';
+					/*localStorage.setItem('itemTypeV',true);
+					localStorage.setItem('itemTypeI',true);*/
+				}
+				else if (newValue.video) {
+					$scope.filter.type='video';
+					/*var typeV = localStorage.getItem('itemTypeV');
+					var bool = typeV ? false : true;
+					localStorage.setItem('itemTypeV',bool);//it's a video*/
+				}
+				else if (newValue.image) {
+					$scope.filter.type='image';
+					/*var typeI = localStorage.getItem('itemTypeI');
+					var bool = typeI ? false : true;
+					localStorage.setItem('itemTypeI',bool);//it's an image*/
+				}
+				else if (newValue.text) $scope.filter.type='text';
+			}
+		}, true);
+		$scope.$watch('inputTerm', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				/*save input status for input term selected*/
+				$scope.filter.inputTerm = newValue;
+				localStorage.setItem('inputTerm', newValue);
+			}
+		});
+		$scope.$watch('defaultipr', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.iprstatus = newValue;
+				/*save input status for ipr status selected*/
+				localStorage.setItem('iprstatus', newValue);
+			}
+		});
+		$scope.$watch('yearfrom', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.yearfrom = newValue;
+				/*save input status for year from selected*/
+				localStorage.setItem('yearfrom', newValue);
+			}
+		});
+		$scope.$watch('yearto', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.yearto = newValue;
+				/*save input status for year to selected*/
+				localStorage.setItem('yearto', newValue);
 			}
 		});
 
@@ -601,12 +613,96 @@
 		};
 		sc.resetPager();
 
+		var europeCenter = [45, 14];
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
-		sc.mapZoom = 3;
-		sc.mapCenter = [53.00,20.34];
+		sc.mapZoom = 4;
+		// initial radius in meters
+		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
+		sc.radius = 1600 * 1000;	// for zoom level 4
+		sc.mapCenter = europeCenter;
 		sc.dynMarkers = [];
 		sc.mapTags = [];
+		sc.showMapBoundary = false;
+
+		sc.centerEurope = function() {
+			sc.mapCenter = europeCenter;
+			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
+			sc.map.setCenter(pt);
+			sc.map.setZoom(4);
+		};
+
+		sc.toggleBoundary = function() {
+			sc.showMapBoundary = !sc.showMapBoundary;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(sc.showMapBoundary);
+		};
+
+		sc.setBoundaryVisible = function(val) {
+			sc.showMapBoundary = val;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(val);
+		};
+
+		sc.centerChanged = function(event) {
+			if (!angular.isDefined(sc.map)) { return; }
+			sc.inputPlaceName = '';
+			$timeout(function() {
+				//sc.map.panTo(sc.map.getCenter());
+				var latLng = sc.map.getCenter();
+				var newCenter = [latLng.lat(), latLng.lng()];
+				if (!_.isEqual(sc.mapCenter, newCenter)) {
+					sc.mapCenter = newCenter;
+					// console.log('center changed to: ' + sc.mapCenter);
+					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+					}
+				}
+			}, 1000);
+		};
+
+		sc.zoomChanged = function() {
+			if (!angular.isDefined(sc.map)) { return; }
+			var oldZoom = sc.mapZoom;
+			var newZoom = sc.map.getZoom();
+			if (newZoom !== oldZoom) {
+				// zoom changed
+				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+				// fit the circle radius properly
+				var r = sc.radius;
+				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
+				// console.log('new radius: ' + sc.radius + ' meters');
+				sc.mapZoom = newZoom;
+				if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+				}
+			}
+		};
+
+		function centerMap(place) {
+			if (place === undefined) { return; }
+			// console.log(place);
+			var lat = place.lat,
+				lng = place.lng;
+			if (lat === undefined || lng === undefined) { return; }
+			var pt = new google.maps.LatLng(lat, lng);
+			sc.map.setCenter(pt);
+			sc.mapCenter = [lat, lng];
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < place.viewport.length; i++) {
+				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
+				bounds.extend(latlng);
+			}
+			sc.map.fitBounds(bounds);
+		}
+
+		$scope.$watch('sc.inputPlaceDetails', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				centerMap(sc.inputPlaceDetails);
+			}
+		}, true);
 
 		sc.search = function() {
 			sc.loading = true;
@@ -618,9 +714,9 @@
 				}
 			};
 			// Add filters
-			request_data.filter = sc.filter;
-			if (sc.inputTerm !== '') {
-				request_data.match.term = sc.inputTerm;
+			request_data.filter = $scope.filter;
+			if ($scope.inputTerm !== '') {
+				request_data.match.term = $scope.inputTerm;
 			}
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
@@ -631,42 +727,23 @@
 					sc.creations = out_data.Response.data;
 					NgMap.getMap().then(function(map) {
 						sc.map = map;
-						// clean up current marker list
-						if (sc.markerClusterer !== undefined) {
-							sc.markerClusterer.clearMarkers();
-						}
-						sc.dynMarkers = [];
-						if (sc.filter.provider !== null) {
-							sc.mapZoom = 14;
-							sc.mapCenter = getPosition(sc.filter.provider);
-							var cFilter = {
-								filter: sc.filter
-							};
-							if (sc.inputTerm !== '') {
-								cFilter.match = {
-									term: sc.inputTerm,
-									fields: sc.selectedMatchFields
-								};
-							}
-							DataService.getGeoDistanceAnnotations(2, sc.mapCenter, cFilter).then(
-								function(response) {
-									sc.mapTags = response.Response.data;
-									angular.forEach(sc.mapTags, function(tag, index){
-										var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
-										var marker = new google.maps.Marker({ position: latLng, id: tag.iri, name: tag.name });
-										google.maps.event.addListener(marker, 'click', function() {
-								            sc.markerTag = marker;
-								            sc.map.showInfoWindow('tag-iw', sc.markerTag);
-								        });
-								        sc.dynMarkers.push(marker);
-									});
-									updateMarkers(map);
-								}
-							);
+						sc.setBoundaryVisible(sc.showMapBoundary);
+						sc.initialMapLoad = true;
+						if ($scope.filter.provider !== null) {
+							map.setZoom(14);
+							sc.mapCenter = getPosition($scope.filter.provider);
+							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
+							sc.initialMapLoad = false;
 						} else {
 							// content from all cities represented on a map of Europe
-							sc.mapZoom = 4;
-							sc.mapCenter = [50.00,20.34];
+							map.setZoom(4);
+							sc.mapCenter = europeCenter;
+
+							// clean up current marker list
+							if (sc.markerClusterer !== undefined) {
+								sc.markerClusterer.clearMarkers();
+							}
+							sc.dynMarkers = [];
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
@@ -685,6 +762,8 @@
 							} else {
 								console.warn('expected content count by provider');
 							}
+							// clean up relevant creations under the map
+							sc.mapResults = [];
 							updateMarkers(map);
 						}
 						
@@ -702,7 +781,232 @@
 					noty.extractErrors(out_data, noty.ERROR);
 				});
 		};
+
+		sc.minProductionYear = 1890;
+		sc.maxProductionYear = 1999;
+
+		//reset filters to default values
+		sc.resetFiltersToDefault = function() {
+
+			$scope.defaultc = '';
+			$scope.inputTerm = '';
+			$scope.defaultipr = null;
+			$scope.codeci=null;
+
+	        $scope.yearfrom = sc.minProductionYear;
+	        $scope.yearto = sc.maxProductionYear;
+
+	        $scope.defaultc = null;
+	        sc.cities = {
+	        	options:  [],
+	        	selected: null
+	        };
+	        angular.forEach(providers, function(p){
+	        	sc.cities.options.push(p.city.name);
+	        });
+
+			sc.selectedMatchFields = ['title'];
+
+			$scope.terms = [];
+
+			$scope.defaultipr=null;
+			// move codelist provision in a service
+			sc.iprstatuses = {
+				options:  iprstatuses,
+				selected: null
+			};
+
+			//reset local storage
+			localStorage.setItem('iprstatus',null);
+			localStorage.setItem('terms','');//it's a term array
+			localStorage.setItem('inputTerm','');
+			localStorage.setItem('yearfrom',1890);
+			localStorage.setItem('yearto',1999);
+			localStorage.setItem('scity','');
+			//localStorage.setItem('itemTypeV',true);
+			//localStorage.setItem('itemTypeI',true);
+
+			//$scope.itemType.video = true;
+			//$scope.itemType.image = true;
+			$scope.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				//iprstatus: null,
+				yearfrom: sc.minProductionYear,
+				yearto: sc.maxProductionYear,
+				terms: []
+			};
+			ivhTreeviewMgr.deselectAll(sc.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+		};
+
+		//reset filters when loading page the first time
+		sc.resetFilters = function() {
+
+			if ($stateParams.type == 'old')//back to old saved search
+			{
+
+				/*initialize last selected input type as default value when refresh page*/
+				/*var itemTV = localStorage.getItem('itemTypeV');
+				var itemTI = localStorage.getItem('itemTypeI');
+				var inputSelectedV = (itemTV!==null) ? itemTV : true;
+				var inputSelectedI = (itemTI!==null) ? itemTI : true;
+				$scope.itemType.video = inputSelectedV;
+				$scope.itemType.image = inputSelectedI;*/
+
+				$scope.yearfrom=1890;
+				$scope.yearto=1999;
+				$scope.codeci=null;
+
+				/*initialize last selected city as default value when refresh page*/
+				var city = localStorage.getItem('scity');
+				var cselected = (city!==null) ? city : null;
+
+				$scope.defaultc = city;
+
+				sc.cities = {
+					options:  [],
+					selected: cselected
+				};
+				angular.forEach(providers, function(p){
+					sc.cities.options.push(p.city.name);
+					if (p.city.name == city) $scope.codeci = p.code;
+				});
+
+				/*initialize last selected input term as default value when refresh page*/
+				var inputT = localStorage.getItem('inputTerm');
+				var inputSelected = (inputT!==null) ? inputT : null;
+				$scope.inputTerm = inputSelected;
+
+				/*initialize last selected ipr status as default value when refresh page*/
+				var iprstatus = localStorage.getItem('iprstatus');
+				var iprselected = (iprstatus!==null) ? iprstatus : null;
+				$scope.defaultipr = iprselected;
+
+				// move codelist provision in a service
+				sc.iprstatuses = {
+					options:  iprstatuses,
+					selected: iprselected
+				};
+
+				/*initialize year from and yearto for time constraints in advanced search*/
+				var yearfrom = parseInt(localStorage.getItem('yearfrom'));
+				var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
+				var yearto = parseInt(localStorage.getItem('yearto'));
+				var yeartoselected = (yearto!==null) ? yearto : 1999;
+
+		        $scope.yearfrom = yearfromselected;
+		        $scope.yearto = yeartoselected;
+
+				sc.selectedMatchFields = ['title'];
+
+				var savedterms = localStorage.getItem('terms');
+				if (savedterms!==""){
+					var dataObj=JSON.parse(savedterms);
+					$scope.terms = (dataObj!==null) ? dataObj : [];
+				}
+				else{
+					$scope.terms = [];
+				}
+
+			}
+			else{
+				sc.resetFiltersToDefault();
+			}
+
+			$scope.filter = {
+				type: 'all',
+				provider: $scope.codeci,
+				country: null,
+				//iprstatus: $scope.defaultipr,
+				yearfrom: $scope.yearfrom,
+				yearto: $scope.yearto,
+				terms: $scope.terms
+			};
+
+		};
+		sc.resetFilters();
 		sc.search();
+
+		function loadGeoDistanceAnnotations(distance, center, isLocated) {
+			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
+				center[1] + '] within distance: ' + distance + ' (meters)');*/
+			// clean up current marker list
+			if (sc.markerClusterer !== undefined) {
+				sc.markerClusterer.clearMarkers();
+			}
+			sc.dynMarkers = [];
+			// clean up relevant creations under the map
+			sc.mapResults = [];
+
+			// load annotations
+			var cFilter = {
+				filter: $scope.filter
+			};
+			if ($scope.inputTerm !== '') {
+				cFilter.match = {
+					term: $scope.inputTerm,
+					fields: sc.selectedMatchFields
+				};
+			}
+			DataService.getGeoDistanceAnnotations(distance, center, cFilter).then(
+				function(response) {
+					sc.mapTags = response.data.Response.data;
+					var relevantCreations = new Map();
+					angular.forEach(sc.mapTags, function(tag, index) {
+						var latLng = new google.maps.LatLng(tag.spatial[0], tag.spatial[1]);
+						var marker = new google.maps.Marker({
+							position: latLng,
+							id: tag.iri,
+							name: tag.name,
+							sources: tag.sources
+						});
+						// update relavant creations
+						for (var i=0; i<tag.sources.length; i++) {
+							var uuid = tag.sources[i].uuid;
+							if(!relevantCreations.has(uuid)) {
+								relevantCreations.set(uuid, new Set([tag.iri]));
+							} else {
+							    relevantCreations.get(uuid).add(tag.iri);
+							}
+						}
+
+						google.maps.event.addListener(marker, 'click', function() {
+							sc.markerTag = marker;
+							GeoCoder.geocode({
+								'placeId': marker.id
+							}).then(function(results) {
+								// look outside in order to enrich details for that given place id
+								if (results[0]) {
+									sc.markerTag.address = results[0].formatted_address;
+								} else {
+									noty.showWarning('No results found');
+								}
+							}).catch(function(error) {
+								noty.showWarning('Unable to get info for place ID: ' + marker.id);
+							}).finally(function(){
+								// should we move the center to tag position?
+								// sc.map.setCenter(sc.markerTag.position);
+								sc.map.showInfoWindow('tag-iw', sc.markerTag);
+							});
+
+						});
+						sc.dynMarkers.push(marker);
+					});
+					updateMarkers(sc.map);
+					sc.loadingMapResults = true;
+					DataService.getRelavantCreations(relevantCreations).then(function(response) {
+						sc.mapResults = response.data.Response.data;
+						// console.log(sc.mapResults);
+					}).catch(function(error) {
+						noty.showWarning('Unable to retrieve relevant creation on the map. Reason: ' + error);
+					}).finally(function() {
+						sc.loadingMapResults = false;
+					});
+				}
+			);
+		}
 
 		function updateMarkers(map) {
 			sc.markerClusterer = new MarkerClusterer(
@@ -711,6 +1015,12 @@
 				});
 			sc.mapLoaded = true;
 		}
+
+		sc.showInfoWindow = function(marker) {
+			console.log(marker);
+			sc.markerTag = marker;
+			sc.map.showInfoWindow('tag-iw', sc.markerTag);
+		};
 
 		// force map resize
 		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
@@ -736,14 +1046,14 @@
 		sc.timeline = {};
 		sc.timeline.range = [1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990];
 		sc.updateFilterByDecade = function(decade) {
-			sc.filter.yearfrom = decade;
-			sc.filter.yearto = decade + 9;
+			$scope.filter.yearfrom = decade;
+			$scope.filter.yearto = decade + 9;
 		};
 	};
 
 	NewSearchController.$inject = [
-		"$scope", "DataService", "NgMap", "$timeout", "$filter",
-		"GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
+		"$scope", "$stateParams", "DataService", "NgMap", "$timeout", "$filter",
+		"GeoCoder", "GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
 	];
 
 })();
