@@ -363,6 +363,15 @@ class VideoContent(GraphBaseOperations):
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            thumbnail_size = input_parameters.get('size')
+            if thumbnail_size is not None and thumbnail_size.lower() == 'large':
+                # load image file in the parent folder with the same name
+                thumbnail_filename = os.path.basename(thumbnail_uri)
+                thumbs_parent_dir = os.path.dirname(
+                    os.path.dirname(os.path.abspath(thumbnail_uri)))
+                thumbnail_uri = os.path.join(
+                    thumbs_parent_dir, thumbnail_filename)
+                logger.debug('request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found",

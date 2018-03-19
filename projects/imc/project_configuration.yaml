@@ -96,6 +96,10 @@ bower_components:
     - ng-tags-input.min.js
   google-marker-cluster:
     - markerclusterer.js
+  angular-holderjs:
+    - src/holder.js
+  holderjs:
+    - holder.min.js
 
 css: 
   - "custom/imc.css"

@@ -257,16 +257,33 @@
 										<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
 									</div>
 									<div ng-repeat-start="media in sc.mapResults track by $index" ng-show="!sc.loadingMapResults" class="col-md-6 col-sm-12">
-										<div class="media-thumbnail search-thumbnail">
+										<div class="media-thumbnail search-thumbnail map-result">
+											<div class="row">
+												<div class="col-xs-12">
+													<div class="space-4"></div>
+													<h4 class="search-title">
+													<i class="imc-icon fa light-blue" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
+
+													<a href ui-sref="logged.search.watch.image({id: media.source.uuid})" ng-if="media.source.type == 'Image'" class="blue">{{media.source.title}}</a>
+													</h4>
+													<h4 class="search-title">
+													<a href ui-sref="logged.search.watch({v: media.source.uuid})" ng-if="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
+													</h4>
+													<span>
+														<i ng-if="media.source.year">({{media.source.year | limitTo:4}})</i>
+													</span>
+													<div class="space-4"></div>
+												</div>
+											</div>
 											<div class="row">
 												<div class="col-sm-4" style="padding-right: 5px;">
 													<div class="media-image-wrapper">
-														<img class="media-object" alt="100%x150" style="height: 150px; width: 100%; display: block;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22150%22%20height%3D%22150%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20150%20150%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_161990d4f10%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A10pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_161990d4f10%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2248.265625%22%20y%3D%2279.5%22%3E150x150%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+														<img class="media-object" alt="100%x150" holder="holder.js/100px150?text=NO THUMBNAIL" ng-if="!media.source.links['thumbnail']">
+														<img class="media-object" alt="100%x150" ng-src="{{media.source.links['thumbnail']+'&size=large'}}" ng-if="media.source.links['thumbnail']">
 													</div>
 													<div class="caption">
 														<div class="clearfix">
 															<span class="pull-right label label-primary label-city">{{(media.source.provider | providerToCity) || 'n/a'}}
-															<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
 															</span>
 															<div class="pull-left bigger-110">
 																<i class="imc-icon fa fa-eye light-blue"></i>
@@ -274,21 +291,13 @@
 																<i class="imc-icon fa fa-heart light-blue"></i>
 															</div>
 														</div>
-														<div class="space-4"></div>
-														<h4 class="search-title" style="display: inline;">
-														<span ng-if="media.source.type == 'Image'">{{media.source.title}}</span>
-														<a href ui-sref="logged.search.watch({v: media.source.uuid})" ng-if="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
-														</h4>
-														<span>
-															<i ng-if="media.source.year">({{media.source.year | limitTo:4}})</i>
-														</span>
 													</div>
 												</div>
 												<div class="col-sm-8" style="padding-left: 0px;">
 													<div class="widget-box transparent">
 														<div class="widget-header widget-header-small">
 															<h4 class="widget-title blue">
-																<i class="imc-icon fa fa-tags orange bigger-110"></i>Geo Annotations
+																<i class="imc-icon fa fa-map-marker orange bigger-110"></i>Geo Annotations
 															</h4>
 														</div>
 														<div class="widget-body">
@@ -328,13 +337,15 @@
 									<div class="media-thumbnail search-thumbnail">
 										<div class="media-image-wrapper">
 											<span class="search-item label bigger-180">
-												<!-- <i class="imc-icon fa fa-camera light-blue"></i> -->
 												<span class="fa-stack">
-												  <i class="imc-icon fa fa-circle-thin fa-stack-2x"></i>
+												  <i class="imc-icon fa fa-circle-thin fa-stack-2x" ng-if="!media.links['thumbnail']"></i>
+												  <i class="imc-icon fa fa-circle fa-stack-2x" ng-if="media.links['thumbnail']"></i>
 												  <i class="imc-icon fa fa-stack-1x light-blue" ng-class="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
 												</span>
 											</span>
-											<img class="media-object" alt="100%x200" style="height: 200px; width: 100%; display: block;" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22234%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20234%20200%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_160c140bbf2%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A12pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_160c140bbf2%22%3E%3Crect%20width%3D%22234%22%20height%3D%22200%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%2284.8046875%22%20y%3D%22105.1%22%3E234x200%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+											<img class="media-object" alt="100%x200" holder="holder.js/100px200?text=NO THUMBNAIL&?auto=yes" ng-if="!media.links['thumbnail']">
+											<img ng-src="{{media.links['thumbnail']+'&size=large'}}" ng-if="media.links['thumbnail']"
+											style="height: 200px; width: 100%; display: block;"/>
 										</div>
 										<div class="caption">
 											<div class="clearfix">
@@ -346,9 +357,7 @@
 												</div>
 											</div>
 											<h3 class="search-title">
-											<!--											
-											<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
-											-->
+											
 											<a href ui-sref="logged.search.watch.image({id: media.id, meta: media})" ng-if="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
 
 											<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
@@ -374,7 +383,7 @@
 										<div class="media search-media" ng-repeat="media in sc.creations">
 											<div class="media-left">
 												<img ng-src="{{media.links['thumbnail']}}" ng-if="media.links['thumbnail']"/>
-												<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="media.links['thumbnail'] == null"/>
+												<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" ng-if="media.links['thumbnail'] == null"/>
 												<div class="cn">
 													<div class="inner">
 														<i class="fa small" ng-class="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
@@ -384,7 +393,7 @@
 											<div class="media-body">
 												<div>
 													<h4 class="media-heading">
-													<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
+													<a href ui-sref="logged.search.watch.image({id: media.id, meta: media})" ng-if="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
 													<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 													</h4>
 													<span>
