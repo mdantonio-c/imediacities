@@ -22,20 +22,9 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='WatchController as watchCtrl' id="item-wrapper">
+<div ng-controller='WatchController as watchCtrl' id="video-wrapper">
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
-			<div style="padding-left: 10px; margin-bottom: 10px;">
-				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;">{{watchCtrl.video.attributes.identifying_title}}
-				</h2>
-				<div>
-					<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
-					<span>{{watchCtrl.video.attributes.production_years[0]}}</span>
-					<span class="label label-default label-city">{{(watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}
-						<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
-					</span>
-				</div>
-			</div>
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="video-container">
 					<div class="anno-tools-container" id="anno-tools-container">
@@ -70,103 +59,8 @@
 						Your browser does not support HTML5 video.
 					</video>
 					<!-- TEST DEI TEST -->
-					<div id="videotest">
-						<div class="controls__wrapper">
-
-							<div class="controls__status">
-								<div class="controls__row controls__status__info">
-									<div class="mark">Frame <span id="frame_mark"></span></div>
-									<div class="mark">SMPTE <span id="smpte_mark"></span></div>
-									<div class="mark">Time <span id="time_mark"></span></div>
-									<div class="mark">Float <span id="float_mark"></span></div>
-								</div>
-								<div class="controls__row controls__status__controls">
-									<div class="controls__status__fps">
-										<select name="fps" id="fps">
-											<option value="6">6 fps</option>
-											<option value="12">12 fps</option>
-											<option value="23" selected>24 fps</option>
-											<option value="48">48 fps</option>
-										</select>
-									</div>
-									<div class="controls__status__play" id="play">
-										<span>
-											<i class="fa fa-play"></i>
-										</span>
-										<span class="display-none">
-											<i class="fa fa-pause"></i>
-										</span>
-									</div>
-									<div class="controls__status__bar flex_spacer">
-										<input type="range" id="range" value="0" min="0" max="1">
-									</div>
-									<!-- <div class="controls__status__play">
-										<i class="fa fa-fast-backward" id="goto_start"></i>
-									</div>
-									<div class="controls__status__play">
-										<i class="fa fa-fast-forward" id="goto_end"></i>
-									</div> -->
-									<label class="controls__status__anno" 
-										uib-tooltip="on/off automatic tags"
-										tooltip-placement="right">
-										<input type="checkbox" ng-click="watchCtrl.switchVideo()">
-  										<span class="video-slider"></span>
-									</label>
-								</div>
-							</div>
-
-							<div class="controls__buttons">
-								<div class="controls__row">
-
-									<div class="controls__container mark">
-										<select id="controls_um" title="imposta unità di misura">
-											<option value="seconds">Seconds</option>
-											<option value="frames" selected>Frames</option>
-										</select>
-									</div>
-
-									<div class="mark">
-										<div class="controls__container">
-											<i class="fa fa-step-backward" id="rewind" title="indietro"></i>
-											&nbsp;
-											<input type="text" id="seek_step" value="1">
-											&nbsp;
-											<i class="fa fa-step-forward" id="fastforward" title="avanti"></i>
-										</div>
-
-									</div>
-
-									<div class="mark">
-										<div class="controls__container">
-											<input type="text" id="jump_to_value" value="1">
-											&nbsp;
-											<i class="fa fa-sign-in-alt" id="jump_to" title="salta a"></i>
-										</div>
-									</div>
-
-									<div class="mark">
-
-										<div class="controls__container">
-											&nbsp;
-											<input type="text" id="play_from" value="1" title="da">
-											-
-											<input type="text" id="play_to" value="1" title="a">
-											&nbsp;
-											<label style="font-size:.75em;" for="play_loop" title="in loop">
-												<i class="fa fa-redo"></i>
-											</label>
-											&nbsp;
-											<input type="checkbox" class="inline" id="play_loop" title="in loop">
-											&nbsp;
-											<i class="fa fa-retweet" id="play_int" title="riproduci frammento"></i>
-										</div>
-
-									</div>
-
-								</div>
-							</div>
-
-						</div>
+					<div
+						ng-include="main.blueprintTemplateDir + 'videoplayer.html'">
 					</div>
 					<!-- FINE TEST DEI TEST -->
 				</div>
@@ -182,7 +76,7 @@
 		<div class="col-xs-12 col-md-6">
 			<uib-tabset>
 
-			<uib-tab heading="General Information">
+			<uib-tab heading="Metadata">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
 				<div class="primary-description">
@@ -237,7 +131,7 @@
 						watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
 						watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
 						<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
-							<uib-accordion-heading>Film Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+							<uib-accordion-heading>Video Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
 							</uib-accordion-heading>
 							<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
 								<p ng-if="format.attributes.sound"><b>Sound</b>:
@@ -392,69 +286,40 @@
 						</tbody>
 					</table>
 				</div>
-				<div class="container" 
-					ng-show="watchCtrl.showmeli"
-					ng-style="{'float': 'left', 'width': '100%'}">
-					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
-			<div class="container" 
-					ng-show="watchCtrl.showmeli"
-					ng-style="{'float': 'left', 'width': '100%'}">
-					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
-			<div class="storyboard">
-				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
-					<div class="media-left">
-						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
-						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
-					</div>
-					<div class="media-content">
-						<div class="row">
-							<div class="col-xs-3">
-								<div class="shot-info">
-									<div scroll-story-on-click>
-										<h4
-										timestamp="{{shot.timestamp}}"
-										class="underline-on-hover"
-										>Shot {{shot.number}}</h4>
+			<div class="container storyboard">
+				<table class="table">
+					<tr>
+						<th>Shot number</th>
+						<th>Frame range</th>
+						<th>Shots</th>
+						<th>Shot timecode</th>
+						<th>Shot duration (sec)</th>
+						<th ng-style="{'text-align': 'center'}">Camera motion</th>
+					</tr>
+					<div class="storyboard">
+						<tr ng-repeat="shot in watchCtrl.storyshots">
+							<td data-title="'Number'" align="center">{{shot.number}}</td>
+							<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
+							<td data-title="'Shot'" scroll-story-on-click>
+								<img ng-style="{'width': '40%'}"
+								id="{{shot.id}}"
+								timestamp="{{shot.timestamp}}"
+								ng-src="{{shot.thumb}}">
+							</td>
+							<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
+							<td data-title="'Duration'" align="center">{{shot.duration}}</td>
+							<td data-title="'Camera motion'" align="center">
+								<dl class="dl-horizontal">
+									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
+										<dt>{{e_attr}}:</dt><dd>{{e_val * 100 | number:1}}%</dd>
 									</div>
-									<span class="small">{{shot.framerange}}</span>
-									<div class="space-0"></div>
-									<span class="small">{{shot.timestamp}}</span>
-								</div>
-							</div>
-							<div class="col-xs-9">
-								<div class="anno-info">
-									<ul class="fa-ul">
-										<li ng-if="(shot.tags | filter: {spatial:'!'}).length !== 0">
-											<i class="fa-li fa fa-tags light-brown"></i>
-											<ul class="list-inline">
-												<li ng-repeat="tag in shot.tags | filter: {spatial:'!'}">
-													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
-												</li>
-											</ul>
-										</li>
-										<li ng-if="(shot.tags | filter: {spatial:'!!'}).length !== 0">
-											<i class="fa-li fa fa-map-marker brown"></i>
-											<ul class="list-inline">
-												<li ng-repeat="tag in shot.tags | filter: {spatial:'!!'}">
-													<span class="label label-location">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
-												</li>
-											</ul>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<div class="search-actions text-center">
-							<dl class="dl-horizontal">
-								<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-									<dt style="width: auto;">{{e_attr}}:</dt><dd style="margin-left: 0;">{{e_val * 100 | number:1}}%</dd>
-								</div>
-							</dl>
-						</div>
+								</dl>
+							</td>
+						</tr>
 					</div>
-				</div>
+				</table>
 			</div>
 			</uib-tab>
 			</uib-tabset>

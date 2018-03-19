@@ -1,0 +1,130 @@
+QWERTY
+<div id="videotest">
+<div class="video_wrapper">
+        <div class="controls__wrapper">
+
+            <div class="controls__status">
+
+                <div class="controls__row controls__status__controls">
+                    <div class="controls__status__fps">
+                        <select name="fps" id="fps">
+                            <option value="6">6 fps</option>
+                            <option value="12">12 fps</option>
+                            <option value="23" selected>24 fps</option>
+                            <option value="48">48 fps</option>
+                        </select>
+                    </div>
+                    <div class="controls__status__play" id="play">
+                        <span>
+                            <i class="fas fa-play"></i>
+                        </span>
+                        <span class="display-none">
+                            <i class="fas fa-pause"></i>
+                        </span>
+                    </div>
+                    <div class="controls__status__bar flex_spacer">
+                        <input type="range" id="range" value="0" min="0" max="1">
+                    </div>
+                    <div class="controls__status__play">
+                        <i class="fas fa-backward" id="backward" title="rewind"></i>
+                    </div>
+                    <div class="controls__status__play">
+                        <i class="fas fa-forward" id="forward" title="forward"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls__buttons">
+                <div class="controls__row">
+                    <!--    unità di misura    -->
+                    <div class="controls__container mark">
+                        <select id="controls_um" title="imposta unità di misura">
+                            <option value="seconds">Seconds</option>
+                            <option value="frames" selected>Frames</option>
+                        </select> &nbsp;
+                    </div>
+                    <!--    step   -->
+                    <div class="mark">
+                        <div class="controls__container">
+                            <i class="fas fa-step-backward" id="seek_backward" title="indietro"></i>
+                            &nbsp;
+                            <input type="text" id="seek_step" value="1">
+                            &nbsp;
+                            <i class="fas fa-step-forward" id="seek_forward" title="avanti"></i>
+                        </div>
+
+                    </div>
+                    <!--    jump   -->
+                    <div class="mark">
+                        <div class="controls__container">
+                            <input type="text" id="jump_to_value" value="1">
+                            &nbsp;
+                            <i class="fas fa-sign-in-alt" id="jump_to" title="salta a"></i>
+                        </div>
+                    </div>
+                    <!--    range  -->
+                    <div class="mark">
+
+                        <div class="controls__container">
+                            <input type="text" id="play_from" value="1" title="da">
+                            <input type="text" id="play_to" value="1" title="a">
+                            &nbsp;
+                            <i class="fas fa-play" id="play_int" title="riproduci frammento"></i>
+                        </div>
+
+                    </div>
+                    <!--    goto   -->
+                    <div class="mark">
+                        <div class="controls__container">
+                            <i class="fas fa-fast-backward" id="goto_start"></i>
+                            &nbsp;
+                            <i class="fa fa-fast-forward" id="goto_end"></i>
+                        </div>
+                    </div>
+                    <!--    volume  -->
+                    <div class="mark">
+                        <div class="controls__container" id="volume">
+                            <span class="volume__down"><i class="fas fa-minus-square"></i>&nbsp;</span>
+
+                            <span class="volume__icon display-none"><i class="fas fa-volume-off"></i></span>
+                            <span class="volume__icon display-none"><i class="fas fa-volume-down"></i></span>
+                            <span class="volume__icon display-none"><i class="fas fa-volume-up"></i></span>
+
+                            <span class="volume__up">&nbsp;<i class="fas fa-plus-square"></i></span>
+                            <span class="volume_info"></span>
+                        </div>
+                    </div>
+                    <!--    switch video   -->
+                    <div class="mark">
+                        <div class="controls__container">
+                            <select id="switch_video_format">
+                                <option value="orf">orf</option>
+                                <option value="video">video</option>
+                            </select>
+                        <!--</div>-->
+                    <!--</div>-->
+                    <!--    fullscreen -->
+                    <!--<div class="mark">-->
+                        <!--<div class="controls__container" id="fullscreen">-->
+                            <span id="fullscreen">
+                                <span><i class="fas fa-expand fullscreen"></i></span>
+                                <span class="display-none"><i class="fas fa-compress fullscreen"></i></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="markers__wrapper">
+
+        <div class="controls__row controls__status__info">
+            <div class="mark">Frame <span id="frame_mark"></span></div>
+            <div class="mark">SMPTE <span id="smpte_mark"></span></div>
+            <div class="mark">Time <span id="time_mark"></span></div>
+            <div class="mark">Float <span id="float_mark"></span></div>
+        </div>
+
+    </div>
+</div>

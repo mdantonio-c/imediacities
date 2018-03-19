@@ -99,4 +99,4 @@ bower_components:
 
 css: 
   - "custom/imc.css"
-  - "custom/nsi.css"
+  - "custom/VideoPlayer_stile.css"
