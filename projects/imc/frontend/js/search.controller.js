@@ -439,20 +439,6 @@
 		sc.displayMode = "Grid";
 		sc.loading = false;
 
-		/*initialize last selected item as default value when refresh page*/
-		var city = localStorage.getItem('scity');
-		var cselected = (city!==null) ? city : null;
-
-		$scope.defaultc = city;
-
-		sc.cities = {
-			options:  [],
-			selected: cselected
-		};
-		angular.forEach(providers, function(p){
-			sc.cities.options.push(p.city.name);
-		});
-
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
@@ -469,8 +455,6 @@
 				sc.selectedMatchFields.push(matchField);
 			}
 		};
-
-		//---
 
 		sc.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
@@ -544,6 +528,16 @@
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
 
+			sc.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				iprstatus: null,
+				yearfrom: sc.minProductionYear,
+				yearto: sc.maxProductionYear,
+				terms: $scope.terms
+			};
+
 			if ($stateParams.type == 'old')//back to old saved search
 			{
 
@@ -557,6 +551,20 @@
 
 				$scope.yearfrom=1890;
 				$scope.yearto=1999;
+
+				/*initialize last selected city as default value when refresh page*/
+				var city = localStorage.getItem('scity');
+				var cselected = (city!==null) ? city : null;
+
+				$scope.defaultc = city;
+
+				sc.cities = {
+					options:  [],
+					selected: cselected
+				};
+				angular.forEach(providers, function(p){
+					sc.cities.options.push(p.city.name);
+				});
 
 				/*initialize last selected input term as default value when refresh page*/
 				var inputT = localStorage.getItem('inputTerm');
@@ -603,6 +611,15 @@
 		        $scope.yearfrom = sc.minProductionYear;
 		        $scope.yearto = sc.maxProductionYear;
 
+				$scope.defaultc = null;
+				sc.cities = {
+					options:  [],
+					selected: null
+				};
+				angular.forEach(providers, function(p){
+					sc.cities.options.push(p.city.name);
+				});
+
 				sc.selectedMatchFields = ['title'];
 
 				$scope.terms = [];
@@ -614,7 +631,7 @@
 				};
 
 				//reset local storage
-				localStorage.setItem('iprstatus','');
+				localStorage.setItem('iprstatus',null);
 				localStorage.setItem('terms','');//it's a term array
 				localStorage.setItem('inputTerm','');
 				localStorage.setItem('yearfrom',1890);
@@ -624,20 +641,12 @@
 
 				sc.itemType.video = true;
 				sc.itemType.image = true;
+
+				ivhTreeviewMgr.deselectAll(sc.vocabulary);
+				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+
 			}
 
-			sc.filter = {
-				type: 'all',
-				provider: null,
-				country: null,
-				iprstatus: null,
-				yearfrom: sc.minProductionYear,
-				yearto: sc.maxProductionYear,
-				terms: $scope.terms
-			};
-
-			ivhTreeviewMgr.deselectAll(sc.vocabulary);
-			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
 		sc.resetFilters();
 
