@@ -291,16 +291,17 @@
 						}, "slow");
 					}
 					// play video from selected shot
-					var myVid = angular.element(window.document.querySelector('#videoarea'));
+					//var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].firstElementChild.attributes.timestamp.value);
 
 					//var times = convertTime(startTime);
 
 					//myVid[0].pause();
 					var seekTime = ((Number(startTime) / 1000) + 0.001);
-					myVid[0].currentTime = seekTime;
-					myVid[0].play();
-
+					//myVid[0].currentTime = seekTime;
+					//myVid[0].play();
+					$scope.videoplayer.time_goto(seekTime);
+				    $scope.videoplayer.video.play();
 				});
 			}
 		};
@@ -317,11 +318,13 @@
 						}, "slow");
 					}
 					// play video from selected shot
-					var myVid = angular.element(window.document.querySelector('#videoarea'));
+					//var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].attributes.timestamp.value);
 					var seekTime = ((Number(startTime) / 1000) + 0.001);
-					myVid[0].currentTime = seekTime;
-					myVid[0].play();
+					//myVid[0].currentTime = seekTime;
+					//myVid[0].play();
+					$scope.videoplayer.time_goto(seekTime);
+				    $scope.videoplayer.video.play();
 				});
 			}
 		};
@@ -1163,7 +1166,7 @@
 
 					// << NSI >> //
 					//	e se il video lo caricassi qui??
-					self.videoplayer = new VideoPlayer({
+					$scope.videoplayer = new VideoPlayer({
 						selector: '#videotest',
 						sources: [self.video.links['content']],
 						fps: self.video.relationships.item[0].attributes.framerate.replace('/1',''),
@@ -1234,8 +1237,8 @@
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
 			//myVid[0].currentTime = seekTime;
 			//myVid[0].play();
-			self.videoplayer.time_goto(seekTime);
-			self.videoplayer.video.play();
+			$scope.videoplayer.time_goto(seekTime);
+			$scope.videoplayer.video.play();
 		};
 
 		/**
@@ -1245,10 +1248,12 @@
 		self.jumpToShotFromAnnotation = function(startTime) {
 			// console.log('jump to shot from annotation. Start time: ' + startTime);
 			// play video from selected shot
-			var myVid = angular.element(window.document.querySelector('#videoarea'));
+			//var myVid = angular.element(window.document.querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
-			myVid[0].currentTime = seekTime;
-			myVid[0].play();
+			//myVid[0].currentTime = seekTime;
+			//myVid[0].play();
+			$scope.videoplayer.time_goto(seekTime);
+			$scope.videoplayer.video.play();
 		};
 
 		self.getTagMenu = function(event) {
@@ -1507,9 +1512,11 @@
 
 			self.jumpToShot = function(selectedShot, startT) {
 				// play video from selected shot
-				var myVid = angular.element(window.document.querySelector('#videoarea'));
-				myVid[0].currentTime = startT /1000;
-				myVid[0].play();
+				//var myVid = angular.element(window.document.querySelector('#videoarea'));
+				//myVid[0].currentTime = startT /1000;
+				//myVid[0].play();
+				$scope.videoplayer.time_goto(startT/1000);
+				$scope.videoplayer.video.play();
 			};
 
 		});
