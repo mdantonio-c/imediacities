@@ -1163,7 +1163,7 @@
 
 					// << NSI >> //
 					//	e se il video lo caricassi qui??
-					var v = new VideoPlayer({
+					self.videoplayer = new VideoPlayer({
 						selector: '#videotest',
 						sources: [self.video.links['content']],
 						fps: self.video.relationships.item[0].attributes.framerate.replace('/1',''),
@@ -1230,10 +1230,12 @@
 			// console.log('jump to shot: Start time: ' + startTime);
 
 			// play video from selected shot
-			var myVid = angular.element($document[0].querySelector('#videoarea'));
+			//var myVid = angular.element($document[0].querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
-			myVid[0].currentTime = seekTime;
-			myVid[0].play();
+			//myVid[0].currentTime = seekTime;
+			//myVid[0].play();
+			self.videoplayer.time_goto(seekTime);
+			self.videoplayer.video.play();
 		};
 
 		/**
