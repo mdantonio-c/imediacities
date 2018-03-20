@@ -434,7 +434,7 @@
 
 	}
 
-	function NewSearchController($scope, DataService, NgMap, $timeout, $filter, GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
+	function NewSearchController($scope, $stateParams, DataService, NgMap, $timeout, $filter, GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
@@ -544,51 +544,86 @@
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
 
-			/*initialize last selected input type as default value when refresh page*/
-			/*var itemTV = localStorage.getItem('itemTypeV');
-			var itemTI = localStorage.getItem('itemTypeI');
-			var inputSelectedV = (itemTV!==null) ? itemTV : true;
-			var inputSelectedI = (itemTI!==null) ? itemTI : true;
-			$scope.itemType.video = inputSelectedV;
-			$scope.itemType.image = inputSelectedI;*/
+			if ($stateParams.type == 'old')//back to old saved search
+			{
 
-			$scope.yearfrom=1890;
-			$scope.yearto=1999;
+				/*initialize last selected input type as default value when refresh page*/
+				/*var itemTV = localStorage.getItem('itemTypeV');
+				var itemTI = localStorage.getItem('itemTypeI');
+				var inputSelectedV = (itemTV!==null) ? itemTV : true;
+				var inputSelectedI = (itemTI!==null) ? itemTI : true;
+				$scope.itemType.video = inputSelectedV;
+				$scope.itemType.image = inputSelectedI;*/
 
-			/*initialize last selected input term as default value when refresh page*/
-			var inputT = localStorage.getItem('inputTerm');
-			var inputSelected = (inputT!==null) ? inputT : null;
-			$scope.inputTerm = inputSelected;
+				$scope.yearfrom=1890;
+				$scope.yearto=1999;
 
-			/*initialize last selected ipr status as default value when refresh page*/
-			var iprstatus = localStorage.getItem('iprstatus');
-			var iprselected = (iprstatus!==null) ? iprstatus : null;
-			$scope.defaultipr = iprselected;
+				/*initialize last selected input term as default value when refresh page*/
+				var inputT = localStorage.getItem('inputTerm');
+				var inputSelected = (inputT!==null) ? inputT : null;
+				$scope.inputTerm = inputSelected;
 
-			// move codelist provision in a service
-			sc.iprstatuses = {
-				options:  iprstatuses,
-				selected: iprselected
-			};
+				/*initialize last selected ipr status as default value when refresh page*/
+				var iprstatus = localStorage.getItem('iprstatus');
+				var iprselected = (iprstatus!==null) ? iprstatus : null;
+				$scope.defaultipr = iprselected;
 
-			/*initialize year from and yearto for time constraints in advanced search*/
-			var yearfrom = parseInt(localStorage.getItem('yearfrom'));
-			var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
-			var yearto = parseInt(localStorage.getItem('yearto'));
-			var yeartoselected = (yearto!==null) ? yearto : 1999;
+				// move codelist provision in a service
+				sc.iprstatuses = {
+					options:  iprstatuses,
+					selected: iprselected
+				};
 
-	        $scope.yearfrom = yearfromselected;
-	        $scope.yearto = yeartoselected;
+				/*initialize year from and yearto for time constraints in advanced search*/
+				var yearfrom = parseInt(localStorage.getItem('yearfrom'));
+				var yearfromselected = (yearfrom!==null) ? yearfrom : 1890;
+				var yearto = parseInt(localStorage.getItem('yearto'));
+				var yeartoselected = (yearto!==null) ? yearto : 1999;
 
-			sc.selectedMatchFields = ['title'];
+		        $scope.yearfrom = yearfromselected;
+		        $scope.yearto = yeartoselected;
 
-			var savedterms = localStorage.getItem('terms');
-			if (savedterms!==""){
-				var dataObj=JSON.parse(savedterms);
-				$scope.terms = (dataObj!==null) ? dataObj : [];
+				sc.selectedMatchFields = ['title'];
+
+				var savedterms = localStorage.getItem('terms');
+				if (savedterms!==""){
+					var dataObj=JSON.parse(savedterms);
+					$scope.terms = (dataObj!==null) ? dataObj : [];
+				}
+				else{
+					$scope.terms = [];
+				}
+
 			}
 			else{
+				$scope.defaultc = '';
+				$scope.inputTerm = '';
+				$scope.defaultipr = null;
+
+		        $scope.yearfrom = sc.minProductionYear;
+		        $scope.yearto = sc.maxProductionYear;
+
+				sc.selectedMatchFields = ['title'];
+
 				$scope.terms = [];
+
+				// move codelist provision in a service
+				sc.iprstatuses = {
+					options:  iprstatuses,
+					selected: null
+				};
+
+				//reset local storage
+				localStorage.setItem('iprstatus','');
+				localStorage.setItem('terms','');//it's a term array
+				localStorage.setItem('inputTerm','');
+				localStorage.setItem('yearfrom',1890);
+				localStorage.setItem('yearto',1999);
+				//localStorage.setItem('itemTypeV',true);
+				//localStorage.setItem('itemTypeI',true);
+
+				sc.itemType.video = true;
+				sc.itemType.image = true;
 			}
 
 			sc.filter = {

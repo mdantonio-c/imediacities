@@ -17,6 +17,9 @@ angular.module('web').constant('customRoutes',
 
     'logged.new-search': {
         url: "/new-search?q",
+        params: {
+            type: null
+        },
         views: {
             "loggedview@logged": {
                 dir: 'blueprint',

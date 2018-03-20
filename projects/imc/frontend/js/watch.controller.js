@@ -934,46 +934,6 @@
 			myVid[0].pause();
 		};
 
-		/*video controllers*/
-
-        $scope.stopBack = function() {
-          if (angular.isDefined(intervalRewind)) {
-            $interval.cancel(intervalRewind);
-            intervalRewind = undefined;
-          }
-        };
-
-		self.fastForward = function() {
-				myVid[0].playbackRate = 4.0;
-				playVid(myVid[0]);
-		};
-
-		self.backward = function() {
-			$scope.rew();
-		};
-
-		self.stepForward = function() {
-       		myVid[0].playbackRate = 1.0;
-       			if(myVid[0].currentTime == 0){
-					$scope.stopBack();
-           			myVid[0].pause();
-      			}
-       			else{
-           			myVid[0].currentTime -= -.1;
-       			}
-		};
-
-		self.stepBackward = function() {
-       		myVid[0].playbackRate = 1.0;
-       			if(myVid[0].currentTime == 0){
-					$scope.stopBack();
-           			//myVid[0].pause();
-      			}
-       			else{
-           			myVid[0].currentTime += -.1;
-       			}
-		};		
-
 		// Returns the shot corresponding to the time in input
 		function getShotFromVideoCurrentTime(currtime) {
 			//console.log('getShotFromVideoCurrentTime: currtime=' + currtime);
