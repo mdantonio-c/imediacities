@@ -862,7 +862,7 @@
 
 		/*video controllers*/
 
-        $scope.stopBack = function() {
+        /*$scope.stopBack = function() {
           if (angular.isDefined(intervalRewind)) {
             $interval.cancel(intervalRewind);
             intervalRewind = undefined;
@@ -898,7 +898,7 @@
        			else{
            			myVid[0].currentTime += -.1;
        			}
-		};
+		};*/
 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);

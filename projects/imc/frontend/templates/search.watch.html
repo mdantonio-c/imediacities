@@ -38,31 +38,19 @@
 							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<div class="video-tools-container" id="video-tools-container">
+					<!--<div class="video-tools-container" id="video-tools-container">
 						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
 							ng-click="watchCtrl.stepBackward()"
 							tooltip-placement="right"
 							uib-tooltip="Step backward">
 							<i class="glyphicon glyphicon glyphicon-step-backward"></i>
 						</div>
-						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.fastBackward()"
-							tooltip-placement="right"
-							uib-tooltip="Fast backward">
-							<i class="glyphicon glyphicon glyphicon-fast-backward"></i>
-						</div>-->
 						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
 							ng-click="watchCtrl.backward()"
 							tooltip-placement="right"
 							uib-tooltip="Backward">
 							<i class="glyphicon glyphicon glyphicon-backward"></i>
 						</div>
-						<!--<div class="btn btn-app btn-xs btn-warning video-tools-btn"
-							ng-click="watchCtrl.forward()"
-							tooltip-placement="right"
-							uib-tooltip="Forward">
-							<i class="glyphicon glyphicon glyphicon-forward"></i>
-						</div>-->
 						<div class="btn btn-app btn-xs btn-warning video-tools-btn"
 							ng-click="watchCtrl.fastForward()"
 							tooltip-placement="right"
@@ -75,7 +63,7 @@
 							uib-tooltip="Step forward">
 							<i class="glyphicon glyphicon-step-forward"></i>
 						</div>
-					</div>
+					</div>-->
 					<video id="videoarea" style="display:none"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"
@@ -185,7 +173,7 @@
 					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
 			
-			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
+			<!--<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
 			<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
 				<div uib-slide ng-repeat="item in watchCtrl.items | limitTo: watchCtrl.slideSize+1" index="$index" style="float:left; width:100%;  height: 100%; overflow: visible;">
 					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9][0]}}" duration="{{watchCtrl.items[$index*9][1]}}" nshots="{{watchCtrl.items[$index*9][2]}}" shotd="{{watchCtrl.items[$index*9][3]}}" progr="{{watchCtrl.items[$index*9][4]}}" timestamp="{{watchCtrl.items[$index*9][5]}}" ng-src="{{watchCtrl.items[$index*9][6]}}" style="float:left;" scroll-on-click/>
@@ -199,7 +187,7 @@
 					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+8][0]}}" duration="{{watchCtrl.items[$index*9+8][1]}}" nshots="{{watchCtrl.items[$index*9+8][2]}}" shotd="{{watchCtrl.items[$index*9+8][3]}}" progr="{{watchCtrl.items[$index*9+8][4]}}" timestamp="{{watchCtrl.items[$index*9+8][5]}}" ng-src="{{watchCtrl.items[$index*9+8][6]}}" style="float:left;" scroll-on-click/>
 				</div>
 			</div>
-			</container-fluid>
+			</container-fluid>-->
 			<div id="timeline-graph" ng-show="watchCtrl.annotations.length >= 1" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
 				<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>
