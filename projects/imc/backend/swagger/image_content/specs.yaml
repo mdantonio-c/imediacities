@@ -1,0 +1,9 @@
+file: images
+class: ImageContent
+# baseuri: "/api"
+schema:
+  expose: true
+mapping:
+  image_content: "/images/<image_id>/content"
+labels:
+  - image

@@ -38,6 +38,19 @@ angular.module('web').constant('customRoutes',
         }
     },
 
+    'logged.search.watch.image': {
+        url: "/image/{id}}",
+        params: {
+            meta: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'watch.image.html'
+            }
+        }
+    },
+
     'logged.tag.geocode': {
         url: "/tag?v",
         params: {

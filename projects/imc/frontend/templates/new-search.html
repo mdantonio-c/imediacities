@@ -345,7 +345,11 @@
 												</div>
 											</div>
 											<h3 class="search-title">
+											<!--											
 											<span ng-if="media.type == 'nonaventity'">{{media.relationships.titles[0].attributes.text}}</span>
+											-->
+											<a href ui-sref="logged.search.watch.image({id: media.id, meta: media})" ng-if="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
+
 											<a href ui-sref="logged.search.watch({v: media.id, meta: media})" ng-if="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 											</h3>
 											<p class="text">

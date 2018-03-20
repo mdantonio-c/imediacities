@@ -232,19 +232,35 @@ class Search(GraphBaseOperations):
                     status_code=hcodes.HTTP_SERVER_ERROR)
 
             item = v.item.single()
-            video_url = api_url + 'api/videos/' + v.uuid
-            # use depth 2 to get provider info from record source
-            # TO BE FIXED
-            video = self.getJsonResponse(v, max_relationship_depth=2)
-            logger.info("links %s" % video['links'])
-            video['links']['self'] = video_url
-            video['links']['content'] = video_url + '/content?type=video'
-            if item.thumbnail is not None:
-                video['links']['thumbnail'] = video_url + \
-                    '/content?type=thumbnail'
-            video['links']['summary'] = video_url + '/content?type=summary'
 
-            data.append(video)
+            if isinstance(v, self.graph.AVEntity):
+                # video 
+                video_url = api_url + 'api/videos/' + v.uuid
+                # use depth 2 to get provider info from record source
+                # TO BE FIXED
+                video = self.getJsonResponse(v, max_relationship_depth=2)
+                logger.info("links %s" % video['links'])
+                video['links']['self'] = video_url
+                video['links']['content'] = video_url + '/content?type=video'
+                if item.thumbnail is not None:
+                    video['links']['thumbnail'] = video_url + \
+                        '/content?type=thumbnail'
+                video['links']['summary'] = video_url + '/content?type=summary'
+                data.append(video)
+            elif isinstance(v, self.graph.NonAVEntity):
+                #image
+                image_url = api_url + 'api/images/' + v.uuid
+                # use depth 2 to get provider info from record source
+                # TO BE FIXED
+                image = self.getJsonResponse(v, max_relationship_depth=2)
+                logger.info("image links %s" % image['links'])
+                image['links']['self'] = image_url
+                image['links']['content'] = image_url + '/content?type=image'
+                if item.thumbnail is not None:
+                    image['links']['thumbnail'] = image_url + \
+                        '/content?type=thumbnail'
+                image['links']['summary'] = image_url + '/content?type=summary'
+                data.append(image)            
 
         # return also the total number of elements
         meta_response = {"totalItems": numels}

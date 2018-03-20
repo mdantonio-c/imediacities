@@ -8,6 +8,7 @@
 		.controller('NotesController', NotesController)
 		.controller('geoResultController', geoResultController)
 		.controller('WatchController', WatchController)
+		.controller('WatchImageController', WatchImageController)
 		.controller('MapController', MapController)
 		.controller('ModalConfirmController', ModalConfirmController);
 
@@ -810,6 +811,8 @@
 		self.showmeli = true;
 		self.video = $stateParams.meta;
 
+		console.log("self.video="+angular.toJson(self.video));
+
 		var intervalRewind;
 
 		$scope.rew = function() {
@@ -1567,6 +1570,173 @@
 			});
 		});
 	}
+
+
+	function WatchImageController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
+			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
+
+		var self = this;
+		var imageId = $stateParams.i;
+		self.image = $stateParams.meta;
+
+		console.log("self.image="+angular.toJson(self.image));
+
+		// pick an identifying title
+		for (var i = 0, len = self.image.relationships.titles; i < len; i++) {
+			if (self.image.relationships.titles[i].attributes.relation.key === 'Original title') {
+				self.image.identifyingTitle = self.image.relationships.titles[i].attributes.text;
+				break;
+			}
+		}
+		// se non c'e' il titolo originale allora prendo il primo
+		if(!self.image.identifyingTitle){
+			self.image.identifyingTitle = self.image.relationships.titles[0].attributes.text;
+		}
+
+		self.inputVocTerm = "";
+		// inizialize status of video format accordion
+		$scope.statusAccor = {
+    		isOpen: false
+  		};
+		// inizialize address for automplete input tag for geolocation
+		$scope.vm = {
+			address: {}
+		};
+		// to visualize annotations in tab table
+		self.annotations = [];
+
+		// to visualize notes in notes tab 
+		self.notes = [];
+		// to visualize shots in notes tab table
+		self.notesShots = [];
+		// current shot in notes tab table
+		self.notesShotSelected=1;
+
+		// initialize multiselect to filter subtitles
+		$scope.options = [];
+		$scope.selectedOptions = [];
+
+		self.manualtag = function(mode) {
+			console.log('manual tag: ' + mode);
+
+			var shot_annotations;
+					
+			if (mode == 'term') {
+				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+			}
+			else if (mode == 'notes') {
+				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
+			}
+			else if (mode == 'location') {
+				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+			}
+	
+		};
+
+		self.deleteAnnotation = function(anno) {
+		
+		};
+		self.deleteNote = function(note) {
+
+		};
+		self.editNote = function(note) {
+			// TODO tutta da fare
+
+			var shot_annotations = null;
+			var shotInfo;
+
+			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});
+			
+		};
+
+		// ritorna le classi css da applicare agli elementi
+		//  della lista degli shot nel tab delle note
+		self.computeCssClass = function(last,shot) {
+		    var cssClass = "tab-list-shot";
+		    if(last){
+		    	cssClass += " tab-list-shot-last";
+		    }
+		    if(shot == self.notesShotSelected){
+		    	cssClass += " tab-list-shot-selected";
+		    }else{
+		    	cssClass += " tab-list-shot-no-selected";		    	
+		    }
+		    //console.log('computeCssClass=' + cssClass);
+		    return cssClass;
+		};
+
+		self.items = [];
+		self.shots = [];
+		self.slideSize = 0;
+
+		self.loadMetadataContent = function(imageId) {
+			// console.log("loading metadata content for imageId: " + imageId);
+			self.loading = true;
+			DataService.getVideoMetadata(imageId).then(
+				function(response) {
+					self.image = response.data[0];
+					self.isShownAt = self.image.relationships.record_sources[0].attributes.is_shown_at;
+					sharedProperties.setRecordProvider(
+						self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
+				},
+				function(error) {
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+		if (!$stateParams.meta) {
+			self.loadMetadataContent(imageId);
+		} else {
+		}
+
+		self.selectedImageId = imageId;
+		self.animationsEnabled = true;
+
+		self.getTagMenu = function(event) {
+		};
+
+		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
+			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
+			if (noteInfo === null) {
+				return;
+			}
+			// se la nota esiste gia' allora e' un update
+			var noteId = noteInfo.uuid;
+			var update = false;
+			angular.forEach(self.notes, function(note, index) {
+				if (note.id === noteId ) {
+					self.notes[index].text = noteInfo.text;
+					self.notes[index].privacy = noteInfo.privacy;
+					self.notes[index].language = noteInfo.textLanguage;
+					self.notes[index].languageCode = noteInfo.textLanguageCode;
+					update = true;
+				}
+			});
+			//console.log("updateNotes update=" + angular.toJson(update, true));
+			if(!update){
+				// add the new note to self.notes
+				var note = {
+					id: noteInfo.uuid,
+					text: noteInfo.text,
+					language: noteInfo.textLanguage,
+					languageCode: noteInfo.textLanguageCode,
+					creatorName: noteInfo.creatorName,
+					creator: noteInfo.creator,
+					creation_datetime: noteInfo.creation_datetime,
+					privacy: noteInfo.privacy,
+					shotId: shotInfo.uuid,
+					shotNum: shotInfo.shotNum,
+					shotStartT: shotInfo.startT,
+					shotEndT: shotInfo.endT
+				};				
+				self.notes.push(note);
+			}
+			//console.log("situazione delle note: " + angular.toJson(self.notes, true));
+			return;
+		});
+
+	}
+
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 

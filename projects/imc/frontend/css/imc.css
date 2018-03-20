@@ -313,10 +313,11 @@ ul li p {
 	padding-top: 4px;
 	color:#6e7a7f;
 }
-
+.image-title-container .title,
 .primary-description .title {
 	padding: 5px 0; 
 }
+.image-title-container .title,
 .primary-description .title span:nth-child(1) {
 	/*margin-left: 15px;
 	margin-right: 5px;*/
@@ -324,7 +325,10 @@ ul li p {
 	font-weight: bold;
 	font-size: 20px;
 }
-
+.image-title-container .year{
+	color:#6e7a7f;
+	font-size: 18px;
+}
 .primary-description>.text {
 	padding: 5px 0;
 	color:#6e7a7f; 
@@ -348,6 +352,11 @@ ul li p {
   background-color: transparent;
   top:-200px;
   left: 200px;
+}
+
+/*image container*/
+.image-container {
+	margin-top: 10px;
 }
 
 /*video container*/
