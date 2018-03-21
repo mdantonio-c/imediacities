@@ -790,6 +790,7 @@
 
 				$scope.yearfrom=1890;
 				$scope.yearto=1999;
+				$scope.codeci=null;
 
 				/*initialize last selected city as default value when refresh page*/
 				var city = localStorage.getItem('scity');
@@ -803,6 +804,7 @@
 				};
 				angular.forEach(providers, function(p){
 					sc.cities.options.push(p.city.name);
+					if (p.city.name == city) $scope.codeci = p.code;
 				});
 
 				/*initialize last selected input term as default value when refresh page*/
@@ -846,6 +848,7 @@
 				$scope.defaultc = '';
 				$scope.inputTerm = '';
 				$scope.defaultipr = null;
+				$scope.codeci=null;
 
 		        $scope.yearfrom = sc.minProductionYear;
 		        $scope.yearto = sc.maxProductionYear;
@@ -889,7 +892,7 @@
 
 			$scope.filter = {
 				type: 'all',
-				provider: null,
+				provider: $scope.codeci,
 				country: null,
 				//iprstatus: $scope.defaultipr,
 				yearfrom: $scope.yearfrom,
