@@ -774,6 +774,56 @@
 
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
+
+		//reset filters to default values
+		sc.resetFiltersToDefault = function() {
+
+			$scope.defaultc = '';
+			$scope.inputTerm = '';
+			$scope.defaultipr = null;
+			$scope.codeci=null;
+
+	        $scope.yearfrom = sc.minProductionYear;
+	        $scope.yearto = sc.maxProductionYear;
+
+	        $scope.defaultc = null;
+	        sc.cities = {
+	        	options:  [],
+	        	selected: null
+	        };
+	        angular.forEach(providers, function(p){
+	        	sc.cities.options.push(p.city.name);
+	        });
+
+			sc.selectedMatchFields = ['title'];
+
+			$scope.terms = [];
+
+			//reset local storage
+			localStorage.setItem('iprstatus','');
+			localStorage.setItem('terms','');//it's a term array
+			localStorage.setItem('inputTerm','');
+			localStorage.setItem('yearfrom',1890);
+			localStorage.setItem('yearto',1999);
+			localStorage.setItem('scity','');
+			//localStorage.setItem('itemTypeV',true);
+			//localStorage.setItem('itemTypeI',true);
+
+			//$scope.itemType.video = true;
+			//$scope.itemType.image = true;
+			$scope.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				//iprstatus: null,
+				yearfrom: sc.minProductionYear,
+				yearto: sc.maxProductionYear,
+				terms: []
+			};
+			ivhTreeviewMgr.deselectAll(sc.vocabulary);
+			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+		};
+
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
 
@@ -845,49 +895,7 @@
 
 			}
 			else{
-				$scope.defaultc = '';
-				$scope.inputTerm = '';
-				$scope.defaultipr = null;
-				$scope.codeci=null;
-
-		        $scope.yearfrom = sc.minProductionYear;
-		        $scope.yearto = sc.maxProductionYear;
-
-				$scope.defaultc = null;
-				sc.cities = {
-					options:  [],
-					selected: null
-				};
-				angular.forEach(providers, function(p){
-					sc.cities.options.push(p.city.name);
-				});
-
-				sc.selectedMatchFields = ['title'];
-
-				$scope.terms = [];
-
-				$scope.defaultipr=null;
-				// move codelist provision in a service
-				sc.iprstatuses = {
-					options:  iprstatuses,
-					selected: null
-				};
-
-				//reset local storage
-				localStorage.setItem('iprstatus',null);
-				localStorage.setItem('terms','');//it's a term array
-				localStorage.setItem('inputTerm','');
-				localStorage.setItem('yearfrom',1890);
-				localStorage.setItem('yearto',1999);
-				//localStorage.setItem('itemTypeV',true);
-				//localStorage.setItem('itemTypeI',true);
-
-				sc.itemType.video = true;
-				sc.itemType.image = true;
-
-				ivhTreeviewMgr.deselectAll(sc.vocabulary);
-				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
-
+				sc.resetFiltersToDefault();
 			}
 
 			$scope.filter = {
@@ -903,44 +911,6 @@
 		};
 		sc.resetFilters();
 		sc.search();
-
-		//reset filters to default values
-		sc.resetFiltersToDefault = function() {
-
-			$scope.defaultc = '';
-			$scope.inputTerm = '';
-			$scope.defaultipr = null;
-
-	        $scope.yearfrom = sc.minProductionYear;
-	        $scope.yearto = sc.maxProductionYear;
-
-			sc.selectedMatchFields = ['title'];
-
-			$scope.terms = [];
-
-			//reset local storage
-			localStorage.setItem('iprstatus','');
-			localStorage.setItem('terms','');//it's a term array
-			localStorage.setItem('inputTerm','');
-			localStorage.setItem('yearfrom',1890);
-			localStorage.setItem('yearto',1999);
-			//localStorage.setItem('itemTypeV',true);
-			//localStorage.setItem('itemTypeI',true);
-
-			$scope.itemType.video = true;
-			$scope.itemType.image = true;
-			$scope.filter = {
-				type: 'all',
-				provider: null,
-				country: null,
-				//iprstatus: null,
-				yearfrom: sc.minProductionYear,
-				yearto: sc.maxProductionYear,
-				terms: []
-			};
-			ivhTreeviewMgr.deselectAll(sc.vocabulary);
-			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
-		};
 
 		function loadGeoDistanceAnnotations(distance, center, isLocated) {
 			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
