@@ -1028,6 +1028,11 @@ button.btn:active {
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffaa33', endColorstr='#fffc9200', GradientType=0) !important
 }
 
+.backsearch:last-child>.btn, .backsearch:last-child>.btn-group {
+    z-index: 2;
+    margin-left: 1px;
+}
+
 .btn>.icon-only.imc-icon {
     margin: 0!important;
     text-align: center;
