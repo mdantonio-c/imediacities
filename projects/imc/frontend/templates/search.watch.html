@@ -43,13 +43,13 @@
 						</div>
 						<div class="space-0"></div>
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
-							ng-click="watchCtrl.manualtag('notes');"
+							ng-click="watchCtrl.manualtag('term');"
 							tooltip-placement="right"
-							uib-tooltip="Add a&nbsp;note">
-							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+							uib-tooltip="Tag&nbsp;by term">
+							<i class="imc-icon fa fa-tag fa-lg"></i>
 						</div>
 					</div>
-					<video id="videoarea"
+					<video id="videoarea" style="display:none"
 						data-setup='{ "controlBar": { "muteToggle": false } }'
 						preload="none"
 						ng-src="{{watchCtrl.video.links['content'] | trustUrl }}"
@@ -57,28 +57,106 @@
 						ng-click="watchCtrl.playPause()" controls>
 						Your browser does not support HTML5 video.
 					</video>
+					<!-- TEST DEI TEST -->
+					<div id="videotest">
+						<div class="controls__wrapper">
+
+							<div class="controls__status">
+								<div class="controls__row controls__status__info">
+									<div class="mark">Frame <span id="frame_mark"></span></div>
+									<div class="mark">SMPTE <span id="smpte_mark"></span></div>
+									<div class="mark">Time <span id="time_mark"></span></div>
+									<div class="mark">Float <span id="float_mark"></span></div>
+								</div>
+								<div class="controls__row controls__status__controls">
+									<div class="controls__status__fps">
+										<select name="fps" id="fps">
+											<option value="6">6 fps</option>
+											<option value="12">12 fps</option>
+											<option value="23" selected>24 fps</option>
+											<option value="48">48 fps</option>
+										</select>
+									</div>
+									<div class="controls__status__play" id="play">
+										<span>
+											<i class="fas fa-play"></i>
+										</span>
+										<span class="display-none">
+											<i class="fas fa-pause"></i>
+										</span>
+									</div>
+									<div class="controls__status__bar flex_spacer">
+										<input type="range" id="range" value="0" min="0" max="1">
+									</div>
+									<div class="controls__status__play">
+										<i class="fas fa-fast-backward" id="goto_start"></i>
+									</div>
+									<div class="controls__status__play">
+										<i class="fas fa-fast-forward" id="goto_end"></i>
+									</div>
+								</div>
+							</div>
+
+							<div class="controls__buttons">
+								<div class="controls__row">
+
+									<div class="controls__container mark">
+										<select id="controls_um" title="imposta unità di misura">
+											<option value="seconds">Seconds</option>
+											<option value="frames" selected>Frames</option>
+										</select>
+									</div>
+
+									<div class="mark">
+										<div class="controls__container">
+											<i class="fas fa-step-backward" id="rewind" title="indietro"></i>
+											&nbsp;
+											<input type="text" id="seek_step" value="1">
+											&nbsp;
+											<i class="fas fa-step-forward" id="fastforward" title="avanti"></i>
+										</div>
+
+									</div>
+
+									<div class="mark">
+										<div class="controls__container">
+											<input type="text" id="jump_to_value" value="1">
+											&nbsp;
+											<i class="fas fa-sign-in-alt" id="jump_to" title="salta a"></i>
+										</div>
+									</div>
+
+									<div class="mark">
+
+										<div class="controls__container">
+											&nbsp;
+											<input type="text" id="play_from" value="1" title="da">
+											-
+											<input type="text" id="play_to" value="1" title="a">
+											&nbsp;
+											<label style="font-size:.75em;" for="play_loop" title="in loop">
+												<i class="fas fa-redo"></i>
+											</label>
+											&nbsp;
+											<input type="checkbox" class="inline" id="play_loop" title="in loop">
+											&nbsp;
+											<i class="fas fa-retweet" id="play_int" title="riproduci frammento"></i>
+										</div>
+
+									</div>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<!-- FINE TEST DEI TEST -->
 				</div>
 				<div class="container" 
 					ng-show="watchCtrl.showmeli"
 					ng-style="{'float': 'left', 'width': '100%'}">
 					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
-			
-			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
-			<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
-				<div uib-slide ng-repeat="item in watchCtrl.items | limitTo: watchCtrl.slideSize+1" index="$index" style="float:left; width:100%;  height: 100%; overflow: visible;">
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9][0]}}" duration="{{watchCtrl.items[$index*9][1]}}" nshots="{{watchCtrl.items[$index*9][2]}}" shotd="{{watchCtrl.items[$index*9][3]}}" progr="{{watchCtrl.items[$index*9][4]}}" timestamp="{{watchCtrl.items[$index*9][5]}}" ng-src="{{watchCtrl.items[$index*9][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+1][0]}}" duration="{{watchCtrl.items[$index*9+1][1]}}" nshots="{{watchCtrl.items[$index*9+1][2]}}" shotd="{{watchCtrl.items[$index*9+1][3]}}" progr="{{watchCtrl.items[$index*9+1][4]}}" timestamp="{{watchCtrl.items[$index*9+1][5]}}" ng-src="{{watchCtrl.items[$index*9+1][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+2][0]}}" duration="{{watchCtrl.items[$index*9+2][1]}}" nshots="{{watchCtrl.items[$index*9+2][2]}}" shotd="{{watchCtrl.items[$index*9+2][3]}}" progr="{{watchCtrl.items[$index*9+2][4]}}" timestamp="{{watchCtrl.items[$index*9+2][5]}}" ng-src="{{watchCtrl.items[$index*9+2][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+3][0]}}" duration="{{watchCtrl.items[$index*9+3][1]}}" nshots="{{watchCtrl.items[$index*9+3][2]}}" shotd="{{watchCtrl.items[$index*9+3][3]}}" progr="{{watchCtrl.items[$index*9+3][4]}}" timestamp="{{watchCtrl.items[$index*9+3][5]}}" ng-src="{{watchCtrl.items[$index*9+3][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+4][0]}}" duration="{{watchCtrl.items[$index*9+4][1]}}" nshots="{{watchCtrl.items[$index*9+4][2]}}" shotd="{{watchCtrl.items[$index*9+4][3]}}" progr="{{watchCtrl.items[$index*9+4][4]}}" timestamp="{{watchCtrl.items[$index*9+4][5]}}" ng-src="{{watchCtrl.items[$index*9+4][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+5][0]}}" duration="{{watchCtrl.items[$index*9+5][1]}}" nshots="{{watchCtrl.items[$index*9+5][2]}}" shotd="{{watchCtrl.items[$index*9+5][3]}}" progr="{{watchCtrl.items[$index*9+5][4]}}" timestamp="{{watchCtrl.items[$index*9+5][5]}}" ng-src="{{watchCtrl.items[$index*9+5][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+6][0]}}" duration="{{watchCtrl.items[$index*9+6][1]}}" nshots="{{watchCtrl.items[$index*9+6][2]}}" shotd="{{watchCtrl.items[$index*9+6][3]}}" progr="{{watchCtrl.items[$index*9+6][4]}}" timestamp="{{watchCtrl.items[$index*9+6][5]}}" ng-src="{{watchCtrl.items[$index*9+6][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+7][0]}}" duration="{{watchCtrl.items[$index*9+7][1]}}" nshots="{{watchCtrl.items[$index*9+7][2]}}" shotd="{{watchCtrl.items[$index*9+7][3]}}" progr="{{watchCtrl.items[$index*9+7][4]}}" timestamp="{{watchCtrl.items[$index*9+7][5]}}" ng-src="{{watchCtrl.items[$index*9+7][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+8][0]}}" duration="{{watchCtrl.items[$index*9+8][1]}}" nshots="{{watchCtrl.items[$index*9+8][2]}}" shotd="{{watchCtrl.items[$index*9+8][3]}}" progr="{{watchCtrl.items[$index*9+8][4]}}" timestamp="{{watchCtrl.items[$index*9+8][5]}}" ng-src="{{watchCtrl.items[$index*9+8][6]}}" style="float:left;" scroll-on-click/>
-				</div>
-			</div>
-			</container-fluid>
 			<div id="timeline-graph" ng-show="watchCtrl.annotations.length >= 1" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
 				<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>

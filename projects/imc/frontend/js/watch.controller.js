@@ -326,16 +326,13 @@
 						}, "slow");
 					}
 					// play video from selected shot
-					var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].firstElementChild.attributes.timestamp.value);
 
 					//var times = convertTime(startTime);
 
-					//myVid[0].pause();
 					var seekTime = ((Number(startTime) / 1000) + 0.001);
-					myVid[0].currentTime = seekTime;
-					myVid[0].play();
-
+					$scope.videoplayer.time_goto(seekTime);
+				    $scope.videoplayer.video.play();
 				});
 			}
 		};
@@ -354,11 +351,10 @@
 					var shotSelectedForNotes = parseInt($elm[0].attributes.progr.value) + 1;
 					scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 					// play video from selected shot
-					var myVid = angular.element(window.document.querySelector('#videoarea'));
 					var startTime = convertToMilliseconds($elm[0].attributes.timestamp.value);
 					var seekTime = ((Number(startTime) / 1000) + 0.001);
-					myVid[0].currentTime = seekTime;
-					myVid[0].play();
+					$scope.videoplayer.time_goto(seekTime);
+				    $scope.videoplayer.video.play();
 				});
 			}
 		};
@@ -812,6 +808,15 @@
 
 		var intervalRewind;
 
+/* 		// << NSI >> //
+		setTimeout( function(){
+			var v = new VideoPlayer({
+			selector: '#disagio',
+			sources: ["http://192.168.2.37:8080/api/videos/cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5/content?type=video"],
+			fps: 24,
+		});
+		}, 2000) */
+		
 		$scope.rew = function() {
         // Don't start a new rewind if we are already doing it
         if ( angular.isDefined(intervalRewind) ) return;
@@ -934,35 +939,6 @@
 			myVid[0].pause();
 		};
 
-		// Returns the shot corresponding to the time in input
-		function getShotFromVideoCurrentTime(currtime) {
-			//console.log('getShotFromVideoCurrentTime: currtime=' + currtime);
-			var currentShot = null;
-			var currentTime = Math.floor(currtime * 1000);
-			//console.log('Current time video (ms): ' + currentTime);
-			for (var i = 0; i <= self.shots.length - 1; i++) {
-				var shotNum = self.shots[i].attributes.shot_num;
-				var shotTimestamp = self.shots[i].attributes.timestamp;
-				var shotDuration = self.shots[i].attributes.duration;
-				var shotStartTime = convertToMilliseconds(shotTimestamp);
-				var nextStartTime = null;
-				if (i < self.shots.length - 1) {
-					// get start time from the next shot
-					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
-				} else {
-					// last shot: use the shot duration instead
-					nextStartTime = shotStartTime + (shotDuration * 1000);
-				}
-				if (currentTime >= shotStartTime && currentTime < nextStartTime) {
-					//console.log('found shot number ' + (shotNum+1) + ', from start time ' + shotStartTime + ' (ms)');
-					currentShot = shotNum+1;
-					// exit loop
-					break;
-				}
-			}
-			return currentShot;
-		}
-		//  TODO it could use the function above 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
 
@@ -1120,6 +1096,7 @@
 					self.slideSize = self.shots.length / 9;
 					self.vduration = vduration;
 					console.log('video duration: ' + vduration);
+					//console.log('vid', vid);
 
 					// timeline definition
 					var minutes = 0,
@@ -1198,6 +1175,14 @@
 
 					// build items for the carousel and the storyboard
 					var numberOfShots = self.shots.length;
+					// << NSI >> //
+					//	scenette
+					var scene = [];
+					//	durata e fps
+					var durata = self.video.relationships.item[0].attributes.duration;
+					var fps = self.video.relationships.item[0].attributes.framerate.replace('/1','');
+					var flen = durata/fps
+
 					angular.forEach(self.shots, function(shot, idx) {
 						// for the carousel
 						var frameshot = [];
@@ -1233,6 +1218,19 @@
 						
 						// loop annotations
 						for (var i = 0; i < shot.annotations.length; i++) {
+														
+							// << NSI >> //
+							var scena = {
+								id: shot.attributes.end_frame_idx,
+								title: shot.attributes.start_frame_idx,
+								start: shot.attributes.start_frame_idx/fps,
+								end: shot.attributes.end_frame_idx/fps,
+								thumbnail: shot.links.thumbnail
+							}
+
+							//	creo scene
+							scene.push(scena);
+							
 							var anno = shot.annotations[i];
 							//console.log("anno=" + angular.toJson(anno, true));
 							if (anno.attributes.annotation_type.key === 'VIM') {
@@ -1299,6 +1297,14 @@
 					// noteShots serve per il tab Notes a destra
 					self.notesShots = self.storyshots;
 
+					// << NSI >> //
+					//	e se il video lo caricassi qui??
+					$scope.videoplayer = new VideoPlayer({
+						selector: '#videotest',
+						sources: [self.video.links['content']],
+						fps: self.video.relationships.item[0].attributes.framerate.replace('/1',''),
+						scene: scene
+					});
 				})
 				.catch(function(response) {
 					console.error('Error loading video shots');
@@ -1372,10 +1378,9 @@
 			//console.log('jump to shot: selectedShot: ' + angular.toJson(shotSelectedForNotes, true));
 			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 			// play video from selected shot
-			var myVid = angular.element($document[0].querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
-			myVid[0].currentTime = seekTime;
-			myVid[0].play();
+			$scope.videoplayer.time_goto(seekTime);
+			$scope.videoplayer.video.play();
 		};
 
 		/**
@@ -1391,10 +1396,9 @@
 			$scope.$emit('updateShotSelectedForNotes', shotSelectedForNotes);
 
 			// play video from selected shot
-			var myVid = angular.element(window.document.querySelector('#videoarea'));
 			var seekTime = ((Number(startTime) / 1000) + 0.001);
-			myVid[0].currentTime = seekTime;
-			myVid[0].play();
+			$scope.videoplayer.time_goto(seekTime);
+			$scope.videoplayer.video.play();
 		};
 
 		self.getTagMenu = function(event) {
@@ -1705,9 +1709,8 @@
 
 			self.jumpToShot = function(selectedShot, startT) {
 				// play video from selected shot
-				var myVid = angular.element(window.document.querySelector('#videoarea'));
-				myVid[0].currentTime = startT /1000;
-				myVid[0].play();
+				$scope.videoplayer.time_goto(startT/1000);
+				$scope.videoplayer.video.play();
 			};
 
 		});
