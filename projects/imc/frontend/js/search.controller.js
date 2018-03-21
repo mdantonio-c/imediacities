@@ -799,8 +799,15 @@
 
 			$scope.terms = [];
 
+			$scope.defaultipr=null;
+			// move codelist provision in a service
+			sc.iprstatuses = {
+				options:  iprstatuses,
+				selected: null
+			};
+
 			//reset local storage
-			localStorage.setItem('iprstatus','');
+			localStorage.setItem('iprstatus',null);
 			localStorage.setItem('terms','');//it's a term array
 			localStorage.setItem('inputTerm','');
 			localStorage.setItem('yearfrom',1890);
