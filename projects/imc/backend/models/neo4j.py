@@ -14,7 +14,7 @@ import pytz
 
 from restapi.services.neo4j.models import (
     StringProperty, ArrayProperty, IntegerProperty, BooleanProperty,
-    FloatProperty, DateTimeProperty, DateProperty,
+    FloatProperty, DateTimeProperty, DateProperty, JSONProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
 )
@@ -69,7 +69,7 @@ class HeritableStructuredNode(StructuredNode):
                     zip(
                         map(lambda cls: len(cls.mro()), class_objs),
                         class_objs),
-                    key=lambda size, cls: size)[-1]
+                    key=lambda size_cls: size_cls[0])[-1]
         else:    # Caller has specified a target class.
             if not isinstance(target_class, str):
                 # In the spirit of neomodel, we might as well support both
@@ -632,6 +632,8 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True)
     targets = RelationshipTo(
         'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
+    refined_selection = RelationshipTo(
+        'FragmentSelector', 'REFINED_SELECTION', cardinality=ZeroOrOne)
 
 
 class AnnotationBody(HeritableStructuredNode):
@@ -647,6 +649,14 @@ class ResourceBody(AnnotationBody):
     iri = StringProperty(required=True, index=True, show=True)
     name = StringProperty(index=True, show=True)
     spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
+    detected_objects = RelationshipFrom('ODBody', 'CONCEPT', cardinality=ZeroOrMore)
+
+
+class ODBody(AnnotationBody):
+    """Detected Object"""
+    object_id = StringProperty(required=True, show=True)
+    confidence = FloatProperty(required=True, show=True)
+    object_type = RelationshipTo('ResourceBody', 'CONCEPT', cardinality=One)
 
 
 class ImageBody(AnnotationBody):
@@ -702,6 +712,7 @@ class VideoSegment(IdentifiedNode, AnnotationTarget):
     """Video Segment"""
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(required=True, show=True)
+    within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
 class Shot(VideoSegment):
@@ -714,13 +725,20 @@ class Shot(VideoSegment):
     annotation_body = RelationshipFrom(
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
+    embedded_segments = RelationshipFrom(
+        'Shot', 'WITHIN_SHOT', cardinality=ZeroOrMore)
 
 
-class ODBody(StructuredNode):
-    """Object Detection"""
-    # OBJECT_TYPES = ('FACE', 'LEFT_EYE', 'RIGHT_EYE')
-    object_id = StringProperty(required=True)
-    object_type = StringProperty(required=True)
-    # FIXME add object attribute relationship
-    # object_attributes = RelationshipTo(
-    #              'ObjectAttribute', 'HAS_ATTRIBUTE', cardinality=ZeroOrMore)
+class FragmentSelector(HeritableStructuredNode):
+    annotation = RelationshipFrom(
+        'Annotation', 'REFINED_SELECTION', cardinality=One)
+
+
+class AreaSequenceSelector(FragmentSelector):
+    """
+    A sequence of regions for detected objects in a video segment frame by frame.
+
+    e.g.
+    [[x1,y1,w1,z1], [x2,y2,w2,z2], ...]
+    """
+    sequence = JSONProperty(required=True, show=True)

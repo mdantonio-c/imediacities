@@ -4,12 +4,13 @@ import os
 import json
 import random
 import re
-
+# import time
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
+from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.models.neo4j import Shot
 from imc.models import codelists
 
@@ -116,8 +117,10 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
                 try:
                     # This is a task restart? What to do in this case?
-                    content_node = self.graph.ContentStage.nodes.get(**properties)
-                    log.debug("Content resource already exist for %s" % content_path)
+                    content_node = self.graph.ContentStage.nodes.get(
+                        **properties)
+                    log.debug("Content resource already exist for %s" %
+                              content_path)
                 except self.graph.ContentStage.DoesNotExist:
                     content_node = self.graph.ContentStage(**properties).save()
                     content_node.ownership.connect(group)
@@ -527,7 +530,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
     if not os.path.exists(orf_results_path):
         raise IOError(
             "Analyze results does not exist in the path %s", orf_results_path)
-    log.debug('get automatic object detection from file [%s]' % orf_results_path)
+    log.info(
+        'get automatic object detection from file [%s]' % orf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(orf_results_path)
 
@@ -550,34 +554,111 @@ def extract_od_annotations(self, item, analyze_dir_path):
         for detected_object in od_list:
             concepts.add(detected_object[1])
             if detected_object[0] not in object_ids:
-                report[detected_object[1]] = report.get(detected_object[1], 0) + 1
+                report[detected_object[1]] = report.get(
+                    detected_object[1], 0) + 1
             object_ids.add(detected_object[0])
-            shot_num = shot_lookup(self, shots, timestamp)
+            shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
             if shot_num is not None:
                 shot_list[shot_num].add(detected_object[1])
-            # collect timestamp for keys (obj,cat) --> [t1, t2, ...]
-            tmp = obj_cat_report.get((detected_object[0], detected_object[1]), [])
-            tmp.append(timestamp)
+            # collect timestamp for keys:
+            # (obj,cat) --> [(t1, confidence1, region1), (t2, confidence2, region2), ...]
+            tmp = obj_cat_report.get(
+                (detected_object[0], detected_object[1]), [])
+            tmp.append((timestamp, detected_object[2], detected_object[3]))
             obj_cat_report[(detected_object[0], detected_object[1])] = tmp
 
-    log.debug('Number of distinct detected objects: {0}'
-              .format(len(object_ids)))
-    log.debug('Number of distinct concepts: {0}'
-              .format(len(concepts)))
-    log.debug('Report of detected concepts: {0}'
-              .format(report))
-    log.debug('Report of detected concepts by shot: {0}'
-              .format(shot_list))
-    report_path = os.path.join(
-        os.path.dirname(analyze_dir_path), "obj_cat_report.txt")
-    report_file = open(report_path, 'w')
-    for (key, values) in obj_cat_report.items():
-        # log.debug("{0}/{1}: {2}".format(key[0], key[1], values))
-        report_file.write("{0}/{1}: {2}\n".format(key[0], key[1], values))
-    report_file.close()
+    log.info('-----------------------------------------------------')
+    # report_filename = 'orf_import_report_{}.txt'.format(int(1000 * time.time()))
+    # f = open(report_filename, 'w')
+    # f.write('Number of distinct detected objects: {}'.format(len(object_ids)))
+    # f.write('Number of distinct concepts: {}'.format(len(concepts)))
+    # f.write('Report of detected concepts: {}'.format(report))
+    # f.write('Report of detected concepts by shot: {}'.format(shot_list))
+    # f.close()
+    log.info('Number of distinct detected objects: {}'.format(len(object_ids)))
+    log.info('Number of distinct concepts: {}'.format(len(concepts)))
+    log.info('Report of detected concepts per shot: {}'.format(shot_list))
+
+    repo = AnnotationRepository(self.graph)
+    counter = 0  # keep count of saved annotation
+    for (key, timestamps) in obj_cat_report.items():
+        if len(timestamps) < 5:
+            # discard detections for short times
+            continue
+        # detect the concept
+        concept_name = key[1]
+        concept_iri = concept_mapping.get(concept_name)
+        if concept_iri is None:
+            log.warn('Cannot find concept <{0}> in the mapping'
+                     .format(concept_name))
+            # DO NOT create this annotation
+            continue
+        concept = {
+            'iri': concept_iri,
+            'name': concept_name
+        }
+
+        # detect the segment
+        start_frame = timestamps[0][0]
+        end_frame = timestamps[-1][0]
+        selector = {
+            'type': 'FragmentSelector',
+            'value': 't=' + str(start_frame) + ',' + str(end_frame)
+        }
+
+        # detect detection confidence
+        confidence = []
+        region_sequence = []
+        for frame in list(range(start_frame, end_frame + 1)):
+            found = False
+            for value in timestamps:
+                # value is a tuple like (timestamp<int>, confidence<float>, region<list>)
+                if value[0] == frame:
+                    confidence.append(value[1])
+                    region_sequence.append(value[2])
+                    found = True
+                    break
+            if not found:
+                confidence.append(None)
+                region_sequence.append(None)
+
+        od_confidences = [e for e in confidence if e is not None]
+        avg_confidence = sum(od_confidences) / float(len(od_confidences))
+        if avg_confidence < 0.5:
+            # discard detections with low confidence
+            continue
+
+        # save annotation
+        bodies = []
+        od_body = {
+            'type': 'ODBody',
+            'object_id': key[0],
+            'confidence': avg_confidence,
+            'region_sequence': region_sequence
+        }
+        od_body['concept'] = {'type': 'ResourceBody', 'source': concept}
+        bodies.append(od_body)
+        try:
+            from neomodel import db as transaction
+            transaction.begin()
+            repo.create_tag_annotation(
+                None, bodies, item, selector, False, None, True)
+            transaction.commit()
+        except Exception as e:
+            log.verbose("Neomodel transaction ROLLBACK")
+            try:
+                transaction.rollback()
+            except Exception as rollback_exp:
+                log.warning(
+                    "Exception raised during rollback: %s" % rollback_exp)
+            raise e
+        counter += 1
+    log.info('Number of saved automatic annotations: {counter}'
+             .format(counter=counter))
+    log.info('-----------------------------------------------------')
 
 
 def shot_lookup(self, shots, timestamp):
     for s in shots:
         if timestamp >= s.start_frame_idx and timestamp <= s.end_frame_idx:
-            return s.shot_num
+            return s.uuid, s.shot_num
