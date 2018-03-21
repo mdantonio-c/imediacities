@@ -515,28 +515,267 @@
 		};
 		$scope.$watch('sc.itemType', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) sc.filter.type='all';
-				else if (newValue.video) sc.filter.type='video';
-				else if (newValue.image) sc.filter.type='image';
-				else if (newValue.text) sc.filter.type='text';
+				if (newValue.video && newValue.image) $scope.filter.type='all';
+				else if (newValue.video) $scope.filter.type='video';
+				else if (newValue.image) $scope.filter.type='image';
+				else if (newValue.text) $scope.filter.type='text';
 			}
 		}, true);
 
+
+		$scope.$watch('defaultc', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				var res = null;
+				// "Athens", "Bologna", "Brussels", "Copenhagen", "Frankfurt am Main", "Barcelona", "Turin", "Vienna", "Stockholm"
+				if (newValue === 'Athens') { res = 'TTE'; }
+				else if(newValue === 'Bologna') { res = 'CCB'; }
+				else if(newValue === 'Brussels') { res = 'CRB'; }
+				else if(newValue === 'Copenhagen') { res = 'DFI'; }
+				else if(newValue === 'Frankfurt am Main') { res = 'DIF'; }
+				else if(newValue === 'Barcelona') { res = 'FDC'; }
+				else if(newValue === 'Turin') { res = 'MNC'; }
+				else if(newValue === 'Vienna') { res = 'OFM'; }
+				else if(newValue === 'Stockholm') { res = 'SFI'; }
+				$scope.filter.provider = res;
+				// console.log('filter by city for archive: ' + $scope.filter.provider);
+				/*save input status for cities selected*/
+				localStorage.setItem('scity', newValue);
+			}
+		});
+		$scope.$watch('itemType', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				if (newValue.video && newValue.image) {
+					$scope.filter.type='all';
+					/*localStorage.setItem('itemTypeV',true);
+					localStorage.setItem('itemTypeI',true);*/
+				}
+				else if (newValue.video) {
+					$scope.filter.type='video';
+					/*var typeV = localStorage.getItem('itemTypeV');
+					var bool = typeV ? false : true;
+					localStorage.setItem('itemTypeV',bool);//it's a video*/
+				}
+				else if (newValue.image) {
+					$scope.filter.type='image';
+					/*var typeI = localStorage.getItem('itemTypeI');
+					var bool = typeI ? false : true;
+					localStorage.setItem('itemTypeI',bool);//it's an image*/
+				}
+				else if (newValue.text) $scope.filter.type='text';
+			}
+		}, true);
+		$scope.$watch('inputTerm', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				/*save input status for input term selected*/
+				$scope.filter.inputTerm = newValue;
+				localStorage.setItem('inputTerm', newValue);
+			}
+		});
+		$scope.$watch('defaultipr', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.iprstatus = newValue;
+				/*save input status for ipr status selected*/
+				localStorage.setItem('iprstatus', newValue);
+			}
+		});
+		$scope.$watch('yearfrom', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.yearfrom = newValue;
+				/*save input status for year from selected*/
+				localStorage.setItem('yearfrom', newValue);
+			}
+		});
+		$scope.$watch('yearto', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.yearto = newValue;
+				/*save input status for year to selected*/
+				localStorage.setItem('yearto', newValue);
+			}
+		});
+
+		// pagination
+		sc.pager = {
+			options: [12, 24, 36, 48],
+			maxSize: 5
+		};
+		sc.resetPager = function() {
+			sc.pager.currentPage = 1;
+			sc.pager.itemsPerPage = sc.pager.options[0];
+		};
+		sc.resetPager();
+
+		var europeCenter = [45, 14];
+		sc.googleMapsUrl = GOOGLE_API_KEY;
+		sc.mapLoaded = false;
+		sc.mapZoom = 4;
+		// initial radius in meters
+		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
+		sc.radius = 1600 * 1000;	// for zoom level 4
+		sc.mapCenter = europeCenter;
+		sc.dynMarkers = [];
+		sc.mapTags = [];
+		sc.showMapBoundary = false;
+
+		sc.centerEurope = function() {
+			sc.mapCenter = europeCenter;
+			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
+			sc.map.setCenter(pt);
+			sc.map.setZoom(4);
+		};
+
+		sc.toggleBoundary = function() {
+			sc.showMapBoundary = !sc.showMapBoundary;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(sc.showMapBoundary);
+		};
+
+		sc.setBoundaryVisible = function(val) {
+			sc.showMapBoundary = val;
+			var circle = sc.map.shapes[0];
+			if (circle === undefined) { return; }
+			circle.setVisible(val);
+		};
+
+		sc.centerChanged = function(event) {
+			if (!angular.isDefined(sc.map)) { return; }
+			sc.inputPlaceName = '';
+			$timeout(function() {
+				//sc.map.panTo(sc.map.getCenter());
+				var latLng = sc.map.getCenter();
+				var newCenter = [latLng.lat(), latLng.lng()];
+				if (!_.isEqual(sc.mapCenter, newCenter)) {
+					sc.mapCenter = newCenter;
+					// console.log('center changed to: ' + sc.mapCenter);
+					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+					}
+				}
+			}, 1000);
+		};
+
+		sc.zoomChanged = function() {
+			if (!angular.isDefined(sc.map)) { return; }
+			var oldZoom = sc.mapZoom;
+			var newZoom = sc.map.getZoom();
+			if (newZoom !== oldZoom) {
+				// zoom changed
+				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+				// fit the circle radius properly
+				var r = sc.radius;
+				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
+				// console.log('new radius: ' + sc.radius + ' meters');
+				sc.mapZoom = newZoom;
+				if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+				}
+			}
+		};
+
+		function centerMap(place) {
+			if (place === undefined) { return; }
+			// console.log(place);
+			var lat = place.lat,
+				lng = place.lng;
+			if (lat === undefined || lng === undefined) { return; }
+			var pt = new google.maps.LatLng(lat, lng);
+			sc.map.setCenter(pt);
+			sc.mapCenter = [lat, lng];
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < place.viewport.length; i++) {
+				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
+				bounds.extend(latlng);
+			}
+			sc.map.fitBounds(bounds);
+		}
+
+		$scope.$watch('sc.inputPlaceDetails', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				centerMap(sc.inputPlaceDetails);
+			}
+		}, true);
+
+		sc.search = function() {
+			sc.loading = true;
+			// at the moment search term ONLY in the title
+			var request_data = {
+				"match": {
+					term: "*",
+					fields: sc.selectedMatchFields
+				}
+			};
+			// Add filters
+			request_data.filter = $scope.filter;
+			if ($scope.inputTerm !== '') {
+				request_data.match.term = $scope.inputTerm;
+			}
+			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
+				function(out_data){
+					var meta = out_data.data.Meta;
+					sc.totalItems = meta.totalItems;
+					sc.countByYears = meta.countByYears;
+					sc.creations = out_data.data.Response.data;
+					NgMap.getMap().then(function(map) {
+						sc.map = map;
+						sc.setBoundaryVisible(sc.showMapBoundary);
+						sc.initialMapLoad = true;
+						if ($scope.filter.provider !== null) {
+							map.setZoom(14);
+							sc.mapCenter = getPosition($scope.filter.provider);
+							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
+							sc.initialMapLoad = false;
+						} else {
+							// content from all cities represented on a map of Europe
+							map.setZoom(4);
+							sc.mapCenter = europeCenter;
+
+							// clean up current marker list
+							if (sc.markerClusterer !== undefined) {
+								sc.markerClusterer.clearMarkers();
+							}
+							sc.dynMarkers = [];
+							// expected content count by providers (i.e. cities)
+							if (meta.countByProviders !== undefined) {
+								Object.keys(meta.countByProviders).forEach(function(key,index) {
+								    // key: the name of the object keyvar position = getPosition(provider);
+									var position = getPosition(key);
+									if (position === undefined) {
+										console.warn("Cannot get position by given key: '" + key + "'");
+									} else {
+										var latLng = new google.maps.LatLng(position[0], position[1]);
+										var count = meta.countByProviders[key];
+										for (var i = 0; i < count; i++) {
+											sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
+										}
+									}
+								});
+							} else {
+								console.warn('expected content count by provider');
+							}
+							// clean up relevant creations under the map
+							sc.mapResults = [];
+							updateMarkers(map);
+						}
+						
+					});
+				},
+				function(out_data) {
+					var errors = out_data.data.Response.errors;
+					angular.forEach(errors, function(error) {
+						sc.alerts.push({
+							msg: error
+						});
+					});
+					noty.extractErrors(out_data, noty.ERROR);
+				}).finally(function() {
+					sc.loading = false;
+				});
+		};
 
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
-
-			sc.filter = {
-				type: 'all',
-				provider: null,
-				country: null,
-				iprstatus: null,
-				yearfrom: sc.minProductionYear,
-				yearto: sc.maxProductionYear,
-				terms: $scope.terms
-			};
 
 			if ($stateParams.type == 'old')//back to old saved search
 			{
@@ -624,6 +863,7 @@
 
 				$scope.terms = [];
 
+				$scope.defaultipr=null;
 				// move codelist provision in a service
 				sc.iprstatuses = {
 					options:  iprstatuses,
@@ -647,8 +887,21 @@
 
 			}
 
+			$scope.filter = {
+				type: 'all',
+				provider: null,
+				country: null,
+				iprstatus: $scope.defaultipr,
+				yearfrom: $scope.yearfrom,
+				yearto: $scope.yearto,
+				terms: $scope.terms
+			};
+
 		};
 		sc.resetFilters();
+
+		/*finally call the search and update results on the search page*/
+		sc.search();
 
 		//reset filters to default values
 		sc.resetFiltersToDefault = function() {
@@ -673,9 +926,9 @@
 			//localStorage.setItem('itemTypeV',true);
 			//localStorage.setItem('itemTypeI',true);
 
-			sc.itemType.video = true;
-			sc.itemType.image = true;
-			sc.filter = {
+			$scope.itemType.video = true;
+			$scope.itemType.image = true;
+			$scope.filter = {
 				type: 'all',
 				provider: null,
 				country: null,
@@ -687,257 +940,6 @@
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
-
-
-		$scope.$watch('defaultc', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				var res = null;
-				// "Athens", "Bologna", "Brussels", "Copenhagen", "Frankfurt am Main", "Barcelona", "Turin", "Vienna", "Stockholm"
-				if (newValue === 'Athens') { res = 'TTE'; }
-				else if(newValue === 'Bologna') { res = 'CCB'; }
-				else if(newValue === 'Brussels') { res = 'CRB'; }
-				else if(newValue === 'Copenhagen') { res = 'DFI'; }
-				else if(newValue === 'Frankfurt am Main') { res = 'DIF'; }
-				else if(newValue === 'Barcelona') { res = 'FDC'; }
-				else if(newValue === 'Turin') { res = 'MNC'; }
-				else if(newValue === 'Vienna') { res = 'OFM'; }
-				else if(newValue === 'Stockholm') { res = 'SFI'; }
-				sc.filter.provider = res;
-				// console.log('filter by city for archive: ' + sc.filter.provider);
-				/*save input status for cities selected*/
-				localStorage.setItem('scity', newValue);
-			}
-		});
-		$scope.$watch('itemType', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) {
-					sc.filter.type='all';
-					/*localStorage.setItem('itemTypeV',true);
-					localStorage.setItem('itemTypeI',true);*/
-				}
-				else if (newValue.video) {
-					sc.filter.type='video';
-					/*var typeV = localStorage.getItem('itemTypeV');
-					var bool = typeV ? false : true;
-					localStorage.setItem('itemTypeV',bool);//it's a video*/
-				}
-				else if (newValue.image) {
-					sc.filter.type='image';
-					/*var typeI = localStorage.getItem('itemTypeI');
-					var bool = typeI ? false : true;
-					localStorage.setItem('itemTypeI',bool);//it's an image*/
-				}
-				else if (newValue.text) sc.filter.type='text';
-			}
-		}, true);
-		$scope.$watch('inputTerm', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				/*save input status for input term selected*/
-				sc.filter.inputTerm = newValue;
-				localStorage.setItem('inputTerm', newValue);
-			}
-		});
-		$scope.$watch('defaultipr', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				sc.filter.iprstatus = newValue;
-				/*save input status for ipr status selected*/
-				localStorage.setItem('iprstatus', newValue);
-			}
-		});
-		$scope.$watch('yearfrom', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				sc.filter.yearfrom = newValue;
-				/*save input status for year from selected*/
-				localStorage.setItem('yearfrom', newValue);
-			}
-		});
-		$scope.$watch('yearto', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				sc.filter.yearto = newValue;
-				/*save input status for year to selected*/
-				localStorage.setItem('yearto', newValue);
-			}
-		});
-
-		// pagination
-		sc.pager = {
-			options: [12, 24, 36, 48],
-			maxSize: 5
-		};
-		sc.resetPager = function() {
-			sc.pager.currentPage = 1;
-			sc.pager.itemsPerPage = sc.pager.options[0];
-		};
-		sc.resetPager();
-
-		var europeCenter = [45, 14];
-		sc.googleMapsUrl = GOOGLE_API_KEY;
-		sc.mapLoaded = false;
-		sc.mapZoom = 4;
-		// initial radius in meters
-		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
-		sc.radius = 1600 * 1000;	// for zoom level 4
-		sc.mapCenter = europeCenter;
-		sc.dynMarkers = [];
-		sc.mapTags = [];
-		sc.showMapBoundary = false;
-
-		sc.centerEurope = function() {
-			sc.mapCenter = europeCenter;
-			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
-			sc.map.setCenter(pt);
-			sc.map.setZoom(4);
-		};
-
-		sc.toggleBoundary = function() {
-			sc.showMapBoundary = !sc.showMapBoundary;
-			var circle = sc.map.shapes[0];
-			if (circle === undefined) { return; }
-			circle.setVisible(sc.showMapBoundary);
-		};
-
-		sc.setBoundaryVisible = function(val) {
-			sc.showMapBoundary = val;
-			var circle = sc.map.shapes[0];
-			if (circle === undefined) { return; }
-			circle.setVisible(val);
-		};
-
-		sc.centerChanged = function(event) {
-			if (!angular.isDefined(sc.map)) { return; }
-			sc.inputPlaceName = '';
-			$timeout(function() {
-				//sc.map.panTo(sc.map.getCenter());
-				var latLng = sc.map.getCenter();
-				var newCenter = [latLng.lat(), latLng.lng()];
-				if (!_.isEqual(sc.mapCenter, newCenter)) {
-					sc.mapCenter = newCenter;
-					// console.log('center changed to: ' + sc.mapCenter);
-					if (sc.filter.provider !== null && !sc.initialMapLoad) {
-						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
-					}
-				}
-			}, 1000);
-		};
-
-		sc.zoomChanged = function() {
-			if (!angular.isDefined(sc.map)) { return; }
-			var oldZoom = sc.mapZoom;
-			var newZoom = sc.map.getZoom();
-			if (newZoom !== oldZoom) {
-				// zoom changed
-				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
-				// fit the circle radius properly
-				var r = sc.radius;
-				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
-				// console.log('new radius: ' + sc.radius + ' meters');
-				sc.mapZoom = newZoom;
-				if (sc.filter.provider !== null && !sc.initialMapLoad) {
-					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
-				}
-			}
-		};
-
-		function centerMap(place) {
-			if (place === undefined) { return; }
-			// console.log(place);
-			var lat = place.lat,
-				lng = place.lng;
-			if (lat === undefined || lng === undefined) { return; }
-			var pt = new google.maps.LatLng(lat, lng);
-			sc.map.setCenter(pt);
-			sc.mapCenter = [lat, lng];
-			var bounds = new google.maps.LatLngBounds();
-			for (var i = 0; i < place.viewport.length; i++) {
-				var latlng = new google.maps.LatLng(place.viewport[i].lat(), place.viewport[i].lng());
-				bounds.extend(latlng);
-			}
-			sc.map.fitBounds(bounds);
-		}
-
-		$scope.$watch('sc.inputPlaceDetails', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				centerMap(sc.inputPlaceDetails);
-			}
-		}, true);
-
-		sc.search = function() {
-			sc.loading = true;
-			// at the moment search term ONLY in the title
-			var request_data = {
-				"match": {
-					term: "*",
-					fields: sc.selectedMatchFields
-				}
-			};
-			// Add filters
-			request_data.filter = sc.filter;
-			if ($scope.inputTerm !== '') {
-				request_data.match.term = $scope.inputTerm;
-			}
-			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
-				function(out_data){
-					var meta = out_data.data.Meta;
-					sc.totalItems = meta.totalItems;
-					sc.countByYears = meta.countByYears;
-					sc.creations = out_data.data.Response.data;
-					NgMap.getMap().then(function(map) {
-						sc.map = map;
-						sc.setBoundaryVisible(sc.showMapBoundary);
-						sc.initialMapLoad = true;
-						if (sc.filter.provider !== null) {
-							map.setZoom(14);
-							sc.mapCenter = getPosition(sc.filter.provider);
-							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
-							sc.initialMapLoad = false;
-						} else {
-							// content from all cities represented on a map of Europe
-							map.setZoom(4);
-							sc.mapCenter = europeCenter;
-
-							// clean up current marker list
-							if (sc.markerClusterer !== undefined) {
-								sc.markerClusterer.clearMarkers();
-							}
-							sc.dynMarkers = [];
-							// expected content count by providers (i.e. cities)
-							if (meta.countByProviders !== undefined) {
-								Object.keys(meta.countByProviders).forEach(function(key,index) {
-								    // key: the name of the object keyvar position = getPosition(provider);
-									var position = getPosition(key);
-									if (position === undefined) {
-										console.warn("Cannot get position by given key: '" + key + "'");
-									} else {
-										var latLng = new google.maps.LatLng(position[0], position[1]);
-										var count = meta.countByProviders[key];
-										for (var i = 0; i < count; i++) {
-											sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
-										}
-									}
-								});
-							} else {
-								console.warn('expected content count by provider');
-							}
-							// clean up relevant creations under the map
-							sc.mapResults = [];
-							updateMarkers(map);
-						}
-						
-					});
-				},
-				function(out_data) {
-					var errors = out_data.data.Response.errors;
-					angular.forEach(errors, function(error) {
-						sc.alerts.push({
-							msg: error
-						});
-					});
-					noty.extractErrors(out_data, noty.ERROR);
-				}).finally(function() {
-					sc.loading = false;
-				});
-		};
-		sc.search();
 
 		function loadGeoDistanceAnnotations(distance, center, isLocated) {
 			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
@@ -952,7 +954,7 @@
 
 			// load annotations
 			var cFilter = {
-				filter: sc.filter
+				filter: $scope.filter
 			};
 			if ($scope.inputTerm !== '') {
 				cFilter.match = {
@@ -1056,8 +1058,8 @@
 		sc.timeline = {};
 		sc.timeline.range = [1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990];
 		sc.updateFilterByDecade = function(decade) {
-			sc.filter.yearfrom = decade;
-			sc.filter.yearto = decade + 9;
+			$scope.filter.yearfrom = decade;
+			$scope.filter.yearto = decade + 9;
 		};
 	}
 
