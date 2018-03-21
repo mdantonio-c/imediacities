@@ -891,7 +891,7 @@
 				type: 'all',
 				provider: null,
 				country: null,
-				iprstatus: $scope.defaultipr,
+				//iprstatus: $scope.defaultipr,
 				yearfrom: $scope.yearfrom,
 				yearto: $scope.yearto,
 				terms: $scope.terms
@@ -899,8 +899,6 @@
 
 		};
 		sc.resetFilters();
-
-		/*finally call the search and update results on the search page*/
 		sc.search();
 
 		//reset filters to default values
@@ -932,7 +930,7 @@
 				type: 'all',
 				provider: null,
 				country: null,
-				iprstatus: null,
+				//iprstatus: null,
 				yearfrom: sc.minProductionYear,
 				yearto: sc.maxProductionYear,
 				terms: []
