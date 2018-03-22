@@ -484,12 +484,10 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				var convertstring = JSON.stringify($scope.terms);
-				localStorage.setItem('terms',convertstring);//it's a term array
+				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			} else {
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
-				var convertstring = JSON.stringify($scope.terms);
-				localStorage.setItem('terms',convertstring);//it's a term array
+				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			}
 		};
 
@@ -500,7 +498,7 @@
 			}
 		};
 
-		self.deselectTreeviewNode = function(tag) {
+		sc.deselectTreeviewNode = function(tag) {
 			if (tag.iri !== undefined) {
 				// console.log('deselect treeview by node id: ' + tag.iri);
 				ivhTreeviewMgr.deselect(sc.vocabulary, tag.iri);
