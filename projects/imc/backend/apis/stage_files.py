@@ -208,15 +208,16 @@ class Stage(GraphBaseOperations):
                     content_stage = item.content_source.single()
                     if content_stage is not None and content_stage.status == 'COMPLETED':
                         log.debug("Content resource already exists with status: " + content_stage.status + ", then mode=skip")
-                        mode='skip'
+                        mode = 'skip'
 
         except self.graph.MetaStage.DoesNotExist:
             resource = self.graph.MetaStage(**properties).save()
             resource.ownership.connect(group)
             log.debug("Metadata Resource created for %s" % path)
 
+        metadata_update = input_parameters.get('update', True)
         task = CeleryExt.import_file.apply_async(
-            args=[path, resource.uuid, mode],
+            args=[path, resource.uuid, mode, metadata_update],
             countdown=10
         )
 

@@ -37,7 +37,7 @@ class Annotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, anno_id=None):
-        """Get an annotation if its id is passed as an argument."""
+        """ Get an annotation if its id is passed as an argument. """
         self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
@@ -65,7 +65,7 @@ class Annotations(GraphBaseOperations):
 
         data = []
         for a in annotations:
-            anno = self.getJsonResponse(a)
+            anno = self.get_annotation_response(a)
             data.append(anno)
 
         return self.force_response(data)
@@ -74,7 +74,7 @@ class Annotations(GraphBaseOperations):
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
-        """Create a new annotation."""
+        """ Create a new annotation. """
         data = self.get_input()
         # logger.debug(data)
         if len(data) == 0:
@@ -211,12 +211,12 @@ class Annotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_CONFLICT)
 
         return self.force_response(
-            self.getJsonResponse(created_anno), code=hcodes.HTTP_OK_CREATED)
+            self.get_annotation_response(created_anno), code=hcodes.HTTP_OK_CREATED)
 
     @decorate.catch_error()
     @catch_graph_exceptions
     def delete(self, anno_id):
-        """ Deletes an annotaion."""
+        """ Deletes an annotation. """
         if anno_id is None:
             raise RestApiException(
                 "Please specify an annotation id",
@@ -239,11 +239,16 @@ class Annotations(GraphBaseOperations):
         logger.debug('current user is admin? {0}'.format(iamadmin))
 
         creator = anno.creator.single()
-        if creator is None:
+        is_manual = True if creator is not None else False
+        if anno.generator is None and creator is None:
+            # manual annotation without creator!
+            logger.warn('Invalid state: manual annotation [{id}] '
+                        'MUST have a creator'
+                        .format(id=anno.uuid))
             raise RestApiException(
                 'Annotation with no creator',
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
-        if user.uuid != creator.uuid and not iamadmin:
+        if is_manual and user.uuid != creator.uuid and not iamadmin:
             raise RestApiException(
                 'You cannot delete an annotation that does not belong to you',
                 status_code=hcodes.HTTP_BAD_FORBIDDEN)
@@ -252,7 +257,7 @@ class Annotations(GraphBaseOperations):
         bid = None
         # body_ref = self.get_input(single_parameter='body_ref')
         body_ref = request.args.get('body_ref')
-        logger.debug(body_ref)
+        # logger.debug(body_ref)
         if body_ref is not None:
             if not BODY_PATTERN.match(body_ref):
                 raise RestApiException(
@@ -264,7 +269,12 @@ class Annotations(GraphBaseOperations):
 
         repo = AnnotationRepository(self.graph)
         try:
-            repo.delete_manual_annotation(anno, body_type, bid)
+            if is_manual:
+                repo.delete_manual_annotation(anno, body_type, bid)
+            elif anno.annotation_type == 'TAG':
+                repo.delete_auto_annotation(anno)
+            else:
+                raise ValueError('Cannot delete anno {id}'.format(id=anno.uuid))
         except ReferenceError as error:
             raise RestApiException(
                 error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
@@ -278,8 +288,8 @@ class Annotations(GraphBaseOperations):
         """
         Update an annotation.
 
-        Updates are allowed only for particular use cases. For example
-        at the moment, only annotation for notes can be updated.
+        Updates are allowed only for particular use cases. For example,
+        at the moment, only annotations for notes can be updated.
         """
         if anno_id is None:
             raise RestApiException(
@@ -364,16 +374,35 @@ class Annotations(GraphBaseOperations):
                 'Not yet implemented',
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
-        updated_anno = self.getJsonResponse(anno, max_relationship_depth=0)
+        updated_anno = self.get_annotation_response(anno)
         del(updated_anno['links'])
-        if anno.creator is not None:
-            updated_anno['creator'] = self.getJsonResponse(anno.creator.single(), max_relationship_depth=0)
 
-        updated_anno['bodies'] = []
+        return self.force_response(updated_anno)
+
+    def get_annotation_response(self, anno):
+        """
+        Utility method to build DTO for annotation model.
+        """
+        res = self.getJsonResponse(anno, max_relationship_depth=0)
+        if anno.creator is not None:
+            creator = self.getJsonResponse(anno.creator.single(), max_relationship_depth=0)
+            if 'links' in creator:
+                del(creator['links'])
+            res['creator'] = creator
+        res['bodies'] = []
         for b in anno.bodies.all():
             body = self.getJsonResponse(b.downcast(), max_relationship_depth=0)
             if 'links' in body:
                 del(body['links'])
-            updated_anno['bodies'].append(body)
-
-        return self.force_response(updated_anno)
+            res['bodies'].append(body)
+        res['targets'] = []
+        for t in anno.targets.all():
+            target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
+            if 'links' in target:
+                del(target['links'])
+            res['targets'].append(target)
+        source = self.getJsonResponse(anno.source_item.single(), max_relationship_depth=0)
+        if 'links' in source:
+            del(source['links'])
+        res['source'] = source
+        return res
