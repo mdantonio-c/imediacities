@@ -24,6 +24,21 @@
 </div>
 <div ng-controller='WatchController as watchCtrl' id="video-wrapper">
 	<div class="row">
+		<div class="col-xs-12">
+			<div style="padding-left: 10px; margin-bottom: 10px;">
+			<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;">{{watchCtrl.video.attributes.identifying_title}}
+			</h2>
+			<div>
+				<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
+				<span>{{watchCtrl.video.attributes.production_years[0]}}</span>
+				<span class="label label-default label-city">{{(watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}
+					<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
+				</span>
+			</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-xs-12 col-md-6">
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="video-container">
