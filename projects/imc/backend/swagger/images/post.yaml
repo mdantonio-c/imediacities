@@ -1,0 +1,11 @@
+images:
+  summary: Create a new image description
+  description: Simple method to attach descriptive metadata to a previously uploaded image (item).
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Image description successfully created 
+    '401':
+      description: This endpoint requires a valid authorization token 

@@ -39,7 +39,7 @@ angular.module('web').constant('customRoutes',
     },
 
     'logged.search.watch.image': {
-        url: "/image/{id}}",
+        url: "/image/{id}",
         params: {
             meta: null
         },

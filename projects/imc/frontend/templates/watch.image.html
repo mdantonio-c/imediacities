@@ -2,17 +2,46 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='WatchImageController as watchCtrl' id="image-wrapper">
+<div ng-controller='WatchImageController as watchCtrl' id="item-wrapper">
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="image-title-container">
-					<span class="title">{{watchCtrl.image.identifyingTitle}}</span>
+					<span class="title">{{watchCtrl.identifyingTitle}}</span>
 					<span class="year" ng-if="watchCtrl.image.attributes.date_created[0]">({{watchCtrl.image.attributes.date_created[0]}})</span>
+					<span class="light-blue" style="margin-left: 5px;">
+						<i class="fa fa-camera fa-lg"></i>
+					</span>
 				</div>
 
 				<div class="image-container">
-					 <img id="image-content" src="{{watchCtrl.image.links['content'] | trustUrl }}" alt="{{watchCtrl.image.description}}" style="width:100%;"> 
+
+					<div class="anno-tools-container" id="anno-tools-container">
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('location');"
+							tooltip-placement="right"
+							uib-tooltip="Tag by location">
+							<i class="imc-icon fa fa-globe fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('term');"
+							tooltip-placement="right"
+							uib-tooltip="Tag&nbsp;by term">
+							<i class="imc-icon fa fa-tag fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('notes');"
+							tooltip-placement="right"
+							uib-tooltip="Add a&nbsp;note">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+						</div>
+					</div>
+
+
+
+					<img id="image-content" src="{{watchCtrl.image.links['content'] | trustUrl }}" alt="{{watchCtrl.image.description}}" style="width:100%;"> 
 				</div>
 			</div>
 
@@ -23,28 +52,31 @@
 
 			<uib-tab heading="Metadata">
 			<!-- metadata -->
-			<ul style="padding-left: 20px;"><li>
-				<div class="primary-description">
-					<!--
-					<div class="title">
-						<span>{{watchCtrl.image.identifyingTitle}}</span>
+			<ul style="padding-left: 20px;">
+				<li>
+					<div class="primary-description">
+						<!--
+						<div class="title">
+							<span>{{watchCtrl.identifyingTitle}}</span>
+						</div>
+						-->
+						<div class="text" ng-repeat="description in watchCtrl.image.relationships.descriptions">
+							<i class="imc-icon fa fa-quote-left"></i>
+							{{description.attributes.text}}
+						</div>
+						<p><b>Keyword(s)</b>:
+							<span ng-repeat="keyword in watchCtrl.image.relationships.keywords">
+							{{keyword.attributes.term}}{{$last ? '' : ', '}}</span>
+						</p>
 					</div>
-					-->
-					<div class="text" ng-repeat="description in watchCtrl.image.relationships.descriptions">
-						<i class="imc-icon fa fa-quote-left"></i>
-						{{description.attributes.text}}
-					</div>
-					<p><b>Keyword(s)</b>:
-						<span ng-repeat="keyword in watchCtrl.image.relationships.keywords">
-						{{keyword.attributes.term}}{{$last ? '' : ', '}}</span>
-					</p>
-				</div>
 					<div class="secondary-description">
 						<p><b>Production Year(s)</b>: {{watchCtrl.image.attributes.date_created[0] || 'Not available'}}</p>
 						<p><b>Contributors</b>:
 							<span ng-repeat="contrib in watchCtrl.image.relationships.contributors">
 							{{contrib.attributes.names[0] | nocomma}} <i ng-if="contrib.attributes.activities">
-								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}</span></p>
+								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}
+							</span>
+						</p>
 						<p><b>Location</b>: {{watchCtrl.image.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
 						<p><b>Owner</b>: {{watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}</p>
 						<p><b>Is shown at</b>:
@@ -54,22 +86,25 @@
 						<p><b>Copyright</b>: {{watchCtrl.image.attributes.rights_status.description || 'Not available'}}</p>
 						<p><b>Rightholder(s)</b>:
 							<span ng-repeat="rightholder in watchCtrl.image.relationships.rightholders">
-							{{rightholder.attributes.name | nocomma}}{{$last ? '' : ', '}}</span></p>
-
+							{{rightholder.attributes.name | nocomma}}{{$last ? '' : ', '}}
+							</span>
+						</p>
 						<p ng-if="watchCtrl.image.relationships.languages && watchCtrl.image.relationships.languages[0].attributes"><b>Language(s)</b>:
 							<span ng-repeat="lang in watchCtrl.image.relationships.languages">
-							{{lang.attributes.code.description}} ({{lang.attributes.usage.description}}) {{$last ? '' : ', '}}</span></p>
-
-						<p ng-if="watchCtrl.image.relationships.titles && watchCtrl.image.relationships.titles[0].attributes"><b>Other title(s)</b>:
+							{{lang.attributes.code.description}} ({{lang.attributes.usage.description}}) {{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p ng-if="watchCtrl.image.relationships.titles && watchCtrl.image.relationships.titles[0].attributes">
+							<b>Other title(s)</b>:
 							<span ng-repeat="otitle in watchCtrl.image.relationships.titles">
-							{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}</span></p>
-
-						<p ng-if="watchCtrl.image.attributes.phisical_format_size"><b>Phisical format size</b>:
-								{{watchCtrl.image.attributes.phisical_format_size}}</span></p>
-
-						<p ng-if="watchCtrl.image.relationships.item[0].attributes.digital_format"><b>Digital format</b>:
-								{{watchCtrl.image.relationships.item[0].attributes.digital_format}}</span></p>
-
+								{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p><b>Specific type</b>: {{watchCtrl.image.attributes.specific_type.description || 'Not available'}}</p>
+						<p><b>Physical format size</b>: {{watchCtrl.image.attributes.phisical_format_size || 'Not available'}}</p>
+						<p><b>Colour</b>: {{watchCtrl.image.attributes.colour || 'Not available'}}</p>
+						<p><b>Digital format</b>: {{watchCtrl.image.relationships.item[0].attributes.digital_format || 'Not available'}}
+						</p>
 					</div>
 				</li>
 			</ul>
@@ -78,140 +113,137 @@
 
 			<!-- notes -->
 			<uib-tab heading="Notes">
-				<div class="space-4"></div>
-				<div class="tab-notes" style="padding-left: 30px;padding-top: 10px;">
-					<div class="tab-notes-title">
-						Notes
-					</div>
-					<!-- list of the notes of the selected shot -->
-					<div class="tab-list-notes">
-
-						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
-							<div>
-								<span class="note-user-icon">
-									<i class="imc-icon fa fa-user fa-4x pull-left"></i>
-								</span>
-							</div>
-							<div style="display: inline-block;height: 60px;">
-								<p style="margin: 0;">
-									<span class="note-user-name">{{note.creatorName}}</span>
-								</p>
-								<p style="margin: 0;">
-									<!--
-									<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
-									-->
-									<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
-										<i class="imc-icon fa fa-clock-o light-grey"></i>
-										{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+			<ul style="padding-left: 20px;">
+				<li>
+					
+						<table class="table table-striped">
+							<tr ng-repeat="note in watchCtrl.notes">
+							<td>
+								<div>
+									<span class="note-user-icon">
+										<i class="imc-icon fa fa-user fa-4x pull-left"></i>
 									</span>
-									
-								</p>
-								<p style="margin: 0;">
-									<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
-										<i class="imc-icon fa fa-lock"></i>
-									</span>
-								</p>
-							</div>
-							<div style="display:  inline-block;float: right;">
-								<span class="note-bin">
-								<a class="btn btn-danger btn-xs"
-									ng-click="watchCtrl.deleteNote(note)"
-									ng-confirm-click="Are you sure you want to delete this note?"
-									tooltip-placement="left"
-									uib-tooltip="Delete note"
-									ng-if="profile.uuid == note.creator">
-									<i class="fa fa-trash-o"> </i>
-								</a>
-								</span>
-								<span class="note-bin">
-								<a class="btn btn-warning btn-xs"
-									ng-click="watchCtrl.editNote(note)"
-									tooltip-placement="left"
-									uib-tooltip="Edit note"
-									ng-if="profile.uuid == note.creator">
-									<i class="fa fa-edit"> </i>
-								</a>
-								</span>
-							</div>
-							<div style="margin: 5px;">
-								<p>
-									<span class="note-text">
-										<i class="imc-icon fa fa-quote-left"></i>
-										{{note.text}}
-									</span>
-								</p>
-							</div>
-						</div>
-					</div>
-					<!-- list of the shots -->
-					<div class="tab-list-shots" data-spy="scroll" data-target="#navbar-hidden">
-
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="watchCtrl.computeCssClass($last,shot.number)">
-
-						<!--
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot tab-list-shot-selected' : 'tab-list-shot tab-list-shot-no-selected'">
-						-->
-
-
-							<span><a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
-
-							<!--
-							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
-							-->
-						</div>
-					</div>
-				</div>
-			</uib-tab>
-
-
-			<uib-tab heading="Annotations">
-				<div class="space-4"></div>
-				<div>
-					<table st-table="watchCtrl.annotations" class="table table-striped">
-						<thead>
-							<tr>
-								<th st-sort="group">category</th>
-								<th st-sort="name">term</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'anno.group'">
-								<td>{{ anno.group }}</td>
-								<td>{{ anno.name }}</td>
-								<td>
+								</div>
+								<div style="display: inline-block;height: 60px;">
+									<p style="margin: 0;">
+										<span class="note-user-name">{{note.creatorName}}</span>
+									</p>
+									<p style="margin: 0;padding-top: 0">
+										<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+											<i class="imc-icon fa fa-clock-o light-grey"></i>
+											{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+										</span>
+										
+									</p>
+									<p style="margin: 0;">
+										<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
+											<i class="imc-icon fa fa-lock"></i>
+										</span>
+									</p>
+								</div>
+								<div style="display:  inline-block;float: right;">
+									<span class="note-bin">
 									<a class="btn btn-danger btn-xs"
-										ng-click="watchCtrl.deleteAnnotation(anno)"
-										ng-confirm-click="Are you sure you want to delete this annotation?"
+										ng-click="watchCtrl.deleteNote(note)"
+										ng-confirm-click="Are you sure you want to delete this note?"
 										tooltip-placement="left"
-										uib-tooltip="Delete annotation"
-										ng-if="profile.uuid == anno.creator">
+										uib-tooltip="Delete note"
+										ng-if="profile.uuid == note.creator">
 										<i class="fa fa-trash-o"> </i>
 									</a>
-								</td>
+									</span>
+									<span class="note-bin">
+									<a class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.editNote(note)"
+										tooltip-placement="left"
+										uib-tooltip="Edit note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-edit"> </i>
+									</a>
+									</span>
+								</div>
+								<div>
+									<p>
+										<span class="note-text">
+											<i class="imc-icon fa fa-quote-left"></i>
+											{{note.text}}
+										</span>
+									</p>
+								</div>
+							</td>
 							</tr>
-						</tbody>
-					</table>
-				</div>
+						</table>
+					
+				</li>
+			</ul>
+
+			</uib-tab>
+
+			<uib-tab heading="Annotations">
+				<ul style="padding-left: 20px;">
+				<li>
+					<div>
+						<table st-table="watchCtrl.annotations" class="table table-striped">
+							<thead>
+								<tr>
+									<th st-sort="group">category</th>
+									<th st-sort="name">term</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'anno.attributes.annotation_type.annotation_type'">
+									<td>{{anno.group}}</td>
+									<td>{{anno.name}}</td>
+									<td>
+										<a class="btn btn-danger btn-xs"
+											ng-click="watchCtrl.deleteAnnotation(anno)"
+											ng-confirm-click="Are you sure you want to delete this annotation?"
+											tooltip-placement="left"
+											uib-tooltip="Delete annotation"
+											ng-if="profile.uuid == anno.creator">
+											<i class="fa fa-trash-o"> </i>
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</li>
+				</ul>
 			</uib-tab>
 
 			</uib-tabset>
 		</div>
 	</div>
-
+	<hr/>
+	<div class="row">
+		<div ng-controller="MapController as vm">
+<!--
+			<div class="container" 
+					ng-show="vm.mapLoading"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+-->
+			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
+				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}" street-view-control="false">
+				<!--<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>-->
+				<div id="class" ng-repeat="marker in vm.markers | orderBy : 'title'">
+					<marker position="[{{marker.videolat}}, {{marker.videolng}}]"  title="{{marker.locname}}" animation="Animation.BOUNCE"></marker>
+					<marker ng-click="$vm.openInfoWindow($event, marker);"></marker>
+				</div>
+				</ng-map>
+			</div>
+		</div>
+	</div>
 
 	<!-- location modal -->
 	<script type="text/ng-template" id="myModalGeoCode.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a location to this shot</h4>
+			<h4 class="modal-title">Add a location to this image</h4>
 		</div>
 		<div class="modal-body">
-			<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
-			<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
-			<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
-			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
-			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
 			<form name="formAutocomplete">
 				<div class="input-group animated fadeIn">
@@ -242,7 +274,7 @@
 			<p><b>You searched for: </b>{{geoResult}}</p>
 		</div>
 		<div class="modal-footer">
-			<button class="btn btn-primary" type="button" ng-click="ok()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="ok('IMAGE','ITEM')">Confirm</button>
 			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		</div>
 	</script>
@@ -250,15 +282,12 @@
 	<script type="text/ng-template" id="myModalVocab.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a vocabulary term to this shot</h4>
+			<h4 class="modal-title">Add a vocabulary term to this image</h4>
 		</div>
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
-					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
-					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
-					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+
 				</div>
 				<div class="col-sm-4">
 					<p>Choose one or more terms</p>
@@ -291,7 +320,7 @@
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms('IMAGE','ITEM')">Confirm</button>
 		</div>
 	</script>
 	<!-- notes modal -->
@@ -303,13 +332,8 @@
 		<div class="modal-body">
 			<div class="row">
 				<div class="col-sm-4">
-					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
-					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
-					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
-					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
 				<div class="col-sm-4">
-					
 
 				</div>
 				<div class="col-sm-8">
@@ -349,7 +373,7 @@
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-default" type="button" ng-click="$notesCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$notesCtrl.confirmNote()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="$notesCtrl.confirmNote('IMAGE','ITEM')">Confirm</button>
 		</div>
 	</script>
 	<script type="text/ng-template" id="termFoundModal.html">

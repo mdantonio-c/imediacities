@@ -357,6 +357,7 @@ ul li p {
 /*image container*/
 .image-container {
 	margin-top: 10px;
+	position: relative;
 }
 
 /*video container*/

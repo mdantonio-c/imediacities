@@ -1,0 +1,42 @@
+common:
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - admin_root
+
+images:
+  summary: List of images
+  description: Returns a list containing all images. The list supports paging.
+  parameters:
+    - name: pageSize
+      in: query
+      description: Number of images returned
+      type: integer
+    - name: pageNumber
+      in: query
+      description: Page number
+      type: integer
+  responses:
+    '200':
+      description: List of images successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token 
+
+image:
+  summary: Gets information about a image
+  description: Returns a single image for its uuid
+  # tags:
+  #   # - logout
+  #   - authentication
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Image information successfully retrieved
+    '401':
+      description: This endpoint requires a valid authorization token
+    '404':
+      description: The image does not exists.
+

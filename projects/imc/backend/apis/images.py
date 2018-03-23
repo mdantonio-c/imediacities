@@ -53,8 +53,8 @@ class Images(GraphBaseOperations):
             # TO BE FIXED
             image = self.getJsonResponse(v, max_relationship_depth=2)
             item = v.item.single()
-            # video['links']['self'] = api_url + \
-            #     'api/videos/' + v.uuid
+            # image['links']['self'] = api_url + \
+            #     'api/images/' + v.uuid
             image['links']['content'] = api_url + \
                 'api/images/' + v.uuid + '/content?type=image'
             if item.thumbnail is not None:
@@ -109,7 +109,7 @@ class Images(GraphBaseOperations):
             repo.delete_non_av_entity(v)
             return self.empty_response()
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % image_id)
+            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
                 "Please specify a valid image id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -122,8 +122,8 @@ class ImageAnnotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id):
-        logger.info("get annotations for AVEntity id: %s", image_id)
-        if image is None:
+        logger.info("get annotations for NonAVEntity id: %s", image_id)
+        if image_id is None:
             raise RestApiException(
                 "Please specify a image id",
                 status_code=hcodes.HTTP_BAD_REQUEST)

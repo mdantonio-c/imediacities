@@ -1,0 +1,8 @@
+file: images
+class: ImageAnnotations
+schema:
+  expose: true
+mapping:
+  image_annotations: "/images/<image_id>/annotations"
+labels:
+  - image_annotations

@@ -34,7 +34,7 @@
 		/* modal view for adding location and term tags */
 		return {
 			open: function(size, template, params) {
-				var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+				var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 				return $uibModal.open({
 					animation: true,
 					templateUrl: template || 'myModalGeoCode.html',
@@ -54,8 +54,7 @@
 		/* modal view for adding notes */
 		return {
 			open: function(size, template, params) {
-				console.log("opening notes modal");
-				var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+				var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 				return $uibModal.open({
 					animation: true,
 					templateUrl: template,
@@ -72,7 +71,7 @@
 			}
 		};
 	}).factory('myGeoConfirmFactory', function($uibModal, $document) {
-		var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+		var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
@@ -105,8 +104,9 @@
 		var startTime = 'test start value';
 		var endTime = 'test end value';
 		var labelTerm = 'test label value';
-		var group = 'test label value';
-		var shotPNG = 'test label value';
+		var group = 'test group value';
+		var shotPNG = 'test shot PNG value';
+		var itemId = '';
 		var videoId = '';
 		var IRI = '';
 		var shotId = '';
@@ -136,6 +136,9 @@
 			},
 			getShotPNG: function() {
 				return shotPNG;
+			},
+			getItemId: function() {
+				return itemId;
 			},
 			getVideoId: function() {
 				return videoId;
@@ -181,6 +184,9 @@
 			},
 			setShotPNG: function(value) {
 				shotPNG = value;
+			},
+			setItemId: function(value) {
+				itemId = value;
 			},
 			setVideoId: function(value) {
 				videoId = value;
@@ -810,9 +816,7 @@
 		var vid = $stateParams.v;
 		self.showmeli = true;
 		self.video = $stateParams.meta;
-
-		console.log("self.video="+angular.toJson(self.video));
-
+		//console.log("self.video="+angular.toJson(self.video));
 		var intervalRewind;
 
 		$scope.rew = function() {
@@ -1062,8 +1066,8 @@
 		};
 
 		self.deleteAnnotation = function(anno) {
-			//console.log(angular.toJson(anno, true));
-			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+			//console.log("deleteAnnotation anno=" + angular.toJson(anno, true));
+			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmModal.html',
 				animation: false,
@@ -1097,7 +1101,7 @@
 		};
 		self.deleteNote = function(note) {
 			//console.log(angular.toJson(note, true));
-			var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));
+			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmNoteModal.html',
 				animation: false,
@@ -1115,7 +1119,7 @@
 							self.notes.splice(index, 1);
 						}
 					});
-					// update the notes tab with the remaining annotations
+					// update the notes tab with the remaining notes
 					// Non c'e' bisogno viene aggiornata in automatico 
 					//  perche' cambia la variabile self.notes
 					//$rootScope.$emit('updateNotes', null, null);
@@ -1127,13 +1131,9 @@
 			});
 		};
 		self.editNote = function(note) {
-			// TODO tutta da fare
-
 			var shot_annotations = null;
 			var shotInfo = self.shots[note.shotNum-1];
-
-			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});
-			
+			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});		
 		};
 
 		// ritorna le classi css da applicare agli elementi
@@ -1268,7 +1268,7 @@
 						var shotStartTime = convertToMilliseconds(shot.attributes.timestamp);
 						var shortEndTime = shotStartTime + (shot.attributes.duration * 1000);
 						var shotInfo = {
-							uuid: shot.id,
+							id: shot.id,
 							shotNum: shot.attributes.shot_num + 1,
 							startT: shotStartTime,
 							endT: shortEndTime
@@ -1293,7 +1293,7 @@
 									var termIRI = anno.bodies[j].attributes.iri;
 									var user_creator = anno.creator.id;
 									var annoInfo = {
-										uuid: anno.id,
+										id: anno.id,
 										name: name,
 										iri: termIRI,
 										group: group,
@@ -1319,7 +1319,7 @@
 									privacy = "public";
 								}
 								var noteInfo = {
-									uuid: anno.id,
+									id: anno.id,
 									text: text,
 									textLanguage: textLanguage,
 									textLanguageCode: textLanguageCode,
@@ -1499,12 +1499,12 @@
 				  {v: shotInfo.shotNum}
 			]});
 			var anno = {
-					id: annoInfo.uuid,
+					id: annoInfo.id,
 					group: annoInfo.group,
 					iri: annoInfo.iri,
 					name: locn,
 					creator: annoInfo.creator,
-					shotid: shotInfo.uuid,
+					shotid: shotInfo.id,
 					shotNum: shotInfo.shotNum,
 					startT: shotInfo.startT,
 					endT: shotInfo.endT
@@ -1527,7 +1527,7 @@
 				return;
 			}
 			// se la nota esiste gia' allora e' un update
-			var noteId = noteInfo.uuid;
+			var noteId = noteInfo.id;
 			var update = false;
 			angular.forEach(self.notes, function(note, index) {
 				if (note.id === noteId ) {
@@ -1542,7 +1542,7 @@
 			if(!update){
 				// add the new note to self.notes
 				var note = {
-					id: noteInfo.uuid,
+					id: noteInfo.id,
 					text: noteInfo.text,
 					language: noteInfo.textLanguage,
 					languageCode: noteInfo.textLanguageCode,
@@ -1550,7 +1550,7 @@
 					creator: noteInfo.creator,
 					creation_datetime: noteInfo.creation_datetime,
 					privacy: noteInfo.privacy,
-					shotId: shotInfo.uuid,
+					shotId: shotInfo.id,
 					shotNum: shotInfo.shotNum,
 					shotStartT: shotInfo.startT,
 					shotEndT: shotInfo.endT
@@ -1572,45 +1572,112 @@
 	}
 
 
-	function WatchImageController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter,
+	function WatchImageController($scope, $rootScope, $http, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
 
 		var self = this;
-		var imageId = $stateParams.i;
+		var imageId = $stateParams.id;
 		self.image = $stateParams.meta;
-
-		console.log("self.image="+angular.toJson(self.image));
-
-		// pick an identifying title
-		for (var i = 0, len = self.image.relationships.titles; i < len; i++) {
-			if (self.image.relationships.titles[i].attributes.relation.key === 'Original title') {
-				self.image.identifyingTitle = self.image.relationships.titles[i].attributes.text;
-				break;
+		//console.log("self.image="+angular.toJson(self.image));
+		
+		self.setIdentifyingTitle = function(data) {
+			//console.log("setIdentifyingTitle");
+			var identifyingTitle;
+			if(data){
+				// pick 'Original title' as identifying title
+				for (var i = 0, len = data.relationships.titles; i < len; i++) {
+					if (data.relationships.titles[i].attributes.relation.key === 'Original title') {
+						identifyingTitle = data.relationships.titles[i].attributes.text;
+						break;
+					}
+				}
+				// if there is not 'Original title' then we get first title in the array
+				if(!identifyingTitle){
+					identifyingTitle = data.relationships.titles[0].attributes.text;
+				}			
 			}
-		}
-		// se non c'e' il titolo originale allora prendo il primo
-		if(!self.image.identifyingTitle){
-			self.image.identifyingTitle = self.image.relationships.titles[0].attributes.text;
-		}
+			//console.log("identifyingTitle=" + identifyingTitle);
+			return identifyingTitle;
+		};
 
-		self.inputVocTerm = "";
-		// inizialize status of video format accordion
-		$scope.statusAccor = {
-    		isOpen: false
-  		};
 		// inizialize address for automplete input tag for geolocation
 		$scope.vm = {
 			address: {}
 		};
-		// to visualize annotations in tab table
+		// to visualize annotations in the tab 
 		self.annotations = [];
-
 		// to visualize notes in notes tab 
 		self.notes = [];
-		// to visualize shots in notes tab table
-		self.notesShots = [];
-		// current shot in notes tab table
-		self.notesShotSelected=1;
+		self.loadImageAnnotations = function(imageId) {
+			//console.log("loading annotations for imageId: " + imageId);
+			self.loading = true;
+			DataService.getImageAnnotations(imageId).then(
+				function(response) {
+					//console.log("get annotations response: " + angular.toJson(response));
+					var annos = response.data;
+					//console.log("annos: " + angular.toJson(annos));
+					for (var i = 0; i < annos.length; i++) {
+						if (annos[i].attributes.annotation_type.key === 'TAG') {
+								//console.log('annotation dal db=' + angular.toJson(annos[i]));
+								for (var j=0; j < annos[i].bodies.length; j++) {
+									// annotation info
+									var spatial = annos[i].bodies[j].attributes.spatial;
+									var group = (spatial !== null && typeof spatial === 'object') ? 'location' : 'term';
+									var name = (annos[i].bodies[j].type === 'textualbody') ? 
+										annos[i].bodies[j].attributes.value : annos[i].bodies[j].attributes.name;
+									var termIRI = annos[i].bodies[j].attributes.iri;
+									var user_creator = annos[i].creator.id;
+									var annoInfo = {
+										id: annos[i].id,
+										name: name,
+										iri: termIRI,
+										group: group,
+										creator: user_creator
+									};
+									self.annotations.push(annoInfo);
+								}
+							}else if (annos[i].attributes.annotation_type.key === 'DSC') { // note
+								//console.log('nota dal db=' + angular.toJson(annos[i]));
+								// mi aspetto che la note abbia un solo body di tipo textual
+								// il backend mi manda solo quelle che posso vedere
+								var text = annos[i].bodies[0].attributes.value;
+								var textLanguageCode = annos[i].bodies[0].attributes.language;
+								//console.log('textLanguageCode=' + angular.toJson(textLanguageCode));
+								var textLanguage = decodeLanguageCode(textLanguageCode);
+								//console.log('textLanguage=' + angular.toJson(textLanguage));
+								var creatorId = annos[i].creator.id;
+								var creatorName = annos[i].creator.attributes.name + " " + annos[i].creator.attributes.surname;
+								var privacy = "private";
+								var creation_datetime = annos[i].attributes.creation_datetime;
+								//console.log('annos[i].attributes.private=' + angular.toJson(annos[i].attributes.private));
+								if(!annos[i].attributes.private){
+									privacy = "public";
+								}
+								var noteInfo = {
+									id: annos[i].id,
+									text: text,
+									textLanguage: textLanguage,
+									textLanguageCode: textLanguageCode,
+									creation_datetime: creation_datetime,
+									creator: creatorId,
+									creatorName: creatorName,
+									privacy: privacy
+								};
+								self.notes.push(noteInfo);
+								//console.log('nota=' + angular.toJson(noteInfo));
+							}else{
+								console.log('not handled annotation type = '+annos[i].attributes.annotation_type.key);
+							}
+					}
+				},
+				function(error) {
+					console.log("get annotations error: " + angular.toJson(error));
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+		// leggo le annotazioni dal db
+		self.loadImageAnnotations(imageId);
 
 		// initialize multiselect to filter subtitles
 		$scope.options = [];
@@ -1618,90 +1685,128 @@
 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
-
-			var shot_annotations;
-					
+			sharedProperties.setGroup(mode);
 			if (mode == 'term') {
-				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations});
 			}
 			else if (mode == 'notes') {
-				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
+				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: self.annotations});
 			}
 			else if (mode == 'location') {
-				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations});
 			}
-	
 		};
 
 		self.deleteAnnotation = function(anno) {
-		
+			//console.log("delete anno=" + angular.toJson(anno, true));
+			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
+			var modalInstance = $uibModal.open({
+				templateUrl: 'confirmModal.html',
+				animation: false,
+				size: 'sm',
+				controller: 'ModalConfirmController',
+				appendTo: parentElem
+			});
+			var annoId = anno.id;
+			var bodyIRI = anno.iri;
+			var bodyName = anno.name;
+			var bodyRef = (anno.iri !== undefined) ? 'resource:' + bodyIRI : 'textual:' + bodyName;
+			//console.log("bodyRef=" + angular.toJson(bodyRef, true));
+			modalInstance.result.then(function() {
+				// YES: delete annotation
+				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
+					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					angular.forEach(self.annotations, function(anno, index) {
+						if (anno.id === annoId &&
+							((anno.iri !== undefined && anno.iri === bodyIRI) ||
+								anno.name === bodyName)) {
+							self.annotations.splice(index, 1);
+						}
+					});
+				}, function(err) {
+					// TODO
+				});
+			}, function() {
+				// NO: do nothing
+			});
 		};
 		self.deleteNote = function(note) {
-
+			console.log("deleteNote: note=" + angular.toJson(note, true));
+			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
+			var modalInstance = $uibModal.open({
+				templateUrl: 'confirmNoteModal.html',
+				animation: false,
+				size: 'sm',
+				controller: 'ModalConfirmController',
+				appendTo: parentElem
+			});
+			var noteId = note.id;
+			modalInstance.result.then(function() {
+				// YES: delete annotation
+				DataService.deleteNote(noteId).then(function() {
+					console.log('Note [' + noteId + '] deleted successfully');
+					angular.forEach(self.notes, function(note, index) {
+						if (note.id === noteId ) {
+							self.notes.splice(index, 1);
+						}
+					});
+					// update the notes tab with the remaining notes
+					// Non c'e' bisogno viene aggiornata in automatico 
+					//  perche' cambia la variabile self.notes
+					//$rootScope.$emit('updateNotes', null, null);
+				}, function(err) {
+					// TODO
+				});
+			}, function() {
+				// NO: do nothing
+			});
 		};
 		self.editNote = function(note) {
-			// TODO tutta da fare
-
+			console.log("editNote: note=" + angular.toJson(note, true));
 			var shot_annotations = null;
-			var shotInfo;
-
+			var shotInfo = null;
 			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});
-			
 		};
-
-		// ritorna le classi css da applicare agli elementi
-		//  della lista degli shot nel tab delle note
-		self.computeCssClass = function(last,shot) {
-		    var cssClass = "tab-list-shot";
-		    if(last){
-		    	cssClass += " tab-list-shot-last";
-		    }
-		    if(shot == self.notesShotSelected){
-		    	cssClass += " tab-list-shot-selected";
-		    }else{
-		    	cssClass += " tab-list-shot-no-selected";		    	
-		    }
-		    //console.log('computeCssClass=' + cssClass);
-		    return cssClass;
-		};
-
+		// items serve per la geolocalizzazione
 		self.items = [];
-		self.shots = [];
-		self.slideSize = 0;
-
 		self.loadMetadataContent = function(imageId) {
-			// console.log("loading metadata content for imageId: " + imageId);
+			//console.log("loading metadata content for imageId: " + imageId);
 			self.loading = true;
-			DataService.getVideoMetadata(imageId).then(
+			DataService.getImageMetadata(imageId).then(
 				function(response) {
+					//console.log("get metadata response: " + angular.toJson(response));
 					self.image = response.data[0];
 					self.isShownAt = self.image.relationships.record_sources[0].attributes.is_shown_at;
 					sharedProperties.setRecordProvider(
 						self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 				},
 				function(error) {
+					console.log("get metadata error: " + angular.toJson(error));
 					self.loading = false;
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
 		if (!$stateParams.meta) {
+			//console.log("stateParams.meta is null, imageId="+imageId);
 			self.loadMetadataContent(imageId);
+			//console.log("self.identifyingTitle=" + self.identifyingTitle);
 		} else {
+			//console.log("stateParams.meta is not null: " + angular.toJson($stateParams.meta));
 		}
-
-		self.selectedImageId = imageId;
-		self.animationsEnabled = true;
+		self.identifyingTitle = self.setIdentifyingTitle(self.image);
+		//console.log("self.identifyingTitle=" + self.identifyingTitle);
+		sharedProperties.setRecordProvider(self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
+		sharedProperties.setItemId(self.image.relationships.item[0].id);
 
 		self.getTagMenu = function(event) {
 		};
-
 		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
 			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
 			if (noteInfo === null) {
 				return;
 			}
 			// se la nota esiste gia' allora e' un update
-			var noteId = noteInfo.uuid;
+			var noteId = noteInfo.id;
 			var update = false;
 			angular.forEach(self.notes, function(note, index) {
 				if (note.id === noteId ) {
@@ -1716,27 +1821,37 @@
 			if(!update){
 				// add the new note to self.notes
 				var note = {
-					id: noteInfo.uuid,
+					id: noteInfo.id,
 					text: noteInfo.text,
 					language: noteInfo.textLanguage,
 					languageCode: noteInfo.textLanguageCode,
 					creatorName: noteInfo.creatorName,
 					creator: noteInfo.creator,
 					creation_datetime: noteInfo.creation_datetime,
-					privacy: noteInfo.privacy,
-					shotId: shotInfo.uuid,
-					shotNum: shotInfo.shotNum,
-					shotStartT: shotInfo.startT,
-					shotEndT: shotInfo.endT
+					privacy: noteInfo.privacy
 				};				
 				self.notes.push(note);
 			}
 			//console.log("situazione delle note: " + angular.toJson(self.notes, true));
 			return;
 		});
+		$rootScope.$on('createdNewAnnotation', function(event, locname, annoInfo) {
+			//console.log("WatchImageController: on createdNewAnnotation: annoInfo=" +angular.toJson(annoInfo,true));
+			if (annoInfo === null) {
+				return;
+			}
+			var locn = (locname !== '') ? locname : annoInfo.name;
+			var anno = {
+					id: annoInfo.id,
+					group: annoInfo.group,
+					iri: annoInfo.iri,
+					name: locn,
+					creator: annoInfo.creator,
+				};						
+			self.annotations.push(anno);
+		});
 
 	}
-
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 
@@ -1755,10 +1870,13 @@
 		// load the map ONLY when the provider info is available
 		sharedProperties.getRecordProvider().then(null, null, function(provider) {
 			// look for existing custom location
-			var customLocation,
-				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
-			if (coverage !== undefined) {
-				customLocation = coverage.attributes.spatial[0];
+			var customLocation;
+			var coverage;
+			if($scope.$parent.watchCtrl.video){
+					coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+				if (coverage !== undefined) {
+					customLocation = coverage.attributes.spatial[0];
+				}
 			}
 
 			if (customLocation === undefined) {
@@ -1931,14 +2049,19 @@
 		var self = this;
 		
 		$scope.geocodingResult = "";
-		$scope.startT = sharedProperties.getStartTime();
-		$scope.endT = sharedProperties.getEndTime();
+
 		$scope.group = sharedProperties.getGroup();
 		$scope.labelTerm = sharedProperties.getLabelTerm();
-		$scope.shotPNGImage = sharedProperties.getShotPNG();
 		$scope.IRI = sharedProperties.getIRI();
+
+		// video SHOT
+		$scope.startT = sharedProperties.getStartTime();
+		$scope.endT = sharedProperties.getEndTime();
+		$scope.shotPNGImage = sharedProperties.getShotPNG();
 		$scope.shotID = sharedProperties.getShotId();
 		$scope.shotNum = sharedProperties.getShotNum();
+		// image
+		$scope.itemId = sharedProperties.getItemId();
 
 		self.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
@@ -1988,10 +2111,13 @@
 		};
 
 		self.confirmLocation = function() {
+			//console.log("confirmLocation: scope.vm=" + angular.toJson($scope.vm, true));
 			if (angular.isUndefined($scope.vm)) {
 				self.alerts.push({msg: 'Invalid place selection. Only values from a controlled list is allowed.'});
 				return;
 			}
+			//console.log("confirmLocation: params.annotations=" + angular.toJson(params.annotations, true));
+			//console.log("confirmLocation: $scope.vm.address.place_id=" + angular.toJson($scope.vm.address.place_id, true));
 			var matched = $filter('filter')(params.annotations, {iri: $scope.vm.address.place_id})[0];
 			if (typeof matched !== "undefined") {
 				self.alerts.push({msg: 'Invalid place selection. "' + $scope.vm.address.name + '" already selected.'});
@@ -2016,33 +2142,48 @@
 			});
 		};
 
-		self.confirmVocabularyTerms = function() {
-			var vid = sharedProperties.getVideoId();
-			var target = 'shot:' + $scope.shotID;
-
+		// itemType: IMAGE, VIDEO
+		// targetType: ITEM, SHOT
+		self.confirmVocabularyTerms = function(itemType,targetType) {
+			//console.log('confirmVocabularyTerms: itemType=' + itemType);
+			//console.log('confirmVocabularyTerms: targetType=' + targetType);
+			//var vid = sharedProperties.getVideoId();
+			var target;
+			if(targetType == 'ITEM'){
+				// al momento il caso item e' solo per le immagini
+				target = 'item:' + $scope.itemId;
+			}else{
+				target = 'shot:' + $scope.shotID;
+			}
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags).then(
 					function(resp) {
-						// console.log(resp.data);
+						//console.log(resp.data);
 						var annoId = resp.data.id;
 						var creatorId = resp.data.relationships.creator[0].id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
 						for (var i=0; i < self.tags.length; i++) {
 							var annoInfo = {
-								"uuid": annoId,
+								"id": annoId,
 								"name": self.tags[i].label,
 								"iri": self.tags[i].iri,
 								"group": $scope.group,
 								"creator": creatorId
 							};
-							var shotInfo = {
-								"uuid": $scope.shotID,
+							//console.log("annoInfo=" + angular.toJson(annoInfo, true));
+							if(itemType == 'IMAGE'){
+								$rootScope.$emit('createdNewAnnotation', '', annoInfo);
+							}else {
+								var shotInfo = {
+								"id": $scope.shotID,
 								"shotNum": $scope.shotNum,
 								"startT": $scope.startT,
 								"endT": $scope.endT
-							};
-							$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+								};
+								//console.log("shotInfo=" + angular.toJson(shotInfo, true));
+								$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+							}
 						}
 					},
 					function(err) {
@@ -2069,19 +2210,19 @@
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $uibModal service used above.
 	function NotesController($scope, $rootScope, $uibModalInstance, $filter, DataService, sharedProperties, params) {
-
 		var self = this;
-		
-		$scope.startT = sharedProperties.getStartTime();
-		$scope.endT = sharedProperties.getEndTime();
 		$scope.group = sharedProperties.getGroup();
 		$scope.labelTerm = sharedProperties.getLabelTerm();
-		$scope.shotPNGImage = sharedProperties.getShotPNG();
 		$scope.IRI = sharedProperties.getIRI();
+		// video SHOT
+		$scope.startT = sharedProperties.getStartTime();
+		$scope.endT = sharedProperties.getEndTime();
+		$scope.shotPNGImage = sharedProperties.getShotPNG();
 		$scope.shotID = sharedProperties.getShotId();
 		$scope.shotNum = sharedProperties.getShotNum();
-
-		$scope.modalTitle = "Add a note to this shot";
+		// image
+		$scope.itemId = sharedProperties.getItemId();
+		$scope.modalTitle = "Add a note";
 		
 		// dati della nota nel form della modale
 		self.form = {};
@@ -2134,8 +2275,13 @@
 			}
 		}
 
-		self.confirmNote = function() {
-			var target = 'shot:' + $scope.shotID;
+		self.confirmNote = function(itemType,targetType) {
+			var target;
+			if(targetType == 'ITEM'){
+				target = 'item:' + $scope.itemId;
+			}else{
+				target = 'shot:' + $scope.shotID;
+			}
 			if (self.form.text && self.form.text.length > 0) {
 				// note text max lenght = noteMaxLenght
 				self.note.text = self.form.text.substring(0, noteMaxLenght);
@@ -2152,7 +2298,7 @@
 						if(self.note.id){
 							// updated existing note
 							noteInfo = {
-								"uuid": self.note.id,
+								"id": self.note.id,
 								"text": self.note.text,
 								"textLanguage": self.note.language,
 								"textLanguageCode": self.note.languageCode,
@@ -2166,7 +2312,7 @@
 								resp.data.relationships.creator[0].attributes.surname;
 							var creationDatetime = resp.data.attributes.creation_datetime;
 							noteInfo = {
-								"uuid": noteId,
+								"id": noteId,
 								"text": self.note.text,
 								"textLanguage": self.note.language,
 								"textLanguageCode": self.note.languageCode,
@@ -2176,13 +2322,17 @@
 								"privacy": self.note.privacy
 							};
 							shotInfo= {
-								"uuid": $scope.shotID,
+								"id": $scope.shotID,
 								"shotNum": $scope.shotNum,
 								"startT": $scope.startT,
 								"endT": $scope.endT
 							};
 						}
-						$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+						if(itemType == 'IMAGE'){
+							$rootScope.$emit('updateNotes', noteInfo, null);
+						}else{
+							$rootScope.$emit('updateNotes', noteInfo, shotInfo);
+						}
 					},
 					function(err) {
 						// TODO
@@ -2205,26 +2355,34 @@
 
 	}
 	function geoResultController($scope, $rootScope, $document, $uibModalInstance, params, sharedProperties, DataService) {
-
 		$scope.geoResult = params.result;
+		$scope.group = sharedProperties.getGroup();
+		$scope.labelTerm = sharedProperties.getLabelTerm();
+		$scope.IRI = sharedProperties.getIRI();
+		$scope.latitude = sharedProperties.getLatitude();
+		$scope.longitude = sharedProperties.getLongitude();
+		$scope.format = sharedProperties.getFormAddr();
 
-		$scope.ok = function() {
+		// video SHOT
+		$scope.startT = sharedProperties.getStartTime();
+		$scope.endT = sharedProperties.getEndTime();
+		$scope.shotPNGImage = sharedProperties.getShotPNG();
+		$scope.shotID = sharedProperties.getShotId();
+		$scope.shotNum = sharedProperties.getShotNum();
+		// image
+		$scope.itemId = sharedProperties.getItemId();
 
-			$scope.startT = sharedProperties.getStartTime();
-			$scope.endT = sharedProperties.getEndTime();
-			$scope.group = sharedProperties.getGroup();
-			$scope.labelTerm = sharedProperties.getLabelTerm();
-			$scope.shotID = sharedProperties.getShotId();
-			$scope.shotNum = sharedProperties.getShotNum();
-			$scope.IRI = sharedProperties.getIRI();
-			$scope.latitude = sharedProperties.getLatitude();
-			$scope.longitude = sharedProperties.getLongitude();
-			$scope.format = sharedProperties.getFormAddr();
-
-			var target = 'shot:' + $scope.shotID;
-			/*console.log($scope.IRI);
-			console.log(res);
-			console.log($scope.labelTerm);*/
+		$scope.ok = function(itemType,targetType) {
+			//console.log('geoResultController:ok: itemType=' + itemType);
+			//console.log('geoResultController:ok: targetType=' + targetType);
+			var target;
+			if(targetType == 'ITEM'){
+				target = 'item:' + $scope.itemId;
+			}else{
+				target = 'shot:' + $scope.shotID;				
+			}
+			//console.log($scope.IRI);
+			//console.log($scope.labelTerm);
 			var source = {
 				"iri": $scope.IRI,
 				"name": $scope.labelTerm
@@ -2242,20 +2400,24 @@
 					var termIRI = source.iri;
 					console.log('Annotation saved successfully. ID: ' + annoId);
 					var annoInfo = {
-						"uuid": annoId,
+						"id": annoId,
 						"name": $scope.labelTerm,
 						"iri": termIRI,
 						"group": $scope.group,
 						"creator": creatorId
 					};
-					var shotInfo = {
-						"uuid": $scope.shotID,
-						"shotNum": $scope.shotNum,
-						"startT": $scope.startT,
-						"endT": $scope.endT
-					};
-					$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
-					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
+					if(itemType == 'IMAGE'){
+						$rootScope.$emit('createdNewAnnotation', '', annoInfo);
+					}else{
+						var shotInfo = {
+							"id": $scope.shotID,
+							"shotNum": $scope.shotNum,
+							"startT": $scope.startT,
+							"endT": $scope.endT
+						};
+						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
+						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);				
+					}
 				},
 				function(err){
 					// TODO
