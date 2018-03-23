@@ -45,7 +45,7 @@
 						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
 							ng-click="watchCtrl.manualtag('notes');"
 							tooltip-placement="right"
-							uib-tooltip="Add s&nbsp;note">
+							uib-tooltip="Add a&nbsp;note">
 							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
 						</div>
 					</div>
@@ -89,12 +89,18 @@
 									<div class="controls__status__bar flex_spacer">
 										<input type="range" id="range" value="0" min="0" max="1">
 									</div>
-									<div class="controls__status__play">
+									<!-- <div class="controls__status__play">
 										<i class="fa fa-fast-backward" id="goto_start"></i>
 									</div>
 									<div class="controls__status__play">
 										<i class="fa fa-fast-forward" id="goto_end"></i>
-									</div>
+									</div> -->
+									<label class="controls__status__anno" 
+										uib-tooltip="on/off annotations"
+										tooltip-placement="right">
+										<input type="checkbox" ng-click="watchCtrl.switchVideo()">
+  										<span class="video-slider"></span>
+									</label>
 								</div>
 							</div>
 

@@ -885,14 +885,12 @@
 
 		// On video time update: update the selected shot on the Notes tab
 		myVid[0].ontimeupdate = function() {
-			//console.log('ontimeupdate start');
-			var currentTime = parseInt(myVid[0].currentTime);
+			/*var currentTime = parseInt(myVid[0].currentTime);
 			// calculate the shot at current time
 			var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
 			//console.log('current shot: ' + angular.toJson(currentShotNotes, true));
 			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
-			$scope.$digest(); //refresh scope  // serve in questo caso? SI
-			//console.log('ontimeupdate end');
+			$scope.$digest(); //refresh scope  // serve in questo caso? SI*/
 		};
 
 		// On video playing toggle values
@@ -918,12 +916,12 @@
 		// On video error
 		myVid[0].onerror = function(event) {
 			let error = event;
-			// console.log(event);
+			console.log(event);
 			var currentSrc;
 			// Chrome v60
 		    if (event.path && event.path[0]) {
 		      error = event.path[0].error;
-		      currentSrc = event.path[0].currentSrc
+		      currentSrc = event.path[0].currentSrc;
 		    }
 
 		    // Firefox v55
@@ -979,9 +977,10 @@
 		};
 
 		self.switchVideo = function() {
-			var atTime = myVid[0].currentTime;
-			console.log('switch video at time: '+ atTime);
-			myVid[0].pause();
+			var video = $scope.videoplayer.video;
+			var atTime = video.currentTime;
+			video.pause();
+			var currentSrc = $scope.videoplayer.conf.sources[0];
 			if (self.videoType == 'video') {
 				// stream video with detected objects
 				self.videoType = 'orf';
@@ -989,11 +988,13 @@
 				// back to original video
 				self.videoType = 'video';
 			}
+			// FIXME: changing source of the video player conf doesn't work
+			$scope.videoplayer.conf.sources[0] = $filter('switchVideoType')(currentSrc, self.videoType);
+			console.log('switch to content['+self.videoType+'] at time: '+ atTime);
 			$timeout(function() {
-				myVid[0].currentTime = atTime;
-				myVid[0].play();
+				video.currentTime = atTime;
+				video.play();
 			}, 50);
-
 		};
 
 		self.manualtag = function(mode) {

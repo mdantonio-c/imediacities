@@ -202,9 +202,9 @@ video {
   .controls__wrapper .controls__status__controls {
     border-left: 1px solid #d1d1d1;
     border-right: 1px solid #d1d1d1; }
-  .controls__wrapper .controls__status__info, .controls__wrapper .controls__status__bar, .controls__wrapper .controls__status__fps {
+  .controls__wrapper .controls__status__info, .controls__wrapper .controls__status__bar, .controls__wrapper .controls__status__fps, .controls__status__anno {
     align-self: center; }
-  .controls__wrapper .controls__status__play, .controls__wrapper .controls__status__bar, .controls__wrapper .controls__status__fps {
+  .controls__wrapper .controls__status__play, .controls__wrapper .controls__status__bar, .controls__wrapper .controls__status__fps, .controls__status__anno {
     padding: 4px 8px; }
   .controls__wrapper .controls__status__play {
     font-size: 2em; }
@@ -292,3 +292,65 @@ video {
   display: none; }
 
 /*# sourceMappingURL=stile.css.map */
+
+/* Video switch - the box around the slider */
+.controls__status__anno {
+  position: relative;
+  display: inline-block;
+  margin-right: 5px;
+  width: 46px;
+  height: 26px;
+}
+
+/* Hide default HTML checkbox */
+.controls__status__anno input {display:none;}
+
+/* The slider */
+.video-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(238, 238, 238);
+  border: 1px solid #d1d1d1;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.video-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border: 1px solid #d1d1d1;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .video-slider {
+  background-color: #333;
+}
+
+input:focus + .video-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .video-slider:before {
+  -webkit-transform: translateX(16px);
+  -ms-transform: translateX(16px);
+  transform: translateX(16px);
+}
+
+/* Rounded sliders */
+.video-slider.round {
+  border-radius: 34px;
+}
+
+.video-slider.round:before {
+  border-radius: 50%;
+}
