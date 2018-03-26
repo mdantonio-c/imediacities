@@ -227,29 +227,64 @@ class VideoShots(GraphBaseOperations):
             # get all shot annotations:
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
+            shot['tags'] = []
+            # <dict(iri, name)>{iri, name, spatial, auto, hits}
+            tags = {}
             for anno in s.annotation.all():
+                creator = anno.creator.single()
                 if anno.private:
-                    if anno.creator is None:
+                    if creator is None:
                         logger.warn('Invalid state: missing creator for private '
                                     'note [UUID:{}]'.format(anno.uuid))
                         continue
-                    creator = anno.creator.single()
                     if creator is not None and creator.uuid != user.uuid:
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
                 if (anno.annotation_type in ('TAG', 'DSC') and
-                        anno.creator is not None):
+                        creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
                 # attach bodies
                 res['bodies'] = []
                 for b in anno.bodies.all():
+                    mdb = b.downcast()  # most derivative body
                     res['bodies'] .append(
-                        self.getJsonResponse(
-                            b.downcast(), max_relationship_depth=0))
+                        self.getJsonResponse(mdb, max_relationship_depth=0))
+                    if 'ResourceBody' in mdb.labels():
+                        # mainly manual annotations here
+                        tag = tags.get((mdb.iri, mdb.name))
+                        if tag is None:
+                            tags[(mdb.iri, mdb.name)] = {
+                                'iri': mdb.iri,
+                                'name': mdb.name,
+                                'hits': 1
+                            }
+                            if mdb.spatial:
+                                    tags[(mdb.iri, mdb.name)]['spatial'] = mdb.spatial
+                        else:
+                            tag['hits'] += 1
                 shot['annotations'].append(res)
 
+            # add any other tags from "embedded segments"
+            for segment in s.embedded_segments.all():
+                # get ONLY public tags
+                for s_anno in segment.annotation.search(annotation_type='TAG', private=False):
+                    for b in s_anno.bodies.all():
+                        mdb = b.downcast()  # most derivative body
+                        if 'ODBody' in mdb.labels():
+                            # object detection body
+                            concept = mdb.object_type.single()
+                            tag = tags.get((concept.iri, concept.name))
+                            if tag is None:
+                                tags[(concept.iri, concept.name)] = {
+                                    'iri': concept.iri,
+                                    'name': concept.name,
+                                    'hits': 1
+                                }
+                            else:
+                                tag['hits'] += 1
+            shot['tags'] = list(tags.values())
             data.append(shot)
 
         return self.force_response(data)
