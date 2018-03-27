@@ -24,11 +24,12 @@ if host == 'sil_pc':
 else:
     root_dir = '/'
 
-stage_area   = root_dir + 'uploads'
-analize_area = root_dir + 'uploads/Analize'
-idmt_bin     = root_dir + 'imedia-pipeline/tools'
-idmt_scripts = root_dir + 'imedia-pipeline/scripts'
-idmt_py      = root_dir + 'imedia-pipeline/scripts/idmt'
+stage_area     = root_dir + 'uploads'
+analize_area   = root_dir + 'uploads/Analize'
+watermark_area = root_dir + 'uploads/Analize/watermarks'
+idmt_bin       = root_dir + 'imedia-pipeline/tools'
+idmt_scripts   = root_dir + 'imedia-pipeline/scripts'
+idmt_py        = root_dir + 'imedia-pipeline/scripts/idmt'
 
 # default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
 # default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
@@ -237,14 +238,16 @@ def transcode(filename, out_folder):
 
 
 # -----------------------------------------------------
-def image_transcode(filename, out_folder):
+def image_transcode(filename, out_folder, watermark ):
     ''' transcode an image to jpg, with a compression quality of 95
         rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
         also save a full resolution version as transcoded_fullres.jpg
     '''    
 
-    out_filename         = os.path.join(out_folder, 'transcoded.jpg')
-    out_filename_fullres = os.path.join(out_folder, 'transcoded_fullres.jpg')
+    out_filename              = os.path.join(out_folder, 'transcoded.jpg')
+    out_filename_fullres      = os.path.join(out_folder, 'transcoded_fullres.jpg')
+    out_filename_logo         = os.path.join(out_folder, 'transcoded_with_logo.jpg')
+    out_filename_logo_fullres = os.path.join(out_folder, 'transcoded_with_logo_fullres.jpg')
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
@@ -271,6 +274,44 @@ def image_transcode(filename, out_folder):
         return False
     return os.path.exists(out_filename)
 
+
+    if watermark:
+
+        cmd_list = []
+        cmd_list.append('/usr/bin/convert')
+        cmd_list.append( out_filename  )
+        cmd_list.append( watermark )
+        cmd_list.append( '-geometry' )
+        cmd_list.append( '+10+10' )
+        cmd_list.append( '-gravity' )
+        cmd_list.append( '-SouthWest' )
+        cmd_list.append( '-composite' )
+        cmd_list.append('-quality')
+        cmd_list.append( '95')
+        cmd_list.append(out_filename_logo)
+        cmd = ' \\\n'.join(cmd_list) + '\n'
+
+        if not run(cmd, out_folder, 'transcode.log', 'transcode.err', 'transcode.sh'):
+            return False
+
+        cmd_list = []
+        cmd_list.append('/usr/bin/convert')
+        cmd_list.append( out_filename_fullres  )
+        cmd_list.append( watermark )
+        cmd_list.append( '-geometry' )
+        cmd_list.append( '+10+10' )
+        cmd_list.append( '-gravity' )
+        cmd_list.append( '-SouthWest' )
+        cmd_list.append( '-composite' )
+        cmd_list.append( '-quality')
+        cmd_list.append( '95')
+        cmd_list.append(out_filename_logo_fullres)
+        cmd = ' \\\n'.join(cmd_list) + '\n'
+    
+        if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
+            return False
+        return os.path.exists(out_filename)
+        
 
 # -----------------------------------------------------
 def tvs(filename, out_folder):
@@ -614,8 +655,29 @@ def analize_image(filename, out_folder, fast=False):
     tr_image = os.path.join(out_folder, 'transcoded.jpg')
 
 
+    watermark = ""
+    if "9621d236-230d-4a6f-bfbf-5959c15baf28" in filename: #"crb"
+        watermark = watermark_area +"/crb.png"
+    if "995eee9b-3a7d-43b5-9c7e-264804583fbd" in filename: #"ccb"
+        watermark = watermark_area +"/ccb.png"
+    if "15b54855-49c8-437c-9ad3-9226695d2fb4" in filename: #"mct"
+        watermark = watermark_area +"/mct.png"
+    if "d42865cb-d61f-42f6-9c57-20f4d6b1ade3" in filename: #"icec"
+        pass
+    if "8daa109f-76fd-4422-bfc4-0de6633ca582" in filename: #"dif"
+        pass
+    if "1ede3472-6abd-453c-844f-e3a656cb21d6" in filename: #"ofm"
+        pass
+    if "ac8e5f4d-5534-4e0d-befb-4b00c7a57fa3" in filename: #"dfi"
+        pass
+    if "9324fc11-68b6-4a41-9294-0227ce8dcd15" in filename: #"tte"
+        pass
+    if "9646014f-929c-4e73-88b7-afcff69f3463" in filename: #"sfi"
+        pass
+
+
     log('image_transcode ---------- begin ')
-    if not image_transcode(filename, out_folder):
+    if not image_transcode(filename, out_folder, watermark ):
         return False
     log('image_transcode ---------- ok ')
 
