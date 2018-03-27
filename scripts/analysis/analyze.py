@@ -272,7 +272,7 @@ def image_transcode(filename, out_folder, watermark ):
 
     if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
         return False
-    return os.path.exists(out_filename)
+    #return os.path.exists(out_filename)
 
 
     if watermark:
@@ -284,14 +284,14 @@ def image_transcode(filename, out_folder, watermark ):
         cmd_list.append( '-geometry' )
         cmd_list.append( '+10+10' )
         cmd_list.append( '-gravity' )
-        cmd_list.append( '-SouthWest' )
+        cmd_list.append( 'SouthWest' )
         cmd_list.append( '-composite' )
         cmd_list.append('-quality')
         cmd_list.append( '95')
         cmd_list.append(out_filename_logo)
         cmd = ' \\\n'.join(cmd_list) + '\n'
 
-        if not run(cmd, out_folder, 'transcode.log', 'transcode.err', 'transcode.sh'):
+        if not run(cmd, out_folder, 'transcode_logo.log', 'transcode_logo.err', 'transcode_logo.sh'):
             return False
 
         cmd_list = []
@@ -301,16 +301,16 @@ def image_transcode(filename, out_folder, watermark ):
         cmd_list.append( '-geometry' )
         cmd_list.append( '+10+10' )
         cmd_list.append( '-gravity' )
-        cmd_list.append( '-SouthWest' )
+        cmd_list.append( 'SouthWest' )
         cmd_list.append( '-composite' )
         cmd_list.append( '-quality')
         cmd_list.append( '95')
         cmd_list.append(out_filename_logo_fullres)
         cmd = ' \\\n'.join(cmd_list) + '\n'
     
-        if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
+        if not run(cmd, out_folder, 'transcode_logo_fullres.log', 'transcode_logo_fullres.err', 'transcode_logo_fullres.sh'):
             return False
-        return os.path.exists(out_filename)
+    return os.path.exists(out_filename)
         
 
 # -----------------------------------------------------
