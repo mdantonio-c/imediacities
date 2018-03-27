@@ -474,7 +474,8 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
 
 
 # -----------------------------------------------------
-def analize(filename, out_folder, fast=False):
+def analize(filename, item_type, out_folder, fast=False):
+    ''' Item type: "Video" or "Image". '''
 
     log('origin_tech_info --- begin')
     if not origin_tech_info(filename, out_folder):
