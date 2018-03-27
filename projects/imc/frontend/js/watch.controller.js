@@ -115,8 +115,7 @@
 		var formatted = '';
 		var photoref = '';
 		var shotnum = '';
-		var recordProvider,
-			defer = $q.defer();
+		var recordProvider, defer = $q.defer();
 
 		return {
 			getStartTime: function() {
@@ -1131,6 +1130,7 @@
 			});
 		};
 		self.editNote = function(note) {
+			//console.log("editNote: note=" + angular.toJson(note, true));
 			var shot_annotations = null;
 			var shotInfo = self.shots[note.shotNum-1];
 			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});		
@@ -1579,6 +1579,20 @@
 		var imageId = $stateParams.id;
 		self.image = $stateParams.meta;
 		//console.log("self.image="+angular.toJson(self.image));
+		// inizialize address for automplete input tag for geolocation
+		$scope.vm = {
+			address: {}
+		};
+		// to visualize annotations in the tab 
+		self.annotations = [];
+		// to visualize notes in notes tab 
+		self.notes = [];
+
+		// initialize multiselect to filter subtitles
+		$scope.options = [];
+		$scope.selectedOptions = [];
+		// items serve per la geolocalizzazione
+		self.items = [];
 		
 		self.setIdentifyingTitle = function(data) {
 			//console.log("setIdentifyingTitle");
@@ -1600,14 +1614,6 @@
 			return identifyingTitle;
 		};
 
-		// inizialize address for automplete input tag for geolocation
-		$scope.vm = {
-			address: {}
-		};
-		// to visualize annotations in the tab 
-		self.annotations = [];
-		// to visualize notes in notes tab 
-		self.notes = [];
 		self.loadImageAnnotations = function(imageId) {
 			//console.log("loading annotations for imageId: " + imageId);
 			self.loading = true;
@@ -1653,17 +1659,17 @@
 								if(!annos[i].attributes.private){
 									privacy = "public";
 								}
-								var noteInfo = {
+								var note = {
 									id: annos[i].id,
 									text: text,
-									textLanguage: textLanguage,
-									textLanguageCode: textLanguageCode,
+									language: textLanguage,
+									languageCode: textLanguageCode,
 									creation_datetime: creation_datetime,
 									creator: creatorId,
 									creatorName: creatorName,
 									privacy: privacy
 								};
-								self.notes.push(noteInfo);
+								self.notes.push(note);
 								//console.log('nota=' + angular.toJson(noteInfo));
 							}else{
 								console.log('not handled annotation type = '+annos[i].attributes.annotation_type.key);
@@ -1676,12 +1682,6 @@
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
-		// leggo le annotazioni dal db
-		self.loadImageAnnotations(imageId);
-
-		// initialize multiselect to filter subtitles
-		$scope.options = [];
-		$scope.selectedOptions = [];
 
 		self.manualtag = function(mode) {
 			console.log('manual tag: ' + mode);
@@ -1690,7 +1690,7 @@
 				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations});
 			}
 			else if (mode == 'notes') {
-				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: self.annotations});
+				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: null});
 			}
 			else if (mode == 'location') {
 				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations});
@@ -1762,23 +1762,33 @@
 			});
 		};
 		self.editNote = function(note) {
-			console.log("editNote: note=" + angular.toJson(note, true));
+			//console.log("editNote: note=" + angular.toJson(note, true));
 			var shot_annotations = null;
 			var shotInfo = null;
 			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});
 		};
-		// items serve per la geolocalizzazione
-		self.items = [];
+
 		self.loadMetadataContent = function(imageId) {
 			//console.log("loading metadata content for imageId: " + imageId);
 			self.loading = true;
 			DataService.getImageMetadata(imageId).then(
 				function(response) {
 					//console.log("get metadata response: " + angular.toJson(response));
-					self.image = response.data[0];
-					self.isShownAt = self.image.relationships.record_sources[0].attributes.is_shown_at;
-					sharedProperties.setRecordProvider(
-						self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
+					self.image = response.data[0];		
+					if(self.image){
+						self.isShownAt = self.image.relationships.record_sources[0].attributes.is_shown_at;
+						self.identifyingTitle = self.setIdentifyingTitle(self.image);
+						//console.log("self.identifyingTitle=" + self.identifyingTitle);
+						sharedProperties.setRecordProvider(self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
+						sharedProperties.setItemId(self.image.relationships.item[0].id);
+					}
+					setTimeout(function() {
+						$scope.$apply(function() {
+							self.loading = false;
+							self.loadImageAnnotations(imageId);
+						});
+					}, 2000);
+					noty.extractErrors(response, noty.WARNING);
 				},
 				function(error) {
 					console.log("get metadata error: " + angular.toJson(error));
@@ -1786,17 +1796,22 @@
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
+
 		if (!$stateParams.meta) {
 			//console.log("stateParams.meta is null, imageId="+imageId);
 			self.loadMetadataContent(imageId);
-			//console.log("self.identifyingTitle=" + self.identifyingTitle);
 		} else {
-			//console.log("stateParams.meta is not null: " + angular.toJson($stateParams.meta));
+			//console.log("stateParams.meta is not null: " + angular.toJson($stateParams.meta));		
+			if(self.image){
+				self.identifyingTitle = self.setIdentifyingTitle(self.image);
+				//console.log("self.identifyingTitle=" + self.identifyingTitle);
+				sharedProperties.setRecordProvider(self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
+				sharedProperties.setItemId(self.image.relationships.item[0].id);
+				self.isShownAt = self.image.relationships.record_sources[0].attributes.is_shown_at;
+			}
+			// leggo le annotazioni dal db
+			self.loadImageAnnotations(imageId);
 		}
-		self.identifyingTitle = self.setIdentifyingTitle(self.image);
-		//console.log("self.identifyingTitle=" + self.identifyingTitle);
-		sharedProperties.setRecordProvider(self.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
-		sharedProperties.setItemId(self.image.relationships.item[0].id);
 
 		self.getTagMenu = function(event) {
 		};
@@ -1861,7 +1876,8 @@
 		vm.videolng = null;
 		vm.locname = null;
 		vm.markers = [];
-		vm.mapLoading = $scope.$parent.watchCtrl.video === undefined ? true : false;
+		//vm.mapLoading = $scope.$parent.watchCtrl.video === undefined ? true : false;
+		vm.mapLoading = true;
 
 		// default location
 		vm.location = 'Strasburgo, FR';
@@ -1934,7 +1950,7 @@
 		};*/
 
 		NgMap.getMap("videomap").then(function(map) {
-			// console.log('get map for location: ' + vm.location);
+			//console.log('get map for location: ' + vm.location);
 			// start geocoding and get video coordinates
 			GeoCoder.geocode({
 					address: vm.location
@@ -2416,8 +2432,9 @@
 							"endT": $scope.endT
 						};
 						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
-						$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);				
 					}
+					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);				
+
 				},
 				function(err){
 					// TODO

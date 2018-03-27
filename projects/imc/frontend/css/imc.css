@@ -328,6 +328,10 @@ ul li p {
 .image-title-container .year{
 	color:#6e7a7f;
 	font-size: 18px;
+	padding: 5px 0; 
+}
+.image-title-container .image-icon {
+	padding: 5px 0; 
 }
 .primary-description>.text {
 	padding: 5px 0;

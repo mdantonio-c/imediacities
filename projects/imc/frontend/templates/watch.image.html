@@ -6,14 +6,14 @@
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
 			<div ng-style="{'float': 'left', 'width': '100%'}">
-				<div class="image-title-container">
-					<span class="title">{{watchCtrl.identifyingTitle}}</span>
-					<span class="year" ng-if="watchCtrl.image.attributes.date_created[0]">({{watchCtrl.image.attributes.date_created[0]}})</span>
-					<span class="light-blue" style="margin-left: 5px;">
-						<i class="fa fa-camera fa-lg"></i>
-					</span>
+				
+				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;" class="ng-binding">{{watchCtrl.identifyingTitle}}
+				</h2>
+				<div>
+					<i class="icon-only imc-icon fa grey bigger-110 fa-camera"></i>						
+					<span class="ng-binding">{{watchCtrl.image.attributes.date_created[0]}}</span>
+					<span class="label label-default label-city ng-binding">{{(watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
 				</div>
-
 				<div class="image-container">
 
 					<div class="anno-tools-container" id="anno-tools-container">
@@ -55,19 +55,18 @@
 			<ul style="padding-left: 20px;">
 				<li>
 					<div class="primary-description">
-						<!--
 						<div class="title">
-							<span>{{watchCtrl.identifyingTitle}}</span>
-						</div>
-						-->
-						<div class="text" ng-repeat="description in watchCtrl.image.relationships.descriptions">
-							<i class="imc-icon fa fa-quote-left"></i>
-							{{description.attributes.text}}
-						</div>
-						<p><b>Keyword(s)</b>:
-							<span ng-repeat="keyword in watchCtrl.image.relationships.keywords">
-							{{keyword.attributes.term}}{{$last ? '' : ', '}}</span>
-						</p>
+					 		<span>{{watchCtrl.identifyingTitle}}</span>					
+					 	</div> 				
+					 	<div class="text" ng-repeat="description in watchCtrl.image.relationships.descriptions">
+					 		<i class="imc-icon fa fa-quote-left"></i>
+					 		{{description.attributes.text}}
+					 	</div> 					
+					 	<p>
+					 		<b>Keyword(s)</b>:
+					 		<span ng-repeat="keyword in watchCtrl.image.relationships.keywords"> 						{{keyword.attributes.term}}{{$last ? '' : ', '}}
+					 		</span>
+					 	</p>
 					</div>
 					<div class="secondary-description">
 						<p><b>Production Year(s)</b>: {{watchCtrl.image.attributes.date_created[0] || 'Not available'}}</p>
@@ -219,12 +218,12 @@
 	<hr/>
 	<div class="row">
 		<div ng-controller="MapController as vm">
-<!--
+
 			<div class="container" 
 					ng-show="vm.mapLoading"
 					ng-style="{'float': 'left', 'width': '100%'}">
 					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
--->
+
 			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
 				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}" street-view-control="false">
 				<!--<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>-->
