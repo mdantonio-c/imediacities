@@ -1564,19 +1564,19 @@ li.ivh-treeview-node::before {
 	z-index: 1
 }
 
-.media .media-body {
+.media .media-content {
 	margin-left: 90px;
 	display: block;
 	width: 80%;
 	max-height: 80px;
 }
 
-.media .media-body .anno-info>ul>li { padding: 0px; }
-.media .media-body .anno-info .list-inline>li {
+.media .media-content .anno-info>ul>li { padding: 0px; }
+.media .media-content .anno-info .list-inline>li {
 	padding: 0px 0px 0px 5px !important;
 }
 
-.media .media-body .shot-info h4 {
+.media .media-content .shot-info h4 {
 	cursor: pointer;
 }
 
@@ -1771,6 +1771,11 @@ li.ivh-treeview-node::before {
     left: 0;
     right: 0;
     top: auto;
+}
+
+.media-body .search-actions .action-buttons a:focus,
+.media-body .search-actions .action-buttons a:hover {
+	text-decoration: none;
 }
 
 
