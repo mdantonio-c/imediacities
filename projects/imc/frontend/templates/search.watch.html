@@ -422,7 +422,7 @@
 											<i class="fa-li fa fa-tags light-brown"></i>
 											<ul class="list-inline">
 												<li ng-repeat="tag in shot.tags | filter: {spatial:'!'}">
-													<span class="label label-term">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
 												</li>
 											</ul>
 										</li>

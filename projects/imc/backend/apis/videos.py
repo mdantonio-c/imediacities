@@ -172,13 +172,15 @@ class VideoAnnotations(GraphBaseOperations):
             res['bodies'] = []
             for b in a.bodies.all():
                 anno_body = b.downcast()
-                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+                body = self.getJsonResponse(
+                    anno_body, max_relationship_depth=0)
                 if 'links' in body:
                     del(body['links'])
                 if a.annotation_type == 'TVS':
                     segments = []
                     for segment in anno_body.segments:
-                        json_segment = self.getJsonResponse(segment, max_relationship_depth=0)
+                        json_segment = self.getJsonResponse(
+                            segment, max_relationship_depth=0)
                         if 'links' in json_segment:
                             del(json_segment['links'])
                         segments.append(json_segment)
@@ -251,17 +253,28 @@ class VideoShots(GraphBaseOperations):
                     mdb = b.downcast()  # most derivative body
                     res['bodies'] .append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
-                    if 'ResourceBody' in mdb.labels():
-                        # mainly manual annotations here
-                        tag = tags.get((mdb.iri, mdb.name))
+                    if anno.annotation_type == 'TAG':
+                        spatial = None
+                        if 'ResourceBody' in mdb.labels():
+                            iri = mdb.iri
+                            name = mdb.name
+                            spatial = mdb.spatial
+                        elif 'TextualBody' in mdb.labels():
+                            iri = None
+                            name = mdb.value
+                        else:
+                            # unmanaged body type for tag
+                            continue
+                        ''' only for manual tag annotations  '''
+                        tag = tags.get((iri, name))
                         if tag is None:
-                            tags[(mdb.iri, mdb.name)] = {
-                                'iri': mdb.iri,
-                                'name': mdb.name,
+                            tags[(iri, name)] = {
+                                'iri': iri,
+                                'name': name,
                                 'hits': 1
                             }
-                            if mdb.spatial:
-                                    tags[(mdb.iri, mdb.name)]['spatial'] = mdb.spatial
+                            if spatial is not None:
+                                tags[(iri, name)]['spatial'] = spatial
                         else:
                             tag['hits'] += 1
                 shot['annotations'].append(res)
