@@ -726,7 +726,7 @@ class Shot(VideoSegment):
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
-        'Shot', 'WITHIN_SHOT', cardinality=ZeroOrMore)
+        'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
 
 
 class FragmentSelector(HeritableStructuredNode):

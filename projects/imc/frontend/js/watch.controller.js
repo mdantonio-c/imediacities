@@ -1266,7 +1266,8 @@
 							timestamp: shot.attributes.timestamp,
 							duration: parseInt(shot.attributes.duration),
 							thumb: shot.links.thumbnail,
-							framerange: framerange
+							framerange: framerange,
+							tags: shot.tags
 						};
 
 						// shot info for the timeline
@@ -1319,7 +1320,7 @@
 									};
 									$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 								}
-							}else if (anno.attributes.annotation_type.key === 'DSC') { // note
+							} else if (anno.attributes.annotation_type.key === 'DSC') { // note
 								//console.log('nota dal db=' + angular.toJson(anno));
 								// mi aspetto che la note abbia un solo body di tipo textual
 								// il backend mi manda solo quelle che posso vedere
@@ -1349,7 +1350,7 @@
 								//console.log('nota=' + angular.toJson(noteInfo));
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
 
-							}else{
+							} else{
 								console.log('not handled annotation type = '+anno.attributes.annotation_type.key);
 							}
 

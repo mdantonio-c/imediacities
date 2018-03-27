@@ -17,6 +17,7 @@ from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
 
 from restapi.flask_ext.flask_celery import CeleryExt
 
@@ -172,13 +173,15 @@ class VideoAnnotations(GraphBaseOperations):
             res['bodies'] = []
             for b in a.bodies.all():
                 anno_body = b.downcast()
-                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+                body = self.getJsonResponse(
+                    anno_body, max_relationship_depth=0)
                 if 'links' in body:
                     del(body['links'])
                 if a.annotation_type == 'TVS':
                     segments = []
                     for segment in anno_body.segments:
-                        json_segment = self.getJsonResponse(segment, max_relationship_depth=0)
+                        json_segment = self.getJsonResponse(
+                            segment, max_relationship_depth=0)
                         if 'links' in json_segment:
                             del(json_segment['links'])
                         segments.append(json_segment)
@@ -227,29 +230,75 @@ class VideoShots(GraphBaseOperations):
             # get all shot annotations:
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
+            shot['tags'] = []
+            # <dict(iri, name)>{iri, name, spatial, auto, hits}
+            tags = {}
             for anno in s.annotation.all():
+                creator = anno.creator.single()
                 if anno.private:
-                    if anno.creator is None:
+                    if creator is None:
                         logger.warn('Invalid state: missing creator for private '
                                     'note [UUID:{}]'.format(anno.uuid))
                         continue
-                    creator = anno.creator.single()
                     if creator is not None and creator.uuid != user.uuid:
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
                 if (anno.annotation_type in ('TAG', 'DSC') and
-                        anno.creator is not None):
+                        creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
                 # attach bodies
                 res['bodies'] = []
                 for b in anno.bodies.all():
+                    mdb = b.downcast()  # most derivative body
                     res['bodies'] .append(
-                        self.getJsonResponse(
-                            b.downcast(), max_relationship_depth=0))
+                        self.getJsonResponse(mdb, max_relationship_depth=0))
+                    if anno.annotation_type == 'TAG':
+                        spatial = None
+                        if 'ResourceBody' in mdb.labels():
+                            iri = mdb.iri
+                            name = mdb.name
+                            spatial = mdb.spatial
+                        elif 'TextualBody' in mdb.labels():
+                            iri = None
+                            name = mdb.value
+                        else:
+                            # unmanaged body type for tag
+                            continue
+                        ''' only for manual tag annotations  '''
+                        tag = tags.get((iri, name))
+                        if tag is None:
+                            tags[(iri, name)] = {
+                                'iri': iri,
+                                'name': name,
+                                'hits': 1
+                            }
+                            if spatial is not None:
+                                tags[(iri, name)]['spatial'] = spatial
+                        else:
+                            tag['hits'] += 1
                 shot['annotations'].append(res)
 
+            # add any other tags from "embedded segments"
+            for segment in s.embedded_segments.all():
+                # get ONLY public tags
+                for s_anno in segment.annotation.search(annotation_type='TAG', private=False):
+                    for b in s_anno.bodies.all():
+                        mdb = b.downcast()  # most derivative body
+                        if 'ODBody' in mdb.labels():
+                            # object detection body
+                            concept = mdb.object_type.single()
+                            tag = tags.get((concept.iri, concept.name))
+                            if tag is None:
+                                tags[(concept.iri, concept.name)] = {
+                                    'iri': concept.iri,
+                                    'name': concept.name,
+                                    'hits': 1
+                                }
+                            else:
+                                tag['hits'] += 1
+            shot['tags'] = list(tags.values())
             data.append(shot)
 
         return self.force_response(data)
@@ -343,7 +392,7 @@ class VideoTools(GraphBaseOperations):
     @graph_transactions
     def post(self, video_id):
 
-        logger.debug('launch automatic toll for video id: %s' % video_id)
+        logger.debug('launch automatic tool for video id: %s' % video_id)
 
         if video_id is None:
             raise RestApiException(
@@ -379,6 +428,13 @@ class VideoTools(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a valid tool. Expected one of %s." %
                 (self.__available_tools__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        # DO NOT re-launch object detection twice for the same video!
+        repo = AnnotationRepository(self.graph)
+        if repo.check_automatic_tagging(item.uuid):
+            raise RestApiException(
+                "Object detection CANNOT be run twice for the same video.",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         task = CeleryExt.launch_tool.apply_async(
