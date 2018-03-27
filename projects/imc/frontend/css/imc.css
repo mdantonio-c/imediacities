@@ -290,14 +290,12 @@ ul {
 	text-align: left;
 }
 
-ul li {
-	/*border-bottom: 1px solid #ddd;*/
+/* ul li {
 	border-bottom: 1px;
 	padding: 10px;
 	overflow: visible;
 }
 ul li:first-child {
-	/*border-top: 1px solid #ddd;*/
 	border-top: 1px;
 }
 
@@ -311,10 +309,9 @@ ul li img {
 }
 
 ul li p {
-	//margin-left: 25px;
 	padding-top: 4px;
 	color:#6e7a7f;
-}
+}*/
 
 .primary-description .title {
 	padding: 5px 0; 
@@ -1573,7 +1570,7 @@ li.ivh-treeview-node::before {
 
 .media .media-content .anno-info {
 	max-height: 80px;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 .media .media-content .anno-info>ul>li { padding: 0px; }
 .media .media-content .anno-info .list-inline>li {

@@ -392,8 +392,16 @@
 						</tbody>
 					</table>
 				</div>
+				<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</uib-tab>
 			<uib-tab class="Storyboard" heading="Storyboard">
+			<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			<div class="storyboard">
 				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
 					<div class="media-left">
