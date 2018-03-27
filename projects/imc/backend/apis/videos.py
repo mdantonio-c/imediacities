@@ -17,6 +17,7 @@ from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
 
 from restapi.flask_ext.flask_celery import CeleryExt
 
@@ -391,7 +392,7 @@ class VideoTools(GraphBaseOperations):
     @graph_transactions
     def post(self, video_id):
 
-        logger.debug('launch automatic toll for video id: %s' % video_id)
+        logger.debug('launch automatic tool for video id: %s' % video_id)
 
         if video_id is None:
             raise RestApiException(
@@ -427,6 +428,13 @@ class VideoTools(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a valid tool. Expected one of %s." %
                 (self.__available_tools__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        # DO NOT re-launch object detection twice for the same video!
+        repo = AnnotationRepository(self.graph)
+        if repo.check_automatic_tagging(item.uuid):
+            raise RestApiException(
+                "Object detection CANNOT be run twice for the same video.",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         task = CeleryExt.launch_tool.apply_async(
