@@ -173,7 +173,7 @@ def image_origin_tech_info(filename, out_folder):
     cmd = ' \\\n'.join(cmd_list) + '\n'
 
     res = run(cmd, out_folder, 'origin_info.out', 'origin_info.err', 'origin_info.sh')
-
+    return res
 # -----------------------------------------------------
 def transcoded_tech_info(filename, out_folder):
 
@@ -691,7 +691,7 @@ def main(args):
     logfile = open(os.path.join(out_folder, "log.txt"), "w")
     log("Analize " + movie)
 
-    if analize(filename, out_folder, fast):
+    if analize(filename, 'Image', out_folder, fast):
         log('Analize done')
     else:
         log('Analize terminated with errors')
