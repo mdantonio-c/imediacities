@@ -1,0 +1,434 @@
+<div
+	ng-if="datactrl.loading"
+	ng-include="main.templateDir + 'loader.html'">
+</div>
+<div ng-controller='WatchImageController as watchCtrl' id="item-wrapper">
+	<div class="row">
+		<div class="col-xs-12 col-md-6">
+			<div ng-style="{'float': 'left', 'width': '100%'}">
+				
+				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;" class="ng-binding">{{watchCtrl.identifyingTitle}}
+				</h2>
+				<div>
+					<i class="icon-only imc-icon fa grey bigger-110 fa-camera"></i>						
+					<span class="ng-binding">{{watchCtrl.image.attributes.date_created[0]}}</span>
+					<span class="label label-default label-city ng-binding">{{(watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+				</div>
+				<div class="image-container">
+
+					<div class="anno-tools-container" id="anno-tools-container">
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('location');"
+							tooltip-placement="right"
+							uib-tooltip="Tag by location">
+							<i class="imc-icon fa fa-globe fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('term');"
+							tooltip-placement="right"
+							uib-tooltip="Tag&nbsp;by term">
+							<i class="imc-icon fa fa-tag fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('notes');"
+							tooltip-placement="right"
+							uib-tooltip="Add a&nbsp;note">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+						</div>
+					</div>
+
+
+
+					<img id="image-content" src="{{watchCtrl.image.links['content'] | trustUrl }}" alt="{{watchCtrl.image.description}}" style="width:100%;"> 
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-xs-12 col-md-6">
+			<uib-tabset>
+
+			<uib-tab heading="Metadata">
+			<!-- metadata -->
+			<ul style="padding-left: 20px;">
+				<li>
+					<div class="primary-description">
+						<div class="title">
+					 		<span>{{watchCtrl.identifyingTitle}}</span>					
+					 	</div> 				
+					 	<div class="text" ng-repeat="description in watchCtrl.image.relationships.descriptions">
+					 		<i class="imc-icon fa fa-quote-left"></i>
+					 		{{description.attributes.text}}
+					 	</div> 					
+					 	<p>
+					 		<b>Keyword(s)</b>:
+					 		<span ng-repeat="keyword in watchCtrl.image.relationships.keywords"> 						{{keyword.attributes.term}}{{$last ? '' : ', '}}
+					 		</span>
+					 	</p>
+					</div>
+					<div class="secondary-description">
+						<p><b>Production Year(s)</b>: {{watchCtrl.image.attributes.date_created[0] || 'Not available'}}</p>
+						<p><b>Contributors</b>:
+							<span ng-repeat="contrib in watchCtrl.image.relationships.contributors">
+							{{contrib.attributes.names[0] | nocomma}} <i ng-if="contrib.attributes.activities">
+								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p><b>Location</b>: {{watchCtrl.image.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
+						<p><b>Owner</b>: {{watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}</p>
+						<p><b>Is shown at</b>:
+							<a target="_blank" href="{{watchCtrl.isShownAt}}" ng-if="watchCtrl.isShownAt">{{watchCtrl.isShownAt}}</a>
+							<span ng-if="!watchCtrl.isShownAt">Not available</span>
+						</p>
+						<p><b>Copyright</b>: {{watchCtrl.image.attributes.rights_status.description || 'Not available'}}</p>
+						<p><b>Rightholder(s)</b>:
+							<span ng-repeat="rightholder in watchCtrl.image.relationships.rightholders">
+							{{rightholder.attributes.name | nocomma}}{{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p ng-if="watchCtrl.image.relationships.languages && watchCtrl.image.relationships.languages[0].attributes"><b>Language(s)</b>:
+							<span ng-repeat="lang in watchCtrl.image.relationships.languages">
+							{{lang.attributes.code.description}} ({{lang.attributes.usage.description}}) {{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p ng-if="watchCtrl.image.relationships.titles && watchCtrl.image.relationships.titles[0].attributes">
+							<b>Other title(s)</b>:
+							<span ng-repeat="otitle in watchCtrl.image.relationships.titles">
+								{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}
+							</span>
+						</p>
+						<p><b>Specific type</b>: {{watchCtrl.image.attributes.specific_type.description || 'Not available'}}</p>
+						<p><b>Physical format size</b>: {{watchCtrl.image.attributes.phisical_format_size || 'Not available'}}</p>
+						<p><b>Colour</b>: {{watchCtrl.image.attributes.colour || 'Not available'}}</p>
+						<p><b>Digital format</b>: {{watchCtrl.image.relationships.item[0].attributes.digital_format || 'Not available'}}
+						</p>
+					</div>
+				</li>
+			</ul>
+			<div class="sb-modal-parent"></div>
+			</uib-tab>
+
+			<!-- notes -->
+			<uib-tab heading="Notes">
+			<ul style="padding-left: 20px;">
+				<li>
+					
+						<table class="table table-striped">
+							<tr ng-repeat="note in watchCtrl.notes">
+							<td>
+								<div>
+									<span class="note-user-icon">
+										<i class="imc-icon fa fa-user fa-4x pull-left"></i>
+									</span>
+								</div>
+								<div style="display: inline-block;height: 60px;">
+									<p style="margin: 0;">
+										<span class="note-user-name">{{note.creatorName}}</span>
+									</p>
+									<p style="margin: 0;padding-top: 0">
+										<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+											<i class="imc-icon fa fa-clock-o light-grey"></i>
+											{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+										</span>
+										
+									</p>
+									<p style="margin: 0;">
+										<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
+											<i class="imc-icon fa fa-lock"></i>
+										</span>
+									</p>
+								</div>
+								<div style="display:  inline-block;float: right;">
+									<span class="note-bin">
+									<a class="btn btn-danger btn-xs"
+										ng-click="watchCtrl.deleteNote(note)"
+										ng-confirm-click="Are you sure you want to delete this note?"
+										tooltip-placement="left"
+										uib-tooltip="Delete note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-trash-o"> </i>
+									</a>
+									</span>
+									<span class="note-bin">
+									<a class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.editNote(note)"
+										tooltip-placement="left"
+										uib-tooltip="Edit note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-edit"> </i>
+									</a>
+									</span>
+								</div>
+								<div>
+									<p>
+										<span class="note-text">
+											<i class="imc-icon fa fa-quote-left"></i>
+											{{note.text}}
+										</span>
+									</p>
+								</div>
+							</td>
+							</tr>
+						</table>
+					
+				</li>
+			</ul>
+
+			</uib-tab>
+
+			<uib-tab heading="Annotations">
+				<ul style="padding-left: 20px;">
+				<li>
+					<div>
+						<table st-table="watchCtrl.annotations" class="table table-striped">
+							<thead>
+								<tr>
+									<th st-sort="group">category</th>
+									<th st-sort="name">term</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'anno.attributes.annotation_type.annotation_type'">
+									<td>{{anno.group}}</td>
+									<td>{{anno.name}}</td>
+									<td>
+										<a class="btn btn-danger btn-xs"
+											ng-click="watchCtrl.deleteAnnotation(anno)"
+											ng-confirm-click="Are you sure you want to delete this annotation?"
+											tooltip-placement="left"
+											uib-tooltip="Delete annotation"
+											ng-if="profile.uuid == anno.creator">
+											<i class="fa fa-trash-o"> </i>
+										</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</li>
+				</ul>
+			</uib-tab>
+
+			</uib-tabset>
+		</div>
+	</div>
+	<hr/>
+	<div class="row">
+		<div ng-controller="MapController as vm">
+
+			<div class="container" 
+					ng-show="vm.mapLoading"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+
+			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
+				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}" street-view-control="false">
+				<!--<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>-->
+				<div id="class" ng-repeat="marker in vm.markers | orderBy : 'title'">
+					<marker position="[{{marker.videolat}}, {{marker.videolng}}]"  title="{{marker.locname}}" animation="Animation.BOUNCE"></marker>
+					<marker ng-click="$vm.openInfoWindow($event, marker);"></marker>
+				</div>
+				</ng-map>
+			</div>
+		</div>
+	</div>
+
+	<!-- location modal -->
+	<script type="text/ng-template" id="myModalGeoCode.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
+			<h4 class="modal-title">Add a location to this image</h4>
+		</div>
+		<div class="modal-body">
+			<p>Choose a location and click on the tag button.</p>
+			<form name="formAutocomplete">
+				<div class="input-group animated fadeIn">
+					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Enter location: City, State..."/>
+					<span class="input-group-btn">
+						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
+					</span>
+				</div>
+			</form>
+			<div class="space-8"></div>
+			<div uib-alert 
+				ng-repeat="alert in $tagCtrl.alerts"
+				ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="5000" 
+				close="$tagCtrl.closeAlert($index)">{{alert.msg}}</div>
+			<p>{{items}}</p>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" ng-click="$tagCtrl.cancel()">Cancel</button>
+		</div>
+	</script>
+
+	<script type="text/ng-template" id="result.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This location has been found</h4>
+		</div>
+		<div class="modal-body">
+			<p><b>You searched for: </b>{{geoResult}}</p>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" type="button" ng-click="ok('IMAGE','ITEM')">Confirm</button>
+			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		</div>
+	</script>
+	<!-- term modal -->
+	<script type="text/ng-template" id="myModalVocab.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
+			<h4 class="modal-title">Add a vocabulary term to this image</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-4">
+
+				</div>
+				<div class="col-sm-4">
+					<p>Choose one or more terms</p>
+					<!-- add here tree view -->
+					<div class="widget-main padding-8">
+						<input type="text" ng-model="$tagCtrl.termSearch" />
+						<div class="space-4"></div>
+						<div class="tree-container">
+							<div
+								ivh-treeview="$tagCtrl.vocabulary"
+								ivh-treeview-filter="$tagCtrl.termSearch"
+								ivh-treeview-node-tpl="$tagCtrl.treeviewTpl"
+								ivh-treeview-on-cb-change="$tagCtrl.toggleTerm(ivhNode)">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<p>... or add a new term.</p>
+					<!-- add here tag selected -->
+					<tags-input ng-model="$tagCtrl.tags" 
+						display-property="label" add-on-paste="true"
+						on-tag-removed="$tagCtrl.deselectTreeviewNode($tag)"
+						on-tag-added="$tagCtrl.selectTreeviewNode($tag)">
+				      <auto-complete source="$tagCtrl.loadVocabularyTerms($query)"></auto-complete>
+				    </tags-input>
+				    <!-- <p>Model: {{$tagCtrl.tags}}</p> -->
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms('IMAGE','ITEM')">Confirm</button>
+		</div>
+	</script>
+	<!-- notes modal -->
+	<script type="text/ng-template" id="myModalNotes.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$notesCtrl.cancel()">x</button>
+			<h4 class="modal-title">{{modalTitle}}</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-4">
+				</div>
+				<div class="col-sm-4">
+
+				</div>
+				<div class="col-sm-8">
+					<div class="modal-div-1">
+
+						<div class="modal-div-options">
+							<div class="modal-div-select-0">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.form.privacy.selected"
+								ng-options="o as o for o in $notesCtrl.form.privacy.options">
+								</select>
+							</div>
+							<!--
+							<div class="modal-div-select-1">
+								<select id="form-field-select-1" class="modal-select-1" ng-model="
+								$notesCtrl.form.type.selected"
+								ng-options="o as o for o in $notesCtrl.form.type.options">
+								</select>
+							</div>
+							-->
+							<div class="modal-div-select-2">
+								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.form.language.selected"
+								ng-options="o as o for o in $notesCtrl.form.language.options">
+									<option value="">language of text</option>
+								</select>
+							</div>
+
+						</div>
+
+						<textarea id="form-field-11" ng-model="$notesCtrl.form.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
+						</textarea>
+
+					</div>
+
+					
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$notesCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$notesCtrl.confirmNote('IMAGE','ITEM')">Confirm</button>
+		</div>
+	</script>
+	<script type="text/ng-template" id="termFoundModal.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This annotation has been already added to the shot</h4>
+		</div>
+		<div class="modal-body">
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning!</strong> Please try adding a different term.
+			</div>
+		</div>
+		<div class="modal-footer">
+			<p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p>
+			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		</div>
+	</script>
+
+	<script type="text/ng-template" id="locationFoundModal.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This location has been already added to the shot</h4>
+		</div>
+		<div class="modal-body">
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning!</strong> Please try adding a different location.
+			</div>
+		</div>
+		<div class="modal-footer">
+			<p class="pull-left"><b>Locations cannot be duplicated on the same shot</p>
+			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		</div>
+	</script>
+
+	<script type="text/ng-template" id="confirmModal.html">
+		<div class="modal-header modal-header-confirm">
+			<button type="button" class="close" ng-click="no()">x</button>
+			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
+		</div>
+		<div class="modal-body">Do you really want to remove this annotation?</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="yes()">Yes</button>
+			<button class="btn btn-warning" ng-click="no()">No</button>
+		</div>
+	</script>
+	<script type="text/ng-template" id="confirmNoteModal.html">
+		<div class="modal-header modal-header-confirm">
+			<button type="button" class="close" ng-click="no()">x</button>
+			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
+		</div>
+		<div class="modal-body">Do you really want to remove this note?</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="yes()">Yes</button>
+			<button class="btn btn-warning" ng-click="no()">No</button>
+		</div>
+	</script>
+	<div class="tag-modal-parent">
+    </div>
+</div>
