@@ -80,6 +80,8 @@ def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
 
 
 # -----------------------------------------------------
+# now called from outside
+# -----------------------------------------------------
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
 # and link the givel filename as  movie_analize_folder/origin + movie_ext
 def make_movie_analize_folder(filename, clean=False):
@@ -161,6 +163,16 @@ def origin_tech_info(filename, out_folder):
     '''
     return res
 
+# -----------------------------------------------------
+def image_origin_tech_info(filename, out_folder):
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append(filename)
+    cmd_list.append( os.path.join(out_folder, 'origin_info.json') )
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    res = run(cmd, out_folder, 'origin_info.out', 'origin_info.err', 'origin_info.sh')
 
 # -----------------------------------------------------
 def transcoded_tech_info(filename, out_folder):
@@ -173,6 +185,17 @@ def transcoded_tech_info(filename, out_folder):
     res = run(cmd, out_folder, 'transcoded_info.json', 'transcoded_info.err', 'transcoded_info.sh')
     return res
 
+# -----------------------------------------------------
+def image_transcoded_tech_info(filename, out_folder):
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append(filename)
+    cmd_list.append( os.path.join(out_folder, 'transcoded_info.json') )
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    res = run(cmd, out_folder, 'transcoded_info.out', 'transcoded_info.err', 'transcoded_info.sh')
+    return res
 
 # -----------------------------------------------------
 def transcoded_num_frames(out_folder):
@@ -211,6 +234,42 @@ def transcode(filename, out_folder):
 
     # to check if a movie is sane --- try to encode using a null output, so you only do the reading
     # ffmpeg -v error -i input -f null - 2> error.log
+
+
+# -----------------------------------------------------
+def image_transcode(filename, out_folder):
+    ''' transcode an image to jpg, with a compression quality of 95
+        rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
+        also save a full resolution version as transcoded_fullres.jpg
+    '''    
+
+    out_filename         = os.path.join(out_folder, 'transcoded.jpg')
+    out_filename_fullres = os.path.join(out_folder, 'transcoded_fullres.jpg')
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append( filename )
+    cmd_list.append('-resize')
+    cmd_list.append('800x600\>')
+    cmd_list.append('-quality')
+    cmd_list.append('95')
+    cmd_list.append(out_filename)
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    if not run(cmd, out_folder, 'transcode.log', 'transcode.err', 'transcode.sh'):
+        return False
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append( filename )
+    cmd_list.append('-quality')
+    cmd_list.append('95')
+    cmd_list.append(out_filename_fullres)
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
+        return False
+    return os.path.exists(out_filename)
 
 
 # -----------------------------------------------------
@@ -472,10 +531,8 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
 
     return True
 
-
 # -----------------------------------------------------
-def analize(filename, item_type, out_folder, fast=False):
-    ''' Item type: "Video" or "Image". '''
+def analize_movie(filename, out_folder, fast=False):
 
     log('origin_tech_info --- begin')
     if not origin_tech_info(filename, out_folder):
@@ -530,7 +587,6 @@ def analize(filename, item_type, out_folder, fast=False):
         log('vimotion ----------- ok ')
 
     # summary_out = os.path.join(out_folder, 'summary.jpg')
-
     # if fast and os.path.exists(summary_out):
     #     log('summary ------------ skipped ')
     # else:
@@ -546,6 +602,44 @@ def analize(filename, item_type, out_folder, fast=False):
 
     return True
 
+# -----------------------------------------------------
+def analize_image(filename, out_folder, fast=False):
+
+    log('image_origin_tech_info --- begin')
+    if not image_origin_tech_info(filename, out_folder):
+        return False
+    log('image_origin_tech_info --- ok ')
+
+
+    tr_image = os.path.join(out_folder, 'transcoded.jpg')
+
+
+    log('image_transcode ---------- begin ')
+    if not image_transcode(filename, out_folder):
+        return False
+    log('image_transcode ---------- ok ')
+
+    log('image_transcoded_info ---- begin ')
+    if not image_transcoded_tech_info(tr_image, out_folder):
+        return False
+    log('image_transcoded_info ---- ok ')
+
+    return True
+
+
+# -----------------------------------------------------
+def analize(filename, item_type, out_folder, fast=False):
+    ''' Item type: "Video" or "Image". '''
+
+    if item_type == "Video":
+        return analize_movie( filename, out_folder, fast )
+        
+    if item_type == "Image":
+        return analize_image( filename, out_folder, fast )
+
+    print( "analize error: bad item_type :", item_type )
+    return false
+
 
 # -----------------------------------------------------
 help = ''' usage:  python3 analyze.py [options] [filename]
@@ -556,6 +650,9 @@ options:
 '''
 
 
+# -----------------------------------------------------
+# not called form IMC
+# IMC calls make_movie_analize_folder (if needed) and analize
 # -----------------------------------------------------
 def main(args):
     global logfile
