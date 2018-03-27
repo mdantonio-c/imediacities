@@ -1571,6 +1571,10 @@ li.ivh-treeview-node::before {
 	max-height: 80px;
 }
 
+.media .media-content .anno-info {
+	max-height: 80px;
+	overflow-y: scroll;
+}
 .media .media-content .anno-info>ul>li { padding: 0px; }
 .media .media-content .anno-info .list-inline>li {
 	padding: 0px 0px 0px 5px !important;
