@@ -19,7 +19,8 @@
             'googlechart',
             'ngFileSaver',
             'ivh.treeview',
-            'ngTagsInput'
+            'ngTagsInput',
+            'ngHolder'
         ]);
 
 })();

@@ -20,6 +20,10 @@ video_content:
       required: true
       description: content type (e.g. video, thumbnail, summary)
       type: string
+    - name: size
+      in: query
+      description: used to get large thumbnail (only for that at the moment)
+      type: string
   responses:
     '200':
       description: Video content successfully retrieved

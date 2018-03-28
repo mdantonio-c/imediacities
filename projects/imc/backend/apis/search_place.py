@@ -6,7 +6,9 @@ Search endpoint for places
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-
+from flask import request
+from utilities.helpers import get_api_url
+from restapi.confs import PRODUCTION
 from utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
@@ -36,6 +38,7 @@ class SearchPlace(GraphBaseOperations):
             raise RestApiException('Expected at least one relevant place list',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
         data = []
+        api_url = get_api_url(request, PRODUCTION)
         for item in place_list:
             creation_id = item.get('creation-id')
             if creation_id is None:
@@ -64,7 +67,11 @@ class SearchPlace(GraphBaseOperations):
                     'external_ids': row[0]['external_ids'],
                     'rights_status': row[0]['rights_status'],
                     'type': row[0]['type'],
-                    'provider': row[0]['provider']
+                    'provider': row[0]['provider'],
+                    'links': {
+                        'content': api_url + 'api/videos/' + row[0]['uuid'] + '/content?type=video',
+                        'thumbnail': api_url + 'api/videos/' + row[0]['uuid'] + '/content?type=thumbnail',
+                    }
                 }
                 # PRODUCTION YEAR: get the first year in the array
                 if 'production_years' in row[0]:
