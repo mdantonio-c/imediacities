@@ -190,53 +190,47 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             extract_tech_info(self, item_node, analyze_path)
 
-            # FIXME naive filter
-            # find TVS and VQ annotations with this item as source
-            annotations = item_node.sourcing_annotations.all()
-            if annotations is not None:
-                repo = AnnotationRepository(self.graph)
-                # here we expect ONLY one anno if present
-                for anno in annotations:
-                    anno_id = anno.id
-                    if anno.annotation_type == 'TVS':
-                        log.debug(anno)
-                        repo.delete_tvs_annotation(anno)
-                        log.info(
-                            "Deleted existing TVS annotation [%s]"
-                            % anno_id)
-                    elif anno.annotation_type == 'VIM':
-                        log.debug(anno)
-                        repo.delete_vim_annotation(anno)
-                        log.info(
-                            "Deleted existing VIM annotation [%s]"
-                            % anno_id)
+            # - ONLY for videos -
+            # extract TVS and VIM results
+            if item_type == 'Video':
+                # find TVS and VIM annotations with this item as source
+                annotations = item_node.sourcing_annotations.all()
+                if annotations is not None:
+                    repo = AnnotationRepository(self.graph)
+                    # here we expect ONLY one anno if present
+                    for anno in annotations:
+                        anno_id = anno.id
+                        if anno.annotation_type == 'TVS':
+                            log.debug(anno)
+                            repo.delete_tvs_annotation(anno)
+                            log.info(
+                                "Deleted existing TVS annotation [%s]"
+                                % anno_id)
+                        elif anno.annotation_type == 'VIM':
+                            log.debug(anno)
+                            repo.delete_vim_annotation(anno)
+                            log.info(
+                                "Deleted existing VIM annotation [%s]"
+                                % anno_id)
 
-            extract_tvs_vim_annotations(self, item_node, analyze_path)
+                extract_tvs_vim_annotations(self, item_node, analyze_path)
 
-            # automatic object detection
+            # extract automatic object detection results
             try:
                 extract_od_annotations(self, item_node, analyze_path)
             except IOError:
                 log.warn('Could not find OD results file.')
 
-            # TODO
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
             content_node.save()
-
-            # TO FIX: move video in the datadir
-            # os.rename(video_path, datadir/video_node.uuid)
 
             xml_resource.status = 'COMPLETED'
             xml_resource.status_message = 'Nothing to declare'
             xml_resource.save()
 
             progress(self, 'Completed', path)
-            # os.remove(path)
 
-        # except self.graph.File.DoesNotExist:
-        #     progress(self, 'Import error', None)
-        #     log.error("Task error, path %s not found" % path)
         except Exception as e:
             progress(self, 'Import error', None)
             log.error("Task error, %s" % e)
@@ -367,12 +361,13 @@ def extract_tech_info(self, item, analyze_dir_path):
     if not os.path.exists(analyze_dir_path):
         raise IOError(
             "Analyze results does not exist in the path %s", analyze_dir_path)
+
     # check for info result
-    tech_info_filename = 'transcoded_info.json'  # 'origin_info.json'
+    tech_info_filename = 'transcoded_info.json'
     tech_info_path = os.path.join(
         os.path.dirname(analyze_dir_path), tech_info_filename)
     if not os.path.exists(tech_info_path):
-        log.warning("Info tech CANNOT be extracted: [%s] does not exist",
+        log.warning("Technical info CANNOT be extracted: [%s] does not exist",
                     tech_info_path)
         return
 
@@ -380,30 +375,30 @@ def extract_tech_info(self, item, analyze_dir_path):
     with open(tech_info_path) as data_file:
         data = json.load(data_file)
 
-    # FIXME to get the thumbnail assigned to a given AV digital object?
-    # thumbnail
-    thumbnails_uri = os.path.join(analyze_dir_path, 'thumbs/')
-    item.thumbnail = get_thumbnail(thumbnails_uri)
-    # duration
-    item.duration = data["streams"][0]["duration"]
-    # framerate
-    item.framerate = data["streams"][0]["avg_frame_rate"]
-    # dimension
-    item.dimension = data["format"]["size"]
-    # format
     item.digital_format = [None for _ in range(4)]
-    # container: e.g."AVI", "MP4", "3GP"
-    item.digital_format[0] = data["format"]["format_name"]
-    # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
-    item.digital_format[1] = data["streams"][0]["codec_long_name"]
-    # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
-    item.digital_format[2] = data["format"]["format_long_name"]
-    # resolution: The degree of sharpness of the digital object expressed in
-    # lines or pixel
-    item.digital_format[3] = data["format"]["bit_rate"]
-
-    item.uri = data["format"]["filename"]
     if item.item_type == 'Video':
+        # get the thumbnail assigned to a given AV digital object
+        thumbnails_uri = os.path.join(analyze_dir_path, 'thumbs/')
+        item.thumbnail = get_thumbnail(thumbnails_uri)
+        # duration
+        item.duration = data["streams"][0]["duration"]
+        # framerate
+        item.framerate = data["streams"][0]["avg_frame_rate"]
+        # dimension
+        item.dimension = data["format"]["size"]
+        # format
+        # container: e.g."AVI", "MP4", "3GP"
+        item.digital_format[0] = data["format"]["format_name"]
+        # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
+        item.digital_format[1] = data["streams"][0]["codec_long_name"]
+        # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
+        item.digital_format[2] = data["format"]["format_long_name"]
+        # resolution: The degree of sharpness of the digital object expressed in
+        # lines or pixel
+        item.digital_format[3] = data["format"]["bit_rate"]
+
+        item.uri = data["format"]["filename"]
+
         # summary
         summary_filename = 'summary.jpg'
         summary_path = os.path.join(
@@ -413,8 +408,32 @@ def extract_tech_info(self, item, analyze_dir_path):
                         summary_filename, analyze_dir_path))
         else:
             item.summary = summary_path
-    item.save()
 
+    elif item.item_type == 'Image':
+        item.uri = data['image']['name']
+        item.thumbnail = data['image']['name']  # FIXME not available!
+
+        # FIXME filese MUST be an Iteger of bytes (not e.g. 4.1KB)
+        # item.dimension = data['image']['filesize']
+
+        # format
+        # container: e.g."AVI", "MP4", "3GP", TIFF
+        item.digital_format[0] = data['image']['format']
+        # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
+        item.digital_format[1] = data['image']["compression"]
+        # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
+        item.digital_format[2] = data['image']['mimeType']
+        # resolution: The degree of sharpness of the digital object expressed in
+        # lines or pixel
+        item.digital_format[3] = data['image']["numberPixels"]
+
+    else:
+        log.warning('Ivalid type. Technical info CANNOT be extracted for '
+                    'Item[{uuid}] with type {type}'.format(
+                        uuid=item.uuid, type=item.item_type))
+        return
+
+    item.save()
     log.info('Extraction of techincal info completed')
 
 

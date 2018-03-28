@@ -62,17 +62,28 @@ class SearchPlace(GraphBaseOperations):
                     uuid=creation_id, place_ids=place_ids)
             result = self.graph.cypher(query)
             for row in result:
+                creation_uuid = row[0]['uuid']
+                creation_type = row[0]['type']
                 creation = {
-                    'uuid': row[0]['uuid'],
+                    'uuid': creation_uuid,
                     'external_ids': row[0]['external_ids'],
                     'rights_status': row[0]['rights_status'],
-                    'type': row[0]['type'],
-                    'provider': row[0]['provider'],
-                    'links': {
-                        'content': api_url + 'api/videos/' + row[0]['uuid'] + '/content?type=video',
-                        'thumbnail': api_url + 'api/videos/' + row[0]['uuid'] + '/content?type=thumbnail',
-                    }
+                    'type': creation_type,
+                    'provider': row[0]['provider']
                 }
+                # add some useful links
+                if creation_type == 'Video':
+                    creation['links'] = {}
+                    creation['links']['content'] = api_url + 'api/videos/' + \
+                        creation_uuid + '/content?type=video'
+                    creation['links']['thumbnail'] = api_url + 'api/videos/' + \
+                        creation_uuid + '/content?type=thumbnail'
+                elif creation_type == 'Image':
+                    creation['links'] = {}
+                    creation['links']['content'] = api_url + 'api/images/' + \
+                        creation_uuid + '/content?type=video'
+                    creation['links']['thumbnail'] = api_url + 'api/images/' + \
+                        creation_uuid + '/content?type=thumbnail'
                 # PRODUCTION YEAR: get the first year in the array
                 if 'production_years' in row[0]:
                     creation['year'] = row[0]['production_years'][0]
