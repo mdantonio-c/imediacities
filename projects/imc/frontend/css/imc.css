@@ -2206,6 +2206,8 @@ li.ivh-treeview-node::before {
 .tab-notes
 {
 	overflow: hidden;
+    max-height: 800px;
+    max-width: 100%;
 }
 .tab-notes-title
 {
@@ -2217,10 +2219,8 @@ li.ivh-treeview-node::before {
 {
 	display: inline-block;
 	border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    width: 70%;
-    height: 500px;
+    width: 85%;
+    height: 800px;
     vertical-align: top;
     overflow-y: auto;
 }
@@ -2231,9 +2231,10 @@ li.ivh-treeview-node::before {
 .tab-list-shots
 {
 	display: inline-block;
-    width: 100px;
-    height: 500px;
-    overflow-y: auto;
+	overflow-y: auto;
+    height: 100%;
+    min-width: 70px;
+    max-width: 100px;
 }
 a.tab-list-shots-link:hover,
 a.tab-list-shots-link:focus

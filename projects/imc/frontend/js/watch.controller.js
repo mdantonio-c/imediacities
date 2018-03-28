@@ -336,7 +336,7 @@
 			//restrict: 'A',
 			link: function($scope, $elm) {
 				$elm.on('click', function() {
-					// console.log('scroll on click');
+					console.log('scrollStoryOnClick');
 					if ($elm[0].parentNode.className == "scrollmenu") {
 						$(".scrollmenu").animate({
 							scrollLeft: ($elm[0].offsetLeft - ($elm[0].parentNode.parentNode.scrollWidth / 2))
@@ -354,6 +354,7 @@
 			}
 		};
 	});
+
 	app.directive('scrollOnClick', function() {
 		return {
 			link: function(scope, $elm) {
@@ -886,20 +887,6 @@
 		self.startTagTime = $rootScope.currentTime;
 		self.currentvidDur = 0;
 
-		// On video time update: update the selected shot on the Notes tab
-		myVid[0].ontimeupdate = function() {
-			/*
-			//console.log('ontimeupdate start');
-			var currentTime = parseInt(myVid[0].currentTime);
-			// calculate the shot at current time
-			var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
-			//console.log('current shot: ' + angular.toJson(currentShotNotes, true));
-			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
-			$scope.$digest(); //refresh scope  // serve in questo caso? SI
-			//console.log('ontimeupdate end');
-			*/
-		};
-
 		// On video playing toggle values
 		myVid[0].onplaying = function() {
 			self.onplaying = true;
@@ -976,11 +963,12 @@
 		self.pauseVideo = function() {
 
 			myVid[0].playbackRate = 1.0;
-			$scope.stopBack();
+			//$scope.stopBack(); // old
 
 			self.onpause = true;
 			self.onplaying = false;
-			myVid[0].pause();
+			//myVid[0].pause();  // old
+			$scope.videoplayer.video.pause();
 		};
 
 		self.switchVideo = function() {
@@ -1010,7 +998,8 @@
 			// force the video to pause
 			self.pauseVideo();
 			// set the initial tag frame with current time
-			self.startTagTime = Math.floor(myVid[0].currentTime * 1000);
+			//self.startTagTime = Math.floor(myVid[0].currentTime * 1000); // old
+			self.startTagTime = Math.floor($scope.videoplayer.video.currentTime * 1000);
 			console.log('Stop video at time (ms): ' + self.startTagTime);
 
 			for (var i = 0; i <= self.shots.length - 1; i++) {
@@ -1424,6 +1413,22 @@
 			self.loadVideoShots(vid, videoDuration);
 		}
 
+		// On video time update: update the selected shot on the Notes tab
+		myVid[0].ontimeupdate = function() { 
+		//$scope.videoplayer.video.ontimeupdate = function() {
+			console.log('ontimeupdate start');
+			var currentTime = parseInt($scope.videoplayer.video.currentTime);
+			console.log('ontimeupdate currentTime=' + currentTime);
+			// calculate the shot at current time
+			
+			//var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
+			var currentShotNotes = 5;
+			console.log('current shot: ' + angular.toJson(currentShotNotes, true));
+			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
+			$scope.$digest(); //refresh scope  // serve in questo caso? Si
+			console.log('ontimeupdate end');
+		};			
+		
 		self.selectedVideoId = vid;
 		self.animationsEnabled = true;
 
