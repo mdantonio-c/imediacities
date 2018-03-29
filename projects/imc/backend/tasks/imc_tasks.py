@@ -411,10 +411,15 @@ def extract_tech_info(self, item, analyze_dir_path):
 
     elif item.item_type == 'Image':
         item.uri = data['image']['name']
-        item.thumbnail = data['image']['name']  # FIXME not available!
+        thumbnail_filename = 'transcoded_small.jpg'
+        thumbnail_uri = os.path.join(
+            os.path.dirname(analyze_dir_path), thumbnail_filename)
+        item.thumbnail = (thumbnail_uri
+                          if os.path.exists(thumbnail_uri)
+                          else data['image']['name'])
 
-        # FIXME filese MUST be an Iteger of bytes (not e.g. 4.1KB)
-        # item.dimension = data['image']['filesize']
+        # filesize MUST be an Iteger of bytes (not e.g. 4.1KB)
+        item.dimension = os.path.getsize(item.uri)
 
         # format
         # container: e.g."AVI", "MP4", "3GP", TIFF
@@ -425,7 +430,8 @@ def extract_tech_info(self, item, analyze_dir_path):
         item.digital_format[2] = data['image']['mimeType']
         # resolution: The degree of sharpness of the digital object expressed in
         # lines or pixel
-        item.digital_format[3] = data['image']["numberPixels"]
+        item.digital_format[3] = str(data['image']['geometry']['width']) \
+            + 'x' + str(data['image']['geometry']['height'])
 
     else:
         log.warning('Ivalid type. Technical info CANNOT be extracted for '
