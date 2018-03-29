@@ -245,6 +245,7 @@ def image_transcode(filename, out_folder, watermark ):
     '''    
 
     out_filename              = os.path.join(out_folder, 'transcoded.jpg')
+    out_filename_small        = os.path.join(out_folder, 'transcoded_small.jpg')
     out_filename_fullres      = os.path.join(out_folder, 'transcoded_fullres.jpg')
     out_filename_logo         = os.path.join(out_folder, 'transcoded_with_logo.jpg')
     out_filename_logo_fullres = os.path.join(out_folder, 'transcoded_with_logo_fullres.jpg')
@@ -272,7 +273,22 @@ def image_transcode(filename, out_folder, watermark ):
 
     if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
         return False
-    #return os.path.exists(out_filename)
+   
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append( filename )
+    cmd_list.append('-resize')
+    cmd_list.append('80x80^')
+    cmd_list.append('-gravity')
+    cmd_list.append('center')
+    cmd_list.append('-quality')
+    cmd_list.append('95')
+    cmd_list.append(out_filename_small)
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    if not run(cmd, out_folder, 'transcode_small.log', 'transcode_small.err', 'transcode_small.sh'):
+        return False
 
 
     if watermark:
