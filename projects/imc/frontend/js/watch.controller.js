@@ -1414,21 +1414,51 @@
 		}
 
 		// On video time update: update the selected shot on the Notes tab
+		/* TODO col nuovo player come gestire questo evento */
 		myVid[0].ontimeupdate = function() { 
-		//$scope.videoplayer.video.ontimeupdate = function() {
 			console.log('ontimeupdate start');
+			/*
 			var currentTime = parseInt($scope.videoplayer.video.currentTime);
 			console.log('ontimeupdate currentTime=' + currentTime);
-			// calculate the shot at current time
-			
-			//var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
-			var currentShotNotes = 5;
+			// get the shot at current time
+			var currentShotNotes = getShotFromVideoCurrentTime(currentTime);
 			console.log('current shot: ' + angular.toJson(currentShotNotes, true));
 			$scope.$emit('updateShotSelectedForNotes', currentShotNotes);
 			$scope.$digest(); //refresh scope  // serve in questo caso? Si
+			*/
 			console.log('ontimeupdate end');
-		};			
-		
+		};
+
+		// Returns the shot number corresponding to the time in input
+		function getShotFromVideoCurrentTime(currtime) {
+			//console.log('getShotFromVideoCurrentTime: currtime=' + currtime);
+			var currentShot = null;
+			var currentTime = Math.floor(currtime * 1000);
+			//console.log('Current time video (ms): ' + currentTime);
+			for (var i = 0; i <= self.shots.length - 1; i++) {
+				var shotNum = self.shots[i].attributes.shot_num;
+				var shotTimestamp = self.shots[i].attributes.timestamp;
+				var shotDuration = self.shots[i].attributes.duration;
+				var shotStartTime = convertToMilliseconds(shotTimestamp);
+				var nextStartTime = null;
+				if (i < self.shots.length - 1) {
+					// get start time from the next shot
+					nextStartTime = convertToMilliseconds(self.shots[i+1].attributes.timestamp);
+				} else {
+					// last shot: use the shot duration instead
+					nextStartTime = shotStartTime + (shotDuration * 1000);
+				}
+				if (currentTime >= shotStartTime && currentTime < nextStartTime) {
+					//console.log('found shot number ' + (shotNum+1) + ', from start time ' + shotStartTime + ' (ms)');
+					currentShot = shotNum+1;
+					// exit loop
+					break;
+				}
+			}
+			return currentShot;
+		}
+
+		/* */
 		self.selectedVideoId = vid;
 		self.animationsEnabled = true;
 

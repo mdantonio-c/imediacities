@@ -2217,7 +2217,6 @@ li.ivh-treeview-node::before {
 .tab-notes
 {
 	overflow: hidden;
-    max-height: 800px;
     max-width: 100%;
 }
 .tab-notes-title
@@ -2246,6 +2245,7 @@ li.ivh-treeview-node::before {
     height: 100%;
     min-width: 70px;
     max-width: 100px;
+    max-height: 800px;
 }
 a.tab-list-shots-link:hover,
 a.tab-list-shots-link:focus
