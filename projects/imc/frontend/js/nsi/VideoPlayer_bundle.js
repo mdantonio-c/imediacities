@@ -47,7 +47,7 @@ var Controls = /** @class */ (function () {
             this.wrapper.classList.add('controls__wrapper--autohide');
             this.wrapper.onmouseenter = function (e) { _this.onmouseenter(e); };
             this.wrapper.onmouseleave = function (e) { _this.onmouseleave(e); };
-            this.wrapper.onfocus = function (e) { console.log("focus"); _this.onmouseenter(e); };
+            this.wrapper.onfocus = function (e) { _this.onmouseenter(e); };
             //  video
             this.video.onmousemove = function (e) { _this.onmouseenter(e); };
             this.video.onmouseenter = function (e) { _this.onmouseenter(e); };
@@ -307,8 +307,8 @@ var VideoPlayer = /** @class */ (function () {
             startAt: null,
             limit: 0,
             check: function (currentTime) {
-                console.log("this", this);
-                console.log("currentTime", currentTime);
+                // console.log("this", this);
+                // console.log("currentTime", currentTime);
                 return this.active && this.stopAt && (currentTime >= this.stopAt - this.limit);
             }
         };
@@ -332,7 +332,7 @@ var VideoPlayer = /** @class */ (function () {
         //  Just in case
         //  un giorno potrà servire
         window.onresize = function (e) {
-            console.log("resized");
+            // console.log("resized");
         };
     }
     /**
@@ -389,11 +389,11 @@ var VideoPlayer = /** @class */ (function () {
         }
         //  Event bindings
         this.video.onloadstart = function (e) {
-            console.log("loadstart");
+            // console.log("loadstart");
             _this.spinner_show();
         };
         this.video.onloadeddata = function (e) {
-            console.log("loadeddata");
+            // console.log("loadeddata");
             if (_this.firstloadeddata) {
                 //  Spinner
                 _this.SpinnerComponent.update(_this.video);
@@ -432,25 +432,25 @@ var VideoPlayer = /** @class */ (function () {
             }
             _this.ControlsComponent.emit('ontimeupdate');
             if (_this.video.currentTime == 0) {
-                console.log("begin");
+                // console.log("begin");
                 _this.ControlsComponent.emit('onbegin');
             }
             _this.seekbar_run_animation();
         };
         this.video.onwaiting = function (e) {
-            console.log("waiting");
+            // console.log("waiting");
             _this.spinner_show();
         };
         this.video.onplaying = function (e) {
-            console.log("playing");
+            // console.log("playing");
             _this.spinner_hide();
         };
         this.video.onseeking = function (e) {
-            console.log("seeking");
+            // console.log("seeking");
             _this.spinner_show();
         };
         this.video.onseeked = function (e) {
-            console.log("seeked");
+            // console.log("seeked");
             _this.spinner_hide();
         };
         this.video.oncanplaythrough = function () {
@@ -484,8 +484,8 @@ var VideoPlayer = /** @class */ (function () {
      * @param loop
      */
     VideoPlayer.prototype.scena_set = function (scena, loop) {
-        console.log("scena", scena);
-        console.log("loop", loop);
+        // console.log("scena", scena);
+        // console.log("loop", loop);
         //  riproduce una scena dall'inizio e si ferma alla fine
         this.autostop.active = true;
         this.autostop.stopAt = scena.end;
@@ -1270,11 +1270,11 @@ var Scenes = /** @class */ (function () {
         scene.className = 'scena noselect';
         scene.setAttribute('data-prog', indice);
         scene.onmousedown = function (e) {
-            console.log("e prevent", e);
+            // console.log("e prevent", e);
             e.preventDefault();
         };
         scene.onclick = function (e) {
-            console.log("e click", e);
+            // console.log("e click", e);
             e.preventDefault();
         };
         this.set_styles(scene, scena);
@@ -1411,10 +1411,10 @@ var Seekbar = /** @class */ (function () {
         }, 100);
     };
     Seekbar.prototype.scene_click = function (classe, e) {
-        console.log("this", this);
-        console.log("this.getAttribute('data-prog')", this.getAttribute('data-prog'));
-        console.log("classe", classe);
-        console.log("e", e);
+        // console.log("this", this);
+        // console.log("this.getAttribute('data-prog')", this.getAttribute('data-prog'));
+        // console.log("classe", classe);
+        // console.log("e", e);
     };
     Seekbar.prototype.seek = function (classe, e) {
         //  Se è stato premuto un tasto diverso dal sinistro, esco
