@@ -1535,11 +1535,12 @@ var SwitchVideoControl = /** @class */ (function (_super) {
         return this.source.src;
     };
     SwitchVideoControl.prototype.source_set = function (e) {
+        var currentTime = this.video.currentTime;
         this.video.pause();
         this.src_current.search.type = this.element.value || 'video';
         this.source.src = this.src_current.path + "?" + this.src_pars_encode(this.src_current.search);
-        this.video.currentTime = 0;
         this.video.load();
+        this.video.currentTime = currentTime;
     };
     SwitchVideoControl.prototype.src_parse = function (source) {
         var a = document.createElement('a');
@@ -1566,8 +1567,6 @@ var SwitchVideoControl = /** @class */ (function (_super) {
             //  readyState 2 => headers ricevuti
             if (request.readyState === 2) {
                 var headers = request.getAllResponseHeaders();
-                console.log("headers", headers);
-                console.log("this.element", _this.element);
                 if (headers.includes('json')) {
                     _this.element.classList.add('display-none');
                     _this.element.style = 'display:none';
