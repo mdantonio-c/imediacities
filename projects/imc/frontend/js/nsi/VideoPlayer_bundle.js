@@ -8,6 +8,544 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+/**
+ * Classe Controls
+ * ---------------
+ * Imposta gli eventi per i controlli
+ */
+var Controls = /** @class */ (function () {
+    function Controls(conf) {
+        //  Riferimento al video
+        this.conf = null;
+        this.video = null;
+        //  Controlli
+        this.wrapper = null;
+        this.wrapperMarkers = null;
+        this.wrapperElement = null;
+        this.controls = {};
+        this.hide_controls = {
+            timeout: null,
+            delay: 750
+        };
+        this.fast_play = null;
+        this.conf = conf;
+        this.video = conf.video;
+        this.wrapperElement = conf.wrapper || '.controls__wrapper';
+        //this.imposta();
+    }
+    Controls.prototype.imposta = function () {
+        var _this = this;
+        this.wrapper = document.querySelector(this.wrapperElement);
+        this.wrapperMarkers = document.querySelector('.markers__wrapper');
+        if (!this.wrapper) {
+            return;
+        }
+        this.comandi_configura();
+        //  Se hide_controls aggiungo eventi ai controlli ed al video
+        if (this.conf.hide_controls && this.conf.hide_controls === true) {
+            //  controlli
+            this.wrapper.classList.add('controls__wrapper--autohide');
+            this.wrapper.onmouseenter = function (e) { _this.onmouseenter(e); };
+            this.wrapper.onmouseleave = function (e) { _this.onmouseleave(e); };
+            this.wrapper.onfocus = function (e) { console.log("focus"); _this.onmouseenter(e); };
+            //  video
+            this.video.onmousemove = function (e) { _this.onmouseenter(e); };
+            this.video.onmouseenter = function (e) { _this.onmouseenter(e); };
+            this.video.onmouseout = function (e) { _this.onmouseleave(e); };
+        }
+        //  Markers
+        this.conf.element = {
+            smpte_mark: this.comando_get('smpte_mark'),
+            frame_mark: this.comando_get('frame_mark'),
+            time_mark: this.comando_get('time_mark'),
+            float_mark: this.comando_get('float_mark')
+        };
+        this.comando_set('markers', new Markers(this.conf));
+        //  Change FPS
+        this.comando_set('fps', new FpsChange(this.conf_set('fps')));
+        //  Progress Bar
+        this.comando_set('progress', new ProgressBar(this.conf_set('progress')));
+        //  Play Button
+        this.comando_set('play', new PlayButton(this.conf_set('play')));
+        //  GotoStart Button
+        this.comando_set('goto_start', new GotoStartButton(this.conf_set('goto_start')));
+        //  GotoEnd Button
+        this.comando_set('goto_end', new GotoEndButton(this.conf_set('goto_end')));
+        //  Change UM
+        this.comando_set('um', new UMChange(this.conf_set('um')));
+        //  Seek Control
+        this.conf.element = {
+            backward: this.comando_get('seek_backward'),
+            step: this.comando_get('seek_step'),
+            forward: this.comando_get('seek_forward')
+        };
+        this.conf.um = this.controls['um'].component;
+        this.comando_set('seek', new SeekControl(this.conf));
+        //  Jump Control
+        this.conf.element = {
+            jump_to: this.comando_get('jump_to'),
+            jump_to_value: this.comando_get('jump_to_value')
+        };
+        this.conf.um = this.controls['um'].component;
+        this.comando_set('jump', new JumpControl(this.conf));
+        //  Range Control
+        this.conf.element = {
+            play_from: this.comando_get('play_from'),
+            play_to: this.comando_get('play_to'),
+            play_int: this.comando_get('play_int'),
+            play_loop: this.comando_get('play_loop')
+        };
+        this.conf.um = this.controls['um'].component;
+        //  Esporto metodo per stop automatico
+        this.conf.play_range = this.conf.videoPlayer.play_range.bind(this.conf.videoPlayer);
+        this.comando_set('range', new RangeControl(this.conf));
+        //  Fast backward e forward
+        this.conf.element = {
+            backward: this.comando_get('backward'),
+            forward: this.comando_get('forward')
+        };
+        this.comando_set('fast', new FastControl(this.conf));
+        //  Fullscreen
+        this.comando_set('fullscreen', new FullScreen(this.conf_set('fullscreen')));
+        //  Volume
+        this.comando_set('volume', new VolumeControl(this.conf_set('volume')));
+        //  Switch Video
+        this.comando_set('switch', new SwitchVideoControl(this.conf_set('switch')));
+    };
+    /**
+     * Crea riferimenti al dom
+     */
+    Controls.prototype.comandi_configura = function () {
+        //  Progress bar
+        this.comando_registra('progress', '#range');
+        //  Marker frame / tempo
+        this.comando_registra('markers', null); // collettivo
+        this.comando_registra('time_mark', '#time_mark');
+        this.comando_registra('smpte_mark', '#smpte_mark');
+        this.comando_registra('frame_mark', '#frame_mark');
+        this.comando_registra('float_mark', '#float_mark');
+        //  Inizio / Fine
+        this.comando_registra('goto_start', '#goto_start');
+        this.comando_registra('goto_end', '#goto_end');
+        //  Play / pause
+        this.comando_registra('play', '#play');
+        //  Unit of measure
+        this.comando_registra('um', '#controls_um');
+        //  Rewind / Fastforward
+        this.comando_registra('fast', null);
+        this.comando_registra('backward', '#backward');
+        this.comando_registra('forward', '#forward');
+        //  Seek frame / tiem
+        this.comando_registra('seek', null); // collettivo
+        this.comando_registra('seek_backward', '#seek_backward');
+        this.comando_registra('seek_forward', '#seek_forward');
+        this.comando_registra('seek_step', '#seek_step');
+        //  Jump to frame / time
+        this.comando_registra('jump', null); // collettivo
+        this.comando_registra('jump_to', '#jump_to');
+        this.comando_registra('jump_to_value', '#jump_to_value');
+        //  Play interval
+        this.comando_registra('range', null); // collettivo
+        this.comando_registra('play_from', '#play_from');
+        this.comando_registra('play_to', '#play_to');
+        this.comando_registra('play_int', '#play_int');
+        this.comando_registra('play_loop', '#play_loop');
+        //  Set Frame rate
+        this.comando_registra('fps', '#fps');
+        //  Fullscreen
+        this.comando_registra('fullscreen', '#fullscreen');
+        //   Volume
+        this.comando_registra('volume', '#volume');
+        //  SwitchVideo
+        this.comando_registra('switch', '#switch_video_format');
+    };
+    Controls.prototype.conf_set = function (elemento) {
+        this.conf.element = this.comando_get(elemento);
+        return this.conf;
+    };
+    Controls.prototype.comando_registra = function (nome, selector) {
+        this.controls[nome] = {
+            selector: selector,
+            ref: nome.indexOf('_mark') === -1 ? this.wrapper.querySelector(selector) : this.wrapperMarkers.querySelector(selector),
+            component: null
+        };
+    };
+    Controls.prototype.comando_get = function (nome) {
+        return this.controls[nome].ref;
+    };
+    Controls.prototype.comando_set = function (nome, component) {
+        this.controls[nome].component = component;
+    };
+    //  Eventi per autohide
+    Controls.prototype.onmouseenter = function (e) {
+        this.wrapper.classList.add('controls__wrapper--visible');
+        clearTimeout(this.hide_controls.timeout);
+    };
+    Controls.prototype.onmouseleave = function (e) {
+        var _this = this;
+        clearTimeout(this.hide_controls.timeout);
+        this.wrapper.classList.add('controls__wrapper--visible');
+        this.hide_controls.timeout = setTimeout(function () {
+            _this.wrapper.classList.remove('controls__wrapper--visible');
+        }, this.hide_controls.delay);
+    };
+    /**
+     * Cicla i compomenti richiamando il metodo corrispondente all'evento event
+     * @param event
+     */
+    Controls.prototype.emit = function (event) {
+        for (var key in this.controls) {
+            if (this.controls.hasOwnProperty(key)) {
+                var value = this.controls[key];
+                if (value.component) {
+                    value.component[event]();
+                }
+            }
+        }
+    };
+    return Controls;
+}());
+/**
+ * Spinner da visualizzare quando il video va in pausa
+ */
+var VideoSpinner = /** @class */ (function () {
+    function VideoSpinner(conf) {
+        this.conf = null;
+        this.mask = null;
+        this.timeout = null;
+        this.delay = 300;
+        this.conf = conf;
+    }
+    VideoSpinner.prototype.show = function () {
+        var _this = this;
+        this.timeout = setTimeout(function () {
+            if (_this.timeout !== null) {
+                _this.hide();
+            }
+            _this.mask.classList.add('video_mask--active');
+        }, this.delay);
+    };
+    VideoSpinner.prototype.hide = function () {
+        this.clearInterval();
+        this.mask.classList.remove('video_mask--active');
+    };
+    VideoSpinner.prototype.clearInterval = function () {
+        clearInterval(this.timeout);
+        this.timeout = null;
+    };
+    VideoSpinner.prototype.create = function () {
+        this.mask = document.createElement('div');
+        this.mask.className = 'video_mask';
+        var spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        VideoSpinner.template_set(spinner, this.conf.template);
+        this.mask.appendChild(spinner);
+        return this.mask;
+    };
+    VideoSpinner.prototype.update = function (video) {
+        var v = video.getBoundingClientRect();
+        this.mask.style.width = v.width + 'px';
+        this.mask.style.height = v.height + 'px';
+    };
+    VideoSpinner.template_set = function (spinner, template) {
+        if (template === void 0) { template = null; }
+        if (template) {
+        }
+        else {
+            for (var i = 0; i < 5; i++) {
+                var rect = document.createElement('div');
+                rect.className = "rect" + (i + 1);
+                spinner.appendChild(rect);
+            }
+        }
+    };
+    return VideoSpinner;
+}());
+/**
+ * Classe VideoPlayer
+ * ------------------
+ * Crea un player riproducendo il video specificato nella configurazione
+ * Inserisce uno spinner per il caricamento
+ * Binda i comandi al dom
+ * Inserisce la barra a scorrimento delle scene
+ */
+var VideoPlayer = /** @class */ (function () {
+    //  Andiamo!
+    function VideoPlayer(conf) {
+        //  Configurazione
+        /**
+         * {
+         *      selector: classe o id dell'elemento in cui creare il video,
+         *      sources: array di url,
+         *      fps: intero,
+         *      scene: oggetto contenente le scene,
+         *      player: oggetto con configurazione delle proprietà del player,
+         *      hide_controls: bool se true inserisce i controlli sopra il video
+         * }
+         */
+        this.conf = null;
+        //  Contenitore del video
+        this.video_container = null;
+        //  Riferimento al video
+        this.video = null;
+        //  Controlli
+        this.controls = null;
+        // private fast_play = null;
+        //  fps reali del filmato
+        this.fps = 0;
+        //  fps impostati dal player
+        this.current_fps = 0;
+        //  "dimensione" del frame rispetto al tempo
+        this.frameLength = 0;
+        //  Tiene traccia del primo caricamento dei dati
+        this.firstloadeddata = true;
+        //  Interfaccia per autostop
+        this.autostop = {
+            active: false,
+            loop: false,
+            stopAt: null,
+            startAt: null,
+            limit: 0,
+            check: function (currentTime) {
+                console.log("this", this);
+                console.log("currentTime", currentTime);
+                return this.active && this.stopAt && (currentTime >= this.stopAt - this.limit);
+            }
+        };
+        //  Componenti esterni
+        this.SpinnerComponent = null;
+        this.SeekBarComponent = null;
+        this.ControlsComponent = null;
+        this.conf = conf;
+        this.fps = conf.fps;
+        this.current_fps = conf.fps;
+        if (this.fps) {
+            this.setFrameLength();
+        }
+        this.video_container = document.querySelector(conf.selector);
+        this.video_container.className += ' video_container';
+        this.video_create(conf.player);
+        //  Componenti
+        this.componenti_create();
+        //  Seekbar
+        this.seek_bar_create();
+        //  Just in case
+        //  un giorno potrà servire
+        window.onresize = function (e) {
+            console.log("resized");
+        };
+    }
+    /**
+     * Inizializza il componente per i controlli
+     */
+    VideoPlayer.prototype.componenti_create = function () {
+        this.ControlsComponent = new Controls({
+            videoPlayer: this,
+            video: this.video,
+            hide_controls: this.conf.hide_controls,
+            fps: this.fps,
+            frameLength: this.frameLength
+        });
+    };
+    /**
+     * Inserisce la seek bar se esiste l'oggetto SeekBar ed esistono scene
+     */
+    VideoPlayer.prototype.seek_bar_create = function () {
+        if (window['Seekbar'] && this.conf.scene && this.conf.scene.length) {
+            this.SeekBarComponent = new Seekbar({
+                video: this.video,
+                fps: this.fps,
+                frameLength: this.frameLength
+            }, this);
+            this.video_container.appendChild(this.SeekBarComponent.create());
+        }
+    };
+    //  Gestione player
+    //  ---------------
+    /**
+     * Configura il player, binda gli eventi e lo inserisce nella pagina
+     * @param conf
+     */
+    VideoPlayer.prototype.video_create = function (conf) {
+        var _this = this;
+        //  Configurazioni base del player
+        var default_player_conf = {
+            controls: false,
+            volume: 0.5
+        };
+        this.video = document.createElement('video');
+        this.video.preload = "none";
+        this.video.controls = false;
+        this.video.volume = conf && (conf.volume !== undefined && conf.volume !== null) ? conf.volume : default_player_conf.volume;
+        this.sources_add(this.conf.sources);
+        //  Aggiungo video
+        var wrapper = this.video_container.querySelector('.video_wrapper');
+        wrapper.insertBefore(this.video, wrapper.firstChild);
+        this.video.load();
+        //  Spinner
+        if (window['VideoSpinner']) {
+            this.SpinnerComponent = new VideoSpinner({ target: this.conf.selector });
+            wrapper.appendChild(this.SpinnerComponent.create());
+        }
+        //  Event bindings
+        this.video.onloadstart = function (e) {
+            console.log("loadstart");
+            _this.spinner_show();
+        };
+        this.video.onloadeddata = function (e) {
+            console.log("loadeddata");
+            if (_this.firstloadeddata) {
+                //  Spinner
+                _this.SpinnerComponent.update(_this.video);
+                //  Controlli
+                _this.ControlsComponent.imposta();
+                //  Scene
+                if (_this.conf.scene && _this.SeekBarComponent) {
+                    _this.SeekBarComponent.showScenes(_this.conf.scene, _this.video.duration);
+                }
+                _this.video.currentTime = 0;
+                _this.firstloadeddata = false;
+            }
+            _this.spinner_hide();
+        };
+        this.video.onplay = function (e) {
+            _this.spinner_hide();
+            if (_this.autostop.active && _this.autostop.loop && _this.autostop.startAt) {
+                _this.video.currentTime = _this.autostop.startAt;
+            }
+            _this.ControlsComponent.emit('onplay');
+            _this.seekbar_run_animation();
+        };
+        this.video.onpause = function (e) {
+            _this.ControlsComponent.emit('onpause');
+            _this.seekbar_stop_animation();
+        };
+        this.video.ontimeupdate = function (e) {
+            if (!_this.video.paused && _this.autostop.check(_this.video.currentTime)) {
+                // if (!this.video.paused && this.autostop.active && this.autostop.stopAt && (this.video.currentTime >= this.autostop.stopAt - 0.250)) {
+                if (_this.autostop.loop === false) {
+                    _this.autostop.active = false;
+                }
+                _this.seekbar_stop_animation();
+                _this.time_goto(_this.autostop.stopAt);
+                return;
+            }
+            _this.ControlsComponent.emit('ontimeupdate');
+            if (_this.video.currentTime == 0) {
+                console.log("begin");
+                _this.ControlsComponent.emit('onbegin');
+            }
+            _this.seekbar_run_animation();
+        };
+        this.video.onwaiting = function (e) {
+            console.log("waiting");
+            _this.spinner_show();
+        };
+        this.video.onplaying = function (e) {
+            console.log("playing");
+            _this.spinner_hide();
+        };
+        this.video.onseeking = function (e) {
+            console.log("seeking");
+            _this.spinner_show();
+        };
+        this.video.onseeked = function (e) {
+            console.log("seeked");
+            _this.spinner_hide();
+        };
+        this.video.oncanplaythrough = function () {
+            //console.log("canplaythrough");
+        };
+        this.video.onclick = function (e) {
+            _this.video.paused ? _this.video.play() : _this.video.pause();
+        };
+        this.video.onvolumechange = function (e) {
+            _this.ControlsComponent.emit('onvolumechange');
+        };
+        this.video.onended = function (e) {
+            _this.ControlsComponent.emit('onended');
+        };
+    };
+    /**
+     * Aggiunge sources
+     * @param sources
+     */
+    VideoPlayer.prototype.sources_add = function (sources) {
+        var _this = this;
+        sources.forEach(function (s) {
+            var source = document.createElement('source');
+            source.src = s;
+            _this.video.appendChild(source);
+        });
+    };
+    /**
+     * imposta una scena da riprodurre
+     * @param scena
+     * @param loop
+     */
+    VideoPlayer.prototype.scena_set = function (scena, loop) {
+        console.log("scena", scena);
+        console.log("loop", loop);
+        //  riproduce una scena dall'inizio e si ferma alla fine
+        this.autostop.active = true;
+        this.autostop.stopAt = scena.end;
+        this.autostop.startAt = scena.start;
+        this.autostop.loop = loop;
+        this.time_goto(scena.start);
+    };
+    /**
+     * Imposta frameLength equivalente alla durata temporale di un frame
+     */
+    VideoPlayer.prototype.setFrameLength = function () {
+        this.frameLength = 1 / this.fps;
+    };
+    /**
+     * sposta il video al tempo passato
+     * @param time
+     */
+    VideoPlayer.prototype.time_goto = function (time) {
+        this.video.pause();
+        this.video.currentTime = time;
+        //  dipendente dal fps settato
+        // this.video.currentTime = time * (this.current_fps / this.fps );
+        //this.marks_update();
+    };
+    VideoPlayer.prototype.play_range = function (from, to, loop) {
+        this.autostop.active = true;
+        this.autostop.loop = loop;
+        this.autostop.startAt = from;
+        this.autostop.stopAt = to;
+        this.video.currentTime = from;
+        this.video.play();
+    };
+    //  Gestione spinner
+    //  ----------------
+    VideoPlayer.prototype.spinner_show = function () {
+        if (this.SpinnerComponent) {
+            this.SpinnerComponent.show();
+        }
+        // throw new Error('spinner show');
+    };
+    VideoPlayer.prototype.spinner_hide = function () {
+        if (this.SpinnerComponent) {
+            this.SpinnerComponent.hide();
+        }
+        // throw new Error('spinner hide');
+    };
+    //  Gestione seekbar
+    //  ----------------
+    VideoPlayer.prototype.seekbar_run_animation = function () {
+        if (this.SeekBarComponent) {
+            this.SeekBarComponent.run_animation();
+        }
+    };
+    VideoPlayer.prototype.seekbar_stop_animation = function () {
+        if (this.SeekBarComponent) {
+            this.SeekBarComponent.stop_animation();
+        }
+    };
+    return VideoPlayer;
+}());
 var ControlloGenerico = /** @class */ (function () {
     function ControlloGenerico(conf) {
         this.element = conf.element;
@@ -39,6 +577,80 @@ var ControlloGenerico = /** @class */ (function () {
     ControlloGenerico.prototype.onfullscreen = function () { }; //  il video è in fullscreen
     return ControlloGenerico;
 }());
+///<reference path="ControlloGenerico.ts"/>
+var FastControl = /** @class */ (function (_super) {
+    __extends(FastControl, _super);
+    function FastControl(conf) {
+        var _this = _super.call(this, conf) || this;
+        _this.backward_interval = null;
+        _this.forward_interval = null;
+        _this.current = null;
+        _this.fast_timeout = 100;
+        _this.element.backward.onclick = function (e) {
+            _this.fast(-1);
+        };
+        _this.element.forward.onclick = function (e) {
+            _this.fast(1);
+        };
+        return _this;
+    }
+    FastControl.prototype.fast = function (fattore) {
+        var _this = this;
+        this.video.pause();
+        //  Se esiste un timeout lo fermo
+        if (this.current !== null) {
+            if (this.current !== fattore) {
+                this.clearInterval(this.current);
+            }
+            else {
+                this.clearInterval(fattore);
+                return;
+            }
+        }
+        //  Attivo
+        if (fattore === -1) {
+            this.backward_interval = setInterval(function () {
+                if (_this.video.seeking) {
+                    return;
+                }
+                _this.video.currentTime += fattore * .1;
+            }, this.fast_timeout);
+        }
+        else {
+            this.forward_interval = setInterval(function () {
+                if (_this.video.seeking) {
+                    return;
+                }
+                _this.video.currentTime += fattore * .1;
+            }, this.fast_timeout);
+        }
+        this.current = fattore;
+    };
+    FastControl.prototype.clearInterval = function (current) {
+        if (current === 1) {
+            clearInterval(this.forward_interval);
+            this.forward_interval = null;
+        }
+        else {
+            clearInterval(this.backward_interval);
+            this.backward_interval = null;
+        }
+        this.current = null;
+    };
+    FastControl.prototype.onplay = function () {
+        this.clearInterval(1);
+        this.clearInterval(-1);
+    };
+    FastControl.prototype.onbegin = function () {
+        this.clearInterval(1);
+        this.clearInterval(-1);
+    };
+    FastControl.prototype.onended = function () {
+        this.clearInterval(1);
+        this.clearInterval(-1);
+    };
+    return FastControl;
+}(ControlloGenerico));
 ///<reference path="ControlloGenerico.ts"/>
 var FpsChange = /** @class */ (function (_super) {
     __extends(FpsChange, _super);
@@ -421,6 +1033,109 @@ var UMChange = /** @class */ (function (_super) {
     };
     return UMChange;
 }(ControlloGenerico));
+///<reference path="ControlloGenerico.ts"/>
+var VolumeControl = /** @class */ (function (_super) {
+    __extends(VolumeControl, _super);
+    function VolumeControl(conf) {
+        var _this = _super.call(this, conf) || this;
+        _this.ico_off = null;
+        _this.ico_down = null;
+        _this.ico_up = null;
+        _this.ico_volume_up = null;
+        _this.ico_volume_down = null;
+        _this.volume_info = null;
+        _this.volume_last_value = 0;
+        //  Icone
+        var icone = _this.element.querySelectorAll('.volume__icon');
+        _this.ico_off = icone[0];
+        _this.ico_down = icone[1];
+        _this.ico_up = icone[2];
+        //  Clic sulle icone
+        _this.ico_off.onclick = function () {
+            _this.volume_unmute();
+        };
+        _this.ico_down.onclick = function () {
+            _this.volume_mute();
+        };
+        _this.ico_up.onclick = function () {
+            _this.volume_mute();
+        };
+        //  Pulsanti
+        _this.ico_volume_up = _this.element.querySelector('.volume__up');
+        _this.ico_volume_down = _this.element.querySelector('.volume__down');
+        _this.ico_volume_up.onclick = function () {
+            _this.volume_set(0.1);
+        };
+        _this.ico_volume_down.onclick = function () {
+            _this.volume_set(-0.1);
+        };
+        //  Info
+        _this.volume_info = _this.element.querySelector('.volume_info');
+        _this.interface();
+        return _this;
+    }
+    VolumeControl.prototype.volume_set = function (v) {
+        var volume_new = this.video.volume + v;
+        if (volume_new > 1 || volume_new < 0) {
+            return;
+        }
+        if (volume_new === 1) {
+            //  nascondo +
+        }
+        else if (volume_new === 0) {
+            //  nascondo -
+        }
+        else {
+            // mostro tutto
+        }
+        this.video.volume = volume_new;
+    };
+    VolumeControl.prototype.volume_mute = function () {
+        this.volume_last_value = this.video.volume;
+        this.video.volume = 0;
+    };
+    VolumeControl.prototype.volume_unmute = function () {
+        this.video.volume = this.volume_last_value;
+    };
+    VolumeControl.prototype.interface = function () {
+        if (this.video.volume < 0.1) {
+            this.icon_display(this.ico_off);
+            this.ico_volume_hide(this.ico_volume_down);
+            this.volume_info.innerHTML = '0.0';
+        }
+        else if (this.video.volume > 0.9) {
+            this.icon_display(this.ico_up);
+            this.ico_volume_hide(this.ico_volume_up);
+            this.volume_info.innerHTML = '1.0';
+        }
+        else if (this.video.volume > 0.7) {
+            this.icon_display(this.ico_up);
+            this.volume_info.innerHTML = this.video.volume.toFixed(1);
+        }
+        else {
+            this.icon_display(this.ico_down);
+            this.ico_volume_hide(null);
+            this.volume_info.innerHTML = this.video.volume.toFixed(1);
+        }
+    };
+    VolumeControl.prototype.ico_volume_hide = function (icon) {
+        this.ico_volume_up.classList.remove('visibility-hidden');
+        this.ico_volume_down.classList.remove('visibility-hidden');
+        if (icon) {
+            icon.classList.add('visibility-hidden');
+        }
+    };
+    VolumeControl.prototype.icon_display = function (icon) {
+        this.ico_off.classList.add('display-none');
+        this.ico_down.classList.add('display-none');
+        this.ico_up.classList.add('display-none');
+        icon.classList.remove('display-none');
+    };
+    VolumeControl.prototype.onvolumechange = function () {
+        this.interface();
+    };
+    return VolumeControl;
+}(ControlloGenerico));
 var Utils;
 (function (Utils) {
     /**
@@ -529,409 +1244,6 @@ var Utils;
     Utils.keydown = keydown;
 })(Utils || (Utils = {}));
 /**
- * Classe Controls
- * ---------------
- * Imposta gli eventi per i controlli
- */
-var Controls = /** @class */ (function () {
-    function Controls(conf) {
-        //  Riferimento al video
-        this.conf = null;
-        this.video = null;
-        //  Controlli
-        this.wrapper = null;
-        this.wrapperMarkers = null;
-        this.wrapperElement = null;
-        this.controls = {};
-        this.hide_controls = {
-            timeout: null,
-            delay: 750
-        };
-        this.fast_play = null;
-        this.conf = conf;
-        this.video = conf.video;
-        this.wrapperElement = conf.wrapper || '.controls__wrapper';
-        //this.imposta();
-    }
-    Controls.prototype.imposta = function () {
-        var _this = this;
-        this.wrapper = document.querySelector(this.wrapperElement);
-        this.wrapperMarkers = document.querySelector('.markers__wrapper');
-        if (!this.wrapper) {
-            return;
-        }
-        this.comandi_configura();
-        //  Se hide_controls aggiungo eventi ai controlli ed al video
-        if (this.conf.hide_controls && this.conf.hide_controls === true) {
-            //  controlli
-            this.wrapper.classList.add('controls__wrapper--autohide');
-            this.wrapper.onmouseenter = function (e) { _this.onmouseenter(e); };
-            this.wrapper.onmouseleave = function (e) { _this.onmouseleave(e); };
-            this.wrapper.onfocus = function (e) { console.log("focus"); _this.onmouseenter(e); };
-            //  video
-            this.video.onmousemove = function (e) { _this.onmouseenter(e); };
-            this.video.onmouseenter = function (e) { _this.onmouseenter(e); };
-            this.video.onmouseout = function (e) { _this.onmouseleave(e); };
-        }
-        //  Markers
-        this.conf.element = {
-            smpte_mark: this.comando_get('smpte_mark'),
-            frame_mark: this.comando_get('frame_mark'),
-            time_mark: this.comando_get('time_mark'),
-            float_mark: this.comando_get('float_mark')
-        };
-        this.comando_set('markers', new Markers(this.conf));
-        //  Change FPS
-        this.comando_set('fps', new FpsChange(this.conf_set('fps')));
-        //  Progress Bar
-        this.comando_set('progress', new ProgressBar(this.conf_set('progress')));
-        //  Play Button
-        this.comando_set('play', new PlayButton(this.conf_set('play')));
-        //  GotoStart Button
-        this.comando_set('goto_start', new GotoStartButton(this.conf_set('goto_start')));
-        //  GotoEnd Button
-        this.comando_set('goto_end', new GotoEndButton(this.conf_set('goto_end')));
-        //  Change UM
-        this.comando_set('um', new UMChange(this.conf_set('um')));
-        //  Seek Control
-        this.conf.element = {
-            backward: this.comando_get('seek_backward'),
-            step: this.comando_get('seek_step'),
-            forward: this.comando_get('seek_forward')
-        };
-        this.conf.um = this.controls['um'].component;
-        this.comando_set('seek', new SeekControl(this.conf));
-        //  Jump Control
-        this.conf.element = {
-            jump_to: this.comando_get('jump_to'),
-            jump_to_value: this.comando_get('jump_to_value')
-        };
-        this.conf.um = this.controls['um'].component;
-        this.comando_set('jump', new JumpControl(this.conf));
-        //  Range Control
-        this.conf.element = {
-            play_from: this.comando_get('play_from'),
-            play_to: this.comando_get('play_to'),
-            play_int: this.comando_get('play_int'),
-            play_loop: this.comando_get('play_loop')
-        };
-        this.conf.um = this.controls['um'].component;
-        //  Esporto metodo per stop automatico
-        this.conf.play_range = this.conf.videoPlayer.play_range.bind(this.conf.videoPlayer);
-        this.comando_set('range', new RangeControl(this.conf));
-        //  Fast backward e forward
-        this.conf.element = {
-            backward: this.comando_get('backward'),
-            forward: this.comando_get('forward')
-        };
-        this.comando_set('fast', new FastControl(this.conf));
-        //  Fullscreen
-        this.comando_set('fullscreen', new FullScreen(this.conf_set('fullscreen')));
-        //  Volume
-        this.comando_set('volume', new VolumeControl(this.conf_set('volume')));
-        //  Switch Video
-        this.comando_set('switch', new SwitchVideoControl(this.conf_set('switch')));
-    };
-    /**
-     * Crea riferimenti al dom
-     */
-    Controls.prototype.comandi_configura = function () {
-        //  Progress bar
-        this.comando_registra('progress', '#range');
-        //  Marker frame / tempo
-        this.comando_registra('markers', null); // collettivo
-        this.comando_registra('time_mark', '#time_mark');
-        this.comando_registra('smpte_mark', '#smpte_mark');
-        this.comando_registra('frame_mark', '#frame_mark');
-        this.comando_registra('float_mark', '#float_mark');
-        //  Inizio / Fine
-        this.comando_registra('goto_start', '#goto_start');
-        this.comando_registra('goto_end', '#goto_end');
-        //  Play / pause
-        this.comando_registra('play', '#play');
-        //  Unit of measure
-        this.comando_registra('um', '#controls_um');
-        //  Rewind / Fastforward
-        this.comando_registra('fast', null);
-        this.comando_registra('backward', '#backward');
-        this.comando_registra('forward', '#forward');
-        //  Seek frame / tiem
-        this.comando_registra('seek', null); // collettivo
-        this.comando_registra('seek_backward', '#seek_backward');
-        this.comando_registra('seek_forward', '#seek_forward');
-        this.comando_registra('seek_step', '#seek_step');
-        //  Jump to frame / time
-        this.comando_registra('jump', null); // collettivo
-        this.comando_registra('jump_to', '#jump_to');
-        this.comando_registra('jump_to_value', '#jump_to_value');
-        //  Play interval
-        this.comando_registra('range', null); // collettivo
-        this.comando_registra('play_from', '#play_from');
-        this.comando_registra('play_to', '#play_to');
-        this.comando_registra('play_int', '#play_int');
-        this.comando_registra('play_loop', '#play_loop');
-        //  Set Frame rate
-        this.comando_registra('fps', '#fps');
-        //  Fullscreen
-        this.comando_registra('fullscreen', '#fullscreen');
-        //   Volume
-        this.comando_registra('volume', '#volume');
-        //  SwitchVideo
-        this.comando_registra('switch', '#switch_video_format');
-    };
-    Controls.prototype.conf_set = function (elemento) {
-        this.conf.element = this.comando_get(elemento);
-        return this.conf;
-    };
-    Controls.prototype.comando_registra = function (nome, selector) {
-        this.controls[nome] = {
-            selector: selector,
-            ref: nome.indexOf('_mark') === -1 ? this.wrapper.querySelector(selector) : this.wrapperMarkers.querySelector(selector),
-            component: null
-        };
-    };
-    Controls.prototype.comando_get = function (nome) {
-        return this.controls[nome].ref;
-    };
-    Controls.prototype.comando_set = function (nome, component) {
-        this.controls[nome].component = component;
-    };
-    //  Eventi per autohide
-    Controls.prototype.onmouseenter = function (e) {
-        this.wrapper.classList.add('controls__wrapper--visible');
-        clearTimeout(this.hide_controls.timeout);
-    };
-    Controls.prototype.onmouseleave = function (e) {
-        var _this = this;
-        clearTimeout(this.hide_controls.timeout);
-        this.wrapper.classList.add('controls__wrapper--visible');
-        this.hide_controls.timeout = setTimeout(function () {
-            _this.wrapper.classList.remove('controls__wrapper--visible');
-        }, this.hide_controls.delay);
-    };
-    /**
-     * Cicla i compomenti richiamando il metodo corrispondente all'evento event
-     * @param event
-     */
-    Controls.prototype.emit = function (event) {
-        for (var key in this.controls) {
-            if (this.controls.hasOwnProperty(key)) {
-                var value = this.controls[key];
-                if (value.component) {
-                    value.component[event]();
-                }
-            }
-        }
-    };
-    return Controls;
-}());
-/**
- * Spinner da visualizzare quando il video va in pausa
- */
-var VideoSpinner = /** @class */ (function () {
-    function VideoSpinner(conf) {
-        this.conf = null;
-        this.mask = null;
-        this.timeout = null;
-        this.delay = 300;
-        this.conf = conf;
-    }
-    VideoSpinner.prototype.show = function () {
-        var _this = this;
-        this.timeout = setTimeout(function () {
-            if (_this.timeout !== null) {
-                //console.log(this.timeout, "timeout cleared intrnally");
-                _this.hide();
-            }
-            _this.mask.classList.add('video_mask--active');
-        }, this.delay);
-        //console.log(this.timeout, "set timeout");
-    };
-    VideoSpinner.prototype.hide = function () {
-        this.clearInterval();
-        this.mask.classList.remove('video_mask--active');
-    };
-    VideoSpinner.prototype.clearInterval = function () {
-        //console.log(this.timeout, "clearing timeout");
-        clearInterval(this.timeout);
-        this.timeout = null;
-    };
-    VideoSpinner.prototype.create = function () {
-        this.mask = document.createElement('div');
-        this.mask.className = 'video_mask';
-        var spinner = document.createElement('div');
-        spinner.className = 'spinner';
-        VideoSpinner.template_default(spinner);
-        this.mask.appendChild(spinner);
-        return this.mask;
-    };
-    VideoSpinner.prototype.update = function (video) {
-        var v = video.getBoundingClientRect();
-        this.mask.style.width = v.width + 'px';
-        this.mask.style.height = v.height + 'px';
-    };
-    VideoSpinner.template_default = function (spinner) {
-        for (var i = 0; i < 5; i++) {
-            var rect = document.createElement('div');
-            rect.className = "rect" + (i + 1);
-            spinner.appendChild(rect);
-        }
-    };
-    return VideoSpinner;
-}());
-///<reference path="ControlloGenerico.ts"/>
-var SwitchVideoControl = /** @class */ (function (_super) {
-    __extends(SwitchVideoControl, _super);
-    function SwitchVideoControl(conf) {
-        var _this = _super.call(this, conf) || this;
-        _this.src_current = {
-            path: null,
-            search: null
-        };
-        _this.source = _this.video.querySelector('source');
-        _this.options = Array.prototype.slice.call(_this.element.querySelectorAll('option'));
-        _this.src_current = _this.src_parse(_this.source_get());
-        _this.source_set_initial();
-        _this.element.onchange = function (e) { _this.source_set(e); };
-        return _this;
-    }
-    SwitchVideoControl.prototype.source_set_initial = function () {
-        var detected_type = this.src_current.search.type || 'video';
-        this.options.filter(function (o) { return o.value === detected_type; })[0].selected = true;
-    };
-    SwitchVideoControl.prototype.source_get = function () {
-        return this.source.src;
-    };
-    SwitchVideoControl.prototype.source_set = function (e) {
-        this.video.pause();
-        this.src_current.search.type = this.element.value || 'video';
-        this.source.src = this.src_current.path + "?" + this.src_pars_encode(this.src_current.search);
-        this.video.currentTime = 0;
-        this.video.load();
-    };
-    SwitchVideoControl.prototype.src_parse = function (source) {
-        var a = document.createElement('a');
-        a.href = source;
-        return {
-            path: a.protocol + "//" + a.host + a.pathname,
-            search: this.src_pars_decode(a.search.substring(1))
-        };
-    };
-    SwitchVideoControl.prototype.src_pars_encode = function (search) {
-        return Object.keys(search).map(function (k) { return k + "=" + search[k]; }).join('&');
-    };
-    SwitchVideoControl.prototype.src_pars_decode = function (search) {
-        if (!search) {
-            return { type: 'video' };
-        }
-        return JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) { return key === "" ? value : decodeURIComponent(value); });
-    };
-    return SwitchVideoControl;
-}(ControlloGenerico));
-///<reference path="ControlloGenerico.ts"/>
-var VolumeControl = /** @class */ (function (_super) {
-    __extends(VolumeControl, _super);
-    function VolumeControl(conf) {
-        var _this = _super.call(this, conf) || this;
-        _this.ico_off = null;
-        _this.ico_down = null;
-        _this.ico_up = null;
-        _this.ico_volume_up = null;
-        _this.ico_volume_down = null;
-        _this.volume_info = null;
-        _this.volume_last_value = 0;
-        //  Icone
-        var icone = _this.element.querySelectorAll('.volume__icon');
-        _this.ico_off = icone[0];
-        _this.ico_down = icone[1];
-        _this.ico_up = icone[2];
-        //  Clic sulle icone
-        _this.ico_off.onclick = function () {
-            _this.volume_unmute();
-        };
-        _this.ico_down.onclick = function () {
-            _this.volume_mute();
-        };
-        _this.ico_up.onclick = function () {
-            _this.volume_mute();
-        };
-        //  Pulsanti
-        _this.ico_volume_up = _this.element.querySelector('.volume__up');
-        _this.ico_volume_down = _this.element.querySelector('.volume__down');
-        _this.ico_volume_up.onclick = function () {
-            _this.volume_set(0.1);
-        };
-        _this.ico_volume_down.onclick = function () {
-            _this.volume_set(-0.1);
-        };
-        //  Info
-        _this.volume_info = _this.element.querySelector('.volume_info');
-        _this.interface();
-        return _this;
-    }
-    VolumeControl.prototype.volume_set = function (v) {
-        var volume_new = this.video.volume + v;
-        if (volume_new > 1 || volume_new < 0) {
-            return;
-        }
-        if (volume_new === 1) {
-            //  nascondo +
-        }
-        else if (volume_new === 0) {
-            //  nascondo -
-        }
-        else {
-            // mostro tutto
-        }
-        this.video.volume = volume_new;
-    };
-    VolumeControl.prototype.volume_mute = function () {
-        this.volume_last_value = this.video.volume;
-        this.video.volume = 0;
-    };
-    VolumeControl.prototype.volume_unmute = function () {
-        this.video.volume = this.volume_last_value;
-    };
-    VolumeControl.prototype.interface = function () {
-        if (this.video.volume < 0.1) {
-            this.icon_display(this.ico_off);
-            this.ico_volume_hide(this.ico_volume_down);
-            this.volume_info.innerHTML = '0.0';
-        }
-        else if (this.video.volume > 0.9) {
-            this.icon_display(this.ico_up);
-            this.ico_volume_hide(this.ico_volume_up);
-            this.volume_info.innerHTML = '1.0';
-        }
-        else if (this.video.volume > 0.7) {
-            this.icon_display(this.ico_up);
-            this.volume_info.innerHTML = this.video.volume.toFixed(1);
-        }
-        else {
-            this.icon_display(this.ico_down);
-            this.ico_volume_hide(null);
-            this.volume_info.innerHTML = this.video.volume.toFixed(1);
-        }
-    };
-    VolumeControl.prototype.ico_volume_hide = function (icon) {
-        this.ico_volume_up.classList.remove('visibility-hidden');
-        this.ico_volume_down.classList.remove('visibility-hidden');
-        if (icon) {
-            icon.classList.add('visibility-hidden');
-        }
-    };
-    VolumeControl.prototype.icon_display = function (icon) {
-        this.ico_off.classList.add('display-none');
-        this.ico_down.classList.add('display-none');
-        this.ico_up.classList.add('display-none');
-        icon.classList.remove('display-none');
-    };
-    VolumeControl.prototype.onvolumechange = function () {
-        this.interface();
-    };
-    return VolumeControl;
-}(ControlloGenerico));
-/**
  *  Oggetto per il render delle scene sulla Seekbar
  */
 var Scenes = /** @class */ (function () {
@@ -953,10 +1265,16 @@ var Scenes = /** @class */ (function () {
         this.scene.push(scena);
     };
     //  Inserisce una scena
-    Scenes.prototype.render = function (scena) {
+    Scenes.prototype.render = function (scena, indice) {
         var scene = document.createElement('div');
         scene.className = 'scena noselect';
+        scene.setAttribute('data-prog', indice);
         scene.onmousedown = function (e) {
+            console.log("e prevent", e);
+            e.preventDefault();
+        };
+        scene.onclick = function (e) {
+            console.log("e click", e);
             e.preventDefault();
         };
         this.set_styles(scene, scena);
@@ -978,9 +1296,10 @@ var Scenes = /** @class */ (function () {
         el.style.left = scena.start * 100 / this.video.duration + "%";
         el.style.width = (scena.end - scena.start) * 100 / this.video.duration + "%";
     };
-    Scenes.prototype.render_all = function (elementoACuiAggiungereLeScene) {
+    Scenes.prototype.render_all = function () {
         var _this = this;
-        this.scene.forEach(function (s) { return elementoACuiAggiungereLeScene.appendChild(_this.render(s)); });
+        return this.scene.map(function (s, index) { return _this.render(s, index); });
+        // /this.scene.forEach( s => elementoACuiAggiungereLeScene.appendChild(this.render(s)));
     };
     return Scenes;
 }());
@@ -1029,49 +1348,57 @@ var Seekbar = /** @class */ (function () {
         return this.seek_bar_wrapper;
     };
     ////    Drag test
-    Seekbar.prototype.dragMouseDown = function (classe, e) {
-        e = e || window.event;
-        classe.seek_bar_inital_position = e.clientX; //-  classe.seek_bar_wrapper.getBoundingClientRect().left;
-        document.onmouseup = classe.mouseUp.bind(this.seek_bar_wrapper, classe);
-        document.onmousemove = classe.mouseMove.bind(this.seek_bar_wrapper, classe);
-    };
-    Seekbar.prototype.mouseUp = function (classe, e) {
-        document.onmouseup = null;
-        document.onmousemove = null;
-    };
-    Seekbar.prototype.mouseMove = function (classe, e) {
-        if (e.clientX - classe.seek_bar_inital_position === 0) {
-            return;
-        }
-        var move = (e.clientX - classe.seek_bar_wrapper.getBoundingClientRect().left);
-        if (move < 0) {
-            move = 0;
-        }
-        classe.seek_bar.style.left = move + 'px';
-    };
+    // private dragMouseDown (classe, e) {
+    //     e = e || window.event;
+    //     classe.seek_bar_inital_position = e.clientX; //-  classe.seek_bar_wrapper.getBoundingClientRect().left;
+    //
+    //     document.onmouseup = classe.mouseUp.bind(this.seek_bar_wrapper, classe);
+    //     document.onmousemove = classe.mouseMove.bind(this.seek_bar_wrapper, classe);
+    // }
+    //
+    // private mouseUp (classe, e) {
+    //     document.onmouseup = null;
+    //     document.onmousemove = null;
+    // }
+    //
+    // private mouseMove (classe, e) {
+    //
+    //     if (e.clientX - classe.seek_bar_inital_position === 0) {return}
+    //     let move = (e.clientX - classe.seek_bar_wrapper.getBoundingClientRect().left);
+    //     if (move < 0 ) {move = 0;}
+    //
+    //     classe.seek_bar.style.left = move + 'px';
+    //
+    // }
     Seekbar.prototype.showScenes = function (scene, video_duration) {
         var _this = this;
-        scene.forEach(function (s) {
-            var pixel = (_this.seek_bar_wrapper.clientWidth / 100 * ((s.end - s.start) / video_duration * 100)) * _this.scene_wrapper_fattore;
-            if (pixel < _this.scene_min_width) {
-                var t = (_this.scene_wrapper_fattore * _this.scene_min_width) / pixel;
-                _this.scene_wrapper_fattore = (_this.scene_wrapper_fattore * _this.scene_min_width) / pixel;
-            }
-        });
+        if (this.scene_min_width > 0) {
+            scene.forEach(function (s) {
+                var pixel = (_this.seek_bar_wrapper.clientWidth / 100 * ((s.end - s.start) / video_duration * 100)) * _this.scene_wrapper_fattore;
+                if (pixel < _this.scene_min_width) {
+                    var t = (_this.scene_wrapper_fattore * _this.scene_min_width) / pixel;
+                    _this.scene_wrapper_fattore = (_this.scene_wrapper_fattore * _this.scene_min_width) / pixel;
+                }
+            });
+        }
         this.SceneComponent = new Scenes({ scene: scene, video: this.video }, { seekbar: this, video: this.parent });
         this.scene_wrapper.style.width = (this.scene_wrapper_fattore) * 100 + "%";
-        this.SceneComponent.render_all(this.scene_wrapper);
+        var _scene = this.SceneComponent.render_all();
+        _scene.forEach(function (s) {
+            //s.onclick = this.scene_click.bind(s, this);
+            //scene.onclick = this.click.bind(scena, this);
+            _this.scene_wrapper.appendChild(s);
+        });
+        _scene = document.querySelectorAll('.scena');
+        //_scene
         //  Timer per determinare la scena corrente
         setInterval(function () {
             if (_this.video.paused) {
                 return;
             }
-            var _scene = document.querySelectorAll('.scena');
+            _scene = Array.prototype.slice.call(_scene);
             for (var s = 0; s < scene.length; s++) {
                 scene[s].active = false;
-                // console.log("this.video.currentTime",  this.video.currentTime);
-                // console.log("scene[s].start",  scene[s].start);
-                // console.log("scene[s].end",  scene[s].end);
                 if (_this.video.currentTime >= scene[s].start && _this.video.currentTime <= scene[s].end) {
                     if (_this.scene_current !== s) {
                         _this.scene_current = s;
@@ -1082,6 +1409,12 @@ var Seekbar = /** @class */ (function () {
                 }
             }
         }, 100);
+    };
+    Seekbar.prototype.scene_click = function (classe, e) {
+        console.log("this", this);
+        console.log("this.getAttribute('data-prog')", this.getAttribute('data-prog'));
+        console.log("classe", classe);
+        console.log("e", e);
     };
     Seekbar.prototype.seek = function (classe, e) {
         //  Se è stato premuto un tasto diverso dal sinistro, esco
@@ -1176,364 +1509,82 @@ var Seekbar = /** @class */ (function () {
     return Seekbar;
 }());
 ///<reference path="ControlloGenerico.ts"/>
-var FastControl = /** @class */ (function (_super) {
-    __extends(FastControl, _super);
-    function FastControl(conf) {
+var SwitchVideoControl = /** @class */ (function (_super) {
+    __extends(SwitchVideoControl, _super);
+    function SwitchVideoControl(conf) {
         var _this = _super.call(this, conf) || this;
-        _this.backward_interval = null;
-        _this.forward_interval = null;
-        _this.current = null;
-        _this.fast_timeout = 100;
-        _this.element.backward.onclick = function (e) {
-            _this.fast(-1);
+        _this.src_current = {
+            path: null,
+            search: null
         };
-        _this.element.forward.onclick = function (e) {
-            _this.fast(1);
-        };
+        _this.source = _this.video.querySelector('source');
+        _this.options = Array.prototype.slice.call(_this.element.querySelectorAll('option'));
+        _this.src_current = _this.src_parse(_this.source_get());
+        _this.source_set_initial();
+        if (_this.element.value === 'video') {
+            _this.type_check('orf');
+        }
+        _this.element.onchange = function (e) { _this.source_set(e); };
         return _this;
     }
-    FastControl.prototype.fast = function (fattore) {
-        var _this = this;
+    SwitchVideoControl.prototype.source_set_initial = function () {
+        var detected_type = this.src_current.search.type || 'video';
+        this.options.filter(function (o) { return o.value === detected_type; })[0].selected = true;
+    };
+    SwitchVideoControl.prototype.source_get = function () {
+        return this.source.src;
+    };
+    SwitchVideoControl.prototype.source_set = function (e) {
         this.video.pause();
-        //  Se esiste un timeout lo fermo
-        if (this.current !== null) {
-            if (this.current !== fattore) {
-                this.clearInterval(this.current);
-            }
-            else {
-                this.clearInterval(fattore);
-                return;
-            }
-        }
-        //  Attivo
-        if (fattore === -1) {
-            this.backward_interval = setInterval(function () {
-                if (_this.video.seeking) {
-                    return;
-                }
-                _this.video.currentTime += fattore * .1;
-            }, this.fast_timeout);
-        }
-        else {
-            this.forward_interval = setInterval(function () {
-                if (_this.video.seeking) {
-                    return;
-                }
-                _this.video.currentTime += fattore * .1;
-            }, this.fast_timeout);
-        }
-        this.current = fattore;
-    };
-    FastControl.prototype.clearInterval = function (current) {
-        if (current === 1) {
-            clearInterval(this.forward_interval);
-            this.forward_interval = null;
-        }
-        else {
-            clearInterval(this.backward_interval);
-            this.backward_interval = null;
-        }
-        this.current = null;
-    };
-    FastControl.prototype.onplay = function () {
-        this.clearInterval(1);
-        this.clearInterval(-1);
-    };
-    FastControl.prototype.onbegin = function () {
-        this.clearInterval(1);
-        this.clearInterval(-1);
-    };
-    FastControl.prototype.onended = function () {
-        this.clearInterval(1);
-        this.clearInterval(-1);
-    };
-    return FastControl;
-}(ControlloGenerico));
-/**
- * Classe VideoPlayer
- * ------------------
- * Crea un player riproducendo il video specificato nella configurazione
- * Inserisce uno spinner per il caricamento
- * Binda i comandi al dom
- * Inserisce la barra a scorrimento delle scene
- */
-var VideoPlayer = /** @class */ (function () {
-    //  Andiamo!
-    function VideoPlayer(conf) {
-        //  Configurazione
-        /**
-         * {
-         *      selector: classe o id dell'elemento in cui creare il video,
-         *      sources: array di url,
-         *      fps: intero,
-         *      scene: oggetto contenente le scene,
-         * }
-         */
-        this.conf = null;
-        //  Configurazioni base del player
-        this.default_player_conf = {
-            controls: false,
-            volume: 0.5
-        };
-        //  Contenitore del video
-        this.video_container = null;
-        //  Riferimento al video
-        this.video = null;
-        //  Controlli
-        this.controls = null;
-        this.hide_controls = {
-            timeout: null,
-            delay: 750
-        };
-        // private fast_play = null;
-        //  fps reali del filmato
-        this.fps = 0;
-        //  fps impostati dal player
-        this.current_fps = 0;
-        //  "dimensione" del frame rispetto al tempo
-        this.frameLength = 0;
-        //  Tiene traccia del primo caricamento dei dati
-        this.firstloadeddata = true;
-        //  Interfaccia per autostop
-        this.autostop = {
-            active: false,
-            loop: false,
-            stopAt: null,
-            startAt: null
-        };
-        //  Componenti esterni
-        this.SpinnerComponent = null;
-        this.SeekBarComponent = null;
-        this.ControlsComponent = null;
-        this.conf = conf;
-        this.fps = conf.fps;
-        this.current_fps = conf.fps;
-        if (this.fps) {
-            this.setFrameLength();
-        }
-        this.video_container = document.querySelector(conf.selector);
-        this.video_container.className += ' video_container';
-        this.video_create(conf.player);
-        //  Componenti
-        this.componenti_create();
-        //  Seekbar
-        this.seek_bar_create();
-        //  Just in case
-        //  un giorno potrà servire
-        window.onresize = function (e) {
-            console.log("resized");
-        };
-    }
-    /**
-     * Inizializza il componente per i controlli
-     */
-    VideoPlayer.prototype.componenti_create = function () {
-        this.ControlsComponent = new Controls({
-            videoPlayer: this,
-            video: this.video,
-            hide_controls: this.conf.hide_controls,
-            fps: this.fps,
-            frameLength: this.frameLength
-        });
-    };
-    /**
-     * Inserisce la seek bar se esiste l'oggetto SeekBar ed esistono scene
-     */
-    VideoPlayer.prototype.seek_bar_create = function () {
-        if (window['Seekbar'] && this.conf.scene && this.conf.scene.length) {
-            this.SeekBarComponent = new Seekbar({
-                video: this.video,
-                fps: this.fps,
-                frameLength: this.frameLength
-            }, this);
-            this.video_container.appendChild(this.SeekBarComponent.create());
-        }
-    };
-    //  Gestione player
-    //  ---------------
-    /**
-     * Configura il player, binda gli eventi e lo inserisce nella pagina
-     * @param conf
-     */
-    VideoPlayer.prototype.video_create = function (conf) {
-        var _this = this;
-        this.video = document.createElement('video');
-        this.video.preload = "none";
-        this.video.controls = false;
-        this.video.volume = conf && (conf.volume !== undefined && conf.volume !== null) ? conf.volume : this.default_player_conf.volume;
-        this.sources_add(this.conf.sources);
-        //  Aggiungo video
-        //  insertbefore così finisce sopra all'eventuale interfaccia
-        var wrapper = document.querySelector('.video_wrapper');
-        wrapper.insertBefore(this.video, wrapper.firstChild);
+        this.src_current.search.type = this.element.value || 'video';
+        this.source.src = this.src_current.path + "?" + this.src_pars_encode(this.src_current.search);
+        this.video.currentTime = 0;
         this.video.load();
-        // this.video_container.insertBefore(this.video, this.video_container.firstChild);
-        //  Spinner
-        //  Verifico che esista l'oggetto
-        if (window['VideoSpinner']) {
-            this.SpinnerComponent = new VideoSpinner({ target: this.conf.selector });
-            wrapper.appendChild(this.SpinnerComponent.create());
-        }
-        //  Event bindings
-        //  todo, vedi di usare le arrow function, almeno in ts
-        this.video.onloadstart = function (e) {
-            console.log("loadstart");
-            _this.spinner_show();
-        };
-        this.video.onloadeddata = function (e) {
-            console.log("loadeddata");
-            if (_this.firstloadeddata) {
-                //  Spinner
-                _this.SpinnerComponent.update(_this.video);
-                //  Controlli
-                _this.ControlsComponent.imposta();
-                //  Scene
-                if (_this.conf.scene && _this.SeekBarComponent) {
-                    _this.SeekBarComponent.showScenes(_this.conf.scene, _this.video.duration);
-                }
-                _this.video.currentTime = 0;
-                _this.firstloadeddata = false;
-            }
-            _this.spinner_hide();
-        };
-        this.video.onplay = function (e) {
-            _this.spinner_hide();
-            if (_this.autostop.active && _this.autostop.loop && _this.autostop.startAt && _this.autostop.startAt) {
-                console.log("we loop");
-                _this.video.currentTime = _this.autostop.startAt;
-            }
-            // if (classe.ControlsComponent) {
-            _this.ControlsComponent.emit('onplay');
-            // }
-            _this.seekbar_run_animation();
-        };
-        this.video.onpause = function (e) {
-            _this.ControlsComponent.emit('onpause');
-            _this.seekbar_stop_animation();
-        };
-        this.video.ontimeupdate = function (e) {
-            //  stop automatico
-            //  todo 0.250? per intercettare il prima possibile l'evento
-            if (!_this.video.paused && _this.autostop.active && _this.autostop.stopAt && (_this.video.currentTime >= _this.autostop.stopAt - 0.250)) {
-                if (_this.autostop.loop === false) {
-                    _this.autostop.active = false;
-                }
-                _this.seekbar_stop_animation();
-                _this.time_goto(_this.autostop.stopAt);
-                return;
-            }
-            _this.ControlsComponent.emit('ontimeupdate');
-            if (_this.video.currentTime == 0) {
-                console.log("begin");
-                _this.ControlsComponent.emit('onbegin');
-            }
-            _this.seekbar_run_animation();
-        };
-        this.video.onwaiting = function (e) {
-            console.log("waiting");
-            _this.spinner_show();
-        };
-        this.video.onplaying = function (e) {
-            console.log("playing");
-            _this.spinner_hide();
-        };
-        this.video.onseeking = function (e) {
-            console.log("seeking");
-            _this.spinner_show();
-        };
-        this.video.onseeked = function (e) {
-            console.log("seeked");
-            _this.spinner_hide();
-        };
-        this.video.oncanplaythrough = function () {
-            //console.log("canplaythrough");
-        };
-        this.video.onclick = function (e) {
-            _this.video.paused ? _this.video.play() : _this.video.pause();
-        };
-        this.video.onvolumechange = function (e) {
-            _this.ControlsComponent.emit('onvolumechange');
-        };
-        this.video.onended = function (e) {
-            _this.ControlsComponent.emit('onended');
+    };
+    SwitchVideoControl.prototype.src_parse = function (source) {
+        var a = document.createElement('a');
+        a.href = source;
+        return {
+            path: a.protocol + "//" + a.host + a.pathname,
+            search: this.src_pars_decode(a.search.substring(1))
         };
     };
-    /**
-     * Aggiunge sources
-     * @param sources
-     */
-    VideoPlayer.prototype.sources_add = function (sources) {
+    SwitchVideoControl.prototype.src_pars_encode = function (search) {
+        return Object.keys(search).map(function (k) { return k + "=" + search[k]; }).join('&');
+    };
+    SwitchVideoControl.prototype.src_pars_decode = function (search) {
+        if (!search) {
+            return { type: 'video' };
+        }
+        return JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}', function (key, value) { return key === "" ? value : decodeURIComponent(value); });
+    };
+    SwitchVideoControl.prototype.type_check = function (type) {
         var _this = this;
-        sources.forEach(function (s) {
-            var source = document.createElement('source');
-            source.src = s;
-            _this.video.appendChild(source);
-        });
+        var request = new XMLHttpRequest();
+        var method = 'Get';
+        request.onreadystatechange = function () {
+            //  readyState 2 => headers ricevuti
+            if (request.readyState === 2) {
+                var headers = request.getAllResponseHeaders();
+                console.log("headers", headers);
+                console.log("this.element", _this.element);
+                if (headers.includes('json')) {
+                    _this.element.classList.add('display-none');
+                    _this.element.style = 'display:none';
+                }
+                else {
+                    _this.element.classList.remove('display-none');
+                    _this.element.style = '';
+                }
+                request.abort();
+            }
+        };
+        var pars = Object.assign({}, this.src_current.search);
+        pars.type = type;
+        var url = this.src_current.path + "?" + this.src_pars_encode(pars);
+        request.open(method, url);
+        request.send();
     };
-    /**
-     * imposta una scena da riprodurre
-     * @param scena
-     * @param loop
-     */
-    VideoPlayer.prototype.scena_set = function (scena, loop) {
-        //  riproduce una scena dall'inizio e si ferma alla fine
-        this.autostop.active = true;
-        this.autostop.stopAt = scena.end;
-        this.autostop.startAt = scena.start;
-        this.autostop.loop = loop;
-        this.time_goto(scena.start);
-    };
-    /**
-     * Imposta frameLength equivalente alla durata temporale di un frame
-     */
-    VideoPlayer.prototype.setFrameLength = function () {
-        this.frameLength = 1 / this.fps;
-    };
-    /**
-     * sposta il video al tempo passato
-     * @param time
-     */
-    VideoPlayer.prototype.time_goto = function (time) {
-        this.video.pause();
-        this.video.currentTime = time;
-        //  dipendente dal fps settato
-        // this.video.currentTime = time * (this.current_fps / this.fps );
-        //this.marks_update();
-    };
-    VideoPlayer.prototype.play_range = function (from, to, loop) {
-        this.autostop.active = true;
-        this.autostop.loop = loop;
-        this.autostop.startAt = from;
-        this.autostop.stopAt = to;
-        this.video.currentTime = from;
-        this.video.play();
-    };
-    //  Gestione spinner
-    //  ----------------
-    VideoPlayer.prototype.spinner_show = function () {
-        if (this.SpinnerComponent) {
-            this.SpinnerComponent.show();
-        }
-        // throw new Error('spinner show');
-    };
-    VideoPlayer.prototype.spinner_hide = function () {
-        if (this.SpinnerComponent) {
-            this.SpinnerComponent.hide();
-        }
-        // throw new Error('spinner hide');
-    };
-    //  Gestione seekbar
-    //  ----------------
-    VideoPlayer.prototype.seekbar_run_animation = function () {
-        if (this.SeekBarComponent) {
-            this.SeekBarComponent.run_animation();
-        }
-    };
-    VideoPlayer.prototype.seekbar_stop_animation = function () {
-        if (this.SeekBarComponent) {
-            this.SeekBarComponent.stop_animation();
-        }
-    };
-    return VideoPlayer;
-}());
+    return SwitchVideoControl;
+}(ControlloGenerico));
 //# sourceMappingURL=VideoPlayer_bundle.js.map
