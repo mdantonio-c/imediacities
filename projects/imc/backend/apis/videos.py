@@ -352,7 +352,8 @@ class VideoContent(GraphBaseOperations):
             download = Downloader()
             return download.send_file_partial(video_uri, mime)
         elif content_type == 'orf':
-            orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
+            # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
+            orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
             if orf_uri is None or not os.path.exists(orf_uri):
                 raise RestApiException(
                     "Video ORF not found",
