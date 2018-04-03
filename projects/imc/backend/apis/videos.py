@@ -372,7 +372,8 @@ class VideoContent(GraphBaseOperations):
                     os.path.dirname(os.path.abspath(thumbnail_uri)))
                 thumbnail_uri = os.path.join(
                     thumbs_parent_dir, thumbnail_filename)
-                logger.debug('request for large thumbnail: {}'.format(thumbnail_uri))
+                logger.debug(
+                    'request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found",
@@ -399,7 +400,6 @@ class VideoTools(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    @graph_transactions
     def post(self, video_id):
 
         logger.debug('launch automatic tool for video id: %s' % video_id)
@@ -440,8 +440,16 @@ class VideoTools(GraphBaseOperations):
                 (self.__available_tools__, ),
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # DO NOT re-launch object detection twice for the same video!
         repo = AnnotationRepository(self.graph)
+        if ('operation' in params and params['operation'] == 'delete' and
+                tool == self.__available_tools__[0]):
+            # get all automatic tags
+            for anno in item.sourcing_annotations:
+                if anno.generator == 'FHG' and anno.annotation_type == 'TAG':
+                    repo.delete_auto_annotation(anno)
+            return self.empty_response()
+
+        # DO NOT re-launch object detection twice for the same video!
         if repo.check_automatic_tagging(item.uuid):
             raise RestApiException(
                 "Object detection CANNOT be run twice for the same video.",

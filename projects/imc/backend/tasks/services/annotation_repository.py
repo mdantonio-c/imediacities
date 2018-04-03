@@ -326,9 +326,15 @@ class AnnotationRepository():
     def delete_auto_annotation(self, annotation):
         log.debug('Delete existing automatic TAG annotation')
         body = annotation.bodies.single()
+        object_id = None
+        object_type = None
         if body:
             od_body = body.downcast()
             log.debug(type(od_body))
+            object_id = od_body.object_id
+            concept = od_body.object_type.single()
+            if concept is not None:
+                object_type = concept.name
             od_body.delete()
         refined_selection = annotation.refined_selection.single()
         if refined_selection:
@@ -345,6 +351,7 @@ class AnnotationRepository():
                 t.delete()
                 log.debug('Deleted orphan segment')
         annotation.delete()
+        log.info('Automatic TAG[{oid}/{otype}] deleted.'.format(oid=object_id, otype=object_type))
 
     def deduplicate_tags(self, bodies, target, selector):
         ''' Check for esisting bodies for the given target. If all bodies
@@ -399,15 +406,17 @@ class AnnotationRepository():
 
     def lookup_existing_segment(self, start_frame, end_frame, item):
         '''
-        Search for the existing segment for a given item.
+        Search for existing segment for a given item.
+        NOTE: we're excluding shots!
         '''
-        segments = self.graph.VideoSegment.nodes.filter(
-            start_frame_idx=start_frame, end_frame_idx=end_frame)
-        for s in segments:
-            related_item = s.within_shots.single().item.single()
-            if related_item.uuid == item.uuid:
-                # existing segment found
-                return s
+        query = "MATCH (n:VideoSegment) WHERE n.start_frame_idx={start_frame} AND n.end_frame_idx={end_frame} " \
+                "MATCH (n)-[:WITHIN_SHOT]-(s:Shot)-[:SHOT]-(i:Item {{uuid: '{item_id}'}}) " \
+                "RETURN n"
+        results = self.graph.cypher(query.format(
+            start_frame=start_frame, end_frame=end_frame, item_id=item.uuid))
+        segment = [self.graph.VideoSegment.inflate(row[0]) for row in results][0]
+        log.debug("Found segment: {0}".format(segment))
+        return segment
 
     def check_automatic_tagging(self, item_id):
         '''
