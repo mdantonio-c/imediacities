@@ -414,9 +414,8 @@ class AnnotationRepository():
                 "RETURN n"
         results = self.graph.cypher(query.format(
             start_frame=start_frame, end_frame=end_frame, item_id=item.uuid))
-        segment = [self.graph.VideoSegment.inflate(row[0]) for row in results][0]
-        log.debug("Found segment: {0}".format(segment))
-        return segment
+        segment = [self.graph.VideoSegment.inflate(row[0]) for row in results]
+        return segment[0] if segment else None
 
     def check_automatic_tagging(self, item_id):
         '''
