@@ -459,6 +459,11 @@
 		sc.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
 			sc.vocabulary = data;
+			if (!$stateParams.type) {
+				// do not load a previous saved filter
+				ivhTreeviewMgr.deselectAll(sc.vocabulary);
+				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+			}
 		});
 
 		$scope.terms = [];
@@ -484,10 +489,9 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			} else {
+				// remove tag
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
-				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			}
 		};
 
@@ -504,6 +508,12 @@
 				ivhTreeviewMgr.deselect(sc.vocabulary, tag.iri);
 			}
 		};
+		$scope.$watch('terms', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.terms = newValue;
+				localStorage.setItem('terms', JSON.stringify($scope.terms));
+			}
+		}, true);
 
 
 		sc.itemType = {
@@ -707,6 +717,7 @@
 			if ($scope.inputTerm !== '') {
 				request_data.match.term = $scope.inputTerm;
 			}
+			// console.log(angular.toJson($scope.filter, true));
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
 					var meta = out_data.data.Meta;
@@ -825,16 +836,15 @@
 				yearto: sc.maxProductionYear,
 				terms: []
 			};
+			
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
 
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
-
 			if ($stateParams.type == 'old')//back to old saved search
 			{
-
 				/*initialize last selected input type as default value when refresh page*/
 				/*var itemTV = localStorage.getItem('itemTypeV');
 				var itemTI = localStorage.getItem('itemTypeI');
