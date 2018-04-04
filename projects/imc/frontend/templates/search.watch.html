@@ -2,6 +2,8 @@
 <div ng-controller='SearchController as searchCtrl'>
 	<div class="row">
 		<div id="search-box">
+			<div class="col-md-2"></div>
+			<div class="col-xs-12 col-md-8">
 			<div class="input-group stylish-input-group">
 				<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search item"
 				ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
@@ -11,9 +13,13 @@
 					</button>
 				</span>
 				<span class="input-group-btn backsearch">
-					<button type="button" ui-sref="logged.new-search({type: 'old'})" class="btn btn-default btn-sm"><i class="imc-icon glyphicon glyphicon-chevron-left" aria-hidden="true"></i>Back to search</button>
+					<button type="button" ui-sref="logged.new-search({type: 'old'})"
+						uib-tooltip="Back to search"
+						class="btn btn-default btn-sm"><i class="imc-icon fa fa-chevron-left" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Back to search<span></button>
 				</span>
 			</div>
+			</div>
+			<div class="col-md-2"></div>
 		</div>
 	</div>
 </div>

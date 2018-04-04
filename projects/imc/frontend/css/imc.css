@@ -214,11 +214,6 @@ div.scrollmenu img:hover {
 	padding: 20px;
 }
 
-#search-box{
-    margin: 0 25%;
-    /*padding: 20px 0;*/
-}
-
 #search-logo {
 	transition: all linear 0.5s;
   	height: 50%;
