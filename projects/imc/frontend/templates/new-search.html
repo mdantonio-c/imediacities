@@ -20,7 +20,8 @@
 											ng-model="inputTerm"
 											ng-attr-placeholder="Look within results"
 											ng-trim="true"
-											name="input-term">
+											name="input-term"
+											ng-keypress="sc.goToSearch($event)">
 										<div class="input-group-btn">
 											<button type="button" class="btn btn-default no-border btn-sm" ng-click="sc.search()">
 												<i class="imc-icon fa fa-search icon-on-right bigger-110"></i>

@@ -117,7 +117,8 @@
 
 	var app = angular.module('web')
 		.controller('SearchController', SearchController)
-		.controller('NewSearchController', NewSearchController);
+		.controller('NewSearchController', NewSearchController)
+		.controller('QuickSearchController', QuickSearchController);
 
 	// create a simple search filter
 	app.filter('searchFor', function() {
@@ -564,11 +565,14 @@
 		});
 		$scope.$watch('defaultipr', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				$scope.filter.iprstatus = newValue;
-				/*save input status for ipr status selected*/
-				localStorage.setItem('iprstatus', newValue);
+				updateIPRStatusFilter(newValue);
 			}
 		});
+		var updateIPRStatusFilter = function(value) {
+			$scope.filter.iprstatus = value;
+			/*save input status for ipr status selected*/
+			localStorage.setItem('iprstatus', value);
+		};
 		$scope.$watch('yearfrom', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				$scope.filter.yearfrom = newValue;
@@ -764,6 +768,12 @@
 				});
 		};
 
+		sc.goToSearch = function(event) {
+			if (event.keyCode === 13) {
+				sc.search();
+			}
+		};
+
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 
@@ -897,16 +907,24 @@
 				sc.resetFiltersToDefault();
 			}
 
+			// state param term
+			var term = $stateParams.q;
+			if (term !== undefined && term !== '') {
+				// force input term to this value
+				$scope.inputTerm = term;
+			}
+			console.log(angular.toJson($stateParams));
+
 			$scope.filter = {
 				type: 'all',
 				provider: $scope.codeci,
 				country: null,
-				//iprstatus: $scope.defaultipr,
 				yearfrom: $scope.yearfrom,
 				yearto: $scope.yearto,
 				terms: $scope.terms
 			};
 			updateItemTypeFilter(sc.itemType);
+			updateIPRStatusFilter($scope.defaultipr);
 
 		};
 		sc.resetFilters();
@@ -1031,6 +1049,18 @@
 		sc.updateFilterByDecade = function(decade) {
 			$scope.filter.yearfrom = decade;
 			$scope.filter.yearto = decade + 9;
+		};
+	}
+
+	function QuickSearchController($scope, $state, $stateParams) {
+		var self = this;
+		self.goToSearch = function(event, term) {
+			if (event.keyCode === 13) {
+				$state.go('logged.new-search', {
+					q: term,
+					type: null
+				});
+			}
 		};
 	}
 
