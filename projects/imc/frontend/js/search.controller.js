@@ -756,12 +756,6 @@
 					});
 				},
 				function(out_data) {
-					var errors = out_data.data.Response.errors;
-					angular.forEach(errors, function(error) {
-						sc.alerts.push({
-							msg: error
-						});
-					});
 					noty.extractErrors(out_data, noty.ERROR);
 				}).finally(function() {
 					sc.loading = false;
@@ -873,7 +867,7 @@
 
 				/*initialize last selected ipr status as default value when refresh page*/
 				var iprstatus = localStorage.getItem('iprstatus');
-				var iprselected = (iprstatus!==null) ? iprstatus : null;
+				var iprselected = (iprstatus!==null && iprstatus!=='null') ? iprstatus : null;
 				$scope.defaultipr = iprselected;
 
 				// move codelist provision in a service
@@ -913,7 +907,6 @@
 				// force input term to this value
 				$scope.inputTerm = term;
 			}
-			console.log(angular.toJson($stateParams));
 
 			$scope.filter = {
 				type: 'all',
