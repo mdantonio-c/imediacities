@@ -14,7 +14,7 @@
 				</span>
 				<span class="input-group-btn backsearch">
 					<button type="button" ui-sref="logged.new-search({type: 'old'})"
-						class="btn btn-default btn-sm"><i class="imc-icon fa fa-chevron-left" aria-hidden="true"></i><span class="hidden-xs hidden-sm">Back to search<span></button>
+						class="btn btn-default btn-sm"><i class="imc-icon fa fa-chevron-left" aria-hidden="true"></i><span class="hidden-xs hidden-sm">&nbsp;Back to search<span></button>
 				</span>
 			</div>
 			</div>
@@ -116,7 +116,7 @@
 						<p><b>Production Country</b>:
 							<span ng-repeat="country in watchCtrl.video.relationships.production_countries">
 							{{country.attributes.code.key}}{{$last ? '' : '/'}}</span></p>
-						<p><b>Contributors</b>:
+						<p><b>Credits</b>:
 							<span ng-repeat="contrib in watchCtrl.video.relationships.contributors">
 							{{contrib.attributes.names[0] | nocomma}} <i ng-if="contrib.attributes.activities">
 								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}</span></p>
