@@ -185,9 +185,23 @@ video {
 video::-webkit-media-controls-enclosure {
   display: none !important; }
 
+.timeranges {
+  position: relative;
+  height: 3px;
+  padding: 0 8px;
+  z-index: 0; }
+
+.timerange {
+  top: 0;
+  height: 100%;
+  position: absolute;
+  background: rgba(51, 51, 51, 0.5); }
+
 [type='range'] {
   -webkit-appearance: none;
-  width: 100%; }
+  width: 100%;
+  position: relative;
+  z-index: 1; }
   [type='range']:focus {
     outline: 0; }
     [type='range']:focus::-webkit-slider-runnable-track {
@@ -201,10 +215,9 @@ video::-webkit-media-controls-enclosure {
     height: 8px;
     transition: all .2s ease;
     width: 100%;
-    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px rgba(13, 13, 13, 0.2);
     background: #eceff1;
     border: 2px solid #cfd8dc;
-    border-radius: 5px; }
+    border-radius: 0; }
   [type='range']::-webkit-slider-thumb {
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2), 0 0 4px rgba(13, 13, 13, 0.2);
     background: #607d8b;
@@ -223,7 +236,7 @@ video::-webkit-media-controls-enclosure {
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px rgba(13, 13, 13, 0.2);
     background: #eceff1;
     border: 2px solid #cfd8dc;
-    border-radius: 5px; }
+    border-radius: 0; }
   [type='range']::-moz-range-thumb {
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2), 0 0 4px rgba(13, 13, 13, 0.2);
     background: #607d8b;
@@ -245,12 +258,12 @@ video::-webkit-media-controls-enclosure {
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px rgba(13, 13, 13, 0.2);
     background: #dde3e6;
     border: 2px solid #cfd8dc;
-    border-radius: 10px; }
+    border-radius: 0; }
   [type='range']::-ms-fill-upper {
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2), 0 0 1px rgba(13, 13, 13, 0.2);
     background: #eceff1;
     border: 2px solid #cfd8dc;
-    border-radius: 10px; }
+    border-radius: 0; }
   [type='range']::-ms-thumb {
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2), 0 0 4px rgba(13, 13, 13, 0.2);
     background: #607d8b;
@@ -333,6 +346,8 @@ video::-webkit-media-controls-enclosure {
     padding: 4px 8px; }
   .controls__wrapper .controls__status__play {
     line-height: 30px; }
+  .controls__wrapper .control__status__range {
+    position: relative; }
   .controls__wrapper .controls__status + .controls__buttons {
     border-top: 0; }
 
@@ -433,7 +448,7 @@ video::-webkit-media-controls-enclosure {
     transform: scaleY(1);
     -webkit-transform: scaleY(1); } }
 .display-none {
-  display: none; }
+  display: none !important; }
 
 .visibility-hidden {
   visibility: hidden; }

@@ -21,8 +21,9 @@
                             <i class="fas fa-pause"></i>
                         </span>
                     </div>
-                    <div class="controls__status__bar flex_spacer">
+                    <div class="controls__status__bar flex_spacer control__status__range">
                         <input type="range" id="range" value="0" min="0" max="1">
+                        <div class="timeranges"></div>
                     </div>
                     <div class="controls__status__play">
                         <i class="fas fa-backward" id="backward" title="rewind"></i>
@@ -33,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="controls__buttons">
+            <div class="controls__buttons controls__advanced">
                 <div class="controls__row">
                     <!--    unità di misura    -->
                     <div class="controls__container mark">
@@ -96,7 +97,7 @@
                     <!--    switch video   -->
                     <div class="mark">
                         <div class="controls__container">
-                            <select id="switch_video_format">
+                            <select id="switch_video_format" style="display:none;">
                                 <option value="orf">orf</option>
                                 <option value="video">video</option>
                             </select>
