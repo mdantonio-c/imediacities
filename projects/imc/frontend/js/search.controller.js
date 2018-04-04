@@ -521,14 +521,19 @@
 			image: true,
 			text: false
 		};
+		// localStorage.setItem('itemType', JSON.stringify(sc.itemType));
 		$scope.$watch('sc.itemType', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) $scope.filter.type='all';
-				else if (newValue.video) $scope.filter.type='video';
-				else if (newValue.image) $scope.filter.type='image';
-				else if (newValue.text) $scope.filter.type='text';
+				updateItemTypeFilter(newValue);
 			}
 		}, true);
+		var updateItemTypeFilter = function(value) {
+			if (value.video && value.image) $scope.filter.type = 'all';
+			else if (value.video) $scope.filter.type = 'video';
+			else if (value.image) $scope.filter.type = 'image';
+			else if (value.text) $scope.filter.type = 'text';
+			localStorage.setItem('itemType', JSON.stringify(sc.itemType));
+		};
 
 
 		$scope.$watch('defaultc', function(newValue, oldValue) {
@@ -550,28 +555,6 @@
 				localStorage.setItem('scity', newValue);
 			}
 		});
-		$scope.$watch('itemType', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) {
-					$scope.filter.type='all';
-					/*localStorage.setItem('itemTypeV',true);
-					localStorage.setItem('itemTypeI',true);*/
-				}
-				else if (newValue.video) {
-					$scope.filter.type='video';
-					/*var typeV = localStorage.getItem('itemTypeV');
-					var bool = typeV ? false : true;
-					localStorage.setItem('itemTypeV',bool);//it's a video*/
-				}
-				else if (newValue.image) {
-					$scope.filter.type='image';
-					/*var typeI = localStorage.getItem('itemTypeI');
-					var bool = typeI ? false : true;
-					localStorage.setItem('itemTypeI',bool);//it's an image*/
-				}
-				else if (newValue.text) $scope.filter.type='text';
-			}
-		}, true);
 		$scope.$watch('inputTerm', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				/*save input status for input term selected*/
@@ -787,6 +770,12 @@
 		//reset filters to default values
 		sc.resetFiltersToDefault = function() {
 
+			sc.itemType = {
+				video: true,
+				image: true,
+				text: false
+			};
+
 			$scope.defaultc = '';
 			$scope.inputTerm = '';
 			$scope.defaultipr = null;
@@ -822,11 +811,8 @@
 			localStorage.setItem('yearfrom',1890);
 			localStorage.setItem('yearto',1999);
 			localStorage.setItem('scity','');
-			//localStorage.setItem('itemTypeV',true);
-			//localStorage.setItem('itemTypeI',true);
+			localStorage.setItem('itemType', JSON.stringify(sc.itemType));
 
-			//$scope.itemType.video = true;
-			//$scope.itemType.image = true;
 			$scope.filter = {
 				type: 'all',
 				provider: null,
@@ -846,12 +832,10 @@
 			if ($stateParams.type == 'old')//back to old saved search
 			{
 				/*initialize last selected input type as default value when refresh page*/
-				/*var itemTV = localStorage.getItem('itemTypeV');
-				var itemTI = localStorage.getItem('itemTypeI');
-				var inputSelectedV = (itemTV!==null) ? itemTV : true;
-				var inputSelectedI = (itemTI!==null) ? itemTI : true;
-				$scope.itemType.video = inputSelectedV;
-				$scope.itemType.image = inputSelectedI;*/
+				var savedItemTypes = localStorage.getItem('itemType');
+				if (savedItemTypes !== undefined) {
+					sc.itemType = JSON.parse(savedItemTypes);
+				}
 
 				$scope.yearfrom=1890;
 				$scope.yearto=1999;
@@ -922,6 +906,7 @@
 				yearto: $scope.yearto,
 				terms: $scope.terms
 			};
+			updateItemTypeFilter(sc.itemType);
 
 		};
 		sc.resetFilters();
