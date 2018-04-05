@@ -5,11 +5,6 @@
   	<a class='nav-link' routerLink='/new/test' routerLinkActive="active">*Admin*</a>
   </li>
 
-  <li class='nav-item' *ngIf="user">
-  	<a class='nav-link' routerLink='/new/profile' routerLinkActive="active">*Profile*</a>
-  </li>
-
-
   <li class='nav-item' *ngIf="user && user.roles['Archive']">
       <a class='nav-link' routerLink="/app/upload" ui-sref="logged.upload">
         Upload
