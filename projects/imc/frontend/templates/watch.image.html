@@ -139,8 +139,8 @@
 			<uib-tab heading="Notes">
 			<ul style="padding-left: 20px;">
 				<li>
-					
-						<table class="table table-striped">
+					<p ng-if="watchCtrl.notes.length == 0">No notes</p>
+						<table class="table table-striped" ng-if="watchCtrl.notes.length > 0">
 							<tr ng-repeat="note in watchCtrl.notes">
 							<td>
 								<div>
@@ -207,7 +207,8 @@
 				<ul style="padding-left: 20px;">
 				<li>
 					<div>
-						<table st-table="watchCtrl.annotations" class="table table-striped">
+						<p ng-if="watchCtrl.annotations.length == 0">No manual tags</p>
+						<table st-table="watchCtrl.annotations" class="table table-striped" ng-if="watchCtrl.annotations.length > 0">
 							<thead>
 								<tr>
 									<th st-sort="group">category</th>
