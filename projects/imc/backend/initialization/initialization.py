@@ -50,3 +50,9 @@ class Initializer(object):
             group.shortname = "test"
             group.save()
             log.info("Group successfully created")
+
+
+class Customizer(object):
+
+    def custom_user_properties(self, properties):
+        return properties
