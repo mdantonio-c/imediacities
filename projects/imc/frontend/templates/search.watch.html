@@ -188,7 +188,8 @@
 					</div>
 					<!-- list of the notes of the selected shot -->
 					<div class="tab-list-notes">
-
+						
+						<p ng-if="watchCtrl.notesShots[watchCtrl.notesShotSelected-1].notes == 0">No notes</p>
 						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
 							<div>
 								<span class="note-user-icon">
@@ -256,7 +257,12 @@
 						-->
 
 
-							<span><a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
+							<span ng-if="shot.notes > 0">
+								<b><a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></b>
+							</span>
+							<span ng-if="shot.notes == 0">
+								<a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a>
+							</span>
 
 							<!--
 							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
