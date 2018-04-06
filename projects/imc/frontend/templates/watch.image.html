@@ -103,7 +103,7 @@
 						</p>
 						<p><b>Location</b>: {{watchCtrl.image.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
 						<p><b>Owner</b>: {{watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}<br/>
-							<b>Owner Record ID</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.source_id}}
+							<b>Owner Record ID</b>: {{watchCtrl.image.relationships.record_sources[0].attributes.source_id}}
 						</p>
 						<p><b>Is shown at</b>:
 							<a target="_blank" href="{{watchCtrl.isShownAt}}" ng-if="watchCtrl.isShownAt">{{watchCtrl.isShownAt}}</a>
