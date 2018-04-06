@@ -17,7 +17,8 @@
         'ngMap',
         'googlechart',
         'ivh.treeview',
-        'ngTagsInput'
+        'ngTagsInput',
+        'ngHolder'
     ]);
 
 })();

@@ -14,9 +14,10 @@ angular.module('web').constant('customRoutes',
     },
 
     'logged.new-search': {
-        url: "/new-search?q",
+        url: "/new-search",
         params: {
-            type: null
+            type: null,
+            q: null
         },
         views: {
             "loggedview@logged": {

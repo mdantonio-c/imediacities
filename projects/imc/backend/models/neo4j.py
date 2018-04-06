@@ -167,9 +167,7 @@ class Item(TimestampedNode, AnnotationTarget):
         framerate       Optional value for the projection speed, given in
                         frames per second, to which the given duration refers.
         dimension       The total physical dimension of the digital object
-                        (i.e. file size in bytes) represented as numeric value,
-                        with decimal places if required.
-        dimension_unit  Unit of the physical dimension of the item: "bytes"
+                        (i.e. file size in bytes) represented as numeric value.
         digital_format  The description of the digital file in which a content
                         object is stored. Array[0]=container; Array[1]=coding;
                         Array[2]=format; Array[3]=resolution:
@@ -187,7 +185,8 @@ class Item(TimestampedNode, AnnotationTarget):
     thumbnail = StringProperty()
     summary = StringProperty()
     duration = FloatProperty(show=True)
-    framerate = StringProperty(show=True)  # FloatProperty()
+    dimension = IntegerProperty(show=True)
+    framerate = StringProperty(show=True)
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
     item_type = StringProperty(
@@ -565,13 +564,13 @@ class NonAVEntity(Creation):
     Attributes:
         date_created            The point or period of time associated with the
                                 creation of the non-audiovisual creation
-                                (“CCYY-MM-DD”, “CCYY”, CCYY-CCYY). If the
+                                ("CCYY-MM-DD", "CCYY", CCYY-CCYY). If the
                                 production year is unknown, the term “unknown”
                                 should be added to indicate that research
                                 regarding the production time has been
                                 unsuccessful.
         non_av_type             The general type of the non-audiovisual
-                                manifestation (“image” or “text”).
+                                manifestation ("image" or "text").
         specific_type           This element further specifies the type of the
                                 non-audiovisual entity.
         phisical_format_size    The dimensions of the physical object.
