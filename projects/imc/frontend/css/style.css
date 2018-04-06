@@ -214,11 +214,6 @@ div.scrollmenu img:hover {
 	padding: 20px;
 }
 
-#search-box{
-    margin: 0 25%;
-    /*padding: 20px 0;*/
-}
-
 #search-logo {
 	transition: all linear 0.5s;
   	height: 50%;
@@ -1902,6 +1897,17 @@ li.ivh-treeview-node::before {
 	padding: 0px 4px;
 }
 
+.map-result h4 {
+	display: inline; padding-left: 5px;
+}
+.map-result .media-image-wrapper img {
+	border: 2px solid #fff;
+	outline: 1px solid #e4e4e4;
+	height: 150px;
+	width: 100%;
+	display: block;
+}
+
 /* Timeline */
 .timeline
 .timeline-horizontal {
@@ -2206,6 +2212,7 @@ li.ivh-treeview-node::before {
 .tab-notes
 {
 	overflow: hidden;
+    max-width: 100%;
 }
 .tab-notes-title
 {
@@ -2217,10 +2224,8 @@ li.ivh-treeview-node::before {
 {
 	display: inline-block;
 	border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    width: 70%;
-    height: 500px;
+    width: 85%;
+    height: 800px;
     vertical-align: top;
     overflow-y: auto;
 }
@@ -2231,9 +2236,11 @@ li.ivh-treeview-node::before {
 .tab-list-shots
 {
 	display: inline-block;
-    width: 100px;
-    height: 500px;
-    overflow-y: auto;
+	overflow-y: auto;
+    height: 100%;
+    min-width: 70px;
+    max-width: 100px;
+    max-height: 800px;
 }
 a.tab-list-shots-link:hover,
 a.tab-list-shots-link:focus
@@ -2279,7 +2286,7 @@ a.tab-list-shots-link:focus
 	border-top: 1px solid #aaa;
     border-left: 1px solid #aaa;
     border-right: 1px solid #aaa;
-    padding: 5px;
+    padding: 4px;
 } 
 .tab-list-shot-last
 {
