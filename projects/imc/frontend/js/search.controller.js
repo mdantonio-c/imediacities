@@ -217,6 +217,16 @@
 				else return provider;
 			};
 		})
+		.directive('holder', [
+		  function() {
+		    return {
+		      link: function(scope, element, attrs) {
+		        if(attrs.holder)
+		          attrs.$set('data-src', attrs.holder);
+		        Holder.run({images:element[0]});
+		      }
+		    };
+		  }])
 		;
 
 	// The controller
