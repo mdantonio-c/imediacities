@@ -618,6 +618,12 @@ def extract_od_annotations(self, item, analyze_dir_path):
 
         # save annotation
         bodies = []
+        # warkaround for very huge area sequence!
+        if len(region_sequence) > 1000:
+            huge_size = len(region_sequence)
+            region_sequence = []
+            log.warn('Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.
+                format(objID=key[0], concept=concept['name'], size=huge_size))
         od_body = {
             'type': 'ODBody',
             'object_id': key[0],
