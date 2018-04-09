@@ -2209,7 +2209,12 @@ li.ivh-treeview-node::before {
 /*----------------------------------------------
        The tab with the Notes -- cinzia
 -----------------------------------------------*/
-.tab-notes
+.notes-content
+{
+	max-height: 800px;
+    max-width: 100%;
+    overflow-y: auto;
+}.tab-notes
 {
 	overflow: hidden;
     max-width: 100%;
@@ -2219,13 +2224,14 @@ li.ivh-treeview-node::before {
 	color: #6e7a7f;
     font-weight: bold;
     font-size: 20px;
+    background-color: #f9f9f9;
 }
 .tab-list-notes
 {
 	display: inline-block;
-	border-top: 1px solid #ddd;
+	/* border-top: 1px solid #ddd; */
     width: 85%;
-    height: 800px;
+    /* height: 800px; */
     vertical-align: top;
     overflow-y: auto;
 }

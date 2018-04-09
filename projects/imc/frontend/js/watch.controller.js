@@ -1106,7 +1106,9 @@
 					// Non c'e' bisogno viene aggiornata in automatico 
 					//  perche' cambia la variabile self.notes
 					//$rootScope.$emit('updateNotes', null, null);
-					self.noteShots[note.shotnum-1].notes--;
+					console.log("deleteNote: note=" + angular.toJson(note, true));
+					console.log("deleteNote: self.notesShots=" + angular.toJson(self.notesShots, true));
+					self.notesShots[note.shotNum-1].notes--;
 				}, function(err) {
 					// TODO
 				});
