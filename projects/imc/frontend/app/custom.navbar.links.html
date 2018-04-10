@@ -1,10 +1,6 @@
 
 <ul class="navbar-nav">
 
-  <li class='nav-item' *ngIf="user && user.isAdmin">
-  	<a class='nav-link' routerLink='/new/test' routerLinkActive="active">*Admin*</a>
-  </li>
-
   <li class='nav-item' *ngIf="user && user.roles['Archive']">
       <a class='nav-link' routerLink="/app/upload" ui-sref="logged.upload">
         Upload
@@ -32,6 +28,12 @@
   <li class='nav-item' *ngIf="user && user.isAdmin">
       <a class='nav-link' routerLink="/app/admin/archive" ui-sref="logged.admin.archive">
         Archive 
+      </a>
+  </li>
+
+  <li class='nav-item' *ngIf="user && user.isAdmin">
+      <a class='nav-link' routerLink="/new/archives">
+        *Archive*
       </a>
   </li>
 

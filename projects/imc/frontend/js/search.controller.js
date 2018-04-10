@@ -117,7 +117,8 @@
 
 	var app = angular.module('web')
 		.controller('SearchController', SearchController)
-		.controller('NewSearchController', NewSearchController);
+		.controller('NewSearchController', NewSearchController)
+		.controller('QuickSearchController', QuickSearchController);
 
 	// create a simple search filter
 	app.filter('searchFor', function() {
@@ -216,6 +217,16 @@
 				else return provider;
 			};
 		})
+		.directive('holder', [
+		  function() {
+		    return {
+		      link: function(scope, element, attrs) {
+		        if(attrs.holder)
+		          attrs.$set('data-src', attrs.holder);
+		        Holder.run({images:element[0]});
+		      }
+		    };
+		  }])
 		;
 
 	// The controller
@@ -470,6 +481,11 @@
 		sc.vocabulary = [];
 		VocabularyService.loadTerms().then(function(data) {
 			sc.vocabulary = data;
+			if (!$stateParams.type) {
+				// do not load a previous saved filter
+				ivhTreeviewMgr.deselectAll(sc.vocabulary);
+				ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
+			}
 		});
 
 		$scope.terms = [];
@@ -495,10 +511,9 @@
 			if (node.selected) {
 				// add tag
 				$scope.terms.push({iri: node.id, label: node.label});
-				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			} else {
+				// remove tag
 				$scope.terms = _.reject($scope.terms, function(el) { return el.label === node.label; });
-				localStorage.setItem('terms', JSON.stringify($scope.terms)); //it's a term array
 			}
 		};
 
@@ -515,6 +530,12 @@
 				ivhTreeviewMgr.deselect(sc.vocabulary, tag.iri);
 			}
 		};
+		$scope.$watch('terms', function(newValue, oldValue) {
+			if (newValue !== oldValue) {
+				$scope.filter.terms = newValue;
+				localStorage.setItem('terms', JSON.stringify($scope.terms));
+			}
+		}, true);
 
 
 		sc.itemType = {
@@ -522,14 +543,19 @@
 			image: true,
 			text: false
 		};
+		// localStorage.setItem('itemType', JSON.stringify(sc.itemType));
 		$scope.$watch('sc.itemType', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) $scope.filter.type='all';
-				else if (newValue.video) $scope.filter.type='video';
-				else if (newValue.image) $scope.filter.type='image';
-				else if (newValue.text) $scope.filter.type='text';
+				updateItemTypeFilter(newValue);
 			}
 		}, true);
+		var updateItemTypeFilter = function(value) {
+			if (value.video && value.image) $scope.filter.type = 'all';
+			else if (value.video) $scope.filter.type = 'video';
+			else if (value.image) $scope.filter.type = 'image';
+			else if (value.text) $scope.filter.type = 'text';
+			localStorage.setItem('itemType', JSON.stringify(sc.itemType));
+		};
 
 
 		$scope.$watch('defaultc', function(newValue, oldValue) {
@@ -551,28 +577,6 @@
 				localStorage.setItem('scity', newValue);
 			}
 		});
-		$scope.$watch('itemType', function(newValue, oldValue) {
-			if (newValue !== oldValue) {
-				if (newValue.video && newValue.image) {
-					$scope.filter.type='all';
-					/*localStorage.setItem('itemTypeV',true);
-					localStorage.setItem('itemTypeI',true);*/
-				}
-				else if (newValue.video) {
-					$scope.filter.type='video';
-					/*var typeV = localStorage.getItem('itemTypeV');
-					var bool = typeV ? false : true;
-					localStorage.setItem('itemTypeV',bool);//it's a video*/
-				}
-				else if (newValue.image) {
-					$scope.filter.type='image';
-					/*var typeI = localStorage.getItem('itemTypeI');
-					var bool = typeI ? false : true;
-					localStorage.setItem('itemTypeI',bool);//it's an image*/
-				}
-				else if (newValue.text) $scope.filter.type='text';
-			}
-		}, true);
 		$scope.$watch('inputTerm', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				/*save input status for input term selected*/
@@ -582,11 +586,14 @@
 		});
 		$scope.$watch('defaultipr', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
-				$scope.filter.iprstatus = newValue;
-				/*save input status for ipr status selected*/
-				localStorage.setItem('iprstatus', newValue);
+				updateIPRStatusFilter(newValue);
 			}
 		});
+		var updateIPRStatusFilter = function(value) {
+			$scope.filter.iprstatus = value;
+			/*save input status for ipr status selected*/
+			localStorage.setItem('iprstatus', value);
+		};
 		$scope.$watch('yearfrom', function(newValue, oldValue) {
 			if (newValue !== oldValue) {
 				$scope.filter.yearfrom = newValue;
@@ -718,6 +725,7 @@
 			if ($scope.inputTerm !== '') {
 				request_data.match.term = $scope.inputTerm;
 			}
+			// console.log(angular.toJson($scope.filter, true));
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
 					console.log(out_data);
@@ -782,11 +790,23 @@
 				});
 		};
 
+		sc.goToSearch = function(event) {
+			if (event.keyCode === 13) {
+				sc.search();
+			}
+		};
+
 		sc.minProductionYear = 1890;
 		sc.maxProductionYear = 1999;
 
 		//reset filters to default values
 		sc.resetFiltersToDefault = function() {
+
+			sc.itemType = {
+				video: true,
+				image: true,
+				text: false
+			};
 
 			$scope.defaultc = '';
 			$scope.inputTerm = '';
@@ -823,11 +843,8 @@
 			localStorage.setItem('yearfrom',1890);
 			localStorage.setItem('yearto',1999);
 			localStorage.setItem('scity','');
-			//localStorage.setItem('itemTypeV',true);
-			//localStorage.setItem('itemTypeI',true);
+			localStorage.setItem('itemType', JSON.stringify(sc.itemType));
 
-			//$scope.itemType.video = true;
-			//$scope.itemType.image = true;
 			$scope.filter = {
 				type: 'all',
 				provider: null,
@@ -837,23 +854,20 @@
 				yearto: sc.maxProductionYear,
 				terms: []
 			};
+			
 			ivhTreeviewMgr.deselectAll(sc.vocabulary);
 			ivhTreeviewMgr.collapseRecursive(sc.vocabulary, sc.vocabulary);
 		};
 
 		//reset filters when loading page the first time
 		sc.resetFilters = function() {
-
 			if ($stateParams.type == 'old')//back to old saved search
 			{
-
 				/*initialize last selected input type as default value when refresh page*/
-				/*var itemTV = localStorage.getItem('itemTypeV');
-				var itemTI = localStorage.getItem('itemTypeI');
-				var inputSelectedV = (itemTV!==null) ? itemTV : true;
-				var inputSelectedI = (itemTI!==null) ? itemTI : true;
-				$scope.itemType.video = inputSelectedV;
-				$scope.itemType.image = inputSelectedI;*/
+				var savedItemTypes = localStorage.getItem('itemType');
+				if (savedItemTypes !== undefined) {
+					sc.itemType = JSON.parse(savedItemTypes);
+				}
 
 				$scope.yearfrom=1890;
 				$scope.yearto=1999;
@@ -881,7 +895,7 @@
 
 				/*initialize last selected ipr status as default value when refresh page*/
 				var iprstatus = localStorage.getItem('iprstatus');
-				var iprselected = (iprstatus!==null) ? iprstatus : null;
+				var iprselected = (iprstatus!==null && iprstatus!=='null') ? iprstatus : null;
 				$scope.defaultipr = iprselected;
 
 				// move codelist provision in a service
@@ -915,15 +929,23 @@
 				sc.resetFiltersToDefault();
 			}
 
+			// state param term
+			var term = $stateParams.q;
+			if (term !== undefined && term !== '') {
+				// force input term to this value
+				$scope.inputTerm = term;
+			}
+
 			$scope.filter = {
 				type: 'all',
 				provider: $scope.codeci,
 				country: null,
-				//iprstatus: $scope.defaultipr,
 				yearfrom: $scope.yearfrom,
 				yearto: $scope.yearto,
 				terms: $scope.terms
 			};
+			updateItemTypeFilter(sc.itemType);
+			updateIPRStatusFilter($scope.defaultipr);
 
 		};
 		sc.resetFilters();
@@ -1055,5 +1077,17 @@
 		"$scope", "$stateParams", "DataService", "NgMap", "$timeout", "$filter",
 		"GeoCoder", "GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
 	];
+
+	function QuickSearchController($scope, $state, $stateParams) {
+		var self = this;
+		self.goToSearch = function(event, term) {
+			if (event.keyCode === 13) {
+				$state.go('logged.new-search', {
+					q: term,
+					type: null
+				});
+			}
+		};
+	}
 
 })();

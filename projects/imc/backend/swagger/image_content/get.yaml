@@ -18,7 +18,11 @@ image_content:
     - name: type
       in: query
       required: true
-      description: content type (e.g. image, thumbnail, summary)
+      description: content type (e.g. image, thumbnail)
+      type: string
+    - name: size
+      in: query
+      description: used to get large thumbnail (only for that at the moment)
       type: string
   responses:
     '200':

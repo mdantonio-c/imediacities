@@ -1,3 +1,28 @@
+
+<div ng-controller='QuickSearchController as searchCtrl'>
+	<div class="row">
+		<div id="search-box">
+			<div class="col-md-2"></div>
+			<div class="col-xs-12 col-md-8">
+			<div class="input-group stylish-input-group">
+				<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search item"
+				ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
+				<span class="input-group-btn">
+					<button type="button" ui-sref="logged.new-search({q: searchCtrl.inputTerm})" class="btn btn-default btn-sm">
+					<i class="imc-icon fa fa-search" aria-hidden="true"></i>
+					</button>
+				</span>
+				<span class="input-group-btn backsearch">
+					<button type="button" ui-sref="logged.new-search({type: 'old'})"
+						class="btn btn-default btn-sm"><i class="imc-icon fa fa-chevron-left" aria-hidden="true"></i><span class="hidden-xs hidden-sm">&nbsp;Back to search<span></button>
+				</span>
+			</div>
+			</div>
+			<div class="col-md-2"></div>
+		</div>
+	</div>
+</div>
+<hr/>
 <div
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
@@ -70,14 +95,16 @@
 					</div>
 					<div class="secondary-description">
 						<p><b>Production Year(s)</b>: {{watchCtrl.image.attributes.date_created[0] || 'Not available'}}</p>
-						<p><b>Contributors</b>:
+						<p><b>Credits</b>:
 							<span ng-repeat="contrib in watchCtrl.image.relationships.contributors">
 							{{contrib.attributes.names[0] | nocomma}} <i ng-if="contrib.attributes.activities">
 								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}
 							</span>
 						</p>
 						<p><b>Location</b>: {{watchCtrl.image.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
-						<p><b>Owner</b>: {{watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}</p>
+						<p><b>Owner</b>: {{watchCtrl.image.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}<br/>
+							<b>Owner Record ID</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.source_id}}
+						</p>
 						<p><b>Is shown at</b>:
 							<a target="_blank" href="{{watchCtrl.isShownAt}}" ng-if="watchCtrl.isShownAt">{{watchCtrl.isShownAt}}</a>
 							<span ng-if="!watchCtrl.isShownAt">Not available</span>
@@ -114,8 +141,8 @@
 			<uib-tab heading="Notes">
 			<ul style="padding-left: 20px;">
 				<li>
-					
-						<table class="table table-striped">
+					<p ng-if="watchCtrl.notes.length == 0">No notes</p>
+						<table class="table table-striped" ng-if="watchCtrl.notes.length > 0">
 							<tr ng-repeat="note in watchCtrl.notes">
 							<td>
 								<div>
@@ -178,11 +205,12 @@
 
 			</uib-tab>
 
-			<uib-tab heading="Annotations">
+			<uib-tab heading="Manual Tags">
 				<ul style="padding-left: 20px;">
 				<li>
 					<div>
-						<table st-table="watchCtrl.annotations" class="table table-striped">
+						<p ng-if="watchCtrl.annotations.length == 0">No manual tags</p>
+						<table st-table="watchCtrl.annotations" class="table table-striped" ng-if="watchCtrl.annotations.length > 0">
 							<thead>
 								<tr>
 									<th st-sort="group">category</th>

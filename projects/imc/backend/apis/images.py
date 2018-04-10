@@ -185,6 +185,7 @@ class ImageAnnotations(GraphBaseOperations):
 
         return self.force_response(data)
 
+
 class ImageContent(GraphBaseOperations):
     """
     Gets image content or thumbnail
@@ -201,8 +202,7 @@ class ImageContent(GraphBaseOperations):
         input_parameters = self.get_input()
         content_type = input_parameters['type']
         if content_type is None or (content_type != 'image' and
-                                    content_type != 'thumbnail' and
-                                    content_type != 'summary'):
+                                    content_type != 'thumbnail'):
             raise RestApiException(
                 "Bad type parameter: expected 'image' or 'thumbnail'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
@@ -232,23 +232,20 @@ class ImageContent(GraphBaseOperations):
             mime = "image/jpeg"
             download = Downloader()
             return download.send_file_partial(image_uri, mime)
-
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            thumbnail_size = input_parameters.get('size')
+            if thumbnail_size is not None and thumbnail_size.lower() == 'large':
+                # load large image file as the original (i.e. transcoded.jpg)
+                thumbnail_uri = item.uri
+                logger.debug(
+                    'request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             return send_file(thumbnail_uri, mimetype='image/jpeg')
-        elif content_type == 'summary':
-            summary_uri = item.summary
-            logger.debug("summary content uri: %s" % summary_uri)
-            if summary_uri is None:
-                raise RestApiException(
-                    "Summary not found",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
-            return send_file(summary_uri, mimetype='image/jpeg')
         else:
             # it should never be reached
             raise RestApiException(

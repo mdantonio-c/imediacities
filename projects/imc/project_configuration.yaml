@@ -36,10 +36,6 @@ releases:
     type: beta
     rapydo: 0.6.0
     status: released 
-  '1.3.0':
-    type: beta
-    rapydo: 0.6.0
-    status: developing 
   '1.4.0':
     type: beta
     rapydo: 0.6.1
@@ -110,7 +106,11 @@ bower_components:
     - ng-tags-input.min.js
   google-marker-cluster:
     - markerclusterer.js
+  angular-holderjs:
+    - src/holder.js
+  holderjs:
+    - holder.min.js
 
 css: 
   - "custom/imc.css"
-  - "custom/nsi.css"
+  - "custom/VideoPlayer_stile.css"
