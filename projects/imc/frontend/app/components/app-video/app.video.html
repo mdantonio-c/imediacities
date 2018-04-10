@@ -1,0 +1,7 @@
+<div *ngIf="videoData">
+    <h1 [innerHTML]="videoData.attributes.identifying_title"></h1>
+    <span [innerHTML]="videoData.relationships.record_sources[0].relationships.provider[0].attributes.identifier|providerToCity"></span> - <span [innerHTML]="videoData.attributes.production_years[0]"></span>
+    <div>
+        <video style="max-width:300px" [src]="videoData.links['content']"></video>
+    </div>
+</div>

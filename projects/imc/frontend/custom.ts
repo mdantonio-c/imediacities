@@ -9,6 +9,7 @@ import 'js-marker-clusterer'
 // import 'bootstrap-treeview'
 
 import '/app/frontend/css/style.css'
+import '/app/frontend/css/VideoPlayer_stile.css'
 
 import '/app/frontend/js/data.service.js'
 import '/app/frontend/js/vocabulary.service.js'
