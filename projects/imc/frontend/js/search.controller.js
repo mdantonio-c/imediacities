@@ -1078,7 +1078,7 @@
 		"GeoCoder", "GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
 	];
 
-	function QuickSearchController($scope, $state, $stateParams) {
+	function QuickSearchController($state) {
 		var self = this;
 		self.goToSearch = function(event, term) {
 			if (event.keyCode === 13) {
@@ -1089,5 +1089,7 @@
 			}
 		};
 	}
+
+	QuickSearchController.$inject = ["$state"];
 
 })();
