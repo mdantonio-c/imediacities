@@ -715,6 +715,9 @@
 						sc.map = map;
 						sc.setBoundaryVisible(sc.showMapBoundary);
 						sc.initialMapLoad = true;
+						clearMarkers();
+						// clean up relevant creations under the map
+						sc.mapResults = [];
 						if ($scope.filter.provider !== null) {
 							map.setZoom(14);
 							sc.mapCenter = getPosition($scope.filter.provider);
@@ -724,11 +727,6 @@
 							// content from all cities represented on a map of Europe
 							map.setZoom(4);
 							sc.mapCenter = europeCenter;
-
-							// clean up current marker list
-							if (sc.markerClusterer !== undefined) {
-								sc.markerClusterer.clearMarkers();
-							}
 							sc.dynMarkers = [];
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
@@ -748,8 +746,6 @@
 							} else {
 								console.warn('expected content count by provider');
 							}
-							// clean up relevant creations under the map
-							sc.mapResults = [];
 							updateMarkers(map);
 						}
 						
@@ -923,13 +919,18 @@
 		sc.resetFilters();
 		sc.search();
 
-		function loadGeoDistanceAnnotations(distance, center, isLocated) {
-			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
-				center[1] + '] within distance: ' + distance + ' (meters)');*/
+		function clearMarkers() {
 			// clean up current marker list
+			// console.log('clear markers');
 			if (sc.markerClusterer !== undefined) {
 				sc.markerClusterer.clearMarkers();
 			}
+		}
+
+		function loadGeoDistanceAnnotations(distance, center, isLocated) {
+			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
+				center[1] + '] within distance: ' + distance + ' (meters)');*/
+			clearMarkers();
 			sc.dynMarkers = [];
 			// clean up relevant creations under the map
 			sc.mapResults = [];
