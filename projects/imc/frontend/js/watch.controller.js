@@ -1083,7 +1083,7 @@
 			});
 		};
 		self.deleteNote = function(note) {
-			//console.log(angular.toJson(note, true));
+			console.log(angular.toJson(note, true));
 			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmNoteModal.html',
@@ -1106,6 +1106,9 @@
 					// Non c'e' bisogno viene aggiornata in automatico 
 					//  perche' cambia la variabile self.notes
 					//$rootScope.$emit('updateNotes', null, null);
+					console.log("deleteNote: note=" + angular.toJson(note, true));
+					console.log("deleteNote: self.notesShots=" + angular.toJson(self.notesShots, true));
+					self.notesShots[note.shotNum-1].notes--;
 				}, function(err) {
 					// TODO
 				});
@@ -1114,7 +1117,7 @@
 			});
 		};
 		self.editNote = function(note) {
-			//console.log("editNote: note=" + angular.toJson(note, true));
+			console.log("editNote: note=" + angular.toJson(note, true));
 			var shot_annotations = null;
 			var shotInfo = self.shots[note.shotNum-1];
 			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});		
@@ -1256,7 +1259,8 @@
 							duration: parseInt(shot.attributes.duration),
 							thumb: shot.links.thumbnail,
 							framerange: framerange,
-							tags: shot.tags
+							tags: shot.tags,
+							notes: 0
 						};
 
 						// shot info for the timeline
@@ -1336,19 +1340,21 @@
 									creatorName: creatorName,
 									privacy: privacy
 								};
+								sbFields.notes++;
 								//console.log('nota=' + angular.toJson(noteInfo));
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
-
 							} else{
 								console.log('not handled annotation type = '+anno.attributes.annotation_type.key);
 							}
 
 						}
+						//console.log('nello shot ' + sbFields.number + ' quante note= ' + sbFields.notes);
 						self.storyshots.push(sbFields);
 						
 					});
 					// noteShots serve per il tab Notes a destra
 					self.notesShots = self.storyshots;
+					//console.log("self.notesShots=" + angular.toJson(self.notesShots, true));
 
 					// << NSI >> //
 					//	e se il video lo caricassi qui??
@@ -1630,7 +1636,6 @@
 			});
 		});
 	}
-
 
 	function WatchImageController($scope, $rootScope, $http, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
@@ -1925,7 +1930,6 @@
 				};						
 			self.annotations.push(anno);
 		});
-
 	}
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {

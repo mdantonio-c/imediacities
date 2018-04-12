@@ -184,91 +184,74 @@
 			<!-- notes -->
 			<uib-tab heading="Notes" class="Notes">
 				<div class="space-4"></div>
-				<div class="tab-notes">
-					<div class="tab-notes-title">
-						Notes on shot {{watchCtrl.notesShotSelected}}
-					</div>
-					<!-- list of the notes of the selected shot -->
-					<div class="tab-list-notes">
-
-						<div class="tab-list-note" ng-repeat="note in watchCtrl.notes | filter : { shotNum: watchCtrl.notesShotSelected }:true">
-							<div>
-								<span class="note-user-icon">
-									<i class="imc-icon fa fa-user fa-4x pull-left"></i>
-								</span>
-							</div>
-							<div style="display: inline-block;height: 60px;">
-								<p style="margin: 0;">
-									<span class="note-user-name">{{note.creatorName}}</span>
-								</p>
-								<p style="margin: 0;">
-									<!--
-									<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
-									-->
-									<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
-										<i class="imc-icon fa fa-clock-o light-grey"></i>
-										{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
-									</span>
-									
-								</p>
-								<p style="margin: 0;">
-									<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
-										<i class="imc-icon fa fa-lock"></i>
-									</span>
-								</p>
-							</div>
-							<div style="display:  inline-block;float: right;">
-								<span class="note-bin">
-								<a class="btn btn-danger btn-xs"
-									ng-click="watchCtrl.deleteNote(note)"
-									ng-confirm-click="Are you sure you want to delete this note?"
-									tooltip-placement="left"
-									uib-tooltip="Delete note"
-									ng-if="profile.uuid == note.creator">
-									<i class="fa fa-trash-o"> </i>
-								</a>
-								</span>
-								<span class="note-bin">
-								<a class="btn btn-warning btn-xs"
-									ng-click="watchCtrl.editNote(note)"
-									tooltip-placement="left"
-									uib-tooltip="Edit note"
-									ng-if="profile.uuid == note.creator">
-									<i class="fa fa-edit"> </i>
-								</a>
-								</span>
-							</div>
-							<div style="margin: 5px;">
-								<p>
-									<span class="note-text">
-										<i class="imc-icon fa fa-quote-left"></i>
-										{{note.text}}
-									</span>
-								</p>
-							</div>
+				<div class="notes-content">
+					<p ng-if="watchCtrl.notes.length == 0">No notes</p>
+					<div class="tab-notes" ng-repeat="note in watchCtrl.notes | orderBy: 'shotNum'">
+						<div class="tab-notes-title" ng-if="watchCtrl.notes[$index-1].shotNum != watchCtrl.notes[$index].shotNum">
+							Notes on shot {{note.shotNum}}
 						</div>
-					</div>
-					<!-- list of the shots -->
-					<div class="tab-list-shots" data-spy="scroll" data-target="#navbar-hidden">
-
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="watchCtrl.computeCssClass($last,shot.number)">
-
-						<!--
-						<div ng-repeat="shot in watchCtrl.notesShots" ng-class="shot.number == watchCtrl.notesShotSelected ? 'tab-list-shot tab-list-shot-selected' : 'tab-list-shot tab-list-shot-no-selected'">
-						-->
-
-
-							<span><a class="tab-list-shots-link" ng-click="watchCtrl.viewNotesOfSelectedShot(shot.number)">Shot {{shot.number}}</a></span>
-
-							<!--
-							<img style="width: 100%;" id="{{shot.id}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}">
-							-->
+						<!-- list of the notes of the selected shot -->
+						<div class="tab-list-notes">
+							<div class="tab-list-note">
+								<div>
+									<span class="note-user-icon">
+										<i class="imc-icon fa fa-user fa-4x pull-left"></i>
+									</span>
+								</div>
+								<div style="display: inline-block;height: 60px;">
+									<p style="margin: 0;">
+										<span class="note-user-name">{{note.creatorName}}</span>
+									</p>
+									<p style="margin: 0;">
+										<!--
+										<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
+										-->
+										<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+											<i class="imc-icon fa fa-clock-o light-grey"></i>
+											{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+										</span>
+										
+									</p>
+									<p style="margin: 0;">
+										<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
+											<i class="imc-icon fa fa-lock"></i>
+										</span>
+									</p>
+								</div>
+								<div style="display:  inline-block;float: right;">
+									<span class="note-bin">
+									<a class="btn btn-danger btn-xs"
+										ng-click="watchCtrl.deleteNote(note)"
+										ng-confirm-click="Are you sure you want to delete this note?"
+										tooltip-placement="left"
+										uib-tooltip="Delete note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-trash-o"> </i>
+									</a>
+									</span>
+									<span class="note-bin">
+									<a class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.editNote(note)"
+										tooltip-placement="left"
+										uib-tooltip="Edit note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-edit"> </i>
+									</a>
+									</span>
+								</div>
+								<div style="margin: 5px;">
+									<p>
+										<span class="note-text">
+											<i class="imc-icon fa fa-quote-left"></i>
+											{{note.text}}
+										</span>
+									</p>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</uib-tab>
-
-
 			<uib-tab heading="Manual Tags">
 				<div class="space-4"></div>
 				<div>
