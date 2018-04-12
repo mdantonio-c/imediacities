@@ -2,6 +2,7 @@
 'use strict';
 
 loggedLandingPage = "logged.new-search";
+defaultPage = "logged.new-search";
 
 angular.module('web').constant('customRoutes',
 {
@@ -16,9 +17,10 @@ angular.module('web').constant('customRoutes',
     },
 
     'logged.new-search': {
-        url: "/new-search?q",
+        url: "/new-search",
         params: {
-            type: null
+            type: null,
+            q: null
         },
         views: {
             "loggedview@logged": {

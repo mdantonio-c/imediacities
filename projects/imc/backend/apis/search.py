@@ -234,7 +234,7 @@ class Search(GraphBaseOperations):
             item = v.item.single()
 
             if isinstance(v, self.graph.AVEntity):
-                # video 
+                # video
                 video_url = api_url + 'api/videos/' + v.uuid
                 # use depth 2 to get provider info from record source
                 # TO BE FIXED
@@ -248,7 +248,7 @@ class Search(GraphBaseOperations):
                 video['links']['summary'] = video_url + '/content?type=summary'
                 data.append(video)
             elif isinstance(v, self.graph.NonAVEntity):
-                #image
+                # image
                 image_url = api_url + 'api/images/' + v.uuid
                 # use depth 2 to get provider info from record source
                 # TO BE FIXED
@@ -260,7 +260,7 @@ class Search(GraphBaseOperations):
                     image['links']['thumbnail'] = image_url + \
                         '/content?type=thumbnail'
                 image['links']['summary'] = image_url + '/content?type=summary'
-                data.append(image)            
+                data.append(image)
 
         # return also the total number of elements
         meta_response = {"totalItems": numels}

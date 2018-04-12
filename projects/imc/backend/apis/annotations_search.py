@@ -149,6 +149,12 @@ class SearchAnnotations(GraphBaseOperations):
                 if c_type != 'all':
                     filters.append("MATCH (i) WHERE i.item_type =~ '(?i){c_type}'"
                                    .format(c_type=c_type))
+                # PROVIDER
+                c_provider = c_filter.get('provider')
+                if c_provider is not None:
+                    filters.append(
+                        "MATCH (creation)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)"
+                        " WHERE p.identifier='{provider}'".format(provider=c_provider.strip()))
                 # IPR STATUS
                 c_iprstatus = c_filter.get('iprstatus')
                 if c_iprstatus is not None:
@@ -170,13 +176,13 @@ class SearchAnnotations(GraphBaseOperations):
                     date_clauses = []
                     if c_type == 'video' or c_type == 'all':
                         date_clauses.append(
-                            "ANY(item IN creation.production_years WHERE item >= '{yfrom}') \
-                            and ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
+                            "ANY(item IN creation.production_years WHERE item >= '{yfrom}') "
+                            "AND ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
                                 yfrom=c_year_from, yto=c_year_to))
                     if c_type == 'image' or c_type == 'text' or c_type == 'all':
                         date_clauses.append(
-                            "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') \
-                            and ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
+                            "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') "
+                            "AND ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
                                 yfrom=c_year_from, yto=c_year_to))
                     filters.append("MATCH (creation) WHERE {clauses}".format(
                         clauses=' or '.join(date_clauses)))
