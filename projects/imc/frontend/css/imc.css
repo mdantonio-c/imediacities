@@ -2226,6 +2226,9 @@ li.ivh-treeview-node::before {
     font-size: 20px;
     background-color: #f9f9f9;
 }
+.tab-notes-title a {
+    cursor: pointer;
+}
 .tab-list-notes
 {
 	display: inline-block;

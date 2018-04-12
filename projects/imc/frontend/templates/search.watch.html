@@ -188,7 +188,8 @@
 					<p ng-if="watchCtrl.notes.length == 0">No notes</p>
 					<div class="tab-notes" ng-repeat="note in watchCtrl.notes | orderBy: 'shotNum'">
 						<div class="tab-notes-title" ng-if="watchCtrl.notes[$index-1].shotNum != watchCtrl.notes[$index].shotNum">
-							Notes on shot {{note.shotNum}}
+							Notes on  <a ng-click="watchCtrl.jumpToShotFromAnnotation(note.shotStartT,note.shotNum)"> shot {{note.shotNum}}</a>
+
 						</div>
 						<!-- list of the notes of the selected shot -->
 						<div class="tab-list-notes">
