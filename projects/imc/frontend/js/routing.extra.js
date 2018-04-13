@@ -1,7 +1,8 @@
 (function() {
 'use strict';
 
-loggedLandingPage = "logged.search";
+loggedLandingPage = "logged.new-search";
+defaultPage = "logged.new-search";
 
 angular.module('web').constant('customRoutes',
 {
@@ -15,6 +16,20 @@ angular.module('web').constant('customRoutes',
         }
     },
 
+    'logged.new-search': {
+        url: "/new-search",
+        params: {
+            type: null,
+            q: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'new-search.html',
+            }
+        }
+    },
+
     'logged.search.watch': {
         url: "/watch?v",
         params: {
@@ -24,6 +39,19 @@ angular.module('web').constant('customRoutes',
             "loggedview@logged": {
                 dir: 'blueprint',
                 templateUrl: 'search.watch.html'
+            }
+        }
+    },
+
+    'logged.search.watch.image': {
+        url: "/image/{id}",
+        params: {
+            meta: null
+        },
+        views: {
+            "loggedview@logged": {
+                dir: 'blueprint',
+                templateUrl: 'watch.image.html'
             }
         }
     },
@@ -55,7 +83,6 @@ angular.module('web').constant('customRoutes',
         url: "/admin",
         views: {
             "loggedview@logged": {
-                dir: 'blueprint',
                 templateUrl: 'admin.html'
             }
         }
@@ -65,7 +92,6 @@ angular.module('web').constant('customRoutes',
         url: "/users",
         views: {
             "admin@logged.admin": {
-                dir: 'blueprint',
                 templateUrl: 'admin.users.html'
             }
         }

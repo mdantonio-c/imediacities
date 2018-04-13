@@ -1,4 +1,5 @@
 
+import json
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 
@@ -17,12 +18,27 @@ class AnnotationRepository():
         self.graph = graph
 
     # @graph_transactions
-    def create_tag_annotation(self, user, body, target, selector):
-        log.debug("Create a new manual annotation")
+    def create_tag_annotation(self, user, bodies, target, selector,
+                              is_private=False, embargo_date=None, automatic=False):
+        # deduplicate body annotations
+        warnings, bodies = self.deduplicate_tags(bodies, target, selector)
+        if len(warnings) > 0:
+            for msg in warnings:
+                log.warning(msg)
+        if len(bodies) == 0:
+            raise ValueError("Annotation cannot be created.", warnings)
+        if not automatic and user is None:
+            raise ValueError("Annotation cannot be created.",
+                             ["Missing creator for manual annotation"])
 
+        log.debug("Create a new tag annotation")
         # create annotation node
-        anno = Annotation(annotation_type='TAG').save()
-        if user is not None:
+        anno = Annotation(annotation_type='TAG')
+        if automatic:
+            # at the moment ONLY FHG tools allowed
+            anno.generator = 'FHG'
+        anno.save()
+        if not automatic:
             # add creator
             anno.creator.connect(user)
 
@@ -32,69 +48,188 @@ class AnnotationRepository():
             anno.source_item.connect(target.source_item.single())
         elif isinstance(target, Shot):
             anno.source_item.connect(target.item.single())
+        else:
+            raise ValueError("Invalid Target instance.")
 
         if selector is not None:
-            s_start, s_end = selector['value'].lstrip('t=').split(',')
+            if not isinstance(target, Item):
+                raise ValueError('Selector allowed only for Item target.')
+            s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
             log.debug('start:{}, end:{}'.format(s_start, s_end))
-            # search for existing segment
-            segment = self.graph.VideoSegment.nodes.get_or_none(
-                start_frame_idx=s_start, end_frame_idx=s_end)
+            # search for existing segment for the given item
+            segment = self.lookup_existing_segment(s_start, s_end, target)
             log.debug('Segment does exist? {}'.format(
                 True if segment else False))
             if segment is None:
                 segment = VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end).save()
             anno.targets.connect(segment)
+            # look up the shot where the segment is enclosed
+            shots = self.get_enclosing_shots(segment, target)
+            if shots is None or len(shots) == 0:
+                raise ValueError('Invalid state: cannot be found shot(s) enclosing '
+                                 'selected segment [{0}]'.format(selector['value']))
+            for shot in shots:
+                segment.within_shots.connect(shot)
         else:
             anno.targets.connect(target)
-        # add body
-        if body['type'] == 'ResourceBody':
-            source = body['source']
-            iri = source if isinstance(source, str) \
-                else source.get('iri')
-            log.debug('ResourceBody with IRI:{}'.format(iri))
-            # look for existing Resource
-            # do not update the existing resource
-            bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
-            if bodyNode is None:
-                bodyNode = ResourceBody(iri=iri)
-                if not isinstance(source, str):
-                    bodyNode.name = source.get('name')
-                if 'spatial' in body:
-                    coord = [body['spatial']['lat'], body['spatial']['long']]
-                    log.debug('lat: {}, long:{}'.format(coord[0], coord[1]))
-                    bodyNode.spatial = coord
+        # add bodies
+        for body in bodies:
+            if body['type'] == 'ResourceBody':
+                source = body['source']
+                iri = source if isinstance(source, str) \
+                    else source.get('iri')
+                log.debug('ResourceBody with IRI:{}'.format(iri))
+                # look for existing Resource
+                # do not update the existing resource
+                bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
+                if bodyNode is None:
+                    log.debug('new ResourceBody for concept: {}'.format(source))
+                    bodyNode = ResourceBody(iri=iri)
+                    if not isinstance(source, str):
+                        bodyNode.name = source.get('name')
+                    if 'spatial' in body:
+                        coord = [body['spatial']['lat'],
+                                 body['spatial']['long']]
+                        log.debug('lat: {}, long:{}'.format(
+                            coord[0], coord[1]))
+                        bodyNode.spatial = coord
+                    bodyNode.save()
+            elif body['type'] == 'TextualBody':
+                text_lang = body.get('language')
+                bodyNode = TextualBody(
+                    value=body['value'], language=text_lang).save()
                 bodyNode.save()
-        elif body['type'] == 'TextualBody':
-            bodyNode = TextualBody(
-                value=body['value'], language=body['language']).save()
-        else:
-            # should never be reached
-            raise ValueError('Invalid body: {}'.format(body['type']))
-        anno.bodies.connect(bodyNode)
+            elif body['type'] == 'ODBody':
+                properties = {
+                    'object_id': body['object_id'],
+                    'confidence': body['confidence']
+                }
+                bodyNode = self.graph.ODBody(**properties).save()
+                if 'region_sequence' in body:
+                    sequence = json.dumps(body['region_sequence'])
+                    fragment_selection = self.graph.AreaSequenceSelector(
+                        sequence=sequence).save()
+                    anno.refined_selection.connect(fragment_selection)
+                # connect the concept
+                concept = body['concept']['source']
+                conceptNode = self.graph.ResourceBody.nodes.get_or_none(
+                    iri=concept['iri'])
+                if conceptNode is None:
+                    log.debug('new ResourceBody for concept: {}'.format(concept))
+                    conceptNode = ResourceBody(
+                        iri=concept['iri'], name=concept['name']).save()
+                bodyNode.object_type.connect(conceptNode)
+            else:
+                # should never be reached
+                raise ValueError('Invalid body: {}'.format(body['type']))
+            anno.bodies.connect(bodyNode)
         return anno
 
-    def delete_manual_annotation(self, anno):
-        body = anno.bodies.single()
-        if body:
+    def create_dsc_annotation(self, user, bodies, target, selector,
+                              is_private=False, embargo_date=None):
+        '''
+        Create a "description" annotation used for private and public notes.
+        '''
+        visibility = 'private' if is_private else 'public'
+        log.debug("Create a new {} description annotation".format(visibility))
+        # create annotation node
+        anno = Annotation(annotation_type='DSC', private=is_private).save()
+        if embargo_date is not None:
+            anno.embargo = embargo_date
+            anno.save()
+        # should we allow to create anno without a user of the system?
+        if user is not None:
+            anno.creator.connect(user)
+
+        if isinstance(target, Item):
+            anno.source_item.connect(target)
+        elif isinstance(target, Annotation):
+            anno.source_item.connect(target.source_item.single())
+        elif isinstance(target, Shot):
+            anno.source_item.connect(target.item.single())
+
+        # ignore at the moment segment selector
+        anno.targets.connect(target)
+
+        for body in bodies:
+            if body['type'] != 'TextualBody':
+                raise ValueError('Invalid body for description annotation: {}'
+                                 .format(body['type']))
+            text_lang = body.get('language')
+            bodyNode = TextualBody(
+                value=body['value'], language=text_lang).save()
+            anno.bodies.connect(bodyNode)
+
+        return anno
+
+    def delete_manual_annotation(self, anno, btype, bid):
+        '''
+        b_type and b_id can be used to delete only a single body in the
+        annotation if multiple bodies exist.
+        '''
+        log.debug('Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]'.format(
+            anno_id=anno.uuid, btype=btype, bid=bid))
+        bodies = anno.bodies.all()
+        body_list_size_before = len(bodies)
+        log.debug('body list size before deletion: {}'.format(
+            body_list_size_before))
+        single_body = True if btype is not None and bid is not None else False
+        log.debug('Deleting single body?: {}'.format(single_body))
+        body_found = False
+        for body in bodies:
             original_body = body.downcast()
             log.debug('body instance of {}'.format(original_body.__class__))
-            # at moment never remove a ResourceBody
-            if isinstance(original_body, TextualBody):
-                original_body.delete()
-        # delete any orphan video segments (NOT SHOT!)
-        targets = anno.targets.all()
-        for t in targets:
-            target_labels = t.labels()
-            log.debug("Target label(s): {}".format(target_labels))
-            if 'VideoSegment' in target_labels and \
-                    'Shot' not in target_labels and \
-                    self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
-                t.delete()
-                log.debug('Deleted orphan segment')
-        anno.delete()
-        log.debug('Manual annotation with ID:{} successfully deleted'
-                  .format(anno.uuid))
+            if single_body:
+                # ONLY the referenced body
+                if isinstance(original_body, ResourceBody) and btype == 'resource':
+                    if bid == original_body.iri:
+                        # disconnect that node
+                        body_found = True
+                        anno.bodies.disconnect(body)
+                elif isinstance(original_body, TextualBody) and btype == 'textual':
+                    if bid == original_body.value:
+                        # remove the textual node
+                        body_found = True
+                        original_body.delete()
+                if body_found:
+                    break
+            else:
+                if isinstance(original_body, ResourceBody):
+                    # never remove a ResourceBody
+                    anno.bodies.disconnect(body)
+                else:
+                    original_body.delete()
+        # refresh the list of bodies
+        bodies = anno.bodies.all()
+        body_list_size_after = len(bodies)
+        log.debug('body list size after deletion: {}'.format(
+            body_list_size_after))
+        if single_body and not body_found:
+            raise ReferenceError("Annotation ID:{anno_id} cannot be deleted."
+                                 " No body found for {btype}:{bid}".format(
+                                     anno_id=anno.uuid, btype=btype, bid=bid))
+        if body_list_size_after == 0:
+            # delete any orphan video segments (NOT SHOT!)
+            targets = anno.targets.all()
+            for t in targets:
+                target_labels = t.labels()
+                log.debug("Target label(s): {}".format(target_labels))
+                if 'VideoSegment' in target_labels and \
+                        'Shot' not in target_labels and \
+                        self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
+                    t.delete()
+                    log.debug('Deleted orphan segment')
+            anno.delete()
+            single_body_removed = ''
+            if single_body:
+                single_body_removed = ' Body {body_type}:{body_id}'.format(
+                    body_type=btype, body_id=bid)
+            log.info('Annotation with ID:{anno_id} successfully deleted.{msg}'.format(
+                anno_id=anno.uuid, msg=single_body_removed))
+        else:
+            log.info('Annotation with ID:{anno_id}. ONLY body {body_type}:{body_id} removed'.format(
+                anno_id=anno.uuid, body_type=btype, body_id=bid))
 
     @staticmethod
     def is_orphan_segment(node):
@@ -183,6 +318,118 @@ class AnnotationRepository():
         vim_body = annotation.bodies.single()
         if vim_body:
             original_vim_body = vim_body.downcast()
-            log.info(original_vim_body.__class__)
+            log.debug(type(original_vim_body))
             original_vim_body.delete()
         annotation.delete()
+
+    @graph_transactions
+    def delete_auto_annotation(self, annotation):
+        log.debug('Delete existing automatic TAG annotation')
+        body = annotation.bodies.single()
+        object_id = None
+        object_type = None
+        if body:
+            od_body = body.downcast()
+            log.debug(type(od_body))
+            object_id = od_body.object_id
+            concept = od_body.object_type.single()
+            if concept is not None:
+                object_type = concept.name
+            od_body.delete()
+        refined_selection = annotation.refined_selection.single()
+        if refined_selection:
+            sequence_selector = refined_selection.downcast()
+            sequence_selector.delete()
+        # delete any orphan video segments (NOT SHOT!)
+        targets = annotation.targets.all()
+        for t in targets:
+            target_labels = t.labels()
+            log.debug("Target label(s): {}".format(target_labels))
+            if 'VideoSegment' in target_labels and \
+                    'Shot' not in target_labels and \
+                    self.is_orphan_segment(t.downcast(target_class='VideoSegment')):
+                t.delete()
+                log.debug('Deleted orphan segment')
+        annotation.delete()
+        log.info('Automatic TAG[{oid}/{otype}] deleted.'.format(oid=object_id, otype=object_type))
+
+    def deduplicate_tags(self, bodies, target, selector):
+        ''' Check for esisting bodies for the given target. If all bodies
+        already exist, throw a duplication exception exception. If the
+        annotation contains some duplicates, report them as warnings.
+        '''
+        warnings = []
+        filtered_bodies = []
+        for body in bodies:
+            if body['type'] != 'ResourceBody':
+                filtered_bodies.append(body)
+                continue
+            if selector is not None:
+                # TODO manage deduplication with selector
+                filtered_bodies.append(body)
+                continue
+            source = body['source']
+            iri = source if isinstance(source, str) else source.get('iri')
+            query = "MATCH (a:Annotation) WHERE a.annotation_type='TAG' " \
+                "match (a)-[:HAS_TARGET]-(t:AnnotationTarget) where t.uuid='{target_uuid}' " \
+                "match (a)-[:HAS_BODY]->(b:ResourceBody) where b.iri='{body_iri}' " \
+                "return count(b)"
+            results = self.graph.cypher(query.format(
+                target_uuid=target.uuid, body_iri=iri))
+            count = [row[0] for row in results][0]
+            log.debug("Duplicated found: {0}".format(count))
+            if count > 0:
+                warnings.append("Duplicated tag: '{name}' - '{iri}'".format(
+                    name=source.get('name', ''), iri=iri))
+                continue
+            filtered_bodies.append(body)
+        # log.debug("Filtered bodies: {0}".format(filtered_bodies))
+        return warnings, filtered_bodies
+
+    def get_enclosing_shots(self, segment, item):
+        '''
+        Return the shot list of the item enclosing the given segment.
+        '''
+        if item is None or not isinstance(item, Item) or item.item_type != 'Video':
+            raise ValueError('Invalid item in getting enclosing shots.')
+        s_start = segment.start_frame_idx
+        s_end = segment.end_frame_idx
+        shots = []
+        for s in sorted(item.shots, key=lambda k: k.start_frame_idx):
+            if (
+                (s_start >= s.start_frame_idx and s_start <= s.end_frame_idx) or
+                (s_end >= s.start_frame_idx and s_end <= s.end_frame_idx) or
+                (s_start < s.start_frame_idx and s_end > s.end_frame_idx)
+            ):
+                shots.append(s)
+        return shots
+
+    def lookup_existing_segment(self, start_frame, end_frame, item):
+        '''
+        Search for existing segment for a given item.
+        NOTE: we're excluding shots!
+        '''
+        query = "MATCH (n:VideoSegment) WHERE n.start_frame_idx={start_frame} AND n.end_frame_idx={end_frame} " \
+                "MATCH (n)-[:WITHIN_SHOT]-(s:Shot)-[:SHOT]-(i:Item {{uuid: '{item_id}'}}) " \
+                "RETURN n"
+        results = self.graph.cypher(query.format(
+            start_frame=start_frame, end_frame=end_frame, item_id=item.uuid))
+        segment = [self.graph.VideoSegment.inflate(row[0]) for row in results]
+        return segment[0] if segment else None
+
+    def check_automatic_tagging(self, item_id):
+        '''
+        Check if at least one automatic annotation exists for the given content
+        item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic annotations found: {0}".format(count))
+        return True if count > 0 else False
+
+
+class DuplicatedAnnotationError(Exception):
+    pass

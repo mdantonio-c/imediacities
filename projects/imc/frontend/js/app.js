@@ -17,7 +17,10 @@
             'tableSort',
             'ngMap',
             'googlechart',
-            'ngFileSaver'
+            'ngFileSaver',
+            'ivh.treeview',
+            'ngTagsInput',
+            'ngHolder'
         ]);
 
 })();

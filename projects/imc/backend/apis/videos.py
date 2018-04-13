@@ -3,6 +3,7 @@
 """
 Handle your video metadata
 """
+import os
 from flask import request, send_file
 from utilities.helpers import get_api_url
 from restapi.confs import PRODUCTION
@@ -16,6 +17,9 @@ from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
+
+from restapi.flask_ext.flask_celery import CeleryExt
 
 logger = get_logger(__name__)
 
@@ -31,7 +35,7 @@ class Videos(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, video_id=None):
         logger.debug("getting AVEntity id: %s", video_id)
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         if video_id is not None:
@@ -73,7 +77,7 @@ class Videos(GraphBaseOperations):
     @catch_graph_exceptions
     @graph_transactions
     def post(self):
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
         if len(v) == 0:
@@ -97,7 +101,7 @@ class Videos(GraphBaseOperations):
         Delete existing video description.
         """
         logger.debug("deliting AVEntity id: %s", video_id)
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         if video_id is None:
             raise RestApiException(
@@ -114,47 +118,6 @@ class Videos(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-    # @decorate.catch_error()
-    # @catch_graph_exceptions
-    # @graph_transactions
-    # def post(self, video_id=None):
-
-    #     self.initGraph()
-
-    #     try:
-    #         data = request.get_json(force=True)
-    #     except:
-    #         data = {}
-
-    #     logger.critical(data)
-
-    #     if 'title' not in data:
-    #         return self.force_response(
-    #             errors=["Missing title"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     if 'description' not in data:
-    #         return self.force_response(
-    #             errors=["Missing description"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     if 'duration' not in data:
-    #         return self.force_response(
-    #             errors=["Missing duration"],
-    #             code=hcodes.HTTP_BAD_REQUEST
-    #         )
-
-    #     video = self.graph.Video()
-    #     video.id = getUUID()
-    #     video.title = data["title"]
-    #     video.description = data["description"]
-    #     video.duration = data["duration"]
-    #     video.save()
-
-    #     return self.force_response(video.id)
-
 
 class VideoAnnotations(GraphBaseOperations):
     """
@@ -169,10 +132,13 @@ class VideoAnnotations(GraphBaseOperations):
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        input_parameters = self.get_input()
-        logger.debug("inputs %s" % input_parameters)
+        params = self.get_input()
+        logger.debug("inputs %s" % params)
+        anno_type = params.get('type')
+        if anno_type is not None:
+            anno_type = anno_type.upper()
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         video = None
@@ -184,10 +150,44 @@ class VideoAnnotations(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+
         item = video.item.single()
         for a in item.targeting_annotations:
-            annotation = self.getJsonResponse(a)
-            data.append(annotation)
+            if anno_type is not None and a.annotation_type != anno_type:
+                continue
+            if a.private:
+                if a.creator is None:
+                    logger.warn('Invalid state: missing creator for private '
+                                'note [UUID:{}]'.format(a.uuid))
+                    continue
+                creator = a.creator.single()
+                if creator.uuid != user.uuid:
+                    continue
+            res = self.getJsonResponse(a, max_relationship_depth=0)
+            del(res['links'])
+            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+                res['creator'] = self.getJsonResponse(
+                    a.creator.single(), max_relationship_depth=0)
+            # attach bodies
+            res['bodies'] = []
+            for b in a.bodies.all():
+                anno_body = b.downcast()
+                body = self.getJsonResponse(
+                    anno_body, max_relationship_depth=0)
+                if 'links' in body:
+                    del(body['links'])
+                if a.annotation_type == 'TVS':
+                    segments = []
+                    for segment in anno_body.segments:
+                        json_segment = self.getJsonResponse(
+                            segment, max_relationship_depth=0)
+                        if 'links' in json_segment:
+                            del(json_segment['links'])
+                        segments.append(json_segment)
+                    body['segments'] = segments
+                res['bodies'] .append(body)
+            data.append(res)
 
         return self.force_response(data)
 
@@ -205,7 +205,7 @@ class VideoShots(GraphBaseOperations):
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         data = []
 
         video = None
@@ -216,6 +216,8 @@ class VideoShots(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        user = self.get_current_user()
 
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
@@ -228,20 +230,75 @@ class VideoShots(GraphBaseOperations):
             # get all shot annotations:
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
+            shot['tags'] = []
+            # <dict(iri, name)>{iri, name, spatial, auto, hits}
+            tags = {}
             for anno in s.annotation.all():
+                creator = anno.creator.single()
+                if anno.private:
+                    if creator is None:
+                        logger.warn('Invalid state: missing creator for private '
+                                    'note [UUID:{}]'.format(anno.uuid))
+                        continue
+                    if creator is not None and creator.uuid != user.uuid:
+                        continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
-                if anno.annotation_type == 'TAG':
+                if (anno.annotation_type in ('TAG', 'DSC') and
+                        creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
                 # attach bodies
                 res['bodies'] = []
                 for b in anno.bodies.all():
+                    mdb = b.downcast()  # most derivative body
                     res['bodies'] .append(
-                        self.getJsonResponse(
-                            b.downcast(), max_relationship_depth=0))
+                        self.getJsonResponse(mdb, max_relationship_depth=0))
+                    if anno.annotation_type == 'TAG':
+                        spatial = None
+                        if 'ResourceBody' in mdb.labels():
+                            iri = mdb.iri
+                            name = mdb.name
+                            spatial = mdb.spatial
+                        elif 'TextualBody' in mdb.labels():
+                            iri = None
+                            name = mdb.value
+                        else:
+                            # unmanaged body type for tag
+                            continue
+                        ''' only for manual tag annotations  '''
+                        tag = tags.get((iri, name))
+                        if tag is None:
+                            tags[(iri, name)] = {
+                                'iri': iri,
+                                'name': name,
+                                'hits': 1
+                            }
+                            if spatial is not None:
+                                tags[(iri, name)]['spatial'] = spatial
+                        else:
+                            tag['hits'] += 1
                 shot['annotations'].append(res)
 
+            # add any other tags from "embedded segments"
+            for segment in s.embedded_segments.all():
+                # get ONLY public tags
+                for s_anno in segment.annotation.search(annotation_type='TAG', private=False):
+                    for b in s_anno.bodies.all():
+                        mdb = b.downcast()  # most derivative body
+                        if 'ODBody' in mdb.labels():
+                            # object detection body
+                            concept = mdb.object_type.single()
+                            tag = tags.get((concept.iri, concept.name))
+                            if tag is None:
+                                tags[(concept.iri, concept.name)] = {
+                                    'iri': concept.iri,
+                                    'name': concept.name,
+                                    'hits': 1
+                                }
+                            else:
+                                tag['hits'] += 1
+            shot['tags'] = list(tags.values())
             data.append(shot)
 
         return self.force_response(data)
@@ -264,12 +321,13 @@ class VideoContent(GraphBaseOperations):
         content_type = input_parameters['type']
         if content_type is None or (content_type != 'video' and
                                     content_type != 'thumbnail' and
-                                    content_type != 'summary'):
+                                    content_type != 'summary' and
+                                    content_type != 'orf'):
             raise RestApiException(
                 "Bad type parameter: expected 'video' or 'thumbnail'",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -293,10 +351,29 @@ class VideoContent(GraphBaseOperations):
             mime = "video/mp4"
             download = Downloader()
             return download.send_file_partial(video_uri, mime)
-
+        elif content_type == 'orf':
+            # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
+            orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
+            if orf_uri is None or not os.path.exists(orf_uri):
+                raise RestApiException(
+                    "Video ORF not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            mime = "video/mp4"
+            download = Downloader()
+            return download.send_file_partial(orf_uri, mime)
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            thumbnail_size = input_parameters.get('size')
+            if thumbnail_size is not None and thumbnail_size.lower() == 'large':
+                # load image file in the parent folder with the same name
+                thumbnail_filename = os.path.basename(thumbnail_uri)
+                thumbs_parent_dir = os.path.dirname(
+                    os.path.dirname(os.path.abspath(thumbnail_uri)))
+                thumbnail_uri = os.path.join(
+                    thumbs_parent_dir, thumbnail_filename)
+                logger.debug(
+                    'request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found",
@@ -315,3 +392,72 @@ class VideoContent(GraphBaseOperations):
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+
+class VideoTools(GraphBaseOperations):
+
+    __available_tools__ = ('object-detection', 'vimotion')
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def post(self, video_id):
+
+        logger.debug('launch automatic tool for video id: %s' % video_id)
+
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id.",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = video.item.single()
+        if item is None:
+            raise RestApiException(
+                "Item not available. Execute the pipeline first!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        if item.item_type != 'Video':
+            raise RestApiException(
+                "Content item is not a video. Use a valid video id.",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        params = self.get_input()
+        if 'tool' not in params:
+            raise RestApiException(
+                'Please specify the tool to be launched.',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        tool = params['tool']
+        if tool not in self.__available_tools__:
+            raise RestApiException(
+                "Please specify a valid tool. Expected one of %s." %
+                (self.__available_tools__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        repo = AnnotationRepository(self.graph)
+        if ('operation' in params and params['operation'] == 'delete' and
+                tool == self.__available_tools__[0]):
+            # get all automatic tags
+            for anno in item.sourcing_annotations:
+                if anno.generator == 'FHG' and anno.annotation_type == 'TAG':
+                    repo.delete_auto_annotation(anno)
+            return self.empty_response()
+
+        # DO NOT re-launch object detection twice for the same video!
+        if repo.check_automatic_tagging(item.uuid):
+            raise RestApiException(
+                "Object detection CANNOT be run twice for the same video.",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        task = CeleryExt.launch_tool.apply_async(
+            args=[tool, item.uuid],
+            countdown=10
+        )
+
+        return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)

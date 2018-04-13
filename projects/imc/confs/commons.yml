@@ -3,11 +3,11 @@ version: '3'
 
 services:
   backend:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
     image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
     volumes:
-      - ../data/imediastuff:/uploads
-      - ../scripts:/code/scripts
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${VANILLA_DIR}/scripts:/code/scripts
     networks:
       worker_net:
       ftp_net:
@@ -44,13 +44,22 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
-      # TODO: REMOVE ME after solved issue #64
-      CELERY_HOST: ${CELERY_BROKER_HOST}
-      CELERY_PORT: ${CELERY_BROKER_PORT}
+      SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_NOREPLY: ${SMTP_NOREPLY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+
+  proxy:
+    environment:
+      SMTP_ADMIN: ${SMTP_ADMIN}
 
   neo4j:
+    restart: on-failure:5
+    volumes:
+      - ${VANILLA_DIR}/data/graphdata:/data
     ports:
-      - 9090:7474
       - 7687:7687
     environment:
       # NEO4J_dbms_memory_pagecache_size: 1024M
@@ -59,14 +68,14 @@ services:
       # NEO4J_dbms_allowFormatMigration: "true"
 
   celery:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
-      - ../data/imediastuff:/uploads
-      - ../submodules/imedia-pipeline:/imedia-pipeline
-      # - ../imedia-pipeline-cin:/imedia-pipeline-cin
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
+      # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
-      - ../scripts:/code/scripts
+      - ${VANILLA_DIR}/scripts:/code/scripts
     depends_on:
       - rabbit
       - neo4j
@@ -90,11 +99,17 @@ services:
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
+      SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+
   celeryui:
-    build: ../projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
     volumes:
-      - ../data/imediastuff:/uploads
+      - ${VANILLA_DIR}/data/imediastuff:/uploads
     environment:
       AUTH_ENABLE: 1
       # putting this here because it should not be configurable in .env
@@ -121,6 +136,6 @@ services:
       - "21:21"
       - "30000-30019:30000-30019"
     volumes:
-      - ../data/imediastuff:/home/ftpusers/
+      - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
     environment:
       ACTIVATE: 1

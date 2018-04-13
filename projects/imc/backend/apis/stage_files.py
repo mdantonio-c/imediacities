@@ -71,16 +71,17 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, group=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         if not self.auth.verify_admin():
             # Only admins can specify a different group to be inspected
             group = None
 
         if group is None:
-            group = self.getSingleLinkedNode(self._current_user.belongs_to)
+            group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
         else:
-            group = self.getNode(self.graph.Group, group, field='uuid')
+            group = self.graph.Group.nodes.get_or_none(uuid=group)
+            # group = self.getNode(self.graph.Group, group, field='uuid')
 
         if group is None:
             raise RestApiException(
@@ -123,22 +124,24 @@ class Stage(GraphBaseOperations):
                 # cast down to Meta or Content stage
                 subres = res.downcast()
                 if 'MetaStage' in subres.labels():
-                    binding = {}
                     item = subres.item.single()
-                    creation = item.creation.single()
-                    source_id = None
-                    if creation is not None:
-                        sources = creation.record_sources.all()
-                        source_id = sources[0].source_id
-                        binding['source_id'] = source_id
-                    content_stage = item.content_source.single()
-                    if content_stage is not None:
-                        binding['filename'] = content_stage.filename
-                        binding['status'] = content_stage.status
-                    else:
-                        binding['filename'] = self.lookup_content(upload_dir, source_id)
-                        binding['status'] = 'PENDING'
-                    row['binding'] = binding
+                    # add binding info ONLY for processed record
+                    if item is not None:
+                        binding = {}
+                        source_id = None
+                        creation = item.creation.single()
+                        if creation is not None:
+                            sources = creation.record_sources.all()
+                            source_id = sources[0].source_id
+                            binding['source_id'] = source_id
+                        content_stage = item.content_source.single()
+                        if content_stage is not None:
+                            binding['filename'] = content_stage.filename
+                            binding['status'] = content_stage.status
+                        else:
+                            binding['filename'] = self.lookup_content(upload_dir, source_id)
+                            binding['status'] = 'PENDING'
+                        row['binding'] = binding
 
             # for res in resources:
             #     if res.path != path:
@@ -154,9 +157,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -196,14 +199,25 @@ class Stage(GraphBaseOperations):
 
         try:
             resource = self.graph.MetaStage.nodes.get(**properties)
-            log.debug("Resource already exist for %s" % path)
+            # if ContentStage exists and status is COMPLETED
+            #  then mode=skip
+            if resource is not None:
+                log.debug("Resource already exists for %s" % path)
+                item = resource.item.single()
+                if item is not None:
+                    content_stage = item.content_source.single()
+                    if content_stage is not None and content_stage.status == 'COMPLETED':
+                        log.debug("Content resource already exists with status: " + content_stage.status + ", then mode=skip")
+                        mode = 'skip'
+
         except self.graph.MetaStage.DoesNotExist:
             resource = self.graph.MetaStage(**properties).save()
             resource.ownership.connect(group)
             log.debug("Metadata Resource created for %s" % path)
 
+        metadata_update = input_parameters.get('update', True)
         task = CeleryExt.import_file.apply_async(
-            args=[path, resource.uuid, mode],
+            args=[path, resource.uuid, mode, metadata_update],
             countdown=10
         )
 
@@ -217,9 +231,9 @@ class Stage(GraphBaseOperations):
     @catch_graph_exceptions
     def delete(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self._current_user.belongs_to)
+        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(

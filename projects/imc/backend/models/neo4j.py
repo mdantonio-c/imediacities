@@ -13,8 +13,8 @@ from datetime import datetime
 import pytz
 
 from restapi.services.neo4j.models import (
-    StringProperty, ArrayProperty, IntegerProperty,
-    FloatProperty, DateTimeProperty, DateProperty,
+    StringProperty, ArrayProperty, IntegerProperty, BooleanProperty,
+    FloatProperty, DateTimeProperty, DateProperty, JSONProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
 )
@@ -69,7 +69,7 @@ class HeritableStructuredNode(StructuredNode):
                     zip(
                         map(lambda cls: len(cls.mro()), class_objs),
                         class_objs),
-                    key=lambda size, cls: size)[-1]
+                    key=lambda size_cls: size_cls[0])[-1]
         else:    # Caller has specified a target class.
             if not isinstance(target_class, str):
                 # In the spirit of neomodel, we might as well support both
@@ -102,7 +102,7 @@ class User(UserBase):
         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
-        'Group', 'PI_FOR', cardinality=ZeroOrMore)
+        'Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
 
 
 class Group(IdentifiedNode):
@@ -167,9 +167,7 @@ class Item(TimestampedNode, AnnotationTarget):
         framerate       Optional value for the projection speed, given in
                         frames per second, to which the given duration refers.
         dimension       The total physical dimension of the digital object
-                        (i.e. file size in bytes) represented as numeric value,
-                        with decimal places if required.
-        dimension_unit  Unit of the physical dimension of the item: "bytes"
+                        (i.e. file size in bytes) represented as numeric value.
         digital_format  The description of the digital file in which a content
                         object is stored. Array[0]=container; Array[1]=coding;
                         Array[2]=format; Array[3]=resolution:
@@ -187,7 +185,8 @@ class Item(TimestampedNode, AnnotationTarget):
     thumbnail = StringProperty()
     summary = StringProperty()
     duration = FloatProperty(show=True)
-    framerate = StringProperty(show=True)  # FloatProperty()
+    dimension = IntegerProperty(show=True)
+    framerate = StringProperty(show=True)
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
     item_type = StringProperty(
@@ -565,13 +564,13 @@ class NonAVEntity(Creation):
     Attributes:
         date_created            The point or period of time associated with the
                                 creation of the non-audiovisual creation
-                                (“CCYY-MM-DD”, “CCYY”, CCYY-CCYY). If the
+                                ("CCYY-MM-DD", "CCYY", CCYY-CCYY). If the
                                 production year is unknown, the term “unknown”
                                 should be added to indicate that research
                                 regarding the production time has been
                                 unsuccessful.
         non_av_type             The general type of the non-audiovisual
-                                manifestation (“image” or “text”).
+                                manifestation ("image" or "text").
         specific_type           This element further specifies the type of the
                                 non-audiovisual entity.
         phisical_format_size    The dimensions of the physical object.
@@ -579,7 +578,7 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
-    date_created = ArrayProperty(StringProperty(), required=True, show=True)
+    date_created = ArrayProperty(StringProperty(), show=True)
     non_av_type = StringProperty(required=True,
                                  choices=codelists.NON_AV_TYPES,
                                  show=True)
@@ -592,11 +591,6 @@ class NonAVEntity(Creation):
 # ANNOTATION
 ##############################################################################
 
-# class Annotation(IdentifiedNode):
-#    key = StringProperty(required=True)
-#    value = StringProperty(required=True)
-#    video = RelationshipFrom('Video', 'IS_ANNOTATED_BY')
-
 
 class AnnotationCreatorRel(StructuredRel):
     when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
@@ -605,12 +599,17 @@ class AnnotationCreatorRel(StructuredRel):
 class Annotation(IdentifiedNode, AnnotationTarget):
     """Annotation class"""
     ANNOTATION_TYPES = (
-        ('OD', 'object detection'),
-        ('OR', 'object recognition'),
         ('VQ', 'video quality'),
         ('VIM', 'video image motion'),
         ('TVS', 'temporal video segmentation'),
-        ('TAG', 'tag')
+        ('TAG', 'tagging'),
+        ('COM', 'commenting'),
+        ('RPL', 'replying'),
+        ('LNK', 'linking'),
+        ('REP', 'reporting'),
+        ('ASS', 'assessing'),
+        ('DSC', 'describing'),
+        ('BMK', 'bookmarking')
     )
     AUTOMATIC_GENERATOR_TOOLS = (
         ('FHG', 'Fraunhofer tool'),
@@ -621,6 +620,8 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
         default=lambda: datetime.now(pytz.utc), show=True)
+    private = BooleanProperty(default=False, show=True)
+    embargo = DateProperty(show=True)
     source_item = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
         'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
@@ -630,6 +631,8 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True)
     targets = RelationshipTo(
         'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
+    refined_selection = RelationshipTo(
+        'FragmentSelector', 'REFINED_SELECTION', cardinality=ZeroOrOne)
 
 
 class AnnotationBody(HeritableStructuredNode):
@@ -638,13 +641,21 @@ class AnnotationBody(HeritableStructuredNode):
 
 class TextualBody(AnnotationBody):
     value = StringProperty(required=True, show=True)
-    language = StringProperty(default='en', show=True)
+    language = StringProperty(show=True)
 
 
 class ResourceBody(AnnotationBody):
     iri = StringProperty(required=True, index=True, show=True)
     name = StringProperty(index=True, show=True)
     spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
+    detected_objects = RelationshipFrom('ODBody', 'CONCEPT', cardinality=ZeroOrMore)
+
+
+class ODBody(AnnotationBody):
+    """Detected Object"""
+    object_id = StringProperty(required=True, show=True)
+    confidence = FloatProperty(required=True, show=True)
+    object_type = RelationshipTo('ResourceBody', 'CONCEPT', cardinality=One)
 
 
 class ImageBody(AnnotationBody):
@@ -700,6 +711,7 @@ class VideoSegment(IdentifiedNode, AnnotationTarget):
     """Video Segment"""
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(required=True, show=True)
+    within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
 class Shot(VideoSegment):
@@ -712,13 +724,20 @@ class Shot(VideoSegment):
     annotation_body = RelationshipFrom(
         'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
+    embedded_segments = RelationshipFrom(
+        'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
 
 
-class ODBody(StructuredNode):
-    """Object Detection"""
-    # OBJECT_TYPES = ('FACE', 'LEFT_EYE', 'RIGHT_EYE')
-    object_id = StringProperty(required=True)
-    object_type = StringProperty(required=True)
-    # FIXME add object attribute relationship
-    # object_attributes = RelationshipTo(
-    #              'ObjectAttribute', 'HAS_ATTRIBUTE', cardinality=ZeroOrMore)
+class FragmentSelector(HeritableStructuredNode):
+    annotation = RelationshipFrom(
+        'Annotation', 'REFINED_SELECTION', cardinality=One)
+
+
+class AreaSequenceSelector(FragmentSelector):
+    """
+    A sequence of regions for detected objects in a video segment frame by frame.
+
+    e.g.
+    [[x1,y1,w1,z1], [x2,y2,w2,z2], ...]
+    """
+    sequence = JSONProperty(required=True, show=True)

@@ -1,8 +1,0 @@
-file: admin_users 
-class: UserRole 
-# baseuri: "/api"
-mapping:
-  all: "/role"
-  query: "/role/<query>"
-labels:
-  - miscellaneous 

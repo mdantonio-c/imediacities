@@ -1,7 +1,19 @@
-<nav class="navbar navbar-default" ng-if="!main.avoidTheToolbar" ng-class="main.toolbarBgColor">
+<nav class="navbar navbar-default" role="navigation" ng-if="!main.avoidTheToolbar" ng-class="main.toolbarBgColor">
   <div class="container-fluid">
 
     <div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" 
+        ng-click="isNavCollapsed = !isNavCollapsed"
+        data-toggle="collapse"
+        data-target="#navbar"
+        aria-expanded="false"
+        aria-controls="navbar"
+    >
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
       <h3>
         <!-- <a ui-sref='public.welcome'>
           {{ myproject }}
@@ -12,7 +24,11 @@
       </h3>
     </div>
 
-  <div id="navbar" class="navbar-collapse collapse">
+
+
+  <div 
+    id="navbar" class="navbar-collapse collapse"
+    uib-collapse='isNavCollapsed' ng-click="isNavCollapsed = !isNavCollapsed">
 
     <ul class="nav navbar-nav navbar-left">
 
@@ -24,13 +40,12 @@
 
       <!-- <li ng-if="profile.isAdmin"> -->
       <li ng-if="logged">
-        <a href ui-sref="logged.search({q: null})" ui-sref-opts="{reload: true}">
+        <a href ui-sref="logged.new-search({q: null, type: null})" ui-sref-opts="{reload: true}">
           Search
         </a>
       </li>
 
-
-      <li ng-if="profile.isAdmin">
+      <li ng-if="profile.isAdmin || profile.isGroupAdmin">
         <a href ui-sref="logged.admin.users" >
           Users
         </a>
@@ -64,9 +79,12 @@
         Login
       </a>
 
-      <a href ui-sref="logged.logout" ng-if="logged">
-      <i class='material-icons' uib-tooltip='Logout' tooltip-placement='bottom'>exit_to_app</i>
+      <a 
+        ng-controller='LogoutController as logout' 
+        ng-click='logout.exit()' ng-if="logged" style="cursor: pointer;">
+        <i class='material-icons' uib-tooltip='Logout' tooltip-placement='bottom'>exit_to_app</i>
       </a>
+
       </li>
 
     </ul>

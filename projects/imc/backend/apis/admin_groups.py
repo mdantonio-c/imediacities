@@ -20,7 +20,7 @@ class AdminGroups(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, id=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
         nodeset = self.graph.Group.nodes
 
         data = []
@@ -35,7 +35,7 @@ class AdminGroups(GraphBaseOperations):
     @graph_transactions
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
         if len(v) == 0:
@@ -66,8 +66,9 @@ class AdminGroups(GraphBaseOperations):
             raise RestApiException(
                 'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST)
 
-        coordinator = self.getNode(
-            self.graph.User, v['coordinator'], field='uuid')
+        coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
+        # coordinator = self.getNode(
+        #     self.graph.User, v['coordinator'], field='uuid')
 
         if coordinator is None:
             raise RestApiException(
@@ -91,11 +92,12 @@ class AdminGroups(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         v = self.get_input()
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
@@ -104,8 +106,10 @@ class AdminGroups(GraphBaseOperations):
 
         if 'coordinator' in v:
 
-            coordinator = self.getNode(
-                self.graph.User, v['coordinator'], field='uuid')
+            coordinator = self.graph.User.nodes.get_or_none(
+                uuid=v['coordinator'])
+            # coordinator = self.getNode(
+            #     self.graph.User, v['coordinator'], field='uuid')
 
             p = None
             for p in group.coordinator.all():
@@ -130,9 +134,10 @@ class AdminGroups(GraphBaseOperations):
                 "Please specify a group id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
-        group = self.getNode(self.graph.Group, group_id, field='uuid')
+        group = self.graph.Group.nodes.get_or_none(uuid=group_id)
+        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
@@ -147,9 +152,17 @@ class UserGroup(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, query=None):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         data = []
+
+        if not self.auth.verify_admin():
+
+            current_user = self.get_current_user()
+            for g in current_user.belongs_to.all():
+                data.append({"id": g.uuid, "shortname": g.shortname})
+                return self.force_response(data)
+
         cypher = "MATCH (g:Group)"
 
         if query is not None:

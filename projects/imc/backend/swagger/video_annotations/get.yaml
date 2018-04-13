@@ -1,6 +1,14 @@
-video_annoations:
+video_annotations:
   summary: Gets video annotations
-  description: Returns a wrapper containing all the annotations belonging to the given video item.
+  description: Returns all the annotations targeting the given video item.
+  parameters:
+    - name: type
+      in: query
+      description: Filter by annotation type (e.g. TAG)
+      type: string
+      enum:
+        - TAG
+        - DSC
   custom:
     authentication: true
   responses:

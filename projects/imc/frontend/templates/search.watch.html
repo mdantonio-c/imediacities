@@ -1,15 +1,24 @@
-<div ng-controller='SearchController as searchCtrl'>
+
+<div ng-controller='QuickSearchController as searchCtrl'>
 	<div class="row">
 		<div id="search-box">
+			<div class="col-md-2"></div>
+			<div class="col-xs-12 col-md-8">
 			<div class="input-group stylish-input-group">
 				<input ng-attr-type="text" ng-model="searchCtrl.inputTerm" ng-init="searchCtrl.inputTerm=''" class="form-control" ng-attr-placeholder="Search item"
 				ng-keypress="searchCtrl.goToSearch($event, searchCtrl.inputTerm)">
 				<span class="input-group-btn">
-					<button ui-sref="logged.search({q: searchCtrl.inputTerm})" class="btn btn-default" type="button">
+					<button type="button" ui-sref="logged.new-search({q: searchCtrl.inputTerm})" class="btn btn-default btn-sm">
 					<i class="imc-icon fa fa-search" aria-hidden="true"></i>
 					</button>
 				</span>
+				<span class="input-group-btn backsearch">
+					<button type="button" ui-sref="logged.new-search({type: 'old'})"
+						class="btn btn-default btn-sm"><i class="imc-icon fa fa-chevron-left" aria-hidden="true"></i><span class="hidden-xs hidden-sm">&nbsp;Back to search<span></button>
+				</span>
 			</div>
+			</div>
+			<div class="col-md-2"></div>
 		</div>
 	</div>
 </div>
@@ -18,52 +27,72 @@
 	ng-if="datactrl.loading"
 	ng-include="main.templateDir + 'loader.html'">
 </div>
-<div ng-controller='WatchController as watchCtrl' id="video-wrapper">
+<div ng-controller='WatchController as watchCtrl' id="item-wrapper">
 	<div class="row">
 		<div class="col-xs-12 col-md-6">
+			<div style="padding-left: 10px; margin-bottom: 10px;">
+				<h2 style="color: #6e7a7f; font-weight: bold; font-size: 28px; margin: 0px;">{{watchCtrl.video.attributes.identifying_title}}
+				</h2>
+				<div>
+					<i class="icon-only imc-icon fa fa-video-camera grey bigger-110" ng-class="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image', 'fa-align-left': source.type === 'Text'}"></i>
+					<span>{{watchCtrl.video.attributes.production_years[0]}}</span>
+					<span class="label label-default label-city">{{(watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}
+						<i class="imc-icon fa" ng-class="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image', 'fa-align-left': media.source.type === 'Text'}"></i>
+					</span>
+				</div>
+			</div>
 			<div ng-style="{'float': 'left', 'width': '100%'}">
 				<div class="video-container">
-					<video id="videoarea" data-setup='{ "controlBar": { "muteToggle": false } }' ng-src="{{watchCtrl.video.links['content'] | trustUrl }}" preload="none" ng-attr-type="video/mp4" ng-click="watchCtrl.pauseVid()" controls>
-					</video>
-					<div class="overlay-desc" ng-model="watchCtrl.locSubtitle">
-						<!--<div ng-repeat="annotation in watchCtrl.annotations | groupfilter:[options,selectedOptions] | timefilter:{currentTime} as filtered_annotations track by $index">
-								<h2>{{annotation.name}} {{currentTime}}</h2>
-						</div>-->
-						<!--<div ng-repeat="annotation in watchCtrl.filtered | groupfilter:[options,selectedOptions] as filtered_annotations track by $index">
-									<h2>{{annotation.name}}</h2>
-						</div>-->
+					<div class="anno-tools-container" id="anno-tools-container">
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('location');"
+							tooltip-placement="right"
+							uib-tooltip="Tag by location">
+							<i class="imc-icon fa fa-globe fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('term');"
+							tooltip-placement="right"
+							uib-tooltip="Tag&nbsp;by term">
+							<i class="imc-icon fa fa-tag fa-lg"></i>
+						</div>
+						<div class="space-0"></div>
+						<div class="btn btn-app btn-xs btn-warning anno-tools-btn"
+							ng-click="watchCtrl.manualtag('notes');"
+							tooltip-placement="right"
+							uib-tooltip="Add a&nbsp;note">
+							<i class="imc-icon fa fa-sticky-note fa-lg"></i>
+						</div>
 					</div>
+					<video id="videoarea" style="display:none"
+						data-setup='{ "controlBar": { "muteToggle": false } }'
+						preload="none"
+						ng-src="{{watchCtrl.video.links['content'] | switchVideoType:watchCtrl.videoType | trustUrl }}"
+						ng-attr-type="video/mp4"
+						ng-click="watchCtrl.playPause()"
+						controls>
+						Your browser does not support HTML5 video.
+					</video>
+					<!-- TEST DEI TEST -->
+					<div
+						ng-include="main.blueprintTemplateDir + 'videoplayer.html'">
+					</div>
+					<!-- FINE TEST DEI TEST -->
 				</div>
-				<div class="container" ng-show="watchCtrl.showmeli" ng-style="{'float': 'left', 'width': '100%'}"><br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+				<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</div>
-			<!--<div class="scrollmenu" ng-style="{'float': 'left'}">
-						<a ng-repeat="item in watchCtrl.items" ng-style="{'width': '13%'}" scroll-on-click>
-									<img ng-style="{'width': '90%', 'height': '90%'}" id="{{item[0]}}" duration="{{item[1]}}" nshots="{{item[2]}}" shotd="{{item[3]}}" progr="{{item[4]}}" timestamp="{{item[5]}}" ng-src="{{item[6]}}" />
-						</a>
-			</div>-->
-			
-			<container-fluid style="float:left; height: 100%; width:100%; overflow: hidden;">
-			<div uib-carousel style="float:left; height: 100%; width:100%;" interval="-1" no-wrap="true" class="scrollmenu" active="active">
-				<div uib-slide ng-repeat="item in watchCtrl.items | limitTo: watchCtrl.slideSize+1" index="$index" style="float:left; width:100%;  height: 100%; overflow: visible;">
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9][0]}}" duration="{{watchCtrl.items[$index*9][1]}}" nshots="{{watchCtrl.items[$index*9][2]}}" shotd="{{watchCtrl.items[$index*9][3]}}" progr="{{watchCtrl.items[$index*9][4]}}" timestamp="{{watchCtrl.items[$index*9][5]}}" ng-src="{{watchCtrl.items[$index*9][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+1][0]}}" duration="{{watchCtrl.items[$index*9+1][1]}}" nshots="{{watchCtrl.items[$index*9+1][2]}}" shotd="{{watchCtrl.items[$index*9+1][3]}}" progr="{{watchCtrl.items[$index*9+1][4]}}" timestamp="{{watchCtrl.items[$index*9+1][5]}}" ng-src="{{watchCtrl.items[$index*9+1][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+2][0]}}" duration="{{watchCtrl.items[$index*9+2][1]}}" nshots="{{watchCtrl.items[$index*9+2][2]}}" shotd="{{watchCtrl.items[$index*9+2][3]}}" progr="{{watchCtrl.items[$index*9+2][4]}}" timestamp="{{watchCtrl.items[$index*9+2][5]}}" ng-src="{{watchCtrl.items[$index*9+2][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+3][0]}}" duration="{{watchCtrl.items[$index*9+3][1]}}" nshots="{{watchCtrl.items[$index*9+3][2]}}" shotd="{{watchCtrl.items[$index*9+3][3]}}" progr="{{watchCtrl.items[$index*9+3][4]}}" timestamp="{{watchCtrl.items[$index*9+3][5]}}" ng-src="{{watchCtrl.items[$index*9+3][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+4][0]}}" duration="{{watchCtrl.items[$index*9+4][1]}}" nshots="{{watchCtrl.items[$index*9+4][2]}}" shotd="{{watchCtrl.items[$index*9+4][3]}}" progr="{{watchCtrl.items[$index*9+4][4]}}" timestamp="{{watchCtrl.items[$index*9+4][5]}}" ng-src="{{watchCtrl.items[$index*9+4][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+5][0]}}" duration="{{watchCtrl.items[$index*9+5][1]}}" nshots="{{watchCtrl.items[$index*9+5][2]}}" shotd="{{watchCtrl.items[$index*9+5][3]}}" progr="{{watchCtrl.items[$index*9+5][4]}}" timestamp="{{watchCtrl.items[$index*9+5][5]}}" ng-src="{{watchCtrl.items[$index*9+5][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+6][0]}}" duration="{{watchCtrl.items[$index*9+6][1]}}" nshots="{{watchCtrl.items[$index*9+6][2]}}" shotd="{{watchCtrl.items[$index*9+6][3]}}" progr="{{watchCtrl.items[$index*9+6][4]}}" timestamp="{{watchCtrl.items[$index*9+6][5]}}" ng-src="{{watchCtrl.items[$index*9+6][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+7][0]}}" duration="{{watchCtrl.items[$index*9+7][1]}}" nshots="{{watchCtrl.items[$index*9+7][2]}}" shotd="{{watchCtrl.items[$index*9+7][3]}}" progr="{{watchCtrl.items[$index*9+7][4]}}" timestamp="{{watchCtrl.items[$index*9+7][5]}}" ng-src="{{watchCtrl.items[$index*9+7][6]}}" style="float:left;" scroll-on-click/>
-					<img style="width: 10%;height: 100%;" id="{{watchCtrl.items[$index*9+8][0]}}" duration="{{watchCtrl.items[$index*9+8][1]}}" nshots="{{watchCtrl.items[$index*9+8][2]}}" shotd="{{watchCtrl.items[$index*9+8][3]}}" progr="{{watchCtrl.items[$index*9+8][4]}}" timestamp="{{watchCtrl.items[$index*9+8][5]}}" ng-src="{{watchCtrl.items[$index*9+8][6]}}" style="float:left;" scroll-on-click/>
-				</div>
-			</div>
-			</container-fluid>
 			<div id="timeline-graph" ng-show="watchCtrl.annotations.length >= 1" ng-model="videoTimeline" ng-style="{'float': 'left', 'height': '100%', 'width': '100%'}">
 				<div ng-style="{'float': 'left', 'height': '100%', 'width': watchCtrl.tlineW}" google-chart chart="watchCtrl.videoTimeline" agc-on-select="watchCtrl.jumpToShot(selectedItem)" agc-on-click="watchCtrl.getTagMenu()"></div>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-6">
 			<uib-tabset>
-			<uib-tab heading="Metadata">
+
+			<uib-tab heading="General Information">
 			<!-- metadata -->
 			<ul style="padding-left: 20px;"><li>
 				<div class="primary-description">
@@ -78,10 +107,6 @@
 						<i class="imc-icon fa fa-quote-left"></i>
 						{{description.attributes.text}}
 					</div>
-					<!-- <p><b>Description(s)</b>:
-						<p ng-repeat="description in watchCtrl.video.relationships.descriptions">
-						{{description.attributes.text}}</p>
-					</p> -->
 					<p><b>Keyword(s)</b>:
 						<span ng-repeat="keyword in watchCtrl.video.relationships.keywords">
 						{{keyword.attributes.term}}{{$last ? '' : ', '}}</span></p>
@@ -91,53 +116,148 @@
 						<p><b>Production Country</b>:
 							<span ng-repeat="country in watchCtrl.video.relationships.production_countries">
 							{{country.attributes.code.key}}{{$last ? '' : '/'}}</span></p>
-						<p><b>Contributors</b>:
+						<p><b>Credits</b>:
 							<span ng-repeat="contrib in watchCtrl.video.relationships.contributors">
 							{{contrib.attributes.names[0] | nocomma}} <i ng-if="contrib.attributes.activities">
 								(<span ng-repeat="role in contrib.attributes.activities">{{role}}{{$last ? '' : ', '}}</span>)</i>{{$last ? '' : ', '}}</span></p>
 						<p><b>Location</b>: {{watchCtrl.video.relationships.coverages[0].attributes.spatial[0] || 'Not available'}}</p>
-						<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}} - <a target="_blank" href="{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || '#'}}">{{watchCtrl.video.relationships.record_sources[0].attributes.is_shown_at || 'Not available'}}</a></p>
+						<p><b>Owner</b>: {{watchCtrl.video.relationships.record_sources[0].relationships.provider[0].attributes.name || 'Not available'}}<br/>
+							<b>Owner Record ID</b>: {{watchCtrl.video.relationships.record_sources[0].attributes.source_id}}
+						</p>
+						<p><b>Is shown at</b>:
+							<a target="_blank" href="{{watchCtrl.isShownAt}}" ng-if="watchCtrl.isShownAt">{{watchCtrl.isShownAt}}</a>
+							<span ng-if="!watchCtrl.isShownAt">Not available</span>
+						</p>
 						<p><b>Copyright</b>: {{watchCtrl.video.attributes.rights_status.description || 'Not available'}}</p>
 						<p><b>Rightholder(s)</b>:
 							<span ng-repeat="rightholder in watchCtrl.video.relationships.rightholders">
 							{{rightholder.attributes.name | nocomma}}{{$last ? '' : ', '}}</span></p>
+						<!-- cinzia start -->
+
+						<p ng-if="watchCtrl.video.relationships.languages && watchCtrl.video.relationships.languages[0].attributes"><b>Language(s)</b>:
+							<span ng-repeat="lang in watchCtrl.video.relationships.languages">
+							{{lang.attributes.code.description}} ({{lang.attributes.usage.description}}) {{$last ? '' : ', '}}</span></p>
+
+						<p ng-if="watchCtrl.video.relationships.titles && watchCtrl.video.relationships.titles[0].attributes"><b>Other title(s)</b>:
+							<span ng-repeat="otitle in watchCtrl.video.relationships.titles">
+							{{otitle.attributes.text}} ({{otitle.attributes.language.description}}) {{$last ? '' : ', '}}</span></p>
+
+						<uib-accordion close-others="false" ng-if="watchCtrl.video.relationships.video_format &&
+						watchCtrl.video.relationships.video_format[0].attributes &&
+						(watchCtrl.video.relationships.video_format[0].attributes.sound  ||
+						watchCtrl.video.relationships.video_format[0].attributes.colour  ||
+						watchCtrl.video.relationships.video_format[0].attributes.gauge  ||
+						watchCtrl.video.relationships.video_format[0].attributes.aspect_ratio)">
+						<div uib-accordion-group class="panel-default" is-open="statusAccor.isOpen" is-disabled="false">
+							<uib-accordion-heading>Film Format <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': statusAccor.isOpen, 'glyphicon-chevron-right': !statusAccor.isOpen}"></i>
+							</uib-accordion-heading>
+							<div class="video_format" ng-repeat="format in watchCtrl.video.relationships.video_format">
+								<p ng-if="format.attributes.sound"><b>Sound</b>:
+									<span>
+										{{format.attributes.sound.description | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.colour"><b>Colour</b>:
+									<span>
+										{{format.attributes.colour.description | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.gauge"><b>Gauge</b>:
+									<span>
+										{{format.attributes.gauge | attributesFilter}}
+									</span>
+								</p>
+								<p ng-if="format.attributes.aspect_ratio"><b>Aspect ratio</b>:
+									<span>
+										{{format.attributes.aspect_ratio | attributesFilter}}
+									</span>
+								</p>
+							</div>
+						</div>
+						</uib-accordion>
 					</div>
-					<!-- <button ng-attr-type="button" class="btn btn-default pull-right" ng-show="watchCtrl.showmesb" ng-disabled="watchCtrl.onplaying">
-					<span class="glyphicon glyphicon-hand-up" ng-click="watchCtrl.manualtag();"></span>
-					</button> -->
 				</li>
 			</ul>
 			<div class="sb-modal-parent"></div>
 			</uib-tab>
-			<uib-tab heading="Annotations">
+
+			<!-- notes -->
+			<uib-tab heading="Notes" class="Notes">
 				<div class="space-4"></div>
-				<div class="clearfix">
-					<div class="pull-right tableTools-container" ng-show="watchCtrl.showmesb">
-						<div class="dt-buttons btn-overlap btn-group">
-							<!-- <a class="dt-button buttons-collection buttons-colvis btn btn-white btn-primary btn-bold">
-								<span><i class="fa fa-tags"></i> <span class="hidden">Add tags</span></span></a> -->
-							<div class="btn-group pull-right" uib-dropdown uib-dropdown-toggle>
-								<button id="split-button" type="button" class="btn btn-default dropdown-toggle glyphicon glyphicon-hand-up" ng-disabled="watchCtrl.onplaying" uib-dropdown-toggle> Tag by Term
-								<span class="caret"></span>
-								</button>
-								<ul uib-dropdown-menu uib-dropdown-toggle role="menu" aria-labelledby="split-button">
-									<input ng-attr-type="text" ng-model="watchCtrl.inputVocTerm" class="form-control" ng-attr-placeholder="Search vocabulary term" ng-click="$event.stopPropagation();" autofocus><hr />
-									<div ng-repeat="groupsitem in watchCtrl.vocabularyFinal.classes">
-										<div ng-repeat="category in groupsitem.groups">
-											<div ng-repeat="term in category.terms | termfilter:watchCtrl.inputVocTerm as filtered_terms track by $index"">
-												<span class="hoverme" style="color:black; font-weight:bold" ng-click="watchCtrl.manualtag(category.name,term.labels.en,term.iri,term.labels);">{{term.labels.en}} <em style="color:gray;">{{category.name}}</em></span>
-											</div>
-										</div>
-									</div>
-								</ul>
+				<div class="notes-content">
+					<p ng-if="watchCtrl.notes.length == 0">No notes</p>
+					<div class="tab-notes" ng-repeat="note in watchCtrl.notes | orderBy: 'shotNum'">
+						<div class="tab-notes-title" ng-if="watchCtrl.notes[$index-1].shotNum != watchCtrl.notes[$index].shotNum">
+							Notes on  <a ng-click="watchCtrl.jumpToShotFromAnnotation(note.shotStartT,note.shotNum)"> shot {{note.shotNum}}</a>
+
+						</div>
+						<!-- list of the notes of the selected shot -->
+						<div class="tab-list-notes">
+							<div class="tab-list-note">
+								<div>
+									<span class="note-user-icon">
+										<i class="imc-icon fa fa-user fa-4x pull-left"></i>
+									</span>
+								</div>
+								<div style="display: inline-block;height: 60px;">
+									<p style="margin: 0;">
+										<span class="note-user-name">{{note.creatorName}}</span>
+									</p>
+									<p style="margin: 0;">
+										<!--
+										<span class="note-date"  uib-tooltip="{{note.creation_datetime | date:'yyyy-MM-dd HH:mm:ss'}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''"><i class="imc-icon fa fa-clock-o light-grey"></i> {{note.creation_datetime | moment: 'fromNow'}}</span>
+										-->
+										<span class="note-date" uib-tooltip="{{note.creation_datetime | localDateTime}}"  ng-if="note.creation_datetime!=null && note.creation_datetime!=''">
+											<i class="imc-icon fa fa-clock-o light-grey"></i>
+											{{note.creation_datetime | localDateTime | moment: 'fromNow'}}
+										</span>
+										
+									</p>
+									<p style="margin: 0;">
+										<span class="note-privacy" uib-tooltip="Private" ng-if="note.privacy == 'private'">
+											<i class="imc-icon fa fa-lock"></i>
+										</span>
+									</p>
+								</div>
+								<div style="display:  inline-block;float: right;">
+									<span class="note-bin">
+									<a class="btn btn-danger btn-xs"
+										ng-click="watchCtrl.deleteNote(note)"
+										ng-confirm-click="Are you sure you want to delete this note?"
+										tooltip-placement="left"
+										uib-tooltip="Delete note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-trash-o"> </i>
+									</a>
+									</span>
+									<span class="note-bin">
+									<a class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.editNote(note)"
+										tooltip-placement="left"
+										uib-tooltip="Edit note"
+										ng-if="profile.uuid == note.creator">
+										<i class="fa fa-edit"> </i>
+									</a>
+									</span>
+								</div>
+								<div style="margin: 5px;">
+									<p>
+										<span class="note-text">
+											<i class="imc-icon fa fa-quote-left"></i>
+											{{note.text}}
+										</span>
+									</p>
+								</div>
 							</div>
-							<button id="loc-button" type="button" class="btn btn-default glyphicon glyphicon-hand-up pull-right" ng-click="watchCtrl.manualtag('location','');" ng-disabled="watchCtrl.onplaying"><span> Tag a Location </span>
-							</button>
 						</div>
 					</div>
 				</div>
+			</uib-tab>
+			<uib-tab heading="Manual Tags">
+				<div class="space-4"></div>
 				<div>
-					<table st-table="watchCtrl.annotations" class="table table-striped">
+					<p ng-if="watchCtrl.annotations.length == 0">No manual tags</p>
+					<table st-table="watchCtrl.annotations" class="table table-striped" ng-if="watchCtrl.annotations.length > 0">
 						<thead>
 							<tr>
 								<th st-sort="shotid">shot number</th>
@@ -150,17 +270,18 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'-anno.shotNum'">
-								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT)">{{anno.shotNum}}</a></td>
-								<td>{{anno.group}}</td>
-								<td>{{anno.name}}</td>
-								<td>{{anno.startT}}</td>
-								<td>{{anno.endT}}</td>
+								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT,anno.shotNum)">{{anno.shotNum}}</a></td>
+								<td>{{ anno.group }}</td>
+								<td>{{ anno.name }}</td>
+								<td>{{ anno.startT | date:'mm:ss' }}</td>
+								<td>{{ anno.endT | date:'mm:ss' }}</td>
 								<td>
 									<a class="btn btn-danger btn-xs"
-										ng-click="watchCtrl.deleteAnnotation(anno.id)"
+										ng-click="watchCtrl.deleteAnnotation(anno)"
 										ng-confirm-click="Are you sure you want to delete this annotation?"
 										tooltip-placement="left"
-										uib-tooltip="Delete annotation">
+										uib-tooltip="Delete annotation"
+										ng-if="profile.uuid == anno.creator">
 										<i class="fa fa-trash-o"> </i>
 									</a>
 								</td>
@@ -168,48 +289,85 @@
 						</tbody>
 					</table>
 				</div>
-			<!--<multiselect class="btn pull-right" choices="options" selected="selectedOptions" placeholder="filter subtitles"></multiselect>-->	<!-- Selected: {{selectedOptions}} -->
+				<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			</uib-tab>
-			<uib-tab class="Storyboard" heading="Storyboard">
-			<div class="container storyboard">
-				<table class="table">
-					<tr>
-						<th>Shot number</th>
-						<th>Frame range</th>
-						<th>Shots</th>
-						<th>Shot timecode</th>
-						<th>Shot duration (sec)</th>
-						<th ng-style="{'text-align': 'center'}">Camera motion</th>
-					</tr>
-					<div class="storyboard">
-						<tr ng-repeat="shot in watchCtrl.storyshots">
-							<td data-title="'Number'" align="center">{{shot.number}}</td>
-							<td data-title="'Frame Range'" align="center">{{shot.framerange}}</td>
-							<td data-title="'Shot'" scroll-story-on-click>
-							<img ng-style="{'width': '40%'}" id="{{shot.id}}" duration="{{shot.duration}}" nshots="{{shot.nshots}}" shotd="{{shot.shotd}}" progr="{{shot.progr}}" timestamp="{{shot.timestamp}}" ng-src="{{shot.thumb}}"></td>
-							<td data-title="'Timestamp'" align="center">{{shot.timestamp}}</td>
-							<td data-title="'Duration'" align="center">{{shot.duration}}</td>
-							<td data-title="'Camera motion'" align="center">
-								<dl class="dl-horizontal">
-									<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
-										<dt>{{e_attr}}:</dt><dd>{{e_val}}</dd>
-									</div>
-								</dl>
-							</td>
-						</tr>
+			<uib-tab class="Storyboard" heading="Shots">
+			<div class="container" 
+					ng-show="watchCtrl.showmeli"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
+			<div class="storyboard">
+				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
+					<div class="media-left">
+						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
+						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
 					</div>
-				</table>
+					<div class="media-content">
+						<div class="row">
+							<div class="col-xs-3">
+								<div class="shot-info">
+									<div scroll-story-on-click>
+										<h4
+										timestamp="{{shot.timestamp}}"
+										class="underline-on-hover"
+										>Shot {{shot.number}}</h4>
+									</div>
+									<span class="small">{{shot.framerange}}</span>
+									<div class="space-0"></div>
+									<span class="small">{{shot.timestamp}}</span>
+								</div>
+							</div>
+							<div class="col-xs-9">
+								<div class="anno-info">
+									<ul class="fa-ul">
+										<li ng-if="(shot.tags | filter: {spatial:'!'}).length !== 0">
+											<i class="fa-li fa fa-tags light-brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in shot.tags | filter: {spatial:'!'}">
+													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+										<li ng-if="(shot.tags | filter: {spatial:'!!'}).length !== 0">
+											<i class="fa-li fa fa-map-marker brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in shot.tags | filter: {spatial:'!!'}">
+													<span class="label label-location">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="search-actions text-center">
+							<dl class="dl-horizontal">
+								<div ng-repeat="(e_attr, e_val) in shot.camera | salientEstimates:0.5">
+									<dt style="width: auto;">{{e_attr}}:</dt><dd style="margin-left: 0;">{{e_val * 100 | number:1}}%</dd>
+								</div>
+							</dl>
+						</div>
+					</div>
+				</div>
 			</div>
 			</uib-tab>
 			</uib-tabset>
 		</div>
 	</div>
 	<hr/>
-	<div ng-controller="MapController as vm" ng-init="vm.init(watchCtrl.video.relationships.coverages[0].attributes.spatial[0])">
+	<div ng-controller="MapController as vm"
+		 >
 		<div class="row">
+			<div class="container" 
+					ng-show="vm.mapLoading"
+					ng-style="{'float': 'left', 'width': '100%'}">
+					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 			<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{vm.googleMapsUrl}}" class="col-xs-12">
-				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}">
-				<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>
+				<ng-map id="videomap" center="{{vm.videolat}}, {{vm.videolng}}" zoom="{{vm.zoom}}" street-view-control="false">
+				<!--<marker position="[{{vm.videolat}}, {{vm.videolng}}]"  title="{{vm.locname}}" animation="Animation.BOUNCE"></marker>-->
 				<div id="class" ng-repeat="marker in vm.markers | orderBy : 'title'">
 					<marker position="[{{marker.videolat}}, {{marker.videolng}}]"  title="{{marker.locname}}" animation="Animation.BOUNCE"></marker>
 					<marker ng-click="$vm.openInfoWindow($event, marker);"></marker>
@@ -219,104 +377,189 @@
 		</div>
 	</div>
 	<hr/>
-	<!-- modal geo code -->
+	<!-- location modal -->
 	<script type="text/ng-template" id="myModalGeoCode.html">
 		<div class="modal-header">
-			<h3 class="modal-title">Add a location to this shot</h3>
-			<p>&nbsp;</p>
-			<p>Choose a location and click on the tag button</p>
-			<p><b>Shot starting time(secs): </b>{{startT}}<b> ending: </b>{{endT}}</p>
-			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
+			<h4 class="modal-title">Add a location to this shot</h4>
 		</div>
 		<div class="modal-body">
-			<form name="formAutocomplete" ng-submit="ok()">
+			<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+			<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+			<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
+			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+			<div class="space-8"></div>
+			<p>Choose a location and click on the tag button.</p>
+			<form name="formAutocomplete">
 				<div class="input-group animated fadeIn">
-					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Optional: enter location: City, State..."/>
+					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Enter location: City, State..."/>
 					<span class="input-group-btn">
-						<button class="btn btn-default" type="button" ng-click="ok()">Confirm</button>
+						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
 					</span>
 				</div>
 			</form>
+			<div class="space-8"></div>
+			<div uib-alert 
+				ng-repeat="alert in $tagCtrl.alerts"
+				ng-class="'alert-' + (alert.type || 'warning')" dismiss-on-timeout="5000" 
+				close="$tagCtrl.closeAlert($index)">{{alert.msg}}</div>
+			<p>{{items}}</p>
 		</div>
 		<div class="modal-footer">
-			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+			<button type="button" class="btn btn-default" ng-click="$tagCtrl.cancel()">Cancel</button>
 		</div>
 	</script>
 
 	<script type="text/ng-template" id="result.html">
 		<div class="modal-header">
-			<h3 class="modal-title">This location has been found</h3>
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This location has been found</h4>
 		</div>
-		<div class="modal-body" ng-model="geocodingResult">
-			<p><b>You searched for: </b>{{geocodingResult}}</p>
+		<div class="modal-body">
+			<p><b>You searched for: </b>{{geoResult}}</p>
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-primary" type="button" ng-click="ok()">Confirm</button>
 			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		</div>
 	</script>
-
+	<!-- term modal -->
 	<script type="text/ng-template" id="myModalVocab.html">
 		<div class="modal-header">
-			<h3 class="modal-title">You are adding a vocabulary tag to this shot</h3>
+			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
+			<h4 class="modal-title">Add a vocabulary term to this shot</h4>
 		</div>
 		<div class="modal-body">
-			<p><b>Shot starting time(secs): </b>{{startT}}<b> ending: </b>{{endT}}</p>
-			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
-			<form name="formAutocomplete" ng-submit="ok()">
-				<div class="input-group animated fadeIn">
+			<div class="row">
+				<div class="col-sm-4">
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
+					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
 				</div>
-			</form>
+				<div class="col-sm-4">
+					<p>Choose one or more terms</p>
+					<!-- add here tree view -->
+					<div class="widget-main padding-8">
+						<input type="text" ng-model="$tagCtrl.termSearch" />
+						<div class="space-4"></div>
+						<div class="tree-container">
+							<div
+								ivh-treeview="$tagCtrl.vocabulary"
+								ivh-treeview-filter="$tagCtrl.termSearch"
+								ivh-treeview-node-tpl="$tagCtrl.treeviewTpl"
+								ivh-treeview-on-cb-change="$tagCtrl.toggleTerm(ivhNode)">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<p>... or add a new term.</p>
+					<!-- add here tag selected -->
+					<tags-input ng-model="$tagCtrl.tags" 
+						display-property="label" add-on-paste="true"
+						on-tag-removed="$tagCtrl.deselectTreeviewNode($tag)"
+						on-tag-added="$tagCtrl.selectTreeviewNode($tag)">
+				      <auto-complete source="$tagCtrl.loadVocabularyTerms($query)"></auto-complete>
+				    </tags-input>
+				    <!-- <p>Model: {{$tagCtrl.tags}}</p> -->
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
+		</div>
+	</script>
+	<!-- notes modal -->
+	<script type="text/ng-template" id="myModalNotes.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="$notesCtrl.cancel()">x</button>
+			<h4 class="modal-title">{{modalTitle}}</h4>
+		</div>
+		<div class="modal-body">
+			<div class="row">
+				<div class="col-sm-4">
+					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
+					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+				</div>
+				<div class="col-sm-4">
+					
+
+				</div>
+				<div class="col-sm-8">
+					<div class="modal-div-1">
+
+						<div class="modal-div-options">
+							<div class="modal-div-select-0">
+								<select id="form-field-select-0" class="modal-select-0" ng-model="$notesCtrl.form.privacy.selected"
+								ng-options="o as o for o in $notesCtrl.form.privacy.options">
+								</select>
+							</div>
+							<!--
+							<div class="modal-div-select-1">
+								<select id="form-field-select-1" class="modal-select-1" ng-model="
+								$notesCtrl.form.type.selected"
+								ng-options="o as o for o in $notesCtrl.form.type.options">
+								</select>
+							</div>
+							-->
+							<div class="modal-div-select-2">
+								<select id="form-field-select-2" class="modal-select-2" ng-model="$notesCtrl.form.language.selected"
+								ng-options="o as o for o in $notesCtrl.form.language.options">
+									<option value="">language of text</option>
+								</select>
+							</div>
+
+						</div>
+
+						<textarea id="form-field-11" ng-model="$notesCtrl.form.text" class="autosize-transition form-control" style="overflow: hidden; overflow-wrap: break-word; resize: both; height: 130px; width: 450px" placeholder="write here ..." maxlength="500">
+						</textarea>
+
+					</div>
+
+					
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-default" type="button" ng-click="$notesCtrl.cancel()">Cancel</button>
+			<button class="btn btn-primary" type="button" ng-click="$notesCtrl.confirmNote()">Confirm</button>
+		</div>
+	</script>
+	<script type="text/ng-template" id="termFoundModal.html">
+		<div class="modal-header">
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This annotation has been already added to the shot</h4>
+		</div>
+		<div class="modal-body">
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning!</strong> Please try adding a different term.
+			</div>
 		</div>
 		<div class="modal-footer">
 			<p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p>
 			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-			<button class="btn btn-default" type="button" ng-click="ok()">Confirm</button>
-		</div>
-	</script>
-
-	<script type="text/ng-template" id="termFoundModal.html">
-		<div class="modal-header">
-				<h3 class="modal-title">This annotation has been already added to the shot</h3>
-		</div>
-		<div class="modal-body">
-				<div class="alert alert-warning" role="alert">
-								<strong>Warning!</strong> Please try adding a different term.
-					</div>
-		</div>
-		<div class="modal-footer">
-				<p class="pull-left"><b>You have selected the term: </b>{{labelTerm}}</p>
-				<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		</div>
 	</script>
 
 	<script type="text/ng-template" id="locationFoundModal.html">
 		<div class="modal-header">
-				<h3 class="modal-title">This location has been already added to the shot</h3>
+			<button type="button" class="close" ng-click="cancel()">x</button>
+			<h4 class="modal-title">This location has been already added to the shot</h4>
 		</div>
 		<div class="modal-body">
-				<div class="alert alert-warning" role="alert">
-								<strong>Warning!</strong> Please try adding a different location.
-					</div>
-		</div>
-		<div class="modal-footer">
-				<p class="pull-left"><b>Locations cannot be duplicated on the same shot</p>
-				<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-		</div>
-	</script>
-
-	<!-- <script type="text/ng-template" id="multiselect.html">
-		<div class="multiselect">
-		<button class="btn" ng-click="toggleSelect()"><span class="pull-left">Select</span>&nbsp;<span class="caret pull-right"></span></button>
-		<div class="multiselect-wrapper" ng-show="isVisible">
-			<input type="text"  ng-model="searchText" autofocus="autofocus" />
-			<ul>
-				<li ng-repeat="c in choices | filter: searchText">
-					<label class="checkbox"><input type="checkbox" ng-click="toggleCheck(c.Value)" ng-checked="isChecked(c.Value)" />{{c.Display}}</label></li>
-				</ul>
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning!</strong> Please try adding a different location.
 			</div>
 		</div>
-	</script> -->
+		<div class="modal-footer">
+			<p class="pull-left"><b>Locations cannot be duplicated on the same shot</p>
+			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+		</div>
+	</script>
 
 	<script type="text/ng-template" id="confirmModal.html">
 		<div class="modal-header modal-header-confirm">
@@ -329,6 +572,17 @@
 			<button class="btn btn-warning" ng-click="no()">No</button>
 		</div>
 	</script>
-	<div class="modal-parent">
+	<script type="text/ng-template" id="confirmNoteModal.html">
+		<div class="modal-header modal-header-confirm">
+			<button type="button" class="close" ng-click="no()">x</button>
+			<h4><i class="fa fa-check-square-o"></i> Please Confirm</h4>
+		</div>
+		<div class="modal-body">Do you really want to remove this note?</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" ng-click="yes()">Yes</button>
+			<button class="btn btn-warning" ng-click="no()">No</button>
+		</div>
+	</script>
+	<div class="tag-modal-parent">
     </div>
 </div>
