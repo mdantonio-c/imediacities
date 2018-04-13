@@ -641,7 +641,7 @@
 				var newCenter = [latLng.lat(), latLng.lng()];
 				if (!_.isEqual(sc.mapCenter, newCenter)) {
 					sc.mapCenter = newCenter;
-					// console.log('center changed to: ' + sc.mapCenter);
+					console.log('center changed to: ' + sc.mapCenter);
 					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
 						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
 					}
@@ -655,7 +655,7 @@
 			var newZoom = sc.map.getZoom();
 			if (newZoom !== oldZoom) {
 				// zoom changed
-				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+				console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
 				// fit the circle radius properly
 				var r = sc.radius;
 				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
@@ -719,15 +719,16 @@
 						// clean up relevant creations under the map
 						sc.mapResults = [];
 						if ($scope.filter.provider !== null) {
+							console.log('search by city');
 							map.setZoom(14);
 							sc.mapCenter = getPosition($scope.filter.provider);
 							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
 							sc.initialMapLoad = false;
 						} else {
 							// content from all cities represented on a map of Europe
+							console.log('search without city');
 							map.setZoom(4);
 							sc.mapCenter = europeCenter;
-							sc.dynMarkers = [];
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
@@ -919,17 +920,21 @@
 		sc.resetFilters();
 		sc.search();
 
+		// Deletes all markers on the map by removing references to them.
 		function clearMarkers() {
-			// clean up current marker list
-			// console.log('clear markers');
+			console.log('clear markers');
+			for (var i = 0; i < sc.dynMarkers.length; i++) {
+         		sc.dynMarkers[i].setMap(null);
+        	}
+			sc.dynMarkers = [];
 			if (sc.markerClusterer !== undefined) {
 				sc.markerClusterer.clearMarkers();
 			}
 		}
 
 		function loadGeoDistanceAnnotations(distance, center, isLocated) {
-			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
-				center[1] + '] within distance: ' + distance + ' (meters)');*/
+			console.log('loading annotations on the map from center [' + center[0] + ', ' +
+				center[1] + '] within distance: ' + distance + ' (meters)');
 			clearMarkers();
 			sc.dynMarkers = [];
 			// clean up relevant creations under the map
@@ -1004,6 +1009,7 @@
 		}
 
 		function updateMarkers(map) {
+			console.log('update markers');
 			sc.markerClusterer = new MarkerClusterer(
 				map, sc.dynMarkers, {
 					imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
