@@ -630,10 +630,20 @@
 		sc.showMapBoundary = false;
 
 		sc.centerEurope = function() {
-			sc.mapCenter = europeCenter;
-			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
+			var pt = new google.maps.LatLng(europeCenter[0], europeCenter[1]);
 			sc.map.setCenter(pt);
 			sc.map.setZoom(4);
+		};
+
+		/**
+		 * Center the map on a given city.
+		 * @param city - Archive ID (e.g. CCB)
+		 */
+		sc.centerCity = function(city) {
+			var cityPosition = getPosition(city);
+			var pt = new google.maps.LatLng(cityPosition[0], cityPosition[1]);
+			sc.map.setCenter(pt);
+			sc.map.setZoom(14);
 		};
 
 		sc.toggleBoundary = function() {
@@ -657,10 +667,11 @@
 				//sc.map.panTo(sc.map.getCenter());
 				var latLng = sc.map.getCenter();
 				var newCenter = [latLng.lat(), latLng.lng()];
+				// console.log('moved from: ' + sc.mapCenter + ' to: ' + newCenter);
 				if (!_.isEqual(sc.mapCenter, newCenter)) {
 					sc.mapCenter = newCenter;
 					// console.log('center changed to: ' + sc.mapCenter);
-					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+					if ($scope.filter.provider !== null) {
 						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
 					}
 				}
@@ -683,7 +694,7 @@
 				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
 				// console.log('new radius: ' + sc.radius + ' meters');
 				sc.mapZoom = newZoom;
-				if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+				if ($scope.filter.provider !== null) {
 					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
 				}
 			}
@@ -744,21 +755,16 @@
 						});
 						sc.map = map;
 						sc.setBoundaryVisible(sc.showMapBoundary);
-						sc.initialMapLoad = true;
 						// clean up relevant creations under the map
 						sc.mapResults = [];
 						if ($scope.filter.provider !== null) {
 							// console.log('search by city');
-							map.setZoom(14);
-							sc.mapCenter = getPosition($scope.filter.provider);
-							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
-							sc.initialMapLoad = false;
+							sc.centerCity($scope.filter.provider);
 						} else {
 							// content from all cities represented on a map of Europe
 							// console.log('search without city');
 							//clearMarkers();
-							map.setZoom(4);
-							sc.mapCenter = europeCenter;
+							sc.centerEurope();
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
