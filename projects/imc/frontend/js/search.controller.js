@@ -115,6 +115,22 @@
 			"name": "Copyright Undetermined"
 		}];
 
+	var mapStyles = {
+		default: null,
+		hide: [{
+			featureType: 'poi.business',
+			stylers: [{
+				visibility: 'off'
+			}]
+		}, {
+			featureType: 'transit',
+			elementType: 'labels.icon',
+			stylers: [{
+				visibility: 'off'
+			}]
+		}]
+	};
+
 	var app = angular.module('web')
 		.controller('SearchController', SearchController)
 		.controller('NewSearchController', NewSearchController)
@@ -603,6 +619,8 @@
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
 		sc.mapZoom = 4;
+		sc.mapStyle = mapStyles.hide; // hide business points of interest (POIs) and transit
+
 		// initial radius in meters
 		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
 		sc.radius = 1600 * 1000;	// for zoom level 4
@@ -641,7 +659,7 @@
 				var newCenter = [latLng.lat(), latLng.lng()];
 				if (!_.isEqual(sc.mapCenter, newCenter)) {
 					sc.mapCenter = newCenter;
-					console.log('center changed to: ' + sc.mapCenter);
+					// console.log('center changed to: ' + sc.mapCenter);
 					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
 						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
 					}
@@ -655,7 +673,11 @@
 			var newZoom = sc.map.getZoom();
 			if (newZoom !== oldZoom) {
 				// zoom changed
-				console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+
+				// close the last opened POI infowindow
+				// TODO
+
 				// fit the circle radius properly
 				var r = sc.radius;
 				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
@@ -692,6 +714,7 @@
 
 		sc.search = function() {
 			sc.loading = true;
+			clearMarkers();
 			// at the moment search term ONLY in the title
 			var request_data = {
 				"match": {
@@ -712,21 +735,28 @@
 					sc.countByYears = meta.countByYears;
 					sc.creations = out_data.data.Response.data;
 					NgMap.getMap().then(function(map) {
+						map.addListener('click', function(event) {
+							// if the event is a POI
+							if (event.placeId) {
+								// prevent the default info windows from showing?
+								event.stop();
+							}
+						});
 						sc.map = map;
 						sc.setBoundaryVisible(sc.showMapBoundary);
 						sc.initialMapLoad = true;
-						clearMarkers();
 						// clean up relevant creations under the map
 						sc.mapResults = [];
 						if ($scope.filter.provider !== null) {
-							console.log('search by city');
+							// console.log('search by city');
 							map.setZoom(14);
 							sc.mapCenter = getPosition($scope.filter.provider);
 							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
 							sc.initialMapLoad = false;
 						} else {
 							// content from all cities represented on a map of Europe
-							console.log('search without city');
+							// console.log('search without city');
+							//clearMarkers();
 							map.setZoom(4);
 							sc.mapCenter = europeCenter;
 							// expected content count by providers (i.e. cities)
@@ -922,7 +952,7 @@
 
 		// Deletes all markers on the map by removing references to them.
 		function clearMarkers() {
-			console.log('clear markers');
+			// console.log('clear markers');
 			for (var i = 0; i < sc.dynMarkers.length; i++) {
          		sc.dynMarkers[i].setMap(null);
         	}
@@ -933,10 +963,9 @@
 		}
 
 		function loadGeoDistanceAnnotations(distance, center, isLocated) {
-			console.log('loading annotations on the map from center [' + center[0] + ', ' +
-				center[1] + '] within distance: ' + distance + ' (meters)');
+			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
+				center[1] + '] within distance: ' + distance + ' (meters)');*/
 			clearMarkers();
-			sc.dynMarkers = [];
 			// clean up relevant creations under the map
 			sc.mapResults = [];
 
@@ -973,6 +1002,7 @@
 						}
 
 						google.maps.event.addListener(marker, 'click', function() {
+							// console.log('show info window on marker');
 							sc.markerTag = marker;
 							GeoCoder.geocode({
 								'placeId': marker.id
@@ -1009,19 +1039,13 @@
 		}
 
 		function updateMarkers(map) {
-			console.log('update markers');
+			// console.log('update markers');
 			sc.markerClusterer = new MarkerClusterer(
 				map, sc.dynMarkers, {
 					imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
 				});
 			sc.mapLoaded = true;
 		}
-
-		sc.showInfoWindow = function(marker) {
-			console.log(marker);
-			sc.markerTag = marker;
-			sc.map.showInfoWindow('tag-iw', sc.markerTag);
-		};
 
 		// force map resize
 		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
