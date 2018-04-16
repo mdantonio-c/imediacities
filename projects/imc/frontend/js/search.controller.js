@@ -696,6 +696,8 @@
 				sc.mapZoom = newZoom;
 				if ($scope.filter.provider !== null) {
 					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+				} else {
+					noty.showWarning('Select a city from the filter on the left in order to get geo-tags on the map');
 				}
 			}
 		};
