@@ -83,11 +83,11 @@ class Search(GraphBaseOperations):
                 elif f == 'keyword':
                     multi_match.append("(n)-[:HAS_KEYWORD]->(k:Keyword)")
                     multi_match_where.append(
-                        "k.term =~ '(?i).*{term}.*'".format(term=term))
+                        "k.term =~ '(?i){term}'".format(term=term))
                 elif f == 'contributor':
                     multi_match.append("(n)-[:CONTRIBUTED_BY]->(a:Agent)")
                     multi_match_where.append(
-                        "ANY(item in a.names where item =~ '(?i){term}')".format(term=term))
+                        "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                 else:
                     # should never be reached
                     raise RestApiException(

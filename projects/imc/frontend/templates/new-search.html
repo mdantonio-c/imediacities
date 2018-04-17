@@ -19,6 +19,9 @@
 											class="form-control"
 											ng-model="inputTerm"
 											ng-attr-placeholder="Look within results"
+											uib-tooltip="Search within titles, keywords or descriptions"
+											tooltip-placement="bottom"
+											tooltip-popup-delay="1000"
 											ng-trim="true"
 											name="input-term"
 											ng-keypress="sc.goToSearch($event)">
@@ -63,8 +66,11 @@
 						<i class="fa fa-tags"></i>Terms</h4>
 						<div class="widget-main" style="max-width: 280px;">
 							<tags-input ng-model="terms"
-								placeholder="Search a term" 
+								placeholder="Search by term"
 								display-property="label" add-on-paste="true"
+								uib-tooltip="Search by terms from the controlled vocabulary or the new ones added"
+								tooltip-placement="bottom"
+								tooltip-popup-delay="1000"
 								on-tag-removed="sc.deselectTreeviewNode($tag)"
 								on-tag-added="sc.selectTreeviewNode($tag)">
 						      <auto-complete source="sc.loadVocabularyTerms($query)"></auto-complete>
@@ -205,7 +211,7 @@
 															<custom-control id="place-control" position="TOP_LEFT" index="1" draggable="false">
 																<div>
 																	<input type="text" name="lookup-place" 
-																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place"><!--  <p>{{sc.mapCenter}}</p> -->
+																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place">
 																</div>
 															</custom-control>
 															<custom-marker ng-repeat="city in sc.counters"

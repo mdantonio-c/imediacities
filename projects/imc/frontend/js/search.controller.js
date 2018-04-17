@@ -466,7 +466,7 @@
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
-		sc.selectedMatchFields = ['title'];
+		sc.selectedMatchFields = ['title', 'keyword', 'description'];
 		// Toggle selection for a given field by name
 		sc.toggleMatchFieldSelection = function(matchField) {
 			var idx = self.selectedMatchFields.indexOf(matchField);
@@ -844,7 +844,7 @@
 	        	sc.cities.options.push(p.city.name);
 	        });
 
-			sc.selectedMatchFields = ['title'];
+			sc.selectedMatchFields = ['title', 'keyword', 'description'];
 
 			$scope.terms = [];
 
@@ -932,7 +932,7 @@
 		        $scope.yearfrom = yearfromselected;
 		        $scope.yearto = yeartoselected;
 
-				sc.selectedMatchFields = ['title'];
+				sc.selectedMatchFields = ['title', 'keyword', 'description'];
 
 				var savedterms = localStorage.getItem('terms');
 				if (savedterms!==""){
