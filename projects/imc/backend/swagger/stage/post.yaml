@@ -1,6 +1,6 @@
 
 stage:
-  summary: Delete a file from the stage area
+  summary: Import a file from the stage area
   custom:
     # publish: true
     authentication: true
@@ -18,6 +18,8 @@ stage:
             type: string
   responses:
     '200':
-      description: File successfully deleted 
+      description: File successfully imported 
     '401':
       description: This endpoint requires a valid authorization token 
+    '409':
+      description: No source ID found in metadata file.
