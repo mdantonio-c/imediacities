@@ -408,9 +408,16 @@
 					</button>
 					<button 
 						type="button" class=""
-						ng-if='watchCtrl.creatingSegment'
+						ng-if='watchCtrl.creatingSegment && (watchCtrl.segmentStart === undefined || watchCtrl.segmentEnd === undefined)'
 						ng-click="watchCtrl.stopSegmentCreation()">
 						Stop Creation
+					</button>
+
+					<button 
+						type="button" class=""
+						ng-if='watchCtrl.creatingSegment && watchCtrl.segmentStart !== undefined && watchCtrl.segmentEnd !== undefined'
+						ng-click="watchCtrl.createSegment()">
+						Confirm Creation
 					</button>
 			</uib-tab>
 

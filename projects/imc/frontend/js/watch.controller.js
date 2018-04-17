@@ -1646,10 +1646,9 @@
 			if (value) {
 				var new_value = $scope.videoplayer.video.currentTime;
 				if (new_value > self.segmentEnd) {
-					console.log("Error! START > END!");
+					console.log("Error: segment start cannot be greater than end");
 				} else {
 					self.segmentStart = new_value
-					console.log(self.segmentStart);
 				}
 			} else {
 				self.segmentStart = undefined;
@@ -1660,13 +1659,12 @@
 			if (value) {
 				var new_value = $scope.videoplayer.video.currentTime;
 				if (self.segmentStart === undefined) {
-					console.log("Cannot set end before start!");
+					console.log("Error: cannot set segment end before setting start");
 				}
 				else if (self.segmentStart > new_value) {
-					console.log("Error! START > END!");
+					console.log("Error: segment end  cannot be lower than start");
 				} else {
 					self.segmentEnd = new_value;
-					console.log(self.segmentEnd);
 				}
 			} else {
 				self.segmentEnd = undefined;
