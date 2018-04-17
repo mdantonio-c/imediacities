@@ -864,6 +864,9 @@
 		// to visualize annotations in tab table
 		self.annotations = [];
 
+		// to visualize manual segmentations in tab table
+		self.manualSegmentations = [];
+
 		// to visualize notes in notes tab 
 		self.notes = [];
 		// to visualize shots in notes tab table
@@ -1635,6 +1638,51 @@
 				}
 			});
 		});
+
+		self.startSegmentCreation = function() {
+			self.creatingSegment = true;
+		}
+		self.lockSegmentStart = function(value) {
+			if (value) {
+				var new_value = $scope.videoplayer.video.currentTime;
+				if (new_value > self.segmentEnd) {
+					console.log("Error! START > END!");
+				} else {
+					self.segmentStart = new_value
+					console.log(self.segmentStart);
+				}
+			} else {
+				self.segmentStart = undefined;
+				self.lockSegmentEnd(false);
+			}
+		}
+		self.lockSegmentEnd = function(value) {
+			if (value) {
+				var new_value = $scope.videoplayer.video.currentTime;
+				if (self.segmentStart === undefined) {
+					console.log("Cannot set end before start!");
+				}
+				else if (self.segmentStart > new_value) {
+					console.log("Error! START > END!");
+				} else {
+					self.segmentEnd = new_value;
+					console.log(self.segmentEnd);
+				}
+			} else {
+				self.segmentEnd = undefined;
+			}
+		}
+
+		self.stopSegmentCreation = function() {
+			self.creatingSegment = false;
+			self.lockSegmentStart(false);
+			self.lockSegmentEnd(false);
+		}
+
+		// init variables	
+		self.stopSegmentCreation();
+
+
 	}
 
 	function WatchImageController($scope, $rootScope, $http, $document, $uibModal, $stateParams, $filter,
