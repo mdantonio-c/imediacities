@@ -208,6 +208,12 @@
 																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place"><!--  <p>{{sc.mapCenter}}</p> -->
 																</div>
 															</custom-control>
+															<custom-marker ng-repeat="city in sc.counters"
+																id="counter-marker-{{city.provider}}"
+																position="{{city.position}}"
+																uib-tooltip="Number of geo-tags in {{city.name}}">
+																<div class="map-counter-panel">{{city.counter}}</div>
+															</custom-marker>
 															<info-window id="tag-iw">
 																<div ng-non-bindable="" id="infowindow-content">
 																	<div class="place-info">

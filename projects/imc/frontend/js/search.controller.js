@@ -82,6 +82,13 @@
 			}
 		}
 	}
+	function getCity(provider) {
+		for (var i = 0; i < providers.length; i++) {
+			if (providers[i].code === provider) {
+				return providers[i].city;
+			}
+		}
+	}
 
 	var iprstatuses = [{
 			"code": "01",
@@ -747,6 +754,7 @@
 					sc.totalItems = meta.totalItems;
 					sc.countByYears = meta.countByYears;
 					sc.creations = out_data.data.Response.data;
+					sc.counters = [];
 					NgMap.getMap().then(function(map) {
 						map.addListener('click', function(event) {
 							// if the event is a POI
@@ -771,7 +779,11 @@
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
 								    // key: the name of the object keyvar position = getPosition(provider);
-									var position = getPosition(key);
+								    var city = getCity(key);
+								    city.counter = meta.countByProviders[key];
+								    city.provider = key;
+								    sc.counters.push(city);
+									/*var position = getPosition(key);
 									if (position === undefined) {
 										console.warn("Cannot get position by given key: '" + key + "'");
 									} else {
@@ -780,7 +792,7 @@
 										for (var i = 0; i < count; i++) {
 											sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
 										}
-									}
+									}*/
 								});
 							} else {
 								console.warn('expected content count by provider');
