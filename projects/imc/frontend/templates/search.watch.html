@@ -362,37 +362,30 @@
 					<table st-table="watchCtrl.manualSegmentations" class="table table-striped" ng-if="watchCtrl.manualSegmentations.length > 0">
 						<thead>
 							<tr>
-<!-- 
-								<th st-sort="shotid">shot number</th>
-								<th st-sort="group">category</th>
-								<th st-sort="name">term</th>
-								<th st-sort="startT">start time <em style="color:gray;">(sec)</em></th>
-								<th st-sort="endT">end time <em style="color:gray;">(sec)</em></th>
+								<th st-sort="segmentid">segment number</th>
+								<th st-sort="start">start frame</th>
+								<th st-sort="end">end frame</th>
 								<th></th>
--->
 							</tr>
 						</thead>
-<!-- 						
 						<tbody>
-							<tr ng-repeat="anno in watchCtrl.annotations | orderBy:'-anno.shotNum'">
-								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(anno.startT,anno.shotNum)">{{anno.shotNum}}</a></td>
-								<td>{{ anno.group }}</td>
-								<td>{{ anno.name }}</td>
-								<td>{{ anno.startT | date:'mm:ss' }}</td>
-								<td>{{ anno.endT | date:'mm:ss' }}</td>
-								<td>
+							<tr ng-repeat="seg in watchCtrl.manualSegmentations | orderBy:'-seg.segmentid'">
+<!-- 								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(seg.startT,seg.shotNum)">{{seg.shotNum}}</a></td> -->
+								<td>{{ seg.segmentid }}</td>
+								<td>{{ seg.start }}</td>
+								<td>{{ seg.end }}</td>
+ 								<td>
 									<a class="btn btn-danger btn-xs"
-										ng-click="watchCtrl.deleteAnnotation(anno)"
-										ng-confirm-click="Are you sure you want to delete this annotation?"
+										ng-click="watchCtrl.deleteManualSegment(seg)"
+										ng-confirm-click="Are you sure you want to delete this segment?"
 										tooltip-placement="left"
-										uib-tooltip="Delete annotation"
-										ng-if="profile.uuid == anno.creator">
+										uib-tooltip="Delete segment"
+										ng-if="profile.uuid == seg.creator">
 										<i class="fa fa-trash-o"> </i>
 									</a>
 								</td>
 							</tr>
 						</tbody>
--->
 					</table>
 				</div>
 				<div class="container" 

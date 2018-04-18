@@ -1639,12 +1639,18 @@
 			});
 		});
 
+		/////////////////////////////////////////////////////////
+		///////////////// MANUAL SEGMENTATION ///////////////////
+		/////////////////////////////////////////////////////////
 		self.startSegmentCreation = function() {
 			self.creatingSegment = true;
 		}
+		self.getCurrentFrame = function() {
+			return Math.ceil($scope.videoplayer.video.currentTime / $scope.videoplayer.frameLength);
+		}
 		self.lockSegmentStart = function(value) {
 			if (value) {
-				var new_value = $scope.videoplayer.video.currentTime;
+				var new_value = self.getCurrentFrame();
 				if (new_value > self.segmentEnd) {
 					console.log("Error: segment start cannot be greater than end");
 				} else {
@@ -1657,7 +1663,7 @@
 		}
 		self.lockSegmentEnd = function(value) {
 			if (value) {
-				var new_value = $scope.videoplayer.video.currentTime;
+				var new_value = self.getCurrentFrame();
 				if (self.segmentStart === undefined) {
 					console.log("Error: cannot set segment end before setting start");
 				}
@@ -1670,16 +1676,38 @@
 				self.segmentEnd = undefined;
 			}
 		}
-
 		self.stopSegmentCreation = function() {
 			self.creatingSegment = false;
 			self.lockSegmentStart(false);
 			self.lockSegmentEnd(false);
 		}
 
+		self.createSegment = function() {
+			var segment = {}
+			segment['segmentid'] = 1 + self.manualSegmentations.length;
+			segment['start'] = self.segmentStart;
+			segment['end'] = self.segmentEnd;
+			segment['creator'] = $rootScope.profile.uuid; 
+			self.manualSegmentations.push(segment);
+			self.stopSegmentCreation();
+		}
+
+		self.deleteManualSegment = function(segment) {
+			if ($rootScope.profile.uuid == segment.creator) {
+
+				for (var i = 0; i < self.manualSegmentations.length; i++) {
+					if (self.manualSegmentations[i].segmentid == segment.segmentid) {
+						self.manualSegmentations.splice(i, 1);
+						break;
+					}
+				}
+			}
+		}
 		// init variables	
 		self.stopSegmentCreation();
-
+		///////////////////////////////////////////////////////////
+		//////////////// END MANUAL SEGMENTATION //////////////////
+		///////////////////////////////////////////////////////////
 
 	}
 
