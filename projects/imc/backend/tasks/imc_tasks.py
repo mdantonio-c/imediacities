@@ -42,26 +42,18 @@ def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
         log.debug("Starting task update_metadata for resource_id %s" % resource_id)
-        progress(self, 'Starting update metadata with file ', path)
+        progress(self, 'Starting update metadata', path)
         self.graph = celery_app.get_service('neo4j')
         xml_resource = None
-        try:                                                 
+        try:                                           
             metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(self, resource_id, path, metadata_update)
             log.debug("Completed task update_metadata for resource_id %s" % resource_id)
 
-            xml_resource.status = 'COMPLETED'
-            xml_resource.status_message = 'Nothing to declare'
-            xml_resource.save()
-
             progress(self, 'Completed', path)
+
         except Exception as e:
-            progress(self, 'Updata metadata error', None)
-            log.error("Task for resource_id %s: Error, %s" % (resource_id, e))
-            if xml_resource is not None:
-                xml_resource.status = 'ERROR'
-                xml_resource.status_message = str(e)
-                xml_resource.save()
+            progress(self, 'Failed updating metadata', path)
             raise e
 
         return 1
@@ -379,19 +371,25 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             item_node.ownership.connect(group)
             item_node.meta_source.connect(xml_resource)
             item_node.save()
-            log.debug("Item resource created")
+            log.debug("Item resource created for resource_id=%s" % resource_id)
 
         # check for existing creation
         creation = item_node.creation.single()
         if creation is not None and not metadata_update:
-            log.info('Skip updating metadata')
+            log.info("Skip updating metadata for resource_id=%s" % resource_id)
         else:
+            # update metadata
+            log.debug("Updating metadata for resource_id=%s" % resource_id)
             xml_resource.warnings = extract_descriptive_metadata(
                 self, path, item_type, item_node)
-            log.info('Metadata updated')
+            log.info("Metadata updated for resource_id=%s" % resource_id)
+
+            xml_resource.status = 'COMPLETED'
+            xml_resource.status_message = 'Nothing to declare'
+            xml_resource.save()
 
     except Exception as e:
-        log.error("Update meta_stage error, %s" % e)
+        log.error("Failed update of resource_id %s, Error: %s" % (resource_id,e))
         if xml_resource is not None:
             xml_resource.status = 'ERROR'
             xml_resource.status_message = str(e)

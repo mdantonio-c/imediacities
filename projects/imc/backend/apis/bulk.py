@@ -41,29 +41,38 @@ class Bulk(GraphBaseOperations):
 
     def lookup_latest_dir(self, path):
         """
-        Look for the sub-directory of path in the form of:
-        yyyy-mm-dd
+        Look for the sub-directory of path in the forms of:
+        %Y-%m-%d (example 2018-04-19)
+        %Y-%m-%dT%H:%M:%S.%fZ (example 2018-04-19T11:22:12.0Z)
         which name is the most recent date
         """
         logger.debug("lookup_latest_dir: input path" + path)
+
+        POSSIBLE_FORMATS = ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S.%fZ']
+
         found_date = None
         found_dir = None
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d)) ]
         for d in dirs:
-            try:
-                return_date = datetime.strptime(d, "%Y-%m-%d")
+            parsed_date = None
+            for format in POSSIBLE_FORMATS :
+                try:
+                    parsed_date = datetime.strptime(d, format)
+                    break;
+                except Exception as e:
+                    # il nome della dir non e' nel formato
+                    pass
+            if parsed_date is not None:
                 # all'inizio found_dir e' vuoto
                 if found_date is None:
-                    found_date = return_date
+                    found_date = parsed_date
                     found_dir = d
                     continue
-                if return_date > found_date:
-                    found_date = return_date
+                if parsed_date > found_date:
+                    found_date = parsed_date
                     found_dir = d
-            except BaseException:
-                logger.info("cannot parse dir=" + d)
-                # se il nome della dir non e' nel formato allora la salto 
-                continue
+            else:
+                logger.warning("cannot parse dir=" + d)
         return os.path.join(path, found_dir)
 
     def extract_creation_ref(self, path):
@@ -212,6 +221,13 @@ class Bulk(GraphBaseOperations):
                     else:
                         #update dei soli metadati
                         logger.debug("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
+
+                        # devo aggiornare nel MetaStage i campi nomefile e path con quelli che
+                        #  vado a usare per l'aggiornamento dei metadati
+                        meta_stage.filename = standard_filename
+                        meta_stage.path = standard_path
+                        meta_stage.save()
+
                         task = CeleryExt.update_metadata.apply_async(
                             args=[standard_path, meta_stage.uuid],
                             countdown=10
