@@ -180,8 +180,9 @@ class VideoAnnotations(GraphBaseOperations):
                 if a.annotation_type == 'TVS':
                     segments = []
                     for segment in anno_body.segments:
+                        # look at the most derivative class
                         json_segment = self.getJsonResponse(
-                            segment, max_relationship_depth=0)
+                            segment.downcast(), max_relationship_depth=0)
                         if 'links' in json_segment:
                             del(json_segment['links'])
                         segments.append(json_segment)
@@ -302,6 +303,65 @@ class VideoShots(GraphBaseOperations):
             data.append(shot)
 
         return self.force_response(data)
+
+
+class VideoSegments(GraphBaseOperations):
+    """
+        Get the list of manual segments for a given video.
+    """
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self, video_id, segment_id):
+        if segment_id is not None:
+            logger.debug("get manual segment [uuid:{sid}] for AVEntity "
+                         "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+        else:
+            logger.debug("get all manual segments for AVEntity [uuid:{vid}]"
+                         .format(vid=video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        data = []
+
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        # user = self.get_current_user()
+
+        item = video.item.single()
+        logger.debug('get manual segments for Item [{}]'.format(item.uuid))
+        # api_url = get_api_url(request, PRODUCTION)
+
+        # TODO
+
+        return self.force_response(data)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def delete(self, video_id, segment_id):
+        logger.debug("delete manual segment [uuid:{sid}] for AVEntity "
+                     "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+        raise RestApiException(
+            "Delete operation not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def put(self, video_id, segment_id):
+        logger.debug("update manual segment [uuid:{sid}] for AVEntity "
+                     "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+        raise RestApiException(
+            "Update operation not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
 
 class VideoContent(GraphBaseOperations):

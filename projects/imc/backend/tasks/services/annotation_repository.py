@@ -54,7 +54,8 @@ class AnnotationRepository():
         if selector is not None:
             if not isinstance(target, Item):
                 raise ValueError('Selector allowed only for Item target.')
-            s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
+            s_start, s_end = map(
+                int, selector['value'].lstrip('t=').split(','))
             log.debug('start:{}, end:{}'.format(s_start, s_end))
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
@@ -63,14 +64,14 @@ class AnnotationRepository():
             if segment is None:
                 segment = VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end).save()
+                # look up the shot where the segment is enclosed
+                shots = self.get_enclosing_shots(segment, target)
+                if shots is None or len(shots) == 0:
+                    raise ValueError('Invalid state: cannot be found shot(s) enclosing '
+                                     'selected segment [{0}]'.format(selector['value']))
+                for shot in shots:
+                    segment.within_shots.connect(shot)
             anno.targets.connect(segment)
-            # look up the shot where the segment is enclosed
-            shots = self.get_enclosing_shots(segment, target)
-            if shots is None or len(shots) == 0:
-                raise ValueError('Invalid state: cannot be found shot(s) enclosing '
-                                 'selected segment [{0}]'.format(selector['value']))
-            for shot in shots:
-                segment.within_shots.connect(shot)
         else:
             anno.targets.connect(target)
         # add bodies
@@ -116,7 +117,8 @@ class AnnotationRepository():
                 conceptNode = self.graph.ResourceBody.nodes.get_or_none(
                     iri=concept['iri'])
                 if conceptNode is None:
-                    log.debug('new ResourceBody for concept: {}'.format(concept))
+                    log.debug(
+                        'new ResourceBody for concept: {}'.format(concept))
                     conceptNode = ResourceBody(
                         iri=concept['iri'], name=concept['name']).save()
                 bodyNode.object_type.connect(conceptNode)
@@ -255,16 +257,75 @@ class AnnotationRepository():
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
 
+    def create_tvs_manual_annotation(self, user, bodies, target,
+                                     is_private=False, embargo_date=None):
+        '''
+        Create a "segmentation" annotation used for user manual segment.
+        '''
+        if not isinstance(target, Item):
+            raise ValueError('Segmentation allowed only for Item target.')
+        visibility = 'private' if is_private else 'public'
+        log.debug("Create a new {} segmentation annotation".format(visibility))
+        # create annotation node
+        anno = Annotation(annotation_type='TVS', private=is_private).save()
+        if embargo_date is not None:
+            anno.embargo = embargo_date
+            anno.save()
+        anno.creator.connect(user)
+        anno.source_item.connect(target)
+        anno.targets.connect(target)
+
+        # Expected single body
+        body = bodies[0]
+        if body['type'] != 'TVSBody':
+            raise ValueError('Invalid body for segmentation annotation: {}'
+                             .format(body['type']))
+        tvs_body = TVSBody().save()
+        anno.bodies.connect(tvs_body)
+        segments = body.get('segments')
+        if segments is None or type(segments) is not list or len(segments) == 0:
+            raise ValueError('Invalid segments')
+        for s in segments:
+            s_start, s_end = map(
+                int, s.lstrip('t=').split(','))
+            log.debug('start:{}, end:{}'.format(s_start, s_end))
+            if s_start > s_end:
+                raise ValueError('Invalid segment range. The start is greater than the end.')
+            # search for existing segment for the given item
+            segment = self.lookup_existing_segment(s_start, s_end, target)
+            log.debug('Segment does exist? {}'.format(
+                True if segment else False))
+            if segment is None:
+                segment = VideoSegment(
+                    start_frame_idx=s_start, end_frame_idx=s_end).save()
+                # look up the shot where the segment is enclosed
+                shots = self.get_enclosing_shots(segment, target)
+                if shots is None or len(shots) == 0:
+                    raise ValueError('Invalid state: cannot be found shot(s) enclosing '
+                                     'selected segment [{0}]'.format(s))
+                for shot in shots:
+                    segment.within_shots.connect(shot)
+            else:
+                # avoid duplicated segmentation for the same segment
+                existing_tvs_body = segment.annotation_body.single()
+                if existing_tvs_body is not None:
+                    warn_msg = 'Segmentation does already exist for {}'.format(s)
+                    log.warn(warn_msg)
+                    raise DuplicatedAnnotationError(warn_msg)
+                raise ValueError('Force Error')
+            tvs_body.segments.connect(segment)
+
+        return anno
+
     @graph_transactions
     def delete_tvs_annotation(self, annotation):
-        log.info('Delete existing TVS annotation')
-        tvs_body = annotation.bodies.single()
-        if tvs_body:
-            original_tvs_body = tvs_body.downcast()
-            log.info(original_tvs_body.__class__)
-            for segment in original_tvs_body.segments:
+        log.debug('Delete existing TVS annotation')
+        body = annotation.bodies.single()
+        if body:
+            tvs_body = body.downcast()
+            for segment in tvs_body.segments:
                 segment.delete()
-            original_tvs_body.delete()
+            tvs_body.delete()
         annotation.delete()
 
     @graph_transactions
@@ -351,7 +412,8 @@ class AnnotationRepository():
                 t.delete()
                 log.debug('Deleted orphan segment')
         annotation.delete()
-        log.info('Automatic TAG[{oid}/{otype}] deleted.'.format(oid=object_id, otype=object_type))
+        log.info(
+            'Automatic TAG[{oid}/{otype}] deleted.'.format(oid=object_id, otype=object_type))
 
     def deduplicate_tags(self, bodies, target, selector):
         ''' Check for esisting bodies for the given target. If all bodies

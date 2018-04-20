@@ -32,7 +32,8 @@ class Annotations(GraphBaseOperations):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
-    allowed_motivations = ('tagging', 'describing', 'commenting', 'replying')
+    allowed_motivations = ('tagging', 'describing',
+                           'commenting', 'replying', 'segmentation')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -192,6 +193,17 @@ class Annotations(GraphBaseOperations):
                     raise RestApiException(
                         'Invalid TextualBody',
                         status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'TVSBody':
+                segments = body.get('segments')
+                if segments is None or type(segments) is not list or len(segments) == 0:
+                    raise RestApiException(
+                        'Invalid TVSBody: invalid or missing segments',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                for s_val in segments:
+                    if s_val is None or not SELECTOR_PATTERN.match(s_val):
+                        raise RestApiException(
+                            'Invalid selector value for: ' + s_val,
+                            status_code=hcodes.HTTP_BAD_REQUEST)
             else:
                 raise RestApiException(
                     'Invalid body type for: {}'.format(b_type))
@@ -201,6 +213,24 @@ class Annotations(GraphBaseOperations):
         if motivation == 'describing':
             created_anno = repo.create_dsc_annotation(
                 user, bodies, targetNode, selector, is_private, embargo_date)
+        elif motivation == 'segmentation':
+            if b_type != 'TVSBody':
+                raise RestApiException(
+                    "Invalid body [{b_type}] for segmentation request. "
+                    "Expected TVSBody."
+                    .format(b_type=b_type),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if target_type != 'item':
+                raise RestApiException(
+                    "Invalid target. Only item allowed."
+                    .format(b_type=b_type),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            try:
+                created_anno = repo.create_tvs_manual_annotation(
+                    user, bodies, targetNode, is_private, embargo_date)
+            except DuplicatedAnnotationError as error:
+                raise RestApiException(error.args[0],
+                                       status_code=hcodes.HTTP_BAD_CONFLICT)
         else:
             try:
                 created_anno = repo.create_tag_annotation(
@@ -274,7 +304,8 @@ class Annotations(GraphBaseOperations):
             elif anno.annotation_type == 'TAG':
                 repo.delete_auto_annotation(anno)
             else:
-                raise ValueError('Cannot delete anno {id}'.format(id=anno.uuid))
+                raise ValueError(
+                    'Cannot delete anno {id}'.format(id=anno.uuid))
         except ReferenceError as error:
             raise RestApiException(
                 error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
@@ -385,7 +416,8 @@ class Annotations(GraphBaseOperations):
         """
         res = self.getJsonResponse(anno, max_relationship_depth=0)
         if anno.creator is not None:
-            creator = self.getJsonResponse(anno.creator.single(), max_relationship_depth=0)
+            creator = self.getJsonResponse(
+                anno.creator.single(), max_relationship_depth=0)
             if 'links' in creator:
                 del(creator['links'])
             res['creator'] = creator
@@ -397,11 +429,13 @@ class Annotations(GraphBaseOperations):
             res['bodies'].append(body)
         res['targets'] = []
         for t in anno.targets.all():
-            target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
+            target = self.getJsonResponse(
+                t.downcast(), max_relationship_depth=0)
             if 'links' in target:
                 del(target['links'])
             res['targets'].append(target)
-        source = self.getJsonResponse(anno.source_item.single(), max_relationship_depth=0)
+        source = self.getJsonResponse(
+            anno.source_item.single(), max_relationship_depth=0)
         if 'links' in source:
             del(source['links'])
         res['source'] = source
