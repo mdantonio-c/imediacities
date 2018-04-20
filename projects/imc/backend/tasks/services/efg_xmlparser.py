@@ -247,7 +247,17 @@ class EFG_XMLParser():
                     keyword['term'] = term.text.strip()
                 log.debug('keyword: {} | {}'.format(
                     keyword['language'], keyword['term']))
-                keyword['termID'] = term.get('id')
+                #log.debug('term id: %s' % term.get('id'))
+                if term.get('id') is not None:
+                    # check keyword term id is integer (keyword term id is optional)
+                    try:
+                        int(term.get('id'))
+                        keyword['termID'] = term.get('id')
+                    except Exception:
+                        self.warnings.append(
+                            'Invalid keyword term id for: ' + term.get('id') + '. Expected integer.')
+                else:
+                    keyword['termID'] = None
                 keyword['schemeID'] = node.get('scheme')
                 keywords.append(keyword)
         return keywords

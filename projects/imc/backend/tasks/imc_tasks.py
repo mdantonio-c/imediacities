@@ -68,48 +68,18 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         self.graph = celery_app.get_service('neo4j')
 
         xml_resource = None
+        try:                                           
+            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
+            xml_resource, group, source_id, item_type, item_node = update_meta_stage(
+                self, resource_id, path, metadata_update)
+            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            progress(self, 'Updated metadata', path)
+        except Exception as e:
+            progress(self, 'Failed updating metadata', path)
+            log.error("Task error, %s" % e)
+            raise e
+
         try:
-            xml_resource = self.graph.MetaStage.nodes.get(uuid=resource_id)
-
-            group = GraphBaseOperations.getSingleLinkedNode(
-                xml_resource.ownership)
-
-            # METADATA EXTRACTION
-            progress(self, 'Extracting descriptive metadata', path)
-
-            source_id = extract_creation_ref(self, path)
-            if source_id is None:
-                raise Exception(
-                    "No source ID found importing metadata file %s" % path)
-
-            item_type = extract_item_type(self, path)
-            if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
-                raise Exception("Invalid content type for: " + item_type)
-            log.info("Content source ID: {0}; TYPE: {1}".format(
-                source_id, item_type))
-
-            # check for existing item
-            item_node = xml_resource.item.single()
-            # if item_node is not None:
-            #     log.debug("Item already exists for metadata Stage[%s]" % path)
-            #     item_node = xml_resource.item.single()
-            # else:
-            if item_node is None:
-                item_properties = {}
-                item_properties['item_type'] = item_type
-                item_node = self.graph.Item(**item_properties).save()
-                item_node.ownership.connect(group)
-                item_node.meta_source.connect(xml_resource)
-                item_node.save()
-                log.debug("Item resource created")
-
-            creation = item_node.creation.single()
-            if creation is not None and not metadata_update:
-                log.info('Skip updating metadata')
-            else:
-                xml_resource.warnings = extract_descriptive_metadata(
-                    self, path, item_type, item_node)
-
             # To ensure that the content item and its metadata will be
             # correctly linked in the system and its repositories,
             # FHI-Partners are expected to name the content item file,
@@ -150,28 +120,15 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             fast = False
             if mode is not None:
                 mode = mode.lower()
+
                 if mode == 'skip':
                     log.info('Analyze skipped for source id: ' + source_id)
-                    xml_resource.status = 'COMPLETED'
-                    xml_resource.status_message = 'Nothing to declare'
-                    xml_resource.save()
-                    content_node.status = 'SKIPPED'
-                    content_node.status_message = 'Nothing to declare'
-                    content_node.save()
+                    if content_node is not None:
+                        content_node.status = 'SKIPPED'
+                        content_node.status_message = 'Nothing to declare'
+                        content_node.save()
                     return 1
                 fast = (mode == 'fast')
-
-            # at the moment SKIP pipeline for NON-AV Entity
-            # if item_type != 'Video':
-            #     if content_node is not None:
-            #         content_node.status = 'SKIPPED'
-            #         content_node.status_message = 'Pipeline for Non AV entity not yet implemented'
-            #         content_node.save()
-
-            #     xml_resource.status = 'COMPLETED'
-            #     xml_resource.status_message = 'Nothing to declare'
-            #     xml_resource.save()
-            #     return 1
 
             if content_node is None:
                 raise Exception(
@@ -244,19 +201,15 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             content_node.status_message = 'Nothing to declare'
             content_node.save()
 
-            xml_resource.status = 'COMPLETED'
-            xml_resource.status_message = 'Nothing to declare'
-            xml_resource.save()
-
             progress(self, 'Completed', path)
 
         except Exception as e:
             progress(self, 'Import error', None)
             log.error("Task error, %s" % e)
-            if xml_resource is not None:
-                xml_resource.status = 'ERROR'
-                xml_resource.status_message = str(e)
-                xml_resource.save()
+            if content_node is not None:
+                content_node.status = 'ERROR'
+                content_node.status_message = str(e)
+                content_node.save()
             raise e
 
         return 1

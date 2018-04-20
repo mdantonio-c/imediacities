@@ -132,8 +132,8 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
 
     if until_date is not None:
         until_date = parse_date(until_date)
-        if from_date is None:
-            log.exit("Unable to convert util date")
+        if until_date is None:
+            log.exit("Unable to convert until date")
 
     report_data = {
         'downloaded': 0,

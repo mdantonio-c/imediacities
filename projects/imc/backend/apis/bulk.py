@@ -17,6 +17,7 @@ POST api/bulk
 # from utilities.helpers import get_api_url
 # from restapi.confs import PRODUCTION
 import os
+import re
 from shutil import copyfile
 from datetime import datetime
 from utilities.logs import get_logger
@@ -154,14 +155,26 @@ class Bulk(GraphBaseOperations):
                 #  come nome del file uso quello nella forma standard "<archive code>_<source id>.xml"
                 #  quindi prima devo estrarre il source id dal file stesso
                 logger.debug("Extracting source id from metadata file %s" % filename)
-                source_id = self.extract_creation_ref(file_path)
-                if source_id is None:
-                    logger.debug("No source ID found: SKIPPED filename %s" % file_path)
+                source_id = None
+                try:
+                    source_id = self.extract_creation_ref(file_path)
+                    if source_id is None:
+                        logger.debug("No source ID found: SKIPPED filename %s" % file_path)
+                        skipped += 1
+                        continue
+                except Exception as e:
+                    logger.error("Exception %s" % e)
+                    logger.error("Cannot extract source id: SKIPPED filename %s" % file_path)
                     skipped += 1
                     continue
 
                 logger.debug("Found source id %s" % source_id)
-                standard_filename = group.shortname + '_' + source_id + '.xml'
+
+                # To use source id in the filename we must 
+                # replace non alpha-numeric characters with a dash
+                source_id_clean = re.sub(r'[\W_]+', '-', source_id.strip())
+
+                standard_filename = group.shortname + '_' + source_id_clean + '.xml'
                 standard_path = os.path.join(upload_dir, standard_filename)
                 try:
                     copyfile(file_path, standard_path)
