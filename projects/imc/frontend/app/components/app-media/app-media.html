@@ -1,0 +1,150 @@
+<div *ngIf="mediaData" class="page-type-video"> <!--page-type-image è la classe da cambiare se siamo nell'item picture-->
+
+    <!-- TOPBAR -->
+    <app-media-top-bar></app-media-top-bar>
+
+    <!-- VIDEO PLAYER / PICTURE -->
+    <div class="container-media row no-gutters justify-content-md-center">
+       <div class="box-title-media col-6 row no-gutters">
+            <h2 class="imc--title-bold col-12">Bologna Monumentale</h2>
+            <p class="col-8 imc--flex--vertical-start">
+                <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp; Bologna - 1922
+            </p>
+            <span class="col-2">1.000 views</span>
+            <span class="col-2">30 annotations</span>
+        </div>
+        <span class="col-3"></span>
+        <section class="box-media col-6">
+            <app-video-player [data]="mediaData" [shots]="shots"></app-video-player>
+            <!-- <app-picture></app-picture> -->
+            <!--
+                Spostato internamente ad app-video-player per migliore integrazione
+                <app-video-tag *ngIf="shots && shots.length" [data]="shots" [video]="mediaData"></app-video-tag>
+            -->
+        </section>
+
+        <!-- TAB SHOTS / SEGMENTS / AREAS-->
+        <section class="col-3 box-shots">
+            <div class="imc--toolbar col-12 row no-gutters">
+                <span class="col-7 imc--flex--vertical-center">Shots</span>
+                <span class="col-5 imc--flex--horizontal-end">
+                    <ul class="nav nav-pills mb-3 tab-shots" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">
+                                <i class="material-icons">movie</i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">
+                                <i class="material-icons">content_cut</i>
+                            </a>
+                        </li>
+                        <!--<li class="nav-item">
+                            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+                        </li>-->
+                    </ul>
+                </span>
+            </div>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <!-- tab shots -->
+                    <div *ngIf="shots && shots.length">
+                        <app-video-shot *ngFor="let shot of shots" [data]="shot" [multiSelection]="activeAnnotation"></app-video-shot>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                    <!-- tab segmenti -->
+
+                        <!--<app-video-shot [multiSelection]="activeAnnotation"></app-video-shot>-->
+                        <!-- Blocco di codice se non ci sono elementi al suo interno-->
+
+                        <div class="container-info-element">
+                            <p>no segments</p>
+                            <span class="info-element-button">
+                                <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                                <button class="btn btn-border-classic">Create Segment<!--Cancel--></button>
+                            </span>
+                        </div>
+
+                </div>
+                <!--<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>-->
+
+                <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
+                <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
+                    <button class="btn btn-border-classic" *ngIf="!activeAnnotation"
+                            (click)="activeMultiAnnotation()">multiple annotation</button>
+
+                    <ng-container *ngIf="activeAnnotation">
+                        <!-- La select compare all'attivazione della selezione multipla per l'aggiunta di annotazioni -->
+                        <select class="imc--input col-5" #addAnnotation>
+                            <option selected>Add annotation</option>
+                            <option value="0">Add Tag</option>
+                            <option value="1">Add Geotag</option>
+                            <option value="2">Add Note</option>
+                            <option value="3">Add Reference</option>
+                            <option value="3">Add Link</option>
+                        </select>&nbsp;
+                        <span class="col-6">
+                            <button class="btn btn-border-classic" (click)="activeMultiAnnotation()">Cancel selection</button>
+                        </span>
+                    </ng-container>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- MAPPA -->
+    <app-media-map></app-media-map>
+
+    <!-- CONTAINER INFO -->
+    <div class="container-fluid imc--container">
+        <div class="row no-gutters">
+
+            <!-- TABS INFO -->
+            <section class="imc--tab col-8">
+                <app-media-info [info]="mediaData" [user_language]="user_language"></app-media-info>
+            </section>
+
+            <!-- MEDIA TAGS -->
+            <section class="col-4 imc--colonna-destra">
+                <app-media-tags *ngIf="shots && shots.length" [shots]="shots"></app-media-tags>
+            </section>
+        </div>
+    </div>
+
+    <!-- Button trigger modal TEST-->
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="selectionModal('insert-tag')">
+        Insert Tag
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="selectionModal('insert-geotag')">
+        Insert Geotag
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="selectionModal('insert-note')">
+        Insert Note
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="selectionModal('insert-link')">
+        Insert Link
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="selectionModal('insert-link')">
+        Insert Reference
+    </button>
+
+    <!-- Modal -->
+    <div class="imc--modal modal fade" id="mediaModal" tabindex="-1" role="dialog" aria-labelledby="mediaModalTitle"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <app-modal-insert-termtag *ngIf="modale === 'insert-tag'" [data]="modaleData"></app-modal-insert-termtag>
+            <app-modal-insert-geotag *ngIf="modale === 'insert-geotag'"></app-modal-insert-geotag>
+            <app-modal-insert-note *ngIf="modale === 'insert-note'"></app-modal-insert-note>
+            <app-modal-insert-link *ngIf="modale === 'insert-link'"></app-modal-insert-link>
+            <app-modal-insert-reference *ngIf="modale === 'insert-reference'"></app-modal-insert-reference>
+            <app-modal-all-annotations *ngIf="modale === 'all-annotations'"></app-modal-all-annotations>
+        </div>
+    </div>
+
+
+</div>
+
+
+

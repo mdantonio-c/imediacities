@@ -591,7 +591,7 @@ element.style {
 /* Button */
 button:focus {outline:0;}
 
-.btn {
+/*.btn {
     color: #FFF!important;
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
     background-image: none!important;
@@ -604,7 +604,7 @@ button:focus {outline:0;}
     vertical-align: middle;
     margin: 0;
     position: relative;
-}
+}*/
 
 .btn-group .dropdown-toggle, .input-group-lg>.form-control, .input-group-lg>.input-group-addon, .input-group-lg>.input-group-btn>.btn {
 	border-radius: 0
@@ -631,10 +631,10 @@ button.btn:active {
 	top: 1px;
 }
 
-.btn, .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+/*.btn, .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
 	background-color: #ABBAC3 !important;
 	border-color: #ABBAC3;
-}
+}*/
 
 .btn-default.focus:hover, .btn-default:active:hover, .btn-default:focus:active, .btn-default:focus:hover, .btn-default:hover, .btn.focus:hover, .btn:active:hover, .btn:focus:active, .btn:focus:hover, .btn:hover, .open>.btn-default.dropdown-toggle, .open>.btn-default.dropdown-toggle.focus, .open>.btn-default.dropdown-toggle:active, .open>.btn-default.dropdown-toggle:focus, .open>.btn-default.dropdown-toggle:hover, .open>.btn.dropdown-toggle, .open>.btn.dropdown-toggle.focus, .open>.btn.dropdown-toggle:active, .open>.btn.dropdown-toggle:focus, .open>.btn.dropdown-toggle:hover {
 

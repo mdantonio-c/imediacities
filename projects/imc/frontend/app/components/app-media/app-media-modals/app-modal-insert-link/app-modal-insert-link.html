@@ -1,0 +1,72 @@
+<!-- Modale per l'iserimento di link -->
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Link</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <h4>Shot: 4</h4>
+
+        <div class="row modal-body-content">
+
+            <!-- Anteprima del video -->
+            <div class="col-5 row no-gutters modal-media--info">
+                <span class="col-5"><strong>00:02:00:40</strong></span>
+                <span class="col-4">frame-range: 540-821</span>
+                <span class="col-3 imc--flex--horizontal-end">duration: 47s</span>
+
+                <!-- Video palyer -->
+                <span class="col-12 modal-media--anteprima"></span>
+
+                <!-- Anteprime di altri shots dopo la selezione multipla -->
+                <div class="col-12 row no-gutters">
+                    <span class="imc--thumb"></span>
+                    <span class="imc--thumb"></span>
+                </div>
+            </div>
+
+            <!-- Aggiunta della nota -->
+            <div class="col-7 row no-gutters">
+               <span class="col-11">
+                   <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                      <label class="custom-control-label imc--radio-label" for="customRadioInline1">Insert URL</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input">
+                      <label class="custom-control-label imc--radio-label" for="customRadioInline2">Search in IMC</label>
+                    </div>
+               </span>
+                <span class="col-11 row imc--flex--vertical-center space-paragraph-20">
+                   <span class="col-9">
+                       <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url">
+                   </span>
+                    <span class="col-2">
+                        <button class="btn btn-accent">Add</button>
+                    </span>
+               </span>
+                <span class="col-11 row imc--flex--vertical-center space-paragraph-20">
+                   <span class="col-9">
+                       <input type="text" class="imc--input imc--input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
+                   </span>
+                    <span class="col-2">
+                        <button class="btn btn-accent">Search</button>
+                    </span>
+                    <div class="col-12">checkbox</div>
+               </span>
+
+                <!-- Media da collegare -->
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-accent">Save</button>
+    </div>
+</div>

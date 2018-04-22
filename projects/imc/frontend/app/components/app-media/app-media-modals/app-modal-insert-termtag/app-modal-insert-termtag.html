@@ -1,0 +1,139 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <!-- Il titolo sarà dinamico -->
+        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Tag</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <h4>Shot: <span [innerHTML]="shot_corrente.attributes.shot_num+1"></span></h4>
+
+       <div class="row modal-body-content">
+            <!-- Anteprima del video -->
+           <div class="col-5 row no-gutters modal-media--info">
+               <span class="col-5"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
+               <span class="col-4">frame-range:
+                    <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
+                    -
+                    <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
+               </span>
+               <span class="col-3 imc--flex--horizontal-end">
+                   <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
+               </span>
+
+               <!-- Video palyer -->
+               <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
+                   <app-video-player layout="modale" [data]="mediaData" [shots]="shots"></app-video-player>
+               </span>
+
+               <!-- Anteprime di altri shots dopo la selezione multipla -->
+               <div class="col-12 row no-gutters">
+                   <span class="imc--thumb"
+                         *ngFor="let shot of data.shots">
+                        <img [src]="shot.links.thumbnail" alt="">
+                        <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
+                    </span>
+               </div>
+           </div>
+
+            <!-- Vocabulary -->
+           <div class="col-3">
+               <h5>Vocabulary</h5>
+
+               <div class="imc--container-tree">
+
+                   <ul *ngIf="vocabolario && vocabolario_visualizza">
+                       <li *ngFor="let term of vocabolario.terms" style="border:0;border-bottom:1px solid #eee">
+                           <h3 style="margin-bottom:0;">
+                               <span class="term"(click)="vocabolario_term($event)"
+                                     style="
+                                        display:flex;
+                                        width:100%;
+                                        padding:4px 10px;
+                                        justify-content: space-between;
+                                        cursor:pointer;
+                                ">
+                                   <span [innerHTML]="term.label"></span>
+                                   <i class="material-icons" style="">keyboard_arrow_down</i>
+                               </span>
+                           </h3>
+                           <ul class="term-list display-none">
+                               <li *ngFor="let child of term.children" style="border:0;border-bottom:1px solid #eee">
+                                   <span class="term" (click)="vocabolario_child($event)" style="
+                                        display:flex;
+                                        width:100%;
+                                        justify-content: space-between;
+                                        cursor:pointer;
+                                        background:#f7f7f7;
+                                        padding:4px 10px 4px 15px;
+                                        border:0;
+                                        font-weight:500;
+                                    ">
+                                       <span [innerHTML]="child.label"></span>
+                                       <i class="material-icons" style="" *ngIf="child.children">keyboard_arrow_down</i>
+                                   </span>
+                                   <ul class="child-list display-none">
+                                       <li *ngFor="let leaf of child.children let last = last" [ngStyle]="{'border-bottom': (last ? '1px solid #eee' : 0)}" style="
+                                            display:flex;
+                                            width:100%;
+                                            justify-content: space-between;
+                                            cursor:pointer;
+                                            background:#fafafa;
+                                            padding:4px 10px 4px 20px;
+                                            border:0;
+                                            border-bottom:1px solid #eee
+                                        ">
+                                           <span class="term" [innerHTML]="leaf.label" (click)="vocabolario_leaf(leaf)"></span>
+                                       </li>
+                                   </ul>
+                               </li>
+                           </ul>
+                       </li>
+                   </ul>
+
+               </div>
+
+
+           </div>
+
+            <!-- Search termtag -->
+           <div class="col-4 row no-gutters">
+               <div class="row no-gutters imc--flex--vertical-end">
+                   <span class="col-8">
+                       <input type="text" class="imc--input imc--input-search" placeholder="Search here" aria-label="Tag">
+                   </span>
+                   <span class="col-4 imc--flex--horizontal-end">
+                       <button type="button" class="btn btn-accent">Add term</button>
+                   </span>
+               </div>
+
+               <!-- Tag appena inseriti -->
+               <div class="col-12 new-badge space-paragraph-25">
+                   <a href="#" class="badge badge-termtag">statua</a>
+                   <a href="#" class="badge badge-termtag">ciclista</a>
+               </div>
+               <!-- Attivazione della data di pubblicazione -->
+               <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
+                   <div class="col-1 box-checkbox">
+                       <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
+                       <label for="multi-annotation"></label>
+                   </div>
+                   <div class="col-7">
+                       <input class="imc--input imc--input-data" type="date" placeholder="Not public until">
+                   </div>
+               </div>
+               <div class="col-12 space-paragraph-25">
+                   <a href="#" class="badge badge-termtag">albero</a>
+                   <a href="#" class="badge badge-termtag--auto">Quercia</a>
+               </div>
+           </div>
+
+       </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-accent">Save</button>
+    </div>
+</div>

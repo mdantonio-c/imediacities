@@ -1,0 +1,54 @@
+<!-- Modale per l'iserimento di nuove note -->
+
+<div class="modal-content">
+    <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Note</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <h4>Shot: 4</h4>
+
+        <div class="row modal-body-content">
+
+            <!-- Anteprima del video -->
+            <div class="col-5 row no-gutters modal-media--info">
+                <span class="col-5"><strong>00:02:00:40</strong></span>
+                <span class="col-4">frame-range: 540-821</span>
+                <span class="col-3 imc--flex--horizontal-end">duration: 47s</span>
+
+                <!-- Video palyer -->
+                <span class="col-12 modal-media--anteprima"></span>
+
+                <!-- Anteprime di altri shots dopo la selezione multipla -->
+                <div class="col-12 row no-gutters">
+                    <span class="imc--thumb"></span>
+                    <span class="imc--thumb"></span>
+                </div>
+            </div>
+
+            <!-- Aggiunta della nota -->
+            <div class="col-7 row no-gutters">
+               <span class="col-11">
+                   <input type="text" class="imc--input  space-paragraph-20" placeholder="Title" aria-label="Title">
+               </span>
+                <span class="col-11 space-paragraph-20">
+                    <textarea class="imc--input" placeholder="Text" aria-label="Text"></textarea>
+               </span>
+                <span class="col-4 space-paragraph-20">
+                   <select class="imc--input col-7" #visibility>
+                        <option selected value="0">Private</option>
+                        <option value="1">Public</option>
+                    </select>&nbsp;
+               </span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-accent">Save</button>
+    </div>
+</div>

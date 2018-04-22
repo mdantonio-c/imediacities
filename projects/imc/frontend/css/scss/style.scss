@@ -1,0 +1,35 @@
+// Variabili
+@import 'vars';
+// Tema e layout customizzato
+@import 'theme';
+// Header del sito
+@import 'header';
+// Topbar
+@import 'topbar';
+// Tabs
+@import 'tabs';
+// Badge per i tag
+@import 'badge';
+// Buttons customizzati
+@import 'buttons';
+// Commenti
+@import 'comments';
+// Tabs shots/segments/areas
+@import 'tabs_shots';
+
+// Stile generale
+body, a, .material-icons {
+  color: $text-color;
+  font-size: $font-size !important;
+  font-family: $font-family;
+
+}
+
+.material-icons {
+  font-size: 25px !important;
+
+  &.xlarge {
+    font-size: 60px !important;
+  }
+}
+
