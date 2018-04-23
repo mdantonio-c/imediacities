@@ -817,7 +817,7 @@
 		return language;
 	}
 	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter, $timeout,
-			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
+			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties, FormDialogService) {
 
 		var self = this;
 		var vid = $stateParams.v;
@@ -1399,6 +1399,8 @@
 					sharedProperties.setRecordProvider(
 						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 
+					sharedProperties.setItemId(self.video.relationships.item[0].id);
+
 					setTimeout(function() {
 						$scope.$apply(function() {
 							self.loading = false;
@@ -1642,6 +1644,23 @@
 		/////////////////////////////////////////////////////////
 		///////////////// MANUAL SEGMENTATION ///////////////////
 		/////////////////////////////////////////////////////////
+
+		self.loadManualSegments = function() {
+			//console.log("loading annotations for imageId: " + imageId);
+			self.loading = true;
+			DataService.getManualSegments(vid).then(
+				function(response) {
+					self.manualSegmentations = response.data;
+					noty.extractErrors(response, noty.WARNING);
+				},
+				function(error) {
+					console.log("get manual segment error: " + angular.toJson(error));
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+		self.loadManualSegments();
+		
 		self.startSegmentCreation = function() {
 			self.creatingSegment = true;
 		}
@@ -1683,17 +1702,29 @@
 		}
 
 		self.createSegment = function() {
-			var segment = {}
+			var target = 'item:' + sharedProperties.getItemId();
+			DataService.saveManualSegment(target, self.segmentStart, self.segmentEnd).then(
+				function(response) {
+					noty.showSuccess("Manual segment successfully created.");
+					self.loadManualSegments();
+					self.stopSegmentCreation();
+				},
+				function(error) {
+					console.log("Segment Creation error: " + angular.toJson(error));
+					self.stopSegmentCreation();
+					noty.extractErrors(error, noty.ERROR);
+				}
+			);
+/*			var segment = {}
 			segment['segmentid'] = 1 + self.manualSegmentations.length;
 			segment['start'] = self.segmentStart;
 			segment['end'] = self.segmentEnd;
 			segment['creator'] = $rootScope.profile.uuid; 
 			self.manualSegmentations.push(segment);
-			self.stopSegmentCreation();
+			self.stopSegmentCreation();*/
 		}
-
+/*
 		self.deleteManualSegment = function(segment) {
-			if ($rootScope.profile.uuid == segment.creator) {
 
 				for (var i = 0; i < self.manualSegmentations.length; i++) {
 					if (self.manualSegmentations[i].segmentid == segment.segmentid) {
@@ -1703,6 +1734,30 @@
 				}
 			}
 		}
+*/
+
+		self.deleteManualSegment = function(segment) {
+
+			var text = "Are you really sure you want to delete this segment?";
+			var subtext = "This operation cannot be undone.";
+			FormDialogService.showConfirmDialog(text, subtext).then(
+				function(answer) {
+					DataService.deleteManualSegment(segment.id).then(
+						function(out_data) {
+				    		self.loadManualSegments();
+				    		noty.showWarning("Manual segment successfully deleted.");
+			    		},
+			    		function(out_data) {
+							noty.extractErrors(out_data, noty.ERROR);
+			    		}
+		    		);
+				},
+				function() {
+
+				}
+			);
+		}
+
 		// init variables	
 		self.stopSegmentCreation();
 		///////////////////////////////////////////////////////////

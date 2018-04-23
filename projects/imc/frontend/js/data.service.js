@@ -132,7 +132,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         data.body = body;
         if(note.privacy == "public"){
             data.private = false;
-        }else{
+        } else{
             data.private = true;            
         }
         // TODO manca embargo
@@ -159,6 +159,30 @@ function DataService($log, api, $q, jsonapi_parser) {
         data.motivation = "tagging";
         return api.apiCall('annotations', 'POST', data);  
     };
+
+    self.getManualSegments = function(videoId) {
+        return jsonapi_parser.parseResponse(
+            api.apiCall(
+                'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
+                )
+            );
+    }
+    self.saveManualSegment = function(target, startFrame, endFrame) {
+        var data = {
+            target: target,
+            body: {
+                type: "TVSBody",
+                segments: ["t="+startFrame+","+endFrame]
+            },
+            motivation: "segmentation"
+        }
+
+        return api.apiCall('annotations', 'POST', data);  
+    }
+
+    self.deleteManualSegment = function(uuid) {
+        return api.apiCall('annotations/'+uuid, 'DELETE');
+    }
 
     self.deleteAnnotation = function (annoId, bodyRef) {
         if (bodyRef !== undefined) {
