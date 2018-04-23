@@ -1405,6 +1405,7 @@
 						$scope.$apply(function() {
 							self.loading = false;
 							self.loadVideoShots(vid, self.currentvidDur);
+							self.loadManualSegments();
 						});
 					}, 2000);
 					noty.extractErrors(response, noty.WARNING);
@@ -1682,7 +1683,6 @@
 					noty.extractErrors(error, noty.ERROR);
 				});
 		};
-		self.loadManualSegments();
 		
 		self.startSegmentCreation = function() {
 			self.creatingSegment = true;
