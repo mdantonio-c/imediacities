@@ -299,8 +299,10 @@ class Annotations(GraphBaseOperations):
 
         repo = AnnotationRepository(self.graph)
         try:
-            if is_manual:
+            if is_manual and anno.annotation_type != 'TVS':
                 repo.delete_manual_annotation(anno, body_type, bid)
+            elif is_manual and anno.annotation_type == 'TVS':
+                repo.delete_tvs_manual_annotation(anno)
             elif anno.annotation_type == 'TAG':
                 repo.delete_auto_annotation(anno)
             else:
