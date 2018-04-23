@@ -58,7 +58,6 @@ def update_metadata(self, path, resource_id):
 
         return 1
 
-# TODO use update_meta_stage inside
 @celery_app.task(bind=True)
 def import_file(self, path, resource_id, mode, metadata_update=True):
     with celery_app.app.app_context():

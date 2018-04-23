@@ -216,21 +216,66 @@ class Bulk(GraphBaseOperations):
                     logger.debug("MetaStage not exist for source id %s " % source_id)
 
                 try:
+                    # se il source_id non esiste nel database, allora possono essere due i casi:
+                    #  1) e' l'import di un nuovo contenuto
+                    #  2) potrebbe esistere un MetaStage associato allo stesso filename
+                    #      ma senza una Creation associata perche' la volta precedente
+                    #      mancava un campo mandatory e quindi l'import era fallito
+                    #  Quindi prima di gestire il caso 1) devo verificare se siamo nel caso 2)
+                    #  Siamo nel caso 2) se esiste MetaStage associato allo stesso filename
+                    #   ma senza una Creation associata. Inoltre devo verificare che l'Item sia
+                    #    del tipo del contenuto che sto caricando (immagine, video,...).
+                    #  Quindi:
+                    #  - se esiste MetaStage associato allo stesso filename che e' associato
+                    #     a un Item di tipo diverso allora lancio eccezione e non proseguo.
+                    #  - se esiste MetaStage associato allo stesso filename che ha già una
+                    #     Creation associata (e quindi avrà un source_id diverso) allora lancio
+                    #     eccezione e non proseguo.
+                    #  
                     if meta_stage is None:
-                        # import di un nuovo contenuto
-                        logger.debug("Creating MetaStage for file %s" % standard_path)
-                        meta_stage = self.graph.MetaStage(**properties).save()
-                        meta_stage.ownership.connect(group)
-                        logger.debug("MetaStage created for source_id %s" % source_id)
-                        mode = "clean"
-                        task = CeleryExt.import_file.apply_async(
-                            args=[standard_path, meta_stage.uuid, mode],
-                            countdown=10
-                        )
-                        meta_stage.status = "IMPORTING"
-                        meta_stage.task_id = task.id
-                        meta_stage.save()
-                        created += 1
+
+                        try:
+                            resource = self.graph.MetaStage.nodes.get(**properties)
+                            logger.debug("MetaStage already exist for %s" % standard_path)
+
+                            # check for existing item
+                            item_node = resource.item.single()
+                            if item_node is not None:
+                                logger.debug("Item associated to MetaStage %s" % resource.uuid)
+                                #TODO check for item_type
+
+                                # check for existing creation
+                                creation = item_node.creation.single()
+                                if creation is not None:
+                                    logger.debug("A creation witha different SOURCE_ID is already associated to %s" % standard_path)
+                                    raise Exception('Existent creation for the same filename but with different SOURCE_ID')
+
+                            task = CeleryExt.update_metadata.apply_async(
+                                args=[standard_path, resource.uuid],
+                                countdown=10
+                            )
+                            logger.debug("Task id=%s" % task.id)
+                            resource.status = "UPDATING METADATA"
+                            resource.task_id = task.id
+                            resource.save()
+                            updated += 1
+
+                        except self.graph.MetaStage.DoesNotExist:                            
+                            # import di un nuovo contenuto
+                            logger.debug("Creating MetaStage for file %s" % standard_path)
+                            meta_stage = self.graph.MetaStage(**properties).save()
+                            meta_stage.ownership.connect(group)
+                            logger.debug("MetaStage created for source_id %s" % source_id)
+                            mode = "clean"
+                            task = CeleryExt.import_file.apply_async(
+                                args=[standard_path, meta_stage.uuid, mode],
+                                countdown=10
+                            )
+                            meta_stage.status = "IMPORTING"
+                            meta_stage.task_id = task.id
+                            meta_stage.save()
+                            created += 1
+
                     else:
                         #update dei soli metadati
                         logger.debug("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
