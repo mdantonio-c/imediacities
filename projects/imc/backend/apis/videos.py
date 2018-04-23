@@ -133,7 +133,6 @@ class VideoAnnotations(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         params = self.get_input()
-        logger.debug("inputs %s" % params)
         anno_type = params.get('type')
         if anno_type is not None:
             anno_type = anno_type.upper()
@@ -151,22 +150,32 @@ class VideoAnnotations(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         user = self.get_current_user()
+        is_manual = params.get('onlyManual')
+        if isinstance(is_manual, str) and (is_manual == '' or is_manual.lower() == 'true'):
+            is_manual = True
+        elif type(is_manual) == bool:
+            # do nothing
+            pass
+        else:
+            is_manual = False
 
         item = video.item.single()
         for a in item.targeting_annotations:
             if anno_type is not None and a.annotation_type != anno_type:
                 continue
+            creator = a.creator.single()
+            if is_manual and creator is None:
+                continue
             if a.private:
-                if a.creator is None:
+                if creator is None:
                     logger.warn('Invalid state: missing creator for private '
                                 'note [UUID:{}]'.format(a.uuid))
                     continue
-                creator = a.creator.single()
                 if creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
             del(res['links'])
-            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+            if a.annotation_type in ('TAG', 'DSC', 'TVS') and a.creator is not None:
                 res['creator'] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0)
             # attach bodies

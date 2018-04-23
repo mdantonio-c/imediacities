@@ -290,7 +290,8 @@ class AnnotationRepository():
                 int, s.lstrip('t=').split(','))
             log.debug('start:{}, end:{}'.format(s_start, s_end))
             if s_start > s_end:
-                raise ValueError('Invalid segment range. The start is greater than the end.')
+                raise ValueError(
+                    'Invalid segment range. The start is greater than the end.')
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
             log.debug('Segment does exist? {}'.format(
@@ -309,7 +310,8 @@ class AnnotationRepository():
                 # avoid duplicated segmentation for the same segment
                 existing_tvs_body = segment.annotation_body.single()
                 if existing_tvs_body is not None:
-                    warn_msg = 'Segmentation does already exist for {}'.format(s)
+                    warn_msg = 'Segmentation does already exist for {}'.format(
+                        s)
                     log.warn(warn_msg)
                     raise DuplicatedAnnotationError(warn_msg)
                 raise ValueError('Force Error')
@@ -324,6 +326,12 @@ class AnnotationRepository():
         if body:
             tvs_body = body.downcast()
             for segment in tvs_body.segments:
+                # avoid illegal state with orphan annotations
+                annotations = segment.annotation.all()
+                if annotations is not None and len(annotations) > 0:
+                    raise ValueError('TVS annotation [{anno_id}] cannot be'
+                                     ' deleted because referred by one or more'
+                                     ' other annotations'.format(anno_id=annotation.uuid))
                 segment.delete()
             tvs_body.delete()
         annotation.delete()

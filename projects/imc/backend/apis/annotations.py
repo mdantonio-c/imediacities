@@ -42,10 +42,9 @@ class Annotations(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
-        logger.debug('input: {}'.format(params))
-        type_f = params.get('type')
-        if type_f is not None:
-            type_f = type_f.upper()
+        anno_type = params.get('type')
+        if anno_type is not None:
+            anno_type = anno_type.upper()
 
         if anno_id is not None:
             # check if the video exists
@@ -58,9 +57,9 @@ class Annotations(GraphBaseOperations):
                     "Please specify a valid annotation id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             annotations = [anno]
-        elif type_f is not None:
+        elif anno_type is not None:
             annotations = self.graph.Annotation.nodes.filter(
-                annotation_type=type_f)
+                annotation_type=anno_type)
         else:
             annotations = self.graph.Annotation.nodes.all()
 
@@ -423,9 +422,20 @@ class Annotations(GraphBaseOperations):
             res['creator'] = creator
         res['bodies'] = []
         for b in anno.bodies.all():
-            body = self.getJsonResponse(b.downcast(), max_relationship_depth=0)
+            anno_body = b.downcast()
+            body = self.getJsonResponse(anno_body, max_relationship_depth=0)
             if 'links' in body:
                 del(body['links'])
+            if anno.annotation_type == 'TVS':
+                segments = []
+                for segment in anno_body.segments:
+                    # look at the most derivative class
+                    json_segment = self.getJsonResponse(
+                        segment.downcast(), max_relationship_depth=0)
+                    if 'links' in json_segment:
+                        del(json_segment['links'])
+                    segments.append(json_segment)
+                body['segments'] = segments
             res['bodies'].append(body)
         res['targets'] = []
         for t in anno.targets.all():
