@@ -161,11 +161,15 @@ function DataService($log, api, $q, jsonapi_parser) {
     };
 
     self.getManualSegments = function(videoId) {
-        return jsonapi_parser.parseResponse(
+/*        return jsonapi_parser.parseResponse(
             api.apiCall(
                 'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
                 )
             );
+*/
+        return api.apiCall(
+            'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
+        );
     }
     self.saveManualSegment = function(target, startFrame, endFrame) {
         var data = {

@@ -1650,7 +1650,27 @@
 			self.loading = true;
 			DataService.getManualSegments(vid).then(
 				function(response) {
-					self.manualSegmentations = response.data;
+
+					self.manualSegmentations = [];
+					for (var i = 0; i < response.data.length; i++) {
+
+						var values = response.data[i];
+
+						var segment = {} 
+
+						segment['creation_datetime'] = values.attributes.creation_datetime;
+						segment['creator'] = values.creator.id;
+
+						segment['segments'] = [];
+						for (var j = 0; j < values.bodies[0].segments.length; j++) {
+							segment['segments'].push(values.bodies[0].segments[j].attributes);
+						}
+
+						console.log(values);
+
+						self.manualSegmentations.push(segment);
+					}
+					/*self.manualSegmentations = response.data;*/
 					noty.extractErrors(response, noty.WARNING);
 				},
 				function(error) {

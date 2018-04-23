@@ -362,10 +362,8 @@
 					<table st-table="watchCtrl.manualSegmentations" class="table table-striped" ng-if="watchCtrl.manualSegmentations.length > 0">
 						<thead>
 							<tr>
-								<th st-sort="segmentid">ID</th>
 								<th st-sort="creation_datetime">Creation</th>
-								<th st-sort="start">start frame</th>
-								<th st-sort="end">end frame</th>
+								<th st-sort="start">Segments</th>
 								<th></th>
 							</tr>
 						</thead>
@@ -373,11 +371,12 @@
 							<tr ng-repeat="seg in watchCtrl.manualSegmentations | orderBy:'-seg.segmentid'">
 <!-- 								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(seg.startT,seg.shotNum)">{{seg.shotNum}}</a></td> -->
 <!-- <td>{{seg}}</td> -->
-								<td>{{ seg.id}}</td>
 								<td>{{ seg.creation_datetime}}</td>
-								<td>{{ seg.creator}}</td>
-								<td>{{ seg.start }}</td>
-								<td>{{ seg.end }}</td>
+								<td>
+									<div ng-repeat="segment in seg.segments">
+										{{ segment.start_frame_idx }} - {{ segment.end_frame_idx }}<br>
+									</div>
+								</td>
  								<td>
 									<a class="btn btn-danger btn-xs"
 										ng-click="watchCtrl.deleteManualSegment(seg)"
