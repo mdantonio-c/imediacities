@@ -1660,13 +1660,16 @@
 
 						segment['creation_datetime'] = values.attributes.creation_datetime;
 						segment['creator'] = values.creator.id;
+						segment['id'] = values.id;
 
 						segment['segments'] = [];
 						for (var j = 0; j < values.bodies[0].segments.length; j++) {
-							segment['segments'].push(values.bodies[0].segments[j].attributes);
+							var seg = {}
+							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
+							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
+							seg['id'] = values.bodies[0].segments[j].id;
+							segment['segments'].push(seg);
 						}
-
-						console.log(values);
 
 						self.manualSegmentations.push(segment);
 					}
@@ -1723,7 +1726,13 @@
 
 		self.createSegment = function() {
 			var target = 'item:' + sharedProperties.getItemId();
-			DataService.saveManualSegment(target, self.segmentStart, self.segmentEnd).then(
+
+			if (self.manualSegmentations.length == 0) {
+				var apicall = DataService.saveManualSegmentation(target, self.segmentStart, self.segmentEnd);
+			} else {
+				var apicall = DataService.saveManualSegment(self.manualSegmentations[0].id, self.segmentStart, self.segmentEnd)
+			}
+			apicall.then(
 				function(response) {
 					noty.showSuccess("Manual segment successfully created.");
 					self.loadManualSegments();
@@ -1735,37 +1744,40 @@
 					noty.extractErrors(error, noty.ERROR);
 				}
 			);
-/*			var segment = {}
-			segment['segmentid'] = 1 + self.manualSegmentations.length;
-			segment['start'] = self.segmentStart;
-			segment['end'] = self.segmentEnd;
-			segment['creator'] = $rootScope.profile.uuid; 
-			self.manualSegmentations.push(segment);
-			self.stopSegmentCreation();*/
+
 		}
-/*
+
 		self.deleteManualSegment = function(segment) {
 
-				for (var i = 0; i < self.manualSegmentations.length; i++) {
-					if (self.manualSegmentations[i].segmentid == segment.segmentid) {
-						self.manualSegmentations.splice(i, 1);
-						break;
-					}
-				}
+			if (self.manualSegmentations.length == 0) {
+				console.log("Unable to delete: no manual segmentation found");
+				return false;
 			}
-		}
-*/
-
-		self.deleteManualSegment = function(segment) {
-
-			var text = "Are you really sure you want to delete this segment?";
+			if (segment === undefined) {
+				var text = "Are you really sure you want to delete all segments?";
+				var single_delete = false;
+			} else {
+				var text = "Are you really sure you want to delete this segment?";
+				var single_delete = true;
+			}
 			var subtext = "This operation cannot be undone.";
 			FormDialogService.showConfirmDialog(text, subtext).then(
 				function(answer) {
-					DataService.deleteManualSegment(segment.id).then(
+					if (segment === undefined || self.manualSegmentations[0].segments.length <= 1) {
+						var apicall = DataService.deleteManualSegmentation(self.manualSegmentations[0].id);
+					} else {
+						var apicall = DataService.deleteManualSegment(self.manualSegmentations[0].id, segment.id);
+					}
+					apicall.then(
 						function(out_data) {
 				    		self.loadManualSegments();
-				    		noty.showWarning("Manual segment successfully deleted.");
+				    		if (single_delete) {
+				    			noty.showWarning("Manual segment successfully deleted.");
+				    		} else {
+				    			noty.showWarning("Manual segments successfully deleted.");
+
+				    		}
+
 			    		},
 			    		function(out_data) {
 							noty.extractErrors(out_data, noty.ERROR);

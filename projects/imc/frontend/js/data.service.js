@@ -171,7 +171,7 @@ function DataService($log, api, $q, jsonapi_parser) {
             'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
         );
     }
-    self.saveManualSegment = function(target, startFrame, endFrame) {
+    self.saveManualSegmentation = function(target, startFrame, endFrame) {
         var data = {
             target: target,
             body: {
@@ -184,8 +184,28 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('annotations', 'POST', data);  
     }
 
-    self.deleteManualSegment = function(uuid) {
+    self.saveManualSegment = function(annotation_id, startFrame, endFrame) {
+        var data = {
+            op: 'add',
+            path: '/bodies/0/segments',
+            value: "t="+startFrame+","+endFrame
+        }
+
+        return api.apiCall('annotations/'+annotation_id, 'PATCH', data);  
+    }
+
+    self.deleteManualSegmentation = function(uuid) {
         return api.apiCall('annotations/'+uuid, 'DELETE');
+    }
+
+    self.deleteManualSegment = function(annotation_id, segment_id) {
+        var data = {
+            op: 'remove',
+            path: '/bodies/0/segments',
+            value: segment_id
+        }
+
+        return api.apiCall('annotations/'+annotation_id, 'PATCH', data);  
     }
 
     self.deleteAnnotation = function (annoId, bodyRef) {

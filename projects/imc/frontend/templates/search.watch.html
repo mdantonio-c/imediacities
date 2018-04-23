@@ -358,32 +358,27 @@
 			<uib-tab heading="Manual Segmentation">
 				<div class="space-4"></div>
 				<div>
-					<p ng-if="watchCtrl.manualSegmentations.length == 0">No segments</p>
-					<table st-table="watchCtrl.manualSegmentations" class="table table-striped" ng-if="watchCtrl.manualSegmentations.length > 0">
+					<p ng-if="watchCtrl.manualSegmentations.length == 0 || watchCtrl.manualSegmentations[0].segments.length == 0">No segments</p>
+					<table st-table="watchCtrl.manualSegmentations[0].segments" class="table table-striped" ng-if="watchCtrl.manualSegmentations.length > 0 && watchCtrl.manualSegmentations[0].segments.length > 0">
 						<thead>
 							<tr>
-								<th st-sort="creation_datetime">Creation</th>
-								<th st-sort="start">Segments</th>
+								<th st-sort="start">Start</th>
+								<th st-sort="end">End</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="seg in watchCtrl.manualSegmentations | orderBy:'-seg.segmentid'">
+							<tr ng-repeat="seg in watchCtrl.manualSegmentations[0].segments | orderBy:'start'">
 <!-- 								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(seg.startT,seg.shotNum)">{{seg.shotNum}}</a></td> -->
 <!-- <td>{{seg}}</td> -->
-								<td>{{ seg.creation_datetime}}</td>
-								<td>
-									<div ng-repeat="segment in seg.segments">
-										{{ segment.start_frame_idx }} - {{ segment.end_frame_idx }}<br>
-									</div>
-								</td>
+								<td>{{ seg.start}}</td>
+								<td>{{ seg.end}}</td>
  								<td>
 									<a class="btn btn-danger btn-xs"
 										ng-click="watchCtrl.deleteManualSegment(seg)"
 										ng-confirm-click="Are you sure you want to delete this segment?"
 										tooltip-placement="left"
-										uib-tooltip="Delete segment"
-										ng-if="profile.uuid == seg.creator">
+										uib-tooltip="Delete segment">
 										<i class="fa fa-trash-o"> </i>
 									</a>
 								</td>
@@ -397,23 +392,30 @@
 					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
 
 					<button 
-						type="button" class=""
+						type="button" class="btn btn-secondary"
 						ng-if='!watchCtrl.creatingSegment'
 						ng-click="watchCtrl.startSegmentCreation()">
 						Create Segment
 					</button>
 					<button 
-						type="button" class=""
+						type="button" class="btn btn-warning"
 						ng-if='watchCtrl.creatingSegment'
 						ng-click="watchCtrl.stopSegmentCreation()">
 						Stop Creation
 					</button>
 
 					<button 
-						type="button" class=""
+						type="button" class="btn btn-success"
 						ng-if='watchCtrl.creatingSegment && watchCtrl.segmentStart !== undefined && watchCtrl.segmentEnd !== undefined'
 						ng-click="watchCtrl.createSegment()">
 						Confirm Creation
+					</button>
+
+					<button 
+						type="button" class="btn btn-danger"
+						ng-if='watchCtrl.manualSegmentations.length > 0'
+						ng-click="watchCtrl.deleteManualSegment()">
+						Delete all segments
 					</button>
 			</uib-tab>
 
