@@ -314,7 +314,6 @@ class AnnotationRepository():
                         s)
                     log.warn(warn_msg)
                     raise DuplicatedAnnotationError(warn_msg)
-                raise ValueError('Force Error')
             tvs_body.segments.connect(segment)
 
         return anno
