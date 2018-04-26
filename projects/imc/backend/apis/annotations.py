@@ -34,6 +34,7 @@ class Annotations(GraphBaseOperations):
     # module
     allowed_motivations = ('tagging', 'describing',
                            'commenting', 'replying', 'segmentation')
+    allowed_patch_operations = ('add', 'remove')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -399,6 +400,120 @@ class Annotations(GraphBaseOperations):
                 textual_body.language = body['language']
             textual_body.save()
             anno.save()
+        else:
+            raise RestApiException(
+                'Not yet implemented',
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+        updated_anno = self.get_annotation_response(anno)
+        del(updated_anno['links'])
+
+        return self.force_response(updated_anno)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def patch(self, anno_id):
+        if anno_id is None:
+            raise RestApiException(
+                "Please specify an annotation id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+
+        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        if anno is None:
+            raise RestApiException(
+                'Annotation not found',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        user = self.get_current_user()
+
+        creator = anno.creator.single()
+        if creator is None:
+            raise RestApiException(
+                'Annotation with no creator',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        if user.uuid != creator.uuid:
+            raise RestApiException(
+                'You cannot update an annotation that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
+        if anno.annotation_type not in ('TVS'):
+            raise RestApiException(
+                'Operation not allowed for annotation {}'
+                .format(anno.annotation_type),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        data = self.get_input()
+        if anno.annotation_type == 'TVS':
+            if 'op' not in data:
+                raise RestApiException(
+                    'Missing operation for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            patch_op = data['op']
+            if patch_op not in self.__class__.allowed_patch_operations:
+                raise RestApiException(
+                    "Bad patch operation: allowed one of %s" %
+                    (self.__class__.allowed_patch_operations, ),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'path' not in data:
+                raise RestApiException(
+                    'Missing path for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            path = data['path']
+            if path != '/bodies/0/segments':
+                raise RestApiException(
+                    'Invalid path to patch segmentation. Use "/bodies/0/segments"',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'value' not in data:
+                raise RestApiException(
+                    'Missing value for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            # check for segment value: expected single or multiple temporal
+            # range for add operation or single or multiple segment uuid for
+            # delete operation
+            values = data['value']
+            if not isinstance(values, list):
+                values = [values]
+            repo = AnnotationRepository(self.graph)
+            for value in values:
+                if patch_op == 'remove':
+                    logger.debug('remove a segment with uuid:{uuid}'
+                                 .format(uuid=value))
+                    segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+                    if segment is None:
+                        raise RestApiException(
+                            'Segment with ID {uuid} not found.'.format(uuid=value),
+                            status_code=hcodes.HTTP_BAD_NOTFOUND)
+                    try:
+                        repo.remove_segment(anno, segment)
+                    except ValueError as error:
+                        raise RestApiException(
+                            error.args[0],
+                            status_code=hcodes.HTTP_BAD_REQUEST)
+                    except DuplicatedAnnotationError as error:
+                        raise RestApiException(error.args[0],
+                                               status_code=hcodes.HTTP_BAD_CONFLICT)
+                    return self.empty_response()
+                elif patch_op == 'add':
+                    logger.debug('add a segment with value:{val}'
+                                 .format(val=value))
+                    if not SELECTOR_PATTERN.match(value):
+                        raise RestApiException(
+                            'Invalid value for: ' + value,
+                            status_code=hcodes.HTTP_BAD_REQUEST)
+                    try:
+                        repo.add_segment(anno, value)
+                    except DuplicatedAnnotationError as error:
+                        raise RestApiException(error.args[0],
+                                               status_code=hcodes.HTTP_BAD_CONFLICT)
+                else:
+                    # should NOT be reached
+                    raise RestApiException(
+                        'Operation {op} not yet implemented'.format(
+                            op=patch_op),
+                        status_code=hcodes.HTTP_NOT_IMPLEMENTED)
         else:
             raise RestApiException(
                 'Not yet implemented',

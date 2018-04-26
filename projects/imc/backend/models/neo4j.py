@@ -143,7 +143,7 @@ class ContentStage(Stage):
 
 class AnnotationTarget(HeritableStructuredNode):
     annotation = RelationshipFrom(
-        'Annotation', 'HAS_TARGET', cardinality=OneOrMore)
+        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
 
 
 class Item(TimestampedNode, AnnotationTarget):
