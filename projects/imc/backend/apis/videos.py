@@ -178,6 +178,7 @@ class VideoAnnotations(GraphBaseOperations):
             if a.annotation_type in ('TAG', 'DSC', 'TVS') and a.creator is not None:
                 res['creator'] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0)
+                del(res['creator']['links'])
             # attach bodies
             res['bodies'] = []
             for b in a.bodies.all():
@@ -195,9 +196,58 @@ class VideoAnnotations(GraphBaseOperations):
                         if 'links' in json_segment:
                             del(json_segment['links'])
                         # collect annotations and tags
-                        # json_segment['annotations'] = []
+                        # code duplicated for VideoShots.get
+                        json_segment['annotations'] = []
                         json_segment['tags'] = []
-                        # TODO
+                        # <dict(iri, name)>{iri, name, spatial, auto, hits}
+                        tags = {}
+                        for anno in segment.annotation.all():
+                            if anno.private:
+                                if creator is None:
+                                    logger.warn('Invalid state: missing creator for private '
+                                                'note [UUID:{}]'.format(anno.uuid))
+                                    continue
+                                if creator is not None and creator.uuid != user.uuid:
+                                    continue
+                            s_anno = self.getJsonResponse(anno, max_relationship_depth=0)
+                            del(s_anno['links'])
+                            if (anno.annotation_type in ('TAG', 'DSC') and
+                                    creator is not None):
+                                s_anno['creator'] = self.getJsonResponse(
+                                    anno.creator.single(), max_relationship_depth=0)
+                                del(s_anno['creator']['links'])
+                            # attach bodies
+                            s_anno['bodies'] = []
+                            for b in anno.bodies.all():
+                                mdb = b.downcast()  # most derivative body
+                                s_anno['bodies'].append(
+                                    self.getJsonResponse(mdb, max_relationship_depth=0))
+                                if anno.annotation_type == 'TAG':
+                                    spatial = None
+                                    if 'ResourceBody' in mdb.labels():
+                                        iri = mdb.iri
+                                        name = mdb.name
+                                        spatial = mdb.spatial
+                                    elif 'TextualBody' in mdb.labels():
+                                        iri = None
+                                        name = mdb.value
+                                    else:
+                                        # unmanaged body type for tag
+                                        continue
+                                    ''' only for manual tag annotations  '''
+                                    tag = tags.get((iri, name))
+                                    if tag is None:
+                                        tags[(iri, name)] = {
+                                            'iri': iri,
+                                            'name': name,
+                                            'hits': 1
+                                        }
+                                        if spatial is not None:
+                                            tags[(iri, name)]['spatial'] = spatial
+                                    else:
+                                        tag['hits'] += 1
+                            json_segment['annotations'].append(s_anno)
+                        json_segment['tags'] = list(tags.values())
                         segments.append(json_segment)
                     body['segments'] = segments
                 res['bodies'] .append(body)
@@ -266,7 +316,7 @@ class VideoShots(GraphBaseOperations):
                 res['bodies'] = []
                 for b in anno.bodies.all():
                     mdb = b.downcast()  # most derivative body
-                    res['bodies'] .append(
+                    res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                     if anno.annotation_type == 'TAG':
                         spatial = None
