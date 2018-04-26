@@ -164,7 +164,7 @@ class VideoAnnotations(GraphBaseOperations):
             if anno_type is not None and a.annotation_type != anno_type:
                 continue
             creator = a.creator.single()
-            if is_manual and creator is None:
+            if is_manual and (creator is None or creator.uuid != user.uuid):
                 continue
             if a.private:
                 if creator is None:
@@ -194,6 +194,10 @@ class VideoAnnotations(GraphBaseOperations):
                             segment.downcast(), max_relationship_depth=0)
                         if 'links' in json_segment:
                             del(json_segment['links'])
+                        # collect annotations and tags
+                        # json_segment['annotations'] = []
+                        json_segment['tags'] = []
+                        # TODO
                         segments.append(json_segment)
                     body['segments'] = segments
                 res['bodies'] .append(body)
