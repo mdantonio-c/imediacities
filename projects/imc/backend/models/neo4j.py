@@ -712,7 +712,7 @@ class VideoSegment(IdentifiedNode, AnnotationTarget):
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(required=True, show=True)
     annotation_body = RelationshipFrom(
-        'TVSBody', 'SEGMENT', cardinality=ZeroOrOne)
+        'TVSBody', 'SEGMENT', cardinality=ZeroOrMore)
     within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
