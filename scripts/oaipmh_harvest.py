@@ -108,6 +108,9 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
     ###################################
     registry = MetadataRegistry()
     registry.registerReader(metadata_prefix, oai_dc_reader)
+
+    #print ("URL=" + str(URL))
+
     client = Client(URL, registry)
 
     ####################################
@@ -156,6 +159,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
 
     log.info("Records retrieved, extracting...")
     try:
+
         for record in records:
             element = record[1].element()
             # Obtained eTree is based on namespaced XML
@@ -193,7 +197,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
 
             if avcreation is not None:
                 manifestation = avcreation.find(tag("avManifestation"))
-                # recordSource = avcreation.find(tag("recordSource"))
+                recordSource = avcreation.find(tag("recordSource"))
                 keywords = avcreation.findall(tag("keywords"))
                 title_el = avcreation.find(tag("identifyingTitle"))
                 title = (title_el.text
@@ -201,7 +205,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                          else "Unknown title")
             elif nonavcreation is not None:
                 manifestation = nonavcreation.find(tag("nonAVManifestation"))
-                # recordSource = nonavcreation.find(tag("recordSource"))
+                recordSource = nonavcreation.find(tag("recordSource"))
                 keywords = nonavcreation.findall(tag("keywords"))
                 title_el = nonavcreation.find(tag("title"))
                 title = (title_el.find(tag("text")).text
@@ -250,7 +254,13 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                     report_data['wrong_content_type'].append(title)
                     continue
 
-            recordSource = manifestation.find(tag("recordSource"))
+
+
+            # ATTENZIONE: il sourceID va preso dal recordSource che sta
+            #              sotto avcreation/nonavcreation e NON sotto
+            #               avManifestation/nonAVManifestation
+
+            #recordSource = manifestation.find(tag("recordSource"))
             if recordSource is None:
                 report_data['missing_sourceid'].append(title)
                 # log.warning("recordSource not found, skipping record")
@@ -262,7 +272,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                 # log.warning("sourceID not found, skipping record")
                 continue
 
-            content = etree.tostring(efgEntity, pretty_print=True)
+            content = etree.tostring(efgEntity, pretty_print=False)
 
             # id_text = urllib.parse.quote_plus(sourceID.text.strip())
             # replace non alpha-numeric characters with a dash
@@ -277,10 +287,14 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
             filepath = os.path.join(dest_folder, filename)
             # with open(filepath, 'wb') as f:
             with codecs.open(filepath, 'wb', "utf-8") as f:
-                f.write(html.unescape(content.decode('utf-8')))
+                f.write(content.decode('utf-8'))
+            # OLD
+            #with codecs.open(filepath, 'wb', "utf-8") as f:
+            #    f.write(html.unescape(content.decode('utf-8')))
 
             report_data['saved'] += 1
             report_data['saved_files'].append(filename)
+
     except NoRecordsMatchError as e:
         log.warning("No more records after filtering?")
         log.warning(e)
