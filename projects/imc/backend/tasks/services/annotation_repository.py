@@ -334,6 +334,23 @@ class AnnotationRepository():
             tvs_body.delete()
         annotation.delete()
 
+    def delete_tvs_manual_annotation(self, annotation):
+        log.debug('Delete existing manual TVS annotation')
+        body = annotation.bodies.single()
+        tvs_body = body.downcast()
+        for segment in tvs_body.segments:
+            # check if the segment is annotated
+            annotations = segment.annotation.all()
+            segmentations = segment.annotation_body.all()
+            if len(annotations) > 0 or len(segmentations) > 1:
+                # there exist related annotations or this segment is shared by
+                # some other segmentations: just disconnect the node.
+                tvs_body.segments.disconnect(segment)
+            else:
+                segment.delete()
+        tvs_body.delete()
+        annotation.delete()
+
     @graph_transactions
     def create_vim_annotation(self, item, estimates):
         if not estimates or len(estimates) == 0:
@@ -542,9 +559,11 @@ class AnnotationRepository():
 
         # check if the segment is annotated
         annotations = segment.annotation.all()
-        if annotations is not None and len(annotations) > 0:
-            log.debug('existing related annotations. Just disconnect the node.')
-            tvs_body.disconnect(segment)
+        segmentations = segment.annotation_body.all()
+        if len(annotations) > 0 or len(segmentations) > 1:
+            # there exist related annotations or this segment is shared by
+            # some other segmentations: just disconnect the node.
+            tvs_body.segments.disconnect(segment)
         else:
             segment.delete()
 
