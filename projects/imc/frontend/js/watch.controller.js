@@ -1657,7 +1657,7 @@
 
 						var values = response.data[i];
 
-						var segment = {} 
+						var segment = {};
 
 						segment['creation_datetime'] = values.attributes.creation_datetime;
 						segment['creator'] = values.creator.id;
@@ -1669,6 +1669,7 @@
 							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
 							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
 							seg['id'] = values.bodies[0].segments[j].id;
+							seg['tags'] = values.bodies[0].segments[j].tags;
 							segment['segments'].push(seg);
 						}
 

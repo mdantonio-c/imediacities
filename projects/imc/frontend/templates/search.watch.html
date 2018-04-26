@@ -356,69 +356,90 @@
 			</uib-tab>
 
 			<uib-tab heading="Manual Segmentation">
-				<div class="space-4"></div>
-				<div>
-					<p ng-if="watchCtrl.manualSegmentations.length == 0 || watchCtrl.manualSegmentations[0].segments.length == 0">No segments</p>
-					<table st-table="watchCtrl.manualSegmentations[0].segments" class="table table-striped" ng-if="watchCtrl.manualSegmentations.length > 0 && watchCtrl.manualSegmentations[0].segments.length > 0">
-						<thead>
-							<tr>
-								<th st-sort="start">Start</th>
-								<th st-sort="end">End</th>
-								<th></th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="seg in watchCtrl.manualSegmentations[0].segments | orderBy:'start'">
-<!-- 								<td><a ng-click="watchCtrl.jumpToShotFromAnnotation(seg.startT,seg.shotNum)">{{seg.shotNum}}</a></td> -->
-<!-- <td>{{seg}}</td> -->
-								<td>{{ seg.start}}</td>
-								<td>{{ seg.end}}</td>
- 								<td>
-									<a class="btn btn-danger btn-xs"
-										ng-click="watchCtrl.deleteManualSegment(seg)"
-										ng-confirm-click="Are you sure you want to delete this segment?"
-										tooltip-placement="left"
-										uib-tooltip="Delete segment">
-										<i class="fa fa-trash-o"> </i>
-									</a>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+			<div class="container"
+				ng-show="watchCtrl.showmeli"
+				ng-style="{'float': 'left', 'width': '100%'}">
+				<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+			</div>
+			<div class="segmentation" ng-hide="watchCtrl.showmeli">
+				<p ng-if="watchCtrl.manualSegmentations.length == 0 || watchCtrl.manualSegmentations[0].segments.length == 0">No segments</p>
+				<div class="media search-media" ng-repeat="seg in watchCtrl.manualSegmentations[0].segments | orderBy:'start'" style="height: 94px; padding-top: 6px;" ng-if="watchCtrl.manualSegmentations.length > 0 && watchCtrl.manualSegmentations[0].segments.length > 0">
+					<div class="media-left">
+						<img ng-src="{{seg.thumb}}" ng-if="seg.thumb"/>
+						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="seg.thumb == null"/>
+					</div>
+					<div class="media-content">
+						<div class="row">
+							<div class="col-xs-3">
+								<div class="shot-info" style="min-width: 110px;">
+									<h4>Segment {{$index+1}}</h4>
+									<span class="small">{{seg.start}}-{{seg.end}}</span>
+								</div>
+							</div>
+							<div class="col-xs-9">
+								<div class="anno-info">
+									<ul class="fa-ul">
+										<li ng-if="(seg.tags | filter: {spatial:'!'}).length !== 0">
+											<i class="fa-li fa fa-tags light-brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in seg.tags | filter: {spatial:'!'}">
+													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+										<li ng-if="(seg.tags | filter: {spatial:'!!'}).length !== 0">
+											<i class="fa-li fa fa-map-marker brown"></i>
+											<ul class="list-inline">
+												<li ng-repeat="tag in seg.tags | filter: {spatial:'!!'}">
+													<span class="label label-location">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="search-actions text-center">
+							<div class="action-buttons bigger-125 pull-right">
+								<a class="btn btn-danger btn-xs"
+									ng-click="watchCtrl.deleteManualSegment(seg)"
+									ng-confirm-click="Are you sure you want to delete this segment?"
+									tooltip-placement="left"
+									uib-tooltip="Delete segment">
+									<i class="fa fa-trash-o"> </i>
+								</a>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="container" 
-					ng-show="watchCtrl.showmeli"
-					ng-style="{'float': 'left', 'width': '100%'}">
-					<br/><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</div>
-
-					<button 
-						type="button" class="btn btn-secondary"
-						ng-if='!watchCtrl.creatingSegment'
-						ng-click="watchCtrl.startSegmentCreation()">
-						Create Segment
-					</button>
-					<button 
-						type="button" class="btn btn-warning"
-						ng-if='watchCtrl.creatingSegment'
-						ng-click="watchCtrl.stopSegmentCreation()">
-						Stop Creation
-					</button>
-
-					<button 
-						type="button" class="btn btn-success"
-						ng-if='watchCtrl.creatingSegment && watchCtrl.segmentStart !== undefined && watchCtrl.segmentEnd !== undefined'
-						ng-click="watchCtrl.createSegment()">
-						Confirm Creation
-					</button>
-
-					<button 
-						type="button" class="btn btn-danger"
-						ng-if='watchCtrl.manualSegmentations.length > 0'
-						ng-click="watchCtrl.deleteManualSegment()">
-						Delete all segments
-					</button>
+				<div class="space-4"></div>
+				<button
+				type="button" class="btn btn-secondary"
+				ng-if='!watchCtrl.creatingSegment'
+				ng-click="watchCtrl.startSegmentCreation()">
+				Create Segment
+				</button>
+				<button
+				type="button" class="btn btn-warning"
+				ng-if='watchCtrl.creatingSegment'
+				ng-click="watchCtrl.stopSegmentCreation()">
+				Stop Creation
+				</button>
+				<button
+				type="button" class="btn btn-success"
+				ng-if='watchCtrl.creatingSegment && watchCtrl.segmentStart !== undefined && watchCtrl.segmentEnd !== undefined'
+				ng-click="watchCtrl.createSegment()">
+				Confirm Creation
+				</button>
+				<button
+				type="button" class="btn btn-danger"
+				ng-if='watchCtrl.manualSegmentations.length > 0'
+				ng-click="watchCtrl.deleteManualSegment()">
+				Delete all segments
+				</button>
+			</div>
+			
 			</uib-tab>
-
 			</uib-tabset>
 		</div>
 	</div>
