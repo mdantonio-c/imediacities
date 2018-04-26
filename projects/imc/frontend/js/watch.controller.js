@@ -995,7 +995,7 @@
 			}, 50);
 		};
 
-		self.manualtag = function(mode) {
+		self.manualtag = function(mode, selector) {
 			console.log('manual tag: ' + mode);
 
 			// force the video to pause
@@ -1037,13 +1037,13 @@
 					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
 					
 					if (mode == 'term') {
-						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations, selector: selector});
 					}
 					else if (mode == 'notes') {
-						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
+						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, selector: selector});
 					}
 					else if (mode == 'location') {
-						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations, selector: selector});
 					}
 					// exit loop
 					break;
@@ -1910,17 +1910,19 @@
 				});
 		};
 
-		self.manualtag = function(mode) {
+		self.manualtag = function(mode, selector) {
 			console.log('manual tag: ' + mode);
+			if (selector !== undefined)
+				console.log('manual segment: ' + selector);
 			sharedProperties.setGroup(mode);
 			if (mode == 'term') {
-				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations});
+				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations, selector: selector});
 			}
 			else if (mode == 'notes') {
-				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: null});
+				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: null, selector: selector});
 			}
 			else if (mode == 'location') {
-				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations});
+				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations, selector: selector});
 			}
 		};
 
@@ -2290,6 +2292,7 @@
 		var self = this;
 		
 		$scope.geocodingResult = "";
+		$scope.selector = params.selector;
 
 		$scope.group = sharedProperties.getGroup();
 		$scope.labelTerm = sharedProperties.getLabelTerm();
@@ -2376,13 +2379,14 @@
 			var restring = locname + ' (lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locaddr + '\')';
 			$uibModalInstance.close($scope.vm.address.locality);
 			myGeoConfirmFactory.open('lg', 'result.html', {
-				result: restring
+				result: restring,
+				selector: $scope.selector
 			});
 		};
 
 		// itemType: IMAGE, VIDEO
 		// targetType: ITEM, SHOT
-		self.confirmVocabularyTerms = function(itemType,targetType) {
+		self.confirmVocabularyTerms = function(itemType,targetType, selector) {
 			//console.log('confirmVocabularyTerms: itemType=' + itemType);
 			//console.log('confirmVocabularyTerms: targetType=' + targetType);
 			//var vid = sharedProperties.getVideoId();
@@ -2395,7 +2399,7 @@
 			}
 			if (self.tags.length > 0) {
 				// save the annotation into the database
-				DataService.saveTagAnnotations(target, self.tags).then(
+				DataService.saveTagAnnotations(target, self.tags, selector).then(
 					function(resp) {
 						//console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
 						var annoId = resp.data.id;
@@ -2600,6 +2604,7 @@
 		$scope.latitude = sharedProperties.getLatitude();
 		$scope.longitude = sharedProperties.getLongitude();
 		$scope.format = sharedProperties.getFormAddr();
+		$scope.selector = params.selector;
 
 		// video SHOT
 		$scope.startT = sharedProperties.getStartTime();
@@ -2610,7 +2615,7 @@
 		// image
 		$scope.itemId = sharedProperties.getItemId();
 
-		$scope.ok = function(itemType,targetType) {
+		$scope.ok = function(itemType,targetType,selector) {
 			//console.log('geoResultController:ok: itemType=' + itemType);
 			//console.log('geoResultController:ok: targetType=' + targetType);
 			var target;
@@ -2631,7 +2636,7 @@
 			};
 
 			// save the annotation into the database
-			DataService.saveGeoAnnotation(target, source, spatial).then(
+			DataService.saveGeoAnnotation(target, source, spatial, selector).then(
 				function(resp) {
 					var annoId = resp.data.id;
 					var creatorId = resp.data.creator.id;

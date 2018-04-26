@@ -400,14 +400,34 @@
 							</div>
 						</div>
 						<div class="search-actions text-center">
-							<div class="action-buttons bigger-125 pull-right">
-								<a class="btn btn-danger btn-xs"
-									ng-click="watchCtrl.deleteManualSegment(seg)"
-									ng-confirm-click="Are you sure you want to delete this segment?"
-									tooltip-placement="left"
-									uib-tooltip="Delete segment">
-									<i class="fa fa-trash-o"> </i>
-								</a>
+							<div class="action-buttons">
+								<div class="btn-group">
+									<button class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.manualtag('location','t='+seg.start+','+seg.end)"
+										uib-tooltip="Tag by location"
+										tooltip-placement="bottom">
+										<i class="fa fa-globe"></i>
+									</button>
+									<button class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.manualtag('term','t='+seg.start+','+seg.end)"
+										uib-tooltip="Tag by term"
+										tooltip-placement="bottom">
+										<i class="fa fa-tag"></i>
+									</button>
+									<!-- <button class="btn btn-warning btn-xs"
+										ng-click="watchCtrl.manualtag('notes','t='+seg.start+','+seg.end)"
+										uib-tooltip="Add a note"
+										tooltip-placement="bottom">
+										<i class="fa fa-sticky-note"></i>
+									</button> -->
+									<button class="btn btn-danger btn-xs"
+										ng-click="watchCtrl.deleteManualSegment(seg)"
+										ng-confirm-click="Are you sure you want to delete this segment?"
+										tooltip-placement="bottom"
+										uib-tooltip="Delete segment">
+										<i class="fa fa-trash-o"></i>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -467,13 +487,19 @@
 	<script type="text/ng-template" id="myModalGeoCode.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a location to this shot</h4>
+			<h4 class="modal-title">Add a location to this <span ng-if="!selector">shot</span><span ng-if="selector">segment</span></h4>
 		</div>
 		<div class="modal-body">
-			<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
-			<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
-			<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
-			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+			<div ng-if="!selector">
+				<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
+				<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
+				<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
+			</div>
+			<div ng-if="selector">
+				<p class="modal-shot_info">Segment <b class="ng-binding">{{selector.replace('t=','').replace(',','-')}}</b></p>
+			</div>
+			<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image" ng-if="!selector">
+			<img alt="200x150" holder="holder.js/200x150?text=NO THUMBNAIL" ng-if="selector">
 			<div class="space-8"></div>
 			<p>Choose a location and click on the tag button.</p>
 			<form name="formAutocomplete">
@@ -505,7 +531,8 @@
 			<p><b>You searched for: </b>{{geoResult}}</p>
 		</div>
 		<div class="modal-footer">
-			<button class="btn btn-primary" type="button" ng-click="ok()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="ok()" ng-if="!selector">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="ok('VIDEO', 'ITEM', selector)" ng-if="selector">Confirm</button>
 			<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 		</div>
 	</script>
@@ -513,15 +540,19 @@
 	<script type="text/ng-template" id="myModalVocab.html">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="$tagCtrl.cancel()">x</button>
-			<h4 class="modal-title">Add a vocabulary term to this shot</h4>
+			<h4 class="modal-title">Add a vocabulary term to this <span ng-if="!selector">shot</span><span ng-if="selector">segment</span></h4>
 		</div>
 		<div class="modal-body">
 			<div class="row">
-				<div class="col-sm-4">
+				<div class="col-sm-4" ng-if="!selector">
 					<p class="modal-shot_info">Shot <b class="ng-binding">{{shotNum}}</b></p>
 					<p class="modal-shot_info">starting time (sec): <b class="ng-binding">{{startT | date:'mm:ss'}}</b></p>
 					<p class="modal-shot_info">ending: <b class="ng-binding">{{endT | date:'mm:ss'}}</b></p>
 					<img src="{{shotPNGImage}}" class="img-fluid" alt="Responsive image">
+				</div>
+				<div class="col-sm-4" ng-if="selector">
+					<p class="modal-shot_info">Segment <b class="ng-binding">{{selector.replace('t=','').replace(',','-')}}</b></p>
+					<img alt="200x150" holder="holder.js/200x150?text=NO THUMBNAIL">
 				</div>
 				<div class="col-sm-4">
 					<p>Choose one or more terms</p>
@@ -554,7 +585,8 @@
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()">Confirm</button>
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()" ng-if="!selector">
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms('VIDEO', 'ITEM', selector)" ng-if="selector">Confirm</button>
 		</div>
 	</script>
 	<!-- notes modal -->

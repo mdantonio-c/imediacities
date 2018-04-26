@@ -79,7 +79,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('videos/'+videoId+'/shots', 'GET');
     };
 
-    self.saveTagAnnotations = function(target, tags) {
+    self.saveTagAnnotations = function(target, tags, selector) {
         var data = {};
         data.target = target;
         if (tags.length === 1) {
@@ -115,6 +115,12 @@ function DataService($log, api, $q, jsonapi_parser) {
             data.body = bodies;
         }
         data.motivation = "tagging";
+        if (selector !== undefined) {
+            data.selector = {
+                type: "FragmentSelector",
+                value: selector
+            };
+        }
         return api.apiCall('annotations', 'POST', data);
     };
 
@@ -146,7 +152,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         }
     };
 
-    self.saveGeoAnnotation = function(target, source, spatial) {
+    self.saveGeoAnnotation = function(target, source, spatial, selector) {
         var data = {
             target: target,
             body: {
@@ -157,6 +163,12 @@ function DataService($log, api, $q, jsonapi_parser) {
             }
         };
         data.motivation = "tagging";
+        if (selector !== undefined) {
+            data.selector = {
+                type: "FragmentSelector",
+                value: selector
+            };
+        }
         return api.apiCall('annotations', 'POST', data);  
     };
 
