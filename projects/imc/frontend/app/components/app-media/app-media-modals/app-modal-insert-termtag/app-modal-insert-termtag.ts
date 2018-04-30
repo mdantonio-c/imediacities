@@ -1,100 +1,84 @@
-import {Component, OnInit, Input, AfterViewInit, ElementRef} from '@angular/core';
+
+import {Component, OnInit, OnChanges, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef} from '@angular/core';
 import {AppVideoService} from "../../../../services/app-video";
 import {AppShotsService} from "../../../../services/app-shots";
-import {HttpClient} from '@angular/common/http';
+import {AppVocabularyService} from "../../../../services/app-vocabulary";
+
+import {AppVideoPlayerComponent} from "../../app-video-player/app-video-player";
+
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppModaleService} from "../../../../services/app-modale";
+
 
 @Component({
     selector: 'app-modal-insert-termtag',
     templateUrl: 'app-modal-insert-termtag.html'
 })
 
-export class AppModalInsertTermtagComponent implements OnInit, AfterViewInit {
+export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterViewInit {
 
     @Input() data: any;
 
-    mediaData = null;
+    @ViewChild('videoPlayer') videoPlayer: AppVideoPlayerComponent;
+    @ViewChild('search_field') search_field: ElementRef;
 
-    shots = null;
-    shot_corrente = null;
+
+    // mediaData = null;
+
+    // shots = null;
+    // shot_corrente = null;
 
     vocabolario = null;
     vocabolario_visualizza = false;
 
+    ricerca_risultati = [];
+
     terms = [];
 
+    constructor(
+        private VocabularyService: AppVocabularyService,
+    ) {}
 
+    vocabolario_term (term) {
+        term.open = !term.open;
 
-    constructor(private http: HttpClient, private VideoService: AppVideoService, private ShotsService: AppShotsService, private elRef: ElementRef) {
-        this.mediaData = this.VideoService.video();
-        this.shots = this.ShotsService.shots();
-
-        this.http.get('/static/assets/vocabulary/vocabulary.json')
-            .subscribe(
-                response => {
-                    console.log("response",  response);
-                    this.vocabolario = response;
-                },
-                err => {
-                    console.log('Vocabolario non trovato!', err)
-                }
-            )
-
-    }
-
-    vocabolario_term (event) {
-        let term = this.trova(event.target, 'li').children[1];
-        let is_chiuso = term.classList.contains('display-none');
-        //  Nascondo tutto
-        this.nascondi(this.elRef.nativeElement.querySelectorAll('ul.term-list, ul.child-list'));
-        //  Visualizzo
-        if (is_chiuso){
-            this.visualizza(term);
-        }
-    }
-
-    vocabolario_child (event) {
-        let child = this.trova(event.target, 'li' ).children[1];
-        let is_chiuso = child.classList.contains('display-none');
-        //  Nascondo
-        this.nascondi(this.elRef.nativeElement.querySelectorAll('ul.child-list'));
-        //  Visualizzo
-        if (is_chiuso) {
-            this.visualizza(child);
-        }
     }
 
     vocabolario_leaf (term) {
-        this.terms.push({
-            group: 'term',
-            creator_type: 'user',
-            name: term.label,
-            id: term.id
-        });
-    }
+        term.selected = !term.selected;
 
-    trova (el, selector) {
-        return el.closest(selector)
-    }
-
-    nascondi (elements) {
-        for (let e = 0; e < elements.length; e++) {
-            elements[e].classList.add('display-none');
+        if ( term.selected ) {
+            this.terms.push(
+                this.VocabularyService.annotation_create(term)
+            );
+        } else {
+            this.terms = this.terms.filter(t => t.name !== term.label)
         }
     }
 
-    visualizza (element) {
-        element.classList.remove('display-none');
+    ricerca (event) {
+        if(event.target.value.length >= 3) {
+            this.ricerca_risultati = this.VocabularyService.search(event.target.value);
+        }
+    }
+
+    salva () {
+        //console.log("salva", this);
+    }
+
+    ngOnInit() {}
+
+    ngOnChanges () {
+
+        this.VocabularyService.get((vocabolario)=>{this.vocabolario = vocabolario});
+
+        this.terms = [];
+        this.ricerca_risultati = [];
+        this.search_field.nativeElement.value = '';
     }
 
     ngAfterViewInit () {
-
         this.vocabolario_visualizza = true;
-
     }
 
-    ngOnInit() {
-        if (this.data.shots && this.data.shots.length) {
-            this.shot_corrente = this.data.shots[0];
-        }
-    }
 }

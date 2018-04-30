@@ -9,7 +9,6 @@ import {AppVideoControlComponent} from "../app-video-controls/app-video-control"
 export class AppVideoTagComponent extends AppVideoControlComponent implements AfterViewInit{
 
     @Input() data;
-    @Input() fps;
     @ViewChild('termtag_slider') termtag_slider: ElementRef;
     @ViewChild('geotag_slider') geotag_slider: ElementRef;
     @Output() scena_visualizza: EventEmitter<any> = new EventEmitter();
@@ -43,23 +42,25 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
     }
 
     scene_click (idx) {
-        this.scena_visualizza.emit(this.data[idx].attributes.start_frame_idx / this.fps );
+        this.scena_visualizza.emit(this.data[idx].attributes.start_frame_idx / this.parent.fps );
     }
 
     scene_update () {
 
-        let current_frame = Math.ceil(this.fps * this.video.currentTime);
-        this.data.forEach((s,idx) => {
-
-            if (current_frame >= s.attributes.start_frame_idx && current_frame < s.attributes.end_frame_idx) {
-                this.termtags[idx].children[0].classList.add('active');
-                this.geotags[idx].children[0].classList.add('active');
-            } else {
-                this.termtags[idx].children[0].classList.remove('active');
-                this.geotags[idx].children[0].classList.remove('active');
-            }
-
-        });
+        // let current_frame = Math.ceil(this.parent.fps * this.video.currentTime);
+        // this.data.forEach((s,idx) => {
+        //
+        //     if (current_frame >= s.attributes.start_frame_idx && current_frame < s.attributes.end_frame_idx) {
+        //         this.termtags[idx].children[0].classList.add('active');
+        //         this.geotags[idx].children[0].classList.add('active');
+        //         s.stato = 'attivo'
+        //     } else {
+        //         this.termtags[idx].children[0].classList.remove('active');
+        //         this.geotags[idx].children[0].classList.remove('active');
+        //         s.stato = 'non attivo'
+        //     }
+        //     console.log("shot",  s);
+        // });
     }
 
     ngAfterViewInit () {
@@ -67,7 +68,6 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
         this.termtags = this.termtag_slider.nativeElement.children;
         this.geotags = this.geotag_slider.nativeElement.children;
 
-        //setInterval(()=> {this._scena_corrente()}, 100);
     }
 
 }

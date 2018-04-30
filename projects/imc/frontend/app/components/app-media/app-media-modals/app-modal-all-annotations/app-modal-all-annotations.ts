@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 
 @Component({
     selector: 'app-modal-all-annotations',
@@ -6,6 +6,9 @@ import {Component, OnInit} from '@angular/core';
 })
 
 export class AppModalAllAnnotationsComponent implements OnInit {
+
+    @Input() data;
+
     constructor() {
     }
 

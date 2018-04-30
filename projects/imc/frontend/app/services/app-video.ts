@@ -22,7 +22,6 @@ export class AppVideoService {
             video_id
         ).subscribe(
             response => {
-                console.log("VideoService",  response.data[0]);
                 this._video = response.data[0];
                 cb(this._video);
             },
@@ -36,5 +35,9 @@ export class AppVideoService {
 
     video () {
         return this._video;
+    }
+
+    type () {
+        return this._video.type === 'aventity' ? 'video' : 'picture';
     }
 }

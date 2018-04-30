@@ -1,7 +1,13 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {AppShotsService} from "../../services/app-shots";
 import {AppVideoService} from "../../services/app-video";
+import {AppModaleComponent} from "../app-modale/app-modale";
+import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
+import {AppVideoShotComponent} from "./app-video-shot/app-video-shot";
 
+/**
+ * Componente per la visualizzazione del media
+ */
 @Component({
     selector: 'app-media',
     templateUrl: 'app-media.html'
@@ -9,36 +15,125 @@ import {AppVideoService} from "../../services/app-video";
 
 export class AppMediaComponent implements OnInit {
 
-    public activeAnnotation: boolean;
-    public mediaData: any;
-    public shots = [];
-    public modale: any;
-    public modaleData: any;
+    /**
+     * Riferimento al componente AppModale
+     */
+    @ViewChild('appModale') appModale: AppModaleComponent;
+    /**
+     * Riferimento al componente AppVideoPlayer
+     */
+    @ViewChild('appVideo') appVideo: AppVideoPlayerComponent;
 
-    //  Lingua dell'utente
+    /**
+     * Consente di visualizzare lo strumento per la selezione multipla degli shot
+     */
+    public multi_annotations_is_active: boolean = false;
+    /**
+     * Riceve i risultati della chiamata al servizio media
+     */
+    public media: any;
+    /**
+     * Oggetto da visualizzare nel corpo della modale
+     * @type {{type: string; data: {}}}
+     */
+    public modale = {
+        /**
+         * Nome del componente da visualizzare
+         */
+        type: '',
+        /**
+         * Dati da passare al componente
+         */
+        data: {}
+    };
+    /**
+     * Riceve i risultati della chiamata al servizio shots
+     * @type {any[]}
+     */
+    public shots = [];
+    public shots_attivi = [];
+    /**
+     * Lingua dell'utente da legare in futuro all'utente loggato
+     * @type {string}
+     */
     public user_language = 'xx';
 
     constructor(private VideoService: AppVideoService, private ShotsService: AppShotsService) {
-        this.activeAnnotation = false;
     }
 
-    activeMultiAnnotation(){
-        this.activeAnnotation = !this.activeAnnotation;
+    /**
+     * Modifica la visibilità dello strumento per la selezione multipla degli shot
+     * e ne resetta lo stato deselezionando tutti
+     */
+    multi_annotations_toggle(){
+        this.multi_annotations_is_active = !this.multi_annotations_is_active;
+        this.shots_attivi_reset();
     }
 
-    selectionModal(modal){
-        let shots = this.ShotsService.shots();
-        this.modaleData = {
-            shots: [shots[3], shots[7]]
-        }
-        this.modale = modal;
+    /**
+     * Apre una modale visualizzando al suo interno il compontente coi dati ricevuti
+     * @param componente Configurazione del componente daq visualizzare nella modale
+     */
+    modal_show (componente){
+
+        //  fermo il video principale
+        this.appVideo.video.pause();
+
+        this.modale.type = componente.modale;
+        this.modale.data = componente.data;
+
+        this.appModale.open(componente.titolo, this.VideoService.type());
+
     }
 
+    /**
+     * Apre una modale visualizzando al suo interno il componente coi dati ricevuti
+     * Inserisce nei dati da visualizzare gli shots selezionati
+     * @param evento Evento richiamante
+     * @param componente Componente selezionato
+     */
+    modal_show_multi (evento, componente) {
+
+        let data = this.shots_attivi.reduce((acc, value, index) => {
+            if (value) {
+                acc.push(this.shots[index])
+            }
+            return acc;
+        },[]);
+
+        if (!data.length) return;
+
+        let comp = {
+            modale: componente,
+            data: {
+                shots: data
+            },
+            titolo:evento.target.innerText
+        };
+
+        this.modal_show(comp);
+    }
+
+    shot_selezionato (shot) {
+        this.shots_attivi[shot.index] = shot.stato;
+    }
+
+    shots_attivi_reset () {
+        this.shots_attivi = this.shots_attivi.map(s => false);
+    }
+
+    shots_init (shots) {
+        this.shots = shots;
+        this.shots_attivi = shots.map(s=>false);
+    }
+
+    /**
+     * Esegue le richieste del video e degli shot
+     */
     ngOnInit() {
 
-        this.VideoService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5', (video) => {this.mediaData = video});
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots = shots});
-
+        this.VideoService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5', (video) => {this.media = video});
+        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
 
     }
 

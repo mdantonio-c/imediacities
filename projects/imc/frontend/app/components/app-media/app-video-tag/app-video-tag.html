@@ -11,7 +11,7 @@
                     [attr.data-shot]="shot.attributes.shot_num"
                     [style.width.px]="shot.attributes.duration / min_detected * min_width"
                     (click)="scene_click(shot.attributes.shot_num)">
-                <a href="#" class="badge badge-termtag" [innerHTML]="shot.annotations.tags.length"></a>
+                <a href="#" class="badge badge-termtag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.tags.length"></a>
             </span>
 
         </div>
@@ -27,7 +27,7 @@
                     [attr.data-shot]="shot.attributes.shot_num"
                     [style.width.px]="shot.attributes.duration / min_detected * min_width"
                     (click)="scene_click(shot.attributes.shot_num)">
-                <a href="#" class="badge badge-geotag" [innerHTML]="shot.annotations.locations.length"></a>
+                <a href="#" class="badge badge-geotag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.locations.length"></a>
             </span>
 
         </div>

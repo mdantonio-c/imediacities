@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-control";
+import {AppVideoRangePlayer} from "../../../../services/app-video-range-player";
 
 @Component({
     selector: 'app-video-control-goto-end',
@@ -8,12 +9,12 @@ import {AppVideoControlComponent} from "../app-video-control";
 
 export class AppVideoControlGotoEndComponent extends AppVideoControlComponent  {
 
-    constructor() {
+    constructor(private RangePlayer: AppVideoRangePlayer) {
         super();
     }
 
     goto_end () {
         this.video.pause();
-        this.video.currentTime = this.video.duration;
+        this.video.currentTime = this.parent.player.begin + this.parent.player.duration;
     }
 }

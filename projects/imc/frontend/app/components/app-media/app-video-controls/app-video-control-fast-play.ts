@@ -17,7 +17,6 @@ export class AppVideoControlFastPlayComponent extends AppVideoControlComponent{
     }
 
     public fast_play (direzione) {
-
         this.video.pause();
         if (AppVideoControlFastPlayComponent.interval) {
 
@@ -30,7 +29,6 @@ export class AppVideoControlFastPlayComponent extends AppVideoControlComponent{
                 return
             }
 
-
         }
 
         AppVideoControlFastPlayComponent.direzione = direzione;
@@ -42,20 +40,31 @@ export class AppVideoControlFastPlayComponent extends AppVideoControlComponent{
 
     }
 
-    private static _stop () {
+    public static _stop () {
         clearInterval(AppVideoControlFastPlayComponent.interval);
         AppVideoControlFastPlayComponent.interval = null;
     }
 
     onplay () {
+        this.parent.spinner_prevent = false;
         AppVideoControlFastPlayComponent._stop();
     }
 
     onbegin () {
+        this.parent.spinner_prevent = false;
         AppVideoControlFastPlayComponent._stop();
     }
 
     onended () {
+        this.parent.spinner_prevent = false;
         AppVideoControlFastPlayComponent._stop();
+    }
+
+    onseeked () {
+        this.parent.spinner_prevent = AppVideoControlFastPlayComponent.interval !== null;
+    }
+
+    onseeking () {
+        this.parent.spinner_prevent = AppVideoControlFastPlayComponent.interval !== null;
     }
 }

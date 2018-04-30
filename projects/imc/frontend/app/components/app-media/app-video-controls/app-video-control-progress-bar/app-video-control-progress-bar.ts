@@ -1,4 +1,4 @@
-import {Component, ViewChild, ElementRef, Input, AfterViewInit} from '@angular/core';
+import {Component, ViewChild, ElementRef, Input} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-control";
 
 @Component({
@@ -6,7 +6,7 @@ import {AppVideoControlComponent} from "../app-video-control";
     templateUrl: 'app-video-control-progress-bar.html'
 })
 
-export class AppVideoControlProgressBarComponent extends AppVideoControlComponent implements AfterViewInit {
+export class AppVideoControlProgressBarComponent extends AppVideoControlComponent {
 
     @ViewChild('progress') progress: ElementRef;
 
@@ -16,14 +16,23 @@ export class AppVideoControlProgressBarComponent extends AppVideoControlComponen
 
     update (e) {
         this.progress.nativeElement.value = (e.offsetX - this.progress.nativeElement.offsetLeft) / this.progress.nativeElement.offsetWidth;
-        this.video.currentTime = this.progress.nativeElement.value * this.video.duration;
+        this.video.currentTime = this.parent.player.begin + this.progress.nativeElement.value * this.parent.player.duration;
     }
 
     ontimeupdate () {
-        this.progress.nativeElement.value = this.video.currentTime / this.video.duration;
+        this._progress_set(Math.abs(this.video.currentTime - this.parent.player.begin) / this.parent.player.duration);
     }
 
-    ngAfterViewInit () {
-        //console.log("progress.nativeElement",  this.progress.nativeElement);
+    onbegin () {
+        this._progress_set(0);
     }
+
+    onended () {
+        this._progress_set(1);
+    }
+
+    _progress_set (value) {
+        this.progress.nativeElement.value = value
+    }
+
 }

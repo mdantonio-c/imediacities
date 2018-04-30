@@ -34,17 +34,21 @@ import {AppModalInsertNoteComponent} from "./components/app-media/app-media-moda
 import {AppModalAllAnnotationsComponent} from "./components/app-media/app-media-modals/app-modal-all-annotations/app-modal-all-annotations";
 import {AppModalInsertLinkComponent} from "./components/app-media/app-media-modals/app-modal-insert-link/app-modal-insert-link";
 import {AppModalInsertReferenceComponent} from "./components/app-media/app-media-modals/app-modal-insert-reference/app-modal-insert-reference";
+import {AppModaleComponent} from "./components/app-modale/app-modale";
+import {AppMediaModal} from "./components/app-media/app-media-modals/app-media-modal";
 
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
 	ProviderToCityPipe,
 
+	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
 	AppPictureComponent,
 	AppVideoTagComponent,
 	AppVideoShotComponent,
+    AppMediaModal,
 	AppMediaAnnotationComponent,
 	AppMediaMapComponent,
 	AppModalAllAnnotationsComponent,

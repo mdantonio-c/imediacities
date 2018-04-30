@@ -1,43 +1,66 @@
 <!-- Modale per l'iserimento di nuove note -->
+<app-media-modal [data]="data">
+
+    <!-- Aggiunta della nota -->
+    <div class="col-7 row no-gutters" modal-col>
+               <span class="col-11">
+                   <input type="text" class="imc--input  space-paragraph-20" placeholder="Title" aria-label="Title">
+               </span>
+        <span class="col-11 space-paragraph-20">
+                    <textarea class="imc--input" placeholder="Text" aria-label="Text"></textarea>
+               </span>
+        <span class="col-4 space-paragraph-20">
+                   <select class="imc--input col-7" #visibility>
+                        <option selected value="0">Private</option>
+                        <option value="1">Public</option>
+                    </select>&nbsp;
+               </span>
+    </div>
+
+    <button type="button" class="btn btn-accent" modal-button (click)="save()">Save</button>
+</app-media-modal>
+<!--
 
 <div class="modal-content">
+&lt;!&ndash;
     <div class="modal-header">
         <h4 class="modal-title" id="exampleModalCenterTitle">Insert Note</h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true" class="material-icons">close</span>
         </button>
     </div>
+&ndash;&gt;
     <div class="modal-body">
         <h4>Shot: 4</h4>
 
         <div class="row modal-body-content">
 
-            <!-- Anteprima del video -->
-            <div class="col-5 row no-gutters modal-media--info">
-                <span class="col-5"><strong>00:02:00:40</strong></span>
-                <span class="col-4">frame-range: 540-821</span>
-                <span class="col-3 imc--flex--horizontal-end">duration: 47s</span>
+            &lt;!&ndash; Anteprima del video &ndash;&gt;
+            <div class="col-5 row no-gutters modal-media&#45;&#45;info">
+                <span class="col-3"><strong>00:02:00:40</strong></span>
+                <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-end">frame-range: 540-821</span>
+                <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">duration: 47s</span>
 
-                <!-- Video palyer -->
-                <span class="col-12 modal-media--anteprima"></span>
+                &lt;!&ndash; Video palyer &ndash;&gt;
+                <span class="col-12 modal-media&#45;&#45;anteprima"></span>
 
-                <!-- Anteprime di altri shots dopo la selezione multipla -->
+                &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
                 <div class="col-12 row no-gutters">
-                    <span class="imc--thumb"></span>
-                    <span class="imc--thumb"></span>
+                    <span class="imc&#45;&#45;thumb"></span>
+                    <span class="imc&#45;&#45;thumb"></span>
                 </div>
             </div>
 
-            <!-- Aggiunta della nota -->
+            &lt;!&ndash; Aggiunta della nota &ndash;&gt;
             <div class="col-7 row no-gutters">
                <span class="col-11">
-                   <input type="text" class="imc--input  space-paragraph-20" placeholder="Title" aria-label="Title">
+                   <input type="text" class="imc&#45;&#45;input  space-paragraph-20" placeholder="Title" aria-label="Title">
                </span>
                 <span class="col-11 space-paragraph-20">
-                    <textarea class="imc--input" placeholder="Text" aria-label="Text"></textarea>
+                    <textarea class="imc&#45;&#45;input" placeholder="Text" aria-label="Text"></textarea>
                </span>
                 <span class="col-4 space-paragraph-20">
-                   <select class="imc--input col-7" #visibility>
+                   <select class="imc&#45;&#45;input col-7" #visibility>
                         <option selected value="0">Private</option>
                         <option value="1">Public</option>
                     </select>&nbsp;
@@ -52,3 +75,4 @@
         <button type="button" class="btn btn-accent">Save</button>
     </div>
 </div>
+-->

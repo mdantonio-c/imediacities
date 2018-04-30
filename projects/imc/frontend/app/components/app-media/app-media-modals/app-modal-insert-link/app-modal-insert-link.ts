@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Input} from '@angular/core';
 
 @Component({
     selector: 'app-modal-insert-link',
@@ -6,6 +6,18 @@ import {Component, OnInit} from '@angular/core';
 })
 
 export class AppModalInsertLinkComponent implements OnInit {
+
+    @Input() data;
+
+    public options = true;
+
+    optionsCheckbox = [
+        {label: 'Video', checked: true},
+        {label: 'Photo', checked: true},
+        {label: 'Reference', checked: false},
+        {label: 'Note', checked: false}
+    ];
+
     constructor() {
     }
 

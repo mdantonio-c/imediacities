@@ -14,6 +14,6 @@ export class AppVideoControlGotoStartComponent extends AppVideoControlComponent 
 
     goto_start () {
         this.video.pause();
-        this.video.currentTime = 0;
+        this.video.currentTime = this.parent.player.begin;
     }
 }

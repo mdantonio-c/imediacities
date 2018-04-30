@@ -1,41 +1,49 @@
 <div class="video_container" *ngIf="data">
     <div class="video_wrapper">
-        <video #videoPlayer preload="none" controls></video>
+        <video #videoPlayer preload controls="false"></video>
         <div class="control__progress" *ngIf="showComponents">
             <!--progress bar-->
-            <app-video-control-progress-bar (current_component)="registra($event)" #progress_bar [video]="video"></app-video-control-progress-bar>
-            <app-video-control-timerange (current_component)="registra($event)" [video]="video"></app-video-control-timerange>
+            <app-video-control-progress-bar (current_component)="registra($event)" #progress_bar [parent]="this"></app-video-control-progress-bar>
+            <app-video-control-timerange (current_component)="registra($event)" [parent]="this"></app-video-control-timerange>
             <div class="controls__wrapper controls__wrapper__black">
                 <div class="controls__row" style="justify-content:space-between;padding:8px;">
                     <!--sx-->
                     <div class="controls__left">
                         <!--time marker-->
-                        <app-video-control-time-markers (current_component)="registra($event)" [video]="video" [fps]="fps"></app-video-control-time-markers>
+                        <app-video-control-time-markers (current_component)="registra($event)" [parent]="this"></app-video-control-time-markers>
                     </div>
                     <!--centro-->
                     <div class="controls__row controls__center">
 
                         <!--start-->
-                        <app-video-control-goto-start (current_component)="registra($event)" [video]="video"></app-video-control-goto-start>
+                        <app-video-control-goto-start (current_component)="registra($event)" [parent]="this"></app-video-control-goto-start>
                         <!--fast rewind-->
-                        <app-video-control-frewind (current_component)="registra($event)" [video]="video"></app-video-control-frewind>
+                        <app-video-control-frewind (current_component)="registra($event)" [parent]="this"></app-video-control-frewind>
                         <!--play-->
-                        <app-video-control-play (current_component)="registra($event)" [video]="video"></app-video-control-play>
+                        <app-video-control-play (current_component)="registra($event)" [parent]="this"></app-video-control-play>
                         <!--fast forward-->
-                        <app-video-control-fforward (current_component)="registra($event)" [video]="video"></app-video-control-fforward>
+                        <app-video-control-fforward (current_component)="registra($event)" [parent]="this"></app-video-control-fforward>
                         <!--end-->
-                        <app-video-control-goto-end (current_component)="registra($event)" [video]="video"></app-video-control-goto-end>
+                        <app-video-control-goto-end (current_component)="registra($event)" [parent]="this"></app-video-control-goto-end>
                     </div>
                     <!--dx-->
                     <div class="controls__row controls__right">
                         <!--volume-->
-                        <app-video-control-volume (current_component)="registra($event)" [video]="video"></app-video-control-volume>
+                        <app-video-control-volume (current_component)="registra($event)" [parent]="this"></app-video-control-volume>
                         <!--fullscreen-->
-                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [video]="video"></app-video-control-fullscreen>
+                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this"></app-video-control-fullscreen>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="video_mask">
+<!--            <div class="spinner">
+                <div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
+            </div>-->
+            <div class="lds-ripple">
+                <div></div><div></div>
+            </div>
+        </div>
     </div>
 </div>
-<app-video-tag *ngIf="shots && shots.length && layout !== 'modale'" [data]="shots" [fps]="fps" (scena_visualizza)="jump_to($event)" (current_component)="registra($event)" [video]="video"></app-video-tag>
+<app-video-tag *ngIf="shots && shots.length && layout !== 'modale'" [data]="shots" (scena_visualizza)="jump_to($event)" (current_component)="registra($event)" [parent]="this"></app-video-tag>

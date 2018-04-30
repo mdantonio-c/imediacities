@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild, ElementRef,} from '@angular/core';
+import {Component, Input, ViewChild, ElementRef, OnChanges} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-control";
 
 @Component({
@@ -6,11 +6,10 @@ import {AppVideoControlComponent} from "../app-video-control";
     templateUrl: 'app-video-control-time-markers.html'
 })
 
-export class AppVideoControlTimeMarkersComponent extends AppVideoControlComponent{
+export class AppVideoControlTimeMarkersComponent extends AppVideoControlComponent implements OnChanges{
 
     @ViewChild('smtpe_mark') smtpe_mark;
     @ViewChild('float_mark') float_mark;
-    @Input() fps = 24;
 
     interval = null;
     timeout = 100;
@@ -23,7 +22,15 @@ export class AppVideoControlTimeMarkersComponent extends AppVideoControlComponen
         return Math.floor(parseFloat(Number) * Math.pow(10, DecimalPlaces)) / Math.pow(10, DecimalPlaces);
     }
 
-    private static _format (time, fps,  smtpe = true) {
+    private _format (time, fps,  smtpe = true) {
+
+        time -= this.parent.player.begin;
+        time = +time.toFixed(4);
+
+        if (time < 0) {
+            time = 0;
+        }
+
         const hours = AppVideoControlTimeMarkersComponent._floor((time / 3600), 0) % 24;
         const minutes = AppVideoControlTimeMarkersComponent._floor((time / 60), 0) % 60;
         const seconds = AppVideoControlTimeMarkersComponent._floor((time % 60), 0);
@@ -39,8 +46,9 @@ export class AppVideoControlTimeMarkersComponent extends AppVideoControlComponen
     }
 
     public markers_update () {
+
         if (this.smtpe_mark) {
-            this.smtpe_mark.nativeElement.innerHTML = AppVideoControlTimeMarkersComponent._format(this.video.currentTime, this.fps);
+            this.smtpe_mark.nativeElement.innerHTML = this._format(this.video.currentTime, this.parent.fps);
         }
         if (this.float_mark) {
             this.float_mark.nativeElement.innerHTML = AppVideoControlTimeMarkersComponent._float_time(this.video.currentTime);
@@ -60,6 +68,14 @@ export class AppVideoControlTimeMarkersComponent extends AppVideoControlComponen
 
     public ontimeupdate () {
         this.markers_update();
+    }
+
+    public onbegin () {
+
+    }
+
+    public onended () {
+
     }
 
 }

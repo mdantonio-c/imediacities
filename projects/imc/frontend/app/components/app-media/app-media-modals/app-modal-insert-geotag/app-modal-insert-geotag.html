@@ -1,50 +1,103 @@
-<div class="modal-content">
-    <div class="modal-header">
-        <!-- Il titolo sarà dinamico -->
-        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Geotag</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="material-icons">close</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <h4>Shot: 4</h4>
+<app-media-modal [data]="data">
 
-        <div class="row modal-body-content">
-            <!-- Anteprima del video -->
-            <div class="col-5 row no-gutters modal-media--info">
-                <span class="col-5"><strong>00:02:00:40</strong></span>
-                <span class="col-4">frame-range: 540-821</span>
-                <span class="col-3 imc--flex--horizontal-end">duration: 47s</span>
-
-                <!-- Video palyer -->
-                <span class="col-12 modal-media--anteprima"></span>
-
-                <!-- Anteprime di altri shots dopo la selezione multipla -->
-                <div class="col-12 row no-gutters">
-                    <span class="imc--thumb"></span>
-                    <span class="imc--thumb"></span>
-                </div>
-            </div>
-
-            <!-- Search geotag -->
-            <div class="col-7 row space-paragraph-20 no-gutters">
+    <div class="col-7 row space-paragraph-20 no-gutters" modal-col>
                    <span class="col-10">
                        <input type="text" class="imc--input imc--input-search" placeholder="Search location" aria-label="Location">
                    </span>
 
-                <!-- Tag appena inseriti -->
+        <!-- Tag appena inseriti -->
+        <div class="col-12 new-badge space-paragraph-25">
+            <a href="#" class="badge badge-geotag">parco acquatico Genova</a>
+            <a href="#" class="badge badge-geotag--auto">Statua Nettuno</a>
+        </div>
+        <!-- Attivazione della data di pubblicazione -->
+        <!-- Attivazione della data di pubblicazione -->
+        <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
+            <div class="col-6 box-checkbox imc--flex--vertical-center">
+                <!--@NSI Attiva il campo date sotto -->
+                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
+                <label for="multi-annotation">Not public until</label>
+            </div>
+            <div class="col-7 space-paragraph-10">
+                <input class="imc--input imc--input-data" type="date">
+            </div>
+        </div>
+        <div class="col-12 space-paragraph-25">
+            <a href="#" class="badge badge-geotag">parco acquatico Genova</a>
+            <a href="#" class="badge badge-geotag">Statua Nettuno</a>
+        </div>
+    </div>
+
+    <div class="modal-map" modal-row>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.411124236811!2d11.257617215383936!3d44.48624210618158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x477fd685cc45f68d%3A0x55191fbc545fa185!2sCineca!5e0!3m2!1sit!2sit!4v1523888271456"
+                frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+
+
+    <button type="button" class="btn btn-accent" modal-button (click)="save()">Save</button>
+
+</app-media-modal>
+<!--
+
+<div class="modal-content">
+&lt;!&ndash;    <div class="modal-header">
+        &lt;!&ndash; Il titolo sarà dinamico &ndash;&gt;
+        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Geotag</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" class="material-icons">close</span>
+        </button>
+    </div>&ndash;&gt;
+    <div class="modal-body">
+        <h4>Shot: 4</h4>
+
+        <div class="row modal-body-content">
+            &lt;!&ndash; Anteprima del video &ndash;&gt;
+            <div class="col-5 row no-gutters modal-media&#45;&#45;info">
+                <span class="col-3"><strong>00:02:00:40</strong></span>
+                <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-end">frame-range: 540-821</span>
+                <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">duration: 47s</span>
+
+                &lt;!&ndash; Video palyer &ndash;&gt;
+                <span class="col-12 modal-media&#45;&#45;anteprima" *ngIf="mediaData">
+                    <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots"></app-video-player>
+                </span>
+
+                &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
+                <div class="col-12 row no-gutters">
+                   <span class="imc&#45;&#45;thumb"
+                         *ngFor="let shot of data.shots let index = index"
+                         [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
+                         [ngStyle]="{border: shot.attributes.shot_num === shot_corrente.attributes.shot_num ? '5px solid' : 0}"
+                         (click)="shot_cambia(index)"
+                   >
+                        <img [src]="shot.links.thumbnail" alt="">
+                        <span [innerHTML]="shot.attributes.duration | number:'2.2'" class="duration"></span>
+                       <span class="shot-number" [innerHTML]="shot.attributes.shot_num+1">3</span>
+                    </span>
+                </div>
+            </div>
+
+            &lt;!&ndash; Search geotag &ndash;&gt;
+            <div class="col-7 row space-paragraph-20 no-gutters">
+                   <span class="col-10">
+                       <input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search location" aria-label="Location">
+                   </span>
+
+                &lt;!&ndash; Tag appena inseriti &ndash;&gt;
                 <div class="col-12 new-badge space-paragraph-25">
                     <a href="#" class="badge badge-geotag">parco acquatico Genova</a>
-                    <a href="#" class="badge badge-geotag--auto">Statua Nettuno</a>
+                    <a href="#" class="badge badge-geotag&#45;&#45;auto">Statua Nettuno</a>
                 </div>
-                <!-- Attivazione della data di pubblicazione -->
-                <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
-                    <div class="col-1 box-checkbox no-margin">
-                        <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
-                        <label for="multi-annotation"></label>
+                &lt;!&ndash; Attivazione della data di pubblicazione &ndash;&gt;
+                &lt;!&ndash; Attivazione della data di pubblicazione &ndash;&gt;
+                <div class="col-12 new-badge space-paragraph-10 row no-gutters imc&#45;&#45;flex&#45;&#45;vertical-center">
+                    <div class="col-6 box-checkbox imc&#45;&#45;flex&#45;&#45;vertical-center">
+                        &lt;!&ndash;@NSI Attiva il campo date sotto &ndash;&gt;
+                        <input class="imc&#45;&#45;input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
+                        <label for="multi-annotation">Not public until</label>
                     </div>
-                    <div class="col-4">
-                        <input class="imc--input imc--input-data" type="date" placeholder="Not public until">
+                    <div class="col-7 space-paragraph-10">
+                        <input class="imc&#45;&#45;input imc&#45;&#45;input-data" type="date">
                     </div>
                 </div>
                 <div class="col-12 space-paragraph-25">
@@ -55,7 +108,7 @@
         </div>
 
     </div>
-    <!-- Mappa -->
+    &lt;!&ndash; Mappa &ndash;&gt;
     <div class="modal-map">
         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2846.411124236811!2d11.257617215383936!3d44.48624210618158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x477fd685cc45f68d%3A0x55191fbc545fa185!2sCineca!5e0!3m2!1sit!2sit!4v1523888271456"
                 frameborder="0" style="border:0" allowfullscreen></iframe>
@@ -65,3 +118,4 @@
         <button type="button" class="btn btn-accent">Save</button>
     </div>
 </div>
+-->

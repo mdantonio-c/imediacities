@@ -20,9 +20,6 @@ export class AppVideoControlFullscreenComponent extends AppVideoControlComponent
         super();
     }
 
-    ngOnInit() {
-
-    }
 
     _fullscreen (stato) {
         this.fullscreen_stato = stato;
