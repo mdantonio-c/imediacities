@@ -235,7 +235,7 @@ class AnnotationRepository():
 
     @staticmethod
     def is_orphan_segment(node):
-        return False if len(node.annotation.all()) > 1 else True
+        return False if (len(node.annotation.all()) > 1 or len(node.annotation_body.all())) else True
 
     @graph_transactions
     def create_tvs_annotation(self, item, shots):

@@ -589,7 +589,7 @@ element.style {
 .bigger-180 { font-size: 180% !important }
 
 /* Button */
-button:focus {outline:0;}
+button:focus {outline:0 !important;}
 
 .btn {
     color: #FFF!important;
@@ -2331,4 +2331,10 @@ a.tab-list-shots-link:focus
 .tab-list-shot-selected
 {
     background-color: #fff;
+}
+
+.tag a.remove {
+	float: right;
+	margin-left: -3px;
+	cursor: pointer;
 }
