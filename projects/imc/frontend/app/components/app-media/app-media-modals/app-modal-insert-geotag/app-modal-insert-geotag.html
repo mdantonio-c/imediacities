@@ -2,7 +2,9 @@
 
     <div class="col-7 row space-paragraph-20 no-gutters" modal-col>
                    <span class="col-10">
-                       <input type="text" class="imc--input imc--input-search" placeholder="Search location" aria-label="Location">
+                       <input type="text" class="imc--input imc--input-search" placeholder="Search location" aria-label="Location"
+                              #search_field
+                              (keyup)="ricerca($event)">
                    </span>
 
         <!-- Tag appena inseriti -->

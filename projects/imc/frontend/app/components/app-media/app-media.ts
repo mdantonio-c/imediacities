@@ -56,7 +56,7 @@ export class AppMediaComponent implements OnInit {
      * Lingua dell'utente da legare in futuro all'utente loggato
      * @type {string}
      */
-    public user_language = 'xx';
+    public user_language = 'it';
 
     constructor(private VideoService: AppVideoService, private ShotsService: AppShotsService) {
     }
@@ -127,6 +127,9 @@ export class AppMediaComponent implements OnInit {
         this.shots_attivi = shots.map(s=>false);
     }
 
+    shots_update (evento) {
+        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
+    }
     /**
      * Esegue le richieste del video e degli shot
      */

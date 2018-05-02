@@ -157,9 +157,9 @@
     <!-- Modal -->
     <app-modale #appModale>
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data"></app-modal-insert-termtag>
-            <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data"></app-modal-insert-geotag>
-            <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data"></app-modal-insert-note>
+            <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-termtag>
+            <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-geotag>
+            <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-note>
             <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data"></app-modal-insert-link>
             <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data"></app-modal-insert-reference>
             <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data"></app-modal-all-annotations>

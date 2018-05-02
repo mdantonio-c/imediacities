@@ -85,8 +85,8 @@ export class AppVocabularyService {
         return {
             group: group,
             creator_type: 'user',
-            name: term.label,
-            iri: term.id
+            name: term.label || term.name,
+            iri: term.id || term.iri || null
         }
     }
 

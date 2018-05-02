@@ -36,12 +36,13 @@ import {AppModalInsertLinkComponent} from "./components/app-media/app-media-moda
 import {AppModalInsertReferenceComponent} from "./components/app-media/app-media-modals/app-modal-insert-reference/app-modal-insert-reference";
 import {AppModaleComponent} from "./components/app-modale/app-modale";
 import {AppMediaModal} from "./components/app-media/app-media-modals/app-media-modal";
+import {NoCommaPipe} from "./pipes/NoComma";
 
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
 	ProviderToCityPipe,
-
+	NoCommaPipe,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,

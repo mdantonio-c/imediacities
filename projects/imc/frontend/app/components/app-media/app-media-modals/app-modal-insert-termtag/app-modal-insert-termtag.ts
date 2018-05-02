@@ -1,14 +1,8 @@
-
-import {Component, OnInit, OnChanges, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef} from '@angular/core';
-import {AppVideoService} from "../../../../services/app-video";
-import {AppShotsService} from "../../../../services/app-shots";
+import {Component, OnInit, OnChanges, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
 import {AppVocabularyService} from "../../../../services/app-vocabulary";
-
 import {AppVideoPlayerComponent} from "../../app-video-player/app-video-player";
-
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {AppModaleService} from "../../../../services/app-modale";
-
+import {AppAnnotationsService} from "../../../../services/app-annotations";
 
 @Component({
     selector: 'app-modal-insert-termtag',
@@ -19,24 +13,26 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
 
     @Input() data: any;
 
-    @ViewChild('videoPlayer') videoPlayer: AppVideoPlayerComponent;
     @ViewChild('search_field') search_field: ElementRef;
 
-
-    // mediaData = null;
-
-    // shots = null;
-    // shot_corrente = null;
+    @Output() shots_update: EventEmitter<any> = new EventEmitter();
 
     vocabolario = null;
     vocabolario_visualizza = false;
 
+    embargo_enable = false;
+
     ricerca_risultati = [];
+    ricerca_key = {
+        name: ''
+    };
+    ricerca_nomatch = false;
 
     terms = [];
 
     constructor(
         private VocabularyService: AppVocabularyService,
+        private AnnotationsService: AppAnnotationsService
     ) {}
 
     vocabolario_term (term) {
@@ -52,18 +48,46 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
                 this.VocabularyService.annotation_create(term)
             );
         } else {
+            //  rimuovo da elenco terms
             this.terms = this.terms.filter(t => t.name !== term.label)
         }
     }
 
     ricerca (event) {
         if(event.target.value.length >= 3) {
+            this.ricerca_key = {name: event.target.value};
             this.ricerca_risultati = this.VocabularyService.search(event.target.value);
+            this.ricerca_nomatch = this.ricerca_risultati.length == 0
+        } else {
+            this.ricerca_key = null;
+            this.ricerca_nomatch = false;
+        }
+    }
+
+    term_add_disable () {
+        return this.ricerca_key && this.ricerca_key.name && this.ricerca_risultati.filter(r => r.name.toLowerCase() === this.ricerca_key.name.toLowerCase()).length
+        //length == 1 && this.ricerca_key && this.ricerca_key.name.toLowerCase() === this.ricerca_risultati[0].name.toLowerCase()
+    }
+
+    term_add (event) {
+        console.log("event",  event);
+        if (event && event.name) {
+
+            if( this.terms.filter(t => t.name.toLowerCase() === event.name.toLowerCase()).length === 0){
+                this.terms.push(
+                    this.VocabularyService.annotation_create(event)
+                );
+            }
+            console.log("this.terms",  this.terms);
         }
     }
 
     salva () {
-        //console.log("salva", this);
+        this.AnnotationsService.create_tag(
+            this.data.shots[0].id,
+            this.terms,
+            (r) => {this.shots_update.emit(r)}
+        );
     }
 
     ngOnInit() {}

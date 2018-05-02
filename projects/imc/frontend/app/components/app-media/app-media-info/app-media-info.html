@@ -32,9 +32,10 @@
                 <div id="titles__content" class="collapse" aria-labelledby="titles__head" data-parent="#general-info_accordion">
                     <div class="card-body row">
                         <h5 class="col-12">Other Titles</h5>
-                        <p class="col-12">
-                        Porte storiche. Piazza Maggiore. Canali. <br>
-                        Scene di vita quotidiana nella Bologna di inizio secolo.</p>
+                        <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text">
+                            Porte storiche. Piazza Maggiore. Canali. <br>
+                            Scene di vita quotidiana nella Bologna di inizio secolo.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -113,8 +114,7 @@
                                     <li
                                             *ngFor="let role of contributor.attributes.activities">
                                         {{role}}:
-                                        <!--todo pipe nocomma-->
-                                        <span [innerHTML]="contributor.attributes.names[0]"></span>
+                                        <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
                                     </li>
 
                                 </ng-template>
@@ -161,7 +161,7 @@
                 <div id="owner_content" class="collapse" aria-labelledby="owner_head" data-parent="#general-info_accordion">
 
                     <div class="card-body row">
-                        <h5 class="col-12">Fondazione Cineteca di Bologna</h5>
+                        <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
                         <div class="col-12"><strong>Contacts:</strong></div>
                         <div class="col-12">
                             <ul>
@@ -173,7 +173,7 @@
                         </div>
                         <div class="col-12 space-paragraph-10">
                             <strong>Film ID in Archive: </strong>
-                            <span [innerHTML]="info.id"></span>
+                            <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
                         </div>
                     </div>
                 </div>
@@ -197,12 +197,14 @@
                         <div class="col-12">
                             <ul class="list-space">
 
-                                <li>
+                                <li
+                                        *ngIf="info.relationships.video_format[0].attributes.sound">
                                     <strong>Sound: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
 
                                 </li>
-                                <li>
+                                <li
+                                        *ngIf="info.relationships.video_format[0].attributes.colour">
                                     <strong>Colour: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
                                 </li>
@@ -242,17 +244,46 @@
                     <div class="card-body row">
                         <div class="col-12">
                             <ul class="list-space">
-                                <li><strong>Nb_streams: </strong>4</li>
-                                <li><strong>Format: </strong>Quick Time / MOV</li>
-                                <li><strong>Start_time: </strong>000000s</li>
-                                <li><strong>Duration: </strong>5555 s</li>
-                                <li><strong>Size: </strong>866563564 kb</li>
-                                <li><strong>Bit_rate: </strong>8436543654</li>
-                                <li><strong>Probe_score: </strong>100</li>
+                                <!-- * = unbind -->
+                                <li><strong>*Nb_streams:</strong>4</li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
+                                    <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 2">
+                                    <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 3">
+                                    <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 4">
+                                    <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
+                                </li>
+
+                                <li><strong>*Start_time:</strong>000000s</li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.duration">
+                                    <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.dimension">
+                                    <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
+                                </li>
+
+                                <li><strong>*Bit_rate:</strong>8436543654</li>
+
+                                <li><strong>*Probe_score:</strong>100</li>
                             </ul>
                         </div>
                         <div class="col-6 space-paragraph-25">
-                            <h5>Video</h5>
+                            <h5>*Video</h5>
                             <ul class="space-paragraph-10">
                                 <li>"label": "xxx"</li>
                                 <li>"label": "xxx"</li>
@@ -261,7 +292,7 @@
                             </ul>
                         </div>
                         <div class="col-6 space-paragraph-25">
-                            <h5>Audio</h5>
+                            <h5>*Audio</h5>
                             <ul class="space-paragraph-10">
                                 <li>"label": "xxx"</li>
                                 <li>"label": "xxx"</li>

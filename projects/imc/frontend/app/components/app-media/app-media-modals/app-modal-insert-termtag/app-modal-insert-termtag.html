@@ -39,25 +39,36 @@
 
     <div class="col-4 row no-gutters" modal-col>
         <div class="row no-gutters imc--flex--vertical-end">
-                   <span class="col-7">
-                       <input type="text" class="imc--input imc--input-search" placeholder="Search here" aria-label="Tag" #search_field (keyup)="ricerca($event)">
-                   </span>
-            <span class="col-5 imc--flex--horizontal-end">
-                       <button type="button" class="btn btn-accent">Add term</button>
-                   </span>
+           <span class="col-7">
+               <input type="text" class="imc--input imc--input-search" placeholder="Search here" aria-label="Tag"
+                      #search_field
+                      (keyup)="ricerca($event)">
+           </span>
+            <span class="col-5 imc&#45;&#45;flex&#45;&#45;horizontal-end">
+                       <button type="button" class="btn btn-accent" [disabled]="term_add_disable()" (click)="term_add(ricerca_key)">Add term</button>
+            </span>
+ <!--
+                    <div *ngIf="ricerca_nomatch">
+                        No match for "<strong>{{ricerca_key.name}}</strong>" do you want to create a new term?
+                        <button type="button" class="btn btn-accent" >Add term</button>
+                    </div>
+-->
         </div>
 
         <!-- Tag appena inseriti -->
         <div class="col-12 new-badge space-paragraph-25">
             <ng-template ngFor let-risultato [ngForOf]="ricerca_risultati">
-                <app-media-annotation  [annotation]="risultato"></app-media-annotation>
+                <!-- @NSI aggiungere una classe con cursore-->
+                <app-media-annotation  [annotation]="risultato" (click)="term_add(risultato)" style="cursor:pointer"></app-media-annotation>
             </ng-template>
         </div>
         <!-- Attivazione della data di pubblicazione -->
         <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
             <div class="col-6 box-checkbox imc--flex--vertical-center">
                 <!--@NSI Attiva il campo date sotto -->
-                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
+                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="on"
+                       [(ngModel)]="embargo_enable">
+                {{embargo_enable}}
                 <label for="multi-annotation">Not public until</label>
             </div>
             <!--
@@ -76,7 +87,7 @@
                                </div>
             -->
             <div class="col-7 space-paragraph-10">
-                <input class="imc--input imc--input-data" type="date">
+                <input class="imc--input imc--input-data" [disabled]="!embargo_enable" type="date">
             </div>
         </div>
         <div class="col-12 space-paragraph-25">
@@ -89,140 +100,3 @@
     <button type="button" class="btn btn-accent" modal-button (click)="salva()">Save</button>
 
 </app-media-modal>
-<!--
-
-<div class="modal-content">
-
-    <div class="modal-body">
-        <h4>Shot: <span [innerHTML]="shot_corrente.attributes.shot_num+1"></span></h4>
-
-       <div class="row modal-body-content">
-            &lt;!&ndash; Anteprima del video &ndash;&gt;
-           <div class="col-5 row no-gutters modal-media&#45;&#45;info">
-               <span class="col-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
-               <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-center">frame-range:
-                    <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
-                    -
-                    <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
-               </span>
-               <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">
-                   duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
-               </span>
-
-               &lt;!&ndash; Video palyer &ndash;&gt;
-               <span class="col-12 modal-media&#45;&#45;anteprima" *ngIf="mediaData">
-                   <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots"></app-video-player>
-               </span>
-
-               &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
-               <div class="col-12 row no-gutters">
-                   <span class="imc&#45;&#45;thumb"
-                         *ngFor="let shot of data.shots let index = index"
-                         [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
-                         [ngStyle]="{border: shot.attributes.shot_num === shot_corrente.attributes.shot_num ? '5px solid' : 0}"
-                         (click)="shot_cambia(index)"
-                   >
-                        <img [src]="shot.links.thumbnail" alt="">
-                        <span [innerHTML]="shot.attributes.duration | number:'2.2'" class="duration"></span>
-                       <span class="shot-number" [innerHTML]="shot.attributes.shot_num+1">3</span>
-                    </span>
-               </div>
-           </div>
-
-            &lt;!&ndash; Vocabulary &ndash;&gt;
-           <div class="col-3">
-               <h5>Vocabulary</h5>
-
-
-               <div class="imc&#45;&#45;container-tree">
-
-                   <ul *ngIf="vocabolario && vocabolario_visualizza">
-                       <li *ngFor="let term of vocabolario.terms">
-                           <h3>
-                               <span class="term" href="#" (click)="vocabolario_term(term)">
-                                   <span [innerHTML]="term.label"></span>
-                                   <i class="material-icons" *ngIf="!term.open">keyboard_arrow_down</i>
-                                   <i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
-                               </span>
-                           </h3>
-                           <ul class="term-list" [ngClass]="{'display-none': !term.open}">
-                               <li *ngFor="let child of term.children">
-                                   <span class="term" [innerHTML]="child.label" (click)="vocabolario_term(child)"></span>
-                                   &lt;!&ndash;<i class="material-icons">keyboard_arrow_down</i>&ndash;&gt;
-                                   <ul class="child-list" [ngClass]="{'display-none': !child.open}">
-                                       <li *ngFor="let leaf of child.children">
-                                           <span class="term" (click)="vocabolario_leaf(leaf)">
-                                                <span [innerHTML]="leaf.label"></span>
-                                               <i *ngIf="leaf.selected" class="material-icons">check</i>
-                                           </span>
-                                       </li>
-                                   </ul>
-                               </li>
-                           </ul>
-                       </li>
-                   </ul>
-
-               </div>
-
-
-           </div>
-
-            &lt;!&ndash; Search termtag &ndash;&gt;
-           <div class="col-4 row no-gutters">
-               <div class="row no-gutters imc&#45;&#45;flex&#45;&#45;vertical-end">
-                   <span class="col-7">
-                       <input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag" #search_field (keyup)="ricerca($event)">
-                   </span>
-                   <span class="col-5 imc&#45;&#45;flex&#45;&#45;horizontal-end">
-                       <button type="button" class="btn btn-accent">Add term</button>
-                   </span>
-               </div>
-
-               &lt;!&ndash; Tag appena inseriti &ndash;&gt;
-               <div class="col-12 new-badge space-paragraph-25">
-                   <ng-template ngFor let-risultato [ngForOf]="ricerca_risultati">
-                        <app-media-annotation  [annotation]="risultato"></app-media-annotation>
-                   </ng-template>
-               </div>
-               &lt;!&ndash; Attivazione della data di pubblicazione &ndash;&gt;
-               <div class="col-12 new-badge space-paragraph-10 row no-gutters imc&#45;&#45;flex&#45;&#45;vertical-center">
-                   <div class="col-6 box-checkbox imc&#45;&#45;flex&#45;&#45;vertical-center">
-                       &lt;!&ndash;@NSI Attiva il campo date sotto &ndash;&gt;
-                       <input class="imc&#45;&#45;input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
-                       <label for="multi-annotation">Not public until</label>
-                   </div>
-&lt;!&ndash;
-                   @NSI calendario bootstrap
-                   todo provare a integrare
-                   <div class="form-group col-7 space-paragraph-10">
-                       <div class="input-group">
-                           <input class="form&#45;&#45;control imc&#45;&#45;input imc&#45;&#45;input-data" placeholder="yyyy-mm-dd"
-                                  name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
-                           <div class="input-group-append">
-                               <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-                                   <i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">today</i>
-                               </button>
-                           </div>
-                       </div>
-                   </div>
-&ndash;&gt;
-                   <div class="col-7 space-paragraph-10">
-                       <input class="imc&#45;&#45;input imc&#45;&#45;input-data" type="date">
-                   </div>
-               </div>
-               <div class="col-12 space-paragraph-25">
-                   <ng-template ngFor let-term [ngForOf]="terms">
-                       <app-media-annotation [annotation]="term"></app-media-annotation>
-                   </ng-template>
-               </div>
-           </div>
-
-       </div>
-
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-border-classic" (click)="chiudi()">Cancel</button>
-        <button type="button" class="btn btn-accent" (click)="salva()">Save</button>
-    </div>
-</div>
--->

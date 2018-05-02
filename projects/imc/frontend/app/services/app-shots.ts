@@ -39,6 +39,7 @@ export class AppShotsService {
         shots.forEach( s => {
 
             let shot_processato = {
+                id: s.id,
                 attributes: s.attributes,
                 links: s.links,
                 annotations: {
