@@ -1583,6 +1583,21 @@
 				};						
 			self.annotations.push(anno);
 		});
+
+		$rootScope.$on('updateSegmentation', function(event, annoInfo, segmentInfo) {
+			console.log('update segmentation list with tag: ' + annoInfo.name);
+			var segments = self.manualSegmentations[0].segments;
+			for (var i = 0; i < segments.length; i++) {
+				if (segments[i].start === segmentInfo.start && segments[i].end === segmentInfo.end) {
+					segments[i].tags.push({
+						hits: 1,
+						iri: annoInfo.iri,
+						name: annoInfo.name
+					})
+				}
+			}
+		});
+
 		$rootScope.$on('updateShotSelectedForNotes', function(event, newShotSelected) {
 			if (newShotSelected === null) {
 				return;
@@ -1592,7 +1607,8 @@
 				self.notesShotSelected = newShotSelected;
 			}
 			return;
-		});		
+		});
+
 		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
 			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
 			if (noteInfo === null) {
@@ -1632,6 +1648,7 @@
 			//console.log("situazione delle note: " + angular.toJson(self.notes, true));
 			return;
 		});
+
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
 			angular.forEach(self.annotations, function(anno) {
@@ -2386,22 +2403,22 @@
 
 		// itemType: IMAGE, VIDEO
 		// targetType: ITEM, SHOT
-		self.confirmVocabularyTerms = function(itemType,targetType, selector) {
+		self.confirmVocabularyTerms = function(itemType, targetType, selector) {
 			//console.log('confirmVocabularyTerms: itemType=' + itemType);
 			//console.log('confirmVocabularyTerms: targetType=' + targetType);
 			//var vid = sharedProperties.getVideoId();
 			var target;
-			if(targetType == 'ITEM'){
+			if (targetType == 'ITEM') {
 				// al momento il caso item e' solo per le immagini
 				target = 'item:' + $scope.itemId;
-			}else{
+			} else {
 				target = 'shot:' + $scope.shotID;
 			}
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags, selector).then(
 					function(resp) {
-						//console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
+						console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
 						var annoId = resp.data.id;
 						var creatorId = resp.data.creator.id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
@@ -2414,14 +2431,21 @@
 								"creator": creatorId
 							};
 							//console.log("annoInfo=" + angular.toJson(annoInfo, true));
-							if(itemType == 'IMAGE'){
+							if (itemType == 'IMAGE') {
 								$rootScope.$emit('createdNewAnnotation', '', annoInfo);
-							}else {
+							} else if (itemType == 'VIDEO' && selector !== undefined) {
+								var segmentInfo = {
+									id: resp.data.targets[0].id,
+									start: resp.data.targets[0].attributes.start_frame_idx,
+									end: resp.data.targets[0].attributes.end_frame_idx
+								}
+								$rootScope.$emit('updateSegmentation', annoInfo, segmentInfo);
+							} else {
 								var shotInfo = {
-								"id": $scope.shotID,
-								"shotNum": $scope.shotNum,
-								"startT": $scope.startT,
-								"endT": $scope.endT
+									"id": $scope.shotID,
+									"shotNum": $scope.shotNum,
+									"startT": $scope.startT,
+									"endT": $scope.endT
 								};
 								//console.log("shotInfo=" + angular.toJson(shotInfo, true));
 								$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
