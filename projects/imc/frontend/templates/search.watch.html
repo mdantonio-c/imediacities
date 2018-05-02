@@ -383,7 +383,13 @@
 											<i class="fa-li fa fa-tags light-brown"></i>
 											<ul class="list-inline">
 												<li ng-repeat="tag in seg.tags | filter: {spatial:'!'}">
-													<span class="label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+													<span class="tag label label-term"><i ng-if="!tag.iri">&ldquo;</i>{{tag.name}}<i ng-if="!tag.iri">&rdquo;</i> <!-- <span ng-show="tag.hits > 1">({{tag.hits}})</span> -->
+													<a class="remove"
+														ng-if="profile.uuid == tag.creator"
+														ng-click="watchCtrl.deleteAnnotation(tag)">
+														<i class="glyphicon glyphicon-remove-sign glyphicon-white dark"></i>
+													</a>
+													</span>
 												</li>
 											</ul>
 										</li>
@@ -391,7 +397,13 @@
 											<i class="fa-li fa fa-map-marker brown"></i>
 											<ul class="list-inline">
 												<li ng-repeat="tag in seg.tags | filter: {spatial:'!!'}">
-													<span class="label label-location">{{tag.name}} <span ng-show="tag.hits > 1">({{tag.hits}})</span></span>
+													<span class="tag label label-location">{{tag.name}} <!-- <span ng-show="tag.hits > 1">({{tag.hits}})</span> -->
+													<a class="remove"
+														ng-if="profile.uuid == tag.creator"
+														ng-click="watchCtrl.deleteAnnotation(tag)">
+														<i class="glyphicon glyphicon-remove-sign glyphicon-white dark"></i>
+													</a>
+													</span>
 												</li>
 											</ul>
 										</li>
@@ -463,10 +475,8 @@
 			</uib-tabset>
 		</div>
 	</div>
-<!-- hidden map
 	<hr/>
-	<div ng-controller="MapController as vm"
-		 >
+	<div ng-controller="MapController as vm">
 		<div class="row">
 			<div class="container" 
 					ng-show="vm.mapLoading"
@@ -483,7 +493,6 @@
 		</div>
 	</div>
 	<hr/>
--->
 
 	<!-- location modal -->
 	<script type="text/ng-template" id="myModalGeoCode.html">
@@ -508,7 +517,7 @@
 				<div class="input-group animated fadeIn">
 					<input type="text" class="form-control finderBar" ng-model="inputTag" ng-autocomplete details="vm.address" id="address" name="address" type="text" placeholder="Enter location: City, State..."/>
 					<span class="input-group-btn">
-						<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
+						<button class="btn btn-primary btn-sm" type="button" ng-click="$tagCtrl.confirmLocation()">Confirm</button>
 					</span>
 				</div>
 			</form>

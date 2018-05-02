@@ -1032,18 +1032,32 @@
 					sharedProperties.setShotId(shotId);
 					sharedProperties.setShotNum(shotNum+1);
 
-					// filter actual manual annotations for this shot
-					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
-					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+					// filter current manual annotations for this shot
+					var current_annotations = [];
+					if (selector !== undefined) {
+						// referring annotation by segments
+						var [s_start, s_end] = selector.replace('t=', '').split(',');
+						for (var j = 0; j < self.manualSegmentations[0].segments.length; j++) {
+							if (String(self.manualSegmentations[0].segments[j].start) === s_start &&
+								String(self.manualSegmentations[0].segments[j].end) === s_end) {
+								current_annotations = self.manualSegmentations[0].segments[j].tags;
+								break;
+							}
+						}
+					} else {
+						// referring annotation by shots
+						current_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
+					}
+					// console.log('current annotations for this target: '+ angular.toJson(current_annotations, true));
 					
 					if (mode == 'term') {
-						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations, selector: selector});
+						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: current_annotations, selector: selector});
 					}
 					else if (mode == 'notes') {
-						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, selector: selector});
+						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: current_annotations, selector: selector});
 					}
 					else if (mode == 'location') {
-						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations, selector: selector});
+						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: current_annotations, selector: selector});
 					}
 					// exit loop
 					break;
@@ -1069,15 +1083,32 @@
 				// YES: delete annotation
 				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
 					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					var found = false;
 					angular.forEach(self.annotations, function(anno, index) {
 						if (anno.id === annoId &&
 							((anno.iri !== undefined && anno.iri === bodyIRI) ||
 								anno.name === bodyName)) {
 							self.annotations.splice(index, 1);
+						    found = true;
 						}
 					});
 					// update the timeline with the remaining annotations
-					$rootScope.$emit('updateTimeline', '', null, null);
+					if (found) {
+						$rootScope.$emit('updateTimeline', '', null, null);
+					} else if (self.manualSegmentations.length > 0) {
+						// look at tag list in the segmentation
+						// console.log('update tag list in the segmentation');
+						angular.forEach(self.manualSegmentations[0].segments, function(segment) {
+							for (var i = 0; i < segment.tags.length; i++) {
+								if (segment.tags[i].id === annoId &&
+									((segment.tags[i].iri !== undefined && segment.tags[i].iri === bodyIRI) ||
+										segment.tags[i].name === bodyName)) {
+									segment.tags.splice(i, 1);
+								}
+							}
+						});
+					}
+
 				}, function(err) {
 					// TODO
 				});
@@ -1583,6 +1614,23 @@
 				};						
 			self.annotations.push(anno);
 		});
+
+		$rootScope.$on('updateSegmentation', function(event, annoInfo, segmentInfo) {
+			// console.log('update segmentation list with tag: ' + annoInfo.name);
+			var segments = self.manualSegmentations[0].segments;
+			for (var i = 0; i < segments.length; i++) {
+				if (segments[i].start === segmentInfo.start && segments[i].end === segmentInfo.end) {
+					segments[i].tags.push({
+						id: annoInfo.id,
+						iri: annoInfo.iri,
+						name: annoInfo.name,
+						spatial: annoInfo.spatial,
+						creator: annoInfo.creator
+					});
+				}
+			}
+		});
+
 		$rootScope.$on('updateShotSelectedForNotes', function(event, newShotSelected) {
 			if (newShotSelected === null) {
 				return;
@@ -1592,7 +1640,8 @@
 				self.notesShotSelected = newShotSelected;
 			}
 			return;
-		});		
+		});
+
 		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
 			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
 			if (noteInfo === null) {
@@ -1632,6 +1681,7 @@
 			//console.log("situazione delle note: " + angular.toJson(self.notes, true));
 			return;
 		});
+
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
 			angular.forEach(self.annotations, function(anno) {
@@ -1669,7 +1719,16 @@
 							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
 							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
 							seg['id'] = values.bodies[0].segments[j].id;
-							seg['tags'] = values.bodies[0].segments[j].tags;
+							seg['tags'] = [];
+							for (var a = 0; a < values.bodies[0].segments[j].annotations.length; a++) {
+								seg['tags'].push({
+									id: values.bodies[0].segments[j].annotations[a].id,
+									iri: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.iri,
+									name: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.name,
+									spatial: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.spatial,
+									creator: values.bodies[0].segments[j].annotations[a].creator.id
+								});
+							}
 							segment['segments'].push(seg);
 						}
 
@@ -2386,22 +2445,22 @@
 
 		// itemType: IMAGE, VIDEO
 		// targetType: ITEM, SHOT
-		self.confirmVocabularyTerms = function(itemType,targetType, selector) {
+		self.confirmVocabularyTerms = function(itemType, targetType, selector) {
 			//console.log('confirmVocabularyTerms: itemType=' + itemType);
 			//console.log('confirmVocabularyTerms: targetType=' + targetType);
 			//var vid = sharedProperties.getVideoId();
 			var target;
-			if(targetType == 'ITEM'){
+			if (targetType == 'ITEM') {
 				// al momento il caso item e' solo per le immagini
 				target = 'item:' + $scope.itemId;
-			}else{
+			} else {
 				target = 'shot:' + $scope.shotID;
 			}
 			if (self.tags.length > 0) {
 				// save the annotation into the database
 				DataService.saveTagAnnotations(target, self.tags, selector).then(
 					function(resp) {
-						//console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
+						// console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
 						var annoId = resp.data.id;
 						var creatorId = resp.data.creator.id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
@@ -2414,14 +2473,21 @@
 								"creator": creatorId
 							};
 							//console.log("annoInfo=" + angular.toJson(annoInfo, true));
-							if(itemType == 'IMAGE'){
+							if (itemType == 'IMAGE') {
 								$rootScope.$emit('createdNewAnnotation', '', annoInfo);
-							}else {
+							} else if (itemType == 'VIDEO' && selector !== undefined) {
+								var segmentInfo = {
+									id: resp.data.targets[0].id,
+									start: resp.data.targets[0].attributes.start_frame_idx,
+									end: resp.data.targets[0].attributes.end_frame_idx
+								}
+								$rootScope.$emit('updateSegmentation', annoInfo, segmentInfo);
+							} else {
 								var shotInfo = {
-								"id": $scope.shotID,
-								"shotNum": $scope.shotNum,
-								"startT": $scope.startT,
-								"endT": $scope.endT
+									"id": $scope.shotID,
+									"shotNum": $scope.shotNum,
+									"startT": $scope.startT,
+									"endT": $scope.endT
 								};
 								//console.log("shotInfo=" + angular.toJson(shotInfo, true));
 								$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
@@ -2643,25 +2709,32 @@
 					var termIRI = source.iri;
 					console.log('Annotation saved successfully. ID: ' + annoId);
 					var annoInfo = {
-						"id": annoId,
-						"name": $scope.labelTerm,
-						"iri": termIRI,
-						"group": $scope.group,
-						"creator": creatorId
+						id: annoId,
+						name: $scope.labelTerm,
+						iri: termIRI,
+						spatial: [spatial.lat, spatial.long],
+						group: $scope.group,
+						creator: creatorId
 					};
-					if(itemType == 'IMAGE'){
+					if (itemType == 'IMAGE') {
 						$rootScope.$emit('createdNewAnnotation', '', annoInfo);
-					}else{
+					} else if (itemType == 'VIDEO' && selector !== undefined) {
+						var segmentInfo = {
+							id: resp.data.targets[0].id,
+							start: resp.data.targets[0].attributes.start_frame_idx,
+							end: resp.data.targets[0].attributes.end_frame_idx
+						}
+						$rootScope.$emit('updateSegmentation', annoInfo, segmentInfo);
+					} else {
 						var shotInfo = {
-							"id": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
+							id: $scope.shotID,
+							shotNum: $scope.shotNum,
+							startT: $scope.startT,
+							endT: $scope.endT
 						};
 						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 					}
-					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);				
-
+					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
 				},
 				function(err){
 					// TODO
