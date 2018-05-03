@@ -1409,6 +1409,170 @@
 				});
 		};
 
+		/////////////////////////////////////////////////////////
+		///////////////// MANUAL SEGMENTATION ///////////////////
+		/////////////////////////////////////////////////////////
+
+		self.loadManualSegments = function() {
+			//console.log("loading annotations for imageId: " + imageId);
+			self.loading = true;
+			DataService.getManualSegments(vid).then(
+				function(response) {
+
+					self.manualSegmentations = [];
+					for (var i = 0; i < response.data.length; i++) {
+
+						var values = response.data[i];
+
+						var segment = {};
+
+						segment['creation_datetime'] = values.attributes.creation_datetime;
+						segment['creator'] = values.creator.id;
+						segment['id'] = values.id;
+
+						segment['segments'] = [];
+						for (var j = 0; j < values.bodies[0].segments.length; j++) {
+							var seg = {}
+							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
+							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
+							seg['id'] = values.bodies[0].segments[j].id;
+							seg['tags'] = [];
+							for (var a = 0; a < values.bodies[0].segments[j].annotations.length; a++) {
+								seg['tags'].push({
+									id: values.bodies[0].segments[j].annotations[a].id,
+									iri: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.iri,
+									name: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.name,
+									spatial: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.spatial,
+									creator: values.bodies[0].segments[j].annotations[a].creator.id
+								});
+							}
+							segment['segments'].push(seg);
+						}
+
+						self.manualSegmentations.push(segment);
+					}
+					/*self.manualSegmentations = response.data;*/
+					noty.extractErrors(response, noty.WARNING);
+				},
+				function(error) {
+					console.log("get manual segment error: " + angular.toJson(error));
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+		
+		self.startSegmentCreation = function() {
+			self.creatingSegment = true;
+		}
+		self.getCurrentFrame = function() {
+			return Math.ceil($scope.videoplayer.video.currentTime / $scope.videoplayer.frameLength);
+		}
+		self.lockSegmentStart = function(value) {
+			if (value) {
+				var new_value = self.getCurrentFrame();
+				if (new_value > self.segmentEnd) {
+					console.log("Error: segment start cannot be greater than end");
+				} else {
+					self.segmentStart = new_value
+				}
+			} else {
+				self.segmentStart = undefined;
+				self.lockSegmentEnd(false);
+			}
+		}
+		self.lockSegmentEnd = function(value) {
+			if (value) {
+				var new_value = self.getCurrentFrame();
+				if (self.segmentStart === undefined) {
+					console.log("Error: cannot set segment end before setting start");
+				}
+				else if (self.segmentStart > new_value) {
+					console.log("Error: segment end  cannot be lower than start");
+				} else {
+					self.segmentEnd = new_value;
+				}
+			} else {
+				self.segmentEnd = undefined;
+			}
+		}
+		self.stopSegmentCreation = function() {
+			self.creatingSegment = false;
+			self.lockSegmentStart(false);
+			self.lockSegmentEnd(false);
+		}
+
+		self.createSegment = function() {
+			var target = 'item:' + sharedProperties.getItemId();
+
+			if (self.manualSegmentations.length == 0) {
+				var apicall = DataService.saveManualSegmentation(target, self.segmentStart, self.segmentEnd);
+			} else {
+				var apicall = DataService.saveManualSegment(self.manualSegmentations[0].id, self.segmentStart, self.segmentEnd)
+			}
+			apicall.then(
+				function(response) {
+					noty.showSuccess("Manual segment successfully created.");
+					self.loadManualSegments();
+					self.stopSegmentCreation();
+				},
+				function(error) {
+					console.log("Segment Creation error: " + angular.toJson(error));
+					self.stopSegmentCreation();
+					noty.extractErrors(error, noty.ERROR);
+				}
+			);
+
+		}
+
+		self.deleteManualSegment = function(segment) {
+
+			if (self.manualSegmentations.length == 0) {
+				console.log("Unable to delete: no manual segmentation found");
+				return false;
+			}
+			if (segment === undefined) {
+				var text = "Are you really sure you want to delete all segments?";
+				var single_delete = false;
+			} else {
+				var text = "Are you really sure you want to delete this segment?";
+				var single_delete = true;
+			}
+			var subtext = "This operation cannot be undone.";
+			FormDialogService.showConfirmDialog(text, subtext).then(
+				function(answer) {
+					if (segment === undefined || self.manualSegmentations[0].segments.length <= 1) {
+						var apicall = DataService.deleteManualSegmentation(self.manualSegmentations[0].id);
+					} else {
+						var apicall = DataService.deleteManualSegment(self.manualSegmentations[0].id, segment.id);
+					}
+					apicall.then(
+						function(out_data) {
+				    		self.loadManualSegments();
+				    		if (single_delete) {
+				    			noty.showWarning("Manual segment successfully deleted.");
+				    		} else {
+				    			noty.showWarning("Manual segments successfully deleted.");
+
+				    		}
+
+			    		},
+			    		function(out_data) {
+							noty.extractErrors(out_data, noty.ERROR);
+			    		}
+		    		);
+				},
+				function() {
+
+				}
+			);
+		}
+
+		// init variables	
+		self.stopSegmentCreation();
+		///////////////////////////////////////////////////////////
+		//////////////// END MANUAL SEGMENTATION //////////////////
+		///////////////////////////////////////////////////////////
+
 		/**
 		 * When the user selects a shot in the Notes Tab then
 		 *  the tab must displays the notes of the selected shot
@@ -1454,6 +1618,7 @@
 			sharedProperties.setRecordProvider(
 						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 			self.loadVideoShots(vid, videoDuration);
+			self.loadManualSegments();
 		}
 
 		// On video time update: update the selected shot on the Notes tab
@@ -1691,170 +1856,6 @@
 				}
 			});
 		});
-
-		/////////////////////////////////////////////////////////
-		///////////////// MANUAL SEGMENTATION ///////////////////
-		/////////////////////////////////////////////////////////
-
-		self.loadManualSegments = function() {
-			//console.log("loading annotations for imageId: " + imageId);
-			self.loading = true;
-			DataService.getManualSegments(vid).then(
-				function(response) {
-
-					self.manualSegmentations = [];
-					for (var i = 0; i < response.data.length; i++) {
-
-						var values = response.data[i];
-
-						var segment = {};
-
-						segment['creation_datetime'] = values.attributes.creation_datetime;
-						segment['creator'] = values.creator.id;
-						segment['id'] = values.id;
-
-						segment['segments'] = [];
-						for (var j = 0; j < values.bodies[0].segments.length; j++) {
-							var seg = {}
-							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
-							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
-							seg['id'] = values.bodies[0].segments[j].id;
-							seg['tags'] = [];
-							for (var a = 0; a < values.bodies[0].segments[j].annotations.length; a++) {
-								seg['tags'].push({
-									id: values.bodies[0].segments[j].annotations[a].id,
-									iri: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.iri,
-									name: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.name,
-									spatial: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.spatial,
-									creator: values.bodies[0].segments[j].annotations[a].creator.id
-								});
-							}
-							segment['segments'].push(seg);
-						}
-
-						self.manualSegmentations.push(segment);
-					}
-					/*self.manualSegmentations = response.data;*/
-					noty.extractErrors(response, noty.WARNING);
-				},
-				function(error) {
-					console.log("get manual segment error: " + angular.toJson(error));
-					self.loading = false;
-					noty.extractErrors(error, noty.ERROR);
-				});
-		};
-		
-		self.startSegmentCreation = function() {
-			self.creatingSegment = true;
-		}
-		self.getCurrentFrame = function() {
-			return Math.ceil($scope.videoplayer.video.currentTime / $scope.videoplayer.frameLength);
-		}
-		self.lockSegmentStart = function(value) {
-			if (value) {
-				var new_value = self.getCurrentFrame();
-				if (new_value > self.segmentEnd) {
-					console.log("Error: segment start cannot be greater than end");
-				} else {
-					self.segmentStart = new_value
-				}
-			} else {
-				self.segmentStart = undefined;
-				self.lockSegmentEnd(false);
-			}
-		}
-		self.lockSegmentEnd = function(value) {
-			if (value) {
-				var new_value = self.getCurrentFrame();
-				if (self.segmentStart === undefined) {
-					console.log("Error: cannot set segment end before setting start");
-				}
-				else if (self.segmentStart > new_value) {
-					console.log("Error: segment end  cannot be lower than start");
-				} else {
-					self.segmentEnd = new_value;
-				}
-			} else {
-				self.segmentEnd = undefined;
-			}
-		}
-		self.stopSegmentCreation = function() {
-			self.creatingSegment = false;
-			self.lockSegmentStart(false);
-			self.lockSegmentEnd(false);
-		}
-
-		self.createSegment = function() {
-			var target = 'item:' + sharedProperties.getItemId();
-
-			if (self.manualSegmentations.length == 0) {
-				var apicall = DataService.saveManualSegmentation(target, self.segmentStart, self.segmentEnd);
-			} else {
-				var apicall = DataService.saveManualSegment(self.manualSegmentations[0].id, self.segmentStart, self.segmentEnd)
-			}
-			apicall.then(
-				function(response) {
-					noty.showSuccess("Manual segment successfully created.");
-					self.loadManualSegments();
-					self.stopSegmentCreation();
-				},
-				function(error) {
-					console.log("Segment Creation error: " + angular.toJson(error));
-					self.stopSegmentCreation();
-					noty.extractErrors(error, noty.ERROR);
-				}
-			);
-
-		}
-
-		self.deleteManualSegment = function(segment) {
-
-			if (self.manualSegmentations.length == 0) {
-				console.log("Unable to delete: no manual segmentation found");
-				return false;
-			}
-			if (segment === undefined) {
-				var text = "Are you really sure you want to delete all segments?";
-				var single_delete = false;
-			} else {
-				var text = "Are you really sure you want to delete this segment?";
-				var single_delete = true;
-			}
-			var subtext = "This operation cannot be undone.";
-			FormDialogService.showConfirmDialog(text, subtext).then(
-				function(answer) {
-					if (segment === undefined || self.manualSegmentations[0].segments.length <= 1) {
-						var apicall = DataService.deleteManualSegmentation(self.manualSegmentations[0].id);
-					} else {
-						var apicall = DataService.deleteManualSegment(self.manualSegmentations[0].id, segment.id);
-					}
-					apicall.then(
-						function(out_data) {
-				    		self.loadManualSegments();
-				    		if (single_delete) {
-				    			noty.showWarning("Manual segment successfully deleted.");
-				    		} else {
-				    			noty.showWarning("Manual segments successfully deleted.");
-
-				    		}
-
-			    		},
-			    		function(out_data) {
-							noty.extractErrors(out_data, noty.ERROR);
-			    		}
-		    		);
-				},
-				function() {
-
-				}
-			);
-		}
-
-		// init variables	
-		self.stopSegmentCreation();
-		///////////////////////////////////////////////////////////
-		//////////////// END MANUAL SEGMENTATION //////////////////
-		///////////////////////////////////////////////////////////
 
 	}
 
