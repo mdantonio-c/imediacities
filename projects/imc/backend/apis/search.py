@@ -59,10 +59,6 @@ class Search(GraphBaseOperations):
             if term is not None and (fields is None or len(fields) == 0):
                 raise RestApiException('Match term fields cannot be empty',
                                        status_code=hcodes.HTTP_BAD_REQUEST)
-
-            if term is not None:
-                term = self.sanitize_input_term(term)
-
             if fields is None:
                 fields = []
             multi_match_fields = []
