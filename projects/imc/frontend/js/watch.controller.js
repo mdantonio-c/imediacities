@@ -1618,6 +1618,7 @@
 			sharedProperties.setRecordProvider(
 						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 			self.loadVideoShots(vid, videoDuration);
+			sharedProperties.setItemId(self.video.relationships.item[0].id);
 			self.loadManualSegments();
 		}
 
