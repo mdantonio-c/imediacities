@@ -2160,6 +2160,7 @@
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 
 		var vm = this;
+		vm.hideMap = true;
 		vm.googleMapsUrl = GOOGLE_API_KEY;
 		vm.videolat = null;
 		vm.videolng = null;
@@ -2177,8 +2178,8 @@
 			// look for existing custom location
 			var customLocation;
 			var coverage;
-			if($scope.$parent.watchCtrl.video){
-					coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+			if ($scope.$parent.watchCtrl.video && $scope.$parent.watchCtrl.video.relationships.coverages !== undefined) {
+				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
 				if (coverage !== undefined) {
 					customLocation = coverage.attributes.spatial[0];
 				}
