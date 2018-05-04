@@ -61,7 +61,7 @@ class Search(GraphBaseOperations):
                                        status_code=hcodes.HTTP_BAD_REQUEST)
 
             if term is not None:
-                term = term.replace("'", "\\'")
+                term = self.sanitize_input_term(term)
 
             if fields is None:
                 fields = []
