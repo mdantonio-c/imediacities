@@ -53,8 +53,7 @@ class Search(GraphBaseOperations):
         if match is not None:
             term = match.get('term')
             if term is not None:
-                # strip and clean up term from '*'
-                term = term.strip().replace("*", "")
+                term = self.sanitize_input_term(term)
 
             fields = match.get('fields')
             if term is not None and (fields is None or len(fields) == 0):
@@ -310,3 +309,10 @@ class Search(GraphBaseOperations):
         meta_response["countByYears"] = group_by_years
 
         return self.force_response(data, meta=meta_response)
+
+    @staticmethod
+    def sanitize_input_term(term):
+        '''
+        Strip and clean up term from special characters.
+        '''
+        return term.strip().replace("*", "").replace("'", "\\'")
