@@ -475,8 +475,8 @@
 			</uib-tabset>
 		</div>
 	</div>
-	<hr/>
-	<div ng-controller="MapController as vm">
+	<div ng-controller="MapController as vm" ng-hide="vm.hideMap">
+		<hr/>
 		<div class="row">
 			<div class="container" 
 					ng-show="vm.mapLoading"
@@ -596,7 +596,7 @@
 		</div>
 		<div class="modal-footer">
 			<button class="btn btn-default" type="button" ng-click="$tagCtrl.cancel()">Cancel</button>
-			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()" ng-if="!selector">
+			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms()" ng-if="!selector">Confirm</button>
 			<button class="btn btn-primary" type="button" ng-click="$tagCtrl.confirmVocabularyTerms('VIDEO', 'ITEM', selector)" ng-if="selector">Confirm</button>
 		</div>
 	</script>
