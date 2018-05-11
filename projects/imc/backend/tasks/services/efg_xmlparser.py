@@ -232,6 +232,7 @@ class EFG_XMLParser():
                             'Invalid keyword language for: ' + lang.text)
                     else:
                         keyword['language'] = lang_code[0]
+                        log.debug('language: {}'.format(keyword['language']))
                 if ktype == 'Form':
                     # check term from a controlled IMC list
                     if term.text.lower() == 'n/a':
@@ -245,8 +246,9 @@ class EFG_XMLParser():
                         keyword['term'] = code_el[0]
                 else:
                     keyword['term'] = term.text.strip()
-                log.debug('keyword: {} | {}'.format(
-                    keyword['language'], keyword['term']))
+
+                log.debug('keyword: {}'.format(keyword['term']))
+                
                 #log.debug('term id: %s' % term.get('id'))
                 if term.get('id') is not None:
                     # check keyword term id is integer (keyword term id is optional)
@@ -375,7 +377,7 @@ class EFG_XMLParser():
             video_format = {}
             # gauge (0..1) enum
             gauge_el = node.find('efg:gauge', self.ns)
-            if gauge_el is not None and gauge_el.text.lower() != 'n/a':
+            if gauge_el is not None and gauge_el.text is not None and gauge_el.text.lower() != 'n/a':
                 code_el = codelists.fromCode(
                     gauge_el.text.strip(), codelists.GAUGE)
                 if code_el is None:
@@ -385,7 +387,7 @@ class EFG_XMLParser():
                     video_format['gauge'] = code_el[0]
             # aspectRation (0..1) enum
             aspect_ratio_el = node.find('efg:aspectRatio', self.ns)
-            if aspect_ratio_el is not None and aspect_ratio_el.text.lower() != 'n/a':
+            if aspect_ratio_el is not None and aspect_ratio_el.text is not None and aspect_ratio_el.text.lower() != 'n/a':
                 code_el = codelists.fromCode(
                     aspect_ratio_el.text.strip(), codelists.ASPECT_RATIO)
                 if code_el is None:
@@ -395,7 +397,7 @@ class EFG_XMLParser():
                     video_format['aspect_ratio'] = code_el[0]
             # sound (0..1) enum
             sound_el = node.find('efg:sound', self.ns)
-            if sound_el is not None:
+            if sound_el is not None and sound_el.text is not None and sound_el.text.lower() != 'n/a':
                 code_el = codelists.fromDescription(
                     sound_el.text.strip(), codelists.VIDEO_SOUND)
                 if code_el is None:
@@ -405,7 +407,7 @@ class EFG_XMLParser():
                     video_format['sound'] = code_el[0]
             # colour (0..1)
             colour_el = node.find('efg:colour', self.ns)
-            if colour_el is not None and colour_el.text.lower() != 'n/a':
+            if colour_el is not None and colour_el.text is not None and colour_el.text.lower() != 'n/a':
                 code_el = codelists.fromDescription(
                     colour_el.text.strip(), codelists.COLOUR)
                 if code_el is None:
