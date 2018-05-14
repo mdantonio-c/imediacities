@@ -1,7 +1,7 @@
 
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
 
-import { ApiService } from '/rapydo/src/app/api.service';
+import { ApiService } from '/rapydo/src/app/services/api';
 import { NotificationService} from '/rapydo/src/app/app.notification.service';
 
 @Component({
