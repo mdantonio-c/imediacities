@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 
 import { ApiService } from '/rapydo/src/app/services/api';
-import { NotificationService} from '/rapydo/src/app/app.notification.service';
+import { NotificationService} from '/rapydo/src/app/services/notification';
 
 @Component({
   selector: 'imc-archives-list',
