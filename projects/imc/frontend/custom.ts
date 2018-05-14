@@ -1,4 +1,4 @@
-
+/*
 import 'ngmap'
 import 'angular-google-chart'
 import 'lodash'
@@ -20,3 +20,4 @@ import '/app/frontend/js/stage.controller.js'
 import '/app/frontend/js/watch.controller.js'
 import '/app/frontend/js/stage.controller.js'
 import '/app/frontend/js/constants.js'
+*/

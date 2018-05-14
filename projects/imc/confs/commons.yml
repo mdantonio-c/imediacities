@@ -4,7 +4,7 @@ version: '3'
 services:
   backend:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
-    image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
+    image: ${COMPOSE_PROJECT_NAME}/backend:0.6.2
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
@@ -69,7 +69,7 @@ services:
 
   celery:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:0.6.1
+    image: ${COMPOSE_PROJECT_NAME}/celery:0.6.2
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
@@ -139,3 +139,7 @@ services:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
     environment:
       ACTIVATE: 1
+
+  frontend:
+    environment:
+      ANGULARJS: disabled
