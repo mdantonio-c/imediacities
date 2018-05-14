@@ -68,9 +68,6 @@
 							<tags-input ng-model="terms"
 								placeholder="Search by term"
 								display-property="label" add-on-paste="true"
-								uib-tooltip="Search by terms from the controlled vocabulary or the new ones added"
-								tooltip-placement="bottom"
-								tooltip-popup-delay="1000"
 								on-tag-removed="sc.deselectTreeviewNode($tag)"
 								on-tag-added="sc.selectTreeviewNode($tag)">
 						      <auto-complete source="sc.loadVocabularyTerms($query)"></auto-complete>
