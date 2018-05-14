@@ -25,15 +25,15 @@
       </a>
   </li>
 
-  <li class='nav-item' *ngIf="user && user.isAdmin">
+<!--   <li class='nav-item' *ngIf="user && user.isAdmin">
       <a class='nav-link' routerLink="/app/admin/archive" ui-sref="logged.admin.archive">
         Archive 
       </a>
   </li>
-
+ -->
   <li class='nav-item' *ngIf="user && user.isAdmin">
-      <a class='nav-link' routerLink="/new/archives">
-        *Archive*
+      <a class='nav-link' routerLink="/app/admin/archives">
+        Archive
       </a>
   </li>
 

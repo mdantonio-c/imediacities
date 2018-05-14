@@ -8,7 +8,7 @@ import { ArchivesListComponent } from './imc.archives.list'
 export const appRoutes: Routes = [
 
   {
-    path: 'new/archives',
+    path: 'app/admin/archives',
     component: ArchivesListComponent,
     canActivate: [AuthGuard],
     data: {role: 'admin_root'}
