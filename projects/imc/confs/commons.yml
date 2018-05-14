@@ -76,6 +76,7 @@ services:
       # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
+      - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
     depends_on:
       - rabbit
       - neo4j
