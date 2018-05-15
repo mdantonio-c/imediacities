@@ -209,7 +209,10 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 content_node.status = 'ERROR'
                 content_node.status_message = str(e)
                 content_node.save()
-            raise e
+            elif xml_resource is not None:
+                xml_resource.warnings.append(str(e))
+                xml_resource.save()
+            #raise e
 
         return 1
 

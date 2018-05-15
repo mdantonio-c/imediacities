@@ -241,9 +241,10 @@ class Bulk(GraphBaseOperations):
                         source_id=source_id, guuid=group.uuid))
                     c = [self.graph.MetaStage.inflate(row[0]) for row in results]
                     if len(c) > 1:
+                        # TODO gestire meglio questo caso
                         # there are more than one MetaStage related to the same source id: Database incoherence!
-                        logger.warning("Database incoherence: there are more than one MetaStage \
-                            related to the same source id %s: SKIPPED filename %s" % (source_id,standard_filename))
+                        logger.warning("Database incoherence: there is more than one MetaStage \
+                            related to the same source id %s: SKIPPED file %s" % (source_id,standard_filename))
                         skipped += 1
                         continue
 
@@ -287,14 +288,21 @@ class Bulk(GraphBaseOperations):
                             item_node, coherent = self.check_item_type_coherence(resource, standard_path)
                             if item_node is not None:
                                 if not coherent:
-                                    logger.warning("Incoming item_type different from item_type in database: SKIPPED filename %s" % standard_path)
-                                    skipped += 1
+                                    logger.error("Incoming item_type different from item_type in database for file %s" % standard_path)
+                                    resource.status = 'ERROR'
+                                    resource.status_message = "Incoming item_type different from item_type in database for file: " + standard_path
+                                    resource.save()
+                                    failed += 1
                                     continue
                                 # check for existing creation
                                 creation = item_node.creation.single()
                                 if creation is not None:
-                                    logger.warning("A creation with a different SOURCE_ID is already associated to %s" % standard_path)
-                                    raise Exception('Existent creation for the same filename but with different SOURCE_ID')
+                                    logger.error("A creation with a different SOURCE_ID is already associated to file: %s" % standard_path)
+                                    resource.status = 'ERROR'
+                                    resource.status_message = "A creation with a different SOURCE_ID is already associated to file: " + standard_path
+                                    resource.save()
+                                    failed += 1
+                                    continue
 
                             task = CeleryExt.update_metadata.apply_async(
                                 args=[standard_path, resource.uuid],
@@ -327,29 +335,59 @@ class Bulk(GraphBaseOperations):
                         # checking for item_type coherence
                         related_item, coherent = self.check_item_type_coherence(meta_stage, standard_path)
                         if related_item is not None and not coherent:
-                            logger.warning("Incoming item_type different from item_type in database: SKIPPED filename %s" % standard_path)
-                            skipped += 1
+                            logger.error("Incoming item_type different from item_type in database for file %s" % standard_path)
+
+                            meta_stage.status = 'ERROR'
+                            meta_stage.status_message = "Incoming item_type different from item_type in database for file: " + standard_path
+                            meta_stage.save()
+                            failed += 1
                             continue
                         #update dei soli metadati
                         logger.info("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
 
                         # devo aggiornare nel MetaStage i campi nomefile e path con quelli che
                         #  vado a usare per l'aggiornamento dei metadati
-                        meta_stage.filename = standard_filename
-                        meta_stage.path = standard_path
-                        meta_stage.save()
 
-                        task = CeleryExt.update_metadata.apply_async(
-                            args=[standard_path, meta_stage.uuid],
-                            countdown=10
-                        )
-                        logger.info("Task id=%s" % task.id)
-                        meta_stage.status = "UPDATING METADATA"
-                        meta_stage.task_id = task.id
-                        meta_stage.save()
-                        updated += 1
+                        # Attenzione: prima bisogna verificare che non esista già un altro metastage 
+                        #              che ha lo stesso standard_path che stiamo andando ad associare
+                        #              al nostro meta_stage (ovviamente avranno source_id diverso)
+                        #              altrimenti viene lanciata una eccezione
+                        props2 = {}
+                        props2['filename'] = standard_filename
+                        props2['path'] = standard_path
+                        try:
+                            metastage_samepath = self.graph.MetaStage.nodes.get(**props2)
+                            logger.debug("metastage_samepath uuid: %s" % metastage_samepath.uuid)
+                            logger.debug("meta_stage uuid: %s" % meta_stage.uuid)
+                            # se è distinto rispetto a quello che avevo trovato per source id
+                            #  allora c'è qualcosa che non va
+                            if metastage_samepath.uuid != meta_stage.uuid:
+                                logger.error("Another metastage exists for file %s" % standard_path)
+                                meta_stage.status = 'ERROR'
+                                meta_stage.status_message = "Another metastage exists for file " + standard_path
+                                meta_stage.save()
+                                failed += 1
+                                continue
+
+                        except self.graph.MetaStage.DoesNotExist:
+                            logger.info("MetaStage does not exist for %s" % standard_path)
+                            # aggiorno nel MetaStage i campi nomefile e path
+                            meta_stage.filename = standard_filename
+                            meta_stage.path = standard_path
+                            meta_stage.save()
+
+                            task = CeleryExt.update_metadata.apply_async(
+                                args=[standard_path, meta_stage.uuid],
+                                countdown=10
+                            )
+                            logger.info("Task id=%s" % task.id)
+                            meta_stage.status = "UPDATING METADATA"
+                            meta_stage.task_id = task.id
+                            meta_stage.save()
+                            updated += 1
+
                 except Exception as e:
-                    logger.debug("Update operation failed for filename %s, error message=%s" % (file_path,e))
+                    logger.error("Update operation failed for filename %s, error message=%s" % (file_path,e))
                     failed += 1
                     continue
 
