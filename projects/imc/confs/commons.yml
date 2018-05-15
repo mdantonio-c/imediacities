@@ -106,6 +106,8 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
+      PROJECT_DOMAIN: ${PROJECT_DOMAIN}
+
   celeryui:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
