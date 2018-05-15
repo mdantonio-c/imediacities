@@ -209,7 +209,10 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 content_node.status = 'ERROR'
                 content_node.status_message = str(e)
                 content_node.save()
-            raise e
+            elif xml_resource is not None:
+                xml_resource.warnings.append(str(e))
+                xml_resource.save()
+            #raise e
 
         return 1
 
@@ -300,45 +303,49 @@ def update_meta_stage(self, resource_id, path, metadata_update):
     try:
         xml_resource = self.graph.MetaStage.nodes.get(uuid=resource_id)
 
-        group = GraphBaseOperations.getSingleLinkedNode(
-            xml_resource.ownership)
+        if xml_resource is not None:
 
-        source_id = extract_creation_ref(self, path)
-        if source_id is None:
-            raise Exception(
-                "No source ID found importing metadata file %s" % path)
+            group = GraphBaseOperations.getSingleLinkedNode(
+                xml_resource.ownership)
 
-        item_type = extract_item_type(self, path)
-        if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
-            raise Exception("Invalid content type for: " + item_type)
-        log.info("Content source ID: {0}; TYPE: {1}".format(
-            source_id, item_type))
+            source_id = extract_creation_ref(self, path)
+            if source_id is None:
+                raise Exception(
+                    "No source ID found importing metadata file %s" % path)
 
-        # check for existing item
-        item_node = xml_resource.item.single()
-        if item_node is None:
-            item_properties = {}
-            item_properties['item_type'] = item_type
-            item_node = self.graph.Item(**item_properties).save()
-            item_node.ownership.connect(group)
-            item_node.meta_source.connect(xml_resource)
-            item_node.save()
-            log.debug("Item resource created for resource_id=%s" % resource_id)
+            item_type = extract_item_type(self, path)
+            if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
+                raise Exception("Invalid content type for: " + item_type)
+            log.info("Content source ID: {0}; TYPE: {1}".format(
+                source_id, item_type))
 
-        # check for existing creation
-        creation = item_node.creation.single()
-        if creation is not None and not metadata_update:
-            log.info("Skip updating metadata for resource_id=%s" % resource_id)
+            # check for existing item
+            item_node = xml_resource.item.single()
+            if item_node is None:
+                item_properties = {}
+                item_properties['item_type'] = item_type
+                item_node = self.graph.Item(**item_properties).save()
+                item_node.ownership.connect(group)
+                item_node.meta_source.connect(xml_resource)
+                item_node.save()
+                log.debug("Item resource created for resource_id=%s" % resource_id)
+
+            # check for existing creation
+            creation = item_node.creation.single()
+            if creation is not None and not metadata_update:
+                log.info("Skip updating metadata for resource_id=%s" % resource_id)
+            else:
+                # update metadata
+                log.debug("Updating metadata for resource_id=%s" % resource_id)
+                xml_resource.warnings = extract_descriptive_metadata(
+                    self, path, item_type, item_node)
+                log.info("Metadata updated for resource_id=%s" % resource_id)
+
+                xml_resource.status = 'COMPLETED'
+                xml_resource.status_message = 'Nothing to declare'
+                xml_resource.save()
         else:
-            # update metadata
-            log.debug("Updating metadata for resource_id=%s" % resource_id)
-            xml_resource.warnings = extract_descriptive_metadata(
-                self, path, item_type, item_node)
-            log.info("Metadata updated for resource_id=%s" % resource_id)
-
-            xml_resource.status = 'COMPLETED'
-            xml_resource.status_message = 'Nothing to declare'
-            xml_resource.save()
+            log.warning("Not found MetaStage for resource_id=%s" % resource_id)
 
     except Exception as e:
         log.error("Failed update of resource_id %s, Error: %s" % (resource_id,e))

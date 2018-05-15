@@ -164,29 +164,28 @@ class Stage(GraphBaseOperations):
 
 # POST
 # 
-# Start IMPORT
-#
-# 1) estraggo il source id dal file dei metadati
-#     se non lo trovo -> RestApiException
-# 
-# 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
-#    se ne trovo più di uno -> RestApiException
-#
-#    se ne trovo uno -> updating metadata
-#        se il nome del file dei metadati è diverso da quello in db -> RestApiException
-#        cerco se c'è un content stage associato a quel meta stage
-#            se esiste e se ha status COMPLETED -> mode=skip
-#
-#    se ne trovo zero -> creating new element
-#        se il file dei metadati non rispetta la convenzione del name '<archive code>_<source id>.xml' -> cambio il nome al file
-#        cerco se esiste già un metastage con quel filename
-#            se non esiste lo creo
-#
-# 3) faccio partire l'import con parametri: path, meta_stage.uuid, mode, metadata_update
 #
     @decorate.catch_error()
     @catch_graph_exceptions
     def post(self):
+
+        """
+        Start IMPORT
+        1) estraggo il source id dal file dei metadati
+            se non lo trovo -> RestApiException 
+        2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID e appartenente al gruppo
+            se ne trovo più di uno -> RestApiException
+            se ne trovo uno -> updating metadata
+                se il nome del file dei metadati è diverso da quello in db -> RestApiException
+                cerco se c'è un content stage associato a quel meta stage
+                    se esiste e se ha status COMPLETED -> mode=skip
+            se ne trovo zero -> creating new element
+                se il file dei metadati non rispetta la convenzione del name '<archive code>_<source id>.xml'
+                    cambio il nome al file
+                cerco se esiste già un metastage con quel filename
+                    se non esiste lo creo
+        3) faccio partire l'import con parametri: path, meta_stage.uuid, mode, metadata_update
+        """
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -235,15 +234,17 @@ class Stage(GraphBaseOperations):
         log.debug("Source id %s found in metadata file" % source_id)
 
         # 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
+        #     e appartenente al gruppo
         meta_stage = None
         try:
-            query = "match (ms:MetaStage)<-[r3:META_SOURCE]-(i:Item) \
+            query = "match (g:Group)<-[r4:IS_OWNED_BY]-(ms:MetaStage) \
+                        match (ms:MetaStage)<-[r3:META_SOURCE]-(i:Item) \
                         match (i:Item)-[r2:CREATION]->(c:Creation) \
                         match (c:Creation)-[r1:RECORD_SOURCE]-> (rs:RecordSource) \
-                        WHERE rs.source_id = '{source_id}' \
+                        WHERE rs.source_id = '{source_id}' and g.uuid = '{guuid}' \
                         return ms"
 
-            results = self.graph.cypher(query.format(source_id=source_id))
+            results = self.graph.cypher(query.format(source_id=source_id, guuid=group.uuid))
             c = [self.graph.MetaStage.inflate(row[0]) for row in results]
             if len(c) > 1:
                 # there are more than one MetaStage related to the same source id: Database incoherence!
@@ -290,7 +291,8 @@ class Stage(GraphBaseOperations):
                     standard_path = os.path.join(upload_dir, standard_filename)
                     # rinomino il file nel filesystem
                     try:
-                        # TODO qui cambio il nome al file dell'utente: come faccio ad avvisarlo????
+                        # cambio il nome al file dell'utente
+                        # TODO come faccio ad avvisarlo????
                         os.replace(path,standard_path)
                     except OSError as ose:
                         log.debug("Error in renaming file %s to %s: " % (path,standard_path))
