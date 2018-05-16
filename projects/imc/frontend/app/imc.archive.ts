@@ -16,6 +16,7 @@ export class ArchiveComponent implements OnInit {
 	@ViewChild('dataModification') public dataModification: TemplateRef<any>;
 	@ViewChild('dataStatus') public dataStatus: TemplateRef<any>;
 
+	private loading:boolean = false;
 	private data: Array<any> = [];
 	private rows: Array<any> = [];
 	private columns: Array<any> = []
@@ -24,13 +25,8 @@ export class ArchiveComponent implements OnInit {
 	private numPages:number = 1;
 	private dataLength:number = 0;
 
-	constructor(
-		private api: ApiService,
-		private notify: NotificationService,
-	) {
+	constructor(private api: ApiService, private notify: NotificationService) {}
 
-
-	}
 	public ngOnInit(): void {
 
 		this.list();
@@ -46,6 +42,7 @@ export class ArchiveComponent implements OnInit {
 
 	list() {
 
+		this.loading = true;
 		this.api.get('stage', this.group.id).subscribe(
       		response => {
 
@@ -55,9 +52,11 @@ export class ArchiveComponent implements OnInit {
 				this.rows = this.changePage(this.data);
 				console.log(this.data);
 				this.notify.extractErrors(response, this.notify.WARNING);
+				this.loading = false;
 			}, error => {
 				console.log(error);
       			this.notify.extractErrors(error, this.notify.ERROR);
+				this.loading = false;
       		}
   		);
 

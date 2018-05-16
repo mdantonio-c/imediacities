@@ -11,6 +11,7 @@ import { NotificationService} from '/rapydo/src/app/services/notification';
 })
 export class ArchivesListComponent { 
 
+	private loading:boolean = false;
 	private groups: Array<any> = [];
 
 	constructor(private api: ApiService, private notify: NotificationService) {
@@ -20,13 +21,16 @@ export class ArchivesListComponent {
 	}
 
 	list() {
+		this.loading = true;
 		this.api.get('admin/groups').subscribe(
       		response => {
 				this.groups = this.api.parseResponse(response.data);
 				this.notify.extractErrors(response, this.notify.WARNING);
+				this.loading = false;
 			}, error => {
 				console.log(error);
       			this.notify.extractErrors(error, this.notify.ERROR);
+      			this.loading = false;
       		}
        );
 	}
