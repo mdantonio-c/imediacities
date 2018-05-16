@@ -3,7 +3,7 @@
   ng-include="main.templateDir + 'loader.html'">
 </div>
 <div class='row' ng-if='!profile.roles["Archive"]'>
-  <div class='col-xs-12 text-center'>
+  <div class='col-12 text-center'>
     <div class='panel panel-danger'>
       <div class='panel-body palette-Red-100 bg'>
         <i class='material-icons medium palette-Red-500 text'>warning</i>
@@ -17,7 +17,7 @@
 </div>
 <div ng-controller='StageController as ctrl' ng-if='profile.roles["Archive"]'>
   <div class='row'>
-    <div class='col-xs-8 col-xs-offset-2'>
+    <div class='col-8 offset-2'>
       <div class='panel panel-default'>
         <div class='panel-heading'>
           <h4 class='panel-title'>Upload new videos</h4>
@@ -72,14 +72,14 @@
   </div>
   <div ng-controller='ListsController as listctrl'>
     <div class='row'>
-      <div class='col-xs-12'>
+      <div class='col-12'>
         <div class='panel panel-default'>
           <div class='panel-heading'>
             <div class='row'>
-              <div class='col-xs-11'>
+              <div class='col-11'>
                 <h4 class='panel-title'>Your files
               </div>
-              <div class='col-xs-1'>
+              <div class='col-1'>
                 <a href="" ng-click="ctrl.loadFiles()">
                   <h4 class='text-right'>
                   <span class="glyphicon glyphicon-refresh" aria-hidden="true" uib-tooltip='Refresh'></span>
