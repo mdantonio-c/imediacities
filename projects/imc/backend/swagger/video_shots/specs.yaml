@@ -3,6 +3,6 @@ class: VideoShots
 schema:
   expose: true
 mapping:
-  video_annoations: "/videos/<video_id>/shots"
+  video_shots: "/videos/<video_id>/shots"
 labels:
   - video_shots

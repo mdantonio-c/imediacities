@@ -1,6 +1,6 @@
 annotation:
-  summary: Updates an annotation
-  description: Update a single annotation identified via its uuid
+  summary: Updates partially an annotation
+  description: Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.
   custom:
     # publish: true
     authentication: true
@@ -10,12 +10,12 @@ annotation:
       required: true
       description: The annotation's uuid
       type: string
-    - name: annotation
+    - name: JsonPatch
       in: body
       required: true
       description: The annotation to update.
       schema:
-        $ref: "#/definitions/Annotation"
+        $ref: "#/definitions/PatchRequest"
   responses:
     204:
       description: Annotation successfully updated.

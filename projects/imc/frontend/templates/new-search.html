@@ -19,6 +19,9 @@
 											class="form-control"
 											ng-model="inputTerm"
 											ng-attr-placeholder="Look within results"
+											uib-tooltip="Search within titles, keywords or descriptions"
+											tooltip-placement="bottom"
+											tooltip-popup-delay="1000"
 											ng-trim="true"
 											name="input-term"
 											ng-keypress="sc.goToSearch($event)">
@@ -63,7 +66,7 @@
 						<i class="fa fa-tags"></i>Terms</h4>
 						<div class="widget-main" style="max-width: 280px;">
 							<tags-input ng-model="terms"
-								placeholder="Search a term" 
+								placeholder="Search by term"
 								display-property="label" add-on-paste="true"
 								on-tag-removed="sc.deselectTreeviewNode($tag)"
 								on-tag-added="sc.selectTreeviewNode($tag)">
@@ -186,10 +189,10 @@
 													<div map-lazy-load="https://maps.google.com/maps/api/js" map-lazy-load-params="{{sc.googleMapsUrl}}">
 														<ng-map ng-show="sc.mapLoaded"
 														  default-style="true"
-														  center="{{sc.mapCenter}}"
 														  on-center-changed="sc.centerChanged()"
 														  on-zoom_changed="sc.zoomChanged()"
 														  disable-default-u-i="true"
+														  styles="{{sc.mapStyle}}"
 														  zoom-control="true" default-style="false" style="display: block; min-height: 500px; height: 100%;">
 															<custom-control id="custom-control" position="TOP_RIGHT" index="1" draggable="false">
 																<div>
@@ -205,9 +208,14 @@
 															<custom-control id="place-control" position="TOP_LEFT" index="1" draggable="false">
 																<div>
 																	<input type="text" name="lookup-place" 
-																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place"><!--  <p>{{sc.mapCenter}}</p> -->
+																		ng-model="sc.inputPlaceName" details="sc.inputPlaceDetails" ng-autocomplete placeholder="Enter a place">
 																</div>
 															</custom-control>
+															<custom-marker ng-repeat="city in sc.counters"
+																id="counter-marker-{{city.provider}}"
+																position="{{city.position}}">
+																<div class="map-counter-panel">{{city.counter}}</div>
+															</custom-marker>
 															<info-window id="tag-iw">
 																<div ng-non-bindable="" id="infowindow-content">
 																	<div class="place-info">

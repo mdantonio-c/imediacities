@@ -126,4 +126,58 @@
         </div>
 
     </div>
+
+    <div class="markers__wrapper" ng-if='watchCtrl.creatingSegment'>
+
+        <div class="controls__row controls__status__info">
+            <div class="mark">Manual segmentation</div>
+            <div class="mark">Start Frame:
+                <i ng-if='watchCtrl.segmentStart === undefined'>
+                    N/A
+                </i>
+                <i ng-if='watchCtrl.segmentStart !== undefined'>
+                    {{watchCtrl.segmentStart}}
+                </i>
+
+                <span>
+                    <i 
+                        class="fa fa-unlock pull-right"
+                        ng-if='watchCtrl.segmentStart === undefined'
+                        ng-click='watchCtrl.lockSegmentStart(true)'
+                    ></i>
+                </span>
+                <span>
+                    <i
+                        class="fa fa-lock pull-right"
+                        ng-if='watchCtrl.segmentStart !== undefined'
+                        ng-click='watchCtrl.lockSegmentStart(false)'
+                    ></i>
+                </span>
+            </div>
+            <div class="mark">End Frame:
+                <i ng-if='watchCtrl.segmentEnd === undefined'>
+                    N/A
+                </i>
+                <i ng-if='watchCtrl.segmentEnd !== undefined'>
+                    {{watchCtrl.segmentEnd}}
+                </i>
+                <span>
+                    <i 
+                        class="fa fa-unlock pull-right"
+                        ng-if='watchCtrl.segmentEnd === undefined'
+                        ng-click='watchCtrl.lockSegmentEnd(true)'
+                    ></i>
+                </span>
+                <span>
+                    <i
+                        class="fa fa-lock pull-right"
+                        ng-if='watchCtrl.segmentEnd !== undefined'
+                        ng-click='watchCtrl.lockSegmentEnd(false)'
+                    ></i>
+                </span>
+            </div>
+        </div>
+
+    </div>
+
 </div>

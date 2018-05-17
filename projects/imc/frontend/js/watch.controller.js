@@ -817,7 +817,7 @@
 	function WatchController(
 		$scope, $rootScope, $interval, $http, $log, $document, $uibModal, 
 		$stateParams, $filter, $timeout, DataService, noty, 
-		myTagModalFactory, myNotesModalFactory, sharedProperties) {
+		myTagModalFactory, myNotesModalFactory, sharedProperties, FormDialogService) {
 
 		function encodeLanguage(language) {
 			// TODO da completare 
@@ -892,6 +892,9 @@
 		};
 		// to visualize annotations in tab table
 		self.annotations = [];
+
+		// to visualize manual segmentations in tab table
+		self.manualSegmentations = [];
 
 		// to visualize notes in notes tab 
 		self.notes = [];
@@ -1021,7 +1024,7 @@
 			}, 50);
 		};
 
-		self.manualtag = function(mode) {
+		self.manualtag = function(mode, selector) {
 			console.log('manual tag: ' + mode);
 
 			// force the video to pause
@@ -1058,18 +1061,32 @@
 					sharedProperties.setShotId(shotId);
 					sharedProperties.setShotNum(shotNum+1);
 
-					// filter actual manual annotations for this shot
-					var shot_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
-					// console.log('actual annotations for this shot: '+ angular.toJson(shot_annotations, true));
+					// filter current manual annotations for this shot
+					var current_annotations = [];
+					if (selector !== undefined) {
+						// referring annotation by segments
+						var [s_start, s_end] = selector.replace('t=', '').split(',');
+						for (var j = 0; j < self.manualSegmentations[0].segments.length; j++) {
+							if (String(self.manualSegmentations[0].segments[j].start) === s_start &&
+								String(self.manualSegmentations[0].segments[j].end) === s_end) {
+								current_annotations = self.manualSegmentations[0].segments[j].tags;
+								break;
+							}
+						}
+					} else {
+						// referring annotation by shots
+						current_annotations = $filter('filter')(self.annotations, {shotNum: shotNum+1});
+					}
+					// console.log('current annotations for this target: '+ angular.toJson(current_annotations, true));
 					
 					if (mode == 'term') {
-						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: current_annotations, selector: selector});
 					}
 					else if (mode == 'notes') {
-						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations});
+						myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: current_annotations, selector: selector});
 					}
 					else if (mode == 'location') {
-						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: shot_annotations});
+						myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: current_annotations, selector: selector});
 					}
 					// exit loop
 					break;
@@ -1095,15 +1112,32 @@
 				// YES: delete annotation
 				DataService.deleteAnnotation(annoId, bodyRef).then(function() {
 					console.log('Annotation [' + annoId + ']['+ bodyRef +'] deleted successfully');
+					var found = false;
 					angular.forEach(self.annotations, function(anno, index) {
 						if (anno.id === annoId &&
 							((anno.iri !== undefined && anno.iri === bodyIRI) ||
 								anno.name === bodyName)) {
 							self.annotations.splice(index, 1);
+						    found = true;
 						}
 					});
 					// update the timeline with the remaining annotations
-					$rootScope.$emit('updateTimeline', '', null, null);
+					if (found) {
+						$rootScope.$emit('updateTimeline', '', null, null);
+					} else if (self.manualSegmentations.length > 0) {
+						// look at tag list in the segmentation
+						// console.log('update tag list in the segmentation');
+						angular.forEach(self.manualSegmentations[0].segments, function(segment) {
+							for (var i = 0; i < segment.tags.length; i++) {
+								if (segment.tags[i].id === annoId &&
+									((segment.tags[i].iri !== undefined && segment.tags[i].iri === bodyIRI) ||
+										segment.tags[i].name === bodyName)) {
+									segment.tags.splice(i, 1);
+								}
+							}
+						});
+					}
+
 				}, function(err) {
 					// TODO
 				});
@@ -1112,7 +1146,7 @@
 			});
 		};
 		self.deleteNote = function(note) {
-			//console.log(angular.toJson(note, true));
+			console.log(angular.toJson(note, true));
 			var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
 			var modalInstance = $uibModal.open({
 				templateUrl: 'confirmNoteModal.html',
@@ -1135,6 +1169,9 @@
 					// Non c'e' bisogno viene aggiornata in automatico 
 					//  perche' cambia la variabile self.notes
 					//$rootScope.$emit('updateNotes', null, null);
+					console.log("deleteNote: note=" + angular.toJson(note, true));
+					console.log("deleteNote: self.notesShots=" + angular.toJson(self.notesShots, true));
+					self.notesShots[note.shotNum-1].notes--;
 				}, function(err) {
 					// TODO
 				});
@@ -1143,7 +1180,7 @@
 			});
 		};
 		self.editNote = function(note) {
-			//console.log("editNote: note=" + angular.toJson(note, true));
+			console.log("editNote: note=" + angular.toJson(note, true));
 			var shot_annotations = null;
 			var shotInfo = self.shots[note.shotNum-1];
 			myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: shot_annotations, note: note, shot: shotInfo});		
@@ -1285,7 +1322,8 @@
 							duration: parseInt(shot.attributes.duration),
 							thumb: shot.links.thumbnail,
 							framerange: framerange,
-							tags: shot.tags
+							tags: shot.tags,
+							notes: 0
 						};
 
 						// shot info for the timeline
@@ -1365,20 +1403,22 @@
 									creatorName: creatorName,
 									privacy: privacy
 								};
+								sbFields.notes++;
 								//console.log('nota=' + angular.toJson(noteInfo));
 								$rootScope.$emit('updateNotes', noteInfo, shotInfo);
-
 							} else{
 								console.log('not handled annotation type = '+anno.attributes.annotation_type.key);
 							}
 
 						}
+						//console.log('nello shot ' + sbFields.number + ' quante note= ' + sbFields.notes);
 						self.storyshots.push(sbFields);
 						
 					});
 
 					// noteShots serve per il tab Notes a destra
 					self.notesShots = self.storyshots;
+					//console.log("self.notesShots=" + angular.toJson(self.notesShots, true));
 
 					// << NSI >> //
 					//	e se il video lo caricassi qui??
@@ -1392,6 +1432,170 @@
 					self.showmeli = false;
 				});
 		};
+
+		/////////////////////////////////////////////////////////
+		///////////////// MANUAL SEGMENTATION ///////////////////
+		/////////////////////////////////////////////////////////
+
+		self.loadManualSegments = function() {
+			//console.log("loading annotations for imageId: " + imageId);
+			self.loading = true;
+			DataService.getManualSegments(vid).then(
+				function(response) {
+
+					self.manualSegmentations = [];
+					for (var i = 0; i < response.data.length; i++) {
+
+						var values = response.data[i];
+
+						var segment = {};
+
+						segment['creation_datetime'] = values.attributes.creation_datetime;
+						segment['creator'] = values.creator.id;
+						segment['id'] = values.id;
+
+						segment['segments'] = [];
+						for (var j = 0; j < values.bodies[0].segments.length; j++) {
+							var seg = {}
+							seg['start'] = values.bodies[0].segments[j].attributes.start_frame_idx;
+							seg['end'] = values.bodies[0].segments[j].attributes.end_frame_idx;
+							seg['id'] = values.bodies[0].segments[j].id;
+							seg['tags'] = [];
+							for (var a = 0; a < values.bodies[0].segments[j].annotations.length; a++) {
+								seg['tags'].push({
+									id: values.bodies[0].segments[j].annotations[a].id,
+									iri: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.iri,
+									name: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.name,
+									spatial: values.bodies[0].segments[j].annotations[a].bodies[0].attributes.spatial,
+									creator: values.bodies[0].segments[j].annotations[a].creator.id
+								});
+							}
+							segment['segments'].push(seg);
+						}
+
+						self.manualSegmentations.push(segment);
+					}
+					/*self.manualSegmentations = response.data;*/
+					noty.extractErrors(response, noty.WARNING);
+				},
+				function(error) {
+					console.log("get manual segment error: " + angular.toJson(error));
+					self.loading = false;
+					noty.extractErrors(error, noty.ERROR);
+				});
+		};
+		
+		self.startSegmentCreation = function() {
+			self.creatingSegment = true;
+		}
+		self.getCurrentFrame = function() {
+			return Math.ceil($scope.videoplayer.video.currentTime / $scope.videoplayer.frameLength);
+		}
+		self.lockSegmentStart = function(value) {
+			if (value) {
+				var new_value = self.getCurrentFrame();
+				if (new_value > self.segmentEnd) {
+					console.log("Error: segment start cannot be greater than end");
+				} else {
+					self.segmentStart = new_value
+				}
+			} else {
+				self.segmentStart = undefined;
+				self.lockSegmentEnd(false);
+			}
+		}
+		self.lockSegmentEnd = function(value) {
+			if (value) {
+				var new_value = self.getCurrentFrame();
+				if (self.segmentStart === undefined) {
+					console.log("Error: cannot set segment end before setting start");
+				}
+				else if (self.segmentStart > new_value) {
+					console.log("Error: segment end  cannot be lower than start");
+				} else {
+					self.segmentEnd = new_value;
+				}
+			} else {
+				self.segmentEnd = undefined;
+			}
+		}
+		self.stopSegmentCreation = function() {
+			self.creatingSegment = false;
+			self.lockSegmentStart(false);
+			self.lockSegmentEnd(false);
+		}
+
+		self.createSegment = function() {
+			var target = 'item:' + sharedProperties.getItemId();
+
+			if (self.manualSegmentations.length == 0) {
+				var apicall = DataService.saveManualSegmentation(target, self.segmentStart, self.segmentEnd);
+			} else {
+				var apicall = DataService.saveManualSegment(self.manualSegmentations[0].id, self.segmentStart, self.segmentEnd)
+			}
+			apicall.then(
+				function(response) {
+					noty.showSuccess("Manual segment successfully created.");
+					self.loadManualSegments();
+					self.stopSegmentCreation();
+				},
+				function(error) {
+					console.log("Segment Creation error: " + angular.toJson(error));
+					self.stopSegmentCreation();
+					noty.extractErrors(error, noty.ERROR);
+				}
+			);
+
+		}
+
+		self.deleteManualSegment = function(segment) {
+
+			if (self.manualSegmentations.length == 0) {
+				console.log("Unable to delete: no manual segmentation found");
+				return false;
+			}
+			if (segment === undefined) {
+				var text = "Are you really sure you want to delete all segments?";
+				var single_delete = false;
+			} else {
+				var text = "Are you really sure you want to delete this segment?";
+				var single_delete = true;
+			}
+			var subtext = "This operation cannot be undone.";
+			FormDialogService.showConfirmDialog(text, subtext).then(
+				function(answer) {
+					if (segment === undefined || self.manualSegmentations[0].segments.length <= 1) {
+						var apicall = DataService.deleteManualSegmentation(self.manualSegmentations[0].id);
+					} else {
+						var apicall = DataService.deleteManualSegment(self.manualSegmentations[0].id, segment.id);
+					}
+					apicall.then(
+						function(out_data) {
+				    		self.loadManualSegments();
+				    		if (single_delete) {
+				    			noty.showWarning("Manual segment successfully deleted.");
+				    		} else {
+				    			noty.showWarning("Manual segments successfully deleted.");
+
+				    		}
+
+			    		},
+			    		function(out_data) {
+							noty.extractErrors(out_data, noty.ERROR);
+			    		}
+		    		);
+				},
+				function() {
+
+				}
+			);
+		}
+
+		// init variables	
+		self.stopSegmentCreation();
+		///////////////////////////////////////////////////////////
+		//////////////// END MANUAL SEGMENTATION //////////////////
+		///////////////////////////////////////////////////////////
 
 		/**
 		 * When the user selects a shot in the Notes Tab then
@@ -1414,10 +1618,13 @@
 					sharedProperties.setRecordProvider(
 						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 
+					sharedProperties.setItemId(self.video.relationships.item[0].id);
+
 					setTimeout(function() {
 						$scope.$apply(function() {
 							self.loading = false;
 							self.loadVideoShots(vid, self.currentvidDur);
+							self.loadManualSegments();
 						});
 					}, 2000);
 					noty.extractErrors(response, noty.WARNING);
@@ -1435,6 +1642,8 @@
 			sharedProperties.setRecordProvider(
 						self.video.relationships.record_sources[0].relationships.provider[0].attributes.identifier);
 			self.loadVideoShots(vid, videoDuration);
+			sharedProperties.setItemId(self.video.relationships.item[0].id);
+			self.loadManualSegments();
 		}
 
 		// On video time update: update the selected shot on the Notes tab
@@ -1595,6 +1804,23 @@
 				};						
 			self.annotations.push(anno);
 		});
+
+		$rootScope.$on('updateSegmentation', function(event, annoInfo, segmentInfo) {
+			// console.log('update segmentation list with tag: ' + annoInfo.name);
+			var segments = self.manualSegmentations[0].segments;
+			for (var i = 0; i < segments.length; i++) {
+				if (segments[i].start === segmentInfo.start && segments[i].end === segmentInfo.end) {
+					segments[i].tags.push({
+						id: annoInfo.id,
+						iri: annoInfo.iri,
+						name: annoInfo.name,
+						spatial: annoInfo.spatial,
+						creator: annoInfo.creator
+					});
+				}
+			}
+		});
+
 		$rootScope.$on('updateShotSelectedForNotes', function(event, newShotSelected) {
 			if (newShotSelected === null) {
 				return;
@@ -1604,7 +1830,8 @@
 				self.notesShotSelected = newShotSelected;
 			}
 			return;
-		});		
+		});
+
 		$rootScope.$on('updateNotes', function(event, noteInfo, shotInfo) {
 			//console.log("updateNotes start: " + angular.toJson(noteInfo, true));
 			if (noteInfo === null) {
@@ -1644,6 +1871,7 @@
 			//console.log("situazione delle note: " + angular.toJson(self.notes, true));
 			return;
 		});
+
 		$rootScope.$on('updateSubtitles', function() {
 			self.filtered = [];				
 			angular.forEach(self.annotations, function(anno) {
@@ -1658,7 +1886,7 @@
 	WatchController.$inject = [
 		"$scope", "$rootScope", "$interval", "$http", "$log", "$document", 
 		"$uibModal", "$stateParams", "$filter", "$timeout", "DataService", "noty",
-		"myTagModalFactory", "myNotesModalFactory", "sharedProperties"
+		"myTagModalFactory", "myNotesModalFactory", "sharedProperties", "FormDialogService"
 	];
 
 	function WatchImageController($scope, $rootScope, $http, $document, $uibModal, $stateParams, $filter,
@@ -1772,17 +2000,19 @@
 				});
 		};
 
-		self.manualtag = function(mode) {
+		self.manualtag = function(mode, selector) {
 			console.log('manual tag: ' + mode);
+			if (selector !== undefined)
+				console.log('manual segment: ' + selector);
 			sharedProperties.setGroup(mode);
 			if (mode == 'term') {
-				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations});
+				myTagModalFactory.open('lg', 'myModalVocab.html', {annotations: self.annotations, selector: selector});
 			}
 			else if (mode == 'notes') {
-				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: null});
+				myNotesModalFactory.open('lg', 'myModalNotes.html', {annotations: null, selector: selector});
 			}
 			else if (mode == 'location') {
-				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations});
+				myTagModalFactory.open('lg', 'myModalGeoCode.html', {annotations: self.annotations, selector: selector});
 			}
 		};
 
@@ -1954,13 +2184,12 @@
 				};						
 			self.annotations.push(anno);
 		});
-
 	};
-
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 
 		var vm = this;
+		vm.hideMap = true;
 		vm.googleMapsUrl = GOOGLE_API_KEY;
 		vm.videolat = null;
 		vm.videolng = null;
@@ -1980,9 +2209,10 @@
 			var customLocation;
 			var coverage;
 
-			if ($scope.$parent.watchCtrl.video) {
-				if ($scope.$parent.watchCtrl.video.relationships.coverages) {
-					coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+			if ($scope.$parent.watchCtrl.video && $scope.$parent.watchCtrl.video.relationships.coverages !== undefined) {
+				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
+				if (coverage !== undefined) {
+					customLocation = coverage.attributes.spatial[0];
 				}
 			}
 
@@ -2163,6 +2393,7 @@
 		var self = this;
 		
 		$scope.geocodingResult = "";
+		$scope.selector = params.selector;
 
 		$scope.group = sharedProperties.getGroup();
 		$scope.labelTerm = sharedProperties.getLabelTerm();
@@ -2249,28 +2480,29 @@
 			var restring = locname + ' (lat, lng) ' + locationlat + ', ' + locationlng + ' (address: \'' + locaddr + '\')';
 			$uibModalInstance.close($scope.vm.address.locality);
 			myGeoConfirmFactory.open('lg', 'result.html', {
-				result: restring
+				result: restring,
+				selector: $scope.selector
 			});
 		};
 
 		// itemType: IMAGE, VIDEO
 		// targetType: ITEM, SHOT
-		self.confirmVocabularyTerms = function(itemType,targetType) {
+		self.confirmVocabularyTerms = function(itemType, targetType, selector) {
 			//console.log('confirmVocabularyTerms: itemType=' + itemType);
 			//console.log('confirmVocabularyTerms: targetType=' + targetType);
 			//var vid = sharedProperties.getVideoId();
 			var target;
-			if(targetType == 'ITEM'){
+			if (targetType == 'ITEM') {
 				// al momento il caso item e' solo per le immagini
 				target = 'item:' + $scope.itemId;
-			}else{
+			} else {
 				target = 'shot:' + $scope.shotID;
 			}
 			if (self.tags.length > 0) {
 				// save the annotation into the database
-				DataService.saveTagAnnotations(target, self.tags).then(
+				DataService.saveTagAnnotations(target, self.tags, selector).then(
 					function(resp) {
-						//console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
+						// console.log("saveTagAnnotations: resp.data=" + angular.toJson(resp.data, true));
 						var annoId = resp.data.id;
 						var creatorId = resp.data.creator.id;
 						console.log('Annotation saved successfully. ID: ' + annoId);
@@ -2283,14 +2515,21 @@
 								"creator": creatorId
 							};
 							//console.log("annoInfo=" + angular.toJson(annoInfo, true));
-							if(itemType == 'IMAGE'){
+							if (itemType == 'IMAGE') {
 								$rootScope.$emit('createdNewAnnotation', '', annoInfo);
-							}else {
+							} else if (itemType == 'VIDEO' && selector !== undefined) {
+								var segmentInfo = {
+									id: resp.data.targets[0].id,
+									start: resp.data.targets[0].attributes.start_frame_idx,
+									end: resp.data.targets[0].attributes.end_frame_idx
+								}
+								$rootScope.$emit('updateSegmentation', annoInfo, segmentInfo);
+							} else {
 								var shotInfo = {
-								"id": $scope.shotID,
-								"shotNum": $scope.shotNum,
-								"startT": $scope.startT,
-								"endT": $scope.endT
+									"id": $scope.shotID,
+									"shotNum": $scope.shotNum,
+									"startT": $scope.startT,
+									"endT": $scope.endT
 								};
 								//console.log("shotInfo=" + angular.toJson(shotInfo, true));
 								$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
@@ -2473,6 +2712,7 @@
 		$scope.latitude = sharedProperties.getLatitude();
 		$scope.longitude = sharedProperties.getLongitude();
 		$scope.format = sharedProperties.getFormAddr();
+		$scope.selector = params.selector;
 
 		// video SHOT
 		$scope.startT = sharedProperties.getStartTime();
@@ -2483,7 +2723,7 @@
 		// image
 		$scope.itemId = sharedProperties.getItemId();
 
-		$scope.ok = function(itemType,targetType) {
+		$scope.ok = function(itemType,targetType,selector) {
 			//console.log('geoResultController:ok: itemType=' + itemType);
 			//console.log('geoResultController:ok: targetType=' + targetType);
 			var target;
@@ -2504,32 +2744,39 @@
 			};
 
 			// save the annotation into the database
-			DataService.saveGeoAnnotation(target, source, spatial).then(
+			DataService.saveGeoAnnotation(target, source, spatial, selector).then(
 				function(resp) {
 					var annoId = resp.data.id;
 					var creatorId = resp.data.creator.id;
 					var termIRI = source.iri;
 					console.log('Annotation saved successfully. ID: ' + annoId);
 					var annoInfo = {
-						"id": annoId,
-						"name": $scope.labelTerm,
-						"iri": termIRI,
-						"group": $scope.group,
-						"creator": creatorId
+						id: annoId,
+						name: $scope.labelTerm,
+						iri: termIRI,
+						spatial: [spatial.lat, spatial.long],
+						group: $scope.group,
+						creator: creatorId
 					};
-					if(itemType == 'IMAGE'){
+					if (itemType == 'IMAGE') {
 						$rootScope.$emit('createdNewAnnotation', '', annoInfo);
-					}else{
+					} else if (itemType == 'VIDEO' && selector !== undefined) {
+						var segmentInfo = {
+							id: resp.data.targets[0].id,
+							start: resp.data.targets[0].attributes.start_frame_idx,
+							end: resp.data.targets[0].attributes.end_frame_idx
+						}
+						$rootScope.$emit('updateSegmentation', annoInfo, segmentInfo);
+					} else {
 						var shotInfo = {
-							"id": $scope.shotID,
-							"shotNum": $scope.shotNum,
-							"startT": $scope.startT,
-							"endT": $scope.endT
+							id: $scope.shotID,
+							shotNum: $scope.shotNum,
+							startT: $scope.startT,
+							endT: $scope.endT
 						};
 						$rootScope.$emit('updateTimeline', '', annoInfo, shotInfo);
 					}
-					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);				
-
+					$rootScope.$emit('updateMap', $scope.format, $scope.latitude, $scope.longitude, $scope.group, $scope.labelTerm, $scope.shotID, $scope.startT);
 				},
 				function(err){
 					// TODO
