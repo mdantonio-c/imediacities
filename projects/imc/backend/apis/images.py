@@ -175,7 +175,9 @@ class ImageAnnotations(GraphBaseOperations):
                 if a.annotation_type == 'TVS':
                     segments = []
                     for segment in anno_body.segments:
-                        json_segment = self.getJsonResponse(segment, max_relationship_depth=0)
+                        # look at the most derivative class
+                        json_segment = self.getJsonResponse(
+                            segment.downcast(), max_relationship_depth=0)
                         if 'links' in json_segment:
                             del(json_segment['links'])
                         segments.append(json_segment)

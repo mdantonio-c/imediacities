@@ -1,9 +1,20 @@
 definitions:
   Annotation:
     required:
+      - motivation
       - target
       - body
     properties:
+      motivation:
+        type: string
+        enum:
+          - tagging
+          - commenting
+          - describing
+          - identifying
+          - classifying
+          - replying
+          - segmentation
       body:
         $ref: "#/definitions/Body"
       target:
@@ -11,6 +22,12 @@ definitions:
         pattern: '(item|shot|anno):[a-z0-9-]+'
       selector:
         $ref: '#/definitions/Selector'
+      private:
+        type: boolean
+        default: false
+      embargo:
+        type: string
+        format: date
 
   Annotations:
     type: array
@@ -27,15 +44,8 @@ definitions:
         enum:
           - ResourceBody
           - TextualBody
-      purpose:
-        type: string
-        enum:
-          - tagging
-          - commenting
-          - describing
-          - identifying
-          - classifying
-          - replying
+          - TVSBody
+
   ResourceBody:
     allOf:
       - $ref: "#/definitions/Body"
@@ -57,6 +67,19 @@ definitions:
           language:
             type: string
             default: 'en'
+  TVSBody:
+    allOf:
+      - $ref: "#/definitions/Body"
+      - required:
+          - segments
+        properties:
+          segments:
+            type: array
+            uniqueItems: true
+            minItems: 1
+            items:
+              type: string
+              pattern: 't=[0-9],[0-9]'
   Selector:
     required:
       - type
@@ -194,6 +217,36 @@ definitions:
                 type: string
       geo_distance:
         $ref: "#/definitions/GeoDistance"
+
+  PatchRequest:
+    type: array
+    items:
+      $ref: "#/definitions/PatchDocument"
+  PatchDocument: 
+    description: A JSONPatch document as defined by RFC 6902 
+    required:
+     - "op"
+     - "path"
+    properties: 
+     op: 
+      type: string 
+      description: The operation to be performed 
+      enum:
+       - "add"
+       - "remove"
+       - "replace"
+       - "move"
+       - "copy"
+       - "test"
+     path: 
+      type: string 
+      description: A JSON-Pointer 
+     value: 
+      type: object 
+      description: The value to be used within the operations.
+     from: 
+      type: string 
+      description: A string containing a JSON Pointer value.
 
 FormDataParameters:
   AdminUsers:

@@ -85,8 +85,7 @@ class SearchAnnotations(GraphBaseOperations):
                 if c_match is not None:
                     term = c_match.get('term')
                     if term is not None:
-                        # strip and clean up term from '*'
-                        term = term.strip().replace("*", "")
+                        term = self.sanitize_input_term(term)
                     multi_match = []
                     multi_match_where = []
                     multi_match_query = ''
@@ -97,6 +96,8 @@ class SearchAnnotations(GraphBaseOperations):
                                                status_code=hcodes.HTTP_BAD_REQUEST)
                     if fields is None:
                         fields = []
+                    multi_match_fields = []
+                    multi_optional_match = []
                     for f in fields:
                         if f not in self.__class__.allowed_term_fields:
                             raise RestApiException(
@@ -108,22 +109,26 @@ class SearchAnnotations(GraphBaseOperations):
                             break
                         if f == 'title':
                             multi_match.append(
-                                "(creation)-[:HAS_TITLE]->(t:Title)")
+                                "MATCH (creation)-[:HAS_TITLE]->(t:Title)")
+                            multi_match_fields.append('t')
                             multi_match_where.append(
                                 "t.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'description':
                             multi_match.append(
-                                "(creation)-[:HAS_DESCRIPTION]->(d:Description)")
+                                "MATCH (creation)-[:HAS_DESCRIPTION]->(d:Description)")
+                            multi_match_fields.append('d')
                             multi_match_where.append(
                                 "d.text =~ '(?i).*{term}.*'".format(term=term))
                         elif f == 'keyword':
-                            multi_match.append(
-                                "(creation)-[:HAS_KEYWORD]->(k:Keyword)")
+                            multi_optional_match.append(
+                                "OPTIONAL MATCH (creation)-[:HAS_KEYWORD]->(k:Keyword)")
+                            multi_match_fields.append('k')
                             multi_match_where.append(
                                 "k.term =~ '(?i){term}'".format(term=term))
                         elif f == 'contributor':
-                            multi_match.append(
-                                "(creation)-[:CONTRIBUTED_BY]->(a:Agent)")
+                            multi_optional_match.append(
+                                "OPTIONAL MATCH (creation)-[:CONTRIBUTED_BY]->(a:Agent)")
+                            multi_match_fields.append('a')
                             multi_match_where.append(
                                 "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                         else:
@@ -132,7 +137,9 @@ class SearchAnnotations(GraphBaseOperations):
                                 'Unexpected field type',
                                 status_code=hcodes.HTTP_SERVER_ERROR)
                     if len(multi_match) > 0:
-                        multi_match_query = "MATCH " + ', '.join(multi_match) \
+                        multi_match_query = ' '.join(multi_match) \
+                            + " " + ' '.join(multi_optional_match) \
+                            + " WITH creation, cityPosition, title, i, body, " + ', '.join(multi_match_fields) \
                             + " WHERE " + ' OR '.join(multi_match_where)
                         # logger.debug(multi_match_query)
                         filters.append(multi_match_query)
@@ -149,6 +156,12 @@ class SearchAnnotations(GraphBaseOperations):
                 if c_type != 'all':
                     filters.append("MATCH (i) WHERE i.item_type =~ '(?i){c_type}'"
                                    .format(c_type=c_type))
+                # PROVIDER
+                c_provider = c_filter.get('provider')
+                if c_provider is not None:
+                    filters.append(
+                        "MATCH (creation)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)"
+                        " WHERE p.identifier='{provider}'".format(provider=c_provider.strip()))
                 # IPR STATUS
                 c_iprstatus = c_filter.get('iprstatus')
                 if c_iprstatus is not None:
@@ -170,13 +183,13 @@ class SearchAnnotations(GraphBaseOperations):
                     date_clauses = []
                     if c_type == 'video' or c_type == 'all':
                         date_clauses.append(
-                            "ANY(item IN creation.production_years WHERE item >= '{yfrom}') \
-                            and ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
+                            "ANY(item IN creation.production_years WHERE item >= '{yfrom}') "
+                            "AND ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
                                 yfrom=c_year_from, yto=c_year_to))
                     if c_type == 'image' or c_type == 'text' or c_type == 'all':
                         date_clauses.append(
-                            "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') \
-                            and ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
+                            "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') "
+                            "AND ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
                                 yfrom=c_year_from, yto=c_year_to))
                     filters.append("MATCH (creation) WHERE {clauses}".format(
                         clauses=' or '.join(date_clauses)))
@@ -262,3 +275,10 @@ class SearchAnnotations(GraphBaseOperations):
 
         meta_response = {"totalItems": numels}
         return self.force_response(data, meta=meta_response)
+
+    @staticmethod
+    def sanitize_input_term(term):
+        '''
+        Strip and clean up term from special characters.
+        '''
+        return term.strip().replace("*", "").replace("'", "\\'")

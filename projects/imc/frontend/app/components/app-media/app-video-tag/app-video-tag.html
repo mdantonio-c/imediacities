@@ -1,0 +1,35 @@
+<!-- Tags bar sotto al player -->
+
+<div class="imc--video-tag row no-gutters">
+    <div class="col-1 imc--video-tag--button">
+        <img src="/static/assets/svg/tag.svg">
+    </div>
+    <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
+        <div #termtag_slider *ngIf="min_detected">
+            <span class="box-badge"
+                    *ngFor="let shot of data"
+                    [attr.data-shot]="shot.attributes.shot_num"
+                    [style.width.px]="shot.attributes.duration / min_detected * min_width"
+                    (click)="scene_click(shot.attributes.shot_num)">
+                <a href="#" class="badge badge-termtag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.tags.length"></a>
+            </span>
+
+        </div>
+    </div>
+    <div class="col-1 imc--video-tag--button">
+        <img src="/static/assets/svg/geotag.svg">
+    </div>
+    <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
+        <div #geotag_slider *ngIf="min_detected">
+
+            <span class="box-badge"
+                    *ngFor="let shot of data"
+                    [attr.data-shot]="shot.attributes.shot_num"
+                    [style.width.px]="shot.attributes.duration / min_detected * min_width"
+                    (click)="scene_click(shot.attributes.shot_num)">
+                <a href="#" class="badge badge-geotag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.locations.length"></a>
+            </span>
+
+        </div>
+    </div>
+</div>

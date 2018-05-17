@@ -2,14 +2,14 @@
 <ul class="navbar-nav">
 
   <li class='nav-item' *ngIf="user && user.roles['Archive']">
-      <a class='nav-link' routerLink="/app/upload">
-        Upload
+      <a class='nav-link' routerLink="/app/upload" disabled>
+        <s>Upload</s>
       </a>
   </li>
 
   <li class='nav-item' *ngIf="user">
-      <a class='nav-link' href ui-sref="logged.new-search({q: null})" ui-sref-opts="{reload: true}">
-        Search
+      <a class='nav-link' href ui-sref="logged.new-search({q: null})" ui-sref-opts="{reload: true}" disabled>
+        <s>Search</s>
       </a>
   </li>
 
@@ -20,14 +20,20 @@
   </li>
 
   <li class='nav-item' *ngIf="user && user.isAdmin">
-      <a class='nav-link' routerLink="/app/admin/groups">
-        Groups
+      <a class='nav-link' routerLink="/app/admin/groups" disabled>
+        <s>Groups</s>
       </a>
   </li>
 
   <li class='nav-item' *ngIf="user && user.isAdmin">
       <a class='nav-link' routerLink="/app/admin/archives">
         Archive
+      </a>
+  </li>
+
+  <li class='nav-item'>
+      <a class='nav-link' routerLink="/app/video">
+        Example video
       </a>
   </li>
 

@@ -1,0 +1,130 @@
+<!-- Template per il singolo shot, da mettere in loop per la creazione di tutti gli shot o segmenti -->
+<div class="row no-gutters box-single-shot" *ngIf="shot" [ngClass]="{'active': is_attivo}">
+
+    <span class="col-1 container-checkbox" *ngIf="multiSelection">
+        <!-- Checkbox per la selezione multipla -->
+       <div class="box-checkbox">
+           <input class="imc--input-checkbox styled-checkbox"
+                  [id]="checkbox_selection_label" type="checkbox"
+                  [value]="shot.attributes.shot_num"
+                  (click)="shot_seleziona($event)"
+           >
+           <label [for]="checkbox_selection_label"></label>
+       </div>
+    </span>
+    <!--
+        // todo
+        @NSI aggiunto stile in linea altrimenti scompare il numero dello shot
+    -->
+    <span class="col-1 imc--flex--vertical-center" style="justify-content: center;flex-direction: column">
+        <!-- Numero dello shot, da scambiare con l'icona dell'active -->
+        <span class="shot-number"><strong [innerHTML]="shot.attributes.shot_num +1" ></strong></span>
+        <!-- Icona freccia azzurra per l'active sullo shot -->
+        <i class="material-icons font-media-color" *ngIf="is_attivo">play_arrow</i>
+
+    </span>
+
+    <span class="col-3 imc--flex--vertical-center">
+        <!-- Anteprima dello shot del video -->
+        <span class="anteprima-shot" (click)="play_scene()">
+            <img [src]="shot.links.thumbnail" alt="">
+            <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
+        </span>
+    </span>
+
+    <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info">
+        <strong [innerHTML]="shot.attributes.timestamp"></strong>
+        <span>
+            frame range:
+            <span [innerHTML]="shot.attributes.start_frame_idx"></span>
+            -
+            <span [innerHTML]="shot.attributes.end_frame_idx"></span>
+        </span>
+        <ul class="box--icon-list">
+            <li><i class="material-icons">place</i><span><strong [innerHTML]="shot.annotations.locations.length"></strong></span></li>
+            <li><i class="material-icons">turned_in</i><span><strong [innerHTML]="shot.annotations.tags.length"></strong></span></li>
+            <li><i class="material-icons">speaker_notes</i><span><strong [innerHTML]="shot.annotations.notes.length"></strong></span></li>
+            <li><i class="material-icons">library_books</i><span><strong [innerHTML]="shot.annotations.references.length"></strong></span></li>
+            <li class="icon-rotate"><i class="material-icons">link</i><span><strong [innerHTML]="shot.annotations.links.length"></strong></span></li>
+        </ul>
+
+    </span>
+
+    <span class="col-1 imc--flex--vertical-center imc--flex--horizontal-center">
+        <i class="material-icons click-event" (click)="details_toggle()" data-toggle="collapse" [attr.data-target]="'#'+collapse_id"
+           aria-expanded="false"
+           [attr.aria-controls]="'#'+collapse_id">
+            <ng-container *ngIf="!details_show; else dropArrow">keyboard_arrow_down</ng-container>
+           <ng-template #dropArrow>keyboard_arrow_up</ng-template></i>
+    </span>
+<!--</div>-->
+
+<!-- Dettagli del singolo shot -->
+<!--
+    //  todo
+    @NSI ho inerito i dettagli dentro allo shot in modo che condividano il suo sfondo
+    per fare funzionare tutto bisogna modificare il padding dello shot (box-single-shot) impostando il padding bottom = 0
+    collapse diventa .collapse.col-12
+    collapse eventualmente prende 10px di padding top
+    collapse > content potrebbe avere background-color inherit, transparent o alpha (o quasi)
+-->
+<div class="collapse col-12"  [id]="collapse_id" [ngbCollapse]="!is_attivo">
+    <div class="content" style="background:inherit">
+        <div>
+            <ng-template
+                    ngFor
+                    let-tag
+                    [ngForOf]="shot.annotations.tags">
+                <app-media-annotation [annotation]="tag"></app-media-annotation>
+            </ng-template>
+        </div>
+        <div>
+            <ng-template
+                    ngFor
+                    let-location
+                    [ngForOf]="shot.annotations.locations">
+                <app-media-annotation [annotation]="location"></app-media-annotation>
+            </ng-template>
+        </div>
+        <div class="row no-gutters">
+        <!-- annotazioni rimanenti -->
+<!--
+        <ul class="box&#45;&#45;horizontal-icon-list col-12">
+            <li><span><strong>12</strong></span><i class="material-icons">speaker_notes</i></li>
+            <li><span><strong>2</strong></span><i class="material-icons">library_books</i></li>
+            <li class="icon-rotate"><span><strong>7</strong></span><i class="material-icons">link</i></li>
+        </ul>
+-->
+        <!-- select per l'aggiunta di nuove annotazioni e apertura delle modali -->
+<!--
+        <select class="imc&#45;&#45;input col-7" (change)="modale_show($event)">
+            <option disabled selected>Add Annotation</option>
+            <option value="insert-tag">Add Tag</option>
+            <option value="insert-geotag">Add Geotag</option>
+            <option value="insert-note">Add Note</option>
+            <option value="insert-reference">Add Reference</option>
+            <option value="insert-link">Add Link</option>
+        </select>
+-->
+
+        <div ngbDropdown class="imc--input--dropdown col-7">
+            <button id="dropdownBasic1" ngbDropdownToggle>Add Annotation</button>
+            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                <span (click)="modale_show($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                <span (click)="modale_show($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                <span (click)="modale_show($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                <span (click)="modale_show($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                <span (click)="modale_show($event, 'insert-link')" class="dropdown-item">Add Link</span>
+            </div>
+        </div>
+
+        <div class="col-5 box-annotation-buttons">
+            <!-- bottone vedi tutte le annotazioni -->
+            <button class="btn btn-accent">See All</button>
+            <!-- aggiungi a una lista -->
+            <button class="btn btn-icon-border-classic"><i class="material-icons">playlist_add</i></button></div>
+        </div>
+    </div>
+</div>
+
+</div>

@@ -9,6 +9,11 @@ video_annotations:
       enum:
         - TAG
         - DSC
+    - name: onlyManual
+      in: query
+      type: boolean
+      default: false
+      allowEmptyValue: true
   custom:
     authentication: true
   responses:

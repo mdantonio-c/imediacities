@@ -1,0 +1,172 @@
+<div *ngIf="media" class="page-type-video"> <!--page-type-image è la classe da cambiare se siamo nell'item picture-->
+
+    <!-- TOPBAR -->
+    <app-media-top-bar></app-media-top-bar>
+
+    <!-- VIDEO PLAYER / PICTURE -->
+    <div class="container-media row no-gutters justify-content-md-center">
+       <div class="box-title-media col-6 row no-gutters">
+            <h2 class="imc--title-bold col-12"  [innerHTML]="media.attributes.identifying_title"></h2>
+            <p class="col-8 imc--flex--vertical-start">
+                <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp;
+                <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span> - <span [innerHTML]="media.attributes.production_years[0]"></span>
+            </p>
+            <span class="col-2">1.000 views</span>
+            <span class="col-2">30 annotations</span>
+        </div>
+        <span class="col-3"></span>
+        <section class="box-media col-6">
+            <app-video-player
+                    #appVideo
+                    [data]="media"
+                    [shots]="shots"
+            ></app-video-player>
+            <!-- <app-picture></app-picture> -->
+        </section>
+
+        <!-- TAB SHOTS / SEGMENTS / AREAS-->
+        <section class="col-3 box-shots">
+            <div class="imc--toolbar col-12 row no-gutters">
+                <span class="col-7 imc--flex--vertical-center">Shots</span>
+                <span class="col-5 imc--flex--horizontal-end">
+                    <ul class="nav nav-pills mb-3 tab-shots" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">
+                                <i class="material-icons">movie</i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">
+                                <i class="material-icons">content_cut</i>
+                            </a>
+                        </li>
+                        <!--<li class="nav-item">
+                            <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+                        </li>-->
+                    </ul>
+                </span>
+            </div>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" style="position:relative">
+                    <!-- tab shots -->
+                    <div *ngIf="shots && shots.length">
+                        <app-video-shot
+                                *ngFor="let shot of shots"
+                                [shot]="shot"
+                                [multiSelection]="multi_annotations_is_active"
+                                (modale_richiedi)="modal_show($event)"
+                                (is_selezionato)="shot_selezionato($event)"
+                                (current_component)="appVideo.registra($event)" [parent]="appVideo"
+                        ></app-video-shot>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                    <!-- tab segmenti -->
+
+                        <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
+                        <!-- Blocco di codice se non ci sono elementi al suo interno-->
+
+                        <div class="container-info-element">
+                            <p>no segments</p>
+                            <span class="info-element-button">
+                                <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                                <button class="btn btn-border-classic">Create Segment<!--Cancel--></button>
+                            </span>
+                        </div>
+
+                </div>
+                <!--<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>-->
+
+                <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
+                <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
+                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active"
+                            (click)="multi_annotations_toggle()">Multiple annotation</button>
+
+                    <ng-container *ngIf="multi_annotations_is_active">
+                        <!-- La select compare all'attivazione della selezione multipla per l'aggiunta di annotazioni -->
+<!--
+                        <select class="imc&#45;&#45;input col-5" #addAnnotation>
+                            <option selected>Add Annotation</option>
+                            <option value="0">Add Tag</option>
+                            <option value="1">Add Geotag</option>
+                            <option value="2">Add Note</option>
+                            <option value="3">Add Reference</option>
+                            <option value="3">Add Link</option>
+                        </select>
+-->
+                        <div ngbDropdown class="imc--input--dropdown col-5">
+                            <button id="dropdownBasic1" ngbDropdownToggle>Add Annotation</button>
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                <span (click)="modal_show_multi($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                                <span (click)="modal_show_multi($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                                <span (click)="modal_show_multi($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                                <span (click)="modal_show_multi($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                                <span (click)="modal_show_multi($event, 'insert-link')" class="dropdown-item">Add Link</span>
+                            </div>
+                        </div>
+                        <span class="col-6">
+                            <button class="btn btn-border-classic" (click)="multi_annotations_toggle()">Cancel selection</button>
+                        </span>
+                    </ng-container>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- MAPPA -->
+    <app-media-map></app-media-map>
+
+    <!-- CONTAINER INFO -->
+    <div class="container-fluid imc--container">
+        <div class="row no-gutters">
+
+            <!-- TABS INFO -->
+            <section class="imc--tab col-8">
+                <app-media-info [info]="media" [user_language]="user_language"></app-media-info>
+            </section>
+
+            <!-- MEDIA TAGS -->
+            <section class="col-4 imc--colonna-destra">
+                <app-media-tags *ngIf="shots && shots.length" [shots]="shots"></app-media-tags>
+            </section>
+        </div>
+    </div>
+
+    <!-- Button trigger modal TEST-->
+<!--
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('insert-tag')">
+        Insert Tag
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('insert-geotag')">
+        Insert Geotag
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('insert-note')">
+        Insert Note
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('insert-link')">
+        Insert Link
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('insert-reference')">
+        Insert Reference
+    </button>
+    <button type="button" class="btn btn-accent" data-toggle="modal" data-target="#mediaModal" (click)="modal_show('all-annotations')">
+        All Annotations
+    </button>
+-->
+
+    <!-- Modal -->
+    <app-modale #appModale>
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-termtag>
+            <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-geotag>
+            <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" (shots_update)="shots_update($event)"></app-modal-insert-note>
+            <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data"></app-modal-insert-link>
+            <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data"></app-modal-insert-reference>
+            <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data"></app-modal-all-annotations>
+        </div>
+    </app-modale>
+
+</div>
+
+
+

@@ -1,0 +1,17 @@
+import {Component, OnInit, Input} from '@angular/core';
+
+@Component({
+    selector: 'app-modal-insert-reference',
+    templateUrl: 'app-modal-insert-reference.html'
+})
+
+export class AppModalInsertReferenceComponent implements OnInit {
+
+    @Input() data;
+
+    constructor() {
+    }
+
+    ngOnInit() {
+    }
+}

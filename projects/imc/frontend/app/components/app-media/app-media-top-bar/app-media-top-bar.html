@@ -1,0 +1,25 @@
+<!-- Black Topbar -->
+<div class="nav imc--topbar">
+    <span class="imc--flex--vertical-center back-icon">
+        <i class="material-icons">keyboard_arrow_left</i>
+    </span>
+    <span class="imc--topbar--title imc--flex--vertical-center">
+        <ng-container *ngIf="mediaType === 'video'; else mediaPhoto">
+            <i class="material-icons">videocam</i>&nbsp; <strong>VIDEO</strong>
+        </ng-container>
+        <ng-template #mediaPhoto>
+            <i class="material-icons">image</i>&nbsp;<strong> PHOTO</strong>
+        </ng-template>
+    </span>
+    <span class="imc--flex--item-end box-icons-share">
+        <i class="material-icons">playlist_add</i>
+        <a data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <i class="material-icons">share</i>
+        </a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="#">Share the video</a>
+            <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Share your segment list</a>
+        </div>
+    </span>
+</div>

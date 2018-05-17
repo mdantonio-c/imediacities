@@ -143,7 +143,7 @@ class ContentStage(Stage):
 
 class AnnotationTarget(HeritableStructuredNode):
     annotation = RelationshipFrom(
-        'Annotation', 'HAS_TARGET', cardinality=OneOrMore)
+        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
 
 
 class Item(TimestampedNode, AnnotationTarget):
@@ -704,13 +704,15 @@ class VIMBody(AnnotationBody):
 
 class TVSBody(AnnotationBody):
     segments = RelationshipTo(
-        'Shot', 'SEGMENT', cardinality=OneOrMore, show=True)
+        'VideoSegment', 'SEGMENT', cardinality=OneOrMore, show=True)
 
 
 class VideoSegment(IdentifiedNode, AnnotationTarget):
     """Video Segment"""
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(required=True, show=True)
+    annotation_body = RelationshipFrom(
+        'TVSBody', 'SEGMENT', cardinality=ZeroOrMore)
     within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
@@ -721,8 +723,6 @@ class Shot(VideoSegment):
     thumbnail_uri = StringProperty()
     timestamp = StringProperty(show=True)
     duration = FloatProperty(show=True)
-    annotation_body = RelationshipFrom(
-        'Annotation', 'SEGMENT', cardinality=One)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
         'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)

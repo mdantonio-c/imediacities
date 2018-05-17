@@ -53,8 +53,7 @@ class Search(GraphBaseOperations):
         if match is not None:
             term = match.get('term')
             if term is not None:
-                # strip and clean up term from '*'
-                term = term.strip().replace("*", "")
+                term = self.sanitize_input_term(term)
 
             fields = match.get('fields')
             if term is not None and (fields is None or len(fields) == 0):
@@ -62,6 +61,8 @@ class Search(GraphBaseOperations):
                                        status_code=hcodes.HTTP_BAD_REQUEST)
             if fields is None:
                 fields = []
+            multi_match_fields = []
+            multi_optional_match = []
             for f in fields:
                 if f not in self.__class__.allowed_term_fields:
                     raise RestApiException(
@@ -72,29 +73,35 @@ class Search(GraphBaseOperations):
                     # catch '*'
                     break
                 if f == 'title':
-                    multi_match.append("(n)-[:HAS_TITLE]->(t:Title)")
+                    multi_match.append("MATCH (n)-[:HAS_TITLE]->(t:Title)")
+                    multi_match_fields.append('t')
                     multi_match_where.append(
                         "t.text =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'description':
                     multi_match.append(
-                        "(n)-[:HAS_DESCRIPTION]->(d:Description)")
+                        "MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
+                    multi_match_fields.append('d')
                     multi_match_where.append(
                         "d.text =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'keyword':
-                    multi_match.append("(n)-[:HAS_KEYWORD]->(k:Keyword)")
+                    multi_optional_match.append("OPTIONAL MATCH (n)-[:HAS_KEYWORD]->(k:Keyword)")
+                    multi_match_fields.append('k')
                     multi_match_where.append(
-                        "k.term =~ '(?i).*{term}.*'".format(term=term))
+                        "k.term =~ '(?i){term}'".format(term=term))
                 elif f == 'contributor':
-                    multi_match.append("(n)-[:CONTRIBUTED_BY]->(a:Agent)")
+                    multi_optional_match.append("OPTIONAL MATCH (n)-[:CONTRIBUTED_BY]->(a:Agent)")
+                    multi_match_fields.append('a')
                     multi_match_where.append(
-                        "ANY(item in a.names where item =~ '(?i){term}')".format(term=term))
+                        "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
                 else:
                     # should never be reached
                     raise RestApiException(
                         'Unexpected field type',
                         status_code=hcodes.HTTP_SERVER_ERROR)
             if len(multi_match) > 0:
-                multi_match_query = "WITH n MATCH " + ', '.join(multi_match) \
+                multi_match_query = ' '.join(multi_match) \
+                    + " " + ' '.join(multi_optional_match) \
+                    + " WITH n, " + ', '.join(multi_match_fields) \
                     + " WHERE " + ' OR '.join(multi_match_where)
 
         # check request for filtering
@@ -302,3 +309,10 @@ class Search(GraphBaseOperations):
         meta_response["countByYears"] = group_by_years
 
         return self.force_response(data, meta=meta_response)
+
+    @staticmethod
+    def sanitize_input_term(term):
+        '''
+        Strip and clean up term from special characters.
+        '''
+        return term.strip().replace("*", "").replace("'", "\\'")

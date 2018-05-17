@@ -1,0 +1,31 @@
+annotation:
+  summary: Updates partially an annotation
+  description: Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.
+  custom:
+    # publish: true
+    authentication: true
+  parameters:
+    - name: uuid
+      in: path
+      required: true
+      description: The annotation's uuid
+      type: string
+    - name: JsonPatch
+      in: body
+      required: true
+      description: The annotation to update.
+      schema:
+        $ref: "#/definitions/PatchRequest"
+  responses:
+    204:
+      description: Annotation successfully updated.
+    400:
+      description: Annotation cannot be updated. Operation allowed only for specific use cases.
+    401:
+      description: This endpoint requires a valid authorization token
+    403:
+      description: Operation forbidden.
+    404:
+      description: Annotation does not exist.
+    500:
+      description: An unexpected error occured.

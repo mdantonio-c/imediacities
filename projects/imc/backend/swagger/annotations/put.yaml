@@ -12,6 +12,7 @@ annotation:
       type: string
     - name: annotation
       in: body
+      required: true
       description: The annotation to update.
       schema:
         $ref: "#/definitions/Annotation"

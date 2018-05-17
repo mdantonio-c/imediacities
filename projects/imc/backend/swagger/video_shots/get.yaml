@@ -1,4 +1,4 @@
-video_annoations:
+video_shots:
   summary: Gets video shots
   description: Returns a list of shots belonging to the given video item.
   custom:

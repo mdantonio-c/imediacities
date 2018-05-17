@@ -8,6 +8,8 @@ import glob
 import shutil
 import xml.etree.ElementTree as ET
 
+os.umask(0)
+
 from PIL import Image
 from subprocess import *
 
@@ -113,10 +115,15 @@ def make_movie_analize_folder(filename, clean=False):
 
     return movie_analize_folder
 
+# -----------------------------------------------------
+def init_child_proc():
+    os.umask(0)
 
 # -----------------------------------------------------
 def run(cmd, out_folder, out_name, err_name, cmd_name=None):
 
+
+    
     if cmd_name:
         cmd_filename = os.path.join(out_folder, cmd_name)
         cmd_file = open(cmd_filename, 'w')
@@ -129,7 +136,7 @@ def run(cmd, out_folder, out_name, err_name, cmd_name=None):
     out_file = open(out_filename, 'w')
     err_file = open(err_filename, 'w')
 
-    p = Popen(cmd, shell=True, universal_newlines=True, stdout=out_file, stderr=err_file)
+    p = Popen(cmd, shell=True, universal_newlines=True, stdout=out_file, stderr=err_file, preexec_fn=init_child_proc)
     res = p.wait()
 
     out_file.close()

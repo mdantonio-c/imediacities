@@ -35,7 +35,11 @@ releases:
   '1.3.0':
     type: beta
     rapydo: 0.6.0
-    status: released 
+    status: discontinued 
+  '1.3.1':
+    type: beta
+    rapydo: 0.6.0
+    status: released
   '1.4.0':
     type: beta
     rapydo: 0.6.1
@@ -44,6 +48,7 @@ releases:
     type: beta
     rapydo: 0.6.2
     status: developing
+
 
 variables:
   repos:

@@ -32,7 +32,9 @@ class Annotations(GraphBaseOperations):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
-    allowed_motivations = ('tagging', 'describing', 'commenting', 'replying')
+    allowed_motivations = ('tagging', 'describing',
+                           'commenting', 'replying', 'segmentation')
+    allowed_patch_operations = ('add', 'remove')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -41,10 +43,9 @@ class Annotations(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
-        logger.debug('input: {}'.format(params))
-        type_f = params.get('type')
-        if type_f is not None:
-            type_f = type_f.upper()
+        anno_type = params.get('type')
+        if anno_type is not None:
+            anno_type = anno_type.upper()
 
         if anno_id is not None:
             # check if the video exists
@@ -57,9 +58,9 @@ class Annotations(GraphBaseOperations):
                     "Please specify a valid annotation id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             annotations = [anno]
-        elif type_f is not None:
+        elif anno_type is not None:
             annotations = self.graph.Annotation.nodes.filter(
-                annotation_type=type_f)
+                annotation_type=anno_type)
         else:
             annotations = self.graph.Annotation.nodes.all()
 
@@ -192,6 +193,17 @@ class Annotations(GraphBaseOperations):
                     raise RestApiException(
                         'Invalid TextualBody',
                         status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'TVSBody':
+                segments = body.get('segments')
+                if segments is None or type(segments) is not list or len(segments) == 0:
+                    raise RestApiException(
+                        'Invalid TVSBody: invalid or missing segments',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                for s_val in segments:
+                    if s_val is None or not SELECTOR_PATTERN.match(s_val):
+                        raise RestApiException(
+                            'Invalid selector value for: ' + s_val,
+                            status_code=hcodes.HTTP_BAD_REQUEST)
             else:
                 raise RestApiException(
                     'Invalid body type for: {}'.format(b_type))
@@ -201,6 +213,24 @@ class Annotations(GraphBaseOperations):
         if motivation == 'describing':
             created_anno = repo.create_dsc_annotation(
                 user, bodies, targetNode, selector, is_private, embargo_date)
+        elif motivation == 'segmentation':
+            if b_type != 'TVSBody':
+                raise RestApiException(
+                    "Invalid body [{b_type}] for segmentation request. "
+                    "Expected TVSBody."
+                    .format(b_type=b_type),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if target_type != 'item':
+                raise RestApiException(
+                    "Invalid target. Only item allowed."
+                    .format(b_type=b_type),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            try:
+                created_anno = repo.create_tvs_manual_annotation(
+                    user, bodies, targetNode, is_private, embargo_date)
+            except DuplicatedAnnotationError as error:
+                raise RestApiException(error.args[0],
+                                       status_code=hcodes.HTTP_BAD_CONFLICT)
         else:
             try:
                 created_anno = repo.create_tag_annotation(
@@ -269,12 +299,15 @@ class Annotations(GraphBaseOperations):
 
         repo = AnnotationRepository(self.graph)
         try:
-            if is_manual:
+            if is_manual and anno.annotation_type != 'TVS':
                 repo.delete_manual_annotation(anno, body_type, bid)
+            elif is_manual and anno.annotation_type == 'TVS':
+                repo.delete_tvs_manual_annotation(anno)
             elif anno.annotation_type == 'TAG':
                 repo.delete_auto_annotation(anno)
             else:
-                raise ValueError('Cannot delete anno {id}'.format(id=anno.uuid))
+                raise ValueError(
+                    'Cannot delete anno {id}'.format(id=anno.uuid))
         except ReferenceError as error:
             raise RestApiException(
                 error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
@@ -379,29 +412,157 @@ class Annotations(GraphBaseOperations):
 
         return self.force_response(updated_anno)
 
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def patch(self, anno_id):
+        if anno_id is None:
+            raise RestApiException(
+                "Please specify an annotation id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+
+        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        if anno is None:
+            raise RestApiException(
+                'Annotation not found',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        user = self.get_current_user()
+
+        creator = anno.creator.single()
+        if creator is None:
+            raise RestApiException(
+                'Annotation with no creator',
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        if user.uuid != creator.uuid:
+            raise RestApiException(
+                'You cannot update an annotation that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
+        if anno.annotation_type not in ('TVS'):
+            raise RestApiException(
+                'Operation not allowed for annotation {}'
+                .format(anno.annotation_type),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        data = self.get_input()
+        if anno.annotation_type == 'TVS':
+            if 'op' not in data:
+                raise RestApiException(
+                    'Missing operation for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            patch_op = data['op']
+            if patch_op not in self.__class__.allowed_patch_operations:
+                raise RestApiException(
+                    "Bad patch operation: allowed one of %s" %
+                    (self.__class__.allowed_patch_operations, ),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'path' not in data:
+                raise RestApiException(
+                    'Missing path for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            path = data['path']
+            if path != '/bodies/0/segments':
+                raise RestApiException(
+                    'Invalid path to patch segmentation. Use "/bodies/0/segments"',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'value' not in data:
+                raise RestApiException(
+                    'Missing value for patch request',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            # check for segment value: expected single or multiple temporal
+            # range for add operation or single or multiple segment uuid for
+            # delete operation
+            values = data['value']
+            if not isinstance(values, list):
+                values = [values]
+            repo = AnnotationRepository(self.graph)
+            for value in values:
+                if patch_op == 'remove':
+                    logger.debug('remove a segment with uuid:{uuid}'
+                                 .format(uuid=value))
+                    segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+                    if segment is None:
+                        raise RestApiException(
+                            'Segment with ID {uuid} not found.'.format(uuid=value),
+                            status_code=hcodes.HTTP_BAD_NOTFOUND)
+                    try:
+                        repo.remove_segment(anno, segment)
+                    except ValueError as error:
+                        raise RestApiException(
+                            error.args[0],
+                            status_code=hcodes.HTTP_BAD_REQUEST)
+                    except DuplicatedAnnotationError as error:
+                        raise RestApiException(error.args[0],
+                                               status_code=hcodes.HTTP_BAD_CONFLICT)
+                    return self.empty_response()
+                elif patch_op == 'add':
+                    logger.debug('add a segment with value:{val}'
+                                 .format(val=value))
+                    if not SELECTOR_PATTERN.match(value):
+                        raise RestApiException(
+                            'Invalid value for: ' + value,
+                            status_code=hcodes.HTTP_BAD_REQUEST)
+                    try:
+                        repo.add_segment(anno, value)
+                    except DuplicatedAnnotationError as error:
+                        raise RestApiException(error.args[0],
+                                               status_code=hcodes.HTTP_BAD_CONFLICT)
+                else:
+                    # should NOT be reached
+                    raise RestApiException(
+                        'Operation {op} not yet implemented'.format(
+                            op=patch_op),
+                        status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+        else:
+            raise RestApiException(
+                'Not yet implemented',
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+        updated_anno = self.get_annotation_response(anno)
+        del(updated_anno['links'])
+
+        return self.force_response(updated_anno)
+
     def get_annotation_response(self, anno):
         """
         Utility method to build DTO for annotation model.
         """
         res = self.getJsonResponse(anno, max_relationship_depth=0)
         if anno.creator is not None:
-            creator = self.getJsonResponse(anno.creator.single(), max_relationship_depth=0)
+            creator = self.getJsonResponse(
+                anno.creator.single(), max_relationship_depth=0)
             if 'links' in creator:
                 del(creator['links'])
             res['creator'] = creator
         res['bodies'] = []
         for b in anno.bodies.all():
-            body = self.getJsonResponse(b.downcast(), max_relationship_depth=0)
+            anno_body = b.downcast()
+            body = self.getJsonResponse(anno_body, max_relationship_depth=0)
             if 'links' in body:
                 del(body['links'])
+            if anno.annotation_type == 'TVS':
+                segments = []
+                for segment in anno_body.segments:
+                    # look at the most derivative class
+                    json_segment = self.getJsonResponse(
+                        segment.downcast(), max_relationship_depth=0)
+                    if 'links' in json_segment:
+                        del(json_segment['links'])
+                    segments.append(json_segment)
+                body['segments'] = segments
             res['bodies'].append(body)
         res['targets'] = []
         for t in anno.targets.all():
-            target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
+            target = self.getJsonResponse(
+                t.downcast(), max_relationship_depth=0)
             if 'links' in target:
                 del(target['links'])
             res['targets'].append(target)
-        source = self.getJsonResponse(anno.source_item.single(), max_relationship_depth=0)
+        source = self.getJsonResponse(
+            anno.source_item.single(), max_relationship_depth=0)
         if 'links' in source:
             del(source['links'])
         res['source'] = source

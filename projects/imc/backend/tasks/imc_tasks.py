@@ -38,6 +38,27 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
+def update_metadata(self, path, resource_id):
+    with celery_app.app.app_context():
+
+        log.debug("Starting task update_metadata for resource_id %s" % resource_id)
+        progress(self, 'Starting update metadata', path)
+        self.graph = celery_app.get_service('neo4j')
+        xml_resource = None
+        try:                                           
+            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
+            xml_resource, group, source_id, item_type, item_node = update_meta_stage(self, resource_id, path, metadata_update)
+            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+
+            progress(self, 'Completed', path)
+
+        except Exception as e:
+            progress(self, 'Failed updating metadata', path)
+            raise e
+
+        return 1
+
+@celery_app.task(bind=True)
 def import_file(self, path, resource_id, mode, metadata_update=True):
     with celery_app.app.app_context():
 
@@ -46,56 +67,18 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         self.graph = celery_app.get_service('neo4j')
 
         xml_resource = None
+        try:                                           
+            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
+            xml_resource, group, source_id, item_type, item_node = update_meta_stage(
+                self, resource_id, path, metadata_update)
+            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            progress(self, 'Updated metadata', path)
+        except Exception as e:
+            progress(self, 'Failed updating metadata', path)
+            log.error("Task error, %s" % e)
+            raise e
+
         try:
-            xml_resource = self.graph.MetaStage.nodes.get(uuid=resource_id)
-
-            group = GraphBaseOperations.getSingleLinkedNode(
-                xml_resource.ownership)
-
-            # METADATA EXTRACTION
-            filename, file_extension = os.path.splitext(path)
-
-            if file_extension.startswith("."):
-                file_extension = file_extension[1:]
-
-            log.debug('filename [{0}], extension [{1}]'.format(
-                filename, file_extension))
-
-            progress(self, 'Extracting descriptive metadata', path)
-
-            source_id = extract_creation_ref(self, path)
-            if source_id is None:
-                raise Exception(
-                    "No source ID found importing metadata file %s" % path)
-
-            item_type = extract_item_type(self, path)
-            if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
-                raise Exception("Invalid content type for: " + item_type)
-            log.info("Content source ID: {0}; TYPE: {1}".format(
-                source_id, item_type))
-
-            # check for existing item
-            item_node = xml_resource.item.single()
-            # if item_node is not None:
-            #     log.debug("Item already exists for metadata Stage[%s]" % path)
-            #     item_node = xml_resource.item.single()
-            # else:
-            if item_node is None:
-                item_properties = {}
-                item_properties['item_type'] = item_type
-                item_node = self.graph.Item(**item_properties).save()
-                item_node.ownership.connect(group)
-                item_node.meta_source.connect(xml_resource)
-                item_node.save()
-                log.debug("Item resource created")
-
-            creation = item_node.creation.single()
-            if creation is not None and not metadata_update:
-                log.info('Skip updating metadata')
-            else:
-                xml_resource.warnings = extract_descriptive_metadata(
-                    self, path, item_type, item_node)
-
             # To ensure that the content item and its metadata will be
             # correctly linked in the system and its repositories,
             # FHI-Partners are expected to name the content item file,
@@ -103,6 +86,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # The FHI project acronym_the FHI content ID (this is the
             # Content item ID in the local FHI’s database).
             # For example: CRB_1234.mp4
+            filename, file_extension = os.path.splitext(path)
+            if file_extension.startswith("."):
+                file_extension = file_extension[1:]
+            log.debug('filename [{0}], extension [{1}]'.format(
+                filename, file_extension))
             basedir = os.path.dirname(os.path.abspath(path))
             log.debug("Content basedir {0}".format(basedir))
             content_path, content_filename = lookup_content(
@@ -131,28 +119,15 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             fast = False
             if mode is not None:
                 mode = mode.lower()
+
                 if mode == 'skip':
                     log.info('Analyze skipped for source id: ' + source_id)
-                    xml_resource.status = 'COMPLETED'
-                    xml_resource.status_message = 'Nothing to declare'
-                    xml_resource.save()
-                    content_node.status = 'SKIPPED'
-                    content_node.status_message = 'Nothing to declare'
-                    content_node.save()
+                    if content_node is not None:
+                        content_node.status = 'SKIPPED'
+                        content_node.status_message = 'Nothing to declare'
+                        content_node.save()
                     return 1
                 fast = (mode == 'fast')
-
-            # at the moment SKIP pipeline for NON-AV Entity
-            # if item_type != 'Video':
-            #     if content_node is not None:
-            #         content_node.status = 'SKIPPED'
-            #         content_node.status_message = 'Pipeline for Non AV entity not yet implemented'
-            #         content_node.save()
-
-            #     xml_resource.status = 'COMPLETED'
-            #     xml_resource.status_message = 'Nothing to declare'
-            #     xml_resource.save()
-            #     return 1
 
             if content_node is None:
                 raise Exception(
@@ -225,20 +200,19 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             content_node.status_message = 'Nothing to declare'
             content_node.save()
 
-            xml_resource.status = 'COMPLETED'
-            xml_resource.status_message = 'Nothing to declare'
-            xml_resource.save()
-
             progress(self, 'Completed', path)
 
         except Exception as e:
             progress(self, 'Import error', None)
             log.error("Task error, %s" % e)
-            if xml_resource is not None:
-                xml_resource.status = 'ERROR'
-                xml_resource.status_message = str(e)
+            if content_node is not None:
+                content_node.status = 'ERROR'
+                content_node.status_message = str(e)
+                content_node.save()
+            elif xml_resource is not None:
+                xml_resource.warnings.append(str(e))
                 xml_resource.save()
-            raise e
+            #raise e
 
         return 1
 
@@ -315,6 +289,72 @@ def lookup_content(self, path, source_id):
             content_filename = f
             break
     return content_path, content_filename
+
+
+def update_meta_stage(self, resource_id, path, metadata_update):
+    """
+    Update data of MetaStage (that has resource_id) with data 
+     coming from xml file in path
+    If metadata_update=false and creation exists then nothing is updated
+    If Item and Creation don't exist then it creates them
+    Return xml_resource (the updated MetaStage), group, source_id, item_type, item_node
+    """
+    xml_resource = None
+    try:
+        xml_resource = self.graph.MetaStage.nodes.get(uuid=resource_id)
+
+        if xml_resource is not None:
+
+            group = GraphBaseOperations.getSingleLinkedNode(
+                xml_resource.ownership)
+
+            source_id = extract_creation_ref(self, path)
+            if source_id is None:
+                raise Exception(
+                    "No source ID found importing metadata file %s" % path)
+
+            item_type = extract_item_type(self, path)
+            if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
+                raise Exception("Invalid content type for: " + item_type)
+            log.info("Content source ID: {0}; TYPE: {1}".format(
+                source_id, item_type))
+
+            # check for existing item
+            item_node = xml_resource.item.single()
+            if item_node is None:
+                item_properties = {}
+                item_properties['item_type'] = item_type
+                item_node = self.graph.Item(**item_properties).save()
+                item_node.ownership.connect(group)
+                item_node.meta_source.connect(xml_resource)
+                item_node.save()
+                log.debug("Item resource created for resource_id=%s" % resource_id)
+
+            # check for existing creation
+            creation = item_node.creation.single()
+            if creation is not None and not metadata_update:
+                log.info("Skip updating metadata for resource_id=%s" % resource_id)
+            else:
+                # update metadata
+                log.debug("Updating metadata for resource_id=%s" % resource_id)
+                xml_resource.warnings = extract_descriptive_metadata(
+                    self, path, item_type, item_node)
+                log.info("Metadata updated for resource_id=%s" % resource_id)
+
+                xml_resource.status = 'COMPLETED'
+                xml_resource.status_message = 'Nothing to declare'
+                xml_resource.save()
+        else:
+            log.warning("Not found MetaStage for resource_id=%s" % resource_id)
+
+    except Exception as e:
+        log.error("Failed update of resource_id %s, Error: %s" % (resource_id,e))
+        if xml_resource is not None:
+            xml_resource.status = 'ERROR'
+            xml_resource.status_message = str(e)
+            xml_resource.save()
+        raise e
+    return xml_resource, group, source_id, item_type, item_node
 
 
 def extract_descriptive_metadata(self, path, item_type, item_node):
@@ -618,6 +658,12 @@ def extract_od_annotations(self, item, analyze_dir_path):
 
         # save annotation
         bodies = []
+        # warkaround for very huge area sequence!
+        if len(region_sequence) > 1000:
+            huge_size = len(region_sequence)
+            region_sequence = []
+            log.warn('Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.
+                format(objID=key[0], concept=concept['name'], size=huge_size))
         od_body = {
             'type': 'ODBody',
             'object_id': key[0],

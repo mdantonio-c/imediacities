@@ -589,9 +589,9 @@ element.style {
 .bigger-180 { font-size: 180% !important }
 
 /* Button */
-button:focus {outline:0;}
+button:focus {outline:0 !important;}
 
-.btn {
+/*.btn {
     color: #FFF!important;
     text-shadow: 0 -1px 0 rgba(0,0,0,.25);
     background-image: none!important;
@@ -604,7 +604,7 @@ button:focus {outline:0;}
     vertical-align: middle;
     margin: 0;
     position: relative;
-}
+}*/
 
 .btn-group .dropdown-toggle, .input-group-lg>.form-control, .input-group-lg>.input-group-addon, .input-group-lg>.input-group-btn>.btn {
 	border-radius: 0
@@ -631,10 +631,10 @@ button.btn:active {
 	top: 1px;
 }
 
-.btn, .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+/*.btn, .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
 	background-color: #ABBAC3 !important;
 	border-color: #ABBAC3;
-}
+}*/
 
 .btn-default.focus:hover, .btn-default:active:hover, .btn-default:focus:active, .btn-default:focus:hover, .btn-default:hover, .btn.focus:hover, .btn:active:hover, .btn:focus:active, .btn:focus:hover, .btn:hover, .open>.btn-default.dropdown-toggle, .open>.btn-default.dropdown-toggle.focus, .open>.btn-default.dropdown-toggle:active, .open>.btn-default.dropdown-toggle:focus, .open>.btn-default.dropdown-toggle:hover, .open>.btn.dropdown-toggle, .open>.btn.dropdown-toggle.focus, .open>.btn.dropdown-toggle:active, .open>.btn.dropdown-toggle:focus, .open>.btn.dropdown-toggle:hover {
 
@@ -1897,6 +1897,28 @@ li.ivh-treeview-node::before {
 	padding: 0px 4px;
 }
 
+.map-counter-panel {
+	border: 1px solid #e08374;
+	background: #ffffff;
+	border-radius: 2px;
+	padding: 2px;
+	font-weight: 700;
+	text-align: center;
+	min-width: 20px;
+}
+.map-counter-panel:before {
+	position: absolute;
+	display: inline-block;
+	top: 24px;
+	left: 6px !important;
+	right: auto;
+	border-right: 6px solid transparent !important;
+    border-top: 6px solid #e08374 !important;
+    border-bottom: 0 solid #e08374 !important;
+    border-left: 6px solid transparent !important;
+    content: " ";
+}
+
 .map-result h4 {
 	display: inline; padding-left: 5px;
 }
@@ -2209,7 +2231,12 @@ li.ivh-treeview-node::before {
 /*----------------------------------------------
        The tab with the Notes -- cinzia
 -----------------------------------------------*/
-.tab-notes
+.notes-content
+{
+	max-height: 800px;
+    max-width: 100%;
+    overflow-y: auto;
+}.tab-notes
 {
 	overflow: hidden;
     max-width: 100%;
@@ -2219,13 +2246,17 @@ li.ivh-treeview-node::before {
 	color: #6e7a7f;
     font-weight: bold;
     font-size: 20px;
+    background-color: #f9f9f9;
+}
+.tab-notes-title a {
+    cursor: pointer;
 }
 .tab-list-notes
 {
 	display: inline-block;
-	border-top: 1px solid #ddd;
+	/* border-top: 1px solid #ddd; */
     width: 85%;
-    height: 800px;
+    /* height: 800px; */
     vertical-align: top;
     overflow-y: auto;
 }
@@ -2300,4 +2331,10 @@ a.tab-list-shots-link:focus
 .tab-list-shot-selected
 {
     background-color: #fff;
+}
+
+.tag a.remove {
+	float: right;
+	margin-left: -3px;
+	cursor: pointer;
 }
