@@ -1,0 +1,25 @@
+video_segments:
+  summary: Gets all manual segments for a video.
+  description: Returns a list of the manual segments belonging to the given video item.
+  custom:
+    authentication: true
+  responses:
+    '200':
+      description: An list of manual segments.
+    '401':
+        description: This endpoint requires a valid authorzation token.
+    '404':
+        description: Video does not exist.
+
+video_segment:
+  summary: Gets a manual video segment with a given id.
+  description: Returns a a single manual segment belonging to the given video item.
+  custom:
+    authentication: true
+  responses:
+    '200':
+      description: The manual video segment.
+    '401':
+        description: This endpoint requires a valid authorzation token.
+    '404':
+        description: Manual video segment does not exist.

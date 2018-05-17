@@ -1,0 +1,13 @@
+video_segment:
+  summary: Delete a video segment.
+  # description:
+  custom:
+    # publish: true
+    authentication: true
+  responses:
+    '200':
+      description: Video segment successfully deleted
+    '401':
+      description: This endpoint requires a valid authorization token
+    '404':
+        description: Video segment does not exist

@@ -1535,12 +1535,17 @@ var SwitchVideoControl = /** @class */ (function (_super) {
         return this.source.src;
     };
     SwitchVideoControl.prototype.source_set = function (e) {
+        var range = document.getElementById('range');
+        var wasPaused = this.video.paused;
         var currentTime = this.video.currentTime;
         this.video.pause();
         this.src_current.search.type = this.element.value || 'video';
         this.source.src = this.src_current.path + "?" + this.src_pars_encode(this.src_current.search);
         this.video.load();
         this.video.currentTime = currentTime;
+        if (!wasPaused) {
+            this.video.play();
+        }
     };
     SwitchVideoControl.prototype.src_parse = function (source) {
         var a = document.createElement('a');

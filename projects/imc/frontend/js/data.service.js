@@ -79,7 +79,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         return api.apiCall('videos/'+videoId+'/shots', 'GET');
     };
 
-    self.saveTagAnnotations = function(target, tags) {
+    self.saveTagAnnotations = function(target, tags, selector) {
         var data = {};
         data.target = target;
         if (tags.length === 1) {
@@ -115,6 +115,12 @@ function DataService($log, api, $q, jsonapi_parser) {
             data.body = bodies;
         }
         data.motivation = "tagging";
+        if (selector !== undefined) {
+            data.selector = {
+                type: "FragmentSelector",
+                value: selector
+            };
+        }
         return api.apiCall('annotations', 'POST', data);
     };
 
@@ -132,7 +138,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         data.body = body;
         if(note.privacy == "public"){
             data.private = false;
-        }else{
+        } else{
             data.private = true;            
         }
         // TODO manca embargo
@@ -146,7 +152,7 @@ function DataService($log, api, $q, jsonapi_parser) {
         }
     };
 
-    self.saveGeoAnnotation = function(target, source, spatial) {
+    self.saveGeoAnnotation = function(target, source, spatial, selector) {
         var data = {
             target: target,
             body: {
@@ -157,8 +163,62 @@ function DataService($log, api, $q, jsonapi_parser) {
             }
         };
         data.motivation = "tagging";
+        if (selector !== undefined) {
+            data.selector = {
+                type: "FragmentSelector",
+                value: selector
+            };
+        }
         return api.apiCall('annotations', 'POST', data);  
     };
+
+    self.getManualSegments = function(videoId) {
+/*        return jsonapi_parser.parseResponse(
+            api.apiCall(
+                'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
+                )
+            );
+*/
+        return api.apiCall(
+            'videos/'+videoId+'/annotations?type=TVS&onlyManual', 'GET'
+        );
+    }
+    self.saveManualSegmentation = function(target, startFrame, endFrame) {
+        var data = {
+            target: target,
+            body: {
+                type: "TVSBody",
+                segments: ["t="+startFrame+","+endFrame]
+            },
+            motivation: "segmentation"
+        }
+
+        return api.apiCall('annotations', 'POST', data);  
+    }
+
+    self.saveManualSegment = function(annotation_id, startFrame, endFrame) {
+        var data = {
+            op: 'add',
+            path: '/bodies/0/segments',
+            value: "t="+startFrame+","+endFrame
+        }
+
+        return api.apiCall('annotations/'+annotation_id, 'PATCH', data);  
+    }
+
+    self.deleteManualSegmentation = function(uuid) {
+        return api.apiCall('annotations/'+uuid, 'DELETE');
+    }
+
+    self.deleteManualSegment = function(annotation_id, segment_id) {
+        var data = {
+            op: 'remove',
+            path: '/bodies/0/segments',
+            value: segment_id
+        }
+
+        return api.apiCall('annotations/'+annotation_id, 'PATCH', data);  
+    }
 
     self.deleteAnnotation = function (annoId, bodyRef) {
         if (bodyRef !== undefined) {

@@ -20,6 +20,12 @@ annotations:
       in: query
       description: filter by annotation type
       type: string
+    - name: onlyManual
+      in: query
+      type: boolean
+      default: false
+      allowEmptyValue: true
+
   responses:
     200:
       description: A list of Annotation

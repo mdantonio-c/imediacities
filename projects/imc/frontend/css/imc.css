@@ -589,7 +589,7 @@ element.style {
 .bigger-180 { font-size: 180% !important }
 
 /* Button */
-button:focus {outline:0;}
+button:focus {outline:0 !important;}
 
 .btn {
     color: #FFF!important;
@@ -1897,6 +1897,28 @@ li.ivh-treeview-node::before {
 	padding: 0px 4px;
 }
 
+.map-counter-panel {
+	border: 1px solid #e08374;
+	background: #ffffff;
+	border-radius: 2px;
+	padding: 2px;
+	font-weight: 700;
+	text-align: center;
+	min-width: 20px;
+}
+.map-counter-panel:before {
+	position: absolute;
+	display: inline-block;
+	top: 24px;
+	left: 6px !important;
+	right: auto;
+	border-right: 6px solid transparent !important;
+    border-top: 6px solid #e08374 !important;
+    border-bottom: 0 solid #e08374 !important;
+    border-left: 6px solid transparent !important;
+    content: " ";
+}
+
 .map-result h4 {
 	display: inline; padding-left: 5px;
 }
@@ -2309,4 +2331,10 @@ a.tab-list-shots-link:focus
 .tab-list-shot-selected
 {
     background-color: #fff;
+}
+
+.tag a.remove {
+	float: right;
+	margin-left: -3px;
+	cursor: pointer;
 }

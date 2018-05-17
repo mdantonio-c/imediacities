@@ -82,6 +82,13 @@
 			}
 		}
 	}
+	function getCity(provider) {
+		for (var i = 0; i < providers.length; i++) {
+			if (providers[i].code === provider) {
+				return providers[i].city;
+			}
+		}
+	}
 
 	var iprstatuses = [{
 			"code": "01",
@@ -114,6 +121,22 @@
 			"code": "10",
 			"name": "Copyright Undetermined"
 		}];
+
+	var mapStyles = {
+		default: null,
+		hide: [{
+			featureType: 'poi.business',
+			stylers: [{
+				visibility: 'off'
+			}]
+		}, {
+			featureType: 'transit',
+			elementType: 'labels.icon',
+			stylers: [{
+				visibility: 'off'
+			}]
+		}]
+	};
 
 	var app = angular.module('web')
 		.controller('SearchController', SearchController)
@@ -443,7 +466,7 @@
 		// list of match field
 		sc.matchFields = ['title', 'keyword', 'description', 'contributor'];
 		// Selected fields
-		sc.selectedMatchFields = ['title'];
+		sc.selectedMatchFields = ['title', 'keyword', 'description'];
 		// Toggle selection for a given field by name
 		sc.toggleMatchFieldSelection = function(matchField) {
 			var idx = self.selectedMatchFields.indexOf(matchField);
@@ -603,6 +626,8 @@
 		sc.googleMapsUrl = GOOGLE_API_KEY;
 		sc.mapLoaded = false;
 		sc.mapZoom = 4;
+		sc.mapStyle = mapStyles.hide; // hide business points of interest (POIs) and transit
+
 		// initial radius in meters
 		//sc.radius = 591657550.500000 / Math.pow( 2, sc.mapZoom-1);
 		sc.radius = 1600 * 1000;	// for zoom level 4
@@ -612,10 +637,20 @@
 		sc.showMapBoundary = false;
 
 		sc.centerEurope = function() {
-			sc.mapCenter = europeCenter;
-			var pt = new google.maps.LatLng(sc.mapCenter[0], sc.mapCenter[1]);
+			var pt = new google.maps.LatLng(europeCenter[0], europeCenter[1]);
 			sc.map.setCenter(pt);
 			sc.map.setZoom(4);
+		};
+
+		/**
+		 * Center the map on a given city.
+		 * @param city - Archive ID (e.g. CCB)
+		 */
+		sc.centerCity = function(city) {
+			var cityPosition = getPosition(city);
+			var pt = new google.maps.LatLng(cityPosition[0], cityPosition[1]);
+			sc.map.setCenter(pt);
+			sc.map.setZoom(14);
 		};
 
 		sc.toggleBoundary = function() {
@@ -639,10 +674,11 @@
 				//sc.map.panTo(sc.map.getCenter());
 				var latLng = sc.map.getCenter();
 				var newCenter = [latLng.lat(), latLng.lng()];
+				// console.log('moved from: ' + sc.mapCenter + ' to: ' + newCenter);
 				if (!_.isEqual(sc.mapCenter, newCenter)) {
 					sc.mapCenter = newCenter;
 					// console.log('center changed to: ' + sc.mapCenter);
-					if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+					if ($scope.filter.provider !== null) {
 						loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
 					}
 				}
@@ -656,13 +692,19 @@
 			if (newZoom !== oldZoom) {
 				// zoom changed
 				// console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+
+				// close the last opened POI infowindow
+				// TODO
+
 				// fit the circle radius properly
 				var r = sc.radius;
 				sc.radius = Math.pow(2,oldZoom-newZoom)*r;
 				// console.log('new radius: ' + sc.radius + ' meters');
 				sc.mapZoom = newZoom;
-				if ($scope.filter.provider !== null && !sc.initialMapLoad) {
+				if ($scope.filter.provider !== null) {
 					loadGeoDistanceAnnotations(sc.radius, sc.mapCenter);
+				} else {
+					noty.showWarning('Select a city from the filter on the left in order to get geo-tags on the map');
 				}
 			}
 		};
@@ -692,6 +734,7 @@
 
 		sc.search = function() {
 			sc.loading = true;
+			clearMarkers();
 			// at the moment search term ONLY in the title
 			var request_data = {
 				"match": {
@@ -711,28 +754,36 @@
 					sc.totalItems = meta.totalItems;
 					sc.countByYears = meta.countByYears;
 					sc.creations = out_data.data.Response.data;
+					sc.counters = [];
 					NgMap.getMap().then(function(map) {
+						map.addListener('click', function(event) {
+							// if the event is a POI
+							if (event.placeId) {
+								// prevent the default info windows from showing?
+								event.stop();
+							}
+						});
 						sc.map = map;
 						sc.setBoundaryVisible(sc.showMapBoundary);
-						sc.initialMapLoad = true;
-						clearMarkers();
 						// clean up relevant creations under the map
 						sc.mapResults = [];
 						if ($scope.filter.provider !== null) {
-							map.setZoom(14);
-							sc.mapCenter = getPosition($scope.filter.provider);
-							/* NAIVE solution: the following is a workaround as on-center-changed logic is delayed */
-							sc.initialMapLoad = false;
+							// console.log('search by city');
+							sc.centerCity($scope.filter.provider);
 						} else {
 							// content from all cities represented on a map of Europe
-							map.setZoom(4);
-							sc.mapCenter = europeCenter;
-							sc.dynMarkers = [];
+							// console.log('search without city');
+							//clearMarkers();
+							sc.centerEurope();
 							// expected content count by providers (i.e. cities)
 							if (meta.countByProviders !== undefined) {
 								Object.keys(meta.countByProviders).forEach(function(key,index) {
 								    // key: the name of the object keyvar position = getPosition(provider);
-									var position = getPosition(key);
+								    var city = getCity(key);
+								    city.counter = meta.countByProviders[key];
+								    city.provider = key;
+								    sc.counters.push(city);
+									/*var position = getPosition(key);
 									if (position === undefined) {
 										console.warn("Cannot get position by given key: '" + key + "'");
 									} else {
@@ -741,7 +792,7 @@
 										for (var i = 0; i < count; i++) {
 											sc.dynMarkers.push(new google.maps.Marker({ position: latLng }));
 										}
-									}
+									}*/
 								});
 							} else {
 								console.warn('expected content count by provider');
@@ -793,7 +844,7 @@
 	        	sc.cities.options.push(p.city.name);
 	        });
 
-			sc.selectedMatchFields = ['title'];
+			sc.selectedMatchFields = ['title', 'keyword', 'description'];
 
 			$scope.terms = [];
 
@@ -881,7 +932,7 @@
 		        $scope.yearfrom = yearfromselected;
 		        $scope.yearto = yeartoselected;
 
-				sc.selectedMatchFields = ['title'];
+				sc.selectedMatchFields = ['title', 'keyword', 'description'];
 
 				var savedterms = localStorage.getItem('terms');
 				if (savedterms!==""){
@@ -919,9 +970,13 @@
 		sc.resetFilters();
 		sc.search();
 
+		// Deletes all markers on the map by removing references to them.
 		function clearMarkers() {
-			// clean up current marker list
 			// console.log('clear markers');
+			for (var i = 0; i < sc.dynMarkers.length; i++) {
+         		sc.dynMarkers[i].setMap(null);
+        	}
+			sc.dynMarkers = [];
 			if (sc.markerClusterer !== undefined) {
 				sc.markerClusterer.clearMarkers();
 			}
@@ -931,7 +986,6 @@
 			/*console.log('loading annotations on the map from center [' + center[0] + ', ' +
 				center[1] + '] within distance: ' + distance + ' (meters)');*/
 			clearMarkers();
-			sc.dynMarkers = [];
 			// clean up relevant creations under the map
 			sc.mapResults = [];
 
@@ -968,6 +1022,7 @@
 						}
 
 						google.maps.event.addListener(marker, 'click', function() {
+							// console.log('show info window on marker');
 							sc.markerTag = marker;
 							GeoCoder.geocode({
 								'placeId': marker.id
@@ -1004,18 +1059,13 @@
 		}
 
 		function updateMarkers(map) {
+			// console.log('update markers');
 			sc.markerClusterer = new MarkerClusterer(
 				map, sc.dynMarkers, {
 					imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
 				});
 			sc.mapLoaded = true;
 		}
-
-		sc.showInfoWindow = function(marker) {
-			console.log(marker);
-			sc.markerTag = marker;
-			sc.map.showInfoWindow('tag-iw', sc.markerTag);
-		};
 
 		// force map resize
 		$scope.$watch('sc.displayMode', function(newValue, oldValue) {
