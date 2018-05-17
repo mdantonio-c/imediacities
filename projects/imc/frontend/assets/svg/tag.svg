@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="2216 -2661 30 30">
+  <defs>
+    <style>
+      .cls-1 {
+        clip-path: url(#clip-tag);
+      }
+
+      .cls-2 {
+        fill: #824eb5;
+      }
+
+      .cls-3 {
+        fill: none;
+      }
+
+      .cls-4 {
+        fill: transparent;
+      }
+    </style>
+    <clipPath id="clip-tag">
+      <rect x="2216" y="-2661" width="30" height="30"/>
+    </clipPath>
+  </defs>
+  <g id="tag" class="cls-1">
+    <rect class="cls-4" x="2216" y="-2661" width="30" height="30"/>
+    <g id="ic_bookmark_black_24px" transform="translate(2217 -2655.606)">
+      <path id="Path_364" data-name="Path 364" class="cls-2" d="M15.06,3H6.677A1.674,1.674,0,0,0,5.008,4.677L5,18.09l5.868-2.515,5.868,2.515V4.677A1.682,1.682,0,0,0,15.06,3Z" transform="translate(-0.808 -0.485)"/>
+      <path id="Path_365" data-name="Path 365" class="cls-3" d="M0,0H20.12V20.12H0Z"/>
+      <path id="Path_366" data-name="Path 366" class="cls-2" d="M13.14,9.652H9.652V13.14H8.489V9.652H5V8.489H8.489V5H9.652V8.489H13.14Z" transform="translate(13.835 1.261)"/>
+    </g>
+  </g>
+</svg>

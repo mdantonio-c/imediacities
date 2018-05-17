@@ -1,0 +1,16 @@
+<div class="imc--card">
+    <div class="imc--toolbar">
+        <input #annotation_filter type="text" class="imc--input--no-line imc--input-search" placeholder="Search in tags" aria-label="Username">
+    </div>
+    <div class="content">
+        <ng-template
+                ngFor
+                let-annotation
+                [ngForOf]="this.annotations_visualizzate">
+            <app-media-annotation [annotation]="annotation[1]"></app-media-annotation>
+        </ng-template>
+        <div class="imc--flex--horizontal-end">
+            <button type="button" class="btn btn-border-classic">Show all</button>
+        </div>
+    </div>
+</div>

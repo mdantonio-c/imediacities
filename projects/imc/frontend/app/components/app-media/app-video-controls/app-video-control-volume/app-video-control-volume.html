@@ -1,0 +1,12 @@
+<div class="controls__status__play" id="volume">
+    <span class="volume__icon" id="ico_off" #ico_off  [ngClass]="{'display-none': volume_level !== 'off'}"><i class="material-icons">volume_off</i></span>
+    <span class="volume__icon" id="ico_mute" #ico_mute [ngClass]="{'display-none': volume_level !== 'mute'}"><i class="material-icons">volume_mute</i></span>
+    <span class="volume__icon" id="ico_down" #ico_down [ngClass]="{'display-none': volume_level !== 'down'}"><i class="material-icons">volume_down</i></span>
+    <span class="volume__icon" id="ico_up" #ico_up [ngClass]="{'display-none': volume_level !== 'up'}"><i class="material-icons">volume_up</i></span>
+    <div id="volume_slider" #volume_slider>
+        <div class="gutter" id="volume_gutter" #volume_gutter></div>
+        <div class="control">
+            <input #volume type="range" min="0" max="1" step=".1" value="0">
+        </div>
+    </div>
+</div>
