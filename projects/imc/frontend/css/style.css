@@ -279,11 +279,16 @@ div.scrollmenu img:hover {
 	The search input
 --------------------------*/
 
+/* COMMENTED BY MATTIA:
+please ad da class to style this... 
+<ul> is used on the navbar;
+
 ul {
 	list-style: none;
 	margin: 0 auto;
 	text-align: left;
 }
+*/
 
 /* ul li {
 	border-bottom: 1px;
