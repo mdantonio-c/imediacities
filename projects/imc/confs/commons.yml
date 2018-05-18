@@ -76,6 +76,7 @@ services:
       # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
+      - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
     depends_on:
       - rabbit
       - neo4j
@@ -104,6 +105,8 @@ services:
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
+
+      PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
   celeryui:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
