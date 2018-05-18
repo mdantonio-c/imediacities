@@ -1,0 +1,12 @@
+<div class="container-fluid map click-event" [ngClass]="{'expanded': map_is_expanded}">
+    <div class="map--bar" (click)="map_extend()">
+        <strong [innerHTML]="map_label" class="paragraph-uppercase"></strong>
+    </div>
+    <div class="map--container">
+        <app-media-map
+                [locations]="locations"
+                [shots]="shots"
+                [draggable_markers]="true"
+                [clickable_markers]="true"></app-media-map>
+    </div>
+</div>

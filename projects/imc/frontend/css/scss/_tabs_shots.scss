@@ -3,33 +3,66 @@
 // Layout delle tab di fianco al player (shots, segments, areas, ecc)
 
 .box-shots {
+  display: flex;
+  flex-direction: column;
   margin: 0;
 
   .imc--toolbar {
     background: $bg-dark-grey;
     margin: 0;
+    padding: $padding-standard-toolbar;
+    align-self: flex-start;
+    flex-basis: 62px;
+    width: 100%;
   }
 
   .tab-content {
     background: $bg-light-grey;
-    height: 430px;
+    /*height: 430px;*/
     display: flex;
     flex-direction: column;
+    align-self: stretch;
+    height: 100%;
+    max-height: 100%;
 
     .tab-pane {
-      position: absolute;
       width: 100%;
-      overflow: auto;
-      height: calc(430px - 53.5px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
+      /*height: calc(430px - 53.5px);*/
     }
+  }
 
-    .tab-content--footer {
-      background: $bg-dark-grey;
-      height: auto;
-      width: 100%;
-      padding: 10px $padding-card;
-      text-align: right;
-      margin-top: auto;
+  .tab-content--footer {
+    background: $bg-dark-grey;
+    height: 65px;
+    width: 100%;
+    padding: 10px $padding-card;
+    text-align: right;
+    margin-top: auto;
+    align-self: flex-end;
+  }
+
+  .imc--toolbar,
+  .tab-content--footer {
+
+    @media (max-width: 991.98px) {
+      padding: 10px 18px !important;
+
+      .btn, button {
+        font-size: 14px;
+        padding: 5px 2.5px;
+      }
+
+      .imc--input--dropdown {
+        font-size: 14px;
+        margin-top: 0;
+      }
+
+      .material-icons {
+        font-size: 20px !important;
+      }
     }
   }
 }
@@ -88,28 +121,38 @@
 .container-info-element {
   display: flex;
   height: 100%;
-  flex-direction: column;
   padding: $padding-card;
 }
 
 .info-element-button {
   margin-top: auto;
   text-align: right;
-
-  button {
-    margin-bottom: 45px;
-  }
 }
 
 // Shot singola riga
 
 .box-single-shot {
   background: $bg-light-grey;
-  padding: 10px 0;
+  padding: 10px 0 0;
 
   &:hover {
     background: $bg-grey;
   }
+
+  .collapse > .content {
+    background: inherit;
+  }
+
+  .imc--input-checkbox + label {
+    @media (max-width: 991.98px) {
+      margin: 2px 0 0 4px;
+    }
+  }
+}
+
+.box-single-shot--number {
+  justify-content: center;
+  flex-direction: column;
 }
 
 .shot-number {
@@ -117,7 +160,7 @@
 }
 
 .anteprima-shot {
-  background: $white;
+  background: $bg-dark;
   min-height: 70px;
   position: relative;
   width: 100%;
@@ -147,6 +190,14 @@
     margin-bottom: 5px;
   }
 
+  & > span .click-event {
+    transition: $transition-all;
+
+    &:hover {
+      color: $theme-video-color;
+    }
+  }
+
   .box--icon-list {
     display: table;
     font-size: 12px;
@@ -163,6 +214,16 @@
       color: $text-dark-color;
       display: block;
       font-size: 21px !important;
+
+      @media (max-width: 991.98px) {
+        font-size: 18px !important;
+      }
+    }
+  }
+
+  & > strong {
+    @media (max-width: 991.98px) {
+      font-size: 13px !important;
     }
   }
 }
@@ -194,13 +255,20 @@
 }
 
 .box-annotation-buttons {
-  padding-left: 15px !important;
+  text-align: right;
+  /*padding-left: 15px !important;*/
+
+  @media (max-width: 991.98px) {
+    /*padding-left: 0 !important;*/
+    margin-top: 15px;
+  }
 
   .btn-accent {
     padding: 3.5px 8px;
   }
 
   button:last-child {
+    margin-left: 5px;
     float: right;
   }
 }

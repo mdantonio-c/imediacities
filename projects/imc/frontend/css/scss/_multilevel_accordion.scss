@@ -1,0 +1,130 @@
+// Layout per il vocabolario
+
+@import 'vars';
+
+.imc--container-tree {
+  width: 100%;
+  color: $text-color;
+
+  ul {
+    padding-left: 0;
+  }
+
+  h3 {
+    background: $bg-grey;
+    border-bottom: 0.5px solid $text-color;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 23px;
+    margin: 0;
+    padding: 3px 0;
+
+
+
+    /* si può togliere se non piace */
+    &:hover {
+      background: $bg-light-grey;
+      //background: rgba($theme-video-color, 0.4);
+    }
+  }
+
+  li {
+    list-style-type: none;
+    background: $bg-grey;
+
+    &:last-child h3 {
+      border-bottom: 0;
+    }
+  }
+
+  .term {
+    display: table;
+    padding: 0 10px;
+    width: 100%;
+
+    span {
+      display: table-cell;
+      float: left;
+    }
+
+    i {
+      display: table-cell;
+      text-align: right;
+      vertical-align: middle;
+    }
+
+    .icon-check-vocabulary {
+      font-size: 18px !important;
+      float: right;
+    }
+  }
+
+  /*a {
+    text-decoration: none;
+    font-size: 12px;
+    line-height: 21px;
+    display: block;
+    padding: 4px 15px;
+    transition: all 0.15s;
+    position: relative;
+
+    &:hover {
+      background: rgba($theme-video-color, 0.4);
+      color: $theme-video-color;
+    }
+  }*/
+
+
+  // Lista secondaria
+
+  .term-list {
+    li {
+      display: table;
+      background: $bg-light-grey;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0 5px;
+      width: 100%;
+
+      .term {
+        border-bottom: 1px solid $bg-grey;
+        font-weight: 500;
+        padding: 3px 10px 3px 20px;
+      }
+
+     /* i, .term {
+        display: table-cell;
+      }*/
+    }
+  }
+
+  .child-list {
+    display: table-row;
+
+    li .term {
+      border: 0 !important;
+      font-weight: 400 !important;
+      padding-left: 30px !important;
+
+      &:hover {
+        background: rgba($theme-video-color, 0.3);
+      }
+    }
+  }
+}
+
+.page-type-image {
+
+  .child-list {
+
+    li .term {
+
+      &:hover {
+        background: rgba($theme-image-color, 0.3) !important;
+      }
+    }
+  }
+}
+
+
+

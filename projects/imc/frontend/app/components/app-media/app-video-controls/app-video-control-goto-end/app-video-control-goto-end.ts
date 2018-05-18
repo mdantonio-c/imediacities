@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-control";
-import {AppVideoRangePlayer} from "../../../../services/app-video-range-player";
+
 
 @Component({
     selector: 'app-video-control-goto-end',
@@ -9,7 +9,7 @@ import {AppVideoRangePlayer} from "../../../../services/app-video-range-player";
 
 export class AppVideoControlGotoEndComponent extends AppVideoControlComponent  {
 
-    constructor(private RangePlayer: AppVideoRangePlayer) {
+    constructor() {
         super();
     }
 

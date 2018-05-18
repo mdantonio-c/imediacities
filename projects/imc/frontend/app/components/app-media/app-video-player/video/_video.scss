@@ -1,9 +1,49 @@
+app-video-player {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/*.main-container-video {
+
+}*/
+
+.video_tag-container {
+    /*height: auto;*/
+    height: 100%;
+    display: flex;
+    width: 100%;
+    flex-grow: 1;
+
+    app-video-tag {
+        width: 100%;
+    }
+}
+
+.video_container--modale {
+    video{
+        max-height: 250px;
+        width: auto;
+    }
+}
+
 .video_container, .video_wrapper{
     position:relative;
     overflow:hidden;
     background:$additional-controls-background;
+    /*height: 100%;*/
+    width: 100%;
 }
+
+.video_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
 .video_container {
+    align-self: stretch;
+    flex-grow: 2;
+
     &.video_container--fullscreen {
         position: fixed;
         z-index: 2147483648 !important;
@@ -36,7 +76,8 @@
         video{
             border:0;
             display: flex;
-            width:100%;
+            //width:100%;
+            max-height: none;
             flex-basis:90%;
         }
 
@@ -51,14 +92,13 @@
         }
 
     }
-
-    &.video_container--modale {
-        video{
-            max-height: 250px;
-            width: auto;
-        }
-    }
 }
+
+.video-box {
+    align-self: stretch;
+    flex-grow: 2;
+}
+
 .video_mask{
     position:absolute;
     top:0;
@@ -87,6 +127,11 @@ video{
     display: block;
     width: auto;
     max-height: 349px;
+
+
+    @media (max-width: 991.98px) {
+        width: 100%;
+    }
 }
 
 #scroller, .seek_bar_wrapper{

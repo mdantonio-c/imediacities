@@ -17,6 +17,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     public details_show = false;
     public checkbox_selection_label = 'multi-annotation';
     public collapse_id = 'collapse-details';
+    public dropdown_id = 'dropdown';
 
     public is_attivo = false;
 
@@ -41,8 +42,12 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     }
 
-    play_scene () {
+    shot_play () {
         this.parent.shot_play(this.shot.attributes.shot_num);
+    }
+
+    shot_goto (frame, pause: true) {
+        this.parent.jump_to(frame, true, pause)
     }
 
     shot_seleziona (evento) {
@@ -50,21 +55,6 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             index: this.shot.attributes.shot_num,
             stato: evento.target.checked
         })
-    }
-
-    ngOnInit() {
-        super.ngOnInit();
-        this.checkbox_selection_label += this.shot.attributes.shot_num;
-        this.collapse_id += this.shot.attributes.shot_num;
-    }
-
-    onshot_start (e) {
-
-        if (e.attributes.shot_num === this.shot.attributes.shot_num) {
-            setTimeout( () => this.scroll(), 0);
-        } else {
-            this.is_attivo = false;
-        }
     }
 
     scroll (){
@@ -75,6 +65,11 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         this.is_attivo = true;
         this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
     }
+
+    tag_is_deletable (tag) {
+        return tag.creator === 'a7411a80-2057-40ad-b7bc-4bc14dd99878';
+    }
+
 
     scrollTo (element, to, duration) {
 
@@ -103,5 +98,22 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         t--;
         return -c/2 * (t*(t-2) - 1) + b;
     };
+
+    ngOnInit() {
+        super.ngOnInit();
+        this.checkbox_selection_label += this.shot.attributes.shot_num;
+        this.collapse_id += this.shot.attributes.shot_num;
+        this.dropdown_id += this.shot.attributes.shot_num;
+    }
+
+    onshot_start (e) {
+
+        if (e.attributes.shot_num === this.shot.attributes.shot_num) {
+            setTimeout( () => this.scroll(), 0);
+        } else {
+            this.is_attivo = false;
+        }
+    }
+
 
 }

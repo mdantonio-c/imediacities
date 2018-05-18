@@ -36,7 +36,7 @@ function _RangePlayer () {
         this._range.start = 1/this._video.fps * conf.start;
         this._range.end = 1/this._video.fps * conf.end;
 
-        this._range.loop = conf.loop || true;
+        this._range.loop = conf.loop;
         this._range.duration = this._range.end - this._range.start;
 
         this._range.active = true;
@@ -45,11 +45,12 @@ function _RangePlayer () {
             this._unset();
         }
 
-        this._video.player = {
-            duration:+this._range.duration.toFixed(6),
-            begin: +this._range.start.toFixed(6)
-        };
-
+        if (this._range.loop) {
+            this._video.player = {
+                duration: +this._range.duration.toFixed(6),
+                begin: +this._range.start.toFixed(6)
+            };
+        }
         this._video.video.pause();
         this._video.video.currentTime = this._range.start;
         this._video._emetti('onrange_start', this._range);
@@ -64,7 +65,14 @@ function _RangePlayer () {
                     this._range.active = false;
                 }
 
-                this._video.video.currentTime = this._range.start;
+                if (this._range.loop) {
+                    this._video.restart_time = this._range.start;
+                } else {
+                    this._unset();
+                }
+
+
+                //this._video.video.currentTime = this._range.start;
 
             }
 
@@ -82,7 +90,7 @@ function _RangePlayer () {
     this._unset = function() {
 
         this._video._emetti('onrange_end', this._range);
-
+        this._video.restart_time = null;
         clearInterval(this._range.interval);
         this._range.interval = null;
 

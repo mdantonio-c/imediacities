@@ -1,0 +1,11 @@
+<div class="controls__status controls__row">
+    <h5>Change fps</h5>
+</div>
+<div *ngIf="video" class="controls__status">
+    <select name="fps" #fps (change)="fps_change($event)">
+        <option value="6">6 fps</option>
+        <option value="12">12 fps</option>
+        <option value="24">24 fps</option>
+        <option value="48">48 fps</option>
+    </select>
+</div>
