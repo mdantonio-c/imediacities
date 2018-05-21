@@ -15,6 +15,12 @@ export class AppVideoControlPlayComponent extends AppVideoControlComponent {
     play () {
 
         if (this.video.paused) {
+
+            if (this.parent.restart_time !== null) {
+                this.video.currentTime = this.parent.restart_time;
+                this.parent.restart_time = null;
+            }
+
             this.video.play();
         } else {
             this.video.pause();

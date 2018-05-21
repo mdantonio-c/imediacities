@@ -1,22 +1,27 @@
-import {Component, Input, ViewChild, OnInit, AfterViewInit} from '@angular/core';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {AppAnnotationsService} from "../../../services/app-annotations";
 
 @Component({
     selector: 'app-media-annotation',
     templateUrl: 'app-media-annotation.html'
 })
 
-export class AppMediaAnnotationComponent implements OnInit, AfterViewInit {
+export class AppMediaAnnotationComponent implements OnInit {
 
     @Input() annotation;
-    @ViewChild('badge') badge;
+    @Input() clickable;
+    @Input() can_delete;
 
-    constructor() {
+    constructor(private element: ElementRef, private AnnotationsService: AppAnnotationsService) {
     }
 
-    ngOnInit() {
+    delete () {
+        if (!this.can_delete) return;
+        this.AnnotationsService.delete_tag(this.annotation);
     }
 
-    ngAfterViewInit () {
+    ngOnInit () {
+
         let classe = 'badge-termtag';
 
         if (this.annotation.group === 'location') {
@@ -27,7 +32,7 @@ export class AppMediaAnnotationComponent implements OnInit, AfterViewInit {
             classe += '--auto';
         }
 
-        this.badge.nativeElement.classList.add(classe);
+        this.element.nativeElement.querySelector('span').classList.add(classe);
 
     }
 }

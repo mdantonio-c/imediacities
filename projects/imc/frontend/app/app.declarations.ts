@@ -37,6 +37,18 @@ import {AppModalInsertReferenceComponent} from "./components/app-media/app-media
 import {AppModaleComponent} from "./components/app-modale/app-modale";
 import {AppMediaModal} from "./components/app-media/app-media-modals/app-media-modal";
 import {NoCommaPipe} from "./pipes/NoComma";
+import {AppModalListaShotsComponent} from "./components/app-media/app-media-modals/app-modal-lista-shots/app-modal-lista-shots";
+import {DropdownPositionDirective} from "./directives/dropdow-reposition";
+import {AppVideoControlFpsComponent} from "./components/app-media/app-video-controls/app-video-control-fps/app-video-control-fps";
+import {AppVideoControlSwitchComponent} from "./components/app-media/app-video-controls/app-video-control-switch/app-video-control-switch";
+import {appVideoControlsDeclarations as VideoControlsDeclarations} from "./components/app-media/app-video-controls/app-video-controls-declarations";
+import {InputNumericDirective} from "./directives/input-numeric";
+import {AppModalTagCloudComponent} from "./components/app-media/app-media-modals/app-modal-tag-cloud/app-modal-tag-cloud";
+import {InputSelectDirective} from "./directives/input-select";
+import {AppMediaCommentiComponent} from "./components/app-media/app-media-commenti/app-media-commenti";
+import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-related-items/app-media-related-items";
+import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
+import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
 
 
 export const declarations: any[] = [
@@ -47,28 +59,29 @@ export const declarations: any[] = [
 	AppMediaComponent,
     AppMediaTopBarComponent,
 	AppPictureComponent,
+	AppShotReferenceComponent,
 	AppVideoTagComponent,
 	AppVideoShotComponent,
     AppMediaModal,
 	AppMediaAnnotationComponent,
+	AppMediaCommentiComponent,
 	AppMediaMapComponent,
+	AppMediaMapWrapperComponent,
+	AppMediaRelatedItemsComponent,
 	AppModalAllAnnotationsComponent,
 	AppModalInsertGeotagComponent,
 	AppModalInsertLinkComponent,
 	AppModalInsertNoteComponent,
 	AppModalInsertReferenceComponent,
     AppModalInsertTermtagComponent,
+	AppModalListaShotsComponent,
 	AppMediaInfoComponent,
 	AppMediaTagsComponent,
     AppVideoPlayerComponent,
-    AppVideoControlPlayComponent,
-    AppVideoControlGotoEndComponent,
-	AppVideoControlGotoStartComponent,
-    AppVideoControlProgressBarComponent,
-	AppVideoControlFforwardComponent,
-	AppVideoControlFrewindComponent,
-	AppVideoControlTimeMarkersComponent,
-	AppVideoControlTimerangeComponent,
-	AppVideoControlVolumeComponent,
-	AppVideoControlFullscreenComponent
+    AppModalTagCloudComponent,
+    VideoControlsDeclarations,
+    DropdownPositionDirective,
+	InputNumericDirective,
+	InputSelectDirective
+
 ];

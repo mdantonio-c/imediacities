@@ -1,8 +1,8 @@
-<div *ngIf="video" class="controls__status__play" id="play" (click)="play()">
+<div *ngIf="video" class="controls__status" id="play" (click)="play()">
     <span *ngIf="video.paused === true">
-        <i class="material-icons">play_arrow</i>
+        <i class="material-icons control_button">play_arrow</i>
     </span>
     <span *ngIf="video.paused === false">
-        <i class="material-icons">pause</i>
+        <i class="material-icons control_button on">pause</i>
     </span>
 </div>

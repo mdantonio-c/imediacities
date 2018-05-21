@@ -145,4 +145,5 @@ services:
 
   frontend:
     environment:
-      ANGULARJS: disabled
+      ALLOW_PASSWORD_RESET: "true"
+      ALLOW_REGISTRATION: "false"

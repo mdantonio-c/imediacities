@@ -8,7 +8,9 @@
     "ng-tags-input": "^3.2.0",
     "angular-ivh-treeview": "^1.1.0",
     "js-marker-clusterer": "",
-    "holderjs": "2.9.4"
+    "holderjs": "2.9.4",
+    "@ngui/map": "",
+    "@types/googlemaps": ""
   },
   "//": {
     "//": "errors installing this, it uses bower!!",

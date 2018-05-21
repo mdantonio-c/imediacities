@@ -23,27 +23,10 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
         super()
     }
 
-    ngOnInit() {
-
-        super.ngOnInit();
-
-        this.data.forEach( s => {
-
-            if (!this.min_detected || s.attributes.duration < this.min_detected) {
-                this.min_detected = s.attributes.duration
-            }
-
-        });
-
-    }
-
-    ontimeupdate () {
-        this.scene_update();
-    }
-
     scene_click (idx) {
         this.scena_visualizza.emit(this.data[idx].attributes.start_frame_idx / this.parent.fps );
     }
+
 
     scene_update () {
 
@@ -63,11 +46,29 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
         // });
     }
 
+    ngOnInit() {
+
+        super.ngOnInit();
+
+        this.data.forEach( s => {
+
+            if (!this.min_detected || s.attributes.duration < this.min_detected) {
+                this.min_detected = s.attributes.duration
+            }
+
+        });
+
+    }
+
     ngAfterViewInit () {
 
         this.termtags = this.termtag_slider.nativeElement.children;
         this.geotags = this.geotag_slider.nativeElement.children;
 
+    }
+
+    ontimeupdate () {
+        this.scene_update();
     }
 
 }

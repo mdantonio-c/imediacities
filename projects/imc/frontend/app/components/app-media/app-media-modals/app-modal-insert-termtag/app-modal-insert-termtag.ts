@@ -1,8 +1,8 @@
-import {Component, OnInit, OnChanges, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, OnChanges, Input, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
 import {AppVocabularyService} from "../../../../services/app-vocabulary";
-import {AppVideoPlayerComponent} from "../../app-video-player/app-video-player";
-import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppAnnotationsService} from "../../../../services/app-annotations";
+import {Observable} from 'rxjs';
+import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 
 @Component({
     selector: 'app-modal-insert-termtag',
@@ -13,6 +13,8 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
 
     @Input() data: any;
 
+    ricerca_model;
+
     @ViewChild('search_field') search_field: ElementRef;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
@@ -21,6 +23,7 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     vocabolario_visualizza = false;
 
     embargo_enable = false;
+    embargo_model;
 
     ricerca_risultati = [];
     ricerca_key = {
@@ -29,17 +32,35 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     ricerca_nomatch = false;
 
     terms = [];
+    terms_all = [];
 
     constructor(
         private VocabularyService: AppVocabularyService,
         private AnnotationsService: AppAnnotationsService
     ) {}
 
-    vocabolario_term (term) {
-        term.open = !term.open;
+    /**
+     * Gestione della visibilità delle termini (elementi con children) del vocabolario sul click
+     * @param term
+     * @param parent
+     */
+    vocabolario_term (term, parent = null) {
+
+        let valore_da_assegnare = !term.open;
+        this.vocabolario.terms.forEach(t => {t.open = false;});
+        if(parent) {
+            parent.open = true;
+            if (parent.hasOwnProperty('children')) {
+                parent.children.forEach(c => {c.open = false})
+            }
+        }
+        term.open = valore_da_assegnare;
 
     }
-
+    /**
+     * Gesitione del click sulle foglie (elementi senza children) del vocabolario
+     * @param term
+     */
     vocabolario_leaf (term) {
         term.selected = !term.selected;
 
@@ -52,41 +73,70 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
             this.terms = this.terms.filter(t => t.name !== term.label)
         }
     }
-
-    ricerca (event) {
-        if(event.target.value.length >= 3) {
-            this.ricerca_key = {name: event.target.value};
-            this.ricerca_risultati = this.VocabularyService.search(event.target.value);
-            this.ricerca_nomatch = this.ricerca_risultati.length == 0
-        } else {
-            this.ricerca_key = null;
-            this.ricerca_nomatch = false;
-        }
-    }
-
+    /**
+     * funzione di ricerca typeahead
+     * @param {<string>} text$
+     * @returns {any}
+     */
+    search = (text$: Observable<string>) =>
+        text$.pipe(
+            debounceTime(300),
+            distinctUntilChanged(),
+            map(term => term === '' ? [] : this.VocabularyService.search(term))
+        );
+    /**
+     * formattatore dei risultati typeahead
+     * @param {{name: string}} result
+     * @returns {string}
+     */
+    formatter = (result: {name: string}) => result.name;
+    //  se tra i tag trovati esiste un termine uguale al termine di ricerca disabilita il pulsante
     term_add_disable () {
         return this.ricerca_key && this.ricerca_key.name && this.ricerca_risultati.filter(r => r.name.toLowerCase() === this.ricerca_key.name.toLowerCase()).length
-        //length == 1 && this.ricerca_key && this.ricerca_key.name.toLowerCase() === this.ricerca_risultati[0].name.toLowerCase()
     }
-
+    /**
+     * Aggiunge il termine all'elenco dei termini da salvare
+     * @param event
+     */
     term_add (event) {
-        console.log("event",  event);
-        if (event && event.name) {
 
+        if (typeof event === 'string') {
+            event = {name:event}
+        }
+        if (event && event.name) {
+            //  prevengo duplicazioni
             if( this.terms.filter(t => t.name.toLowerCase() === event.name.toLowerCase()).length === 0){
                 this.terms.push(
                     this.VocabularyService.annotation_create(event)
                 );
             }
-            console.log("this.terms",  this.terms);
+
         }
     }
-
+    /**
+     * rimuove term dall'elenco dei termini
+     * @param term
+     */
+    term_remove (term) {
+        this.terms = this.terms.filter(t => t.name !== term.name);
+    }
+    /**
+     * esegue il salvataggio
+     */
     salva () {
         this.AnnotationsService.create_tag(
-            this.data.shots[0].id,
+            this.data.shots.map(s => s.id),
             this.terms,
-            (r) => {this.shots_update.emit(r)}
+            (response) => {
+
+                response.some(r => {
+                    if (!r.errors) {
+                        this.shots_update.emit(r.data);
+                        return true;
+                    }
+                })
+
+            }
         );
     }
 
@@ -94,11 +144,15 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
 
     ngOnChanges () {
 
-        this.VocabularyService.get((vocabolario)=>{this.vocabolario = vocabolario});
+        this.terms_all = this.AnnotationsService.merge(this.data.shots, 'tags');
 
+        this.VocabularyService.get((vocabolario)=>{this.vocabolario = vocabolario});
+        this.ricerca_model = this.data.shots;
         this.terms = [];
         this.ricerca_risultati = [];
-        this.search_field.nativeElement.value = '';
+        if (this.search_field) {
+            this.search_field.nativeElement.value = '';
+        }
     }
 
     ngAfterViewInit () {

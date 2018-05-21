@@ -116,7 +116,8 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
 
         this._volume_gutter_set(ico);
 
-        this.volume_slider.nativeElement.style = `top:${elemRect.top + elemRect.height}px;left:${elemRect.left}px;`;
+        //this.volume_slider.nativeElement.style = `top:${elemRect.top + elemRect.height}px;left:${elemRect.left}px;`;
+        this.volume_slider.nativeElement.style = `top:38px;left:3px;position:absolute;`;
         this.volume_slider.nativeElement.classList.add('show');
 
         if (this.volume_slider_timeout === null) {

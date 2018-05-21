@@ -422,13 +422,6 @@ element.style {
     z-index: 1051 !important;
 }
 
-.modal{
-    z-index: 2;   
-}
-.modal-backdrop{
-    z-index: 100;        
-}​
-
 /*dropdown*/
 .uib-dropdown-toggle {
     min-width: 260px !important;

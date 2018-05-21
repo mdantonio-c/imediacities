@@ -1,0 +1,11 @@
+<div class="col-5 modal--list-thumb">
+    <span><img [src]="shot.links.thumbnail" alt=""></span>
+</div>
+<div class="col-7 modal--list-info">
+    <strong>SHOT <span [innerHTML]="shot.attributes.shot_num"></span></strong>
+    <p>
+        smpte: <span [innerHTML]="shot.attributes.timestamp"></span> <br>
+        frame range: <span [innerHTML]="shot.attributes.start_frame_idx"></span> - <span [innerHTML]="shot.attributes.end_frame_idx"></span> <br>
+        duration: <span [innerHTML]="shot.attributes.duration"></span>s
+    </p>
+</div>

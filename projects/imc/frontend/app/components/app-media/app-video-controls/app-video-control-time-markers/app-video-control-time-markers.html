@@ -1,9 +1,9 @@
-<div #smtpe_mark>
-    <strong>00</strong>:
-    <strong>00</strong>:
-    <strong>00</strong> f
-    <strong>00</strong>
+<div #smtpe_mark style="font-family: monospace">
+    <strong>&nbsp;</strong>
+
+    <strong [innerHTML]="hours">00</strong>:<strong [innerHTML]="minutes">00</strong>:<strong [innerHTML]="seconds">00</strong>&nbsp;&nbsp;f <strong [innerHTML]="smtpe">00</strong>
 </div>
-<div>
-    <span>s&nbsp;</span><span #float_mark>0.0000</span>
+<div style="font-family: monospace">
+    <strong>s&nbsp;</strong><strong [innerHTML]="float_mark">0000.0000</strong>
+    <strong>f </strong><strong [innerHTML]="frame_mark">00000</strong>
 </div>

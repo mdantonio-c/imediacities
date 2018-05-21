@@ -5,6 +5,22 @@
     background:#fff;
     display:flex;
 }
+.controls{
+    position:relative;
+    width:100%;
+
+    .material-icons{
+        transition: color .4s;
+    }
+    .material-icons:hover {
+        color:rgba(#FFF,.8);
+    }
+
+    .material-icons.on {
+        color:$progress-value-color;
+    }
+}
+
 .controls__wrapper{
 
     .material-icons{
@@ -33,10 +49,6 @@
         left:0; //   1em padding dal container
         bottom:0;
         z-index: 2147483648;
-    }
-
-    .controls__buttons,.controls__status{
-        //padding:8px;
     }
 
     .controls__button{
@@ -113,19 +125,15 @@
         align-self:center;
     }
 
-    .controls__status__play, .controls__status__bar, .controls__status__fps{
+    .controls__status, .controls__status__bar, .controls__status__fps{
         padding:4px 8px;
     }
-    .controls__status__play {
+    .controls__status {
         line-height: 15px;
     }
 
     .control__status__range {
         position:relative;
-    }
-
-    .controls__status + .controls__buttons {
-        border-top:0;
     }
 
     &.controls__wrapper__black{
@@ -140,8 +148,36 @@
     font-size:.9em;
 }
 
+.controls__left {
+    justify-content: center;
+
+    & div {
+        @media (max-width: 991.98px) {
+            display: inline-block;
+            margin-right: 25px;
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        width: 100%;
+    }
+}
+
+.controls__center {
+    justify-content: center;
+
+    @media (max-width: 991.98px) {
+        width: 59%;
+    }
+}
+
 .controls__right {
     justify-content: flex-end;
+
+    @media (max-width: 991.98px) {
+        justify-content: center;
+        width: 40%;
+    }
 }
 
 #controls_um{
@@ -152,18 +188,7 @@
     display:inline;
 }
 
-#play,
-#range,
-#goto_start,
-#goto_end,
-#rewind,
-#fastforward,
-#seek_backward,
-#seek_forward,
-#jump_to,
-.fullscreen,
-#volume span,
-#play_int{
+.control_button{
     user-select: none;
     cursor:pointer;
 }
@@ -251,6 +276,15 @@
 
     }
 
+}
+
+.controls__row--container {
+    justify-content: space-between;
+    padding: 8px;
+
+    @media (max-width: 991.98px) {
+        flex-wrap: wrap;
+    }
 }
 
 .flex_spacer{

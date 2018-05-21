@@ -1,18 +1,18 @@
-<div class="modal-content">
+
     <div class="modal-body">
 
         <h4>Shot: <span [innerHTML]="shot_corrente.attributes.shot_num+1"></span></h4>
         <div class="row modal-body-content">
 
             <!-- Anteprima del video -->
-            <div class="col-5 row no-gutters modal-media--info">
-                <span class="col-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
-                <span class="col-6 imc--flex--horizontal-center">frame-range:
+            <div class="col-12 col-sm-5 row no-gutters modal-media--info">
+                <span class="col-6 col-lg-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
+                <span class="col-6 col-lg-6 imc--flex--horizontal-center">frame-range:
                     <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
                     -
                     <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
                </span>
-                <span class="col-3 imc--flex--horizontal-end">
+                <span class="col-12 col-lg-3 imc--flex--horizontal-end">
                    duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
                </span>
 
@@ -22,7 +22,7 @@
                </span>
 
                 <!-- Anteprime di altri shots dopo la selezione multipla -->
-                <div class="col-12 row no-gutters">
+                <div class="col-12 row no-gutters" *ngIf="data.shots.length > 1">
                    <span class="imc--thumb"
                          *ngFor="let shot of data.shots let index = index"
                          [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
@@ -42,9 +42,10 @@
     </div>
 
     <ng-content select="[modal-row]"></ng-content>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-border-classic" (click)="chiudi()">Cancel</button>
-        <ng-content select="[modal-button]"></ng-content>
-    </div>
 
+
+
+<div class="modal-footer" modal-footer>
+    <button type="button" class="btn btn-border-classic" (click)="chiudi()">Cancel</button>
+    <ng-content select="[modal-button]"></ng-content>
 </div>

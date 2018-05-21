@@ -1,0 +1,129 @@
+// Layout della mappa all'interno dell'item media (e geotag)
+@import 'vars';
+
+$transition-map: all .4s ease-out;
+
+.map {
+  background: $bg-light-grey;
+  height: 580px;
+  max-height: 80px;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  transition: $transition-map;
+
+  /*iframe*/
+  .mappa {
+    height: 500px;
+    width: 100%;
+    transition: $transition-map;
+  }
+
+  &.expanded {
+    max-height: 580px;
+
+    /*iframe*/
+    .mappa {
+      margin-top: 80px;
+    }
+  }
+}
+
+.map--bar {
+  color: $white;
+  line-height: 73px;
+  height: 80px;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: 100%;
+  z-index: 99;
+}
+
+/*.map--container {
+  position: relative;
+}*/
+
+.page-type-video {
+
+  .map--container {
+    .mappa {
+      border-bottom: 8px solid $theme-video-color !important;
+    }
+  }
+
+  .map--bar {
+    background: rgba($theme-video-color, 0.7);
+    border-bottom: 8px solid $theme-video-color;
+    transition: $transition-map;
+  }
+
+  .map {
+    &.expanded {
+      .map--bar {
+        background: $theme-video-color;
+      }
+    }
+  }
+}
+
+.page-type-image {
+
+  .map--container {
+    .mappa {
+      border-bottom: 8px solid $theme-image-color !important;
+    }
+  }
+
+  .map--bar {
+    background: rgba($theme-image-color, 0.7);
+    border-bottom: 8px solid $theme-image-color;
+    transition: $transition-map;
+  }
+
+  .map {
+    &.expanded {
+      .map--bar {
+        background: $theme-image-color;
+      }
+    }
+  }
+}
+
+.map--local-tooltip {
+  background: $white;
+  box-shadow: $box-shadow-small-card;
+  position: absolute;
+  max-width: 350px;
+  padding: 15px;
+  top: 60%;
+  right: 30%;
+
+  & > .row {
+    align-items: flex-start;
+  }
+
+  img {
+    width: 100%;
+    padding-right: 15px;
+  }
+
+  p {
+    font-size: 12px;
+
+    strong {
+      color: $text-dark-color;
+      display: block;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+  }
+
+  i {
+    font-size: 18px !important;
+  }
+
+  .badge {
+    left: 0;
+  }
+}

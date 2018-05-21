@@ -41,6 +41,6 @@ export class AppVideoControlComponent implements OnInit, OnChanges {
     public onrange_start (e) {};     //  evento custom
     public onrange_end (e) {};       //  evento custom
 
-    public onshot_start (e) {};     //  evento custom
+    public onshot_start (e) {};      //  evento custom
 
 }

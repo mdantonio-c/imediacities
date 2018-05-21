@@ -1,0 +1,105 @@
+@import 'vars';
+
+/*
+  Classi per i Badge da utilizzare per i geotag(arancio) e termtag(viola)
+  - badge arancio:      badge-geotag
+  - badge arancio + A:  badge-geotag--auto
+  - badge viola:        badge-termtag
+  - badge viola + A:    badge-termtag--auto
+
+  - .active è la classe che opacizza il colore di sfondo dei badge
+  - .focus è la classe che gli viene applicata per invertire i colori e avere il gb bianco
+*/
+
+// Badge colorati per i tags
+
+.badge {
+  border-radius: 5px;
+  right: -5px;
+  padding: 3px 9px;
+  color: $white;
+  font-size: $font-size-small !important;
+  font-weight: 500;
+  position: relative !important;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  .material-icons {
+    color: $white;
+    font-size: 14px !important;
+    padding-left: 4px;
+    vertical-align: sub;
+  }
+
+}
+
+.badge-geotag,
+.badge-geotag--auto {
+  background: $geotag-color;
+
+  &.active {
+    background: $badge-geotag-active;
+  }
+
+  &.focus {
+    background: $white;
+    border: 2px solid $geotag-color;
+    color: $geotag-color;
+    font-weight: 500;
+    padding: 2px 9px;
+
+    &:hover,
+    &:focus {
+      color: $geotag-color;
+    }
+  }
+}
+
+.badge-termtag,
+.badge-termtag--auto {
+  background: $termtag-color;
+
+  &.active {
+    background: $badge-termtag-active;
+  }
+
+  &.focus {
+    background: $white;
+    border: 2px solid $termtag-color;
+    color: $termtag-color;
+    font-weight: 500;
+    padding: 2px 9px;
+
+    &:hover,
+    &:focus {
+      color: $termtag-color;
+    }
+  }
+}
+
+.badge-geotag--auto,
+.badge-termtag--auto {
+  padding-left: 20px;
+
+  &:before {
+    content: 'A';
+    background: $bg-dark;
+    line-height: 16px;
+    width: 15px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+}
+
+.new-badge {
+  .badge {
+    opacity: 0.6;
+  }
+}
+

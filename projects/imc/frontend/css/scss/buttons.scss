@@ -1,0 +1,86 @@
+@import 'vars';
+
+/*
+  Bottoni da utilizzare
+  - bottone classico:   btn-border-classic
+  - bottone azzurro:    btn-accent--video
+  - bottone rosso:      btn-accent--image
+*/
+
+// Button customizzati
+
+.btn {
+  font-size: 16px;
+  border-radius: 0;
+  padding: 5px 20px;
+
+  &:focus,
+  &:active {
+    box-shadow: none;
+    outline: none !important;
+  }
+}
+
+.btn-reset {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  width: 100%;
+}
+
+.btn-accent,
+.btn-accent:focus {
+  color: white;
+}
+
+.page-type-video {
+  .btn-accent {
+    background: $theme-video-color;
+    border: 1.5px solid $theme-video-color;
+
+    &:hover {
+      background: transparent;
+      color: $theme-video-color;
+    }
+  }
+}
+
+.page-type-image {
+  .btn-accent {
+    background: $theme-image-color;
+    border: 1.5px solid $theme-image-color;
+
+    &:hover {
+      background: transparent;
+      color: $theme-image-color;
+    }
+
+   /* &:focus {
+      color: $white;
+    }*/
+  }
+}
+
+.btn-border-classic,
+.btn-icon-border-classic {
+  color: $text-color;
+  background: transparent;
+  border: 1px solid $text-color !important;
+
+  &:hover {
+    color: $white;
+    background: $text-color;
+
+    i {
+      color: $white !important;
+    }
+  }
+}
+
+.btn-icon-border-classic {
+  padding: 2.5px 5px;
+
+  i {
+    vertical-align: middle;
+  }
+}

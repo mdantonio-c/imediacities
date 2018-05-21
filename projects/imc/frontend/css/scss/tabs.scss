@@ -1,0 +1,54 @@
+// Stile per le tabs
+@import 'vars';
+
+.imc--tab {
+
+  .nav-item {
+    font-size: 16px;
+
+    @media (max-width: 575.98px) {
+      width: 50%;
+    }
+  }
+
+  .nav-link {
+    border: 0;
+    color: $text-color;
+    padding: $padding-top-bottom-toolbar 40px;
+
+    @media (max-width: 575.98px) {
+      font-size: 15px !important;
+      padding: 15px 20px;
+      text-align: center;
+    }
+
+    &:hover {
+      background: none;
+      border: 0;
+    }
+
+    &.active {
+      border: 0;
+    }
+  }
+}
+
+.page-type-video {
+  .imc--tab {
+    .nav-link {
+      &.active {
+        border-bottom: 4px solid $theme-video-color;
+      }
+    }
+  }
+}
+
+.page-type-image {
+  .imc--tab {
+    .nav-link {
+      &.active {
+        border-bottom: 4px solid $theme-image-color;
+      }
+    }
+  }
+}
