@@ -10,7 +10,6 @@ import 'js-marker-clusterer'
 
 import '/app/frontend/css/style.css'
 //import '/app/frontend/css/VideoPlayer_stile.css'
-import '/app/frontend/css/fix-dev.css'
 import '/app/frontend/css/scss/style.css'
 import '/app/frontend/app/components/app-media/app-video-player/app-video-player.css'
 
