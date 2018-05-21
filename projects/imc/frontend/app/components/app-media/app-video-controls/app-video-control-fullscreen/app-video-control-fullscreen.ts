@@ -1,4 +1,4 @@
-import {Component, ViewChild, ElementRef, Output, EventEmitter, OnInit, AfterViewInit} from '@angular/core';
+import {Component, ViewChild, ElementRef, Output, EventEmitter, AfterViewInit} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-control";
 import {AppVideoPlayerComponent} from "../../app-video-player/app-video-player";
 
@@ -19,7 +19,6 @@ export class AppVideoControlFullscreenComponent extends AppVideoControlComponent
     constructor() {
         super();
     }
-
 
     _fullscreen (stato) {
         this.fullscreen_stato = stato;

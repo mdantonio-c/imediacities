@@ -1,3 +1,4 @@
+
 <ng-template #content let-c="close" let-d="dismiss">
 
     <div class="modal-header">
@@ -7,6 +8,6 @@
         </button>
     </div>
 
-    <ng-content select=".modal-dialog"></ng-content>
+    <ng-content select="[modal-dialog]"></ng-content>
 
 </ng-template>

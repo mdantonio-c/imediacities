@@ -13,6 +13,15 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
 
     public description_languages: any;
     public description_active = null;
+    public isCollapsed = {
+        title: true,
+        description: false,
+        prod_information: true,
+        copyright: true,
+        owner: true,
+        analogue: true,
+        format: true
+    };
 
     constructor() {
     }
@@ -75,6 +84,10 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
             this.description_languages_selector.nativeElement.appendChild(option);
         })
 
+    }
+
+    expandCard(card){
+        this.isCollapsed[card] = !this.isCollapsed[card];
     }
 
     ngOnInit() {

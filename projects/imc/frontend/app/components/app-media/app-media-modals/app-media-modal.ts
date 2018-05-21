@@ -25,6 +25,10 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
         private ModalService: AppModaleService
     ) {}
 
+    /**
+     * Consente di riprodurre uno shot cliccando sulla sua miniatura
+     * @param shot_index
+     */
     shot_cambia (shot_index) {
 
         if (!this.data || !this.data.shots || !this.data.shots.length) return;
@@ -36,11 +40,15 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
                 index: this.shot_corrente.attributes.shot_num,
                 start: this.shot_corrente.attributes.start_frame_idx,
                 end: this.shot_corrente.attributes.end_frame_idx,
+                loop: true,
                 video: this.videoPlayer
             })
         }
     }
 
+    /**
+     * Chiude la modal
+     */
     chiudi () {
         this.videoPlayer.video.pause();
         (this.ModalService.get()).dismiss();

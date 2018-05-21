@@ -1,7 +1,7 @@
 <!-- Black Topbar -->
 <div class="nav imc--topbar">
     <span class="imc--flex--vertical-center back-icon">
-        <i class="material-icons">keyboard_arrow_left</i>
+        <i class="material-icons click-event" (click)="backClicked()">keyboard_arrow_left</i>
     </span>
     <span class="imc--topbar--title imc--flex--vertical-center">
         <ng-container *ngIf="mediaType === 'video'; else mediaPhoto">
@@ -12,11 +12,12 @@
         </ng-template>
     </span>
     <span class="imc--flex--item-end box-icons-share">
-        <i class="material-icons">playlist_add</i>
-        <a data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+        <i class="material-icons click-event">playlist_add</i>
+
+        <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
             <i class="material-icons">share</i>
         </a>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
           <a class="dropdown-item" href="#">Share the video</a>
             <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="#">Share your segment list</a>

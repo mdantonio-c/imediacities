@@ -1,20 +1,23 @@
-<div class="video_container" *ngIf="data">
+<!-- Container del video player e dei controlli -->
+<div class="main-container-video row no-gutters">
+    <div class="video_container col-12" *ngIf="data">
     <div class="video_wrapper">
-        <video #videoPlayer preload controls="false"></video>
-        <div class="control__progress" *ngIf="showComponents">
+        <div class="video-box">
+            <video #videoPlayer preload></video>
+        </div>
+        <div class="controls" *ngIf="showComponents">
             <!--progress bar-->
             <app-video-control-progress-bar (current_component)="registra($event)" #progress_bar [parent]="this"></app-video-control-progress-bar>
             <app-video-control-timerange (current_component)="registra($event)" [parent]="this"></app-video-control-timerange>
             <div class="controls__wrapper controls__wrapper__black">
-                <div class="controls__row" style="justify-content:space-between;padding:8px;">
+                <div class="controls__row controls__row--container">
                     <!--sx-->
-                    <div class="controls__left">
+                    <div class="controls__row controls__left">
                         <!--time marker-->
                         <app-video-control-time-markers (current_component)="registra($event)" [parent]="this"></app-video-control-time-markers>
                     </div>
                     <!--centro-->
                     <div class="controls__row controls__center">
-
                         <!--start-->
                         <app-video-control-goto-start (current_component)="registra($event)" [parent]="this"></app-video-control-goto-start>
                         <!--fast rewind-->
@@ -28,22 +31,41 @@
                     </div>
                     <!--dx-->
                     <div class="controls__row controls__right">
+                        <!-- file orf -->
+                        <app-video-control-switch (current_component)="registra($event)" [parent]="this"></app-video-control-switch>
                         <!--volume-->
                         <app-video-control-volume (current_component)="registra($event)" [parent]="this"></app-video-control-volume>
+                        <!--controlli avanzati-->
+                        <app-video-control-advanced (current_component)="registra($event)" [parent]="this" (advanced_show)=advanced_control_show($event)></app-video-control-advanced>
                         <!--fullscreen-->
                         <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this"></app-video-control-fullscreen>
+                    </div>
+                </div>
+                <!-- test -->
+                <div class="controls__row controls__row--container" *ngIf="advanced_show">
+                    <div class="controls__row controls__left">
+                        <app-video-control-step (current_component)="registra($event)" [parent]="this"></app-video-control-step>
+                        <app-video-control-jump-to (current_component)="registra($event)" [parent]="this"></app-video-control-jump-to>
+                        <app-video-control-range (current_component)="registra($event)" [parent]="this"></app-video-control-range>
+                        <app-video-control-fps (current_component)="registra($event)" [parent]="this"></app-video-control-fps>
                     </div>
                 </div>
             </div>
         </div>
         <div class="video_mask">
-<!--            <div class="spinner">
-                <div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div>
-            </div>-->
             <div class="lds-ripple">
                 <div></div><div></div>
             </div>
         </div>
     </div>
 </div>
-<app-video-tag *ngIf="shots && shots.length && layout !== 'modale'" [data]="shots" (scena_visualizza)="jump_to($event)" (current_component)="registra($event)" [parent]="this"></app-video-tag>
+
+    <!-- Barre sotto al player degli shot -->
+    <div class="video_tag-container col-12">
+        <app-video-tag *ngIf="layout_check('modale')"
+                   [data]="shots"
+                   (scena_visualizza)="jump_to($event)"
+                   (current_component)="registra($event)"
+                   [parent]="this"></app-video-tag>
+    </div>
+</div>

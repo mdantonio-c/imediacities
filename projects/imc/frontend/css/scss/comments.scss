@@ -1,0 +1,106 @@
+@import 'vars';
+
+// Sezioni commenti dell'item
+
+.imc--content-comments {
+  margin-top: 27px;
+  padding-top: $padding-card;
+  border-top: 1px solid $text-color;
+}
+
+.box-add-comment {
+  margin: 35px 0;
+
+  input {
+    width: 95%;
+  }
+}
+
+.profile-image {
+  //background: $text-color;
+  background: url("../../assets/svg/user.svg") no-repeat center center lightsteelblue;
+  border-radius: 100%;
+  display: block;
+  height: 50px;
+  width: 50px;
+  text-align: center;
+
+  @media (max-width: 575.98px) {
+    height: 30px;
+    width: 30px;
+    margin-top: 8px;
+  }
+
+  i {
+    color: $bg-light-grey;
+    font-size: 35px;
+    line-height: 41px;
+  }
+}
+
+.box-comment {
+  h5 {
+    color: $text-dark-color;
+    display: inline-block;
+    margin: 15px 0;
+    transition: all .1s ease-in-out;
+
+    .material-icons {
+      color: $text-dark-color;
+      vertical-align: middle;
+    }
+
+    &.box-comment--vote:hover {
+      color: $text-color;
+
+      .material-icons {
+        color: $text-color;
+      }
+    }
+
+    & + .material-icons {
+      color: $text-dark-color;
+      font-size: 20px !important;
+      vertical-align: sub;
+    }
+  }
+}
+
+.box-comment--vote {
+  font-size: 15px;
+  font-weight: 500;
+  margin-right: 20px;
+
+  a:hover {
+    color: $text-dark-color; //colore di default
+    text-decoration: none;
+  }
+
+  .material-icons {
+    font-size: 20px !important;
+    vertical-align: sub;
+    margin-right: 5px;
+  }
+
+  a, .material-icons {
+    transition: all .1s ease-in-out;
+  }
+}
+
+.page-type-video {
+  .box-comment--vote {
+    a:hover,
+    .material-icons:hover {
+      color: $theme-video-color;
+    }
+  }
+}
+
+.page-type-image {
+  .box-comment--vote {
+    a:hover,
+    .material-icons:hover {
+      color: $theme-image-color;
+    }
+  }
+}

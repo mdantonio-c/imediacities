@@ -2,22 +2,28 @@
 <app-media-modal [data]="data">
 
     <!-- Aggiunta della nota -->
-    <div class="col-7 row no-gutters" modal-col>
-               <span class="col-11">
-                   <input type="text" class="imc--input  space-paragraph-20" placeholder="Title" aria-label="Title"
-                          [(ngModel)]="note.title">
-               </span>
+    <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
+        <span class="col-11">
+           <input type="text" class="imc--input  space-paragraph-20" placeholder="Title" aria-label="Title"
+                  [(ngModel)]="note.title">
+        </span>
         <span class="col-11 space-paragraph-20">
-                    <textarea class="imc--input" placeholder="Text" aria-label="Text"
-                              [(ngModel)]="note.text"></textarea>
-               </span>
-        <span class="col-4 space-paragraph-20">
-                   <select class="imc--input col-7" #visibility [(ngModel)]="note.private">
-                        <option selected value="true">Private</option>
-                        <option value="false">Public</option>
-                    </select>&nbsp;
-               </span>
+            <textarea class="imc--input" placeholder="Text" aria-label="Text"
+                      [(ngModel)]="note.text"></textarea>
+        </span>
+        <span class="col-12 col-sm-6 col-lg-4 space-paragraph-20">
+           <select class="imc--input col-7" #visibility [(ngModel)]="note.private">
+                <option selected value="true">Private</option>
+                <option value="false">Public</option>
+            </select>&nbsp;
+        </span>
+        <span class="col-12 col-sm-6 col-lg-4 space-paragraph-20">
+           <select class="imc--input col-7" #language>
+                <option selected value="true">English</option>
+                <option value="false">Italian</option>
+            </select>&nbsp;
+        </span>
     </div>
-    <p>{{note | json}}</p>
+
     <button type="button" class="btn btn-accent" modal-button (click)="save()">Save</button>
 </app-media-modal>

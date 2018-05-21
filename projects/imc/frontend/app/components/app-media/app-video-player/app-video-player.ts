@@ -19,10 +19,12 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
     @ViewChild('videoPlayer') videoPlayer: ElementRef;
 
+    advanced_show = false;
+
     componenti = new Array();
 
     fps = 0;
-    frame_lentgh = 0;
+    frame_length = 0;
 
     showComponents = false;
     video = null;
@@ -33,6 +35,12 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     spinner_prevent = false;
     shot_current = -1;
 
+    /**
+     * Memorizza il punto da cui ripartire nel caso di un range in loop
+     * @type {number}
+     */
+    restart_time = null;
+
     constructor(private cdRef: ChangeDetectorRef, private elRef: ElementRef ) {}
 
     @rangePlayer() range;
@@ -40,7 +48,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     _frame_set (f) {
         //  sporchissimo :)
         this.fps = eval(f);
-        this.frame_lentgh = 1/this.fps;
+        this.frame_length = 1/this.fps;
     }
     
     _video_source_add (source_url) {
@@ -175,8 +183,17 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
     }
 
-    public jump_to (evento) {
-        this.video.currentTime = evento;
+    public jump_to (time_or_frames, um_is_frame = false, pause = false) {
+
+        if (pause) {
+            this.video.pause();
+        }
+
+        if (um_is_frame) {
+            time_or_frames =  this.frame_to_time(time_or_frames);
+        }
+
+        this.video.currentTime = time_or_frames;
     }
 
     public shot_play (shot_number) {
@@ -192,11 +209,47 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     public fullscreen (stato) {
-        this.elRef.nativeElement.children[0].classList[stato === 'on' ? 'add' : 'remove']('video_container--fullscreen');
+        this.elRef.nativeElement.children[0].querySelector('.video_container').classList[stato === 'on' ? 'add' : 'remove']('video_container--fullscreen');
     }
 
     public remove () {
         this.video.remove();
+    }
+
+    frame_to_time (frame) {
+        return frame * this.frame_length;
+    }
+
+    time_to_frame (time) {
+        return Math.ceil(time / this.frame_length);
+    }
+
+    frame_current () {
+        return this.time_to_frame(this.video.currentTime);
+    }
+
+    _floor (number, decimal_places) {
+        return Math.floor(parseFloat(number) * Math.pow(10, decimal_places)) / Math.pow(10, decimal_places);
+    }
+
+    _round (number, decimal_places) {
+        return Math.round(parseFloat(number) * Math.pow(10, decimal_places)) / Math.pow(10,decimal_places);
+    }
+
+    _round_fixed (number, decimal_places) {
+        return this._round(number, decimal_places).toFixed(decimal_places);
+    }
+
+    _ceil (number, decimal_places) {
+        return Math.ceil(parseFloat(number) * Math.pow(10,decimal_places)) / Math.pow(10, decimal_places);
+    }
+
+    public layout_check (layout) {
+        return this.shots && this.shots.length && this.layout !== layout
+    }
+
+    public advanced_control_show (stato) {
+        this.advanced_show = stato;
     }
 
     ngOnInit () {

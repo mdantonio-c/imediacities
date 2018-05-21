@@ -1,9 +1,8 @@
-import {Component, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {AppShotsService} from "../../services/app-shots";
 import {AppVideoService} from "../../services/app-video";
 import {AppModaleComponent} from "../app-modale/app-modale";
 import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
-import {AppVideoShotComponent} from "./app-video-shot/app-video-shot";
 
 /**
  * Componente per la visualizzazione del media
@@ -46,6 +45,7 @@ export class AppMediaComponent implements OnInit {
          */
         data: {}
     };
+    public locations;
     /**
      * Riceve i risultati della chiamata al servizio shots
      * @type {any[]}
@@ -58,8 +58,7 @@ export class AppMediaComponent implements OnInit {
      */
     public user_language = 'it';
 
-    constructor(private VideoService: AppVideoService, private ShotsService: AppShotsService) {
-    }
+    constructor(private VideoService: AppVideoService, private ShotsService: AppShotsService) {}
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot
@@ -82,7 +81,7 @@ export class AppMediaComponent implements OnInit {
         this.modale.type = componente.modale;
         this.modale.data = componente.data;
 
-        this.appModale.open(componente.titolo, this.VideoService.type());
+        this.appModale.open(componente.titolo, this.VideoService.type(), componente.classe);
 
     }
 
@@ -130,14 +129,16 @@ export class AppMediaComponent implements OnInit {
     shots_update (evento) {
         this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
     }
+
     /**
      * Esegue le richieste del video e degli shot
      */
     ngOnInit() {
 
         this.VideoService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5', (video) => {this.media = video});
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
-
+        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {
+            this.shots_init(shots);
+            this.locations = this.ShotsService.annotations().filter(a => a.group === 'location');
+        });
     }
-
 }

@@ -1,0 +1,8 @@
+<div *ngIf="video">
+    <div [ngClass]="{'display-none': orf_not_available}">
+        <div class="switch">
+            <input type="checkbox" id="switchOrf" class="switch__input">
+            <label for="switchOrf" class="switch__label" (click)="source_set()">Orf</label>
+        </div>
+    </div>
+</div>

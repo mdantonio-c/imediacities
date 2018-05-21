@@ -1,7 +1,7 @@
 <!-- Modale per l'iserimento di link -->
 <app-media-modal [data]="data">
 
-    <div class="col-7 row no-gutters" modal-col>
+    <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
                <span class="col-11">
                    <div class="custom-control custom-radio custom-control-inline">
                       <input type="radio"
@@ -33,10 +33,10 @@
                     </span>
                </span>
         <span *ngIf="!options" class="col-12 row no-gutters imc--flex--vertical-center space-paragraph-20">
-                   <span class="col-8">
+                   <span class="col-7 col-sm-8">
                        <input type="text" class="imc--input imc--input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
                    </span>
-                    <span class="col-3 imc--flex--horizontal-end">
+                    <span class="col-4 col-sm-3 imc--flex--horizontal-end">
                         <button class="btn btn-accent">Search</button>
                     </span>
                     <div class="col-12 space-paragraph-20 box-checkbox-group">

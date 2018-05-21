@@ -1,1 +1,5 @@
-<span class="badge" #badge [innerHTML]="annotation.name"></span>
+<span class="badge" [ngClass]="{'click-event': clickable}">
+    <span
+        [innerHTML]="annotation.name"></span>
+    <i *ngIf="can_delete" class="material-icons click-event" (click)="delete()">close</i>
+</span>
