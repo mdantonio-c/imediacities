@@ -177,14 +177,7 @@
                                     [attr.aria-expanded]="!isCollapsed.owner"
                                     aria-controls="owner_content">
                                 <div class="row">
-                                    <div class="col-9 col-sm-10">
-                                        <!--
-                                    todo I dati seguenti sono statici. Mancano nell'API videos. I dati più simili sono in relationships/rightholders
-                                -->
-                                        <span class="dev dev-warning" title="I dati seguenti sono statici. Mancano nell'API videos. I dati più simili sono in relationships/rightholders ">
-                                    <i class="material-icons">warning</i>
-                                </span>
-                                        <!---->
+                                    <div class="col-9 col-sm-10">                                        
                                         Owner
                                     </div>
                                     <div class="col imc--flex--horizontal-end">
@@ -281,14 +274,6 @@
                                     aria-controls="digital_content">
                                 <div class="row">
                                     <div class="col-9 col-sm-10">
-                                        <!--
-                                    todo I dati seguenti sono statici. Mancano nell'API videos. I dati più simili sono in relationships/item
-                                -->
-                                        <span class="dev dev-warning" title="I dati seguenti sono statici. Mancano nell'API videos. I dati più simili sono in relationships/item">
-                                    <i class="material-icons">warning</i>
-                                </span>
-                                        <!-- -->
-
                                         Digital format
                                     </div>
                                     <div class="col imc--flex--horizontal-end">
@@ -303,9 +288,6 @@
                         <div class="card-body row">
                             <div class="col-12">
                                 <ul class="list-space">
-                                    <!-- * = unbind -->
-                                    <li><strong>*Nb_streams:</strong>4</li>
-
                                     <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
                                         <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
                                     </li>
@@ -326,8 +308,6 @@
                                         <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
                                     </li>
 
-                                    <li><strong>*Start_time:</strong>000000s</li>
-
                                     <li *ngIf="info.relationships.item[0].attributes.duration">
                                         <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
                                     </li>
@@ -336,11 +316,9 @@
                                         <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
                                     </li>
 
-                                    <li><strong>*Bit_rate:</strong>8436543654</li>
-
-                                    <li><strong>*Probe_score:</strong>100</li>
                                 </ul>
                             </div>
+<!--
                             <div class="col-6 space-paragraph-25">
                                 <h5>*Video</h5>
                                 <ul class="space-paragraph-10">
@@ -359,6 +337,7 @@
                                     <li>"label": "xxx"</li>
                                 </ul>
                             </div>
+-->
                         </div>
                     </div>
                 </div>

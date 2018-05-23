@@ -1,8 +1,10 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {AppShotsService} from "../../services/app-shots";
-import {AppVideoService} from "../../services/app-video";
+import {AppMediaService} from "../../services/app-media";
 import {AppModaleComponent} from "../app-modale/app-modale";
 import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
+import {AuthService} from "/rapydo/src/app/services/auth";
+import {AppVideoService} from "../../services/app-video";
 
 /**
  * Componente per la visualizzazione del media
@@ -14,6 +16,9 @@ import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
 
 export class AppMediaComponent implements OnInit {
 
+    //  Id video
+    video_id = 'cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5';
+
     /**
      * Riferimento al componente AppModale
      */
@@ -22,7 +27,11 @@ export class AppMediaComponent implements OnInit {
      * Riferimento al componente AppVideoPlayer
      */
     @ViewChild('appVideo') appVideo: AppVideoPlayerComponent;
-
+    /**
+     * Conteggio annotazioni
+     * @type {number}
+     */
+    public annotations_count = 0;
     /**
      * Consente di visualizzare lo strumento per la selezione multipla degli shot
      */
@@ -45,6 +54,9 @@ export class AppMediaComponent implements OnInit {
          */
         data: {}
     };
+    /**
+     * Elenco delle location da passare alla mappa
+     */
     public locations;
     /**
      * Riceve i risultati della chiamata al servizio shots
@@ -57,8 +69,13 @@ export class AppMediaComponent implements OnInit {
      * @type {string}
      */
     public user_language = 'it';
+    public user = {};
 
-    constructor(private VideoService: AppVideoService, private ShotsService: AppShotsService) {}
+    constructor(
+        private AuthService: AuthService,
+        private MediaService: AppMediaService,
+        private ShotsService: AppShotsService,
+        private VideoService: AppVideoService) {}
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot
@@ -81,7 +98,7 @@ export class AppMediaComponent implements OnInit {
         this.modale.type = componente.modale;
         this.modale.data = componente.data;
 
-        this.appModale.open(componente.titolo, this.VideoService.type(), componente.classe);
+        this.appModale.open(componente.titolo, this.MediaService.type(), componente.classe);
 
     }
 
@@ -113,8 +130,8 @@ export class AppMediaComponent implements OnInit {
         this.modal_show(comp);
     }
 
-    shot_selezionato (shot) {
-        this.shots_attivi[shot.index] = shot.stato;
+    shot_selezionato (evento) {
+        this.shots_attivi[evento.index] = evento.stato;
     }
 
     shots_attivi_reset () {
@@ -122,12 +139,23 @@ export class AppMediaComponent implements OnInit {
     }
 
     shots_init (shots) {
-        this.shots = shots;
+        //  Questo tipo di aggiornamento serve per non ridisegnare tutti i componenti collegati agli shots
+        if (this.shots.length) {
+            this.shots.forEach((s,idx) => {
+                s.annotations = shots[idx].annotations;
+            })
+        } else {
+            this.shots = shots;
+        }
         this.shots_attivi = shots.map(s=>false);
     }
 
     shots_update (evento) {
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
+        this.ShotsService.get();
+    }
+
+    video_player_set (event) {
+        this.VideoService.video_set(event);
     }
 
     /**
@@ -135,10 +163,18 @@ export class AppMediaComponent implements OnInit {
      */
     ngOnInit() {
 
-        this.VideoService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5', (video) => {this.media = video});
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {
+        this.user = this.AuthService.getUser();
+
+        this.MediaService.get(this.video_id, (video) => {this.media = video});
+        this.ShotsService.get(this.video_id);
+
+        this.ShotsService.update.subscribe(shots => {
             this.shots_init(shots);
-            this.locations = this.ShotsService.annotations().filter(a => a.group === 'location');
-        });
+            const annotations = this.ShotsService.annotations();
+            this.annotations_count = annotations.length;
+            this.locations = annotations.filter(a => a.group === 'location')
+        })
+
     }
+
 }

@@ -62,9 +62,19 @@ export class AppMediaTagsComponent implements OnInit{
 
     }
 
-    ngOnInit() {
-        this.annotations.elenco = this.ShotsService.annotations().slice();
+    annotations_set (shots?) {
+        if (shots) {
+            this.shots = shots;
+        }
+        this.annotations.elenco = this.ShotsService.annotations().filter(a => a.type === 'TAG');
         this.annotations.visualizzate = this.annotations.elenco.slice();
+    }
+
+    ngOnInit() {
+        this.annotations_set();
+        this.ShotsService.update.subscribe(shots => {
+            this.annotations_set(shots);
+        })
 
     }
 }

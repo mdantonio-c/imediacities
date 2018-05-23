@@ -1,7 +1,7 @@
 <!-- Tags bar sotto al player -->
 
 <div class="imc--video-tag row no-gutters">
-    <div class="col-1 imc--video-tag--button">
+    <div class="col-1 imc--video-tag--button" (click)="termtag_add()">
         <img src="/static/assets/svg/tag.svg">
     </div>
     <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
@@ -11,12 +11,12 @@
                     [attr.data-shot]="shot.attributes.shot_num"
                     [style.width.px]="shot.attributes.duration / min_detected * min_width"
                     (click)="scene_click(shot.attributes.shot_num)">
-                <a href="#" class="badge badge-termtag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.tags.length"></a>
+                <span class="badge badge-termtag click-event" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.tags.length"></span>
             </span>
 
         </div>
     </div>
-    <div class="col-1 imc--video-tag--button">
+    <div class="col-1 imc--video-tag--button" (click)="geotag_add()">
         <img src="/static/assets/svg/geotag.svg">
     </div>
     <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
@@ -27,7 +27,7 @@
                     [attr.data-shot]="shot.attributes.shot_num"
                     [style.width.px]="shot.attributes.duration / min_detected * min_width"
                     (click)="scene_click(shot.attributes.shot_num)">
-                <a href="#" class="badge badge-geotag" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.locations.length"></a>
+                <span class="badge badge-geotag click-event" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.locations.length"></span>
             </span>
 
         </div>

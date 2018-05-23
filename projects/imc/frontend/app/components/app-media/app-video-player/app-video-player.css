@@ -594,6 +594,8 @@ progress[value]::-webkit-progress-value {
 .controls__row {
   align-items: center;
   display: flex; }
+  .controls__row input {
+    max-width: 75px; }
   .controls__row .mark {
     width: 25%;
     border: 1px solid #d1d1d1;

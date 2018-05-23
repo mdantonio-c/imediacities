@@ -1,43 +1,47 @@
 import {Injectable} from '@angular/core';
-import {ApiService} from '/rapydo/src/app/services/api';
 
 @Injectable()
 export class AppVideoService {
 
-    private _video = null;
+    private _video_component = null;
 
-    constructor (private api: ApiService) {
-
+    constructor() {
     }
 
-    get (video_id, cb) {
-
-        if (!cb || typeof cb !== 'function') {
-            console.log("AppShotService", "Callback mancante");
-            return
+    /**
+     * Va all'inizio di uno shot
+     * @param indice
+     */
+    shot_play (indice) {
+        if (this.video_check()) {
+            this._video_component.shot_play(indice)
         }
-
-        this.api.get(
-            'videos',
-            video_id
-        ).subscribe(
-            response => {
-                this._video = response.data[0];
-                cb(this._video);
-            },
-            err => {
-                alert('ops');
-                console.log("err", err);
-            }
-        );
-
     }
 
-    video () {
-        return this._video;
+    /**
+     * Recupera lo shot corrente
+     * @returns {(() => (() => any) | number) | number}
+     */
+    shot_current () {
+        if (this.video_check()) {
+            return this._video_component.shot_current;
+        } else {
+            return -1
+        }
     }
 
-    type () {
-        return this._video.type === 'aventity' ? 'video' : 'picture';
+    /**
+     * verifica che il video_component sia settato
+     * @returns {boolean}
+     */
+    video_check () {
+        return this._video_component !== null;
+    }
+    /**
+     * Imposta il video component
+     * @param video
+     */
+    video_set (video) {
+        this._video_component = video;
     }
 }

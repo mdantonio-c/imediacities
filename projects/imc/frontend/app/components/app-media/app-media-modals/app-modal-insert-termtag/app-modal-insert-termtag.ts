@@ -99,7 +99,6 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
      * @param event
      */
     term_add (event) {
-
         if (typeof event === 'string') {
             event = {name:event}
         }
@@ -119,6 +118,14 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
      */
     term_remove (term) {
         this.terms = this.terms.filter(t => t.name !== term.name);
+    }
+
+    /**
+     * Una voce di ricerca viene cliccata
+     * @param term
+     */
+    term_selected (term) {
+        this.term_add(term.item);
     }
     /**
      * esegue il salvataggio

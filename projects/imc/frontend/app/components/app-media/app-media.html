@@ -13,7 +13,9 @@
                 <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span> - <span [innerHTML]="media.attributes.production_years[0]"></span>
             </p>
             <span class="col-6 col-sm-2">1.000 views</span>
-            <span class="col-6 col-sm-2">30 annotations</span>
+            <span class="col-6 col-sm-2" *ngIf="annotations_count">
+                <span [innerHTML]="annotations_count"></span> annotations
+            </span>
         </div>
         <span class="col-lg-3"></span>
 
@@ -25,6 +27,7 @@
                         #appVideo
                         [data]="media"
                         [shots]="shots"
+                        (video_player_ready)="video_player_set($event)"
                 ></app-video-player>
                 <!-- <app-picture></app-picture> -->
             </section>
@@ -59,6 +62,7 @@
                             <app-video-shot
                                     *ngFor="let shot of shots"
                                     [shot]="shot"
+                                    [user]="user"
                                     [multiSelection]="multi_annotations_is_active"
                                     (modale_richiedi)="modal_show($event)"
                                     (is_selezionato)="shot_selezionato($event)"
@@ -156,7 +160,6 @@
         <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
         <app-modal-tag-cloud *ngIf="modale.type === 'tag-cloud'" [data]="modale.data" modal-dialog></app-modal-tag-cloud>
     </app-modale>
-
 </div>
 
 

@@ -2,11 +2,12 @@ import {Injectable} from '@angular/core';
 import {ApiService} from '/rapydo/src/app/services/api';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
+import {AppShotsService} from "./app-shots";
 
 @Injectable()
 export class AppAnnotationsService {
 
-    constructor(private api: ApiService) {}
+    constructor(private api: ApiService, private ShotsService: AppShotsService) {}
 
     create_tag (shots_ids, sources, cb) {
 
@@ -56,19 +57,28 @@ export class AppAnnotationsService {
 
     }
 
+    delete_request (annotation) {
+        let confirm = window.confirm('Delete the annotation "' + annotation.name + '"?');
+        if (confirm) {
+            this.delete_tag(annotation);
+        }
+    }
+
     delete_tag (annotation) {
-        // this.api.delete(
-        //     'annotations',
-        //     annotation.id
-        // ).subscribe(
-        //     response => {
-        //         console.log("delete annotation response",  response);
-        //     },
-        //     err => {
-        //         console.log("delete annotation err",  err);
-        //     }
-        // );
-        console.log("todo delete",  annotation);
+
+        const bodyRef = annotation.iri ? `resource:${annotation.iri}` : `textual:${annotation.name}`;
+
+        this.api.delete(
+            'annotations',
+            `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
+        ).subscribe(
+            response => {
+                this.ShotsService.get();
+            },
+            err => {
+            }
+        );
+
     }
 
     merge (shots, gruppo) {
@@ -94,10 +104,10 @@ export class AppAnnotationsService {
     }
 
     static spatial (s) {
-        if (s.lat && s.long) {
+        if (s.lat && s.lng) {
             return {
                 lat: s.lat,
-                long: s.long
+                long: s.lng
             }
         } else {
             return null;

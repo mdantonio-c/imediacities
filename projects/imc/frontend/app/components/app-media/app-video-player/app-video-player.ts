@@ -1,6 +1,4 @@
 import {Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
-// import {AppVideoControlProgressBarComponent} from "../app-video-controls/app-video-control-progress-bar/app-video-control-progress-bar";
-// import {AppVideoControlComponent} from "../app-video-controls/app-video-control";
 import {rangePlayer} from "../../../decorators/app-range";
 
 
@@ -16,6 +14,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     @Input() data: any;
     @Input() shots: any;
     @Input() layout: any;
+
+    @Output() video_player_ready: EventEmitter<any> = new EventEmitter();
 
     @ViewChild('videoPlayer') videoPlayer: ElementRef;
 
@@ -266,6 +266,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
         this._video_source_add(this.data.links.content);
         this._video_events();
+
+        this.video_player_ready.emit(this);
 
         this.cdRef.detectChanges();
     }

@@ -32,21 +32,27 @@
                     <!--dx-->
                     <div class="controls__row controls__right">
                         <!-- file orf -->
-                        <app-video-control-switch (current_component)="registra($event)" [parent]="this"></app-video-control-switch>
+                        <app-video-control-switch (current_component)="registra($event)" [parent]="this" *ngIf="layout_check('modale')"></app-video-control-switch>
                         <!--volume-->
                         <app-video-control-volume (current_component)="registra($event)" [parent]="this"></app-video-control-volume>
                         <!--controlli avanzati-->
-                        <app-video-control-advanced (current_component)="registra($event)" [parent]="this" (advanced_show)=advanced_control_show($event)></app-video-control-advanced>
+                        <app-video-control-advanced (current_component)="registra($event)" [parent]="this" (advanced_show)="advanced_control_show($event)" *ngIf="layout_check('modale')"></app-video-control-advanced>
                         <!--fullscreen-->
-                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this"></app-video-control-fullscreen>
+                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this" *ngIf="layout_check('modale')"></app-video-control-fullscreen>
                     </div>
                 </div>
                 <!-- test -->
-                <div class="controls__row controls__row--container" *ngIf="advanced_show">
+                <div class="controls__row controls__row--container" *ngIf="advanced_show && layout_check('modale')">
                     <div class="controls__row controls__left">
                         <app-video-control-step (current_component)="registra($event)" [parent]="this"></app-video-control-step>
+                    </div>
+                    <div class="controls__row controls__left">
                         <app-video-control-jump-to (current_component)="registra($event)" [parent]="this"></app-video-control-jump-to>
+                    </div>
+                    <div class="controls__row controls__left">
                         <app-video-control-range (current_component)="registra($event)" [parent]="this"></app-video-control-range>
+                    </div>
+                    <div class="controls__row controls__left">
                         <app-video-control-fps (current_component)="registra($event)" [parent]="this"></app-video-control-fps>
                     </div>
                 </div>
@@ -64,6 +70,7 @@
     <div class="video_tag-container col-12">
         <app-video-tag *ngIf="layout_check('modale')"
                    [data]="shots"
+                   (modale_richiedi)="modal_show($event)"
                    (scena_visualizza)="jump_to($event)"
                    (current_component)="registra($event)"
                    [parent]="this"></app-video-tag>

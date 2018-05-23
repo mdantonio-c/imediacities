@@ -17,6 +17,10 @@ export class ProviderToCityPipe implements PipeTransform {
 
     transform(provider: any): any {
 
+        if (provider) {
+            provider = provider.toUpperCase();
+        }
+
         if (provider === 'CCB') return 'Bologna';
         else if (provider === 'CRB') return 'Brussels';
         else if (provider === 'DFI') return 'Copenhagen';

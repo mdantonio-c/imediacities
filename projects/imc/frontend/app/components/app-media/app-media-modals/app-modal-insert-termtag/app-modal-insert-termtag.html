@@ -53,7 +53,9 @@
                        [(ngModel)]="ricerca_model"
                        [ngbTypeahead]="search"
                        [inputFormatter]="formatter"
-                       [resultTemplate]="rt">
+                       [resultTemplate]="rt"
+                       (selectItem)="term_selected($event)"
+                >
                 <ng-template #rt let-r="result" let-t="term">
                   {{r.name}}
                 </ng-template>
@@ -88,21 +90,7 @@
                        [(ngModel)]="embargo_enable">
                 <label for="multi-annotation">Not public until</label>
             </div>
-            <!--
-                               @NSI calendario bootstrap
-                               todo provare a integrare
-                               <div class="form-group col-7 space-paragraph-10">
-                                   <div class="input-group">
-                                       <input class="form&#45;&#45;control imc&#45;&#45;input imc&#45;&#45;input-data" placeholder="yyyy-mm-dd"
-                                              name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
-                                       <div class="input-group-append">
-                                           <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
-                                               <i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">today</i>
-                                           </button>
-                                       </div>
-                                   </div>
-                               </div>
-            -->
+
             <div class="col-12 col-lg-8 space-paragraph-10">
                 <!--<input class="imc&#45;&#45;input imc&#45;&#45;input-data" [disabled]="!embargo_enable" type="date">-->
 

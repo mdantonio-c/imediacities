@@ -1,5 +1,14 @@
 import {Injectable} from '@angular/core';
+import {
+    Injector,
+    ComponentFactoryResolver,
+    EmbeddedViewRef,
+    ApplicationRef,
+    ComponentRef
+} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AppModalInsertGeotagComponent} from "../components/app-media/app-media-modals/app-modal-insert-geotag/app-modal-insert-geotag";
+import {AppModalInsertNoteComponent} from "../components/app-media/app-media-modals/app-modal-insert-note/app-modal-insert-note";
 /**
  * Servizio per la gestione delle modali
  */
@@ -54,9 +63,32 @@ export class AppModaleService {
 
     };
 
-    constructor(private ngb_modal: NgbModal) {
+    constructor(private ngb_modal: NgbModal,
+                private componentFactoryResolver: ComponentFactoryResolver,
+                private appRef: ApplicationRef,
+                private injector: Injector) {
     }
 
+    // Test
+    // appendComponentToBody(component: any, data) {
+    //     // Create a component reference from the component
+    //     const componentRef = this.componentFactoryResolver
+    //         .resolveComponentFactory(component)
+    //         .create(this.injector);
+    //     console.log("componentRef.instance",  componentRef.instance);
+    //     (<AppModalInsertNoteComponent>componentRef.instance).data = {shots: data};
+    //
+    //
+    //     // Attach component to the appRef so that it's inside the ng component tree
+    //     this.component.attachView(componentRef.hostView);
+    //
+    //     // Get DOM element from component
+    //     const domElem = (componentRef.hostView as EmbeddedViewRef<any>)
+    //         .rootNodes[0] as HTMLElement;
+    //
+    //     // Append DOM element to the body
+    //     document.body.appendChild(domElem);
+    // }
     /**
      * Ritorna il riferimento della modale correntemente aperta
      * @returns {NgbModalRef}

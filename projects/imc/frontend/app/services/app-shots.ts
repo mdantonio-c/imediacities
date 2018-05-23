@@ -1,38 +1,44 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Output, EventEmitter} from '@angular/core';
 import {ApiService} from '/rapydo/src/app/services/api';
 
 @Injectable()
 export class AppShotsService {
 
-    private _shots: IMC_Shot[] = [];
-    private _annotations_map = new Map();
     private _annotations_all: IMC_Annotation[] = [];
+    private _annotations_map = new Map();
+    private _media_id = '';
+    private _shots: IMC_Shot[] = [];
+
+    @Output() update: EventEmitter<any> = new EventEmitter();
 
     constructor(private api: ApiService) {
     }
     /**
-     * Ottiene gli shots del video video_id
-     * @param video_id
-     * @param cb
+     * Ottiene gli shots del video media_id
+     * @param media_id
      */
-    get (video_id, cb) {
+    get (media_id?) {
 
-        if (!cb || typeof cb !== 'function') {
-            console.log("AppShotService", "Callback mancante");
-            return
+        if (!media_id) {
+            media_id = this._media_id;
         }
 
         this.api.get(
             'videos',
-            `${video_id}/shots`
+            `${media_id}/shots`
         ).subscribe(
             response => {
-                cb(this._shots_parse(response.data))
+                this._media_id = media_id;
+                this._shots_parse(response.data);
+                this.update.emit(this._shots)
             },
             err => {
                 console.log('AppShotService', err)
             }
         )
+    }
+    media_id () {
+        return this._media_id;
     }
     /**
      * Ritorna gli shots processati
@@ -94,6 +100,7 @@ export class AppShotsService {
     private _shots_parse (shots): IMC_Shot[] {
 
         let shots_processed = [];
+        //  per ogni shot
         shots.forEach( (s, index) => {
 
             let shot_processato = {
@@ -108,7 +115,7 @@ export class AppShotsService {
                     links: []
                 }
             };
-
+            //  processo annotazioni
             this._annotations_parse(shot_processato.annotations, s.annotations, index);
             AppShotsService._annotations_sort(shot_processato.annotations);
             shots_processed.push(shot_processato);
@@ -145,7 +152,8 @@ export class AppShotsService {
 
                 //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
-                target.notes.push(AppShotsService._annotation_set(annotation, annotation.bodies[0]));
+                this._annotation_add(target.notes, AppShotsService._annotation_set(annotation, annotation.bodies[0]), shot_indice)
+                // target.notes.push(AppShotsService._annotation_set(annotation, annotation.bodies[0]));
             }
 
             //  todo non so come individuare referenze e links
@@ -176,7 +184,6 @@ export class AppShotsService {
             this._annotations_map.set(annotation.id, annotation);
         }
 
-
     }
     private _annotations_all_from_map () {
         this._annotations_all = Array.from(this._annotations_map).map(annotation => annotation[1]);
@@ -198,7 +205,8 @@ export class AppShotsService {
             creator_type: annotation.creator.type,
             embargo: annotation.embargo || null,
             group: annotation_body.attributes.spatial ? 'location' : 'term',
-            id: annotation_body.id,
+            body_id: annotation_body.id,
+            id: annotation.id,
             iri: annotation_body.attributes.iri || null,
             name: annotation_body.type == 'textualbody' ? annotation_body.attributes.value : annotation_body.attributes.name,
             private: annotation.private || false,
@@ -242,6 +250,7 @@ export interface IMC_Annotation {
     creator_type: string,
     embargo: Date,
     group: string,
+    body_id: string,
     id: string,
     iri: string,
     name: string,

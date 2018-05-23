@@ -16,7 +16,7 @@
                    duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
                </span>
 
-                <!-- Video palyer -->
+                <!-- Video player -->
                 <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
                    <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots"></app-video-player>
                </span>
