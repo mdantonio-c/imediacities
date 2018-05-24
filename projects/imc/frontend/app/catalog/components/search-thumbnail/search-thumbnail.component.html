@@ -1,0 +1,34 @@
+<div class="media-thumbnail">
+	<div class="media-image-wrapper">
+		<span class="search-item label bigger-180">
+			<span class="fa-stack">
+				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.links['thumbnail']"></i>
+				<i class="fa fa-circle fa-stack-2x" *ngIf="media.links['thumbnail']"></i>
+				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
+			</span>
+			<!-- <i class="material-icons light-blue" *ngIf="media.relationships.item[0].attributes.item_type.key === 'Video'">videocam</i>
+			<i class="material-icons light-blue" *ngIf="media.relationships.item[0].attributes.item_type.key === 'Image'">photo_camera</i> -->
+		</span>
+		<img class="media-object" alt="100%x200" holder="holder.js/100px200?text=NO THUMBNAIL&?auto=yes" *ngIf="!media.links['thumbnail']">
+		<img src="{{media.links['thumbnail']+'&size=large'}}" *ngIf="media.links['thumbnail']"
+		style="height: 200px; width: 100%; display: block;"/>
+	</div>
+	<div class="caption">
+		<div class="clearfix">
+			<span class="float-right badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+			<div class="float-left bigger-110">
+				<i class="imc-icon fa fa-eye light-blue"></i>
+				<i class="imc-icon fa fa-asterisk light-blue"></i>
+				<i class="imc-icon fa fa-heart light-blue"></i>
+			</div>
+		</div>
+		<h3 class="search-title">
+			<a href="#" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
+			<a [routerLink]=[media.id] *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+		</h3>
+		<p class="text">
+			<i class="imc-icon fa fa-quote-left"></i>
+			{{media.relationships.descriptions[0].attributes.text}}
+		</p>
+	</div>
+</div>

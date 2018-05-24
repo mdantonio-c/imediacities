@@ -1,0 +1,14 @@
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+	selector: 'search-map',
+	templateUrl: './search-map.component.html'
+})
+export class SearchMapComponent implements OnInit {
+
+	constructor() { }
+
+	ngOnInit() {
+	}
+
+}

@@ -4,6 +4,14 @@ import { CustomBrandComponent } from './app.custom.navbar';
 import { ArchiveComponent } from './imc.archive'
 import { ArchivesListComponent } from './imc.archives.list'
 
+import { CatalogComponent } from './catalog/catalog.component';
+import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
+import { SearchNavbarComponent } from './catalog/components/search-navbar/search-navbar.component';
+import { SearchThumbnailComponent } from './catalog/components/search-thumbnail/search-thumbnail.component';
+import { SearchMediaComponent } from './catalog/components/search-media/search-media.component';
+import { SearchMapComponent } from './catalog/components/search-map/search-map.component';
+import { SearchTimelineComponent } from './catalog/components/search-timeline/search-timeline.component';
+
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
@@ -53,6 +61,13 @@ import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
+	CatalogComponent,
+    SearchFilterComponent,
+    SearchNavbarComponent,
+    SearchThumbnailComponent,
+    SearchMediaComponent,
+    SearchMapComponent,
+    SearchTimelineComponent,
 	ProviderToCityPipe,
 	NoCommaPipe,
 	AppModaleComponent,

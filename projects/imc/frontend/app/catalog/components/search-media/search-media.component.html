@@ -1,0 +1,47 @@
+<div class="media search-media">
+	<div class="media-left">
+		<img src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
+		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
+		<div class="cn">
+			<div class="card inner bg-secondary small">
+				<i class="fa small" [ngClass]="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+			</div>
+		</div>
+	</div>
+	<div class="media-body">
+		<div>
+			<h4 class="media-heading">
+			<a href="#" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
+			<a href="#" *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+			</h4>
+			<span>
+				<i *ngIf="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
+				<i *ngIf="media.attributes.date_created > 0">({{media.attributes.date_created[0]}})</i>
+			</span>
+		</div>
+		<div class="space-4"></div>
+		<p class="text">
+			<i class="imc-icon fa fa-quote-left"></i>
+			{{media.relationships.descriptions[0].attributes.text}}
+		</p>
+		<div class="search-actions text-center">
+			<div class="duration" *ngIf="media.type == 'aventity'">
+				<i class="imc-icon fa fa-clock-o"></i>
+				<span class="blue">{{media.relationships.item[0].attributes.duration}}</span>
+			</div>
+			<span class="badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+			<div class="action-buttons bigger-125 pull-down">
+				<a href="#">
+					<i class="imc-icon fa fa-eye light-blue"></i>
+				</a>
+				<a href="#">
+					<i class="imc-icon fa fa-asterisk light-blue"></i>
+				</a>
+				<a href="#">
+					<i class="imc-icon fa fa-heart light-blue"></i>
+				</a>
+			</div>
+			<!-- <a class="search-btn-action btn btn-sm btn-block btn-info">Tag it!</a> -->
+		</div>
+	</div>
+</div>

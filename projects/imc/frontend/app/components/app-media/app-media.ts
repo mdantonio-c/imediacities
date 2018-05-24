@@ -127,7 +127,7 @@ export class AppMediaComponent implements OnInit {
     }
 
     shots_update (evento) {
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {this.shots_init(shots)});
+        this.ShotsService.get('09a6f13f-7f0b-4674-a6e8-49dbecbf58c0',(shots) => {this.shots_init(shots)});
     }
 
     /**
@@ -135,8 +135,8 @@ export class AppMediaComponent implements OnInit {
      */
     ngOnInit() {
 
-        this.VideoService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5', (video) => {this.media = video});
-        this.ShotsService.get('cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5',(shots) => {
+        this.VideoService.get('09a6f13f-7f0b-4674-a6e8-49dbecbf58c0', (video) => {this.media = video});
+        this.ShotsService.get('09a6f13f-7f0b-4674-a6e8-49dbecbf58c0',(shots) => {
             this.shots_init(shots);
             this.locations = this.ShotsService.annotations().filter(a => a.group === 'location');
         });

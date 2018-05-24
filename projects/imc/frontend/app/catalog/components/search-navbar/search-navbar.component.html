@@ -1,0 +1,28 @@
+<div class="search-nav row card mb-4 py-2 px-3" style="height: 58px;">
+	<div class="mr-auto">
+		<b style="position: absolute;top: 50%;height: 38px;margin-top: -11px;">
+		<span *ngIf="!loading">{{totalItems}}</span>
+		<span *ngIf="loading">
+			<i class="fa fa-spinner fa-spin blue" aria-hidden="true" style="font-size:12px"></i>
+		</span>
+		results</b>
+	</div>
+	<div class="ml-auto" *ngIf="totalItems > 0">
+			<b>Display</b>
+			&nbsp;
+			<div id="toggle-result-format" class="btn-group btn-overlap" role="group" aria-label="Basic example">
+				<button type="button" class="btn btn-white" (click)="changeView('Grid')"
+				[ngClass]="{'btn-success': displayMode==='Grid', 'btn-grey': displayMode!=='Grid'}" placement="top" ngbTooltip="Thumbnail view">
+				<i class="material-icons">view_module</i>
+				</button>
+				<button type="button" class="btn btn-white" (click)="changeView('List')"
+				[ngClass]="{'btn-primary': displayMode==='List', 'btn-grey': displayMode!=='List'}" placement="top" ngbTooltip="List view">
+				<i class="material-icons">view_list</i>
+				</button>
+				<button type="button" class="btn btn-white" (click)="changeView('Map')"
+				[ngClass]="{'btn-warning': displayMode==='Map', 'btn-grey': displayMode!=='Map'}" placement="top" ngbTooltip="Map&nbsp;view">
+				<i class="material-icons">location_searching</i>
+				</button>
+			</div>
+	</div>
+</div>

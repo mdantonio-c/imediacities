@@ -1,0 +1,102 @@
+<div class="search-filter card">
+	<div class="search-filter-header">
+		<i class="material-icons light-green bigger-130 d-inline">tune</i>
+		<h5 class="smaller no-margin-bottom">
+		&nbsp; Refine your Search
+		</h5>
+	</div>
+	<div class="card-body p-2">
+		<div class="space-8"></div>
+		<form [formGroup]="searchForm" (ngSubmit)="applyFilter()">
+			<div class="row">
+				<div class="col col-sm-11 col-md-10">
+					<div class="input-group mb-3">
+						<input type="text" class="form-control"
+						name="searchTerm"
+						formControlName="searchTerm"
+						placeholder="Look within results"
+						uib-tooltip="Search within titles, keywords or descriptions"
+						tooltip-placement="bottom"
+						tooltip-popup-delay="1000">
+						<div class="input-group-append">
+							<button class="btn btn-outline-secondary" type="submit">
+							<i class="material-icons">search</i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="hr hr-dotted"></div>
+			<h4 class="blue smaller">
+			<i class="material-icons bigger-110">filter</i>
+			Content type
+			</h4>
+			<!-- TODO -->
+			<div class="hr hr-dotted"></div>
+			<h4 class="blue smaller">
+			<i class="material-icons bigger-110">local_offer</i>
+			Terms
+			</h4>
+			<div class="widget-main" style="max-width: 280px;"></div>
+			<div class="hr hr-dotted"></div>
+			<h4 class="blue smaller">
+			<i class="material-icons light-orange bigger-110">place</i>
+			City
+			</h4>
+			<div>
+				<select formControlName="city" class="form-control">
+					<option value=""></option>
+					<option *ngFor="let c of cities" [value]="c">{{c}}</option>
+				</select>
+			</div>
+			<div class="hr hr-dotted"></div>
+			<h4 class="blue smaller">
+			<i class="fa fa-calendar light-grey bigger-110"></i>
+			Production Date
+			</h4>
+			<!-- <div class="search-filter-element">
+					<div class="form-group">
+							<div class="input-group date-range">
+												<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
+												<input class="input-num" style="min-width: 50px;"
+												type="number" ng-model="yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+												<input class="input-num" style="min-width: 50px;"
+												type="number" ng-model="yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
+							</div>
+							<div class="space-4"></div>
+							<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="yearfrom" value-max="yearto"></slider-range>
+					</div>
+			</div> -->
+			<div class="hr hr-dotted"></div>
+			<h4 class="blue smaller">
+			<i class="material-icons light-grey bigger-110">copyright</i>
+			Rights Status
+			</h4>
+			<div>
+				<!-- <select class="form-control" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
+									<option value=""></option>
+				</select> -->
+				<!-- <select [(ngModel)]="selectedIPRStatus">
+								<option *ngFor="let s of iprstatuses" [ngValue]="s.code">{{s.name}}</option>
+				</select> -->
+				<select formControlName="iprstatus" class="form-control down-arrow">
+					<option value=""></option>
+					<option *ngFor="let iprstatus of iprstatuses" [ngValue]="iprstatus.code">{{iprstatus.name}}</option>
+				</select>
+			</div>
+			<div class="hr hr-dotted hr-24"></div>
+			<div class="text-center">
+				<button type="button" class="btn btn-default btn-sm btn-white" (click)="resetFiltersToDefault()">
+				<i class="imc-icon fa fa-remove red2"></i>
+				Reset
+				</button>
+				<button type="submit" class="btn btn-default btn-white">
+				<i class="imc-icon fa fa-refresh green"></i>
+				Update
+				</button>
+			</div>
+			<div class="space-4"></div>
+		</form>
+	</div>
+</div>
