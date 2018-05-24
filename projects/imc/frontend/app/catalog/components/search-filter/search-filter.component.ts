@@ -6,7 +6,8 @@ import 'rxjs/add/observable/combineLatest';
 
 @Component({
   selector: 'search-filter',
-  templateUrl: './search-filter.component.html'
+  templateUrl: './search-filter.component.html',
+  styleUrls: ['./search-filter.component.css']
 })
 export class SearchFilterComponent implements OnInit {
   searchForm: FormGroup;

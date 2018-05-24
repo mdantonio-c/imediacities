@@ -1,0 +1,29 @@
+.search-filter-header {
+	display: flex;
+	padding: 10px 8px 4px 8px;
+	margin: 4px;
+	color: #fff;
+    background-color: #337ab7;
+}
+
+.search-filter-element {
+	padding: 12px;
+	background-color: #FFF;
+	border: 1px solid #C9DDE7
+}
+
+/*.search-promotion.label {
+	position: absolute;
+	margin-top: -1px;
+	margin-left: -1px
+}*/
+
+.search-filter-element .date-range {
+	/*margin: 0 auto;
+    width: 15.4em;*/
+    margin-left: 10%;
+}
+
+.date-range input {
+	min-width: 50px;
+}
