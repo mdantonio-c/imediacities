@@ -29,14 +29,14 @@
 
         <div class="col-12 space-paragraph-25">
             <ng-template ngFor let-place [ngForOf]="markers">
-                <app-media-annotation [annotation]="place"></app-media-annotation>
+                <app-media-annotation [annotation]="place" *ngIf="place.name"></app-media-annotation>
             </ng-template>
         </div>
 
     </div>
 
     <div class="modal-map" modal-row>
-        <app-media-map #map [locations]="markers" [shots]="data.shots" (fit_bounds)="fit_bounds()"></app-media-map>
+        <app-media-map #map [markers]="markers" [shots]="data.shots"></app-media-map>
     </div>
 
 

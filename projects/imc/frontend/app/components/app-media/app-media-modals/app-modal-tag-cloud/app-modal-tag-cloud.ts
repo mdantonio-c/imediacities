@@ -63,6 +63,7 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
+        this.ShotsService.update.subscribe(shots => this.data = shots)
     }
 
 

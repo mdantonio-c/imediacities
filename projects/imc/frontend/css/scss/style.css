@@ -457,7 +457,6 @@ input[type="radio"] {
   .imc--topbar a:active {
     outline: none !important; }
 
-/*
 .page-type-video .imc--topbar--title,
 .page-type-video .imc--topbar--title .material-icons {
   color: #53b8e2; }
@@ -470,7 +469,6 @@ input[type="radio"] {
 .box-icons-share .material-icons {
   color: #fff;
   margin-right: 10px; }
-*/
 
 .imc--tab .nav-item {
   font-size: 16px; }
@@ -954,7 +952,7 @@ input[type="radio"] {
     left: 0; }
 
 .imc--modal {
-  z-index: 102; }
+  z-index: 1050; }
   .imc--modal .modal-dialog {
     top: 0;
     width: 100%; }
@@ -971,10 +969,8 @@ input[type="radio"] {
     .imc--modal .modal-header h4 {
       color: #333;
       font-size: 20px; }
-      /*
     .imc--modal .modal-header .material-icons {
       font-size: 25px; }
-      */
   .imc--modal .modal-body {
     padding: 18px 25px; }
     .imc--modal .modal-body h4 {
@@ -1304,19 +1300,12 @@ input[type="radio"] {
 body, a {
   color: #707070;
   font-size: 16px !important;
-  font-family: "Maven Pro", sans-serif;
-}
-
-/*
-.material-icons {
-  color: #707070;
-  font-size: 16px !important;
-}
+  font-family: "Maven Pro", sans-serif; }
 
 .material-icons {
   color: #707070;
   font-size: 25px !important; }
   .material-icons.xlarge {
     font-size: 60px !important; }
-*/
+
 /*# sourceMappingURL=style.css.map */

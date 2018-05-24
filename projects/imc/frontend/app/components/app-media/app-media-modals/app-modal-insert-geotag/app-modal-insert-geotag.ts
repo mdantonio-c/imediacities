@@ -4,6 +4,7 @@ import {AppAnnotationsService} from "../../../../services/app-annotations";
 import { } from '@types/googlemaps';
 import {} from '@ngui';
 import {AppMediaMapComponent} from "../../app-media-map/app-media-map";
+
 @Component({
     selector: 'app-modal-insert-geotag',
     templateUrl: 'app-modal-insert-geotag.html'
@@ -24,7 +25,10 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     markers = [];
     places_to_add = [];
 
-    constructor (private AnnotationsService: AppAnnotationsService, private ref: ChangeDetectorRef) {}
+    constructor (
+        private AnnotationsService: AppAnnotationsService,
+        private ref: ChangeDetectorRef
+        ) {}
 
     /**
      * Evento di inizializzazione del componente Autocomplete
@@ -63,7 +67,8 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
         };
 
         this.places_to_add.push(marker);
-        this.markers.push(marker);
+        this.mappa.marker_push(marker);
+        //this.markers.push(marker);
 
         this.fit_bounds();
         this.ref.detectChanges();
@@ -75,7 +80,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
      */
     place_remove (place) {
         this.places_to_add = this.places_to_add.filter(p => p.name !== place.name);
-        this.markers = this.markers.filter(l => l.name != place.name);
+        //this.markers = this.markers.filter(l => l.name != place.name);
         this.fit_bounds();
     }
     /**
@@ -96,7 +101,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
                     "iri": p.place.place_id,
                     "name": p.name,
                     "lat": p.place.geometry.location.lat(),
-                    "long": p.place.geometry.location.lng()
+                    "lng": p.place.geometry.location.lng()
                 }}),
                 (r) => {this.shots_update.emit(r)}
             )

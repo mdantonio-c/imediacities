@@ -4,9 +4,10 @@
     </div>
     <div class="map--container">
         <app-media-map
-                [locations]="locations"
+                [markers]="locations"
                 [shots]="shots"
-                [draggable_markers]="true"
+                [draggable_markers]="false"
+                [current_shot_from_video]="true"
                 [clickable_markers]="true"></app-media-map>
     </div>
 </div>

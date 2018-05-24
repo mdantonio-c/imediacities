@@ -1,7 +1,7 @@
-import {Component, Input, ViewChild, OnInit, OnChanges, AfterViewInit, OnDestroy} from '@angular/core';
+import {Component, Input, ViewChild, OnInit, OnChanges, AfterViewInit, OnDestroy, ViewContainerRef} from '@angular/core';
 import {AppShotsService} from "../../../services/app-shots";
 import {AppModaleService} from "../../../services/app-modale";
-import {AppVideoService} from "../../../services/app-video";
+import {AppMediaService} from "../../../services/app-media";
 import {AppVideoPlayerComponent} from "../app-video-player/app-video-player";
 
 @Component({
@@ -20,10 +20,12 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     public shot_corrente = null;
 
     constructor (
-        private VideoService: AppVideoService,
+        private VideoService: AppMediaService,
         private ShotsService: AppShotsService,
-        private ModalService: AppModaleService
-    ) {}
+        private ModalService: AppModaleService,
+    ) {
+
+    }
 
     /**
      * Consente di riprodurre uno shot cliccando sulla sua miniatura
@@ -61,7 +63,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     }
 
     ngOnChanges () {
-        this.mediaData = this.VideoService.video();
+        this.mediaData = this.VideoService.media();
         this.shots = this.ShotsService.shots();
         this.shot_cambia(0);
     }

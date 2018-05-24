@@ -17,7 +17,9 @@ export class AppMediaAnnotationComponent implements OnInit {
 
     delete () {
         if (!this.can_delete) return;
-        this.AnnotationsService.delete_tag(this.annotation);
+        if (this.annotation.id) {
+            this.AnnotationsService.delete_request(this.annotation);
+        }
     }
 
     ngOnInit () {

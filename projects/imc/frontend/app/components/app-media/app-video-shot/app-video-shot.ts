@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit, ViewChild, ElementRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, ViewChild, ElementRef} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-controls/app-video-control";
 
 @Component({
@@ -6,13 +6,16 @@ import {AppVideoControlComponent} from "../app-video-controls/app-video-control"
     templateUrl: 'app-video-shot.html'
 })
 
-export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit {
+export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() shot;
     @Input() multiSelection;
+    @Input() user;
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
     @Output() is_selezionato: EventEmitter<any> = new EventEmitter();
+
+    public scene = null;
 
     public details_show = false;
     public checkbox_selection_label = 'multi-annotation';
@@ -21,12 +24,17 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     public is_attivo = false;
 
-    constructor(private element: ElementRef) {
+    constructor(
+        private element: ElementRef) {
         super();
     }
 
-    details_toggle(stato = null){
-        this.details_show = stato ? stato : !this.details_show
+    details_toggle(){
+        this.details_show = !this.details_show;
+        //  tdb scrolla quando viene espanso
+        // if (this.details_show) {
+        //     setTimeout( () => this.scroll(), 0);
+        // }
     }
 
     modale_show (evento, modale) {
@@ -57,17 +65,19 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         })
     }
 
-    scroll (){
+    scroll (set_attivo = false){
 
         let element = this.element.nativeElement;
 
         let h = element.getBoundingClientRect().height;
-        this.is_attivo = true;
+        if (set_attivo) {
+            this.is_attivo = true;
+        }
         this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
     }
 
     tag_is_deletable (tag) {
-        return tag.creator === 'a7411a80-2057-40ad-b7bc-4bc14dd99878';
+        return tag.creator === this.user.uuid
     }
 
 
@@ -101,15 +111,26 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     ngOnInit() {
         super.ngOnInit();
+    }
+
+    ngOnChanges () {
+        // console.log("onchanges",this.shot.attributes.shot_num);
+        // console.log("this.details_show",  this.details_show);
+        this.scene = Object.assign({}, this.shot);
+        // console.log("this.scene",  this.scene);
+
         this.checkbox_selection_label += this.shot.attributes.shot_num;
         this.collapse_id += this.shot.attributes.shot_num;
         this.dropdown_id += this.shot.attributes.shot_num;
     }
 
+    ngOnDestroy () {
+        console.log("ngOnDestroy",  this.shot.attributes.shot_num);
+    }
     onshot_start (e) {
 
         if (e.attributes.shot_num === this.shot.attributes.shot_num) {
-            setTimeout( () => this.scroll(), 0);
+            setTimeout( () => this.scroll(true), 0);
         } else {
             this.is_attivo = false;
         }
