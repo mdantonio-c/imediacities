@@ -15,6 +15,8 @@ export const appRoutes: Routes = [
 		data: { role: 'admin_root' }
 	},
 	{ path: 'app/catalog', component: CatalogComponent },
-	{ path: 'app/catalog/:uuid', component: AppMediaComponent }
+	{ path: 'app/catalog/:uuid', component: AppMediaComponent },
+	{ path: 'app', redirectTo: '/app/catalog', pathMatch: 'full' },
+	{ path: '', redirectTo: '/app/catalog', pathMatch: 'full' }
 
 ];
