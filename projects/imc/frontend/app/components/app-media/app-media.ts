@@ -1,4 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import {AppShotsService} from "../../services/app-shots";
 import {AppMediaService} from "../../services/app-media";
 import {AppModaleComponent} from "../app-modale/app-modale";
@@ -17,7 +18,7 @@ import {AppVideoService} from "../../services/app-video";
 export class AppMediaComponent implements OnInit {
 
     //  Id video
-    video_id = 'cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5';
+    video_id;
 
     /**
      * Riferimento al componente AppModale
@@ -73,6 +74,8 @@ export class AppMediaComponent implements OnInit {
 
     constructor(
         private AuthService: AuthService,
+        private route: ActivatedRoute,
+        private router: Router,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
         private VideoService: AppVideoService) {}
@@ -162,11 +165,13 @@ export class AppMediaComponent implements OnInit {
      * Esegue le richieste del video e degli shot
      */
     ngOnInit() {
-
         this.user = this.AuthService.getUser();
 
-        this.MediaService.get(this.video_id, (video) => {this.media = video});
-        this.ShotsService.get(this.video_id);
+        this.route.params.subscribe((params: Params) => {
+            this.video_id = params['uuid'];
+            this.MediaService.get(this.video_id, (video) => {this.media = video});
+            this.ShotsService.get(this.video_id);
+        });
 
         this.ShotsService.update.subscribe(shots => {
             this.shots_init(shots);
