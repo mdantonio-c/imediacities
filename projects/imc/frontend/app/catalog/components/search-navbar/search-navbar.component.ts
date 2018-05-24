@@ -2,7 +2,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
 	selector: 'search-navbar',
-	templateUrl: './search-navbar.component.html'
+	templateUrl: './search-navbar.component.html',
+	styleUrls: ['./search-navbar.component.css']
 })
 export class SearchNavbarComponent {
 	@Input() totalItems: number;

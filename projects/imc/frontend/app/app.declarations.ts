@@ -13,6 +13,7 @@ import { SearchMapComponent } from './catalog/components/search-map/search-map.c
 import { SearchTimelineComponent } from './catalog/components/search-timeline/search-timeline.component';
 
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
+import {DurationPipe} from "./pipes/duration.pipe";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
 import {AppMediaTopBarComponent} from "./components/app-media/app-media-top-bar/app-media-top-bar";
@@ -70,6 +71,7 @@ export const declarations: any[] = [
     SearchTimelineComponent,
 	ProviderToCityPipe,
 	NoCommaPipe,
+	DurationPipe,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,

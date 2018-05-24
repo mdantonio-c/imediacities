@@ -5,7 +5,8 @@ import { MediaEntity } from './services/data'
 
 @Component({
 	selector: 'app-catalog',
-	templateUrl: './catalog.component.html'
+	templateUrl: './catalog.component.html',
+	styleUrls: ['./catalog.component.css']
 })
 export class CatalogComponent implements OnInit {
 	loading: boolean = false;
