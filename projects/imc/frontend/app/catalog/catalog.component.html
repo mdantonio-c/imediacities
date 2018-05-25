@@ -1,7 +1,8 @@
 <div class="container-search row no-gutters justify-content-md-center">
 	<div class="col-12">
 		<div class="row">
-			<search-filter class="col-12 col-sm-4 col-md-3"></search-filter>
+			<search-filter class="col-12 col-sm-4 col-md-3"
+				(onFilterChange)="changeFilter($event)"></search-filter>
 			<!-- results list -->
 			<div class="col-12 col-sm-8 col-md-9">
 				<div class="row">

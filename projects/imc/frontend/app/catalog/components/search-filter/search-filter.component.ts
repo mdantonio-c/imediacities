@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SearchFilter } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
@@ -14,10 +15,12 @@ export class SearchFilterComponent implements OnInit {
   iprstatuses = IPRStatuses;
   cities = []
 
+  @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
+
   constructor(private formBuilder: FormBuilder) {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
-      itemType: ['', Validators.required],
+      itemType: ['video', Validators.required],
       terms: [''],
       city: [''],
       productionYear: [''],
@@ -30,7 +33,10 @@ export class SearchFilterComponent implements OnInit {
   }
 
   applyFilter() {
-    console.log('apply filter');
+    let filter = this.searchForm.value;
+    if (filter.iprstatus === '') { filter.iprstatus = null; }
+    if (filter.city === '') { filter.city = null; }
+    this.onFilterChange.emit(filter);
   }
 
   resetFiltersToDefault() {
