@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 
 import { AuthGuard } from '/rapydo/src/app/app.auth.guard';
 
-import { ArchivesListComponent } from './imc.archives.list';
+import { ArchivesListComponent } from './components/admin/archive/archives.list';
 import { AdminGroupsComponent } from './components/admin/groups';
 
 import { CatalogComponent } from './catalog/catalog.component';

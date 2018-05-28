@@ -1,8 +1,8 @@
 
 import { CustomNavbarComponent } from './app.custom.navbar';
 import { CustomBrandComponent } from './app.custom.navbar';
-import { ArchiveComponent } from './imc.archive'
-import { ArchivesListComponent } from './imc.archives.list'
+import { ArchiveComponent } from './components/admin/archive/archive'
+import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
 
 import { CatalogComponent } from './catalog/catalog.component';

@@ -7,7 +7,7 @@ import { NotificationService} from '/rapydo/src/app/services/notification';
 @Component({
   selector: 'imc-archive',
   providers: [ApiService, NotificationService],
-  templateUrl: './imc.archive.html'
+  templateUrl: './archive.html'
 })
 export class ArchiveComponent implements OnInit { 
 
