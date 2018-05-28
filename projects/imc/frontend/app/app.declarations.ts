@@ -3,6 +3,7 @@ import { CustomNavbarComponent } from './app.custom.navbar';
 import { CustomBrandComponent } from './app.custom.navbar';
 import { ArchiveComponent } from './imc.archive'
 import { ArchivesListComponent } from './imc.archives.list'
+import { AdminGroupsComponent } from './components/admin/groups';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
@@ -63,6 +64,7 @@ import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
+	AdminGroupsComponent,
 	CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,
