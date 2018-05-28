@@ -1,23 +1,23 @@
 <div class="container-search row no-gutters justify-content-md-center">
-	<div class="col-12">
+	<div class="col">
 		<div class="row">
-			<search-filter class="col-12 col-sm-4 col-md-3"
-				(onFilterChange)="changeFilter($event)"></search-filter>
+			<search-filter class="col col-sm-4 col-md-3"
+			(onFilterChange)="changeFilter($event)"></search-filter>
 			<!-- results list -->
-			<div class="col-12 col-sm-8 col-md-9">
+			<div class="col col-sm-8 col-md-9">
 				<div class="row">
-					<div class="col-12">
+					<div class="col">
 						<!-- search navbar -->
 						<search-navbar
-							[loading]=loading
-							[totalItems]=totalItems
-							(onViewChange)="changeView($event)"></search-navbar>
-						<div class="loader col-12" *ngIf="loading" style="text-align: center">
+						[loading]=loading
+						[totalItems]=totalItems
+						(onViewChange)="changeView($event)"></search-navbar>
+						<div class="loader col" *ngIf="loading" style="text-align: center">
 							<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
 						</div>
 						<!-- no results -->
 						<div class="row" *ngIf="!loading && totalItems == 0">
-							<div class="col-12">
+							<div class="col">
 								<div class="no-results">
 									<h2>No Results</h2>
 									<p>Your search returned no results</p>
@@ -26,10 +26,10 @@
 						</div>
 						<!-- view results -->
 						<div class="row" *ngIf="totalItems > 0">
-							<div class="col-12">
+							<div class="col">
 								<div *ngIf="currentView == 'Grid'" class="row">
 									<search-thumbnail
-									class="col-lg-3 col-md-4 col-sm-6 col-12"
+									class="col-lg-3 col-md-4 col-sm-6 col"
 									*ngFor="let mediaEntity of results"
 									[media]="mediaEntity">
 									</search-thumbnail>
@@ -42,9 +42,19 @@
 								</div>
 								<div class="space-8"></div>
 								<!-- pagination -->
+								<div class="search-pager row card pt-3" *ngIf="currentView != 'Map'">
+									<div class="d-flex justify-content-center">
+									<ngb-pagination [collectionSize]="totalItems"
+									  [(page)]="currentPage"
+									  [maxSize]="5"
+									  [rotate]="true"
+									  [boundaryLinks]="true"
+									  (pageChange)="changePage($event)"></ngb-pagination>
+									</div>
+								</div>
 								<!-- TODO -->
 								<div class="row" *ngIf="currentView == 'Map'">
-									<div class="col-12">
+									<div class="col">
 										<div class="card">
 											<div class="card-body">
 												<div class="map-view">
@@ -58,7 +68,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="col-12">
+									<div class="col">
 										<!-- PUT HERE results from map filter -->
 									</div>
 								</div>

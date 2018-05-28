@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
+import { Observable } from 'rxjs/Observable';
+import { catchError, map } from 'rxjs/operators';
 import { MediaEntity } from './data'
 
 export interface SearchFilter {
@@ -36,13 +38,20 @@ export class CatalogService {
 			filter: {
 				type: filter.itemType,
 				provider: filter.provider,
-				iprstatus: filter.iprstatus
+				iprstatus: filter.iprstatus,
+				yearfrom: filter.productionYearFrom,
+				yearto: filter.productionYearTo
 			}
 		}
 		if (filter.searchTerm) {
 			data.match = { term: filter.searchTerm, fields: matchFields}
 		}
-		return this.api.post(endpoint, data);
+		/*this.api.post(endpoint, data, {"rawResponse": true}).pipe(
+			map(response => {}),
+			catchError((error, caught) => {})
+		);*/
+		return this.api.post(endpoint, data, {"rawResponse": true});
+		/*return this.api.post(endpoint, data);*/
 	}
 
 	/*get countByYears() {
