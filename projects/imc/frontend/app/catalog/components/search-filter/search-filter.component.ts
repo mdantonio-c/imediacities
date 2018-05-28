@@ -75,4 +75,12 @@ export class SearchFilterComponent implements OnInit {
     return p;
   }
 
+  changeYearTo(newVal) {
+    this.searchForm.get('productionYearTo').setValue(newVal, {emitEvent: false})
+  }
+
+  changeYearFrom(newVal) {
+    this.searchForm.get('productionYearFrom').setValue(newVal, {emitEvent: false})
+  }
+
 }

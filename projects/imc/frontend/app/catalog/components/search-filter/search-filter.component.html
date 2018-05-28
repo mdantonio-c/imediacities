@@ -76,8 +76,8 @@
 					</div>
 					<div class="space-4"></div>
 					<slider-range [min]="minProductionYear" [max]="maxProductionYear" [step]="1"
-							[value-min]="searchForm.get('productionYearFrom').value"
-							[value-max]="searchForm.get('productionYearTo').value"></slider-range>
+							[value-min]="searchForm.get('productionYearFrom').value" (onMinChange)="changeYearFrom($event)"
+							[value-max]="searchForm.get('productionYearTo').value" (onMaxChange)="changeYearTo($event)"></slider-range>
 				</div>
 			</div>
 			<div class="hr hr-dotted"></div>

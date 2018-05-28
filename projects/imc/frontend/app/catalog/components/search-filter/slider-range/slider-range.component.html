@@ -1,6 +1,8 @@
 <div class="slider horizontal">
 	<div class="range"></div>
-	<a class="handle min" (mousedown)="mouseDownMin($event)"></a>
+	<a class="handle min"
+	  (mousedown)="mouseDownMin($event)"
+	  (mousemove)="mouseMoveMin($event)"></a>
 	<a class="handle max" 
 		(mousedown)="mouseDownMax($event)"
 		(mousemove)="mouseMoveMax($event)"></a>
