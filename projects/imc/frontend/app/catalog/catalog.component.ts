@@ -23,8 +23,10 @@ export class CatalogComponent implements OnInit {
 			searchTerm: null,
 			itemType: 'video',
 			terms: [],
-			city: null,
-			productionYear: null,
+			provider: null,
+			country: null,
+			productionYearFrom: 1890,
+			productionYearTo: 1999,
 			iprstatus: null
 		};
 	}

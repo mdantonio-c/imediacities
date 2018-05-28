@@ -32,7 +32,9 @@
 			<i class="fa fa-filter bigger-110"></i>
 			Content type
 			</h4>
-			<!-- TODO -->
+			<select formControlName="itemTypes" class="form-control type-selector" multiple >
+				<option *ngFor="let itemType of itemTypes" [value]="itemType">{{itemType}}</option>
+			</select>
 			<div class="hr hr-dotted"></div>
 			<h4 class="blue smaller">
 			<i class="fa fa-tags"></i>
@@ -55,19 +57,29 @@
 			<i class="fa fa-calendar light-grey bigger-110"></i>
 			Production Date
 			</h4>
-			<!-- <div class="search-filter-element">
-					<div class="form-group">
-							<div class="input-group date-range">
-												<span style="max-width: 26%; max-height: 30%;" class="input-group-addon" id="basic-addon1">Year range</span>
-												<input class="input-num" style="min-width: 50px;"
-												type="number" ng-model="yearfrom" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
-												<input class="input-num" style="min-width: 50px;"
-												type="number" ng-model="yearto" min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}"/>
-							</div>
-							<div class="space-4"></div>
-							<slider-range min="{{sc.minProductionYear}}" max="{{sc.maxProductionYear}}" step="1" value-min="yearfrom" value-max="yearto"></slider-range>
+			<div class="search-filter-element d-flex justify-content-center">
+				<div class="form-group">
+					<div class="input-group date-range">
+						<div class="input-group-prepend">
+							<span class="input-group-text">Year range</span>
+						</div>
+						<input type="number" class="form-control"
+							formControlName="productionYearFrom"
+							name="productionYearFrom" 
+							[min]="minProductionYear"
+							[max]="maxProductionYear"/>
+						<input type="number" class="form-control"
+						  formControlName="productionYearTo"
+						  name="productionYearTo"
+						  [min]="minProductionYear"
+						  [max]="maxProductionYear"/>
 					</div>
-			</div> -->
+					<div class="space-4"></div>
+					<slider-range [min]="minProductionYear" [max]="maxProductionYear" [step]="1"
+							[value-min]="searchForm.get('productionYearFrom').value"
+							[value-max]="searchForm.get('productionYearTo').value"></slider-range>
+				</div>
+			</div>
 			<div class="hr hr-dotted"></div>
 			<h4 class="blue smaller">
 			<i class="fa fa-copyright light-grey bigger-110"></i>
@@ -75,10 +87,10 @@
 			</h4>
 			<div>
 				<!-- <select class="form-control" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
-									<option value=""></option>
+											<option value=""></option>
 				</select> -->
 				<!-- <select [(ngModel)]="selectedIPRStatus">
-								<option *ngFor="let s of iprstatuses" [ngValue]="s.code">{{s.name}}</option>
+										<option *ngFor="let s of iprstatuses" [ngValue]="s.code">{{s.name}}</option>
 				</select> -->
 				<select formControlName="iprstatus" class="form-control down-arrow">
 					<option value=""></option>

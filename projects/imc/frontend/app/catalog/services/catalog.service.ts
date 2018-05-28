@@ -6,8 +6,10 @@ export interface SearchFilter {
 	searchTerm: string,
 	itemType: string,
 	terms: string[],
-	city: string,
-	productionYear: string,
+	provider: string,
+	country: string,
+	productionYearFrom: number,
+	productionYearTo: number,
 	iprstatus: string
 }
 
@@ -27,13 +29,13 @@ export class CatalogService {
      * @param pageIdx
      * @param pageSize
      */
-	search(filter, pageIdx, pageSize) {
+	search(filter: SearchFilter, pageIdx: number, pageSize: number) {
 		let endpoint = 'search?currentpage=' + pageIdx + '&perpage=' + pageSize;
 		let data = {
 			match: null,
 			filter: {
 				type: filter.itemType,
-				provider: filter.city,
+				provider: filter.provider,
 				iprstatus: filter.iprstatus
 			}
 		}
