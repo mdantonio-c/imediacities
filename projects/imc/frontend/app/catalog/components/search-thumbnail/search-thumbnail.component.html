@@ -6,10 +6,8 @@
 				<i class="fa fa-circle fa-stack-2x" *ngIf="media.links['thumbnail']"></i>
 				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
 			</span>
-			<!-- <i class="material-icons light-blue" *ngIf="media.relationships.item[0].attributes.item_type.key === 'Video'">videocam</i>
-			<i class="material-icons light-blue" *ngIf="media.relationships.item[0].attributes.item_type.key === 'Image'">photo_camera</i> -->
 		</span>
-		<img class="media-object" alt="100%x200" holder="holder.js/100px200?text=NO THUMBNAIL&?auto=yes" *ngIf="!media.links['thumbnail']">
+		<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.id" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.links['thumbnail']"></hjs>
 		<img src="{{media.links['thumbnail']+'&size=large'}}" *ngIf="media.links['thumbnail']"
 		style="height: 200px; width: 100%; display: block;"/>
 	</div>
@@ -26,6 +24,7 @@
 			<a href="#" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
 			<a [routerLink]=[media.id] *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 		</h3>
+		<div class="space-8"></div>
 		<p class="text">
 			<i class="imc-icon fa fa-quote-left"></i>
 			{{media.relationships.descriptions[0].attributes.text}}

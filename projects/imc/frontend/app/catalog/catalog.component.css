@@ -7,6 +7,14 @@
   width: 100%;
 }
 
+.search-pager {
+  /* same as search-filter */
+  background-color: #ecf1f4;
+    border-color: #d6e1ea;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
 /* no results */
 .container-search .no-results {
   background-color: #f8f8f8;

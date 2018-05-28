@@ -9,6 +9,7 @@
     "angular-ivh-treeview": "^1.1.0",
     "js-marker-clusterer": "",
     "holderjs": "2.9.4",
+    "angular2-holderjs": "0.0.7",
     "material-icons": "0.2.3",
     "@ngui/map": "",
     "@types/googlemaps": ""
