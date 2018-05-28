@@ -18,7 +18,8 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 	private xPosMin = 0;
 	private xPosMax = 0;
 
-	@Output() change: EventEmitter<any> = new EventEmitter<true>();
+	@Output() onMinChange: EventEmitter<any> = new EventEmitter<true>();
+	@Output() onMaxChange: EventEmitter<any> = new EventEmitter<true>();
 
 	constructor(private el: ElementRef, private renderer: Renderer2) { }
 
@@ -79,13 +80,13 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 	/*@HostListener('mousemove', ['$event']) onMouseMove($event) { */
 	mouseMoveMax($event) {
 		if (!this.dragging) return;
-		// console.log($event);
+		/*console.log('dragging', this.dragging);*/
+
 		//Calculate handle position
 		let moveDelta = $event.pageX - this.startPointXMax;
-		console.log('moveDelta: ' + moveDelta);
+		/*console.log('moveDelta: ' + moveDelta);*/
 		let clientWidth = this.el.nativeElement.querySelector('div').clientWidth;
-		/*console.log('clientWidth: ' + clientWidth);*/
-		console.log('current xPosMax: ' + this.xPosMax + ', current xPosMin: ' + this.xPosMin);
+		/*console.log('current xPosMax: ' + this.xPosMax + ', current xPosMin: ' + this.xPosMin);*/
 		let xPosMax = this.xPosMax + ((moveDelta / clientWidth) * 100);
 		if (xPosMax > 100) {
 			xPosMax = 100;
@@ -95,10 +96,10 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 			// Prevent generating "lag" if moving outside window
 			this.startPointXMax = $event.pageX;
 		}
-		console.log('new xPosMax: ' + xPosMax);
-		// FIXME: UPDATE formControl input 
+		/*console.log('new xPosMax: ' + xPosMax);*/
 		this.valueMax = Math.round((((this.max - this.min) * (xPosMax / 100)) + this.min) / this.step) * this.step;
-		console.log('valueMax: ' + this.valueMax);
+		/*console.log('valueMax: ' + this.valueMax);*/
+		this.onMaxChange.emit(this.valueMax);
 
 		// Move the Handle
 		this.moveHandle("max", xPosMax);
@@ -106,12 +107,40 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 	}
 
 	mouseMoveMin($event) {
-		// TODO
+		if (!this.dragging) return;
+
+		//Calculate handle position
+		let moveDelta = $event.pageX - this.startPointXMin;
+		/*console.log('moveDelta: ' + moveDelta);*/
+		let clientWidth = this.el.nativeElement.querySelector('div').clientWidth;
+		/*console.log('current xPosMax: ' + this.xPosMax + ', current xPosMin: ' + this.xPosMin);*/
+		let xPosMin = this.xPosMin + ((moveDelta / clientWidth) * 100);
+		if (xPosMin < 0) {
+			xPosMin = 0;
+		} else if (xPosMin > this.xPosMax) {
+			xPosMin = this.xPosMax;
+		} else {
+			// Prevent generating "lag" if moving outside window
+			this.startPointXMin = $event.pageX;
+		}
+		/*console.log('new xPosMin: ' + xPosMin);*/
+		this.valueMin = Math.round((((this.max - this.min) * (xPosMin / 100)) + this.min) / this.step) * this.step;
+		/*console.log('valueMin: ' + this.valueMin);*/
+		this.onMinChange.emit(this.valueMin);
+
+		// Move the Handle
+		this.moveHandle("min", xPosMin);
+		this.moveRange(xPosMin, this.xPosMax);
 	}
 
-	@HostListener('mouseup', ['$event']) onMouseUp() {
+	/*@HostListener('mouseout', ['$event']) onMouseOut() {
 		this.dragging = false;
-		console.log('dragging: ' + this.dragging);
+		console.log('mouse out');
+	}*/
+
+	@HostListener('document:mouseup', ['$event']) onMouseUp() {
+		this.dragging = false;
+		/*console.log('dragging', this.dragging);*/
 		/*document.unbind('mousemove');
 		document.unbind('mousemove');*/
 	}
