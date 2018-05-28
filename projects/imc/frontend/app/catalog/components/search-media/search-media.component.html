@@ -27,7 +27,7 @@
 		<div class="search-actions text-center">
 			<div class="duration" *ngIf="media.type == 'aventity'">
 				<i class="imc-icon fa fa-clock-o"></i>
-				<span class="blue">{{media.relationships.item[0].attributes.duration}}</span>
+				<span class="blue">{{media.relationships.item[0].attributes.duration | duration}}</span>
 			</div>
 			<span class="badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
 			<div class="action-buttons bigger-125 pull-down">

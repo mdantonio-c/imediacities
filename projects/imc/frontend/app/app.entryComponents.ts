@@ -1,5 +1,6 @@
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
+import { SliderRangeComponent } from './catalog/components/search-filter/slider-range/slider-range.component';
 import { SearchNavbarComponent } from './catalog/components/search-navbar/search-navbar.component';
 import { SearchThumbnailComponent } from './catalog/components/search-thumbnail/search-thumbnail.component';
 import { SearchMediaComponent } from './catalog/components/search-media/search-media.component';
@@ -14,6 +15,7 @@ import {AppModalInsertReferenceComponent} from "./components/app-media/app-media
 export const entryComponents: any[] = [
 	CatalogComponent,
     SearchFilterComponent,
+    SliderRangeComponent,
     SearchNavbarComponent,
     SearchThumbnailComponent,
     SearchMediaComponent,

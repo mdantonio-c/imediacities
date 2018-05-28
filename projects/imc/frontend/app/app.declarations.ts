@@ -6,6 +6,7 @@ import { ArchivesListComponent } from './imc.archives.list'
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
+import { SliderRangeComponent } from './catalog/components/search-filter/slider-range/slider-range.component';
 import { SearchNavbarComponent } from './catalog/components/search-navbar/search-navbar.component';
 import { SearchThumbnailComponent } from './catalog/components/search-thumbnail/search-thumbnail.component';
 import { SearchMediaComponent } from './catalog/components/search-media/search-media.component';
@@ -13,6 +14,7 @@ import { SearchMapComponent } from './catalog/components/search-map/search-map.c
 import { SearchTimelineComponent } from './catalog/components/search-timeline/search-timeline.component';
 
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
+import {DurationPipe} from "./pipes/duration.pipe";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
 import {AppMediaTopBarComponent} from "./components/app-media/app-media-top-bar/app-media-top-bar";
@@ -63,6 +65,7 @@ export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
 	CatalogComponent,
     SearchFilterComponent,
+    SliderRangeComponent,
     SearchNavbarComponent,
     SearchThumbnailComponent,
     SearchMediaComponent,
@@ -70,6 +73,7 @@ export const declarations: any[] = [
     SearchTimelineComponent,
 	ProviderToCityPipe,
 	NoCommaPipe,
+	DurationPipe,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
