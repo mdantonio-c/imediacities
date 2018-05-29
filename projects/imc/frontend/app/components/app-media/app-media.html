@@ -1,7 +1,8 @@
-<div *ngIf="media" class="page-type-video"> <!--page-type-image è la classe da cambiare se siamo nell'item picture-->
+<div *ngIf="media" class="page-type-image" id="pageMedia" #pageMedia> <!--page-type-image è la classe da cambiare se siamo nell'item
+picture-->
 
     <!-- TOPBAR -->
-    <app-media-top-bar></app-media-top-bar>
+    <app-media-top-bar [type_media]="type_shot"></app-media-top-bar>
 
     <!-- MEDIA -->
     <div class="container-media row no-gutters justify-content-md-center">
@@ -21,72 +22,184 @@
 
         <!-- container video and shot -->
         <div class="container-media--content row no-gutters col-12 justify-content-md-center">
-            <!-- VIDEO PLAYER -->
+            <!-- box media -->
             <section class="box-media col-12 col-sm-7 col-lg-6">
-                <app-video-player
-                        #appVideo
-                        [data]="media"
-                        [shots]="shots"
-                        (video_player_ready)="video_player_set($event)"
-                ></app-video-player>
-                <!-- <app-picture></app-picture> -->
+                <!-- PICTURE -->
+                <ng-container *ngIf="type_shot === false">
+                   <div class="container-picture">
+                       <app-picture></app-picture>
+                   </div>
+                </ng-container>
+
+                <!-- VIDEO PLAYER -->
+                <ng-container *ngIf="type_shot === true">
+                 <app-video-player
+                         #appVideo
+                         [data]="media"
+                         [shots]="shots"
+                         (video_player_ready)="video_player_set($event)"></app-video-player>
+                </ng-container>
             </section>
 
             <!-- TAB SHOTS / SEGMENTS / AREAS-->
             <section class="col-12 col-sm-5 col-lg-3 box-shots">
 
                 <div class="imc--toolbar row no-gutters">
-                    <span class="col-6 col-lg-7 imc--flex--vertical-center">Shots</span>
-                    <span class="col-6 col-lg-5 imc--flex--horizontal-end">
+                    <ng-container *ngIf="type_shot === true">
+                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'shots'">Shots</span>
+                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'seg'">Segments</span>
+                    </ng-container>
+                    <ng-container *ngIf="type_shot === false">
+                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'picture'">All Picture</span>
+                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'areas'">Areas</span>
+                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'myareas'">My Areas</span>
+                    </ng-container>
+                    <span class="col-7 col-lg-6 imc--flex--horizontal-end">
                         <ul class="nav nav-pills mb-3 tab-shots" id="pills-tab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">
-                                    <i class="material-icons">movie</i>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">
-                                    <i class="material-icons">content_cut</i>
-                                </a>
-                            </li>
-                            <!--<li class="nav-item">
-                                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
-                            </li>-->
+                            <!--Tab per il video-->
+                            <ng-container *ngIf="type_shot === true">
+                                <li class="nav-item" (click)="titleTabShot('shots')">
+                                    <a class="nav-link active"
+                                       id="shots"
+                                       data-toggle="pill"
+                                       href="#pills-shots"
+                                       role="tab"
+                                       aria-controls="pills-shots"
+                                       aria-selected="true">
+                                        <i class="material-icons">movie</i>
+                                    </a>
+                                </li>
+                                <li class="nav-item" (click)="titleTabShot('seg')">
+                                    <a class="nav-link"
+                                       id="segments"
+                                       data-toggle="pill"
+                                       href="#pills-segments"
+                                       role="tab"
+                                       aria-controls="pills-segments"
+                                       aria-selected="false">
+                                        <i class="material-icons">content_cut</i>
+                                    </a>
+                                </li>
+                            </ng-container>
+                            <!--Tab per l'immagine-->
+                            <ng-container *ngIf="type_shot === false">
+                                <li class="nav-item" (click)="titleTabShot('picture')">
+                                    <a class="nav-link active"
+                                       id="picture"
+                                       data-toggle="pill"
+                                       href="#pills-picture"
+                                       role="tab"
+                                       aria-controls="pills-picture"
+                                       aria-selected="true">
+                                        <i class="material-icons">crop_original</i>
+                                    </a>
+                                </li>
+                                <li class="nav-item" (click)="titleTabShot('areas')">
+                                    <a class="nav-link"
+                                       id="areas"
+                                       data-toggle="pill"
+                                       href="#pills-areas"
+                                       role="tab"
+                                       aria-controls="pills-areas"
+                                       aria-selected="false">
+                                        <i class="material-icons">burst_mode</i>
+                                    </a>
+                                </li>
+                                <li class="nav-item" (click)="titleTabShot('myareas')">
+                                    <a class="nav-link"
+                                       id="myareas"
+                                       data-toggle="pill"
+                                       href="#pills-myareas"
+                                       role="tab"
+                                       aria-controls="pills-myareas"
+                                       aria-selected="false">
+                                        <i class="material-icons">crop</i>
+                                    </a>
+                                </li>
+                            </ng-container>
                         </ul>
                     </span>
                 </div>
                 <div class="tab-content" id="pills-tabContent">
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                        <!-- tab shots -->
-                        <div *ngIf="shots && shots.length">
-                            <app-video-shot
-                                    *ngFor="let shot of shots"
-                                    [shot]="shot"
-                                    [user]="user"
-                                    [multiSelection]="multi_annotations_is_active"
-                                    (modale_richiedi)="modal_show($event)"
-                                    (is_selezionato)="shot_selezionato($event)"
-                                    (current_component)="appVideo.registra($event)" [parent]="appVideo"
-                            ></app-video-shot>
+                    <!-- Contenuto delle tab -->
+                    <ng-container *ngIf="type_shot === true">
+                        <div class="tab-pane fade show active" id="pills-shots" role="tabpanel" aria-labelledby="shots">
+                            <!-- tab shots -->
+                            <div *ngIf="shots && shots.length">
+                                <app-video-shot
+                                        *ngFor="let shot of shots"
+                                        [shot]="shot"
+                                        [user]="user"
+                                        [multiSelection]="multi_annotations_is_active"
+                                        (modale_richiedi)="modal_show($event)"
+                                        (is_selezionato)="shot_selezionato($event)"
+                                        (current_component)="appVideo.registra($event)" [parent]="appVideo"
+                                ></app-video-shot>
+                            </div>
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <!-- tab segmenti -->
+                        <div class="tab-pane fade" id="pills-segments" role="tabpanel" aria-labelledby="segments">
+                            <!-- tab segmenti -->
+
+                                <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
+                                <!-- Blocco di codice se non ci sono elementi al suo interno-->
+
+                                <div class="container-info-element row no-gutters">
+                                    <div class="col-12"><p>no segments</p></div>
+                                    <span class="info-element-button col-12">
+                                        <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                                        <button class="btn btn-border-classic">Create Segment<!--Cancel--></button>
+                                    </span>
+                                </div>
+
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="type_shot === false">
+                        <div class="tab-pane fade show active" id="pills-picture" role="tabpanel" aria-labelledby="picture">
+                            <!-- tab picture -->
 
                             <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
                             <!-- Blocco di codice se non ci sono elementi al suo interno-->
 
                             <div class="container-info-element row no-gutters">
-                                <div class="col-12"><p>no segments</p></div>
-                                <span class="info-element-button col-12">
-                                    <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
-                                    <button class="btn btn-border-classic">Create Segment<!--Cancel--></button>
-                                </span>
+                                <div class="col-12"><p>no tags</p></div>
+                                <!--<span class="info-element-button col-12">
+                                        &lt;!&ndash; In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab&ndash;&gt;
+                                        <button class="btn btn-border-classic">Create Segment&lt;!&ndash;Cancel&ndash;&gt;</button>
+                                    </span>-->
                             </div>
 
-                    </div>
-                    <!--<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>-->
+                        </div>
+                        <div class="tab-pane fade" id="pills-areas" role="tabpanel" aria-labelledby="areas">
+                            <!-- tab aree automatiche -->
 
+                            <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
+                            <!-- Blocco di codice se non ci sono elementi al suo interno-->
+
+                            <div class="container-info-element row no-gutters">
+                                <div class="col-12"><p>no automatic areas</p></div>
+                                <span class="info-element-button col-12">
+                                        <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                                        <!--<button class="btn btn-border-classic">Create Segment&lt;!&ndash;Cancel&ndash;&gt;</button>-->
+                                    </span>
+                            </div>
+
+                        </div>
+                        <div class="tab-pane fade" id="pills-myareas" role="tabpanel" aria-labelledby="myareas">
+                            <!-- tab segmenti -->
+
+                            <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
+                            <!-- Blocco di codice se non ci sono elementi al suo interno-->
+
+                            <div class="container-info-element row no-gutters">
+                                <div class="col-12"><p>no personal areas</p></div>
+                                <span class="info-element-button col-12">
+                                        <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                                        <button class="btn btn-border-classic">Create Area<!--Cancel--></button>
+                                    </span>
+                            </div>
+
+                        </div>
+                    </ng-container>
 
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->

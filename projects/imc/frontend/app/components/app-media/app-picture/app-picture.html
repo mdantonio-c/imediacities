@@ -1,1 +1,19 @@
-app-picture
+<!-- Componente per l'IMMAGINE -->
+
+<svg width="100%" height="100%">
+    <defs>
+        <mask id="mask-image">
+            <!-- Rettangolo nero -->
+            <rect height="100%" width="100%" fill="white" opacity="0.5" style="position: absolute;" />
+            <!-- Combinazione (coordinate) dei rettangoli di ritaglio -->
+            <path d="M100 80 H300 V200 H100 Z M80 80 H150 V150 H80 Z" />
+        </mask>
+    </defs>
+    <!-- Immagine da linkare -->
+    <image xlink:href="http://www.italiainfoto.com/gallery/data/744/Bologna.jpg" height="100%" width="100%" />
+
+    <!-- Rettangolo nero tagliato-->
+    <!-- @NSI Capire che dimensione dargli -->
+    <rect width="100%" height="100%" mask="url(#mask-image)"/>
+</svg>
+

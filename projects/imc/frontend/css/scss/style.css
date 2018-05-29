@@ -318,12 +318,10 @@ input[type="radio"] {
   padding: 35px 25px;
   width: 100%; }
 
-.container-media--content {
-  max-height: 496px; }
-
 .box-media {
-  background: #f7f7f7;
-  min-height: 480px; }
+  background: #333;
+  /*min-height: 480px;*/
+  align-self: stretch; }
 
 .imc--tab,
 .imc--card {
@@ -705,7 +703,9 @@ input[type="radio"] {
 .box-shots {
   display: flex;
   flex-direction: column;
-  margin: 0; }
+  margin: 0;
+  max-height: 500px;
+  min-height: 500px; }
   .box-shots .imc--toolbar {
     background: #dfdfdf;
     margin: 0;
@@ -715,7 +715,6 @@ input[type="radio"] {
     width: 100%; }
   .box-shots .tab-content {
     background: #f7f7f7;
-    /*height: 430px;*/
     display: flex;
     flex-direction: column;
     align-self: stretch;
@@ -762,7 +761,7 @@ input[type="radio"] {
     padding: 0 8px; }
 
 .page-type-image .tab-shots .nav-link.active, .page-type-image .tab-shots .nav-link.active i {
-  background-color: #e43432; }
+  color: #e43432; }
 .page-type-image .box-single-shot.active {
   background-color: rgba(228, 52, 50, 0.2); }
 
@@ -1296,6 +1295,14 @@ input[type="radio"] {
 
 .page-type-image .child-list li .term:hover {
   background: rgba(228, 52, 50, 0.3) !important; }
+
+.container-picture {
+  max-height: 500px;
+  height: 500px; }
+  .container-picture svg {
+    position: relative;
+    margin: 0 auto;
+    display: block; }
 
 body, a {
   color: #707070;

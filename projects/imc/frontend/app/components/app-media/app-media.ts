@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, DoCheck } from '@angular/core';
 import {AppShotsService} from "../../services/app-shots";
 import {AppMediaService} from "../../services/app-media";
 import {AppModaleComponent} from "../app-modale/app-modale";
@@ -19,6 +19,8 @@ export class AppMediaComponent implements OnInit {
     //  Id video
     video_id = 'cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5';
 
+    //Riferimento alla pagina contenente il media
+    @ViewChild('pageMedia') pageMedia: ElementRef;
     /**
      * Riferimento al componente AppModale
      */
@@ -70,12 +72,17 @@ export class AppMediaComponent implements OnInit {
      */
     public user_language = 'it';
     public user = {};
+    public title_shot: string;
+    public type_shot: boolean;
 
     constructor(
         private AuthService: AuthService,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
-        private VideoService: AppVideoService) {}
+        private VideoService: AppVideoService ) {
+
+
+    }
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot
@@ -156,6 +163,24 @@ export class AppMediaComponent implements OnInit {
 
     video_player_set (event) {
         this.VideoService.video_set(event);
+    }
+
+    /* Seleziona il titolo per le tabs degli shot */
+    titleTabShot(title) {
+        this.title_shot = title;
+    }
+    // Controllo della classe page-type-video o page-type-media all'interno del div principale che contiene il media
+    ngAfterViewInit() {
+        setTimeout(() => {
+            if (this.pageMedia.nativeElement.classList.contains('page-type-video')) {
+                this.type_shot = true;
+                /* Settaggio del titolo iniziale delle tab-shot */
+                this.title_shot = 'shots';
+            } else if (this.pageMedia.nativeElement.classList.contains('page-type-image')) {
+                this.type_shot = false;
+                this.title_shot = 'picture';
+            }
+        }, 1000);
     }
 
     /**
