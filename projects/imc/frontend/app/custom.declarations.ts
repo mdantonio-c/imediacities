@@ -1,6 +1,8 @@
+import { NguiMapModule} from '@ngui/map';
+import { HolderJsModule } from 'angular2-holderjs/component';
 
-import { CustomNavbarComponent } from './app.custom.navbar';
-import { CustomBrandComponent } from './app.custom.navbar';
+import { CustomNavbarComponent } from './custom.navbar';
+import { CustomBrandComponent } from './custom.navbar';
 import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
@@ -61,6 +63,14 @@ import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-re
 import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
 
+import {CatalogService} from './catalog/services/catalog.service';
+import {AppAnnotationsService} from "./services/app-annotations";
+import {AppShotsService} from "./services/app-shots";
+import {AppMediaService} from "./services/app-media";
+import {AppVocabularyService} from "./services/app-vocabulary";
+import {AppModaleService} from "./services/app-modale";
+import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fast-play";
+import {AppVideoService} from "./services/app-video";
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
@@ -105,4 +115,37 @@ export const declarations: any[] = [
 	InputNumericDirective,
 	InputSelectDirective
 
+];
+
+export const entryComponents: any[] = [
+	CatalogComponent,
+    SearchFilterComponent,
+    SliderRangeComponent,
+    SearchNavbarComponent,
+    SearchThumbnailComponent,
+    SearchMediaComponent,
+    SearchMapComponent,
+    SearchTimelineComponent,
+    AppModalInsertTermtagComponent,
+    AppModalInsertGeotagComponent,
+    AppModalInsertNoteComponent,
+    AppModalInsertLinkComponent,
+    AppModalInsertReferenceComponent,
+];
+
+export const providers: any[] = [
+    CatalogService,
+    AppAnnotationsService,
+    AppMediaService,
+    AppModaleService,
+    AppShotsService,
+    AppVocabularyService,
+    AppVideoService,
+    AppVideoControlsFastPlayService,
+    ProviderToCityPipe
+];
+
+export const imports: any[] = [
+  NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
+  HolderJsModule
 ];
