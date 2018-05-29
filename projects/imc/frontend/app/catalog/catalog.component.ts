@@ -13,6 +13,7 @@ export class CatalogComponent implements OnInit {
 	totalItems: number = 0;
 	results: MediaEntity[];
 	countByYears: any;
+	countByProviders: any;
 	currentView: string = 'Grid';
 	filter: SearchFilter;
 	currentPage: number = 1;
@@ -33,19 +34,19 @@ export class CatalogComponent implements OnInit {
 
 	ngOnInit() {
 		this.load();
-		/*this.countByYears = this.catalogService.countByYears;*/
 	}
 
 	load() {
-		console.log(this.filter);
+		/*console.log(this.filter);*/
 		this.loading = true;
 		// clean current results
 		this.results = [];
 		this.catalogService.search(this.filter, this.currentPage, this.pageSize).subscribe(
-			results => {
-				this.results = results.data;
-				this.totalItems = this.results.length;
-				/*console.log(this.results);*/
+			response => {
+				this.results = response["Response"].data;
+				this.totalItems = response["Meta"].totalItems;
+				this.countByYears = response["Meta"].countByYears;
+				this.countByProviders = response["Meta"].countByProviders;
 				this.loading = false;
 			},
 			error => {
