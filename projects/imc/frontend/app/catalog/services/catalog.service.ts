@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
 import { Observable } from 'rxjs/Observable';
 import { catchError, map } from 'rxjs/operators';
-import { MediaEntity } from './data'
+import { MediaEntity, Providers } from './data'
 
 export interface SearchFilter {
 	searchTerm: string,
@@ -15,7 +15,7 @@ export interface SearchFilter {
 	iprstatus: string
 }
 
-const matchFields =  ["title", "contributor", "keyword"];
+const matchFields = ["title", "contributor", "keyword"];
 
 @Injectable()
 export class CatalogService {
@@ -44,28 +44,25 @@ export class CatalogService {
 			}
 		}
 		if (filter.searchTerm) {
-			data.match = { term: filter.searchTerm, fields: matchFields}
+			data.match = { term: filter.searchTerm, fields: matchFields }
 		}
-		/*this.api.post(endpoint, data, {"rawResponse": true}).pipe(
-			map(response => {}),
-			catchError((error, caught) => {})
-		);*/
-		return this.api.post(endpoint, data, {"rawResponse": true});
-		/*return this.api.post(endpoint, data);*/
+		return this.api.post(endpoint, data, { "rawResponse": true });
 	}
 
-	/*get countByYears() {
-		return this._countByYears;
+	getProviderPosition(provider: string) {
+		for (let p of Providers) {
+			if (p.code === provider) {
+				return p.city.position;
+			}
+		}
 	}
 
-	get countByProviders() {
-		return this._countByProviders;
+	getProviderCity(provider: string) {
+		for (let p of Providers) {
+			if (p.code === provider) {
+				return p.city;
+			}
+		}
 	}
-
-	mediaEntity(uuid: string) {
-		return this._data.find(row => {
-			return row.id === uuid;
-		});
-	}*/
 
 }
