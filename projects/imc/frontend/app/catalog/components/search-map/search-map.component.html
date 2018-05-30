@@ -1,12 +1,26 @@
 <ngui-map
     class="search-map"
+    center="45, 14"
     (mapReady$)="onMapReady($event)"
     (mapClick)="onMapClick($event)"
-    [center]="center"
-    [zoom]="zoom"
     [styles]="mapStyle"
     [disableDefaultUI]="true"
     [zoomControl]="true">
+        <div id="custom-control" index="1" draggable="false" #customControl>
+            <button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" (click)="centerEurope()">
+            <i class="imc-icon fa fa-crosshairs fa-2x grey"></i>
+            </button>
+            <div class="separator"></div>
+            <button draggable="false" title="Show/Hide Boundary" aria-label="Show/Hide Boundary" type="button" (click)="toggleBoundary()">
+            <i class="imc-icon fa fa-circle fa-2x grey"></i>
+            </button>
+        </div>
+        <div id="place-control" index="1" draggable="false" #placeControl>
+            <input type="text" name="lookup-place" placeholder="Enter a place"
+                places-auto-complete
+                (place_changed)="placeChanged($event)"
+                [types]="['geocode']">
+        </div>
         <marker
             *ngFor="let pos of markers"
             (click)="showInfoWindow($event)"

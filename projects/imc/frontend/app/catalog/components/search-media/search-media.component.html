@@ -11,8 +11,8 @@
 	<div class="media-body">
 		<div>
 			<h4 class="media-heading">
-			<a href="#" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
-			<a href="#" *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+			<a [routerLink]=[media.id] *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
+			<a [routerLink]=[media.id] *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 			</h4>
 			<span>
 				<i *ngIf="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
