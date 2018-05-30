@@ -1,15 +1,13 @@
 /* Map */
-.map-view {
-	background-color: #d0d0d0;
-	border-color: #d6e1ea;
-    padding: .35em;
+.search-map {
+  min-height: 500px;
 }
 
-.map #custom-control .imc-icon:hover {
+#custom-control .imc-icon:hover {
 	color: #333 !important
 }
 
-.map #custom-control {
+#custom-control {
 	user-select: none;
 	box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
 	border-radius: 2px;
@@ -20,7 +18,7 @@
 	margin: 10px;
 }
 
-.map #custom-control button {
+#custom-control button {
 	background: none;
 	display: block;
 	border: 0px;
@@ -35,12 +33,12 @@
 	left: 0px;
 }
 
-.map #place-control {
+#place-control {
 	margin: 10px;
 	line-height: 24px;
 }
 
-.map #place-control input {
+#place-control input {
 	width: 280px;
 	font-size: small;
 	padding-left: 5px;
@@ -72,19 +70,22 @@
 }
 
 .map-counter-panel {
-	border: 1px solid #e08374;
+	top: -30px;
+    left: -11px;
+    position: absolute;
+	border: 4px double #e08374;
 	background: #ffffff;
 	border-radius: 2px;
-	padding: 2px;
+	padding: 3px;
 	font-weight: 700;
 	text-align: center;
-	min-width: 20px;
+	min-width: 25px;
 }
 .map-counter-panel:before {
 	position: absolute;
 	display: inline-block;
-	top: 24px;
-	left: 6px !important;
+	top: 22px;
+	left: 1px !important;
 	right: auto;
 	border-right: 6px solid transparent !important;
     border-top: 6px solid #e08374 !important;

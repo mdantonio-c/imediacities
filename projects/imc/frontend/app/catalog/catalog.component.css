@@ -28,3 +28,9 @@
   padding-left: 1.5%;
   padding-right: 1.5%;
 }
+
+.map-view {
+  background-color: #d0d0d0;
+  border-color: #d6e1ea;
+    padding: .35em;
+}
