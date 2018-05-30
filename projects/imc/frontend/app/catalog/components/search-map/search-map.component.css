@@ -33,6 +33,16 @@
 	left: 0px;
 }
 
+#custom-control .separator {
+	position: relative;
+	overflow: hidden;
+	width: 67%;
+	height: 1px;
+	left: 16%;
+	background-color: rgb(230, 230, 230);
+	top: 0px;
+}
+
 #place-control {
 	margin: 10px;
 	line-height: 24px;
