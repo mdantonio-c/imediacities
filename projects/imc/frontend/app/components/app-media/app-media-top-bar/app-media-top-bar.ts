@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 
 @Component({
@@ -7,11 +7,10 @@ import {Location} from '@angular/common';
 })
 
 export class AppMediaTopBarComponent implements OnInit {
-    /* esempio del cambiamento per il tipo di media, test topbar*/
-    public mediaType: string;
+
+    @Input() type_media;
 
     constructor(private _location: Location) {
-        this.mediaType = 'video';
     }
 
     backClicked() {

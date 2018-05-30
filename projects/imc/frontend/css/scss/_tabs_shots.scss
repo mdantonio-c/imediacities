@@ -84,7 +84,7 @@
     .nav-link {
       &.active,
       &.active i {
-        background-color: $theme-image-color;
+        color: $theme-image-color;
       }
     }
   }
