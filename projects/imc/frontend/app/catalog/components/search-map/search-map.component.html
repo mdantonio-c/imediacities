@@ -50,7 +50,7 @@
             </div>
         </info-window>
         <circle *ngIf="showMapBoundary"
-            [center]="center"
+            [center]="map.getCenter()"
             [strokeColor]="'#FF0000'"
             [strokeOpacity]="0.8"
             [strokeWeight]="2"
