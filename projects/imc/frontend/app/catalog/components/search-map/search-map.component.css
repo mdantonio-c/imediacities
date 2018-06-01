@@ -103,14 +103,3 @@
     border-left: 6px solid transparent !important;
     content: " ";
 }
-
-.map-result h4 {
-	display: inline; padding-left: 5px;
-}
-.map-result .media-image-wrapper img {
-	border: 2px solid #fff;
-	outline: 1px solid #e4e4e4;
-	height: 150px;
-	width: 100%;
-	display: block;
-}

@@ -1,0 +1,64 @@
+<div class="media-thumbnail search-thumbnail map-result">
+	<div class="row">
+		<div class="col">
+			<div class="space-4"></div>
+			<h4 class="search-title">
+			<i class="imc-icon fa light-blue" [ngClass]="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image'}"></i>
+			<a [routerLink]=[media.source.uuid] class="blue">{{media.source.title}}</a>
+			</h4>
+			<span *ngIf="media?.source?.year">
+				<i>({{media.source.year | slice:0:4}})</i>
+			</span>
+			<div class="space-4"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-4" style="padding-right: 5px;">
+			<div class="media-image-wrapper">
+				<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.source.uuid" [imgSrc]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.source.links['thumbnail']"></hjs>
+				<img class="media-object" alt="100%x150" src="{{media.source.links['thumbnail']+'&size=large'}}" *ngIf="media.source.links['thumbnail']">
+			</div>
+			<div class="caption">
+				<div class="clearfix">
+					<span class="float-right badge badge-primary label-city">{{(media.source.provider | providerToCity) || 'n/a'}}
+					</span>
+					<div class="float-left bigger-110">
+						<i class="imc-icon fa fa-eye light-blue"></i>
+						<i class="imc-icon fa fa-asterisk light-blue"></i>
+						<i class="imc-icon fa fa-heart light-blue"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-8" style="padding-left: 0px;">
+			<div class="widget-box transparent">
+				<div class="widget-header widget-header-small">
+					<h4 class="widget-title blue">
+					<i class="imc-icon fa fa-map-marker orange bigger-110"></i>Geo Annotations
+					</h4>
+				</div>
+				<div class="widget-body">
+					<div class="widget-main padding-8">
+						<div style="max-height: 200px; overflow: auto;">
+							<div class="tag-activity" *ngFor="let anno of media.annotations">
+								<div class="annotation">
+									<b>{{anno.body.name}}</b><br/>
+									<span *ngIf="anno.shot">(shot: {{anno.shot.start_frame_idx}}-{{anno.shot.end_frame_idx}})</span>
+								</div>
+								<div class="creator">
+									<i class="imc-icon fa fa-user fa-2x light-grey pull-left"></i>
+									<span>{{anno.creator.name}} {{anno.creator.surname}}</span>
+									<div class="time">
+										<i class="imc-icon fa fa-clock-o light-grey"></i>
+										<span>{{anno.creation_datetime * 1000 | date:'yyyy-MM-dd HH:mm'}}</span>
+									</div>
+								</div>
+								<div class="space-4" style="height:10%; position:absolute; bottom:0px;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

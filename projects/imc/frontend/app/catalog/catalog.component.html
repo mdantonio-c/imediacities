@@ -59,7 +59,7 @@
 												<div class="map-view">
 													<div class="view-header">
 														<!-- map -->
-														<search-map [countByProviders]="countByProviders"></search-map>
+														<search-map [countByProviders]="countByProviders" [filter]="filter" (onMapChange)="loadMediaTags($event)">></search-map>
 													</div>
 													<div class="view-content">
 														<search-timeline [countByYears]="countByYears"></search-timeline>
@@ -68,8 +68,21 @@
 											</div>
 										</div>
 									</div>
-									<div class="col">
+									<div class="col-12 loader" *ngIf="loadingMapResults" style="text-align: center">
+										<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
+									</div>
+									<div class="col" *ngIf="!loadingMapResults">
 										<!-- PUT HERE results from map filter -->
+										<div class="row">
+											<div class="space-8"></div>
+										</div>
+										<div class="row">
+											<search-media-tag 
+												*ngFor="let mediaTag of mediaTags"
+												[media]="mediaTag"
+												class="col-md-6 col-sm-12">
+											</search-media-tag>
+										</div>
 									</div>
 								</div>
 							</div>
