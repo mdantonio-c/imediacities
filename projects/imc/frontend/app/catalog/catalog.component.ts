@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CatalogService, SearchFilter } from './services/catalog.service'
-import { NotificationService} from '/rapydo/src/app/services/notification';
+import { NotificationService } from '/rapydo/src/app/services/notification';
 import { MediaEntity } from './services/data'
 
 @Component({
@@ -10,6 +10,7 @@ import { MediaEntity } from './services/data'
 })
 export class CatalogComponent implements OnInit {
 	loading: boolean = false;
+	loadingMapResults: boolean = false;
 	totalItems: number = 0;
 	results: MediaEntity[];
 	countByYears: any;
@@ -18,6 +19,7 @@ export class CatalogComponent implements OnInit {
 	filter: SearchFilter;
 	currentPage: number = 1;
 	pageSize: number = 12;
+	mediaTags: any[];
 
 	constructor(private catalogService: CatalogService, private notify: NotificationService) {
 		this.filter = {
@@ -50,7 +52,7 @@ export class CatalogComponent implements OnInit {
 				this.loading = false;
 			},
 			error => {
-      			this.notify.extractErrors(error, this.notify.ERROR);
+				this.notify.extractErrors(error, this.notify.ERROR);
 				this.loading = false;
 			});
 	}
@@ -67,6 +69,24 @@ export class CatalogComponent implements OnInit {
 
 	changeView(view) {
 		this.currentView = view;
+	}
+
+	/**
+	 * Load relevant media entity for a list of geo tags.
+	 * @param entityPlaceMap <Map> 'entity-id' => Array<place-id>.
+	 */
+	loadMediaTags(entityPlaceMap) {
+		/*console.log(entityPlaceMap);*/
+		this.loadingMapResults = true;
+		this.catalogService.getRelavantCreations(entityPlaceMap).subscribe(
+			response => {
+				this.mediaTags = response["Response"].data;
+				this.loadingMapResults = false;
+			},
+			error => {
+				this.notify.extractErrors(`Unable to retrieve relevant creations on the map: ${error}`, this.notify.ERROR);
+				this.loadingMapResults = false;
+			});
 	}
 
 }

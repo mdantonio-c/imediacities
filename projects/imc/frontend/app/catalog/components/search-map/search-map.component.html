@@ -1,8 +1,10 @@
 <ngui-map
     class="search-map"
     center="45, 14"
+    zoom="4"
     (mapReady$)="onMapReady($event)"
-    (mapClick)="onMapClick($event)"
+    (zoom_changed)="onZoomChanged($event)"
+    (center_changed)="onCenterChanged($event)"
     [styles]="mapStyle"
     [disableDefaultUI]="true"
     [zoomControl]="true">
@@ -22,9 +24,9 @@
                 [types]="['geocode']">
         </div>
         <marker
-            *ngFor="let pos of markers"
-            (click)="showInfoWindow($event)"
-            [position]="pos">
+            *ngFor="let m of markers"
+            (click)="showInfoWindow($event, m)"
+            [position]="m.position">
         </marker>
         <custom-marker
             *ngFor="let city of counters"
@@ -33,19 +35,19 @@
             <div class="map-counter-panel">{{city.counter}}</div>
         </custom-marker>
         <info-window id="tag-iw">
-            <!-- <div id="infowindow-content">
+            <div id="infowindow-content">
                 <div class="place-info">
-                    <span id="place-name" class="title">{{markerTag.name}}</span>
+                    <span id="place-name" class="title">{{marker.name}}</span>
                     <br/>
-                    <span id="place-address">{{markerTag.address}}</span>
+                    <span id="place-address">{{marker?.address}}</span>
                 </div>
                 <div class="place-item-list">
-                    <div *ngFor="let source of markerTag.sources" style="display:list-item;">
+                    <div *ngFor="let source of marker.sources" style="display:list-item;">
                         <i class="icon-only imc-icon fa fa-video-camera grey bigger-110" [ngClass]="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image'}"></i>
-                        <a [routerLink]=[source.uuid]>{{source.title || 'n/a'}}</a><i *ngIf="source.year">({{source.year | slice:0:4}})</i>
+                        <a [routerLink]=[source.uuid]>{{source?.title || 'n/a'}}</a><i *ngIf="source.year">({{source?.year | slice:0:4}})</i>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </info-window>
         <circle *ngIf="showMapBoundary"
             [center]="center"
