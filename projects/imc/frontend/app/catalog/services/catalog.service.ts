@@ -94,8 +94,8 @@ export class CatalogService {
 	 * @param relevantCreations
 	 */
     getRelavantCreations = function(relevantCreations) {
-        if (relevantCreations === undefined || relevantCreations.size === 0) { 
-            return Observable.of({'data': {'Response': {'data': []}}});
+        if (relevantCreations === undefined || relevantCreations.size === 0) {
+        	return Observable.of({'Response': {'data': []}});
         }
         var data = {
             'relevant-list': []
