@@ -1,9 +1,10 @@
-import { 
+import {
 	Component,
 	Input,
 	Output,
 	ViewChild,
 	ElementRef,
+	Renderer2,
 	EventEmitter,
 	ChangeDetectorRef,
 	OnInit, OnChanges
@@ -66,6 +67,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
 	map;
 	private zoom;
+	private center;
+	private reloading: boolean = false;
 	/*isLoaded: boolean = false;*/
 	mapStyle = mapStyles.hide;
 	radius: number = 1600 * 1000;	// for zoom level 4
@@ -90,7 +93,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		private catalogService: CatalogService,
 		private geoCoder: GeoCoder,
 		private ref: ChangeDetectorRef,
-		private notify: NotificationService
+		private notify: NotificationService,
+		private renderer: Renderer2
 	) { }
 
 	initialized(autocomplete: any) {
@@ -98,7 +102,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	}
 
 	placeChanged(place) {
-		if (place === undefined) { return; }
+		if (!place || !place.geometry) { return; }
 		this.map.setCenter(place.geometry.location);
 		this.map.fitBounds(place.geometry.viewport);
 		this.ref.detectChanges();
@@ -106,9 +110,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
 	ngOnInit() {
 		/*console.log('ngOnInit');*/
-		this.loadCountByProvider();
-		if (this.filter.provider != null) {
-			// load geo-tags for this provider
+		if (!this.filter.provider) {
+			this.loadCountByProvider();
 		}
 	}
 
@@ -118,16 +121,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		if (!this.filter.provider) {
 			this.loadCountByProvider();
 		}
-		//  Remove any residual markers
-		/*this.markers.forEach(m => {
-			if (m.hasOwnProperty('map')) {
-				m.setMap(null)
-			}
-		});
-
-		//  reset markers
-		this.markers = this.markers.slice();*/
-		/*this.fitBounds();*/
 	}
 
 	private loadCountByProvider() {
@@ -173,18 +166,14 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	};
 
 	onMapReady(map) {
-		/*console.log('onMapReady');*/
-		/*console.log('map', map);*/
-
 		// add custom controls
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.customControl.nativeElement);
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.placeControl.nativeElement);
 
 		this.map = map;
-		this.zoom = map.getZoom();
+		this.zoom = this.map.getZoom();
 		(this.filter.provider != null) ? this.centerCity(this.filter.provider) : this.centerEurope();
-		/*this.fitBounds();*/
-		/*console.log('markers', map.markers);*/
+		this.center = { lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() };
 	}
 
 	onIdle(event) {
@@ -196,26 +185,55 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	}
 
 	onZoomChanged(event) {
-		/*console.log(event);*/
+		if (!this.map) { return; }
+		if (!this.reloading) { this.reloading = true; }
+
 		let oldZoom = this.zoom;
 		let newZoom = event.target.zoom;
 		if (newZoom !== oldZoom) {
 			// zoom changed
-			console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);
+			/*console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);*/
 			// fit the circle radius properly
 			this.radius = Math.pow(2, oldZoom - newZoom) * this.radius;
 			// console.log('new radius: ' + sc.radius + ' meters');
 			this.zoom = newZoom;
-			if (this.filter.provider !== null) {
+			/*console.log('onZoomChanged: reloading geo-tags? ', this.reloading);*/
+			if (this.filter.provider !== null && this.reloading) {
 				let pos = [this.map.getCenter().lat(), this.map.getCenter().lng()];
 				this.loadGeoTags(pos, this.radius);
+				this.reloading = false;
 			}
 		}
 	}
 
 
 	onCenterChanged(event) {
-		/*console.log('center changed');*/
+		if (!this.map) { return; }
+		if (!this.reloading) { this.reloading = true; }
+
+		// reset the place-name control on the map
+		let inputPlaceControl = this.placeControl.nativeElement.querySelector('input');
+		this.renderer.setProperty(inputPlaceControl, 'value', '');
+
+		setTimeout(() => {
+			let latLng = this.map.getCenter();
+			/*console.log('onCenterChanged: reloading geo-tags? ', this.reloading);
+			console.log('moved from: (' + this.center.lat + ', ' + this.center.lng + ') to: ' + latLng);*/
+			if (!this.moving()) { return; }
+			this.center = { lat: latLng.lat(), lng: latLng.lng() };
+			if (this.filter.provider !== null && this.reloading) {
+				let pos = [this.map.getCenter().lat(), this.map.getCenter().lng()];
+				this.loadGeoTags(pos, this.radius);
+				this.reloading = false;
+			}
+		}, 1000);
+	}
+
+	private moving() {
+		let latLng = this.map.getCenter();
+		if (latLng.lat() != this.center.lat) { return true; }
+		if (latLng.lng() != this.center.lng) { return true; }
+		return false;
 	}
 
 	/**
@@ -273,14 +291,14 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
 			this.updateClusters();
 			this.onMapChange.emit(relevantCreations);
-			
+
 		}, error => {
 			this.notify.extractErrors(`There was an error loading geo-tags: ${error}`, this.notify.ERROR);
 		});
 	}
 
 	private clearMarkers() {
-		// TODO
+		this.markers = [];
 	}
 
 	private updateClusters() {
