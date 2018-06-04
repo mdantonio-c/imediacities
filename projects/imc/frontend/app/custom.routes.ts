@@ -5,6 +5,7 @@ import { AuthGuard } from '/rapydo/src/app/app.auth.guard';
 
 import { ArchivesListComponent } from './components/admin/archive/archives.list';
 import { AdminGroupsComponent } from './components/admin/groups';
+import { UploadComponent } from './components/upload/upload';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { AppMediaComponent } from './components/app-media/app-media';
@@ -21,6 +22,12 @@ export const appRoutes: Routes = [
 		component: AdminGroupsComponent,
 		canActivate: [AuthGuard],
 		data: { role: 'admin_root' }
+	},
+	{
+		path: 'app/upload',
+		component: UploadComponent,
+		canActivate: [AuthGuard],
+		data: { role: 'Archive' }
 	},
 	{ path: 'app/catalog', component: CatalogComponent },
 	{ path: 'app/catalog/:uuid', component: AppMediaComponent },

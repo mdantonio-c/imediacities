@@ -6,6 +6,7 @@ import { CustomBrandComponent } from './custom.navbar';
 import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
+import { UploadComponent } from './components/upload/upload';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
@@ -74,8 +75,10 @@ import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fas
 import {AppVideoService} from "./services/app-video";
 
 export const declarations: any[] = [
-	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
+	CustomNavbarComponent, CustomBrandComponent,
+    ArchivesListComponent, ArchiveComponent,
 	AdminGroupsComponent,
+    UploadComponent,
 	CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,
