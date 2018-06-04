@@ -4,7 +4,8 @@
 			<div class="space-4"></div>
 			<h4 class="search-title">
 			<i class="imc-icon fa light-blue" [ngClass]="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image'}"></i>
-			<a [routerLink]=[media.source.uuid] class="blue">{{media.source.title}}</a>
+			<a [routerLink]="['images', media.source.uuid]" *ngIf="media.source.type == 'Image'" class="blue">{{media.source.title}}</a>
+			<a [routerLink]="['videos', media.source.uuid]" *ngIf="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
 			</h4>
 			<span *ngIf="media?.source?.year">
 				<i>({{media.source.year | slice:0:4}})</i>
