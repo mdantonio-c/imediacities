@@ -1,8 +1,8 @@
-<div *ngIf="media" class="page-type-image" id="pageMedia" #pageMedia> <!--page-type-image è la classe da cambiare se siamo nell'item
+<div *ngIf="media" [class]="media_class" id="pageMedia"> <!--page-type-image è la classe da cambiare se siamo nell'item
 picture-->
 
     <!-- TOPBAR -->
-    <app-media-top-bar [type_media]="type_shot"></app-media-top-bar>
+    <app-media-top-bar [media_type]="media_type"></app-media-top-bar>
 
     <!-- MEDIA -->
     <div class="container-media row no-gutters justify-content-md-center">
@@ -25,14 +25,14 @@ picture-->
             <!-- box media -->
             <section class="box-media col-12 col-sm-7 col-lg-6">
                 <!-- PICTURE -->
-                <ng-container *ngIf="type_shot === false">
+                <ng-container *ngIf="media_type === 'image'">
                    <div class="container-picture">
                        <app-picture></app-picture>
                    </div>
                 </ng-container>
 
                 <!-- VIDEO PLAYER -->
-                <ng-container *ngIf="type_shot === true">
+                <ng-container *ngIf="media_type === 'video'">
                  <app-video-player
                          #appVideo
                          [data]="media"
@@ -45,20 +45,12 @@ picture-->
             <section class="col-12 col-sm-5 col-lg-3 box-shots">
 
                 <div class="imc--toolbar row no-gutters">
-                    <ng-container *ngIf="type_shot === true">
-                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'shots'">Shots</span>
-                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'seg'">Segments</span>
-                    </ng-container>
-                    <ng-container *ngIf="type_shot === false">
-                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'picture'">All Picture</span>
-                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'areas'">Areas</span>
-                        <span class="col-5 col-lg-6 imc--flex--vertical-center" *ngIf="title_shot === 'myareas'">My Areas</span>
-                    </ng-container>
+                    <span class="col-5 col-lg-6 imc--flex--vertical-center" [innerHTML]="tab_title"></span>
                     <span class="col-7 col-lg-6 imc--flex--horizontal-end">
                         <ul class="nav nav-pills mb-3 tab-shots" id="pills-tab" role="tablist">
                             <!--Tab per il video-->
-                            <ng-container *ngIf="type_shot === true">
-                                <li class="nav-item" (click)="titleTabShot('shots')">
+                            <ng-container *ngIf="media_type === 'video'">
+                                <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link active"
                                        id="shots"
                                        data-toggle="pill"
@@ -66,10 +58,10 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-shots"
                                        aria-selected="true">
-                                        <i class="material-icons">movie</i>
+                                        <i class="material-icons" data-title="Shots">movie</i>
                                     </a>
                                 </li>
-                                <li class="nav-item" (click)="titleTabShot('seg')">
+                                <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link"
                                        id="segments"
                                        data-toggle="pill"
@@ -77,13 +69,13 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-segments"
                                        aria-selected="false">
-                                        <i class="material-icons">content_cut</i>
+                                        <i class="material-icons" data-title="Segments">content_cut</i>
                                     </a>
                                 </li>
                             </ng-container>
                             <!--Tab per l'immagine-->
-                            <ng-container *ngIf="type_shot === false">
-                                <li class="nav-item" (click)="titleTabShot('picture')">
+                            <ng-container *ngIf="media_type === 'image'">
+                                <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link active"
                                        id="picture"
                                        data-toggle="pill"
@@ -91,10 +83,10 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-picture"
                                        aria-selected="true">
-                                        <i class="material-icons">crop_original</i>
+                                        <i class="material-icons" data-title="All Picture">crop_original</i>
                                     </a>
                                 </li>
-                                <li class="nav-item" (click)="titleTabShot('areas')">
+                                <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link"
                                        id="areas"
                                        data-toggle="pill"
@@ -102,10 +94,10 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-areas"
                                        aria-selected="false">
-                                        <i class="material-icons">burst_mode</i>
+                                        <i class="material-icons" data-title="Areas">burst_mode</i>
                                     </a>
                                 </li>
-                                <li class="nav-item" (click)="titleTabShot('myareas')">
+                                <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link"
                                        id="myareas"
                                        data-toggle="pill"
@@ -113,7 +105,7 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-myareas"
                                        aria-selected="false">
-                                        <i class="material-icons">crop</i>
+                                        <i class="material-icons" data-title="My Areas">crop</i>
                                     </a>
                                 </li>
                             </ng-container>
@@ -122,7 +114,7 @@ picture-->
                 </div>
                 <div class="tab-content" id="pills-tabContent">
                     <!-- Contenuto delle tab -->
-                    <ng-container *ngIf="type_shot === true">
+                    <ng-container *ngIf="media_type === 'video'">
                         <div class="tab-pane fade show active" id="pills-shots" role="tabpanel" aria-labelledby="shots">
                             <!-- tab shots -->
                             <div *ngIf="shots && shots.length">
@@ -153,7 +145,7 @@ picture-->
 
                         </div>
                     </ng-container>
-                    <ng-container *ngIf="type_shot === false">
+                    <ng-container *ngIf="media_type === 'image'">
                         <div class="tab-pane fade show active" id="pills-picture" role="tabpanel" aria-labelledby="picture">
                             <!-- tab picture -->
 

@@ -9,14 +9,18 @@ import {AppMediaComponent} from "./components/app-media/app-media";
 
 export const appRoutes: Routes = [
 
-   {
+  {
         path: 'app/admin/archives',
-        component: ArchivesListComponent,
-        canActivate: [AuthGuard],
-        data: {role: 'admin_root'}
+    component: ArchivesListComponent,
+    canActivate: [AuthGuard],
+    data: {role: 'admin_root'}
+  },
+    {
+        path: 'app/catalog/videos/:uuid',
+        component: AppMediaComponent
     },
     {
-        path: 'app/video',
+        path: 'app/catalog/images/:uuid',
         component: AppMediaComponent
     }
     

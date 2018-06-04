@@ -4,12 +4,9 @@
         <i class="material-icons click-event" (click)="backClicked()">keyboard_arrow_left</i>
     </span>
     <span class="imc--topbar--title imc--flex--vertical-center">
-        <ng-container *ngIf="type_media === true; else mediaPhoto">
-            <i class="material-icons">videocam</i>&nbsp; <strong>VIDEO</strong>
-        </ng-container>
-        <ng-template #mediaPhoto>
-            <i class="material-icons">image</i>&nbsp;<strong> PHOTO</strong>
-        </ng-template>
+        <i class="material-icons" [innerHTML]="icon"></i>
+        &nbsp;
+        <strong [innerHTML]="label"></strong>
     </span>
     <span class="imc--flex--item-end box-icons-share">
         <i class="material-icons click-event">playlist_add</i>

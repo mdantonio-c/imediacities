@@ -7,6 +7,12 @@ import {AppShotsService} from "./app-shots";
 @Injectable()
 export class AppAnnotationsService {
 
+    private confirmationPopover_config = {
+        popoverTitle: 'Vut scanzler',
+        popoverMessage: 'It segur?',
+        appendToBody: true
+    };
+
     constructor(private api: ApiService, private ShotsService: AppShotsService) {}
 
     create_tag (shots_ids, sources, cb) {
@@ -94,6 +100,11 @@ export class AppAnnotationsService {
             return 0;
         });
 
+    }
+
+    popover () {
+        let popover_conf = Object.assign({}, this.confirmationPopover_config);
+        return popover_conf;
     }
 
     static source (s) {

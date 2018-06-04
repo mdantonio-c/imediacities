@@ -65,6 +65,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         }
     };
 
+    public popover;
+
     constructor(
         private AuthService: AuthService,
         private AnnotationsService: AppAnnotationsService,
@@ -178,7 +180,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
      * @param marker
      */
     marker_delete (marker) {
-        this.AnnotationsService.delete_request(marker);
+        this.AnnotationsService.delete_tag(marker);
     }
     /**
      * Al termine del trascinamento di un marker mostra una InfoWindow con le opzioni possibili
@@ -434,7 +436,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         if (owner.location) {
             this.center = owner.location;
         }
-
+        this.popover = this.AnnotationsService.popover();
         this.ShotsService.update.subscribe(shots => {this.shots = shots;})
     }
 

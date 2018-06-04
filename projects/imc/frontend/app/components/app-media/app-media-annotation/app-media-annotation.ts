@@ -12,13 +12,15 @@ export class AppMediaAnnotationComponent implements OnInit {
     @Input() clickable;
     @Input() can_delete;
 
+    public popover;
+
     constructor(private element: ElementRef, private AnnotationsService: AppAnnotationsService) {
     }
 
     delete () {
         if (!this.can_delete) return;
         if (this.annotation.id) {
-            this.AnnotationsService.delete_request(this.annotation);
+            this.AnnotationsService.delete_tag(this.annotation);
         }
     }
 
@@ -35,6 +37,8 @@ export class AppMediaAnnotationComponent implements OnInit {
         }
 
         this.element.nativeElement.querySelector('span').classList.add(classe);
+
+        this.popover = this.AnnotationsService.popover();
 
     }
 }
