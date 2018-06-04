@@ -85,7 +85,7 @@ class SearchAnnotations(GraphBaseOperations):
                 if c_match is not None:
                     term = c_match.get('term')
                     if term is not None:
-                        term = self.sanitize_input_term(term)
+                        term = self.graph.sanitize_input(term)
                     multi_match = []
                     multi_match_where = []
                     multi_match_query = ''
@@ -275,10 +275,3 @@ class SearchAnnotations(GraphBaseOperations):
 
         meta_response = {"totalItems": numels}
         return self.force_response(data, meta=meta_response)
-
-    @staticmethod
-    def sanitize_input_term(term):
-        '''
-        Strip and clean up term from special characters.
-        '''
-        return term.strip().replace("*", "").replace("'", "\\'")
