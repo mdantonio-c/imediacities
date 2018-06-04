@@ -13,7 +13,7 @@ export class AppMediaService {
 
     }
 
-    get (media_id, cb) {
+    get (media_id, endpoint, cb) {
 
         if (!cb || typeof cb !== 'function') {
             console.log("AppMediaService", "Callback mancante");
@@ -21,7 +21,7 @@ export class AppMediaService {
         }
 
         this.api.get(
-            'videos',
+            endpoint,
             media_id
         ).subscribe(
             response => {

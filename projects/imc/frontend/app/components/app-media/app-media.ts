@@ -17,9 +17,6 @@ import {AppVideoService} from "../../services/app-video";
 
 export class AppMediaComponent implements OnInit {
 
-    //  Id video
-    /*video_id;*/
-
     //Riferimento alla pagina contenente il media
     @ViewChild('pageMedia') pageMedia: ElementRef;
     /**
@@ -194,17 +191,20 @@ export class AppMediaComponent implements OnInit {
 
         this.route.params.subscribe((params: Params) => {
             let mediaID = params['uuid'];
-            this.MediaService.get(mediaID, (mediaEntity) => {this.media = mediaEntity});
-            this.ShotsService.get(mediaID);
+            let endpoint = (this.router.url.indexOf("videos") != -1) ? 'videos' : 'images';
+            this.MediaService.get(mediaID, endpoint, (mediaEntity) => {
+                this.media = mediaEntity;
+                if (this.media.type === 'aventity') {
+                    this.ShotsService.get(mediaID);
+                    this.ShotsService.update.subscribe(shots => {
+                        this.shots_init(shots);
+                        const annotations = this.ShotsService.annotations();
+                        this.annotations_count = annotations.length;
+                        this.locations = annotations.filter(a => a.group === 'location')
+                    })
+                }
+            });
         });
-
-        this.ShotsService.update.subscribe(shots => {
-            this.shots_init(shots);
-            const annotations = this.ShotsService.annotations();
-            this.annotations_count = annotations.length;
-            this.locations = annotations.filter(a => a.group === 'location')
-        })
-
     }
 
 }

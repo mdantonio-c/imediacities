@@ -21,8 +21,8 @@
 			</div>
 		</div>
 		<h3 class="search-title">
-			<a [routerLink]=[media.id] *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
-			<a [routerLink]=[media.id] *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
+			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
 		</h3>
 		<div class="space-8"></div>
 		<p class="text">
