@@ -3,7 +3,6 @@
 <div class="row justify-content-md-center">
 <div class='col-12'>
 
-
 <div class='card'>
 <div class='card-header'>
 	<h4 class='panel-title'>
@@ -35,13 +34,19 @@
 
     <div class="col-md-9" style="margin-bottom: 40px">
 
-        <h3>Upload queue</h3>
+    	<div class='row'>
+    	<div class='col-4'>
+        	<h3>Upload queue</h3>
+        </div>
+        <div class='col-8'>
             <ngb-progressbar 
 	            *ngIf='uploader.queue.length'
             	showValue="true"
             	type="info"
             	[value]="uploader.progress"
             ></ngb-progressbar>
+        </div>
+        </div>
 		<br>
 
         <ng-template #emptyQueue>
@@ -130,11 +135,11 @@
                     (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
                 <span class="glyphicon glyphicon-trash"></span> Remove all
             </button>
-
-
-
-    </div>
-    </div>
+	    </div>
+	</div>
+	</div>
+</div>
+</div>
 
 <!--
     <div flow-init="flowOptions"
@@ -173,11 +178,7 @@
         </div>
     </div>
     -->
-</div>
-</div>
-
-
-<br><br>
+<br>
 
 <div class='card'>
 <div class='card-header'>

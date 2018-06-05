@@ -2,7 +2,6 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { saveAs as importedSaveAs } from "file-saver";
 import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
-// import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload/ng2-file-upload';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApiService } from '/rapydo/src/app/services/api';
@@ -12,12 +11,11 @@ import { FormlyService } from '/rapydo/src/app/services/formly'
 
 import { BasePaginationComponent } from '/rapydo/src/app/components/base.pagination.component'
 
-const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 @Component({
   selector: 'upload',
   styles: [
-  	'.my-drop-zone { border: dotted 3px lightgray; text-align:center; height: 100px; line-height: 100px;}',
-  	'.nv-file-over { border: dotted 3px red; }'
+  	'.my-drop-zone { border: dotted 2px lightgray; text-align:center; height: 100px; line-height: 100px;}',
+  	'.nv-file-over { border: dotted 2px red; }'
   ],
   providers: [ApiService, AuthService, NotificationService, FormlyService],
   templateUrl: './upload.html'
@@ -29,8 +27,7 @@ export class UploadComponent extends BasePaginationComponent {
 	@ViewChild('dataStatus') public dataStatus: TemplateRef<any>;
 	@ViewChild('controlsCell') public controlsCell: TemplateRef<any>;
 	@ViewChild('emptyHeader') public emptyHeader: TemplateRef<any>;
-
-	public uploader:FileUploader = new FileUploader({url: URL});
+	public uploader:FileUploader;
 	public hasDropZoneOver:boolean = false;
  
 	protected endpoint = 'not_used'
@@ -47,6 +44,24 @@ export class UploadComponent extends BasePaginationComponent {
 
 		this.list();
 		this.initPaging(20);
+
+/*
+		$scope.flowOptions = {
+	        target: process.env.apiUrl + '/upload',
+	        chunkSize: 10*1024*1024,
+	        simultaneousUploads: 1,
+	        testChunks: false,
+	        permanentErrors: [ 401, 405, 500, 501 ],
+	        headers: {Authorization : 'Bearer ' + AuthService2.getToken()}
+	    };
+*/
+
+		this.uploader = new FileUploader(
+			{
+				url: process.env.apiUrl + '/upload',
+				authToken: this.auth.getToken()
+			}
+		);
 	}
 
 	public ngOnInit(): void {
@@ -64,7 +79,33 @@ export class UploadComponent extends BasePaginationComponent {
 	public fileOver(e:any):void {
 		this.hasDropZoneOver = e;
 	}
+/*
+    self.importStageFiles = function(file) {
+		DataService.importStageFiles(file).then(
+			function(out_data) {
+		    	// console.log(out_data)
+		    	self.loadFiles();
 
+	            noty.extractErrors(out_data, noty.WARNING);
+			}, function(out_data) {
+		    	console.log("error...");
+
+	            noty.extractErrors(out_data, noty.ERROR);
+			});
+	};
+*/
+/*
+    self.uploadComplete = function (event, $flow, flowFile) {
+    	$rootScope.transitionConfirmationRequested = false;
+    	self.loadFiles();
+    };
+*/
+/*
+    self.uploadStart = function (event, $flow, flowFile) {
+    	$rootScope.transitionConfirmationRequested = true;
+    	$rootScope.transitionConfirmationMessage = "Are you sure want to leave this page? This may interrupt your uploads";
+    };
+*/
 	list() {
 		return this.get('stage')
 	}
