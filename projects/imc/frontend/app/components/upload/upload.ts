@@ -1,5 +1,6 @@
 
 import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { saveAs as importedSaveAs } from "file-saver";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApiService } from '/rapydo/src/app/services/api';
@@ -59,24 +60,26 @@ export class UploadComponent extends BasePaginationComponent {
 	}
 
 	download(filename) {
-		console.log("Download not implemented");
-		console.log(filename);
-/*
-        var config = {'responseType': 'arraybuffer'};
-        ApiService2.get('download/'+filename, "", {}, {"rawResponse": true, "conf": config}).toPromise().then(
-			function(out_data) {
-				var headers = out_data.headers();
-				var contentType = headers['content-type'] || 'application/octet-stream';
-				//console.log('content-type: ' + contentType);
-				var data = new Blob([out_data.data], { type: contentType });
-				FileSaver.saveAs(data, name);
 
-	            noty.extractErrors(out_data, noty.WARNING);
-			}, function(out_data) {
-				// self.loading = false;
-	            noty.extractErrors(out_data, noty.ERROR);
-			});
-*/
-
+		var options = {
+			"rawResponse": true,
+			// "conf": {'responseType': ResponseContentType.Blob}
+			"conf": {
+				'responseType': 'arraybuffer',
+				"observe": "response",
+			}
+		};
+		this.api.get('download', filename, {}, options).subscribe(
+			response => {
+				var contentType = response.headers['content-type'] || 'application/octet-stream';
+				console.log(contentType);
+				const blob = new Blob([response.body], { type: contentType });
+				importedSaveAs(blob, filename);
+				//this.notify.extractErrors(response, this.notify.WARNING);
+			},
+			error => {
+				this.notify.showError('Unable to download file: ' + filename);
+			}
+		);
 	}
 }
