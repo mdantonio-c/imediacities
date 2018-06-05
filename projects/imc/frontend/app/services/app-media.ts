@@ -32,18 +32,29 @@ export class AppMediaService {
             response => {
 
                 this._media = response.data[0];
+
                 this._owner = this._media.relationships.item[0].relationships.ownership[0];
 
                 //  Cerco coordinate della città della cineteca cui appartiene il media
                 if (this._owner && this._owner.attributes && this._owner.attributes.shortname) {
-                    this.coordinates_find(
-                        { address: this.ProviderToCity.transform(this._owner.attributes.shortname) },
-                        (result) => {
-                            this.owner_coordinates_add(result)
-                        }
-                    )
-                }
 
+                    //  Aggiunto il codice sottostante perchè l'immagine di prova aveva test come owner
+                    let location_to_find = null;
+                    if (this._owner.attributes.shortname.length === 3) {
+                        location_to_find = this._owner.attributes.shortname;
+                    } else if (this._media.relationships.record_sources && this._media.relationships.record_sources[0].relationships.provider[0].attributes.identifier) {
+                        location_to_find = this._media.relationships.record_sources[0].relationships.provider[0].attributes.identifier;
+                    }
+
+                    if (location_to_find) {
+                        this.coordinates_find(
+                            {address: this.ProviderToCity.transform(location_to_find)},
+                            (result) => {
+                                this.owner_coordinates_add(result)
+                            }
+                        )
+                    }
+                }
 
                 cb(this._media);
             },

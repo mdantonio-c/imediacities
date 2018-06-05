@@ -42,12 +42,23 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @private
      */
     _descriptions_get_languages (dati) {
+        let force_user_language = true;
         dati.forEach(d => {
-            if(!this.description_active) {
+
+            if (!this.description_active) {
                 this._user_language_set(d.attributes.language.key);
             }
+
+            if (force_user_language && d.attributes.language.key === this.description_active) {
+                force_user_language = false;
+            }
+
             this.description_languages.set(d.attributes.language.key, d.attributes.language.description);
         });
+
+        if (force_user_language) {
+            this._user_language_set(dati[0].attributes.language.key);
+        }
     }
 
     /**
@@ -99,11 +110,6 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         }
 
         this._descriptions_get_languages(this.info.relationships.descriptions);
-
-        //  dato finto per simulare cambio lingua
-        this.description_languages.set('xx','Lingua Fittizia per testare cambio lingua');
-
-
 
     }
 

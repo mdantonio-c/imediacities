@@ -11,7 +11,10 @@ picture-->
             <h2 class="imc--title-bold col-12"  [innerHTML]="media.attributes.identifying_title"></h2>
             <p class="col-12 col-sm-8 imc--flex--vertical-start">
                 <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp;
-                <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span> - <span [innerHTML]="media.attributes.production_years[0]"></span>
+
+                <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span>
+                &nbsp;-&nbsp;
+                <span [innerHTML]="media.attributes.production_years[0]"></span>
             </p>
             <span class="col-6 col-sm-2">1.000 views</span>
             <span class="col-6 col-sm-2" *ngIf="annotations_count">
@@ -27,7 +30,7 @@ picture-->
                 <!-- PICTURE -->
                 <ng-container *ngIf="media_type === 'image'">
                    <div class="container-picture">
-                       <app-picture></app-picture>
+                       <app-picture [data]="media"></app-picture>
                    </div>
                 </ng-container>
 
@@ -222,7 +225,7 @@ picture-->
     </div>
 
     <!-- MAPPA -->
-    <app-media-map-wrapper [locations]="locations" [shots]="shots" *ngIf="locations"></app-media-map-wrapper>
+    <app-media-map-wrapper [shots]="shots" *ngIf="locations"></app-media-map-wrapper>
 
     <!-- CONTAINER INFO -->
     <div class="container-fluid imc--container">

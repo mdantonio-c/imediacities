@@ -214,8 +214,28 @@ export class AppMediaComponent implements OnInit {
 
             this.MediaService.get(mediaID, endpoint, (mediaEntity) => {
 
-                if (!mediaEntity) {
-                    this.router.navigate(['/404']);
+                //  Normalizzo i dati delle immagini
+                if (this.media_type === 'image') {
+                    
+                    // anno di produzione
+                    if (mediaEntity.attributes.date_created) {
+                        mediaEntity.attributes.production_years = mediaEntity.attributes.date_created;
+                    }
+
+                    // titolo principale
+                    if (mediaEntity.relationships.titles.length) {
+                        mediaEntity.attributes.identifying_title = mediaEntity.relationships.titles[0].attributes.text;
+                    }
+
+
+                    this.locations = [];
+
+
+                }
+
+                //  elimino i titoli aggiuntivi se sono identici a quello identificativo
+                if (mediaEntity.relationships.titles.length) {
+                    mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title )
                 }
 
                 this.media = mediaEntity;
@@ -225,7 +245,7 @@ export class AppMediaComponent implements OnInit {
                 },100);
 
                 if (this.media_type === 'video') {
-                    this.ShotsService.get(mediaID);
+                    this.ShotsService.get(mediaID, endpoint);
                     this.ShotsService.update.subscribe(shots => {
                         this.shots_init(shots);
                         const annotations = this.ShotsService.annotations();

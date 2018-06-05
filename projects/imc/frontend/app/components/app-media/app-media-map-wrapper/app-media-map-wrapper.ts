@@ -7,8 +7,7 @@ import {AppMediaMapComponent} from "../app-media-map/app-media-map";
 })
 
 export class AppMediaMapWrapperComponent implements OnInit {
-
-    @Input() locations;
+    
     @Input() shots;
 
     static map_expanded_label = 'Close the map';
