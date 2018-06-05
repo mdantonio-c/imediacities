@@ -29,17 +29,6 @@ const mapStyles = {
 		}]
 	}]
 };
-interface GeoMarker {
-	iri: string;
-	name: string;
-	address: string;
-	sources: string[];
-	position: LatLng;
-};
-interface LatLng {
-	lat: number;
-	lng: number;
-};
 export interface MediaTag {
 	annotations: any[];
 	source: MediaSource;
@@ -53,6 +42,7 @@ export interface MediaSource {
 	uuid: string;
 	year: string;
 };
+declare var MarkerClusterer: any;
 
 @Component({
 	selector: 'search-map',
@@ -72,7 +62,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	/*isLoaded: boolean = false;*/
 	mapStyle = mapStyles.hide;
 	radius: number = 1600 * 1000;	// for zoom level 4
-	markers: GeoMarker[] = [];
+	markers: any[] = [];
+	markerClusterer;
 	showMapBoundary: boolean = false;
 	counters = [];
 	autocomplete: any;
@@ -81,13 +72,14 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	@ViewChild('customControl') private customControl: ElementRef;
 	@ViewChild('placeControl') private placeControl: ElementRef;
 
-	marker: GeoMarker = {
+	/*marker: GeoMarker = {
 		iri: null,
 		name: null,
 		address: null,
 		sources: [],
 		position: null
-	};
+	};*/
+	marker: any = {};
 
 	constructor(
 		private catalogService: CatalogService,
@@ -174,15 +166,16 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		this.zoom = this.map.getZoom();
 		(this.filter.provider != null) ? this.centerCity(this.filter.provider) : this.centerEurope();
 		this.center = { lat: this.map.getCenter().lat(), lng: this.map.getCenter().lng() };
+
 	}
 
 	onIdle(event) {
 		console.log('map', event.target);
 	}
 
-	onMarkerInit(marker) {
-		console.log('marker', marker);
-	}
+	/*onMarkerInit(marker) {
+		this.dynMarkers.push(marker);
+	}*/
 
 	onZoomChanged(event) {
 		if (!this.map) { return; }
@@ -236,27 +229,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		return false;
 	}
 
-	/**
-     * Show InfoWindow for a marker
-     * @param event
-     * @param pos
-     */
-	showInfoWindow({ target: marker }, geoMarker) {
-		this.marker = geoMarker;
-		this.geoCoder.geocode({
-			'placeId': geoMarker.iri
-		}).subscribe(results => {
-			// look outside in order to enrich details for that given place id
-			if (results[0]) {
-				this.marker.address = results[0].formatted_address;
-			}
-		}, error => {
-			this.notify.showWarning('Unable to get info for place ID: ' + geoMarker.iri);
-		});
-
-		marker.nguiMapComponent.openInfoWindow('tag-iw', marker);
-	}
-
 	private loadGeoTags(position: number[], distance: number) {
 		/*console.log('loading annotations on the map from center [' + position[0] + ', ' +
 			position[1] + '] within distance: ' + distance + ' (meters)');*/
@@ -265,17 +237,34 @@ export class SearchMapComponent implements OnInit, OnChanges {
 			let mapTags = response["Response"].data;
 			let relevantCreations = new Map();
 			mapTags.forEach(tag => {
-				/*console.log(tag);*/
-				let m = {
-					iri: tag.iri,
-					name: tag.name,
-					address: null,
-					sources: tag.sources,
+				let m = new google.maps.Marker({
 					position: {
 						lat: tag.spatial[0],
 						lng: tag.spatial[1]
-					}
-				}
+					},
+					map: this.map
+				});
+				m.set('iri',  tag.iri);
+				m.set('name', tag.name);
+				m.set('sources', tag.sources);
+				m.set('target', this);
+
+				google.maps.event.addListener(m, 'click', function(event) {
+					let target = m.get('target');
+					target.marker = m;
+					target.geoCoder.geocode({
+						'placeId': m.get('iri')
+					}).subscribe(results => {
+						// look outside in order to enrich details for that given place id
+						if (results[0]) {
+							target.marker.set('address', results[0].formatted_address);
+						}
+					}, error => {
+						target.notify.showWarning('Unable to get info for place ID: ' + m.get('iri'));
+						target.marker.set('address', 'n/a');
+					});
+					target.ngMap.infoWindows['tag-iw'].open(m);
+				});
 				this.markers.push(m);
 
 				// update relavant creations
@@ -298,11 +287,20 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	}
 
 	private clearMarkers() {
+		// console.log('clear markers');
+    	for (let m of this.markers) {
+    		m.setMap(null);
+    	}
 		this.markers = [];
+		if (this.markerClusterer !== undefined) {
+			this.markerClusterer.clearMarkers();
+		}
 	}
 
 	private updateClusters() {
-		// TODO
+		this.markerClusterer = new MarkerClusterer(this.map, this.markers,
+			{ imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m' }
+		);
 	}
 
 }
