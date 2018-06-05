@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {ApiService} from '/rapydo/src/app/services/api';
 import {ProviderToCityPipe} from "../pipes/ProviderToCity";
 import {GeoCoder} from '@ngui/map';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class AppMediaService {
@@ -9,7 +10,11 @@ export class AppMediaService {
     private _media = null;
     public _owner = null;
 
-    constructor (private api: ApiService, private geoCoder: GeoCoder, private ProviderToCity: ProviderToCityPipe) {
+    constructor (
+        private api: ApiService,
+        private geoCoder: GeoCoder,
+        private ProviderToCity: ProviderToCityPipe,
+        private Router: Router) {
 
     }
 
@@ -43,6 +48,7 @@ export class AppMediaService {
                 cb(this._media);
             },
             err => {
+                this.Router.navigate(['/404']);
                 console.log("err", err);
             }
         );

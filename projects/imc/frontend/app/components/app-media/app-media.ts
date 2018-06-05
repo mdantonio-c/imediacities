@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, ElementRef, DoCheck} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, Renderer2, DoCheck} from '@angular/core';
 import {ActivatedRoute, Router, Params} from '@angular/router';
 import {AppShotsService} from "../../services/app-shots";
 import {AppMediaService} from "../../services/app-media";
@@ -6,6 +6,7 @@ import {AppModaleComponent} from "../app-modale/app-modale";
 import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
 import {AuthService} from "/rapydo/src/app/services/auth";
 import {AppVideoService} from "../../services/app-video";
+import {Router, Route, ActivatedRoute, Params} from '@angular/router';
 
 /**
  * Componente per la visualizzazione del media
@@ -18,7 +19,7 @@ import {AppVideoService} from "../../services/app-video";
 export class AppMediaComponent implements OnInit {
 
     //Riferimento alla pagina contenente il media
-    @ViewChild('pageMedia') pageMedia: ElementRef;
+    // @ViewChild('pageMedia') pageMedia: ElementRef;
     /**
      * Riferimento al componente AppModale
      */
@@ -70,17 +71,38 @@ export class AppMediaComponent implements OnInit {
      */
     public user_language = 'it';
     public user = {};
-    public title_shot: string;
-    public type_shot: boolean;
+    //public type_shot: boolean;
+
+    public media_class = '';
+    public media_type = '';
+
+    public tab_title = '';
 
     constructor(
-        private AuthService: AuthService,
-        private route: ActivatedRoute,
         private router: Router,
+        private route: ActivatedRoute,
+        private AuthService: AuthService,
+        private Element: ElementRef,
+        private renderer: Renderer2,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
-        private VideoService: AppVideoService ) {
+        private VideoService: AppVideoService ) {}
 
+    media_type_set (url) {
+
+        if (url.indexOf('/video') !== -1) {
+
+            this.media_class = 'page-type-video';
+            this.media_type = 'video';
+            // this.type_shot = true;
+
+        } else if (url.indexOf('/image') !== -1) {
+
+            this.media_class = 'page-type-image';
+            this.media_type = 'image';
+            // this.type_shot = false;
+
+        }
 
     }
 
@@ -166,21 +188,13 @@ export class AppMediaComponent implements OnInit {
     }
 
     /* Seleziona il titolo per le tabs degli shot */
-    titleTabShot(title) {
-        this.title_shot = title;
-    }
-    // Controllo della classe page-type-video o page-type-media all'interno del div principale che contiene il media
-    ngAfterViewInit() {
-        setTimeout(() => {
-            if (this.pageMedia.nativeElement.classList.contains('page-type-video')) {
-                this.type_shot = true;
-                /* Settaggio del titolo iniziale delle tab-shot */
-                this.title_shot = 'shots';
-            } else if (this.pageMedia.nativeElement.classList.contains('page-type-image')) {
-                this.type_shot = false;
-                this.title_shot = 'picture';
-            }
-        }, 1000);
+    tab_title_set(evento) {
+
+        let ev = evento.target;
+        if (ev.nodeName.toUpperCase() === 'LI') {
+            ev = ev.querySelector('a > i');
+        }
+        this.tab_title = ev.attributes.getNamedItem('data-title').value;
     }
 
     /**
@@ -188,12 +202,37 @@ export class AppMediaComponent implements OnInit {
      */
     ngOnInit() {
         this.user = this.AuthService.getUser();
+        this.media_type_set(this.router.url);
 
         this.route.params.subscribe((params: Params) => {
+
             let mediaID = params['uuid'];
             let endpoint = (this.router.url.indexOf("videos") != -1) ? 'videos' : 'images';
+
             this.MediaService.get(mediaID, endpoint, (mediaEntity) => {
+
+                if (!mediaEntity) {
+                    this.router.navigate(['/404']);
+                }
+
                 this.media = mediaEntity;
+
+                // To be confirmed
+                setTimeout(() => {
+                    this.Element.nativeElement.querySelector('#pills-tab > li').click();
+                },100);
+
+                // Please selected between this implementation
+                if (this.media_type === 'video') {
+                    this.ShotsService.get(mediaID);
+                    this.ShotsService.update.subscribe(shots => {
+                        this.shots_init(shots);
+                        const annotations = this.ShotsService.annotations();
+                        this.annotations_count = annotations.length;
+                        this.locations = annotations.filter(a => a.group === 'location')
+                    })
+                }
+                // and this alternative implementation
                 if (this.media.type === 'aventity') {
                     this.ShotsService.get(mediaID);
                     this.ShotsService.update.subscribe(shots => {
@@ -203,8 +242,13 @@ export class AppMediaComponent implements OnInit {
                         this.locations = annotations.filter(a => a.group === 'location')
                     })
                 }
+
             });
+
+
         });
+
+
     }
 
 }

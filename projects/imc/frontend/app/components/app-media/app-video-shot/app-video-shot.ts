@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, ViewChild, ElementRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, OnChanges, ViewChild, ElementRef} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-controls/app-video-control";
 
 @Component({
@@ -6,7 +6,7 @@ import {AppVideoControlComponent} from "../app-video-controls/app-video-control"
     templateUrl: 'app-video-shot.html'
 })
 
-export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit, OnChanges, OnDestroy {
+export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit, OnChanges {
 
     @Input() shot;
     @Input() multiSelection;
@@ -80,7 +80,6 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         return tag.creator === this.user.uuid
     }
 
-
     scrollTo (element, to, duration) {
 
         let start = element.scrollTop;
@@ -124,9 +123,6 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         this.dropdown_id += this.shot.attributes.shot_num;
     }
 
-    ngOnDestroy () {
-        console.log("ngOnDestroy",  this.shot.attributes.shot_num);
-    }
     onshot_start (e) {
 
         if (e.attributes.shot_num === this.shot.attributes.shot_num) {

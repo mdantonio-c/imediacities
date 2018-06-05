@@ -1,5 +1,13 @@
 <span class="badge" [ngClass]="{'click-event': clickable}">
     <span
         [innerHTML]="annotation.name"></span>
-    <i *ngIf="can_delete" class="material-icons click-event" (click)="delete()">close</i>
+    <i
+        *ngIf="can_delete"
+        class="material-icons click-event"
+        mwlConfirmationPopover
+        [popoverTitle]="popover.popoverTitle + ' \'' + annotation.name + '\'?'"
+        [popoverMessage]="popover.popoverMessage"
+        [appendToBody]="popover.appendToBody"
+        (confirm)="delete()"
+    >close</i>
 </span>

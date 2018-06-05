@@ -15,10 +15,15 @@
     ></marker>
     <info-window id="iw">
         <div>
-            <!--<div class="col-12 imc&#45;&#45;modal"></div>-->
             <app-modal-lista-shots class="imc--modal col-12 row no-gutter" [data]="info_window_data" [modal]="true" [show_title]="true"></app-modal-lista-shots>
                 <div style="text-align:right" *ngIf="info_window_data.owner">
-                    <span class="material-icons click-event" (click)="marker_delete(info_window_data.annotations[0])">delete</span>
+                    <span class="material-icons click-event"
+                          mwlConfirmationPopover
+                          [popoverTitle]="popover.popoverTitle + ' \'' + info_window_data.annotations[0].name + '\'?'"
+                          [popoverMessage]="popover.popoverMessage"
+                          [appendToBody]="popover.appendToBody"
+                          (confirm)="marker_delete(info_window_data.annotations[0])"
+                    >delete</span>
                     <span class="material-icons click-event" (click)="marker_update(info_window_data.annotations[0], info_window_data.marker)">edit</span>
                 </div>
             <div></div>
