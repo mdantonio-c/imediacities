@@ -1,6 +1,8 @@
 
 import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { saveAs as importedSaveAs } from "file-saver";
+import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
+// import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload/ng2-file-upload';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApiService } from '/rapydo/src/app/services/api';
@@ -10,8 +12,13 @@ import { FormlyService } from '/rapydo/src/app/services/formly'
 
 import { BasePaginationComponent } from '/rapydo/src/app/components/base.pagination.component'
 
+const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 @Component({
   selector: 'upload',
+  styles: [
+  	'.my-drop-zone { border: dotted 3px lightgray; text-align:center; height: 100px; line-height: 100px;}',
+  	'.nv-file-over { border: dotted 3px red; }'
+  ],
   providers: [ApiService, AuthService, NotificationService, FormlyService],
   templateUrl: './upload.html'
 })
@@ -23,6 +30,9 @@ export class UploadComponent extends BasePaginationComponent {
 	@ViewChild('controlsCell') public controlsCell: TemplateRef<any>;
 	@ViewChild('emptyHeader') public emptyHeader: TemplateRef<any>;
 
+	public uploader:FileUploader = new FileUploader({url: URL});
+	public hasDropZoneOver:boolean = false;
+ 
 	protected endpoint = 'not_used'
 
 	constructor(
@@ -49,6 +59,10 @@ export class UploadComponent extends BasePaginationComponent {
 	        {name: 'Status', prop: "status", flexGrow: 0.5, cellTemplate: this.dataStatus},
 			{name: 'controls', prop: 'controls', cellTemplate: this.controlsCell, headerTemplate: this.emptyHeader, flexGrow: 0.2},
 		];
+	}
+
+	public fileOver(e:any):void {
+		this.hasDropZoneOver = e;
 	}
 
 	list() {

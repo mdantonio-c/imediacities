@@ -13,6 +13,129 @@
 
 <div class='card-block'>
 
+	<div class='row'>
+	<div class="col-md-3">
+
+		<h3>Select files</h3>
+
+		<br>
+
+		<input type="file" ng2FileSelect [uploader]="uploader" multiple/><br/>
+
+		<br><br>
+
+	    <div ng2FileDrop
+	         [ngClass]="{'nv-file-over': hasDropZoneOver}"
+	         (fileOver)="fileOver($event)"
+	         [uploader]="uploader"
+	         class="well my-drop-zone">
+	        Drop here your files 
+	    </div>
+    </div>
+
+    <div class="col-md-9" style="margin-bottom: 40px">
+
+        <h3>Upload queue</h3>
+            <ngb-progressbar 
+	            *ngIf='uploader.queue.length'
+            	showValue="true"
+            	type="info"
+            	[value]="uploader.progress"
+            ></ngb-progressbar>
+		<br>
+
+        <ng-template #emptyQueue>
+			No element in queue
+        </ng-template>
+        <table class="table" *ngIf='uploader.queue.length; else emptyQueue'>
+            <thead>
+            <tr>
+                <th width="50%">Name</th>
+                <th>Size</th>
+                <th>Status</th>
+                <th colspan=2>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of uploader.queue">
+                <td><strong>{{ item?.file?.name }}</strong></td>
+                <td>{{item?.file?.size | bytes}}</td>
+
+                <td>
+
+		            <ngb-progressbar 
+		            	*ngIf="item.isUploading"
+		            	showValue="false"
+		            	type="info"
+		            	[value]="item.progress"
+		            ></ngb-progressbar>
+
+                    <span *ngIf="item.isSuccess">
+	                    <i class='fa fa-check fa-large'
+	                    	style='color:green;'
+	                    	ngbTooltip='Upload completed'
+	                    	></i>
+                    </span>
+
+                    <span *ngIf="item.isCancel">
+	                    <i class='fa fa-ban fa-large'
+	                    	style='color:orange;'
+	                    	ngbTooltip='Upload cancelled'
+	                    	></i>
+                    </span>
+
+                    <span *ngIf="item.isError">
+	                    <i class='fa fa-exclamation fa-large'
+	                    	style='color:red;'
+	                    	ngbTooltip='Upload errored'
+	                    	></i>
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <i class='fa fa-trash fa-large' style='color:red;'
+                		(click)="item.remove()"
+                        ngbTooltip='Remove upload'></i>
+
+                </td>
+
+                <td>
+                    <i class='fa fa-play fa-large' style='color:green;'
+                		(click)="item.upload()"
+                        *ngIf="!item.isReady && !item.isUploading && !item.isSuccess"
+                        ngbTooltip='Start upload'></i>
+
+                    <i class='fa fa-ban fa-large' style='color:orange;'
+                		(click)="item.cancel()"
+                        *ngIf="item.isUploading"
+                        ngbTooltip='Cancel upload'></i>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+        <div *ngIf='uploader.queue.length'>
+            <button type="button" class="btn btn-success btn-s"
+                    (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+                <span class="glyphicon glyphicon-upload"></span> Upload all
+            </button>
+            <button type="button" class="btn btn-warning btn-s"
+                    (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
+                <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+            </button>
+            <button type="button" class="btn btn-danger btn-s"
+                    (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
+                <span class="glyphicon glyphicon-trash"></span> Remove all
+            </button>
+
+
+
+    </div>
+    </div>
+
 <!--
     <div flow-init="flowOptions"
         ng-controller='NgFlowController'
@@ -50,7 +173,6 @@
         </div>
     </div>
     -->
-    Upload not re-implemented
 </div>
 </div>
 

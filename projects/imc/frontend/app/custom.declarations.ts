@@ -1,6 +1,8 @@
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
 
+import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
+
 import { CustomNavbarComponent } from './custom.navbar';
 import { CustomBrandComponent } from './custom.navbar';
 import { ArchiveComponent } from './components/admin/archive/archive'
@@ -118,7 +120,9 @@ export const declarations: any[] = [
     VideoControlsDeclarations,
     DropdownPositionDirective,
 	InputNumericDirective,
-	InputSelectDirective
+	InputSelectDirective,
+
+    FileSelectDirective, FileDropDirective
 
 ];
 
