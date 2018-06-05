@@ -23,11 +23,6 @@
                 (place_changed)="placeChanged($event)"
                 [types]="['geocode']">
         </div>
-        <marker
-            *ngFor="let m of markers"
-            (click)="showInfoWindow($event, m)"
-            [position]="m.position">
-        </marker>
         <custom-marker
             *ngFor="let city of counters"
             [id]="'counter-marker-'+city.provider"
@@ -39,6 +34,9 @@
                 <div class="place-info">
                     <span id="place-name" class="title">{{marker.name}}</span>
                     <br/>
+                    <span *ngIf="!marker.address">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true" style="font-size:12px"></i>
+                    </span>
                     <span id="place-address">{{marker?.address}}</span>
                 </div>
                 <div class="place-item-list">

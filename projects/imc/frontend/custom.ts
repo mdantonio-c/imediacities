@@ -8,6 +8,7 @@ import 'angular-ivh-treeview'
 import 'js-marker-clusterer'
 // import 'bootstrap-treeview'
 */
+import 'js-marker-clusterer/src/markerclusterer.js'
 
 import 'material-icons/iconfont/material-icons.css'
 
