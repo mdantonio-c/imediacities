@@ -221,18 +221,7 @@ export class AppMediaComponent implements OnInit {
                     this.Element.nativeElement.querySelector('#pills-tab > li').click();
                 },100);
 
-                // Please selected between this implementation
                 if (this.media_type === 'video') {
-                    this.ShotsService.get(mediaID);
-                    this.ShotsService.update.subscribe(shots => {
-                        this.shots_init(shots);
-                        const annotations = this.ShotsService.annotations();
-                        this.annotations_count = annotations.length;
-                        this.locations = annotations.filter(a => a.group === 'location')
-                    })
-                }
-                // and this alternative implementation
-                if (this.media.type === 'aventity') {
                     this.ShotsService.get(mediaID);
                     this.ShotsService.update.subscribe(shots => {
                         this.shots_init(shots);
