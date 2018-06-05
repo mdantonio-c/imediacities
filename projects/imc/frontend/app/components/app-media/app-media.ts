@@ -1,12 +1,11 @@
 import {Component, OnInit, ViewChild, ElementRef, Renderer2, DoCheck} from '@angular/core';
-import {ActivatedRoute, Router, Params} from '@angular/router';
+import {Router, Route, ActivatedRoute, Params} from '@angular/router';
 import {AppShotsService} from "../../services/app-shots";
 import {AppMediaService} from "../../services/app-media";
 import {AppModaleComponent} from "../app-modale/app-modale";
 import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
 import {AuthService} from "/rapydo/src/app/services/auth";
 import {AppVideoService} from "../../services/app-video";
-import {Router, Route, ActivatedRoute, Params} from '@angular/router';
 
 /**
  * Componente per la visualizzazione del media
