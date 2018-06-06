@@ -8,6 +8,7 @@ import 'angular-ivh-treeview'
 import 'js-marker-clusterer'
 // import 'bootstrap-treeview'
 */
+import 'js-marker-clusterer/src/markerclusterer.js'
 
 import 'material-icons/iconfont/material-icons.css'
 
@@ -15,6 +16,7 @@ import '/app/frontend/css/style.css'
 //import '/app/frontend/css/VideoPlayer_stile.css'
 import '/app/frontend/css/scss/style.css'
 /*import '/app/frontend/app/components/app-media/app-video-player/app-video-player.css'*/
+import '/app/frontend/css/app-video-player.css'
 
 /*
 import '/app/frontend/js/data.service.js'

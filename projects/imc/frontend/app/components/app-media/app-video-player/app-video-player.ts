@@ -5,8 +5,7 @@ import {rangePlayer} from "../../../decorators/app-range";
 
 @Component({
     selector: 'app-video-player',
-    templateUrl: 'app-video-player.html',
-    styleUrls: ['./app-video-player.css']
+    templateUrl: 'app-video-player.html'
 })
 
 
