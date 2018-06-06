@@ -2,58 +2,17 @@ project:
     title: "iMediaCities Repository"
     description": "..."
     version: "1.4.1"
-tags:
-    file: "All endpoints to handle files"
-    admin: "Operations only allowed for admin users"
-    miscellaneous: "Endpoints not classified in other specific sections"
-
-releases:
-  '1.1.0':
-    type: beta
-    rapydo: 0.5.5
-    status: discontinued
-  '1.1.1':
-    type: beta
-    rapydo: 0.5.7
-    status: released
-  '1.1.2':
-    type: beta
-    rapydo: 0.6.0
-    status: discontinued 
-  '1.2.0':
-    type: beta
-    rapydo: 0.5.7
-    status: released 
-  '1.2.1':
-    type: beta
-    rapydo: 0.6.0
-    status: discontinued 
-  '1.2.2':
-    type: beta
-    rapydo: 0.6.1
-    status: discontinued
-  '1.3.0':
-    type: beta
-    rapydo: 0.6.0
-    status: discontinued 
-  '1.3.1':
-    type: beta
-    rapydo: 0.6.0
-    status: released
-  '1.4.0':
-    type: beta
-    rapydo: 0.6.1
-    status: developing
-  '1.4.1':
-    type: beta
     rapydo: 0.6.2
-    status: developing
-
 
 variables:
-  repos:
-    frontend:
-      branch: 0.6.2
+
+  frontend:
+    framework: angular
+
+  # repos:
+  #   frontend:
+  #     online_url: https://github.com/rapydo/rapydo-angular.git
+  #     branch: 0.6.2
 
   env:
     COMPOSE_PROJECT_NAME: imc
@@ -89,37 +48,8 @@ variables:
     allowed_roles:
       - Researcher
       - Archive
-  frontend:
-      enable: true
-bower_components:
-  ng-flow:
-    - "dist/ng-flow-standalone.min.js"
-  angular-tablesort:
-    - js/angular-tablesort.js
-    - tablesort.css
-  ngmap:
-    - build/scripts/ng-map.min.js
-  angular-google-chart:
-    - "ng-google-chart.min.js"
-  font-awesome:
-    - css/font-awesome.min.css
-  lodash:
-    - dist/lodash.min.js
-  angular-file-saver:
-    - dist/angular-file-saver.bundle.min.js
-  angular-ivh-treeview:
-    - dist/ivh-treeview.min.js
-    - dist/ivh-treeview.min.css
-  ng-tags-input:
-    - ng-tags-input.min.css
-    - ng-tags-input.min.js
-  google-marker-cluster:
-    - markerclusterer.js
-  angular-holderjs:
-    - src/holder.js
-  holderjs:
-    - holder.min.js
 
-css: 
-  - "custom/imc.css"
-  - "custom/VideoPlayer_stile.css"
+tags:
+    file: "All endpoints to handle files"
+    admin: "Operations only allowed for admin users"
+    miscellaneous: "Endpoints not classified in other specific sections"
