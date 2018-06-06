@@ -9,10 +9,10 @@
 
 .search-pager {
   /* same as search-filter */
-  background-color: #ecf1f4;
-    border-color: #d6e1ea;
-    -webkit-box-shadow: none;
-    box-shadow: none;
+  background-color: #dfdfdf; /*#ecf1f4*/
+  border-color: #d6e1ea;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
 /* no results */
@@ -32,5 +32,5 @@
 .map-view {
   background-color: #d0d0d0;
   border-color: #d6e1ea;
-    padding: .35em;
+  padding: .35em;
 }

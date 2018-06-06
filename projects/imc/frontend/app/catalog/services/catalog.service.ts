@@ -7,12 +7,17 @@ import { MediaEntity, Providers } from './data'
 export interface SearchFilter {
 	searchTerm: string,
 	itemType: string,
-	terms: string[],
+	terms: SearchTerm[],
 	provider: string,
 	country: string,
 	productionYearFrom: number,
 	productionYearTo: number,
 	iprstatus: string
+}
+
+export interface SearchTerm {
+	iri?: string,
+	label: string
 }
 
 const matchFields = ["title", "contributor", "keyword"];
@@ -40,7 +45,8 @@ export class CatalogService {
 				provider: filter.provider,
 				iprstatus: filter.iprstatus,
 				yearfrom: filter.productionYearFrom,
-				yearto: filter.productionYearTo
+				yearto: filter.productionYearTo,
+				terms: filter.terms
 			}
 		}
 		if (filter.searchTerm) {
