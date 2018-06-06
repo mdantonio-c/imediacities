@@ -25,7 +25,7 @@
                                     <div class="col-9 col-sm-10">Titles
                                         <span class="imc--title-bold" [innerHTML]="info.attributes.identifying_title"></span>
                                     </div>
-                                    <div class="col imc--flex--horizontal-end">
+                                    <div class="col imc--flex--horizontal-end" *ngIf="info.relationships.titles.length">
                                         <i *ngIf="isCollapsed.title" class="material-icons">keyboard_arrow_down</i>
                                         <i *ngIf="!isCollapsed.title" class="material-icons">keyboard_arrow_up</i>
                                     </div>
@@ -34,13 +34,13 @@
                         </h5>
                     </div>
 
-                    <div id="titles__content" [ngbCollapse]="isCollapsed.title" class="collapse">
+                    <div id="titles__content" class="collapse"
+                         [ngbCollapse]="isCollapsed.title"
+                         *ngIf="info.relationships.titles.length"
+                    >
                         <div class="card-body row">
                             <h5 class="col-12">Other Titles</h5>
-                            <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text">
-                                Porte storiche. Piazza Maggiore. Canali. <br>
-                                Scene di vita quotidiana nella Bologna di inizio secolo.
-                            </p>
+                            <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text"></p>
                         </div>
                     </div>
                 </div>
@@ -81,16 +81,6 @@
                                    [attr.data-languagekey]="descrizione.attributes.language.key"
                                    [innerHTML]="descrizione.attributes.text"></p>
                             </ng-template>
-                            <!--todo eliminare questo test-->
-                           <p class="col-12"
-                              *ngIf="'xx' === description_active"
-                              data-languagekey="xx"> Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad
-                            squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa
-                            nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid
-                            single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer
-                            labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo.
-                            Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably
-                            haven't heard of them accusamus labore sustainable VHS.</p>
                         </div>
                     </div>
                 </div>
@@ -118,12 +108,15 @@
                             <!--Todo pipe per valore nullo-->
                             <div class="col-2"><strong>Year:</strong> <span [innerHTML]="info.attributes.production_years[0]"></span></div>
                             <!--Paesi di produzione-->
-                            <div class="col-2"><strong>Country:</strong>
-                                <span
-                                        *ngFor="let production_country of info.relationships.production_countries; last as last">
-                                    {{production_country.attributes.code.description}}{{last ? '' : '/'}}
-                                </span>
-                            </div>
+                            <!-- @NSI non esiste production_countries per le immagini-->
+                            <ng-template *ngIf="media_type === 'video'">
+                                <div class="col-2"><strong>Country:</strong>
+                                    <span
+                                            *ngFor="let production_country of info.relationships.production_countries; last as last">
+                                        {{production_country.attributes.code.description}}{{last ? '' : '/'}}
+                                    </span>
+                                </div>
+                            </ng-template>
                             <!--Crediti-->
                             <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
                             <div class="col-12">
@@ -177,7 +170,7 @@
                                     [attr.aria-expanded]="!isCollapsed.owner"
                                     aria-controls="owner_content">
                                 <div class="row">
-                                    <div class="col-9 col-sm-10">                                        
+                                    <div class="col-9 col-sm-10">
                                         Owner
                                     </div>
                                     <div class="col imc--flex--horizontal-end">
@@ -216,7 +209,7 @@
         <!-- tab TECHNICAL INFO -->
         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div id="tech-info_accordion" class="imc--accordion">
-                <div class="card imc--expansion-panel">
+                <div class="card imc--expansion-panel" *ngIf="info.type === 'aventity'">
                     <div class="card-header" id="analogue_head">
                         <h5 class="mb-0">
                             <button class="btn btn-link collapsed"
@@ -233,7 +226,7 @@
                             </button>
                         </h5>
                     </div>
-                    <div id="analogue_content" class="collapse" [ngbCollapse]="isCollapsed.analogue">
+                    <div id="analogue_content" class="collapse"  [ngbCollapse]="isCollapsed.analogue">
                         <div class="card-body row">
                             <div class="col-12">
                                 <ul class="list-space">
@@ -265,7 +258,7 @@
                     </div>
                 </div>
 
-                <div class="card imc--expansion-panel">
+                <div class="card imc--expansion-panel" *ngIf="info.type === 'aventity'">
                     <div class="card-header" id="digital_head">
                         <h5 class="mb-0">
                             <button class="btn btn-link collapsed"

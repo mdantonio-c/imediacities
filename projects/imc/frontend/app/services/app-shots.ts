@@ -16,15 +16,16 @@ export class AppShotsService {
     /**
      * Ottiene gli shots del video media_id
      * @param media_id
+     * @param endpoint
      */
-    get (media_id?) {
+    get (media_id?, endpoint?) {
 
         if (!media_id) {
             media_id = this._media_id;
         }
 
         this.api.get(
-            'videos',
+            endpoint,
             `${media_id}/shots`
         ).subscribe(
             response => {
