@@ -44,7 +44,8 @@
 				<div class="col-12">
 					<div class="form-group">
 						<div class="input-group">
-							<input type="text" class="imc--input" placeholder="Search by term" aria-label="Tag"
+							<input id="tag-term" type="text" class="imc--input" placeholder="Search by term" aria-label="Tag"
+							formControlName="term"
 							[ngbTypeahead]="searchByTerm"
 							[inputFormatter]="formatter"
 							[resultTemplate]="rt"
@@ -53,7 +54,7 @@
 							{{r.name}}
 							</ng-template>
 							<div class="input-group-append">
-								<button class="btn-reset" type="button">
+								<button class="btn-reset" type="button" (click)="addTerm(searchForm.get('term').value)">
 								<i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">add_box</i>
 								</button>
 							</div>

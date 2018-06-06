@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
@@ -24,11 +24,14 @@ export class SearchFilterComponent implements OnInit {
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
-  constructor(private formBuilder: FormBuilder, private vocabularyService: AppVocabularyService) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private vocabularyService: AppVocabularyService,
+    private el: ElementRef) {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
       itemTypes: [['video'], Validators.required],
-      terms: [[]],
+      term: [''],
       city: [''],
       productionYearFrom: [1890],
       productionYearTo: [1999],
@@ -43,6 +46,7 @@ export class SearchFilterComponent implements OnInit {
 
   applyFilter() {
     let form = this.searchForm.value;
+    /*console.log('Form', form);*/
     let filter: SearchFilter = {
       searchTerm: null,
       itemType: 'video',
@@ -56,7 +60,9 @@ export class SearchFilterComponent implements OnInit {
     if (form.searchTerm !== '') { filter.searchTerm = form.searchTerm; }
     if (form.itemTypes.length === 2) { filter.itemType = 'all'; }
     else { filter.itemType = form.itemTypes[0]; }
-    // TODO terms
+    for (let t of this.terms) {
+      filter.terms.push({iri: t.iri, label: t.name});
+    }
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
     this.onFilterChange.emit(filter);
   }
@@ -130,14 +136,22 @@ export class SearchFilterComponent implements OnInit {
   formatter = (result: { name: string }) => result.name;
 
   /**
-   * Una voce di ricerca viene cliccata
+   * A search entry is clicked
    * @param term
    */
   selectTerm(term) {
     this.addTerm(term.item);
+    this.vocabularyService.toggle_term(term.item);
+    // clear the input field
+    const input = this.el.nativeElement.querySelector('#tag-term');
+    if (input) {
+      // FIXME
+      input.value = '';  
+    }
   }
 
   addTerm(event) {
+    /*console.log(event);*/
     if (typeof event === 'string') {
       event = { name: event }
     }
@@ -154,6 +168,9 @@ export class SearchFilterComponent implements OnInit {
 
   removeTerm(term) {
     this.terms = this.terms.filter(t => t.name !== term.name);
+    if (term.iri) {
+      this.vocabularyService.toggle_term(term);
+    }
   }
 
 }

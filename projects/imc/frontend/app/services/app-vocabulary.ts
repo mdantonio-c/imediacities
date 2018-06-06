@@ -90,5 +90,18 @@ export class AppVocabularyService {
         }
     }
 
-
+    toggle_term(term, node = null) {
+        if (!node) {
+            node = { children: this._vocabolario.terms }
+        }
+        if (node.hasOwnProperty('children')) {
+            node.children.forEach(c => {
+                this.toggle_term(term, c);
+            });
+        } else {
+            if (node.id === term.iri) {
+                node.selected = !node.selected;
+            }
+        }
+    }
 }
