@@ -110,7 +110,7 @@ services:
 
   celeryui:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
+    image: ${COMPOSE_PROJECT_NAME}/celery:0.6.2
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
     environment:
