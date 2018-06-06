@@ -93,11 +93,11 @@ export class CatalogService {
 	 * Retrieve a list of relevant creations for given creation uuids and related place ids.
 	 * @param relevantCreations
 	 */
-    getRelavantCreations = function(relevantCreations) {
+    getRelevantCreations = function(relevantCreations) {
         if (relevantCreations === undefined || relevantCreations.size === 0) {
         	return Observable.of({'Response': {'data': []}});
         }
-        var data = {
+        let data = {
             'relevant-list': []
         };
         for (let entry of Array.from(relevantCreations.entries())) {

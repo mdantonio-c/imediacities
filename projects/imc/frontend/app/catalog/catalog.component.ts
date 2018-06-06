@@ -78,7 +78,7 @@ export class CatalogComponent implements OnInit {
 	loadMediaTags(entityPlaceMap) {
 		/*console.log(entityPlaceMap);*/
 		this.loadingMapResults = true;
-		this.catalogService.getRelavantCreations(entityPlaceMap).subscribe(
+		this.catalogService.getRelevantCreations(entityPlaceMap).subscribe(
 			response => {
 				this.mediaTags = response["Response"].data;
 				this.loadingMapResults = false;

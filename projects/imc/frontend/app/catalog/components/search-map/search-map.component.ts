@@ -155,7 +155,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 			return;
 		}
 		let cityPosition = this.catalogService.getProviderPosition(provider);
-		var pt = new google.maps.LatLng(cityPosition[0], cityPosition[1]);
+		let pt = new google.maps.LatLng(cityPosition[0], cityPosition[1]);
 		this.map.setCenter(pt);
 		this.map.setZoom(14);
 		this.center = { lat: cityPosition[0], lng: cityPosition[1] };
