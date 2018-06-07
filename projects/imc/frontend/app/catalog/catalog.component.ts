@@ -43,7 +43,7 @@ export class CatalogComponent implements OnInit {
 				this.loading = false;
 			},
 			error => {
-				this.notify.extractErrors(error, this.notify.ERROR);
+				this.notify.extractErrors(error.error.Response, this.notify.ERROR);
 				this.loading = false;
 			});
 	}

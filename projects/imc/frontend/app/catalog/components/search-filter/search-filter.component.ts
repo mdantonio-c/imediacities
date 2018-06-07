@@ -55,7 +55,7 @@ export class SearchFilterComponent implements OnInit {
       country: null,
       productionYearFrom: form.productionYearFrom,
       productionYearTo: form.productionYearTo,
-      iprstatus: form.iprstatus
+      iprstatus: null
     }
     if (form.searchTerm !== '') { filter.searchTerm = form.searchTerm; }
     if (form.itemTypes.length === 2) { filter.itemType = 'all'; }
@@ -64,6 +64,7 @@ export class SearchFilterComponent implements OnInit {
       filter.terms.push({iri: t.iri, label: t.name});
     }
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
+    if (form.iprstatus !== '') { filter.iprstatus = form.iprstatus; }
     this.onFilterChange.emit(filter);
   }
 
@@ -142,16 +143,9 @@ export class SearchFilterComponent implements OnInit {
   selectTerm(term) {
     this.addTerm(term.item);
     this.vocabularyService.toggle_term(term.item);
-    // clear the input field
-    const input = this.el.nativeElement.querySelector('#tag-term');
-    if (input) {
-      // FIXME
-      input.value = '';  
-    }
   }
 
   addTerm(event) {
-    /*console.log(event);*/
     if (typeof event === 'string') {
       event = { name: event }
     }
@@ -164,6 +158,10 @@ export class SearchFilterComponent implements OnInit {
       }
 
     }
+    // clear the input field
+    this.searchForm.get('term').setValue('', { emitEvent: false });
+    const input = this.el.nativeElement.querySelector('#tag-term');
+    if (input) { input.value = ''; }
   }
 
   removeTerm(term) {
