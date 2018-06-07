@@ -140,13 +140,14 @@ li.ivh-treeview-node::before {
 */
 
 .material-icons.button-filter{
-    color: #FFF;
+    color: #eee;
 }
 
 .imc-search-filter.btn{
     border: 1px solid #53b8e2;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
+    margin-left: 2px;
 }
 
 .imc-search-filter.btn.active{
@@ -155,6 +156,7 @@ li.ivh-treeview-node::before {
     border-radius: 5px;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
+    margin-left: 2px;
 }
 
 .imc-search-filter.btn.focus{
@@ -162,6 +164,7 @@ li.ivh-treeview-node::before {
     box-shadow: none;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
+    margin-left: 2px;
 }
 
 .imc-search-filter.btn.focus.active{
@@ -170,6 +173,7 @@ li.ivh-treeview-node::before {
     box-shadow: none;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
+    margin-left: 2px;
 }
 
 
