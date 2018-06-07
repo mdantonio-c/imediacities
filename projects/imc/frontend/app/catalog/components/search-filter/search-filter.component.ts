@@ -15,16 +15,19 @@ export class SearchFilterComponent implements OnInit {
   searchForm: FormGroup;
   iprstatuses: any[] = IPRStatuses;
   cities: string[] = [];
-  itemTypes: string[] = ['video', 'image'];
   minProductionYear: number = 1890;
   maxProductionYear: number = 1999;
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(private formBuilder: FormBuilder) {}
+
+  ngOnInit() {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
-      itemTypes: [['video'], Validators.required],
+      //itemTypes: [{video: true, image: false}],
+      videoType: [true],
+      imageType: [false],
       terms: [[]],
       city: [''],
       productionYearFrom: [1890],
@@ -34,14 +37,31 @@ export class SearchFilterComponent implements OnInit {
     for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
   }
 
-  ngOnInit() {
+  verifyItemType(type) {
+    //console.log('verifyItemType: type=' + type);
+    let form = this.searchForm.value;
+    var newVideoType: boolean = form.videoType;
+    var newImageType: boolean = form.imageType;
+
+    if (type == 'image') {
+      newImageType = !newImageType;
+    }
+    if (type == 'video') {
+      newVideoType = !newVideoType;
+    }
+    //console.log('newVideoType=' + newVideoType);
+    //console.log('newImageType=' + newImageType);
+    if (!newVideoType && !newImageType) {
+      return false;
+    }
+    return true;
   }
 
   applyFilter() {
     let form = this.searchForm.value;
     let filter: SearchFilter = {
       searchTerm: null,
-      itemType: 'video',
+      itemType: null,
       terms: [],
       provider: null,
       country: null,
@@ -50,8 +70,14 @@ export class SearchFilterComponent implements OnInit {
       iprstatus: form.iprstatus
     }
     if (form.searchTerm !== '') { filter.searchTerm = form.searchTerm; }
-    if (form.itemTypes.length === 2) { filter.itemType = 'all'; }
-    else {filter.itemType = form.itemTypes[0]; }
+    // item type
+    if (form.videoType && form.imageType) {
+      filter.itemType = 'all'; 
+    } else if (form.videoType) {
+      filter.itemType = 'video'; 
+    } else if (form.imageType) {
+      filter.itemType = 'image'; 
+    }
     // TODO terms
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
     this.onFilterChange.emit(filter);

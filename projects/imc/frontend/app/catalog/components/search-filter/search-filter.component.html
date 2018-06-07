@@ -32,9 +32,35 @@
 			<i class="fa fa-filter bigger-110"></i>
 			Content type
 			</h4>
-			<select formControlName="itemTypes" class="form-control type-selector" multiple >
-				<option *ngFor="let itemType of itemTypes" [value]="itemType">{{itemType}}</option>
-			</select>
+
+			<div class="row">
+				<div class="col col-sm-11 col-md-10">
+
+					<div class="btn-group btn-group-toggle">
+						
+						    <label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('video')">
+						    	<input type="checkbox" formControlName="videoType" ngbButton>
+        						<i class="material-icons button-filter">videocam</i>
+						    </label>
+
+						    <label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('image')">
+						    	<input type="checkbox" formControlName="imageType" ngbButton> 
+       							<i class="material-icons button-filter">photo_camera</i>
+						    </label>
+						
+					  </div>
+
+
+					  <hr>
+					<pre>{{searchForm.value | json}}</pre>
+
+				</div>
+			</div>
+
+
+
+
+
 			<div class="hr hr-dotted"></div>
 			<h4 class="blue smaller">
 			<i class="fa fa-tags"></i>
