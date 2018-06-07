@@ -1,6 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
+enum Flag {
+    Deselected = 0,
+    Selected = 1
+}
+
 @Injectable()
 export class AppVocabularyService {
 
@@ -90,17 +95,43 @@ export class AppVocabularyService {
         }
     }
 
-    toggle_term(term, node = null) {
+    reset() {
+        this._vocabolario.terms.forEach(t => {
+            this._vocabolario_reset(t);
+        });
+        return this._vocabolario;
+    }
+
+    select_term (term) {
+        this.toggle_term(term, Flag.Selected);
+    }
+
+    deselect_term (term) {
+        this.toggle_term(term, Flag.Deselected);
+    }
+
+    toggle_term(term, flag: Flag = null, node = null) {
         if (!node) {
             node = { children: this._vocabolario.terms }
         }
         if (node.hasOwnProperty('children')) {
             node.children.forEach(c => {
-                this.toggle_term(term, c);
+                this.toggle_term(term, flag, c);
             });
         } else {
             if (node.id === term.iri) {
-                node.selected = !node.selected;
+                console.log('already selected?', node.selected);
+                switch (flag) {
+                    case Flag.Selected:
+                        node.selected = true;
+                        break;
+                    case Flag.Deselected:
+                        node.selected = false;
+                        break;
+                    default:
+                        node.selected = !node.selected;
+                        break;
+                }
             }
         }
     }

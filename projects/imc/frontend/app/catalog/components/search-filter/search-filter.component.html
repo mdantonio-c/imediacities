@@ -60,16 +60,17 @@
 							[ngbTypeahead]="searchByTerm"
 							[inputFormatter]="formatter"
 							[resultTemplate]="rt"
-							(selectItem)="selectTerm($event)">
-							<ng-template #rt let-r="result" let-t="term">
-							{{r.name}}
-							</ng-template>
+							(selectItem)="selectTerm($event)"
+							style="width: 80%;">
 							<div class="input-group-append">
 								<button class="btn-reset" type="button" (click)="addTerm(searchForm.get('term').value)">
 								<i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">add_box</i>
 								</button>
 							</div>
 						</div>
+						<ng-template #rt let-r="result" let-t="term">
+						{{r.name}}
+						</ng-template>
 					</div>
 				</div>
 				<!-- just inserted tags -->

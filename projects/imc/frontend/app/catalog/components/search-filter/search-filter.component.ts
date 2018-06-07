@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SearchFilter } from '../../services/catalog.service'
+import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
 import { SliderRangeComponent } from './slider-range/slider-range.component';
 import { AppVocabularyService } from "../../../services/app-vocabulary";
@@ -26,11 +26,8 @@ export class SearchFilterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private vocabularyService: AppVocabularyService,
+    private catalogService: CatalogService,
     private el: ElementRef) {
-    
-  }
-
-  ngOnInit() {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
       videoType: [true],
@@ -41,8 +38,36 @@ export class SearchFilterComponent implements OnInit {
       productionYearTo: [1999],
       iprstatus: [null]
     });
+  }
+
+  ngOnInit() {
     for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
-    this.vocabularyService.get((vocabulary) => { this.vocabulary = vocabulary });
+    this.vocabularyService.get((vocabulary) => { 
+      this.vocabulary = vocabulary;
+      for (let t of this.terms) {
+        this.vocabularyService.select_term(t);
+      }
+    });
+    this.searchForm.setValue(this.toForm(this.catalogService.filter));
+  }
+
+  private toForm(filter: SearchFilter) {
+    let res = {
+      searchTerm: filter.searchTerm,
+      videoType: (filter.itemType === 'all' || filter.itemType === 'video') ? true : false,
+      imageType: (filter.itemType === 'all' || filter.itemType === 'image') ? true : false,
+      term: '',
+      city: this.providerToCity(filter.provider),
+      productionYearFrom: filter.productionYearFrom,
+      productionYearTo: filter.productionYearTo,
+      iprstatus: filter.iprstatus
+    }
+    this.terms = [];
+    for (let t of filter.terms) {
+      let entry = (!t.iri) ? t.label : { iri: t.iri, name: t.label };
+      this.addTerm(entry);
+    }
+    return res;
   }
 
   verifyItemType(type) {
@@ -63,7 +88,7 @@ export class SearchFilterComponent implements OnInit {
       return false;
     }
     return true;
-  }  
+  }
 
   applyFilter() {
     let form = this.searchForm.value;
@@ -81,14 +106,14 @@ export class SearchFilterComponent implements OnInit {
     if (form.searchTerm !== '') { filter.searchTerm = form.searchTerm; }
     // item type
     if (form.videoType && form.imageType) {
-      filter.itemType = 'all'; 
+      filter.itemType = 'all';
     } else if (form.videoType) {
-      filter.itemType = 'video'; 
+      filter.itemType = 'video';
     } else if (form.imageType) {
-      filter.itemType = 'image'; 
+      filter.itemType = 'image';
     }
     for (let t of this.terms) {
-      filter.terms.push({iri: t.iri, label: t.name});
+      filter.terms.push({ iri: t.iri, label: t.name });
     }
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
     if (form.iprstatus !== '') { filter.iprstatus = form.iprstatus; }
@@ -96,7 +121,9 @@ export class SearchFilterComponent implements OnInit {
   }
 
   resetFiltersToDefault() {
-    console.log('reset filter to default');
+    this.catalogService.reset();
+    this.searchForm.setValue(this.toForm(this.catalogService.filter));
+    this.vocabularyService.reset();
   }
 
   private cityToProvider(city) {
@@ -111,6 +138,20 @@ export class SearchFilterComponent implements OnInit {
     else if (city === 'Vienna') { p = 'OFM'; }
     else if (city === 'Stockholm') { p = 'SFI'; }
     return p;
+  }
+
+  private providerToCity(provider) {
+    let c = null;
+    if (provider === 'TTE') { c = 'Athens'; }
+    else if (provider === 'CCB') { c = 'Bologna'; }
+    else if (provider === 'CRB') { c = 'Brussels'; }
+    else if (provider === 'DFI') { c = 'Copenhagen'; }
+    else if (provider === 'DIF') { c = 'Frankfurt am Main'; }
+    else if (provider === 'FDC') { c = 'Barcelona'; }
+    else if (provider === 'MNC') { c = 'Turin'; }
+    else if (provider === 'OFM') { c = 'Vienna'; }
+    else if (provider === 'SFI') { c = 'Stockholm'; }
+    return c;
   }
 
   changeYearTo(newVal) {
@@ -169,7 +210,7 @@ export class SearchFilterComponent implements OnInit {
    */
   selectTerm(term) {
     this.addTerm(term.item);
-    this.vocabularyService.toggle_term(term.item);
+    this.vocabularyService.select_term(term.item);
   }
 
   addTerm(event) {
@@ -194,7 +235,7 @@ export class SearchFilterComponent implements OnInit {
   removeTerm(term) {
     this.terms = this.terms.filter(t => t.name !== term.name);
     if (term.iri) {
-      this.vocabularyService.toggle_term(term);
+      this.vocabularyService.deselect_term(term);
     }
   }
 
