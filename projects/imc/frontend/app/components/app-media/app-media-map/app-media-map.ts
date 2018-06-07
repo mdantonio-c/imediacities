@@ -435,12 +435,14 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         let owner = this.MediaService.owner();
         if (owner.location) {
             this.center = owner.location;
+            console.log("this.center",  this.center);
         }
         this.popover = this.AnnotationsService.popover();
         this.ShotsService.update.subscribe(shots => {this.shots = shots;})
     }
 
     ngOnChanges () {
+
         //  Elimino tutti i marker eventualmente residui
         this._markers.forEach(m => {
             if (m.hasOwnProperty('map')) {
@@ -449,7 +451,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         });
 
         //  Reimposto i marker
-        this._markers = this.markers.slice();
+        if (this._markers && this._markers.length) {
+            this._markers = this.markers.slice();
+        }
 
         this.fit_bounds();
 

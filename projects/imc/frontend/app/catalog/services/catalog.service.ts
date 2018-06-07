@@ -7,12 +7,17 @@ import { MediaEntity, Providers } from './data'
 export interface SearchFilter {
 	searchTerm: string,
 	itemType: string,
-	terms: string[],
+	terms: SearchTerm[],
 	provider: string,
 	country: string,
 	productionYearFrom: number,
 	productionYearTo: number,
 	iprstatus: string
+}
+
+export interface SearchTerm {
+	iri?: string,
+	label: string
 }
 
 const matchFields = ["title", "contributor", "keyword"];
@@ -40,7 +45,8 @@ export class CatalogService {
 				provider: filter.provider,
 				iprstatus: filter.iprstatus,
 				yearfrom: filter.productionYearFrom,
-				yearto: filter.productionYearTo
+				yearto: filter.productionYearTo,
+				terms: filter.terms
 			}
 		}
 		if (filter.searchTerm) {
@@ -93,11 +99,11 @@ export class CatalogService {
 	 * Retrieve a list of relevant creations for given creation uuids and related place ids.
 	 * @param relevantCreations
 	 */
-    getRelavantCreations = function(relevantCreations) {
+    getRelevantCreations = function(relevantCreations) {
         if (relevantCreations === undefined || relevantCreations.size === 0) {
         	return Observable.of({'Response': {'data': []}});
         }
-        var data = {
+        let data = {
             'relevant-list': []
         };
         for (let entry of Array.from(relevantCreations.entries())) {

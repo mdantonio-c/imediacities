@@ -116,7 +116,7 @@ export class UploadComponent extends BasePaginationComponent {
 
 	download(filename) {
 
-		var options = {
+		let options = {
 			"rawResponse": true,
 			// "conf": {'responseType': ResponseContentType.Blob}
 			"conf": {
@@ -126,8 +126,7 @@ export class UploadComponent extends BasePaginationComponent {
 		};
 		this.api.get('download', filename, {}, options).subscribe(
 			response => {
-				var contentType = response.headers['content-type'] || 'application/octet-stream';
-				console.log(contentType);
+				let contentType = response.headers['content-type'] || 'application/octet-stream';
 				const blob = new Blob([response.body], { type: contentType });
 				importedSaveAs(blob, filename);
 				//this.notify.extractErrors(response, this.notify.WARNING);
