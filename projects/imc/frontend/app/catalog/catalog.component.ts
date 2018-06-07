@@ -21,21 +21,12 @@ export class CatalogComponent implements OnInit {
 	pageSize: number = 12;
 	mediaTags: any[];
 
-	constructor(private catalogService: CatalogService, private notify: NotificationService) {
-		this.filter = {
-			searchTerm: null,
-			itemType: 'video',
-			terms: [],
-			provider: null,
-			country: null,
-			productionYearFrom: 1890,
-			productionYearTo: 1999,
-			iprstatus: null
-		};
-	}
+	constructor(private catalogService: CatalogService,
+		private notify: NotificationService) {}	
 
 	ngOnInit() {
-		this.load();
+		this.catalogService.init();
+		this.changeFilter(this.catalogService.filter);
 	}
 
 	load() {
@@ -60,6 +51,10 @@ export class CatalogComponent implements OnInit {
 	changeFilter(newFilter: SearchFilter) {
 		this.filter = newFilter;
 		this.load()
+	}
+
+	resetFilter() {
+		this.catalogService.reset();	
 	}
 
 	changePage(page: number) {

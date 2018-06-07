@@ -3,6 +3,7 @@ import { ApiService } from '/rapydo/src/app/services/api';
 import { Observable } from 'rxjs/Observable';
 import { catchError, map } from 'rxjs/operators';
 import { MediaEntity, Providers } from './data'
+import { LocalStorageService } from './local-storage.service';
 
 export interface SearchFilter {
 	searchTerm: string,
@@ -27,8 +28,24 @@ export class CatalogService {
 	private _data: MediaEntity[] = [];
 	private _countByYears: any;
 	private _countByProviders: any;
+	private _filter: SearchFilter;
 
-	constructor(private api: ApiService) { }
+	constructor(private api: ApiService, private localStorageService: LocalStorageService) { }
+
+	get filter() { return this._filter; }
+
+	init() {
+		this._filter = this.localStorageService.get('filter', {
+			searchTerm: null,
+			itemType: 'video',
+			terms: [],
+			provider: null,
+			country: null,
+			productionYearFrom: 1890,
+			productionYearTo: 1999,
+			iprstatus: null
+		});
+	}
 
 	/**
      * Search for media entities from the catalog.
@@ -38,6 +55,7 @@ export class CatalogService {
      */
 	search(filter: SearchFilter, pageIdx: number, pageSize: number) {
 		let endpoint = 'search?currentpage=' + pageIdx + '&perpage=' + pageSize;
+		this._filter = filter;
 		let data = {
 			match: null,
 			filter: {
@@ -52,6 +70,7 @@ export class CatalogService {
 		if (filter.searchTerm) {
 			data.match = { term: filter.searchTerm, fields: matchFields }
 		}
+		this.cacheValues();
 		return this.api.post(endpoint, data, { "rawResponse": true });
 	}
 
@@ -130,6 +149,24 @@ export class CatalogService {
 				return p.city;
 			}
 		}
+	}
+
+	reset() {
+		this._filter = {
+			searchTerm: null,
+			itemType: 'video',
+			terms: [],
+			provider: null,
+			country: null,
+			productionYearFrom: 1890,
+			productionYearTo: 1999,
+			iprstatus: null
+		};
+		this.cacheValues();
+	}
+
+	private cacheValues() {
+		this.localStorageService.set('filter', this.filter);
 	}
 
 }

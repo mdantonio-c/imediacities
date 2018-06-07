@@ -68,6 +68,7 @@ import {AppShotReferenceComponent} from "./components/app-media/app-shot-referen
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
 
 import {CatalogService} from './catalog/services/catalog.service';
+import {LocalStorageService} from './catalog/services/local-storage.service';
 import {AppAnnotationsService} from "./services/app-annotations";
 import {AppShotsService} from "./services/app-shots";
 import {AppMediaService} from "./services/app-media";
@@ -145,6 +146,7 @@ export const entryComponents: any[] = [
 
 export const providers: any[] = [
     CatalogService,
+    LocalStorageService,
     AppAnnotationsService,
     AppMediaService,
     AppModaleService,

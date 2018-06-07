@@ -29,9 +29,9 @@ export const appRoutes: Routes = [
 		canActivate: [AuthGuard],
 		data: { role: 'Archive' }
 	},
-	{ path: 'app/catalog', component: CatalogComponent },
-	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent },
-	{ path: 'app/catalog/videos/:uuid', component: AppMediaComponent },
+	{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard] },
+	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard] },
+	{ path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard] },
 	{ path: 'app', redirectTo: '/app/catalog', pathMatch: 'full' },
 	{ path: '', redirectTo: '/app/catalog', pathMatch: 'full' }
 
