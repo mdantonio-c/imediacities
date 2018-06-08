@@ -14,7 +14,7 @@ from PIL import Image
 from subprocess import *
 
 
-TRANSCODED_FRAMERATE = 24
+TRANSCODED_FRAMERATE = 24 # now used as a default
 
 if getpass.getuser() == 'simboden':
     host = 'sil_pc'
@@ -86,19 +86,24 @@ def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
 # now called from outside
 # -----------------------------------------------------
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
-# and link the givel filename as  movie_analize_folder/origin + movie_ext
-def make_movie_analize_folder(filename, clean=False):
+# and link the given filename as  movie_analize_folder/origin + movie_ext
+def make_movie_analize_folder(filename, clean=False, temporary=False):
 
     if not mkdir(analize_area):
         return ""
 
     user_folder = filename.replace(stage_area + '/', '').split('/')[0]
-    user_analyze_folder = os.path.join(analize_area, user_folder)
+    user_analyze_folder = os.path.join(analize_area, user_folder)\
+
     if not mkdir(user_analyze_folder):
         return ""
 
     m_name, m_ext = os.path.splitext(os.path.basename(filename))
     movie_analize_folder = os.path.join(user_analyze_folder, m_name)
+    
+    if temporary:
+        movie_analize_folder += "_tmp"
+       
     if not mkdir(movie_analize_folder, clean):
         return ""
 
@@ -146,9 +151,31 @@ def run(cmd, out_folder, out_name, err_name, cmd_name=None):
     else:
         return False
 
+# -----------------------------------------------------
+def  get_framerate( filename ):
+
+    out_file = open( filename, 'r')
+    if out_file is None:
+        log( 'cant open '+filename )
+        return 0
+        
+    data = json.load( out_file )
+    for s in data['streams'] :
+        if s['codec_type'] == 'video':
+            if not 'r_frame_rate' in s:
+                log( 'r_frame_rate not found in: '+filename )
+                return 0
+            value = int(s['r_frame_rate'].split('/')[0])
+            if value < 1 or value > 100:
+                log( 'bad framerate:' + str(value) +'in:' +filename )
+                return 0
+            return value
+    log( 'framerate not found in: '+filename )
+    return 0
 
 # -----------------------------------------------------
 def origin_tech_info(filename, out_folder):
+    global TRANSCODED_FRAMERATE
 
     cmd_list = []
     cmd_list.append('/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams')
@@ -157,18 +184,11 @@ def origin_tech_info(filename, out_folder):
 
     res = run(cmd, out_folder, 'origin_info.json', 'origin_info.err', 'origin_info.sh')
 
-    ''' -- origin_info.json inspection example
-
-    if res:
-
-        out_filename = os.path.join( out_folder, 'origin_info.json')
-        out_file = open( out_filename, 'r')
-        data = json.load( out_file )
-        print( '    movie tech info:')
-        print( '    format', data['format']['format_long_name'])
-        for s in data['streams'] :
-            print( '   ', s['codec_type'], 'codec', s['codec_name'] )
-    '''
+    framerate =  get_framerate( os.path.join(out_folder, 'origin_info.json' ))
+    if framerate != 0 :
+        TRANSCODED_FRAMERATE = framerate
+    else:
+        TRANSCODED_FRAMERATE = 24 #fallback (errors already logged) 
     return res
 
 # -----------------------------------------------------
@@ -476,7 +496,8 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         im_small = im.resize(th_sz, Image.BILINEAR)
         im_small.save(fn.replace(out_folder, th_folder), quality=90)
 
-    # prepare index
+    # prepare index --- not used anymore
+    '''                                
     idx_folder = os.path.join(out_folder, 'index')
     if not mkdir(idx_folder, True):
         return False
@@ -508,7 +529,8 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     f = open(idx_folder + "/index.json", 'w')
     f.write(str)
     f.close()
-
+    '''
+                                
     # prepare storyboard
     sb_folder = os.path.join(out_folder, 'storyboard')
     if not mkdir(sb_folder, True):
@@ -539,7 +561,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         d = {}
         d['shot_num']    = i
         d['first_frame'] = frame
-        d['last_frame'] = nextframe
+        d['last_frame']  = nextframe                    ## nextframe-1  ??
         d['timecode']    = frame_to_timecode(frame)
         d['len_seconds'] = shot_len
         d['img']         = im_name
@@ -594,6 +616,19 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     f.close()
 
     return True
+
+
+# -----------------------------------------------------
+def revert_to_origin_framerate(filename):
+
+    out_folder = make_movie_analize_folder(filename, True, True )
+    if out_folder == "":
+        return False;
+    log('out_folder='+out_folder)
+    if not analize_movie(filename, out_folder, False):
+        return False;
+    # if all ok swap the two out_folders
+                                    
 
 # -----------------------------------------------------
 def analize_movie(filename, out_folder, fast=False):
@@ -785,4 +820,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    #main(sys.argv[1:])
+    revert_to_origin_framerate( sys.argv[1] )
+    print('done')
+
