@@ -224,14 +224,14 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         # 1) estraggo il source id dal file dei metadati
-        log.debug("Extracting source id from metadata file %s" %filename)
+        log.debug("Extracting source id from metadata file %s", filename)
         source_id = self.extract_creation_ref(path)
         if source_id is None:
-            log.debug("No source ID found in metadata file %s" % path)
+            log.debug("No source ID found in metadata file %s", path)
             raise RestApiException(
                 "No source ID found in metadata file: %s" % filename,
                 status_code=hcodes.HTTP_BAD_CONFLICT)
-        log.debug("Source id %s found in metadata file" % source_id)
+        log.debug("Source id %s found in metadata file", source_id)
 
         # 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
         #     e appartenente al gruppo
@@ -321,7 +321,7 @@ class Stage(GraphBaseOperations):
             log.debug("with meta_stage.uuid=%s" % (meta_stage.uuid))
             log.debug("with mode=%s" % (mode))
             log.debug("with metadata_update=%s" % (metadata_update))
-                
+
         except self.graph.MetaStage.DoesNotExist:
             log.debug("MetaStage not exist for source id %s " % source_id)
 
