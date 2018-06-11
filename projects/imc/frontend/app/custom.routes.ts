@@ -16,21 +16,21 @@ export const appRoutes: Routes = [
 		component: ArchivesListComponent,
 		canActivate: [AuthGuard],
 		runGuardsAndResolvers: 'always',
-		data: { role: 'admin_root' }
+		data: { roles: ['admin_root'] }
 	},
 	{
 		path: 'app/admin/groups',
 		component: AdminGroupsComponent,
 		canActivate: [AuthGuard],
 		runGuardsAndResolvers: 'always',
-		data: { role: 'admin_root' }
+		data: { roles: ['admin_root'] }
 	},
 	{
 		path: 'app/upload',
 		component: UploadComponent,
 		canActivate: [AuthGuard],
 		runGuardsAndResolvers: 'always',
-		data: { role: 'Archive' }
+		data: { roles: ['Archive'] }
 	},
 	{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
 	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
