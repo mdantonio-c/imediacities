@@ -9,6 +9,7 @@ import {AppAnnotationsService} from "../../../../services/app-annotations";
 export class AppModalInsertNoteComponent {
 
     @Input() data;
+    @Input() media_type: string;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
 
@@ -32,6 +33,7 @@ export class AppModalInsertNoteComponent {
         this.AnnotationsService.create_note(
             this.data.shots.map(s => s.id),
             n,
+            this.media_type,
             (r) => {this.shots_update.emit(r)}
         );
     }

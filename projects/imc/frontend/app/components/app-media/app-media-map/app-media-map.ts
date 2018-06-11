@@ -1,25 +1,41 @@
-import {Component, Input, ViewChild, OnInit, OnChanges} from '@angular/core';
+import {Component, Input, ViewChild, OnInit, OnChanges, OnDestroy} from '@angular/core';
 import {AppMediaService} from "../../../services/app-media";
 import {GeoCoder, NguiMapComponent} from '@ngui/map';
 import {AppAnnotationsService} from "../../../services/app-annotations";
 import {AppShotsService} from "../../../services/app-shots";
 import {AuthService} from "/rapydo/src/app/services/auth";
 import {AppVideoService} from "../../../services/app-video";
+import {ApiService} from '/rapydo/src/app/services/api';
+import {ProviderToCityPipe} from "../../../pipes/ProviderToCity";
 
 @Component({
     selector: 'app-media-map',
     templateUrl: 'app-media-map.html'
 })
 
-export class AppMediaMapComponent implements OnInit, OnChanges {
+export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() current_shot_from_video = false;
     @Input() markers;
     @Input() shots;
     @Input() draggable_markers;
     @Input() clickable_markers;
+    @Input() media_type;
 
     @ViewChild(NguiMapComponent) ngMap: NguiMapComponent;
+
+    constructor(
+        private api: ApiService,
+        private AuthService: AuthService,
+        private AnnotationsService: AppAnnotationsService,
+        private ShotsService: AppShotsService,
+        private geoCoder: GeoCoder,
+        private ProviderToCity: ProviderToCityPipe,
+        private MediaService: AppMediaService,
+        private VideoService: AppVideoService
+    ) {}
+
+    private _subscription;
 
     public center = {
         lat: 0,
@@ -34,6 +50,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
      * Viene assegnato dall'evento ready della mappa
      */
     public map;
+    /**
+     * Stili della mappa
+     * @type {{featureType: string; stylers: {visibility: string}[]}[]}
+     */
     public map_styles = [
         {
             featureType: "poi.business",
@@ -66,15 +86,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
     };
 
     public popover;
-
-    constructor(
-        private AuthService: AuthService,
-        private AnnotationsService: AppAnnotationsService,
-        private ShotsService: AppShotsService,
-        private geoCoder: GeoCoder,
-        private MediaService: AppMediaService,
-        private VideoService: AppVideoService
-        ) {}
 
     public marker_edit: any = {
         marker: null,
@@ -132,11 +143,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         //  Verifico shot corrente
         const shots_idx = this.shots_get();
 
-        if (!shots_idx.length) {
+        if (this.media_type === 'video' && !shots_idx.length) {
             return alert('No shot selected');
         }
 
-        this.geoCoder.geocode({
+        const geocode = this.geoCoder.geocode({
             location: event.latLng
         }).subscribe(
             result => {
@@ -148,8 +159,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
                 }
             },
             null
-        )
-
+        );
+        this._subscription.add(geocode);
+        console.log("this._subscription",  this._subscription);
     }
 
     /**
@@ -169,7 +181,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
                 return acc;
             },[]),
             marker: event.target,
-            owner: this._current_user.uuid === pos.creator
+            owner: (this._current_user.uuid === pos.creator) // oppure admin
         };
 
         event.target.nguiMapComponent.openInfoWindow('iw', event.target);
@@ -180,7 +192,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
      * @param marker
      */
     marker_delete (marker) {
-        this.AnnotationsService.delete_tag(marker);
+        this.AnnotationsService.delete_tag(marker, this.media_type);
     }
     /**
      * Al termine del trascinamento di un marker mostra una InfoWindow con le opzioni possibili
@@ -218,16 +230,17 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
     }
     /**
      * Salvataggio marker
-     * todo impostare shot correttamente
-     */
+      */
     marker_edit_save () {
-
         if(this.marker_edit.state === 'updating') {
-            this.AnnotationsService.delete_tag({
-                id: this.marker_edit.id,
-                iri: this.marker_edit.iri,
-                name: this.marker_edit.address
-            })
+            this.AnnotationsService.delete_tag(
+                {
+                    id: this.marker_edit.id,
+                    iri: this.marker_edit.iri,
+                    name: this.marker_edit.address
+                },
+                this.media_type
+            )
         }
 
         //  Impostazione shot
@@ -237,21 +250,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
             shots_idx = this.marker_edit.shots_idx;
         }
 
-        // if (this.current_shot_from_video) {
-        //     let current_shot = this.VideoService.shot_current();
-        //     console.log("current_shot",  current_shot);
-        //     shots_idx = this.shots.filter(s => s.attributes.shot_num === current_shot).map(s => s.attributes.shot_num);
-        // } else {
-        //     shots_idx = this.shots.map(s => s.attributes.shot_num)
-        // }
-
-        if (!shots_idx.length) {
+        if (this.media_type === 'video' && !shots_idx.length) {
             return alert('No shot selected');
         }
 
-        //  Ripristinare
         this.AnnotationsService.create_tag(
-            //[this.shots[0].id],
             shots_idx.map(s => s.id),
             [{
                 iri: this.marker_edit.iri,
@@ -259,11 +262,17 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
                 lat: this.marker_edit.location.lat,
                 lng: this.marker_edit.location.lng,
             }],
+            this.media_type,
             (r) => {
                 this.marker_edit.state = 'saved';
                 this.marker_edit.icon = null;
+
+                if (this.media_type === 'video') {
+                    this.ShotsService.get();
+                } else if (this.media_type === 'image') {
+                    this.AnnotationsService.get(this.MediaService.media_id(), 'images');
+                }
                 this.marker_edit_close(false);
-                this.ShotsService.get();
             }
         )
 
@@ -350,6 +359,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
     marker_push (marker) {
         this._markers.push(marker);
     }
+    marker_remove (marker) {
+        this._markers = this._markers.filter(m => m.name != marker.name);
+    }
     /**
      * Prepara un marker esistente per la modifica e visualizza la infowindow corrispondente
      * @param annotation
@@ -357,7 +369,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
      */
     marker_update (annotation, marker) {
         //todo shots_idx??
-        console.log("marker",  marker);
         this.marker_edit = {
             marker: marker,
             address: annotation.name,
@@ -382,8 +393,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
      * @returns {any[]}
      */
     shots_get () {
+
         let shots_idx = [];
-        if (this.current_shot_from_video) {
+        if (this.current_shot_from_video && this.media_type === 'video') {
             let current_shot = this.VideoService.shot_current();
             shots_idx = this.shots.filter(s => s.attributes.shot_num === current_shot)
         } else {
@@ -405,11 +417,14 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         if (this.map) {
 
             if (this._markers.length) {
+
                 let bounds = new google.maps.LatLngBounds();
                 this._markers.forEach(l => bounds.extend({lat: l.spatial[0], lng: l.spatial[1]}));
                 this.map.fitBounds(bounds);
                 this.map.panToBounds(bounds);
             } else {
+                const currentCenter = this.map.getCenter();
+                if (currentCenter.lat() !== 0 && currentCenter.lng() !== 0) return;
                 this.map.panTo(this.center);
                 this.map.setZoom(14);
             }
@@ -426,19 +441,52 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         this.fit_bounds();
     }
 
+    set_center_from_owner () {
+
+        const _media_owner = this.MediaService.owner();
+
+        if (_media_owner && _media_owner.attributes && _media_owner.attributes.shortname) {
+
+            //  Aggiunto il codice sottostante perchè l'immagine di prova aveva "test" come owner
+            let location_to_find = null;
+            if (_media_owner.attributes.shortname.length === 3) {
+                location_to_find = _media_owner.attributes.shortname;
+            } else {
+                location_to_find = 'ccb';
+            }
+
+            if (location_to_find) {
+
+                const geocode = this.geoCoder.geocode(
+                    {address: this.ProviderToCity.transform(location_to_find)},
+                ).subscribe(
+                    results => {
+                        this.center = {
+                            lat: results[0].geometry.location.lat(),
+                            lng: results[0].geometry.location.lng()
+                        };
+
+                        this.fit_bounds();
+
+                    },
+                    err => {
+                        console.log("set_center_from_owner err",  err);
+                    }
+                );
+                this._subscription.add(geocode);
+
+            }
+        }
+
+    }
 
     ngOnInit() {
 
-        this._current_user = this.AuthService.getUser();
-
-        //  Centro la mappa sul default
-        let owner = this.MediaService.owner();
-        if (owner.location) {
-            this.center = owner.location;
-            console.log("this.center",  this.center);
-        }
         this.popover = this.AnnotationsService.popover();
-        this.ShotsService.update.subscribe(shots => {this.shots = shots;})
+        this._subscription = this.ShotsService.update.subscribe(shots => {this.shots = shots;});
+
+        this._current_user = this.AuthService.getUser();
+        this.set_center_from_owner();
     }
 
     ngOnChanges () {
@@ -451,11 +499,16 @@ export class AppMediaMapComponent implements OnInit, OnChanges {
         });
 
         //  Reimposto i marker
-        if (this._markers && this._markers.length) {
+        if (this.markers && this.markers.length) {
             this._markers = this.markers.slice();
         }
 
         this.fit_bounds();
 
     }
+
+    ngOnDestroy () {
+        this._subscription.unsubscribe();
+    }
+
 }

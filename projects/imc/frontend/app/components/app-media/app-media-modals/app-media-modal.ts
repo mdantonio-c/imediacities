@@ -12,6 +12,7 @@ import {AppVideoPlayerComponent} from "../app-video-player/app-video-player";
 export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestroy{
 
     @Input() data: any;
+    @Input() media_type: string;
     @ViewChild('videoPlayer') videoPlayer: AppVideoPlayerComponent;
 
     public mediaData = null;
@@ -52,7 +53,9 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
      * Chiude la modal
      */
     chiudi () {
-        this.videoPlayer.video.pause();
+        if (this.videoPlayer) {
+            this.videoPlayer.video.pause();
+        }
         (this.ModalService.get()).dismiss();
     }
 

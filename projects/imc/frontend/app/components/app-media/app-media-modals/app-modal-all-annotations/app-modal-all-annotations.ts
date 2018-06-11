@@ -8,7 +8,7 @@ import {Component, OnInit, OnChanges, Input} from '@angular/core';
 export class AppModalAllAnnotationsComponent implements OnInit, OnChanges {
 
     @Input() data;
-
+    @Input() media_type: string;
     public shot;
 
     constructor() {

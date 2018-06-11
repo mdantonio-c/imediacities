@@ -49,12 +49,14 @@ import {AppMediaCommentiComponent} from "./components/app-media/app-media-commen
 import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-related-items/app-media-related-items";
 import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
+import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
 
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent, ArchivesListComponent, ArchiveComponent,
 	ProviderToCityPipe,
 	NoCommaPipe,
+	AppExpansionPanelComponent,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,

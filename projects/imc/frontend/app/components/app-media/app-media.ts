@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, ElementRef, Renderer2, DoCheck } from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild, ElementRef, DoCheck } from '@angular/core';
 import {AppShotsService} from "../../services/app-shots";
 import {AppMediaService} from "../../services/app-media";
 import {AppModaleComponent} from "../app-modale/app-modale";
@@ -6,7 +6,7 @@ import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
 import {AuthService} from "/rapydo/src/app/services/auth";
 import {AppVideoService} from "../../services/app-video";
 import {Router, Route, ActivatedRoute, Params} from '@angular/router';
-
+import {AppAnnotationsService} from "../../services/app-annotations";
 /**
  * Componente per la visualizzazione del media
  */
@@ -15,7 +15,7 @@ import {Router, Route, ActivatedRoute, Params} from '@angular/router';
     templateUrl: 'app-media.html'
 })
 
-export class AppMediaComponent implements OnInit {
+export class AppMediaComponent implements OnInit, OnDestroy {
 
     //  Id video
     video_id = 'cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5';
@@ -77,15 +77,18 @@ export class AppMediaComponent implements OnInit {
 
     public media_class = '';
     public media_type = '';
+    public media_id = '';
 
     public tab_title = '';
+
+    private _subscription;
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private AuthService: AuthService,
         private Element: ElementRef,
-        private renderer: Renderer2,
+        private AnnotationService: AppAnnotationsService,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
         private VideoService: AppVideoService ) {}
@@ -124,8 +127,9 @@ export class AppMediaComponent implements OnInit {
     modal_show (componente){
 
         //  fermo il video principale
-        this.appVideo.video.pause();
-
+        if (this.appVideo) {
+            this.appVideo.video.pause();
+        }
         this.modale.type = componente.modale;
         this.modale.data = componente.data;
 
@@ -182,7 +186,11 @@ export class AppMediaComponent implements OnInit {
     }
 
     shots_update (evento) {
-        this.ShotsService.get();
+        if (this.media_type === 'video') {
+            this.ShotsService.get();
+        } else if (this.media_type === 'image') {
+            this.AnnotationService.get(this.media_id, 'images');
+        }
     }
 
     video_player_set (event) {
@@ -192,11 +200,43 @@ export class AppMediaComponent implements OnInit {
     /* Seleziona il titolo per le tabs degli shot */
     tab_title_set(evento) {
 
-        let ev = evento.target;
-        if (ev.nodeName.toUpperCase() === 'LI') {
-            ev = ev.querySelector('a > i');
+        let target = evento.target;
+
+        if (target.nodeName.toUpperCase() === 'LI') {
+            target = target.querySelector('a > i');
+        } else if (target.nodeName.toUpperCase() === 'A') {
+            target = target.querySelector('i');
         }
-        this.tab_title = ev.attributes.getNamedItem('data-title').value;
+        this.tab_title = target.attributes.getNamedItem('data-title').value;
+    }
+
+    media_entity_normalize (mediaEntity) {
+
+        //  Normalizzo i dati delle immagini
+        if (this.media_type === 'image') {
+
+            // anno di produzione
+            if (mediaEntity.attributes.date_created) {
+                mediaEntity.attributes.production_years = mediaEntity.attributes.date_created;
+            }
+
+            // titolo principale
+            if (mediaEntity.relationships.titles.length) {
+                mediaEntity.attributes.identifying_title = mediaEntity.relationships.titles[0].attributes.text;
+            }
+
+
+            this.locations = [];
+
+
+        }
+
+        //  elimino i titoli aggiuntivi se sono identici a quello identificativo
+        if (mediaEntity.relationships.titles.length) {
+            mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title )
+        }
+
+        return mediaEntity;
     }
 
     /**
@@ -207,60 +247,53 @@ export class AppMediaComponent implements OnInit {
         this.user = this.AuthService.getUser();
         this.media_type_set(this.router.url);
 
-        this.route.params.subscribe((params: Params) => {
+        this._subscription = this.route.params.subscribe((params: Params) => {
 
-            let mediaID = params['uuid'];
+            this.media_id = params['uuid'];
             let endpoint = (this.router.url.indexOf("videos") != -1) ? 'videos' : 'images';
 
-            this.MediaService.get(mediaID, endpoint, (mediaEntity) => {
+            this.MediaService.get(this.media_id, endpoint, (mediaEntity) => {
 
-                //  Normalizzo i dati delle immagini
-                if (this.media_type === 'image') {
-                    
-                    // anno di produzione
-                    if (mediaEntity.attributes.date_created) {
-                        mediaEntity.attributes.production_years = mediaEntity.attributes.date_created;
-                    }
-
-                    // titolo principale
-                    if (mediaEntity.relationships.titles.length) {
-                        mediaEntity.attributes.identifying_title = mediaEntity.relationships.titles[0].attributes.text;
-                    }
-
-
-                    this.locations = [];
-
-
-                }
-
-                //  elimino i titoli aggiuntivi se sono identici a quello identificativo
-                if (mediaEntity.relationships.titles.length) {
-                    mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title )
-                }
-
-                this.media = mediaEntity;
+                this.media = this.media_entity_normalize(mediaEntity);
 
                 setTimeout(() => {
                     this.Element.nativeElement.querySelector('#pills-tab > li').click();
                 },100);
 
                 if (this.media_type === 'video') {
-                    this.ShotsService.get(mediaID, endpoint);
-                    this.ShotsService.update.subscribe(shots => {
-                        this.shots_init(shots);
-                        const annotations = this.ShotsService.annotations();
-                        this.annotations_count = annotations.length;
-                        this.locations = annotations.filter(a => a.group === 'location')
-                    })
+                    this.ShotsService.get(this.media_id, endpoint);
                 }
+
+                if (this.media_type === 'image') {
+                    this.AnnotationService.get(this.media_id, endpoint);
+                    const annotations_subscription = this.AnnotationService.update.subscribe(annotations => {
+                        this.ShotsService.get(this.media_id, endpoint, {
+                            annotations: annotations,
+                            links: this.media.links,
+                            item_id: this.media.relationships.item[0].id
+                        });
+                    });
+                    this._subscription.add(annotations_subscription);
+                }
+
+                const shots_subscription = this.ShotsService.update.subscribe(shots => {
+                    this.shots_init(shots);
+                    const annotations = this.ShotsService.annotations();
+                    this.annotations_count = annotations.length;
+                    this.locations = annotations.filter(a => a.group === 'location');
+                });
+                this._subscription.add(shots_subscription);
+
 
             });
 
 
         });
 
+    }
 
-
+    ngOnDestroy() {
+        this._subscription.unsubscribe();
     }
 
 }

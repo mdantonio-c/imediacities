@@ -13,6 +13,7 @@ import {AppMediaMapComponent} from "../../app-media-map/app-media-map";
 export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
 
     @Input() data;
+    @Input() media_type: string;
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
     @ViewChild('map') mappa: AppMediaMapComponent;
 
@@ -24,6 +25,9 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     center: any;
     markers = [];
     places_to_add = [];
+
+    embargo_enable = false;
+    embargo_model;
 
     constructor (
         private AnnotationsService: AppAnnotationsService,
@@ -80,8 +84,10 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
      */
     place_remove (place) {
         this.places_to_add = this.places_to_add.filter(p => p.name !== place.name);
-        //this.markers = this.markers.filter(l => l.name != place.name);
+        this.mappa.marker_remove(place);
+        
         this.fit_bounds();
+        this.ref.detectChanges();
     }
     /**
      * Richiama il metodo fitBounds della mappa per centrare i marker aggiunt/tolti
@@ -103,6 +109,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
                     "lat": p.place.geometry.location.lat(),
                     "lng": p.place.geometry.location.lng()
                 }}),
+                this.media_type,
                 (r) => {this.shots_update.emit(r)}
             )
         }

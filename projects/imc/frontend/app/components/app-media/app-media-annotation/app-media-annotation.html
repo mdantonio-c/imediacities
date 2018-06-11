@@ -5,9 +5,11 @@
         *ngIf="can_delete"
         class="material-icons click-event"
         mwlConfirmationPopover
+        [isDisabled]="disable_confirmation"
         [popoverTitle]="popover.popoverTitle + ' \'' + annotation.name + '\'?'"
         [popoverMessage]="popover.popoverMessage"
         [appendToBody]="popover.appendToBody"
         (confirm)="delete()"
+        (click)="cancella_senza_popover($event)"
     >close</i>
 </span>

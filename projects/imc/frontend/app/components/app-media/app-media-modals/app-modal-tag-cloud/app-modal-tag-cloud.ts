@@ -1,4 +1,4 @@
-import {Component, ViewChild , OnInit, OnChanges, Input} from '@angular/core';
+import {Component, ViewChild , OnInit, OnChanges, OnDestroy, Input} from '@angular/core';
 import {AppShotsService, IMC_Annotation} from "../../../../services/app-shots";
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 
@@ -7,10 +7,14 @@ import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
     templateUrl: 'app-modal-tag-cloud.html'
 })
 
-export class AppModalTagCloudComponent implements OnInit, OnChanges {
+export class AppModalTagCloudComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() data;
+    @Input() media_type: string;
+
     @ViewChild('p') p;
+
+    constructor(private ShotsService: AppShotsService) {}
 
     annotations_sorted = {
         count: [],
@@ -37,8 +41,7 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges {
         sorting: 'popularity'
     };
 
-    constructor(private ShotsService: AppShotsService) {
-    }
+    _subscription;
 
     options_set_sorting (event) {
         this.options.sorting = event.target.value;
@@ -63,7 +66,7 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges {
     }
 
     ngOnInit() {
-        this.ShotsService.update.subscribe(shots => this.data = shots)
+        this._subscription = this.ShotsService.update.subscribe(shots => this.data = shots)
     }
 
 
@@ -82,7 +85,13 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges {
             if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
             return 0;
         });
+
         this.annotations_filtered.count = this.annotations_sorted.count.slice();
         this.annotations_filtered.alpha = this.annotations_sorted.alpha.slice();
+
+    }
+
+    ngOnDestroy () {
+        this._subscription.unsubscribe();
     }
 }
