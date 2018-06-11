@@ -1,5 +1,5 @@
 
-stage:
+deletion:
   summary: Delete a file from the stage area
   custom:
     # publish: true

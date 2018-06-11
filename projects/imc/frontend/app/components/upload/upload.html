@@ -280,7 +280,7 @@
 	        [popoverTitle]="deleteConfirmation.title"
 	        [popoverMessage]="deleteConfirmation.message"
 	        placement="left"
-	        (confirm)="remove(row.id)"
+	        (confirm)="remove(row.name)"
 	        (cancel)="cancelRequest()"></i>
 
         <ng-template #disableDelete>

@@ -19,7 +19,7 @@ from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 # from restapi.services.download import Downloader
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 mime = MimeTypes()
 
 
@@ -29,7 +29,7 @@ class Upload(Uploader, GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
-    def post(self):
+    def post(self, filename):
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -44,25 +44,33 @@ class Upload(Uploader, GraphBaseOperations):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
 
-        chunk_number = int(self.get_input(single_parameter='flowChunkNumber'))
-        chunk_total = int(self.get_input(single_parameter='flowTotalChunks'))
-        chunk_size = int(self.get_input(single_parameter='flowChunkSize'))
-        filename = self.get_input(single_parameter='flowFilename')
+        # chunk_number = int(self.get_input(
+        #     single_parameter='flowChunkNumber'))
+        # chunk_total = int(self.get_input(
+        #     single_parameter='flowTotalChunks'))
+        # chunk_size = int(self.get_input(
+        #     single_parameter='flowChunkSize'))
+        # filename = self.get_input(single_parameter='flowFilename')
 
-        abs_fname, secure_name = self.ngflow_upload(
-            filename, upload_dir, request.files['file'],
-            chunk_number, chunk_size, chunk_total,
-            overwrite=True
-        )
+        # abs_fname, secure_name = self.ngflow_upload(
+        #     filename, upload_dir, request.files['file'],
+        #     chunk_number, chunk_size, chunk_total,
+        #     overwrite=True
+        # )
+
+        upload_response = self.upload_data(
+            filename, subfolder=upload_dir, force=False)
 
         # return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)
-        return self.force_response("")
+        # return self.force_response("")
+
+        return upload_response
 
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
     def get(self, filename):
-        logger.info("get stage content for filename %s" % filename)
+        log.info("get stage content for filename %s" % filename)
         if filename is None:
             raise RestApiException(
                 "Please specify a stage filename",
@@ -105,7 +113,7 @@ class Upload(Uploader, GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
         mime_type = mime.guess_type(f)
-        logger.debug('mime type: {}'.format(mime_type))
+        log.debug('mime type: {}'.format(mime_type))
 
         response = make_response(send_file(staged_file))
         response.headers['Content-Type'] = mime_type[0]

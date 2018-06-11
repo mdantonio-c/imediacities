@@ -6,23 +6,6 @@ upload:
     authentication: true
     authorized:
       - Archive
-  parameters:
-    - name: flowFilename
-      required: true
-      in: query
-      type: string
-    - name: flowChunkNumber
-      required: true
-      in: query
-      type: integer
-    - name: flowTotalChunks
-      required: true
-      in: query
-      type: integer
-    - name: flowChunkSize
-      required: true
-      in: query
-      type: integer
   responses:
     '200':
       description: File successfully uploaded 

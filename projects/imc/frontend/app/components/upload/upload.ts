@@ -30,8 +30,6 @@ export class UploadComponent extends BasePaginationComponent {
 	public uploader:FileUploader;
 	public hasDropZoneOver:boolean = false;
  
-	protected endpoint = 'not_used'
-
 	constructor(
 		protected api: ApiService,
 		protected auth: AuthService,
@@ -56,12 +54,33 @@ export class UploadComponent extends BasePaginationComponent {
 	    };
 */
 
+		let token = this.auth.getToken();
 		this.uploader = new FileUploader(
 			{
 				url: process.env.apiUrl + '/upload',
-				authToken: this.auth.getToken()
+				authToken: `Bearer ${token}`,
+				disableMultipart: true,
+				// authToken: this.auth.getToken()
 			}
 		);
+/*		this.uploader.onAfterAddingFile = (item => {
+			console.log(item);	
+			// item.withCredentials = false;
+		});*/
+
+		this.uploader.onBeforeUploadItem = (item => {
+			item.url += "/" + item._file.name;
+			// item.withCredentials = false;
+		});
+
+		this.uploader.onCompleteItem = (item:any, response:any, status:any, headers:any) => {
+
+			response = JSON.parse(response);
+			this.notify.extractErrors(response["Response"], this.notify.ERROR);
+
+			this.list();
+
+		}
 	}
 
 	public ngOnInit(): void {
@@ -110,8 +129,8 @@ export class UploadComponent extends BasePaginationComponent {
 		return this.get('stage')
 	}
 
-	remove(uuid) {
-		return this.delete(this.endpoint, uuid);
+	remove(filename: string) {
+		return this.delete("stage", filename);
 	}
 
 	download(filename) {

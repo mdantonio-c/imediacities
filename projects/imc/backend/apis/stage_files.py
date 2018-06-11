@@ -339,7 +339,7 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    def delete(self):
+    def delete(self, filename):
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -358,12 +358,12 @@ class Stage(GraphBaseOperations):
 
         input_parameters = self.get_input()
 
-        if 'filename' not in input_parameters:
-            raise RestApiException(
-                "Filename not found",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+        # if 'filename' not in input_parameters:
+        #     raise RestApiException(
+        #         "Filename not found",
+        #         status_code=hcodes.HTTP_BAD_REQUEST)
 
-        filename = input_parameters['filename']
+        # filename = input_parameters['filename']
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
