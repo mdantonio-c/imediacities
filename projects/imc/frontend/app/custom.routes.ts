@@ -15,23 +15,26 @@ export const appRoutes: Routes = [
 		path: 'app/admin/archives',
 		component: ArchivesListComponent,
 		canActivate: [AuthGuard],
+		runGuardsAndResolvers: 'always',
 		data: { role: 'admin_root' }
 	},
 	{
 		path: 'app/admin/groups',
 		component: AdminGroupsComponent,
 		canActivate: [AuthGuard],
+		runGuardsAndResolvers: 'always',
 		data: { role: 'admin_root' }
 	},
 	{
 		path: 'app/upload',
 		component: UploadComponent,
 		canActivate: [AuthGuard],
+		runGuardsAndResolvers: 'always',
 		data: { role: 'Archive' }
 	},
-	{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard] },
-	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard] },
-	{ path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard] },
+	{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+	{ path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
 	{ path: 'app', redirectTo: '/app/catalog', pathMatch: 'full' },
 	{ path: '', redirectTo: '/app/catalog', pathMatch: 'full' }
 
