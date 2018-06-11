@@ -1,6 +1,6 @@
 <div class="search-filter card">
 	<div class="search-filter-header">
-		<i class="material-icons light-green bigger-130 d-inline">tune</i>
+		<i class="material-icons bigger-130 d-inline">tune</i>
 		<h5 class="smaller no-margin-bottom">
 		&nbsp; Refine your Search
 		</h5>
@@ -9,106 +9,173 @@
 		<div class="space-8"></div>
 		<form [formGroup]="searchForm" (ngSubmit)="applyFilter()">
 			<div class="row">
-				<div class="col col-sm-11 col-md-10">
+				<div class="col-12">
 					<div class="input-group mb-3">
-						<input type="text" class="form-control"
+						<input type="text" class="imc--input imc--input-search"
 						name="searchTerm"
 						formControlName="searchTerm"
 						placeholder="Look within results"
 						uib-tooltip="Search within titles, keywords or descriptions"
 						tooltip-placement="bottom"
 						tooltip-popup-delay="1000">
-						<div class="input-group-append">
-							<button class="btn btn-outline-secondary" type="submit">
-							<i class="material-icons">search</i>
-							</button>
-						</div>
+						<!-- <div class="input-group-append">
+								<button class="btn btn-outline-secondary" type="submit">
+								<i class="material-icons">search</i>
+								</button>
+						</div> -->
 					</div>
 				</div>
 			</div>
 			
 			<div class="hr hr-dotted"></div>
-			<h4 class="blue smaller">
+			<h4 class="smaller">
 			<i class="fa fa-filter bigger-110"></i>
 			Content type
 			</h4>
-			<select formControlName="itemTypes" class="form-control type-selector" multiple >
-				<option *ngFor="let itemType of itemTypes" [value]="itemType">{{itemType}}</option>
-			</select>
-			<div class="hr hr-dotted"></div>
-			<h4 class="blue smaller">
-			<i class="fa fa-tags"></i>
-			Terms
-			</h4>
-			<div class="widget-main" style="max-width: 280px;"></div>
-			<div class="hr hr-dotted"></div>
-			<h4 class="blue smaller">
-			<i class="fa fa-map-marker light-orange bigger-110"></i>
-			City
-			</h4>
-			<div>
-				<select formControlName="city" class="form-control">
-					<option value=""></option>
-					<option *ngFor="let c of cities" [value]="c">{{c}}</option>
-				</select>
-			</div>
-			<div class="hr hr-dotted"></div>
-			<h4 class="blue smaller">
-			<i class="fa fa-calendar light-grey bigger-110"></i>
-			Production Date
-			</h4>
-			<div class="search-filter-element d-flex justify-content-center">
-				<div class="form-group">
-					<div class="input-group date-range">
-						<div class="input-group-prepend">
-							<span class="input-group-text">Year range</span>
-						</div>
-						<input type="number" class="form-control"
-							formControlName="productionYearFrom"
-							name="productionYearFrom" 
-							[min]="minProductionYear"
-							[max]="maxProductionYear"/>
-						<input type="number" class="form-control"
-						  formControlName="productionYearTo"
-						  name="productionYearTo"
-						  [min]="minProductionYear"
-						  [max]="maxProductionYear"/>
-					</div>
-					<div class="space-4"></div>
-					<slider-range [min]="minProductionYear" [max]="maxProductionYear" [step]="1"
-							[value-min]="searchForm.get('productionYearFrom').value" (onMinChange)="changeYearFrom($event)"
-							[value-max]="searchForm.get('productionYearTo').value" (onMaxChange)="changeYearTo($event)"></slider-range>
+			<div class="row">
+				<div class="col col-sm-11 col-md-10">
+					<div class="btn-group btn-group-toggle">
+					    <label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('video')">
+					    	<input type="checkbox" formControlName="videoType" ngbButton>
+        					<i class="material-icons button-filter">videocam</i>
+					    </label>
+						    <label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('image')">
+					    	<input type="checkbox" formControlName="imageType" ngbButton> 
+      						<i class="material-icons button-filter">photo_camera</i>
+					    </label>					
+				  </div>
 				</div>
 			</div>
 			<div class="hr hr-dotted"></div>
-			<h4 class="blue smaller">
-			<i class="fa fa-copyright light-grey bigger-110"></i>
-			Rights Status
+			<h4 class="smaller">
+			<i class="fa fa-tags"></i>
+			Terms
 			</h4>
-			<div>
-				<!-- <select class="form-control" ng-options="iprstatus.code as iprstatus.name for iprstatus in sc.iprstatuses.options">
-											<option value=""></option>
-				</select> -->
-				<!-- <select [(ngModel)]="selectedIPRStatus">
-										<option *ngFor="let s of iprstatuses" [ngValue]="s.code">{{s.name}}</option>
-				</select> -->
-				<select formControlName="iprstatus" class="form-control down-arrow">
-					<option value=""></option>
-					<option *ngFor="let iprstatus of iprstatuses" [ngValue]="iprstatus.code">{{iprstatus.name}}</option>
-				</select>
-			</div>
-			<div class="hr hr-dotted hr-24"></div>
-			<div class="text-center">
-				<button type="button" class="btn btn-default btn-sm btn-white" (click)="resetFiltersToDefault()">
-				<i class="imc-icon fa fa-remove red2"></i>
-				Reset
-				</button>
-				<button type="submit" class="btn btn-default btn-white">
-				<i class="imc-icon fa fa-refresh green"></i>
-				Update
-				</button>
-			</div>
-			<div class="space-4"></div>
-		</form>
+			<div class="row no-gutters imc--flex--vertical-end">
+				<div class="col-12">
+					<div class="form-group">
+						<div class="input-group">
+							<input id="tag-term" type="text" class="imc--input" placeholder="Search by term" aria-label="Tag"
+							formControlName="term"
+							[ngbTypeahead]="searchByTerm"
+							[inputFormatter]="formatter"
+							[resultTemplate]="rt"
+							(selectItem)="selectTerm($event)"
+							(keydown.enter)="$event.preventDefault(); addTerm(searchForm.get('term').value);"
+							style="width: 80%;">
+							<div class="input-group-append">
+								<button class="btn-reset" type="button" (click)="addTerm(searchForm.get('term').value)">
+								<i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">add_box</i>
+								</button>
+							</div>
+						</div>
+						<ng-template #rt let-r="result" let-t="term">
+						{{r.name}}
+						</ng-template>
+					</div>
+				</div>
+				<!-- just inserted tags -->
+				<div class="col-12 new-badge mb-2">
+					<ng-template ngFor let-term [ngForOf]="terms">
+					<app-media-annotation
+						[annotation]="term"
+						[can_delete]="true"
+						(click)="removeTerm(term)"
+					></app-media-annotation>
+					</ng-template>
+				</div>
+				<div class="imc--container-tree" style="max-height: 250px; overflow-y: auto;">
+					<ul *ngIf="vocabulary">
+						<li *ngFor="let term of vocabulary.terms">
+							<h3>
+							<span class="term" (click)="expandTerm(term)">
+								<span [innerHTML]="term.label"></span>
+								<i class="material-icons" *ngIf="!term.open">keyboard_arrow_down</i>
+								<i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
+							</span>
+							</h3>
+							<ul class="term-list" [ngClass]="{'display-none': !term.open}">
+								<li *ngFor="let child of term.children">
+									<span class="term" (click)="expandTerm(child, term)">
+										<span [innerHTML]="child.label"></span>
+										<i class="material-icons" *ngIf="!child.open">keyboard_arrow_down</i>
+										<i class="material-icons" *ngIf="child.open">keyboard_arrow_up</i>
+									</span>
+									<ul class="child-list" [ngClass]="{'display-none': !child.open}">
+										<li *ngFor="let leaf of child.children">
+											<span class="term" (click)="vocabularyLeaf(leaf)">
+												<span [innerHTML]="leaf.label"></span>
+												<i *ngIf="leaf.selected" class="material-icons icon-check-vocabulary">check</i>
+											</span>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</ul>
+					</div>
+				</div>
+				<div class="hr hr-dotted"></div>
+				<h4 class="smaller">
+				<i class="fa fa-map-marker light-orange bigger-110"></i>
+				City
+				</h4>
+				<div>
+					<select formControlName="city" class="form-control">
+						<option value=""></option>
+						<option *ngFor="let c of cities" [value]="c">{{c}}</option>
+					</select>
+				</div>
+				<div class="hr hr-dotted"></div>
+				<h4 class="smaller">
+				<i class="fa fa-calendar light-grey bigger-110"></i>
+				Production Date
+				</h4>
+				<div class="search-filter-element d-flex justify-content-center">
+					<div class="form-group">
+						<div class="input-group date-range">
+							<div class="input-group-prepend">
+								<span class="input-group-text">Year range</span>
+							</div>
+							<input type="number" class="form-control"
+							formControlName="productionYearFrom"
+							name="productionYearFrom"
+							[min]="minProductionYear"
+							[max]="maxProductionYear"/>
+							<input type="number" class="form-control"
+							formControlName="productionYearTo"
+							name="productionYearTo"
+							[min]="minProductionYear"
+							[max]="maxProductionYear"/>
+						</div>
+						<div class="space-4"></div>
+						<slider-range [min]="minProductionYear" [max]="maxProductionYear" [step]="1"
+						[value-min]="searchForm.get('productionYearFrom').value" (onMinChange)="changeYearFrom($event)"
+						[value-max]="searchForm.get('productionYearTo').value" (onMaxChange)="changeYearTo($event)"></slider-range>
+					</div>
+				</div>
+				<div class="hr hr-dotted"></div>
+				<h4 class="smaller">
+				<i class="fa fa-copyright light-grey bigger-110"></i>
+				Rights Status
+				</h4>
+				<div>
+					<select formControlName="iprstatus" class="form-control down-arrow">
+						<option value=""></option>
+						<option *ngFor="let iprstatus of iprstatuses" [ngValue]="iprstatus.code">{{iprstatus.name}}</option>
+					</select>
+				</div>
+				<div class="hr hr-dotted hr-24"></div>
+				<div class="text-center">
+					<button type="button" class="btn btn-border-classic btn-sm" (click)="resetFiltersToDefault()">
+					<i class="imc-icon fa fa-remove"></i>
+					Reset
+					</button>
+					<button type="submit" class="btn btn-accent">
+					<i class="imc-icon fa fa-refresh"></i>
+					Update
+					</button>
+				</div>
+				<div class="space-4"></div>
+			</form>
+		</div>
 	</div>
-</div>

@@ -186,11 +186,11 @@ class Search(GraphBaseOperations):
             terms = filtering.get('terms')
             if terms:
                 term_clauses = []
-                iris = [term['iri'] for term in terms if 'iri' in term]
+                iris = [term['iri'] for term in terms if 'iri' in term and term['iri'] is not None]
                 if iris:
                     term_clauses.append('body.iri IN {iris}'.format(iris=iris))
                 free_terms = [term['label']
-                              for term in terms if 'iri' not in term and 'label' in term]
+                              for term in terms if 'iri' not in term or term['iri'] is None and 'label' in term]
                 if free_terms:
                     term_clauses.append('body.value IN {free_terms}'.format(
                         free_terms=free_terms))
