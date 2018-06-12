@@ -11,16 +11,16 @@
 			<b>Display</b>
 			&nbsp;
 			<div id="toggle-result-format" class="btn-group btn-overlap" role="group" aria-label="Basic example">
-				<button type="button" class="btn btn-icon-border-classic btn-white" (click)="changeView('Grid')"
-				[ngClass]="{'btn-success': displayMode==='Grid', 'btn-grey': displayMode!=='Grid'}" placement="top" ngbTooltip="Thumbnail view">
+				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('Grid')"
+				[ngClass]="{'active btn-success': displayMode==='Grid'}" placement="top" ngbTooltip="Thumbnail view">
 				<i class="material-icons">view_module</i>
 				</button>
-				<button type="button" class="btn btn-icon-border-classic btn-white" (click)="changeView('List')"
-				[ngClass]="{'btn-primary': displayMode==='List', 'btn-grey': displayMode!=='List'}" placement="top" ngbTooltip="List view">
+				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('List')"
+				[ngClass]="{'active btn-primary': displayMode==='List'}" placement="top" ngbTooltip="List view">
 				<i class="material-icons">view_list</i>
 				</button>
-				<button type="button" class="btn btn-icon-border-classic btn-white" (click)="changeView('Map')"
-				[ngClass]="{'btn-warning': displayMode==='Map', 'btn-grey': displayMode!=='Map'}" placement="top" ngbTooltip="Map&nbsp;view">
+				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('Map')"
+				[ngClass]="{'active btn-warning': displayMode==='Map'}" placement="top" ngbTooltip="Map&nbsp;view">
 				<i class="material-icons">location_searching</i>
 				</button>
 			</div>

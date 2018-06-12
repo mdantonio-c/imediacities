@@ -46,6 +46,15 @@ h4.smaller { font-size: 17px; }
 .imc-scroll { overflow: hidden }
 
 button:focus {outline:0 !important;}
+.container-search .btn-accent {
+  background: #53b8e2;
+  border: 1.5px solid #53b8e2;
+}
+.container-search .btn-accent:hover {
+  background: transparent;
+  color: #53b8e2;
+}
+
 .btn>.icon-only.imc-icon {
     margin: 0!important;
     text-align: center;

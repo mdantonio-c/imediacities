@@ -5,3 +5,17 @@
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+
+
+.btn-success.active i,
+.btn-primary.active i,
+.btn-warning.active i {
+    color: #fff !important;
+}
+.btn-success.active {
+    box-shadow: 0 0 0 0.2rem rgba(40,167,69,.5);
+}
+.btn-primary.active {
+}
+.btn-warning.active {
+}
