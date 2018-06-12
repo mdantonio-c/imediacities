@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
@@ -26,8 +26,7 @@ export class SearchFilterComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private vocabularyService: AppVocabularyService,
-    private catalogService: CatalogService,
-    private el: ElementRef) {
+    private catalogService: CatalogService) {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
       videoType: [true],
@@ -206,11 +205,12 @@ export class SearchFilterComponent implements OnInit {
 
   /**
    * A search entry is clicked
-   * @param term
+   * @param $event
    */
-  selectTerm(term) {
-    this.addTerm(term.item);
-    this.vocabularyService.select_term(term.item);
+  selectTerm($event) {
+    $event.preventDefault();
+    this.addTerm($event.item);
+    this.vocabularyService.select_term($event.item);
   }
 
   addTerm(event) {
@@ -228,8 +228,6 @@ export class SearchFilterComponent implements OnInit {
     }
     // clear the input field
     this.searchForm.get('term').setValue('', { emitEvent: false });
-    const input = this.el.nativeElement.querySelector('#tag-term');
-    if (input) { input.value = ''; }
   }
 
   removeTerm(term) {
