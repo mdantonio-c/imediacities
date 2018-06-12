@@ -3,7 +3,7 @@
         (mapReady$)="onMapReady($event)"
         (click)="marker_add($event)"
         [styles]="map_styles"
-        [center]="center">
+        >
     <marker
             *ngFor="let pos of _markers"
             [position]="pos.spatial"
@@ -49,7 +49,7 @@
                 Description: <br>
                 <input name="marker_edit" id="marker_edit" [(ngModel)]="marker_edit.description" style="width:100%">
             </div>
-            <div>
+            <div *ngIf="media_type === 'video'">
                 <br>
                 <strong>This geotag will be added to:<br></strong>
                 <ng-template

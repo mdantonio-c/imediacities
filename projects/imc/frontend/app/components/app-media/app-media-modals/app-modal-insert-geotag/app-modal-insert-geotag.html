@@ -1,4 +1,4 @@
-<app-media-modal [data]="data">
+<app-media-modal [data]="data" [media_type]="media_type">
 
     <div class="col-12 col-sm-7 row space-paragraph-20 no-gutters" modal-col>
        <span class="col-10">
@@ -11,20 +11,47 @@
         <!-- Tag appena inseriti -->
         <div class="col-12 new-badge space-paragraph-25">
             <ng-template ngFor let-place [ngForOf]="places_to_add">
-                <app-media-annotation [annotation]="place" [can_delete]="true" (click)="place_remove(place)"></app-media-annotation>
+                <app-media-annotation
+                        [annotation]="place"
+                        [can_delete]="true"
+                        [disable_confirmation]="true"
+                        [delete_fn]="place_remove.bind(this)"
+                        ></app-media-annotation>
             </ng-template>
         </div>
 
         <!-- Attivazione della data di pubblicazione -->
         <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
-            <div class="col-12 col-sm-6 box-checkbox imc--flex--vertical-center">
+
+            <div class="col-12 col-lg-7 box-checkbox imc--flex--vertical-center">
                 <!--@NSI Attiva il campo date sotto -->
-                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="value1">
+                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="on"
+                       [(ngModel)]="embargo_enable">
                 <label for="multi-annotation">Not public until</label>
             </div>
+
             <div class="col-12 col-sm-7 space-paragraph-10">
-                <input class="imc--input imc--input-data" type="date">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="imc--input imc--input-data"
+                               placeholder="yyyy-mm-dd"
+                               name="dp"
+                               [(ngModel)]="embargo_model"
+                               ngbDatepicker
+                               [disabled]="!embargo_enable"
+                               #d="ngbDatepicker">
+                        <div class="input-group-append">
+                            <button class="btn-reset"
+                                    type="button"
+                                    [disabled]="!embargo_enable"
+                                    (click)="d.toggle()">
+                                <i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">today</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
 
         <div class="col-12 space-paragraph-25">
@@ -36,7 +63,7 @@
     </div>
 
     <div class="modal-map" modal-row>
-        <app-media-map #map [markers]="markers" [shots]="data.shots"></app-media-map>
+        <app-media-map #map [markers]="markers" [shots]="data.shots" [media_type]="media_type"></app-media-map>
     </div>
 
 

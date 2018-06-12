@@ -10,28 +10,51 @@ export class AppShotsService {
     private _shots: IMC_Shot[] = [];
 
     @Output() update: EventEmitter<any> = new EventEmitter();
+    private _others_data_as_object;
 
     constructor(private api: ApiService) {
     }
+
     /**
      * Ottiene gli shots del video media_id
      * @param media_id
      * @param endpoint
+     * @param others_data_as_object
      */
-    get (media_id?, endpoint?) {
+    get (media_id?, endpoint?, others_data_as_object?) {
 
         if (!media_id) {
             media_id = this._media_id;
         }
 
+        //  Quando l'applicazione non è di tipo video non chiamo shots, ma li simulo.
+        if (endpoint && endpoint !== 'videos') {
+
+            const shot_mimic = [
+                {
+                    id: others_data_as_object.item_id,
+                    links: others_data_as_object.links,
+                    attributes: {
+                        shot_num:0
+                    },
+                    annotations: others_data_as_object.annotations
+                }
+            ];
+
+            this._media_id = media_id;
+            this._shots_parse(shot_mimic, 'image');
+            this.update.emit(this._shots);
+            return;
+        }
+
         this.api.get(
-            endpoint,
+            endpoint || 'videos',
             `${media_id}/shots`
         ).subscribe(
             response => {
                 this._media_id = media_id;
-                this._shots_parse(response.data);
-                this.update.emit(this._shots)
+                this._shots_parse(response.data, 'video');
+                this.update.emit(this._shots);
             },
             err => {
                 console.log('AppShotService', err)
@@ -95,16 +118,17 @@ export class AppShotsService {
      * ne estrae proprietà e annotazioni
      * ritornando l'elenco degli shot elaborato
      * @param shots
+     * @param media_type
      * @returns {IMC_Shot[]}
      * @private
      */
-    private _shots_parse (shots): IMC_Shot[] {
+    private _shots_parse (shots, media_type): IMC_Shot[] {
 
         let shots_processed = [];
         //  per ogni shot
         shots.forEach( (s, index) => {
 
-            let shot_processato = {
+            let shot_processato: IMC_Shot = {
                 id: s.id,
                 attributes: s.attributes,
                 links: s.links,
@@ -117,7 +141,7 @@ export class AppShotsService {
                 }
             };
             //  processo annotazioni
-            this._annotations_parse(shot_processato.annotations, s.annotations, index);
+            this._annotations_parse(shot_processato.annotations, s.annotations, media_type, index);
             AppShotsService._annotations_sort(shot_processato.annotations);
             shots_processed.push(shot_processato);
 
@@ -131,10 +155,11 @@ export class AppShotsService {
      * Processa le annotazioni suddividendole per categoria
      * @param target
      * @param annotations
+     * @param media_type
      * @param shot_indice shot in cui compare l'annotazione
      * @private
      */
-    private _annotations_parse (target, annotations, shot_indice) {
+    private _annotations_parse (target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
 
@@ -148,13 +173,12 @@ export class AppShotsService {
                         tipo = 'locations';
                     }
 
-                    this._annotation_add(target[tipo], AppShotsService._annotation_set(annotation, body), shot_indice)
+                    this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice)
                 })
 
                 //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
-                this._annotation_add(target.notes, AppShotsService._annotation_set(annotation, annotation.bodies[0]), shot_indice)
-                // target.notes.push(AppShotsService._annotation_set(annotation, annotation.bodies[0]));
+                this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
             }
 
             //  todo non so come individuare referenze e links
@@ -195,10 +219,11 @@ export class AppShotsService {
      * Crea un'annotazione riorganizzando i dati
      * @param annotation
      * @param annotation_body
+     * @param media_type
      * @returns {IMC_Annotation}
      * @private
      */
-    static _annotation_set (annotation, annotation_body): IMC_Annotation {
+    private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
 
         return {
             creation_date: annotation.attributes.creation_datetime,
@@ -212,7 +237,9 @@ export class AppShotsService {
             name: annotation_body.type == 'textualbody' ? annotation_body.attributes.value : annotation_body.attributes.name,
             private: annotation.private || false,
             spatial: annotation_body.attributes.spatial || null,
-            type: annotation.attributes.annotation_type.key
+            type: annotation.attributes.annotation_type.key,
+            source: media_type,
+            source_uuid: this._media_id
         };
     }
 
@@ -257,7 +284,9 @@ export interface IMC_Annotation {
     name: string,
     private: boolean,
     spatial: number[],
-    type: string
+    type: string,
+    source: string,
+    source_uuid: string
 }
 
 export interface IMC_Shot {

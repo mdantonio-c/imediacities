@@ -8,6 +8,7 @@ import {Component, OnInit, OnChanges, Input} from '@angular/core';
 export class AppModalListaShotsComponent implements OnInit, OnChanges {
 
     @Input() data: any;
+    @Input() media_type: string;
     @Input() modal: boolean;
     @Input() cols: number;
     @Input() show_title: boolean;

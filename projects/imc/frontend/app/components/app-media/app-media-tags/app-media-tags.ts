@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {Component, OnInit, OnDestroy,  Input, Output, EventEmitter} from '@angular/core';
 import {AppShotsService, IMC_Annotation} from "../../../services/app-shots";
 
 @Component({
@@ -6,17 +6,20 @@ import {AppShotsService, IMC_Annotation} from "../../../services/app-shots";
     templateUrl: 'app-media-tags.html'
 })
 
-export class AppMediaTagsComponent implements OnInit{
+export class AppMediaTagsComponent implements OnInit, OnDestroy{
 
     @Input() shots = null;
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
+
+    constructor(private ShotsService: AppShotsService) {}
 
     public annotations = {
         elenco: [],
         visualizzate: []
     };
 
-    constructor(private ShotsService: AppShotsService) {}
+    private _subscription;
+
 
     /**
      * Filtra le annotazioni
@@ -72,9 +75,13 @@ export class AppMediaTagsComponent implements OnInit{
 
     ngOnInit() {
         this.annotations_set();
-        this.ShotsService.update.subscribe(shots => {
+        this._subscription = this.ShotsService.update.subscribe(shots => {
             this.annotations_set(shots);
         })
 
+    }
+
+    ngOnDestroy () {
+        this._subscription.unsubscribe();
     }
 }

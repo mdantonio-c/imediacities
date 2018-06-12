@@ -8,6 +8,7 @@ import {Component, OnInit, Input} from '@angular/core';
 export class AppModalInsertReferenceComponent implements OnInit {
 
     @Input() data;
+    @Input() media_type: string;
 
     constructor() {
     }

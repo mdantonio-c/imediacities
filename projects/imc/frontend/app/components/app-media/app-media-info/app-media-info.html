@@ -14,36 +14,12 @@
 
             <div id="general-info_accordion" class="imc--accordion">
 
-                <div class="card imc--expansion-panel">
-                    <div class="card-header" id="titles__head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link"
-                                    (click)="expandCard('title')"
-                                    [attr.aria-expanded]="!isCollapsed.title"
-                                    aria-controls="titles__content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">Titles
-                                        <span class="imc--title-bold" [innerHTML]="info.attributes.identifying_title"></span>
-                                    </div>
-                                    <div class="col imc--flex--horizontal-end" *ngIf="info.relationships.titles.length">
-                                        <i *ngIf="isCollapsed.title" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.title" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </button>
-                        </h5>
+                <app-expansion-panel title="Titles" [subtitle]="info.attributes.identifying_title" [allow_expansion]="info.relationships.titles.length">
+                    <div *ngIf="info.relationships.titles.length">
+                        <h5 class="col-12">Other Titles</h5>
+                        <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text"></p>
                     </div>
-
-                    <div id="titles__content" class="collapse"
-                         [ngbCollapse]="isCollapsed.title"
-                         *ngIf="info.relationships.titles.length"
-                    >
-                        <div class="card-body row">
-                            <h5 class="col-12">Other Titles</h5>
-                            <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text"></p>
-                        </div>
-                    </div>
-                </div>
+                </app-expansion-panel>
 
                 <div class="card imc--expansion-panel">
                     <div class="card-header" id="description_head">
@@ -85,255 +61,175 @@
                     </div>
                 </div>
 
-                <div class="card imc--expansion-panel">
-                    <div class="card-header" id="production-info_head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                                    (click)="expandCard('prod_information')"
-                                    [attr.aria-expanded]="!isCollapsed.prod_information"
-                                    aria-controls="production-info_content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">Production information</div>
-                                    <div class="col imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.prod_information" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.prod_information" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="production-info_content" class="collapse" [ngbCollapse]="isCollapsed.prod_information">
-                        <div class="card-body row">
-                            <!--Anno di produzione-->
-                            <!--Todo pipe per valore nullo-->
-                            <div class="col-2"><strong>Year:</strong> <span [innerHTML]="info.attributes.production_years[0]"></span></div>
-                            <!--Paesi di produzione-->
-                            <!-- @NSI non esiste production_countries per le immagini-->
-                            <ng-template *ngIf="media_type === 'video'">
-                                <div class="col-2"><strong>Country:</strong>
-                                    <span
-                                            *ngFor="let production_country of info.relationships.production_countries; last as last">
-                                        {{production_country.attributes.code.description}}{{last ? '' : '/'}}
-                                    </span>
-                                </div>
-                            </ng-template>
-                            <!--Crediti-->
-                            <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
-                            <div class="col-12">
-                                <ul>
-                                    <ng-template ngFor let-contributor [ngForOf]="info.relationships.contributors">
-                                        <li
-                                                *ngFor="let role of contributor.attributes.activities">
-                                            {{role}}:
-                                            <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
-                                        </li>
+                <app-expansion-panel title="Production information">
 
-                                    </ng-template>
-                                </ul>
-                            </div>
+                    <!--Anno di produzione-->
+                    <div class="col-2"><strong>Year:</strong> <span [innerHTML]="info.attributes.production_years[0]"></span></div>
+                    <!--Paesi di produzione-->
+                    <!-- @NSI non esiste production_countries per le immagini-->
+
+                    <ng-template [ngIf]="info.type === 'aventity'">
+                        <div class="col-2">
+                            <strong>Country:</strong>
+                            <span
+                                    *ngFor="let production_country of info.relationships.production_countries; last as last">
+                                    {{production_country.attributes.code.description}}{{last ? '' : '/'}}
+                            </span>
                         </div>
-                    </div>
-                </div>
+                    </ng-template>
+                    <!--Crediti-->
+                    <ng-template [ngIf]="info.relationships.contributors && info.relationships.contributors.length">
+                        <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
+                        <div class="col-12">
+                            <ul>
+                                <ng-template ngFor let-contributor [ngForOf]="info.relationships.contributors">
+                                    <li
+                                            *ngFor="let role of contributor.attributes.activities">
+                                        {{role}}:
+                                        <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
+                                    </li>
 
-                <div class="card imc--expansion-panel">
-                    <div class="card-header" id="copyright_head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                                    (click)="expandCard('copyright')"
-                                    [attr.aria-expanded]="!isCollapsed.copyright"
-                                    aria-controls="copyright_content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">Copyright</div>
-                                    <div class="col imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.copyright" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.copyright" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="copyright_content" class="collapse" [ngbCollapse]="isCollapsed.copyright">
-                        <div class="card-body row">
-                            <div class="col-12">
-                                <strong>Right Status: </strong>
-                                <span [innerHTML]="info.attributes.rights_status.description"></span>
-                            </div>
+                                </ng-template>
+                            </ul>
                         </div>
+                    </ng-template>
+                </app-expansion-panel>
+
+                <app-expansion-panel title="Copyright">
+                    <div class="col-12">
+                        <strong>Right Status: </strong>
+                        <span [innerHTML]="info.attributes.rights_status.description"></span>
                     </div>
-                </div>
+                </app-expansion-panel>
 
-                <div class="card imc--expansion-panel">
-                    <div class="card-header" id="owner_head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                                    (click)="expandCard('owner')"
-                                    [attr.aria-expanded]="!isCollapsed.owner"
-                                    aria-controls="owner_content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">
-                                        Owner
-                                    </div>
-                                    <div class="col imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.owner" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.owner" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-
-                            </button>
-                        </h5>
-                    </div>
-                    <!--todo nell'api i dati di contatto non esistono in questa forma-->
-                    <div id="owner_content" class="collapse" [ngbCollapse]="isCollapsed.owner">
-
-                        <div class="card-body row">
-                            <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
-                            <div class="col-12"><strong>Contacts:</strong></div>
-                            <div class="col-12">
-                                <ul>
-                                    <li>Via Riva Reno, 72 - 40122 Bologna</li>
-                                    <li>tel: (+39) 05124879656</li>
-                                    <li>fax: (-39) 05124879656</li>
-                                    <li>http://www.cinetecadibologna.it/</li>
-                                </ul>
-                            </div>
-                            <div class="col-12 space-paragraph-10">
-                                <strong>Film ID in Archive: </strong>
-                                <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
-                            </div>
+                <app-expansion-panel title="Contacts">
+                        <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
+                        <div class="col-12"><strong>Contacts:</strong></div>
+                        <div class="col-12">
+                            <ul>
+                                <li>Via Riva Reno, 72 - 40122 Bologna</li>
+                                <li>tel: (+39) 05124879656</li>
+                                <li>fax: (-39) 05124879656</li>
+                                <li>http://www.cinetecadibologna.it/</li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
+                        <div class="col-12 space-paragraph-10">
+                            <strong>Film ID in Archive: </strong>
+                            <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
+                        </div>
+                </app-expansion-panel>
+
             </div>
 
         </div>
         <!-- tab TECHNICAL INFO -->
         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             <div id="tech-info_accordion" class="imc--accordion">
-                <div class="card imc--expansion-panel" *ngIf="info.type === 'aventity'">
-                    <div class="card-header" id="analogue_head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                                    (click)="expandCard('analogue')"
-                                    [attr.aria-expanded]="!isCollapsed.analogue"
-                                    aria-controls="analogue_content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">Analogue film format</div>
-                                    <div class="col imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.analogue" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.analogue" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="analogue_content" class="collapse"  [ngbCollapse]="isCollapsed.analogue">
-                        <div class="card-body row">
-                            <div class="col-12">
-                                <ul class="list-space">
 
-                                    <li
-                                            *ngIf="info.relationships.video_format[0].attributes.sound">
-                                        <strong>Sound: </strong>
-                                        <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
+                <ng-template [ngIf]="info.type === 'aventity'">
 
-                                    </li>
-                                    <li
-                                            *ngIf="info.relationships.video_format[0].attributes.colour">
-                                        <strong>Colour: </strong>
-                                        <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
-                                    </li>
-                                    <li
-                                            *ngIf="info.relationships.video_format[0].attributes.gauge">
-                                        <strong>Gauge: </strong>
-                                        <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
-                                    </li>
-                                    <li
-                                            *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
-                                        <strong>Aspect ratio: </strong>
-                                        <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
-                                    </li>
-                                </ul>
-                            </div>
+                    <app-expansion-panel title="Analogue film format" >
+                        <div class="col-12">
+                            <ul class="list-space">
+
+                                <li *ngIf="info.relationships.video_format[0].attributes.sound">
+                                    <strong>Sound: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
+
+                                </li>
+                                <li *ngIf="info.relationships.video_format[0].attributes.colour">
+                                    <strong>Colour: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
+                                </li>
+                                <li *ngIf="info.relationships.video_format[0].attributes.gauge">
+                                    <strong>Gauge: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
+                                </li>
+                                <li
+                                        *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
+                                    <strong>Aspect ratio: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
+                                </li>
+                            </ul>
                         </div>
-                    </div>
-                </div>
+                    </app-expansion-panel>
 
-                <div class="card imc--expansion-panel" *ngIf="info.type === 'aventity'">
-                    <div class="card-header" id="digital_head">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed"
-                                    (click)="expandCard('format')"
-                                    [attr.aria-expanded]="!isCollapsed.format"
-                                    aria-controls="digital_content">
-                                <div class="row">
-                                    <div class="col-9 col-sm-10">
-                                        Digital format
-                                    </div>
-                                    <div class="col imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.format" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.format" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="digital_content" class="collapse" [ngbCollapse]="isCollapsed.format">
-                        <div class="card-body row">
-                            <div class="col-12">
-                                <ul class="list-space">
-                                    <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
-                                        <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
-                                    </li>
+                    <app-expansion-panel title="Digital format">
+                        <div class="col-12">
+                            <ul class="list-space">
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
+                                    <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 2">
-                                        <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 2">
+                                    <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 3">
-                                        <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 3">
+                                    <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 4">
-                                        <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 4">
+                                    <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.framerate">
-                                        <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.duration">
-                                        <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.duration">
+                                    <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
+                                </li>
 
-                                    <li *ngIf="info.relationships.item[0].attributes.dimension">
-                                        <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
-                                    </li>
+                                <li *ngIf="info.relationships.item[0].attributes.dimension">
+                                    <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
+                                </li>
 
-                                </ul>
-                            </div>
-<!--
-                            <div class="col-6 space-paragraph-25">
-                                <h5>*Video</h5>
-                                <ul class="space-paragraph-10">
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                </ul>
-                            </div>
-                            <div class="col-6 space-paragraph-25">
-                                <h5>*Audio</h5>
-                                <ul class="space-paragraph-10">
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                    <li>"label": "xxx"</li>
-                                </ul>
-                            </div>
--->
+                            </ul>
                         </div>
-                    </div>
-                </div>
+                    </app-expansion-panel>
+
+                </ng-template>
+
+                <ng-template [ngIf]="info.type !== 'aventity'">
+
+                    <app-expansion-panel title="Analogue format">
+                        <ul class="list-space">
+                            <li>
+                                <strong>Media type: </strong>
+                                <span [innerHTML]="info.attributes.specific_type.description"></span>
+                            </li>
+
+                            <li>
+                                <strong>Physical format: </strong>
+                                <span [innerHTML]="info.attributes.phisical_format_size.join(' ')"></span>
+                            </li>
+
+                            <li *ngIf="info.attributes.colour">
+                                <strong>Colour: </strong>
+                                <span [innerHTML]="info.attributes.colour.description"></span>
+                            </li>
+                        </ul>
+                    </app-expansion-panel>
+
+                    <app-expansion-panel title="Digital format">
+                        <ul class="list-space">
+
+                            <li>
+                                <strong>Item type:</strong>
+                                <span [innerHTML]="info.relationships.item[0].attributes.item_type.description"></span>
+                            </li>
+
+                            <li>
+                                <strong>Format:</strong>
+                                <span [innerHTML]="info.relationships.item[0].attributes.digital_format.join(' ')"></span>
+                            </li>
+
+                        </ul>
+                    </app-expansion-panel>
+
+                </ng-template>
+
             </div>
         </div>
     </div>

@@ -86,7 +86,7 @@ picture-->
                                        role="tab"
                                        aria-controls="pills-picture"
                                        aria-selected="true">
-                                        <i class="material-icons" data-title="All Picture">crop_original</i>
+                                        <i class="material-icons" data-title="Whole Picture">crop_original</i>
                                     </a>
                                 </li>
                                 <li class="nav-item" (click)="tab_title_set($event)">
@@ -148,20 +148,33 @@ picture-->
 
                         </div>
                     </ng-container>
+
                     <ng-container *ngIf="media_type === 'image'">
+
                         <div class="tab-pane fade show active" id="pills-picture" role="tabpanel" aria-labelledby="picture">
                             <!-- tab picture -->
 
                             <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
                             <!-- Blocco di codice se non ci sono elementi al suo interno-->
 
-                            <div class="container-info-element row no-gutters">
-                                <div class="col-12"><p>no tags</p></div>
-                                <!--<span class="info-element-button col-12">
-                                        &lt;!&ndash; In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab&ndash;&gt;
-                                        <button class="btn btn-border-classic">Create Segment&lt;!&ndash;Cancel&ndash;&gt;</button>
-                                    </span>-->
+                            <div class="container-info-element row no-gutters" *ngIf="!shots || !shots.length">
+                                <div class="col-12"><p>no tags!</p></div>
                             </div>
+
+                            <div *ngIf="shots && shots.length">
+                                <app-video-shot
+                                        *ngFor="let shot of shots"
+                                        [shot]="shot"
+                                        [user]="user"
+                                        [media_type]="image"
+                                        [multiSelection]="multi_annotations_is_active"
+                                        (modale_richiedi)="modal_show($event)"
+                                        (is_selezionato)="shot_selezionato($event)"
+                                ></app-video-shot>
+                            </div>
+
+
+
 
                         </div>
                         <div class="tab-pane fade" id="pills-areas" role="tabpanel" aria-labelledby="areas">
@@ -225,7 +238,7 @@ picture-->
     </div>
 
     <!-- MAPPA -->
-    <app-media-map-wrapper [shots]="shots" *ngIf="locations"></app-media-map-wrapper>
+    <app-media-map-wrapper [locations]="locations" [shots]="shots" [media_type]="media_type"></app-media-map-wrapper>
 
     <!-- CONTAINER INFO -->
     <div class="container-fluid imc--container">
@@ -259,14 +272,14 @@ picture-->
 
     <!-- Modal -->
     <app-modale #appModale>
-        <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-termtag>
-        <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-geotag>
-        <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-note>
-        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" modal-dialog></app-modal-insert-link>
-        <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data" modal-dialog></app-modal-insert-reference>
-        <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data" modal-dialog></app-modal-all-annotations>
-        <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
-        <app-modal-tag-cloud *ngIf="modale.type === 'tag-cloud'" [data]="modale.data" modal-dialog></app-modal-tag-cloud>
+        <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-termtag>
+        <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-geotag>
+        <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-note>
+        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-link>
+        <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-reference>
+        <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-all-annotations>
+        <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" [media_type]="media_type" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
+        <app-modal-tag-cloud *ngIf="modale.type === 'tag-cloud'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-tag-cloud>
     </app-modale>
 </div>
 

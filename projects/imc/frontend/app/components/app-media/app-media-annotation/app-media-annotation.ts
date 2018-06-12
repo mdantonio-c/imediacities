@@ -11,6 +11,8 @@ export class AppMediaAnnotationComponent implements OnInit {
     @Input() annotation;
     @Input() clickable;
     @Input() can_delete;
+    @Input() delete_fn;
+    @Input() disable_confirmation = false;
 
     public popover;
 
@@ -20,14 +22,22 @@ export class AppMediaAnnotationComponent implements OnInit {
     delete () {
         if (!this.can_delete) return;
         if (this.annotation.id) {
-            this.AnnotationsService.delete_tag(this.annotation);
+            this.AnnotationsService.delete_tag(this.annotation, this.annotation.source);
+        } else if (this.delete_fn) {
+                this.delete_fn(this.annotation)
+        }
+
+    }
+
+    cancella_senza_popover () {
+        if (this.disable_confirmation === true) {
+            this.delete();
         }
     }
 
     ngOnInit () {
 
         let classe = 'badge-termtag';
-
         if (this.annotation.group === 'location') {
             classe = 'badge-geotag'
         }

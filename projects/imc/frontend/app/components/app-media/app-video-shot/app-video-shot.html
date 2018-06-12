@@ -22,15 +22,15 @@
 
     <span class="col-3 imc--flex--vertical-center">
         <!-- Anteprima dello shot del video -->
-        <span class="anteprima-shot click-event" (click)="shot_play()">
+        <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
             <img [src]="shot.links.thumbnail" alt="">
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
     </span>
 
-    <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info">
-        <strong [innerHTML]="shot.attributes.timestamp"></strong>
-        <span>
+    <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">
+        <strong [innerHTML]="shot.attributes.timestamp || '&nbsp;'"></strong>
+        <span *ngIf="media_type === 'video'">
             frame range:
             <span class="paragraph-not-divide">
                 <strong class="click-event" [innerHTML]="shot.attributes.start_frame_idx" (click)="shot_goto(shot.attributes.start_frame_idx)"></strong>
@@ -38,6 +38,7 @@
                 <strong class="click-event" [innerHTML]="shot.attributes.end_frame_idx" (click)="shot_goto(shot.attributes.end_frame_idx)"></strong>
             </span>
         </span>
+        <span *ngIf="media_type !== 'video'">&nbsp;</span>
         <ul class="box--icon-list">
             <li><i class="material-icons">place</i><span><strong [innerHTML]="shot.annotations.locations.length"></strong></span></li>
             <li><i class="material-icons">turned_in</i><span><strong [innerHTML]="shot.annotations.tags.length"></strong></span></li>

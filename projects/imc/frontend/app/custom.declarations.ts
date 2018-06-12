@@ -66,6 +66,7 @@ import {AppMediaCommentiComponent} from "./components/app-media/app-media-commen
 import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-related-items/app-media-related-items";
 import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
+import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {LocalStorageService} from './catalog/services/local-storage.service';
@@ -76,6 +77,7 @@ import {AppVocabularyService} from "./services/app-vocabulary";
 import {AppModaleService} from "./services/app-modale";
 import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fast-play";
 import {AppVideoService} from "./services/app-video";
+import {AppLodService} from "./services/app-lod";
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent,
@@ -94,6 +96,7 @@ export const declarations: any[] = [
 	ProviderToCityPipe,
 	NoCommaPipe,
 	DurationPipe,
+	AppExpansionPanelComponent,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
@@ -148,6 +151,7 @@ export const providers: any[] = [
     CatalogService,
     LocalStorageService,
     AppAnnotationsService,
+    AppLodService,
     AppMediaService,
     AppModaleService,
     AppShotsService,

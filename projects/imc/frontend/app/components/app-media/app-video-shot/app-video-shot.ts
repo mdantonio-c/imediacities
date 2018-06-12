@@ -11,6 +11,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Input() shot;
     @Input() multiSelection;
     @Input() user;
+    @Input() media_type = 'video';
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
     @Output() is_selezionato: EventEmitter<any> = new EventEmitter();
@@ -43,7 +44,8 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             this.modale_richiedi.emit({
                 modale: modale,
                 titolo: evento.target.innerText,
-                data: {shots: [this.shot]}
+                data: {shots: [this.shot]},
+                media_type: this.media_type
             });
 
         }
@@ -51,6 +53,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     }
 
     shot_play () {
+        if (this.media_type !== 'video') return;
         this.parent.shot_play(this.shot.attributes.shot_num);
     }
 

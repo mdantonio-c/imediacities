@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Output, EventEmitter} from '@angular/core';
 import {ApiService} from '/rapydo/src/app/services/api';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
@@ -7,22 +7,26 @@ import {AppShotsService} from "./app-shots";
 @Injectable()
 export class AppAnnotationsService {
 
+    _annotations = [];
+
     private confirmationPopover_config = {
-        popoverTitle: 'Vut scanzler',
-        popoverMessage: 'It segur?',
+        popoverTitle: 'Delete',
+        popoverMessage: 'This operation cannot be undone<br>Do you wish to continue?',
         appendToBody: true
     };
 
+    @Output() update: EventEmitter<any> = new EventEmitter();
+
     constructor(private api: ApiService, private ShotsService: AppShotsService) {}
 
-    create_tag (shots_ids, sources, cb) {
-
+    create_tag (shots_ids, sources, media_type, cb) {
+console.log("media_type",  media_type);
         let  observables:Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
                 'annotations',
                 {
-                    target:`shot:${shot_id}`,
+                    target: media_type === 'video' ? `shot:${shot_id}` : `item:${shot_id}`,
                     motivation: 'tagging',
                     body: sources.map(s => {
                         if (s.iri) {
@@ -42,14 +46,15 @@ export class AppAnnotationsService {
 
     }
 
-    create_note (shots_ids, note, cb) {
+    create_note (shots_ids, note, media_type, cb) {
 
         let  observables:Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
                 'annotations',
                 {
-                    target:`shot:${shot_id}`,
+                    // target:`shot:${shot_id}`,
+                    target: media_type === 'video' ? `shot:${shot_id}` : `item:${shot_id}`,
                     motivation: 'describing',
                     body: AppAnnotationsService.textual_body(note),
                     private: note.private
@@ -63,14 +68,14 @@ export class AppAnnotationsService {
 
     }
 
-    delete_request (annotation) {
+    delete_request (annotation, media_type) {
         let confirm = window.confirm('Delete the annotation "' + annotation.name + '"?');
         if (confirm) {
-            this.delete_tag(annotation);
+            this.delete_tag(annotation, media_type);
         }
     }
 
-    delete_tag (annotation) {
+    delete_tag (annotation, media_type) {
 
         const bodyRef = annotation.iri ? `resource:${annotation.iri}` : `textual:${annotation.name}`;
 
@@ -79,11 +84,33 @@ export class AppAnnotationsService {
             `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
         ).subscribe(
             response => {
-                this.ShotsService.get();
+                console.log("media_type",  media_type);
+                if (media_type === 'video') {
+                    this.ShotsService.get();
+                } else if (media_type === 'image') {
+                    console.log("annotation.source_uuid",  annotation.source_uuid);
+                    this.get(annotation.source_uuid, 'images');
+                }
+            },
+            err => {}
+        );
+
+    }
+
+    get (media_id, endpoint) {
+
+        this.api.get(
+            endpoint,
+            `${media_id}/annotations`
+        ).subscribe(
+            response => {
+                this._annotations = response.data;
+                this.update.emit(this._annotations);
             },
             err => {
+                console.log("err",  err);
             }
-        );
+        )
 
     }
 
