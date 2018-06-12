@@ -98,13 +98,13 @@
 .media-body .text {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 80px;
+    max-height: 72px;
     transition: .50s all;   
     transition-delay: 5s; 
 }
 
 .media-body .text:hover {
-    overflow: visible;
+    /*overflow: visible;*/
     height:auto;
     transition-delay: 1s;
 }
