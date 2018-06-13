@@ -1,5 +1,6 @@
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
+import { IonRangeSliderModule } from "ng2-ion-range-slider";
 
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 
@@ -163,5 +164,6 @@ export const providers: any[] = [
 
 export const imports: any[] = [
   NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
-  HolderJsModule
+  HolderJsModule,
+  IonRangeSliderModule
 ];

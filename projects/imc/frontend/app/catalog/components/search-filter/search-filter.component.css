@@ -35,10 +35,22 @@
 	/*margin: 0 auto;
     width: 15.4em;*/
     /*margin-left: 10%;*/
+    flex-wrap: nowrap;
+    justify-content: center;
 }
 
-.search-filter-element .date-range input {
-	min-width: 50px;
+.search-filter-element .date-range .input-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
+.search-filter-element .date-range .input-wrapper input {
+    min-width: 78px;
+    flex: 1;
+}
+
+.search-filter-element .date-range .input-wrapper input,
+.search-filter-element .date-range .input-group-prepend {
+    border-radius: 0 !important;
 }
 
 /* custom treeview */
@@ -175,5 +187,4 @@ li.ivh-treeview-node::before {
     padding: 5px 10px 0px 10px !important;
     margin-left: 2px;
 }
-
 

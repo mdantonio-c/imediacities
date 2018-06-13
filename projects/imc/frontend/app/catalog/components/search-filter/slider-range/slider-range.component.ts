@@ -69,18 +69,24 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 	}
 
 	mouseDownMax($event) {
-		/*console.log('mouse-down-max');
-		console.log($event);*/
+		console.log('mouse-down-max');
+		/*console.log($event);*/
 		this.dragging = true;
 		this.startPointXMax = $event.pageX;
 		/*console.log('dragging: ' + this.dragging);*/
 	}
 
 	// Bind to full document, to make move easiery (not to lose focus on y axis)
-	/*@HostListener('mousemove', ['$event']) onMouseMove($event) { */
-	mouseMoveMax($event) {
+	@HostListener('document:mousemove', ['$event']) onMouseMove($event) {
 		if (!this.dragging) return;
-		/*console.log('dragging', this.dragging);*/
+		if ($event.target === this.el.nativeElement.querySelector('.handle.min')) {
+			this.mouseMoveMin($event);
+		} else if ($event.target === this.el.nativeElement.querySelector('.handle.max')) {
+			this.mouseMoveMax($event);
+		}
+	}
+
+	private mouseMoveMax($event) {
 
 		//Calculate handle position
 		let moveDelta = $event.pageX - this.startPointXMax;
@@ -106,7 +112,7 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 		this.moveRange(this.xPosMin, xPosMax);
 	}
 
-	mouseMoveMin($event) {
+	private mouseMoveMin($event) {
 		if (!this.dragging) return;
 
 		//Calculate handle position
@@ -132,11 +138,6 @@ export class SliderRangeComponent implements OnChanges, OnInit {
 		this.moveHandle("min", xPosMin);
 		this.moveRange(xPosMin, this.xPosMax);
 	}
-
-	/*@HostListener('mouseout', ['$event']) onMouseOut() {
-		this.dragging = false;
-		console.log('mouse out');
-	}*/
 
 	@HostListener('document:mouseup', ['$event']) onMouseUp() {
 		this.dragging = false;
