@@ -1415,3 +1415,13 @@ body, a {
     font-size: 60px !important; }
 
 /*# sourceMappingURL=style.css.map */
+
+.search-pager .pagination > li {
+    align-items: stretch !important;
+    color: #707070;
+    background: transparent;
+    border: 1px solid #707070 !important;
+}
+.search-pager .pagination > li.page-item.active > a.page-link {
+  background: #53b8e2;
+}

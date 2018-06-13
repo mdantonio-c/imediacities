@@ -1,11 +1,13 @@
-import { Component, OnInit, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
 import { SliderRangeComponent } from './slider-range/slider-range.component';
 import { AppVocabularyService } from "../../../services/app-vocabulary";
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { IonRangeSliderComponent } from "ng2-ion-range-slider";
 
 @Component({
   selector: 'search-filter',
@@ -23,11 +25,12 @@ export class SearchFilterComponent implements OnInit {
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
+  @ViewChild('rangeSlider') rangeSliderEl: IonRangeSliderComponent;
+
   constructor(
     private formBuilder: FormBuilder,
     private vocabularyService: AppVocabularyService,
-    private catalogService: CatalogService,
-    private el: ElementRef) {
+    private catalogService: CatalogService) {
     this.searchForm = this.formBuilder.group({
       searchTerm: [''],
       videoType: [true],
@@ -49,6 +52,17 @@ export class SearchFilterComponent implements OnInit {
       }
     });
     this.searchForm.setValue(this.toForm(this.catalogService.filter));
+
+    Observable.combineLatest(
+      this.searchForm.get('productionYearFrom').valueChanges
+    ).subscribe(([productionYearFrom = 1890]) => {
+      this.setSliderTo(productionYearFrom, this.searchForm.get('productionYearTo').value);
+    });
+    Observable.combineLatest(
+      this.searchForm.get('productionYearTo').valueChanges
+    ).subscribe(([productionYearTo = 1999]) => {
+      this.setSliderTo(this.searchForm.get('productionYearFrom').value, productionYearTo);
+    });
   }
 
   private toForm(filter: SearchFilter) {
@@ -206,11 +220,12 @@ export class SearchFilterComponent implements OnInit {
 
   /**
    * A search entry is clicked
-   * @param term
+   * @param $event
    */
-  selectTerm(term) {
-    this.addTerm(term.item);
-    this.vocabularyService.select_term(term.item);
+  selectTerm($event) {
+    $event.preventDefault();
+    this.addTerm($event.item);
+    this.vocabularyService.select_term($event.item);
   }
 
   addTerm(event) {
@@ -228,8 +243,6 @@ export class SearchFilterComponent implements OnInit {
     }
     // clear the input field
     this.searchForm.get('term').setValue('', { emitEvent: false });
-    const input = this.el.nativeElement.querySelector('#tag-term');
-    if (input) { input.value = ''; }
   }
 
   removeTerm(term) {
@@ -237,6 +250,15 @@ export class SearchFilterComponent implements OnInit {
     if (term.iri) {
       this.vocabularyService.deselect_term(term);
     }
+  }
+  
+  updateSlider($event) {
+    this.changeYearFrom($event.from);
+    this.changeYearTo($event.to);
+  }
+
+  setSliderTo(from, to) {
+    this.rangeSliderEl.update({from: from, to:to});
   }
 
 }

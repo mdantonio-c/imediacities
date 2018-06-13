@@ -9,6 +9,11 @@ import 'js-marker-clusterer'
 // import 'bootstrap-treeview'
 */
 import 'js-marker-clusterer/src/markerclusterer.js'
+import 'ion-rangeslider/js/ion.rangeSlider.min.js'
+
+// add the ion-range-slider style and skin css
+import 'ion-rangeslider/css/ion.rangeSlider.css'
+import 'ion-rangeslider/css/ion.rangeSlider.skinFlat.css'
 
 import 'material-icons/iconfont/material-icons.css'
 
