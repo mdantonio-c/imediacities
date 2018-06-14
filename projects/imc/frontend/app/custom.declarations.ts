@@ -20,6 +20,7 @@ import { SearchMediaComponent } from './catalog/components/search-media/search-m
 import { SearchMapComponent } from './catalog/components/search-map/search-map.component';
 import { SearchTimelineComponent } from './catalog/components/search-timeline/search-timeline.component';
 import { SearchMediaTagComponent } from './catalog/components/search-media-tag/search-media-tag.component';
+import { SliderRangeComponent } from './catalog/components/search-filter/slider-range/slider-range.component';
 
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
 import {DurationPipe} from "./pipes/duration.pipe";
