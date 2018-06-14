@@ -15,9 +15,9 @@
 }
 
 .imc--video-tag--button {
-  background: $bg-light-grey;
-  border: 1px solid $border;
-  cursor: pointer;
+  background: $bg-dark;
+  border: 1px solid rgba($border, .5);
+  //cursor: pointer;
   text-align: center;
   transition: $transition-all;
 
@@ -31,9 +31,10 @@
     }
   }
 
-  &:hover {
-    background: $bg-grey;
-  }
+  //&:hover {
+  //  background: lighten($bg-dark, 30%);
+  //  //background: $bg-grey;
+  //}
 }
 
 .box-badge {

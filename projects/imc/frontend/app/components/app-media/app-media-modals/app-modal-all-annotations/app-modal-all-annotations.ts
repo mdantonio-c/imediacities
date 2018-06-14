@@ -1,4 +1,6 @@
 import {Component, OnInit, OnChanges, Input} from '@angular/core';
+import {AuthService} from "/rapydo/src/app/services/auth";
+import {is_annotation_owner} from "../../../../decorators/app-annotation-owner";
 
 @Component({
     selector: 'app-modal-all-annotations',
@@ -9,12 +11,22 @@ export class AppModalAllAnnotationsComponent implements OnInit, OnChanges {
 
     @Input() data;
     @Input() media_type: string;
-    public shot;
+    @is_annotation_owner() is_annotation_owner;
 
-    constructor() {
+    public shot;
+    private _current_user;
+
+    constructor(
+        private AuthService: AuthService
+    ) {
+    }
+
+    tag_is_deletable (tag) {
+        return this.is_annotation_owner(this._current_user, tag.creator);
     }
 
     ngOnInit() {
+        this._current_user = this.AuthService.getUser();
         this.shot = this.data.shots[0];
     }
 

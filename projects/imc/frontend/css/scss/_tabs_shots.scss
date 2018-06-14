@@ -6,6 +6,8 @@
   display: flex;
   flex-direction: column;
   margin: 0;
+  max-height: 500px;
+  min-height: 500px;
 
   .imc--toolbar {
     background: $bg-dark-grey;
@@ -18,7 +20,6 @@
 
   .tab-content {
     background: $bg-light-grey;
-    /*height: 430px;*/
     display: flex;
     flex-direction: column;
     align-self: stretch;

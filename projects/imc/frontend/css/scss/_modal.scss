@@ -276,28 +276,42 @@
 
 .modal-body-content {
   align-items: flex-start;
+}
 
-  //.popover {
-  //  border: 0;
-  //  border-radius: 0;
-  //  box-shadow: none;
-  //  margin-bottom: 8px;
-  //  max-width: 1000px;
-  //  position: relative;
-  //  padding: 0;
-  //  left: 0 !important;
-  //  top: 0 !important;
-  //  width: auto;
-  //
-  //  .arrow:after,
-  //  .arrow:before {
-  //    display: none;
-  //  }
-  //}
-  //
-  //.popover-body {
-  //  padding: 0;
-  //}
+.popover-embedded {
+  align-items: flex-start;
+
+  .popover {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-bottom: 8px;
+    max-width: 1000px;
+    position: relative;
+    padding: 0;
+    left: 0 !important;
+    top: 0 !important;
+    width: auto;
+
+  }
+
+  .popover-body {
+    padding: 0;
+  }
+
+}
+
+.popover-left .popover {
+  top: 25px !important;
+  left:0 !important;
+  max-width: unset;
+}
+
+.popover-no-arrow .popover {
+  .arrow:after,
+  .arrow:before {
+    display: none;
+  }
 }
 
 .modal-media--info {

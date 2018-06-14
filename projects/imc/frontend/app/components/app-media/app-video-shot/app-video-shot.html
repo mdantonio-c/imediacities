@@ -39,27 +39,24 @@
             </span>
         </span>
         <span *ngIf="media_type !== 'video'">&nbsp;</span>
-        <ul class="box--icon-list">
-            <li><i class="material-icons">place</i><span><strong [innerHTML]="shot.annotations.locations.length"></strong></span></li>
-            <li><i class="material-icons">turned_in</i><span><strong [innerHTML]="shot.annotations.tags.length"></strong></span></li>
-            <li><i class="material-icons">speaker_notes</i><span><strong [innerHTML]="shot.annotations.notes.length"></strong></span></li>
-            <li><i class="material-icons">library_books</i><span><strong [innerHTML]="shot.annotations.references.length"></strong></span></li>
-            <li class="icon-rotate"><i class="material-icons">link</i><span><strong [innerHTML]="shot.annotations.links.length"></strong></span></li>
+        <ul class="box--icon-list" (click)="details_show()">
+            <li class="click-event"><i class="material-icons">place</i><span><strong [innerHTML]="shot.annotations.locations.length"></strong></span></li>
+            <li class="click-event"><i class="material-icons">turned_in</i><span><strong [innerHTML]="shot.annotations.tags.length"></strong></span></li>
+            <li class="click-event"><i class="material-icons">speaker_notes</i><span><strong [innerHTML]="shot.annotations.notes.length"></strong></span></li>
+            <li class="click-event"><i class="material-icons">library_books</i><span><strong [innerHTML]="shot.annotations.references.length"></strong></span></li>
+            <li class="click-event icon-rotate"><i class="material-icons">link</i><span><strong [innerHTML]="shot.annotations.links.length"></strong></span></li>
         </ul>
-
     </span>
 
     <span class="col-1 imc--flex--vertical-center imc--flex--horizontal-center">
-        <i class="material-icons click-event" (click)="details_toggle()" data-toggle="collapse" [attr.data-target]="'#'+collapse_id"
-           aria-expanded="false"
-           [attr.aria-controls]="'#'+collapse_id">
-            <ng-container *ngIf="!details_show; else dropArrow">keyboard_arrow_down</ng-container>
+        <i class="material-icons click-event" (click)="details_toggle()">
+            <ng-container *ngIf="!arrow_icon; else dropArrow">keyboard_arrow_down</ng-container>
            <ng-template #dropArrow>keyboard_arrow_up</ng-template></i>
     </span>
 <!--</div>-->
 
 <!-- Dettagli del singolo shot -->
-<div class="collapse col-12"  [id]="collapse_id" [ngbCollapse]="!is_attivo">
+<div class="collapse col-12"  [id]="collapse_id" [ngbCollapse]="!details_open">
     <div class="content">
         <div>
             <ng-template
@@ -96,7 +93,7 @@
             <!-- bottone vedi tutte le annotazioni -->
             <button class="btn btn-accent" (click)="modale_show($event, 'all-annotations')">See All</button>
             <!-- aggiungi a una lista -->
-            <button class="btn btn-icon-border-classic"><i class="material-icons">playlist_add</i></button></div>
+            <button class="btn btn-icon-border-classic tmp_hidden"><i class="material-icons">playlist_add</i></button></div>
         </div>
     </div>
 </div>

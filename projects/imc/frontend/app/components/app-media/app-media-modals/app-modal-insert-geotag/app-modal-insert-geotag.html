@@ -8,8 +8,16 @@
                   [types]="['geocode']">
        </span>
 
+        <!--Tag duplicati-->
+        <div class="col-10 new-badge" *ngIf="add_geotag.visible">
+            <app-info  [message]="add_geotag.message" [result]="add_geotag.status"
+                       *ngIf="add_geotag.visible"
+                       (click)="add_geotag.visible = false"></app-info>
+        </div>
+
         <!-- Tag appena inseriti -->
-        <div class="col-12 new-badge space-paragraph-25">
+        <div class="col-12 new-badge space-paragraph-25" *ngIf="places_to_add.length">
+            <h5>Geotags to be added</h5>
             <ng-template ngFor let-place [ngForOf]="places_to_add">
                 <app-media-annotation
                         [annotation]="place"
@@ -55,6 +63,7 @@
         </div>
 
         <div class="col-12 space-paragraph-25">
+            <h5>Current geotags</h5>
             <ng-template ngFor let-place [ngForOf]="markers">
                 <app-media-annotation [annotation]="place" *ngIf="place.name"></app-media-annotation>
             </ng-template>
@@ -67,6 +76,10 @@
     </div>
 
 
-    <button type="button" class="btn btn-accent" modal-button (click)="save()">Save</button>
-
+    <button type="button" class="btn btn-accent" modal-button [disabled]="!places_to_add.length" (click)="save()">Save</button>
+    <!--esito-->
+    <app-info modal-button
+              [message]="save_result.message" [result]="save_result.status"
+              *ngIf="save_result.visible"
+              (click)="save_result.visible = false"></app-info>
 </app-media-modal>

@@ -7,6 +7,7 @@ import {AuthService} from "/rapydo/src/app/services/auth";
 import {AppVideoService} from "../../../services/app-video";
 import {ApiService} from '/rapydo/src/app/services/api';
 import {ProviderToCityPipe} from "../../../pipes/ProviderToCity";
+import {is_annotation_owner} from "../../../decorators/app-annotation-owner";
 
 @Component({
     selector: 'app-media-map',
@@ -23,6 +24,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     @Input() media_type;
 
     @ViewChild(NguiMapComponent) ngMap: NguiMapComponent;
+
+    @is_annotation_owner() is_annotation_owner;
 
     constructor(
         private api: ApiService,
@@ -138,10 +141,20 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
      * @param event
      */
     marker_add (event) {
+
         if (event instanceof MouseEvent) return;
 
+        let shots_idx = [];
+
         //  Verifico shot corrente
-        const shots_idx = this.shots_get();
+        if (this.media_type === 'video' && this.current_shot_from_video) {
+            if (this.VideoService.shot_current() === -1) {
+                return alert('No shot selected');
+            }
+            shots_idx = this._shots_get(this.VideoService.shot_current())
+        } else {
+            shots_idx = this._shots_get(this.shots.map(s => s.attributes.shot_num))
+        }
 
         if (this.media_type === 'video' && !shots_idx.length) {
             return alert('No shot selected');
@@ -161,7 +174,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             null
         );
         this._subscription.add(geocode);
-        console.log("this._subscription",  this._subscription);
     }
 
     /**
@@ -181,7 +193,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
                 return acc;
             },[]),
             marker: event.target,
-            owner: (this._current_user.uuid === pos.creator) // oppure admin
+            owner: this.is_annotation_owner(this._current_user, pos.creator)
         };
 
         event.target.nguiMapComponent.openInfoWindow('iw', event.target);
@@ -232,16 +244,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
      * Salvataggio marker
       */
     marker_edit_save () {
-        if(this.marker_edit.state === 'updating') {
-            this.AnnotationsService.delete_tag(
-                {
-                    id: this.marker_edit.id,
-                    iri: this.marker_edit.iri,
-                    name: this.marker_edit.address
-                },
-                this.media_type
-            )
-        }
 
         //  Impostazione shot
         let shots_idx = [];
@@ -254,6 +256,18 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             return alert('No shot selected');
         }
 
+        if(this.marker_edit.state === 'updating') {
+            this.AnnotationsService.delete_tag(
+                {
+                    id: this.marker_edit.id,
+                    iri: this.marker_edit.iri,
+                    name: this.marker_edit.address,
+                    source_uuid: this.marker_edit.source_uuid
+                },
+                this.media_type
+            )
+        }
+
         this.AnnotationsService.create_tag(
             shots_idx.map(s => s.id),
             [{
@@ -264,14 +278,18 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             }],
             this.media_type,
             (r) => {
-                this.marker_edit.state = 'saved';
-                this.marker_edit.icon = null;
 
                 if (this.media_type === 'video') {
-                    this.ShotsService.get();
+                    if (this.marker_edit.state !== 'updating') {
+                        this.ShotsService.get();
+                    }
                 } else if (this.media_type === 'image') {
                     this.AnnotationsService.get(this.MediaService.media_id(), 'images');
                 }
+
+                this.marker_edit.state = 'saved';
+                this.marker_edit.icon = null;
+
                 this.marker_edit_close(false);
             }
         )
@@ -368,13 +386,14 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
      * @param marker
      */
     marker_update (annotation, marker) {
-        //todo shots_idx??
         this.marker_edit = {
             marker: marker,
             address: annotation.name,
             description: annotation.name,
             iri: annotation.iri,
             id: annotation.id,
+            source_uuid: annotation.source_uuid,
+            shots_idx: this._shots_get(annotation.shots_idx),
             location: {
                 lat: annotation.spatial[0],
                 lng: annotation.spatial[1]
@@ -392,23 +411,34 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
      * Ottiene gli indici degli shot ai quali associare il marker da salvare
      * @returns {any[]}
      */
-    shots_get () {
+    _shots_get (elenco_shots = null) {
+
+        if (!elenco_shots || !Array.isArray(elenco_shots)) {
+            elenco_shots = [elenco_shots];
+        }
 
         let shots_idx = [];
-        if (this.current_shot_from_video && this.media_type === 'video') {
-            let current_shot = this.VideoService.shot_current();
-            shots_idx = this.shots.filter(s => s.attributes.shot_num === current_shot)
-        } else {
-            shots_idx = this.shots
-        }
+
+        elenco_shots.forEach(e => {
+
+            this.shots.forEach(s => {
+                if (s.attributes.shot_num === e) {
+                    shots_idx.push(s);
+                }
+            })
+
+        });
+
         shots_idx = shots_idx.map(s => {
             return {
                 indice: s.attributes.shot_num,
                 id: s.id
             }
         });
-        return shots_idx;
+
+        return shots_idx
     }
+
     /**
      * Imposta la mappa in modo da visualizzare tutti i marker
      */

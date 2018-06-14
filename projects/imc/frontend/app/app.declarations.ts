@@ -50,6 +50,8 @@ import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-re
 import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
 import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
+import {AppInfoComponent} from "./components/app-info/app-info";
+import {AppNoteComponent} from "./components/app-note/app-note";
 
 
 export const declarations: any[] = [
@@ -57,6 +59,7 @@ export const declarations: any[] = [
 	ProviderToCityPipe,
 	NoCommaPipe,
 	AppExpansionPanelComponent,
+	AppInfoComponent,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
@@ -79,6 +82,7 @@ export const declarations: any[] = [
 	AppModalListaShotsComponent,
 	AppMediaInfoComponent,
 	AppMediaTagsComponent,
+	AppNoteComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,

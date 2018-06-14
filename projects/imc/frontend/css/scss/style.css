@@ -603,7 +603,11 @@ input[type="radio"] {
 
 .btn-accent,
 .btn-accent:focus {
-  color: white; }
+  color: #fff; }
+
+.btn-accent.disabled, .btn-accent.disabled:active, .btn-accent:disabled, .btn-accent:disabled:hover {
+  border-color: #ABBAC3 !important;
+  color: #fff !important; }
 
 .page-type-video .btn-accent {
   background: #53b8e2;
@@ -1121,6 +1125,9 @@ input[type="radio"] {
 .page-type-image .modal--media-link {
   background: rgba(228, 52, 50, 0.2); }
 
+.modal-body-content {
+  align-items: flex-start; }
+
 .popover-embedded {
   align-items: flex-start; }
   .popover-embedded .popover {
@@ -1213,7 +1220,6 @@ input[type="radio"] {
 .imc--video-tag--button {
   background: #333;
   border: 1px solid rgba(222, 226, 230, 0.5);
-  cursor: pointer;
   text-align: center;
   transition: all 0.25s ease-out; }
   .imc--video-tag--button img {
@@ -1223,8 +1229,6 @@ input[type="radio"] {
       .imc--video-tag--button img {
         width: 102%;
         padding: 2px; } }
-  .imc--video-tag--button:hover {
-    background: gray; }
 
 .box-badge {
   margin-right: 4px; }
@@ -1403,6 +1407,52 @@ input[type="radio"] {
   .lod .search-terms-nav button {
     background-color: #824eb5; }
 
+.app-info {
+  align-items: center;
+  border: 1px solid;
+  display: flex;
+  font-size: 16px;
+  justify-content: space-between;
+  padding: 5px 10px; }
+  .app-info.success {
+    background: #e1ebda;
+    border-color: #5e8244;
+    color: #76a356; }
+  .app-info.error {
+    background: #fce7e6;
+    border-color: #c91c1a;
+    color: #e43432; }
+  .app-info.info {
+    background: white;
+    border-color: #28a6d9;
+    color: #53B8E1; }
+  .app-info .material-icons {
+    color: inherit !important;
+    padding-left: 5px; }
+
+.notes {
+  border: 1px solid #707070;
+  padding: .5em;
+  display: block; }
+  .notes .notes-container {
+    display: flex;
+    justify-content: space-between; }
+  .notes .notes-text {
+    height: 1.5em;
+    overflow: hidden;
+    width: 90%; }
+  .notes .notes-buttons {
+    display: flex;
+    justify-content: flex-end; }
+    .notes .notes-buttons .material-icons {
+      font-size: 1.3em !important; }
+
+.notes.note-expanded .notes-text {
+  height: auto; }
+
+.notes + .notes {
+  border-top: 0; }
+
 body, a {
   color: #707070;
   font-size: 16px !important;
@@ -1413,5 +1463,8 @@ body, a {
   font-size: 25px !important; }
   .material-icons.xlarge {
     font-size: 60px !important; }
+
+.tmp_hidden {
+  visibility: hidden; }
 
 /*# sourceMappingURL=style.css.map */

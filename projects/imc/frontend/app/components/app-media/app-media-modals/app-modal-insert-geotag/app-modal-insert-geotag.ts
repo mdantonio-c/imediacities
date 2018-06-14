@@ -4,6 +4,7 @@ import {AppAnnotationsService} from "../../../../services/app-annotations";
 import { } from '@types/googlemaps';
 import {} from '@ngui';
 import {AppMediaMapComponent} from "../../app-media-map/app-media-map";
+import {infoResult} from "../../../../decorators/app-info";
 
 @Component({
     selector: 'app-modal-insert-geotag',
@@ -16,6 +17,8 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     @Input() media_type: string;
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
     @ViewChild('map') mappa: AppMediaMapComponent;
+    @infoResult() save_result;
+    @infoResult() add_geotag;
 
     /**
      * Oggetto autocomplete per ricerca
@@ -70,9 +73,22 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
             spatial: [place.geometry.location.lat(), place.geometry.location.lng()],
         };
 
+        let esistente = this.places_to_add.some(e => {
+            return e.spatial[0] === marker.spatial[0] && e.spatial[1] === marker.spatial[1]
+        });
+
+        esistente = esistente || this.mappa.markers.some(e => {
+            return e.spatial[0] === marker.spatial[0] && e.spatial[1] === marker.spatial[1]
+        });
+
+        if (esistente) {
+            return this.add_geotag.show('info', 'This geotag has already been added');
+        } else {
+            this.add_geotag.hide();
+        }
+
         this.places_to_add.push(marker);
         this.mappa.marker_push(marker);
-        //this.markers.push(marker);
 
         this.fit_bounds();
         this.ref.detectChanges();
@@ -85,7 +101,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     place_remove (place) {
         this.places_to_add = this.places_to_add.filter(p => p.name !== place.name);
         this.mappa.marker_remove(place);
-        
+
         this.fit_bounds();
         this.ref.detectChanges();
     }
@@ -110,7 +126,17 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
                     "lng": p.place.geometry.location.lng()
                 }}),
                 this.media_type,
-                (r) => {this.shots_update.emit(r)}
+                (err, r) => {
+
+                    if (err) {
+                        this.save_result.show('error');
+                    }
+
+                    this.shots_update.emit(r);
+                    this.save_result.show('success', 'Geotag added successfully');
+                    this.places_to_add.forEach(t => {this.markers.push(t)});
+                    this.places_to_add = [];
+                }
             )
         }
 
@@ -119,6 +145,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     ngOnInit () {}
 
     ngOnChanges () {
+        this.add_geotag.hide();
         this.places_to_add = [];
         this.markers = this.AnnotationsService.merge(this.data.shots,'locations');
         this.fit_bounds();

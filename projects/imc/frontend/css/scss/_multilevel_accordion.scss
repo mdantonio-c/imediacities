@@ -56,6 +56,15 @@
     .icon-check-vocabulary {
       font-size: 18px !important;
       float: right;
+
+      .page-type-video & {
+        color: $theme-video-color;
+      }
+
+      .page-type-image & {
+        color: $theme-image-color;
+      }
+
     }
   }
 

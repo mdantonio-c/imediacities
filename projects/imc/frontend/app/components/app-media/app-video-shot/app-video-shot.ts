@@ -1,5 +1,6 @@
 import {Component, Input, Output, EventEmitter, OnInit, OnChanges, ViewChild, ElementRef} from '@angular/core';
 import {AppVideoControlComponent} from "../app-video-controls/app-video-control";
+import {is_annotation_owner} from "../../../decorators/app-annotation-owner";
 
 @Component({
     selector: 'app-video-shot',
@@ -16,26 +17,31 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
     @Output() is_selezionato: EventEmitter<any> = new EventEmitter();
 
+    @is_annotation_owner() is_annotation_owner;
+
     public scene = null;
 
-    public details_show = false;
+    public arrow_icon = false;
     public checkbox_selection_label = 'multi-annotation';
     public collapse_id = 'collapse-details';
     public dropdown_id = 'dropdown';
 
     public is_attivo = false;
+    public details_open = false;
 
     constructor(
         private element: ElementRef) {
         super();
     }
 
-    details_toggle(){
-        this.details_show = !this.details_show;
-        //  tdb scrolla quando viene espanso
-        // if (this.details_show) {
-        //     setTimeout( () => this.scroll(), 0);
-        // }
+    details_toggle () {
+        this.arrow_icon = !this.arrow_icon;
+        this.details_open = !this.details_open;
+    }
+
+    details_show () {
+        this.details_open = true;
+        this.arrow_icon = true;
     }
 
     modale_show (evento, modale) {
@@ -45,7 +51,6 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
                 modale: modale,
                 titolo: evento.target.innerText,
                 data: {shots: [this.shot]},
-                media_type: this.media_type
             });
 
         }
@@ -75,12 +80,13 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         let h = element.getBoundingClientRect().height;
         if (set_attivo) {
             this.is_attivo = true;
+            this.details_open = true;
         }
         this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
     }
 
     tag_is_deletable (tag) {
-        return tag.creator === this.user.uuid
+        return this.is_annotation_owner(this.user, tag.creator);
     }
 
     scrollTo (element, to, duration) {
@@ -116,8 +122,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     }
 
     ngOnChanges () {
-        // console.log("onchanges",this.shot.attributes.shot_num);
-        // console.log("this.details_show",  this.details_show);
+
         this.scene = Object.assign({}, this.shot);
         // console.log("this.scene",  this.scene);
 
@@ -132,6 +137,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             setTimeout( () => this.scroll(true), 0);
         } else {
             this.is_attivo = false;
+            this.details_open = false;
         }
     }
 

@@ -1,0 +1,31 @@
+@mixin app-info($color){
+  background: lighten($color, 40%);
+  border-color: darken($color, 10%);
+  color: $color;
+}
+.app-info {
+  align-items: center;
+  border:1px solid;
+  display:flex;
+  font-size:16px;
+  justify-content: space-between;
+  padding:5px 10px;
+
+  &.success {
+    @include app-info(#76a356);
+  }
+
+  &.error {
+    @include app-info(#e43432);
+  }
+
+  &.info {
+    @include app-info(#53B8E1);
+  }
+
+  .material-icons {
+    color:inherit !important;
+    padding-left:5px;
+  }
+
+}

@@ -5,32 +5,37 @@
 .search-term-close{
   float:right;
 }
-.search-term-header, .search-term-footer{
-
-  .page-type-video & {
-    border-color: $theme-video-color;
-  }
-
-
-  .page-type-image & {
-    border-color: $theme-image-color;
-  }
-
-  .page-type-video &.lod, .page-type-image &.lod {
-    border-color: $termtag-color;
-  }
-}
+//.search-term-header, .search-term-footer{
+//
+//  .page-type-video & {
+//    border-color: $theme-video-color;
+//  }
+//
+//
+//  .page-type-image & {
+//    border-color: $theme-image-color;
+//  }
+//
+//  .page-type-video &.lod, .page-type-image &.lod {
+//    border-color: $termtag-color;
+//  }
+//}
 
 .search-term-header{
   padding-bottom:4px;
   margin-bottom:4px;
-  border-bottom: 1px solid;
+  //border-bottom: 1px solid;
 }
 
 .search-term-footer{
   padding-top:4px;
   margin-top:4px;
-  border-top: 1px solid;
+  //border-top: 1px solid;
+}
+
+.search-term-no-results{
+  font-style:italic;
+  text-align:center;
 }
 
 .search-term-label {
@@ -114,15 +119,22 @@
     visibility:hidden;
   }
 
-  .page-type-video & span {
-      color: $theme-video-color;
+  button {
+    color:#FFF;
+    border-width: 0;
+    padding-top:2px;
+    padding-bottom:2px;
   }
 
-  .page-type-image & span {
-      color: $theme-image-color;
+  .page-type-video & button {
+      background-color: $theme-video-color;
   }
 
-  .lod & span {
+  .page-type-image & button {
+      background-color: $theme-image-color;
+  }
+
+  .lod & button {
       background-color: $termtag-color;
   }
 
