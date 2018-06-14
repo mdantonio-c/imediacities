@@ -1,0 +1,13 @@
+<div class="notes-container">
+    <div class="notes-text" [innerHTML]="note.name"></div>
+    <i class="material-icons click-event" [innerHTML]="icon" (click)="toggle()"></i>
+</div>
+<div class="notes-buttons" *ngIf="can_delete">
+    <i class="material-icons click-event"
+       mwlConfirmationPopover
+       [popoverTitle]="popover.popoverTitle + ' note?'"
+       [popoverMessage]="popover.popoverMessage"
+       [appendToBody]="popover.appendToBody"
+       (confirm)="delete()"
+    >delete</i>
+</div>

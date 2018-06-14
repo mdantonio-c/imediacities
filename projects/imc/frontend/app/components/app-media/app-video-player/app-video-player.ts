@@ -271,4 +271,5 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
         this.cdRef.detectChanges();
     }
+
 }

@@ -249,6 +249,22 @@ input[type="radio"] {
   }
 }
 
+.page-type-image {
+
+  input[type="radio"]:checked {
+    & + .imc--radio-label {
+
+      &:before {
+        border: 2px solid $theme-image-color !important;
+        background: $white;
+      }
+      &:after {
+        background: $theme-image-color;
+      }
+    }
+  }
+}
+
 //Datepicker
 .imc--input-data {
   /*background: url("../../assets/svg/today.svg") no-repeat right;
@@ -461,13 +477,10 @@ input[type="radio"] {
   width: 100%;
 }
 
-.container-media--content {
-  max-height: 496px;
-}
-
 .box-media {
-  background: $bg-light-grey;
-  min-height: 480px;
+  background: $bg-dark;
+  /*min-height: 480px;*/
+  align-self: stretch;
 }
 
 

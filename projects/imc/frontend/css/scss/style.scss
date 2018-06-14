@@ -24,6 +24,11 @@
 @import 'tags_bar';
 // Layout dell'accordio multilivello (vocabolario)
 @import 'multilevel_accordion';
+// Layout Picture
+@import '_layout_picture';
+@import 'search-term-results';
+@import '_app-info';
+@import '_app-notes';
 
 // Stile generale
 body, a {
@@ -40,4 +45,7 @@ body, a {
     font-size: 60px !important;
   }
 }
-
+//  Classe creata per nascondere elementi che al momento non sono stati sviluppati
+.tmp_hidden {
+  visibility: hidden;
+}

@@ -10,7 +10,8 @@
                             ngFor
                             let-tag
                             [ngForOf]="shot.annotations.tags">
-                        <app-media-annotation [annotation]="tag"></app-media-annotation>
+                        <app-media-annotation [annotation]="tag"
+                                              [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
                     </ng-template>
                 </span>
             </li>
@@ -21,7 +22,8 @@
                             ngFor
                             let-location
                             [ngForOf]="shot.annotations.locations">
-                        <app-media-annotation [annotation]="location"></app-media-annotation>
+                        <app-media-annotation [annotation]="location"
+                                              [can_delete]="tag_is_deletable(location)"></app-media-annotation>
                     </ng-template>
                 </span>
             </li>
@@ -32,7 +34,9 @@
                             ngFor
                             let-note
                             [ngForOf]="shot.annotations.notes">
-                        <div [innerHTML]="note.name" *ngIf="note.name" style="margin-bottom:1em;border-bottom:1px solid;padding-bottom:1em;"></div>
+                        <app-note [note]="note"
+                                  [can_delete]="tag_is_deletable(note)"
+                                  *ngIf="note.name"></app-note>
                     </ng-template>
                 </span>
 <!--

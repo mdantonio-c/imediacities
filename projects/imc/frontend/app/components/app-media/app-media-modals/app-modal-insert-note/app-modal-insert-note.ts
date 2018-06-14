@@ -1,5 +1,6 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {AppAnnotationsService} from "../../../../services/app-annotations";
+import {infoResult} from "../../../../decorators/app-info";
 
 @Component({
     selector: 'app-modal-insert-note',
@@ -12,6 +13,7 @@ export class AppModalInsertNoteComponent {
     @Input() media_type: string;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
+    @infoResult() save_result;
 
     public note = {
         title: '',
@@ -34,7 +36,15 @@ export class AppModalInsertNoteComponent {
             this.data.shots.map(s => s.id),
             n,
             this.media_type,
-            (r) => {this.shots_update.emit(r)}
+            (err, r) => {
+
+                if (err) {
+                    this.save_result.show('error');
+                }
+
+                this.save_result.show('success', 'Note added successfully');
+                this.shots_update.emit(r);
+            }
         );
     }
 }

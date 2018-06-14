@@ -1,3 +1,4 @@
+import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
 import { IonRangeSliderModule } from "ng2-ion-range-slider";
@@ -67,6 +68,8 @@ import {AppMediaRelatedItemsComponent} from "./components/app-media/app-media-re
 import {AppShotReferenceComponent} from "./components/app-media/app-shot-reference/app-shot-reference";
 import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-wrapper/app-media-map-wrapper";
 import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
+import {AppInfoComponent} from "./components/app-info/app-info";
+import {AppNoteComponent} from "./components/app-note/app-note";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {LocalStorageService} from './catalog/services/local-storage.service';
@@ -97,6 +100,7 @@ export const declarations: any[] = [
 	NoCommaPipe,
 	DurationPipe,
 	AppExpansionPanelComponent,
+	AppInfoComponent,
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
@@ -119,6 +123,7 @@ export const declarations: any[] = [
 	AppModalListaShotsComponent,
 	AppMediaInfoComponent,
 	AppMediaTagsComponent,
+	AppNoteComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,
@@ -161,6 +166,7 @@ export const providers: any[] = [
 ];
 
 export const imports: any[] = [
+  HttpClientJsonpModule,
   NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
   HolderJsModule,
   IonRangeSliderModule

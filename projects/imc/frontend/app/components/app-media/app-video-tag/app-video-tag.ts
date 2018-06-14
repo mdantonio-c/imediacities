@@ -35,24 +35,15 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
 
 
     scene_update () {
-
-        // let current_frame = Math.ceil(this.parent.fps * this.video.currentTime);
-        // this.data.forEach((s,idx) => {
-        //
-        //     if (current_frame >= s.attributes.start_frame_idx && current_frame < s.attributes.end_frame_idx) {
-        //         this.termtags[idx].children[0].classList.add('active');
-        //         this.geotags[idx].children[0].classList.add('active');
-        //         s.stato = 'attivo'
-        //     } else {
-        //         this.termtags[idx].children[0].classList.remove('active');
-        //         this.geotags[idx].children[0].classList.remove('active');
-        //         s.stato = 'non attivo'
-        //     }
-        //     console.log("shot",  s);
-        // });
     }
 
     tag_add (modale) {
+
+        if (this.parent.shot_current < 0) {
+            alert('no shot selected');
+            return
+        }
+
         this.modale_richiedi.emit({
             modale: modale,
             titolo: 'Add Tag',

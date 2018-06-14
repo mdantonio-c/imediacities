@@ -20,7 +20,6 @@ export class AppAnnotationsService {
     constructor(private api: ApiService, private ShotsService: AppShotsService) {}
 
     create_tag (shots_ids, sources, media_type, cb) {
-console.log("media_type",  media_type);
         let  observables:Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
@@ -41,7 +40,10 @@ console.log("media_type",  media_type);
 
         Observable.forkJoin(
             observables
-        ).subscribe(res => cb(res));
+        ).subscribe(
+            res => cb(null ,res),
+            err => cb(err, null)
+        );
 
 
     }
@@ -88,7 +90,6 @@ console.log("media_type",  media_type);
                 if (media_type === 'video') {
                     this.ShotsService.get();
                 } else if (media_type === 'image') {
-                    console.log("annotation.source_uuid",  annotation.source_uuid);
                     this.get(annotation.source_uuid, 'images');
                 }
             },
@@ -115,10 +116,10 @@ console.log("media_type",  media_type);
     }
 
     merge (shots, gruppo) {
-
         let mappa = new Map();
+
         shots.forEach(s => {
-            s.annotations[gruppo].forEach(t => mappa.set(t.id, t))
+            s.annotations[gruppo].forEach(t => mappa.set(t.id + '_' + t.body_id, t))
         });
 
         return Array.from(mappa).map(t => t[1]).sort((a, b) => {

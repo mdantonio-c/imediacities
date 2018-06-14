@@ -1,11 +1,12 @@
 import {Component, ChangeDetectorRef, OnInit, OnChanges, Input, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
 import {AppVocabularyService} from "../../../../services/app-vocabulary";
 import {AppAnnotationsService} from "../../../../services/app-annotations";
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {AppLodService} from "../../../../services/app-lod";
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {infoResult} from "../../../../decorators/app-info";
 
 @Component({
     selector: 'app-modal-insert-termtag',
@@ -17,6 +18,9 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     @Input() data: any;
     @Input() media_type: string;
     @ViewChild('p') p;
+
+    @infoResult() save_result;
+    @infoResult() add_tag;
 
     ricerca_model;
     results = {
@@ -36,8 +40,11 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
             hide_next: false,
             hide_prev: true
         },
-        show: 'v'
+        show: 'v',
+        key: ''
     };
+
+    private subject: Subject<string> = new Subject();
 
     @ViewChild('search_field') search_field: ElementRef;
 
@@ -93,7 +100,6 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
         term.selected = !term.selected;
 
         if ( term.selected ) {
-            console.log("term",  term);
             if( this.terms.filter(t => t.name.toLowerCase() === term.label.toLowerCase()).length === 0) {
                 this.terms.push(
                     this.VocabularyService.annotation_create(term)
@@ -105,18 +111,31 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
         }
     }
 
+    onKeyup (event) {
+        this.subject.next(event);
+    }
+
     /**
      * ricerca il termine nel vocabolario e su wikidata
      * @param term
      * @returns {any}
      */
     search_vocabulary_and_lods (event) {
-        const term = event.target.value;
 
+        const term = event.target.value;
         if (term.length < 2) return;
 
+        if (this.results.key === term) {
+            if (event.keyCode === 13) {
+                this.p.open();
+            }
+            return;
+        }
+
+        this.results.key = term;
+        this.add_tag.hide();
+
         //  resetto visualizzazione risultati
-        //this.results.show = 'v';
         this.results.vocabulary_nav = {
             page_size:10,
             page_start:0,
@@ -150,7 +169,7 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
                 this.results.lods.sort(AppModalInsertTermtagComponent._sort_alpha);
 
                 this.results.show =  !this.results.vocabulary.length ? 'l' : 'v';
-                
+
                 if (!this.results.vocabulary.length) {
                     this.results.vocabulary_nav.hide_next = true;
                     this.results.vocabulary_nav.hide_prev = true;
@@ -161,7 +180,11 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
                     this.results.lods_nav.hide_prev = true;
                 }
 
-                this.p.open();
+                if (this.results.vocabulary.length || this.results.lods.length) {
+                    this.p.open();
+                } else {
+                    this.p.close();
+                }
                 return vocabolario;
             })
 
@@ -187,18 +210,36 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
      * @param event
      */
     term_add (event) {
-        console.log("event",  event);
 
+        let close_results = false;
         if (event.source === 'vocabulary') {
             this.VocabularyService.toggle_term(event);
         }
 
+        if (typeof event === 'string') {
+            event = {name:event};
+            close_results = true;
+        }
+
         if (event && event.name) {
             //  prevengo duplicazioni
-            if( this.terms.filter(t => t.name.toLowerCase() === event.name.toLowerCase()).length === 0){
+            let esistente = this.terms.some(t => {
+                return t.name.toLowerCase() === event.name.toLowerCase()
+            });
+            esistente = esistente || this.terms_all.some(t => {
+                return t.name.toLowerCase() === event.name.toLowerCase()
+            });
+            if (esistente) {
+                this.add_tag.show('info','This tag has already been added');
+            } else {
+                this.add_tag.hide();
                 this.terms.push(
                     this.VocabularyService.annotation_create(event)
                 );
+            }
+
+            if (close_results) {
+                this.p.close();
             }
 
         }
@@ -228,13 +269,17 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
             this.data.shots.map(s => s.id),
             this.terms,
             this.media_type,
-            (response) => {
+            (err, response) => {
 
+                if (err) {
+                    return this.save_result.show('error');
+                }
                 response.some(r => {
                     if (!r.errors) {
                         this.shots_update.emit(r.data);
                         this.terms.forEach(t => this.terms_all.push(t));
                         this.terms = [];
+                        this.save_result.show('success', 'Tag added successfully');
                         return true;
                     }
                 })
@@ -242,7 +287,9 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
             }
         );
     }
-
+    hide_app_info () {
+        this.save_result.visible = false;
+    }
     nav_next(obj) {
         const results = this.results[obj];
         const nav = this.results[`${obj}_nav`];
@@ -266,21 +313,25 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     static nav_show_buttons (results, nav) {
         if (results.length) {
             nav.hide_prev = nav.page_start < nav.page_size;
-            nav.hide_next = nav.page_start >= results.length - nav.page_size;
+            nav.hide_next = (nav.page_start >= results.length - nav.page_size) || results.length < nav.page_size;
         } else {
             nav.hide_prev = true;
             nav.hide_next = true;
         }
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.subject.debounceTime(300).subscribe(searchTextValue => {
+            this.search_vocabulary_and_lods(searchTextValue);
+        });
+    }
 
     ngOnChanges () {
 
         this.terms_all = this.AnnotationsService.merge(this.data.shots, 'tags');
 
         this.VocabularyService.get((vocabolario)=>{this.vocabolario = vocabolario});
-        this.ricerca_model = this.data.shots;
+        this.ricerca_model = '';
         this.terms = [];
         this.ricerca_risultati = [];
         if (this.search_field) {

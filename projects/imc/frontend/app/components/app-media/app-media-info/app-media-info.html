@@ -145,8 +145,7 @@
                                     <strong>Gauge: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
                                 </li>
-                                <li
-                                        *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
+                                <li *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
                                     <strong>Aspect ratio: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
                                 </li>
@@ -195,12 +194,13 @@
 
                     <app-expansion-panel title="Analogue format">
                         <ul class="list-space">
-                            <li>
+
+                            <li *ngIf="info.attributes.specific_type">
                                 <strong>Media type: </strong>
                                 <span [innerHTML]="info.attributes.specific_type.description"></span>
                             </li>
 
-                            <li>
+                            <li *ngIf="info.attributes.phisical_format_size">
                                 <strong>Physical format: </strong>
                                 <span [innerHTML]="info.attributes.phisical_format_size.join(' ')"></span>
                             </li>
@@ -212,15 +212,15 @@
                         </ul>
                     </app-expansion-panel>
 
-                    <app-expansion-panel title="Digital format">
+                    <app-expansion-panel title="Digital format" *ngIf="info.relationships.item[0] && info.relationships.item[0].attributes">
                         <ul class="list-space">
 
-                            <li>
+                            <li *ngIf="info.relationships.item[0].attributes.item_type">
                                 <strong>Item type:</strong>
                                 <span [innerHTML]="info.relationships.item[0].attributes.item_type.description"></span>
                             </li>
 
-                            <li>
+                            <li *ngIf="info.relationships.item[0].attributes.digital_format">
                                 <strong>Format:</strong>
                                 <span [innerHTML]="info.relationships.item[0].attributes.digital_format.join(' ')"></span>
                             </li>
