@@ -34,6 +34,7 @@ export class CatalogComponent implements OnInit {
 		this.loading = true;
 		// clean current results
 		this.results = [];
+		this.mediaTags = [];
 		this.catalogService.search(this.filter, this.currentPage, this.pageSize).subscribe(
 			response => {
 				this.results = response["Response"].data;
