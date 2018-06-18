@@ -196,6 +196,10 @@ export class SearchMapComponent implements OnInit, OnChanges {
 				this.loadGeoTags(pos, this.radius);
 				this.reloading = false;
 			}
+
+			if (this.filter.provider === null) {
+				this.notify.showWarning('Select a city from the filter on the left in order to get geo-tags on the map');
+			}
 		}
 	}
 
