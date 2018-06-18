@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
@@ -14,7 +14,7 @@ import { IonRangeSliderComponent } from "ng2-ion-range-slider";
   templateUrl: './search-filter.component.html',
   styleUrls: ['./search-filter.component.css']
 })
-export class SearchFilterComponent implements OnInit {
+export class SearchFilterComponent implements OnInit, AfterViewInit {
   searchForm: FormGroup;
   vocabulary;
   terms = [];
@@ -63,6 +63,12 @@ export class SearchFilterComponent implements OnInit {
     ).subscribe(([productionYearTo = 1999]) => {
       this.setSliderTo(this.searchForm.get('productionYearFrom').value, productionYearTo);
     });
+  }
+
+  ngAfterViewInit() {
+    this.setSliderTo(
+      this.searchForm.get('productionYearFrom').value,
+      this.searchForm.get('productionYearTo').value);
   }
 
   private toForm(filter: SearchFilter) {
