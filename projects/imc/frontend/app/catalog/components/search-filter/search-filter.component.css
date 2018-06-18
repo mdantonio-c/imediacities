@@ -155,36 +155,34 @@ li.ivh-treeview-node::before {
     color: #eee;
 }
 
-.imc-search-filter.btn{
+.imc-search-filter.btn, .imc-search-filter.btn.focus{
     border: 1px solid #53b8e2;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
     margin-left: 2px;
+    box-shadow: none;
 }
 
-.imc-search-filter.btn.active{
+.imc-search-filter.btn:hover, .imc-search-filter.btn.focus:hover{
+    border: 1px solid #53b8e2;
+    border-radius: 5px !important;
+    padding: 5px 10px 0px 10px !important;
+    margin-left: 2px;
+    box-shadow: 0 0 0 0.2rem rgba(83, 184, 226, 0.3);
+}
+.imc-search-filter.btn.active, .imc-search-filter.btn.focus.active{
     background-color: #53b8e2 !important;
     border: 1px solid #53b8e2;
-    border-radius: 5px;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
     margin-left: 2px;
-}
-
-.imc-search-filter.btn.focus{
-    border: 1px solid #53b8e2;
     box-shadow: none;
-    border-radius: 5px !important;
-    padding: 5px 10px 0px 10px !important;
-    margin-left: 2px;
 }
-
-.imc-search-filter.btn.focus.active{
+.imc-search-filter.btn.active:hover, .imc-search-filter.btn.focus.active:hover{
     background-color: #53b8e2 !important;
     border: 1px solid #53b8e2;
-    box-shadow: none;
     border-radius: 5px !important;
     padding: 5px 10px 0px 10px !important;
     margin-left: 2px;
+    box-shadow: 0 0 0 0.2rem rgba(83, 184, 226, 0.3);
 }
-
