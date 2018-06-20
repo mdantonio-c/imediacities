@@ -73,6 +73,7 @@ import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
 
 import {CatalogService} from './catalog/services/catalog.service';
+import {MediaUtilsService} from './catalog/services/media-utils.service';
 import {LocalStorageService} from './catalog/services/local-storage.service';
 import {AppAnnotationsService} from "./services/app-annotations";
 import {AppShotsService} from "./services/app-shots";
@@ -154,6 +155,7 @@ export const entryComponents: any[] = [
 
 export const providers: any[] = [
     CatalogService,
+    MediaUtilsService,
     LocalStorageService,
     AppAnnotationsService,
     AppLodService,

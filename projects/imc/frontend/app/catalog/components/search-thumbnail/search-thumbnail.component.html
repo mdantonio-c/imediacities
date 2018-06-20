@@ -21,13 +21,13 @@
 			</div>
 		</div>
 		<h3 class="search-title">
-			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
-			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
+			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
 		</h3>
 		<div class="space-8"></div>
 		<p class="text">
 			<i class="imc-icon fa fa-quote-left"></i>
-			{{media.relationships.descriptions[0].attributes.text}}
+			{{description}}
 		</p>
 	</div>
 </div>

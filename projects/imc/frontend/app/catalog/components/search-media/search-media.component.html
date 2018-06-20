@@ -11,8 +11,8 @@
 	<div class="media-body">
 		<div>
 			<h4 class="media-heading">
-			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{media.relationships.titles[0].attributes.text}}</a>
-			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{media.attributes.identifying_title}}</a>
+			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
+			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
 			</h4>
 			<span>
 				<i *ngIf="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
@@ -22,7 +22,7 @@
 		<div class="space-4"></div>
 		<p class="text">
 			<i class="imc-icon fa fa-quote-left"></i>
-			{{media.relationships.descriptions[0].attributes.text}}
+			{{description}}
 		</p>
 		<div class="search-actions text-center">
 			<div class="duration" *ngIf="media.type == 'aventity'">
