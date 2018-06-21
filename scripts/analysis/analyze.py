@@ -14,7 +14,7 @@ from PIL import Image
 from subprocess import *
 
 
-TRANSCODED_FRAMERATE = 24 # now used as a default
+TRANSCODED_FRAMERATE = 24  # now used as a default
 
 if getpass.getuser() == 'simboden':
     host = 'sil_pc'
@@ -36,7 +36,7 @@ idmt_py        = root_dir + 'imedia-pipeline/scripts/idmt'
 # default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
 # default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
 default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
-default_movie    = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
+# default_movie    = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
 default_filename = os.path.join(stage_area, default_movie)
 
 logfile = None
@@ -74,10 +74,10 @@ def filename_to_frame(f):
 # -----------------------------------------------------
 def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
     f = int(f)
-    t_hour  =  int(f / (3600 * fps))
-    t_min   =  int((f - t_hour * 3600 * fps) / (60 * fps))
-    t_sec   =  int((f - t_hour * 3600 * fps - t_min * 60 * fps) / fps)
-    t_frame =  int((f - t_hour * 3600 * fps - t_min * 60 * fps - t_sec * fps))
+    t_hour  = int(f / (3600 * fps))
+    t_min   = int((f - t_hour * 3600 * fps) / (60 * fps))
+    t_sec   = int((f - t_hour * 3600 * fps - t_min * 60 * fps) / fps)
+    t_frame = int((f - t_hour * 3600 * fps - t_min * 60 * fps - t_sec * fps))
     timecode = '{0:02d}:{1:02d}:{2:02d}-f{3:02d}'.format(t_hour, t_min, t_sec, t_frame)
     return timecode
 
@@ -100,10 +100,10 @@ def make_movie_analize_folder(filename, clean=False, temporary=False):
 
     m_name, m_ext = os.path.splitext(os.path.basename(filename))
     movie_analize_folder = os.path.join(user_analyze_folder, m_name)
-    
+
     if temporary:
         movie_analize_folder += "_tmp"
-       
+
     if not mkdir(movie_analize_folder, clean):
         return ""
 
@@ -120,15 +120,15 @@ def make_movie_analize_folder(filename, clean=False, temporary=False):
 
     return movie_analize_folder
 
+
 # -----------------------------------------------------
 def init_child_proc():
     os.umask(0)
 
+
 # -----------------------------------------------------
 def run(cmd, out_folder, out_name, err_name, cmd_name=None):
 
-
-    
     if cmd_name:
         cmd_filename = os.path.join(out_folder, cmd_name)
         cmd_file = open(cmd_filename, 'w')
@@ -151,27 +151,29 @@ def run(cmd, out_folder, out_name, err_name, cmd_name=None):
     else:
         return False
 
-# -----------------------------------------------------
-def  get_framerate( filename ):
 
-    out_file = open( filename, 'r')
+# -----------------------------------------------------
+def get_framerate(filename):
+
+    out_file = open(filename, 'r')
     if out_file is None:
-        log( 'cant open '+filename )
+        log('cant open ' + filename)
         return 0
-        
-    data = json.load( out_file )
-    for s in data['streams'] :
+
+    data = json.load(out_file)
+    for s in data['streams']:
         if s['codec_type'] == 'video':
-            if not 'r_frame_rate' in s:
-                log( 'r_frame_rate not found in: '+filename )
+            if 'r_frame_rate' not in s:
+                log('r_frame_rate not found in: ' + filename)
                 return 0
             value = int(s['r_frame_rate'].split('/')[0])
             if value < 1 or value > 100:
-                log( 'bad framerate:' + str(value) +'in:' +filename )
+                log('bad framerate:' + str(value) + 'in:' + filename)
                 return 0
             return value
-    log( 'framerate not found in: '+filename )
+    log('framerate not found in: ' + filename)
     return 0
+
 
 # -----------------------------------------------------
 def origin_tech_info(filename, out_folder):
@@ -184,12 +186,13 @@ def origin_tech_info(filename, out_folder):
 
     res = run(cmd, out_folder, 'origin_info.json', 'origin_info.err', 'origin_info.sh')
 
-    framerate =  get_framerate( os.path.join(out_folder, 'origin_info.json' ))
-    if framerate != 0 :
+    framerate = get_framerate(os.path.join(out_folder, 'origin_info.json'))
+    if framerate != 0:
         TRANSCODED_FRAMERATE = framerate
     else:
-        TRANSCODED_FRAMERATE = 24 #fallback (errors already logged) 
+        TRANSCODED_FRAMERATE = 24  # fallback (errors already logged)
     return res
+
 
 # -----------------------------------------------------
 def image_origin_tech_info(filename, out_folder):
@@ -197,11 +200,13 @@ def image_origin_tech_info(filename, out_folder):
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
     cmd_list.append(filename)
-    cmd_list.append( os.path.join(out_folder, 'origin_info.json') )
+    cmd_list.append(os.path.join(out_folder, 'origin_info.json'))
     cmd = ' \\\n'.join(cmd_list) + '\n'
 
     res = run(cmd, out_folder, 'origin_info.out', 'origin_info.err', 'origin_info.sh')
     return res
+
+
 # -----------------------------------------------------
 def transcoded_tech_info(filename, out_folder):
 
@@ -213,17 +218,19 @@ def transcoded_tech_info(filename, out_folder):
     res = run(cmd, out_folder, 'transcoded_info.json', 'transcoded_info.err', 'transcoded_info.sh')
     return res
 
+
 # -----------------------------------------------------
 def image_transcoded_tech_info(filename, out_folder):
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
     cmd_list.append(filename)
-    cmd_list.append( os.path.join(out_folder, 'transcoded_info.json') )
+    cmd_list.append(os.path.join(out_folder, 'transcoded_info.json'))
     cmd = ' \\\n'.join(cmd_list) + '\n'
 
     res = run(cmd, out_folder, 'transcoded_info.out', 'transcoded_info.err', 'transcoded_info.sh')
     return res
+
 
 # -----------------------------------------------------
 def transcoded_num_frames(out_folder):
@@ -265,11 +272,11 @@ def transcode(filename, out_folder):
 
 
 # -----------------------------------------------------
-def image_transcode(filename, out_folder, watermark ):
+def image_transcode(filename, out_folder, watermark):
     ''' transcode an image to jpg, with a compression quality of 95
         rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
         also save a full resolution version as transcoded_fullres.jpg
-    '''    
+    '''
 
     out_filename              = os.path.join(out_folder, 'transcoded.jpg')
     out_filename_small        = os.path.join(out_folder, 'transcoded_small.jpg')
@@ -279,7 +286,7 @@ def image_transcode(filename, out_folder, watermark ):
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
-    cmd_list.append( filename )
+    cmd_list.append(filename)
     cmd_list.append('-resize')
     cmd_list.append('800x600\>')
     cmd_list.append('-quality')
@@ -292,7 +299,7 @@ def image_transcode(filename, out_folder, watermark ):
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
-    cmd_list.append( filename )
+    cmd_list.append(filename)
     cmd_list.append('-quality')
     cmd_list.append('95')
     cmd_list.append(out_filename_fullres)
@@ -300,11 +307,10 @@ def image_transcode(filename, out_folder, watermark ):
 
     if not run(cmd, out_folder, 'transcode_fullres.log', 'transcode_fullres.err', 'transcode_fullres.sh'):
         return False
-   
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
-    cmd_list.append( filename )
+    cmd_list.append(filename)
     cmd_list.append('-resize')
     cmd_list.append('80x80^')
     cmd_list.append('-gravity')
@@ -317,20 +323,19 @@ def image_transcode(filename, out_folder, watermark ):
     if not run(cmd, out_folder, 'transcode_small.log', 'transcode_small.err', 'transcode_small.sh'):
         return False
 
-
     if watermark:
 
         cmd_list = []
         cmd_list.append('/usr/bin/convert')
-        cmd_list.append( out_filename  )
-        cmd_list.append( watermark )
-        cmd_list.append( '-geometry' )
-        cmd_list.append( '+10+10' )
-        cmd_list.append( '-gravity' )
-        cmd_list.append( 'SouthWest' )
-        cmd_list.append( '-composite' )
+        cmd_list.append(out_filename)
+        cmd_list.append(watermark)
+        cmd_list.append('-geometry')
+        cmd_list.append('+10+10')
+        cmd_list.append('-gravity')
+        cmd_list.append('SouthWest')
+        cmd_list.append('-composite')
         cmd_list.append('-quality')
-        cmd_list.append( '95')
+        cmd_list.append('95')
         cmd_list.append(out_filename_logo)
         cmd = ' \\\n'.join(cmd_list) + '\n'
 
@@ -339,22 +344,22 @@ def image_transcode(filename, out_folder, watermark ):
 
         cmd_list = []
         cmd_list.append('/usr/bin/convert')
-        cmd_list.append( out_filename_fullres  )
-        cmd_list.append( watermark )
-        cmd_list.append( '-geometry' )
-        cmd_list.append( '+10+10' )
-        cmd_list.append( '-gravity' )
-        cmd_list.append( 'SouthWest' )
-        cmd_list.append( '-composite' )
-        cmd_list.append( '-quality')
-        cmd_list.append( '95')
+        cmd_list.append(out_filename_fullres)
+        cmd_list.append(watermark)
+        cmd_list.append('-geometry')
+        cmd_list.append('+10+10')
+        cmd_list.append('-gravity')
+        cmd_list.append('SouthWest')
+        cmd_list.append('-composite')
+        cmd_list.append('-quality')
+        cmd_list.append('95')
         cmd_list.append(out_filename_logo_fullres)
         cmd = ' \\\n'.join(cmd_list) + '\n'
-    
+
         if not run(cmd, out_folder, 'transcode_logo_fullres.log', 'transcode_logo_fullres.err', 'transcode_logo_fullres.sh'):
             return False
     return os.path.exists(out_filename)
-        
+
 
 # -----------------------------------------------------
 def tvs(filename, out_folder):
@@ -497,7 +502,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         im_small.save(fn.replace(out_folder, th_folder), quality=90)
 
     # prepare index --- not used anymore
-    '''                                
+    '''
     idx_folder = os.path.join(out_folder, 'index')
     if not mkdir(idx_folder, True):
         return False
@@ -530,7 +535,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     f.write(str)
     f.close()
     '''
-                                
+
     # prepare storyboard
     sb_folder = os.path.join(out_folder, 'storyboard')
     if not mkdir(sb_folder, True):
@@ -552,8 +557,10 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         shot_len = 0
         if i != len(lst) - 1:
             nextframe = filename_to_frame(lst[i + 1])
+            nextframe_FIXED = nextframe - 1
         else:
             nextframe = num_frames
+            nextframe_FIXED  = nextframe
 
         shot_len = (nextframe - frame) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
@@ -561,7 +568,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         d = {}
         d['shot_num']    = i
         d['first_frame'] = frame
-        d['last_frame']  = nextframe                    ## nextframe-1  ??
+        d['last_frame'] = nextframe_FIXED
         d['timecode']    = frame_to_timecode(frame)
         d['len_seconds'] = shot_len
         d['img']         = im_name
@@ -621,14 +628,14 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
 # -----------------------------------------------------
 def revert_to_origin_framerate(filename):
 
-    out_folder = make_movie_analize_folder(filename, True, True )
+    out_folder = make_movie_analize_folder(filename, True, True)
     if out_folder == "":
-        return False;
-    log('out_folder='+out_folder)
+        return False
+    log('out_folder=' + out_folder)
     if not analize_movie(filename, out_folder, False):
-        return False;
+        return False
     # if all ok swap the two out_folders
-                                    
+
 
 # -----------------------------------------------------
 def analize_movie(filename, out_folder, fast=False):
@@ -702,6 +709,8 @@ def analize_movie(filename, out_folder, fast=False):
     return True
 
 # -----------------------------------------------------
+
+
 def analize_image(filename, out_folder, fast=False):
 
     log('image_origin_tech_info --- begin')
@@ -709,33 +718,30 @@ def analize_image(filename, out_folder, fast=False):
         return False
     log('image_origin_tech_info --- ok ')
 
-
     tr_image = os.path.join(out_folder, 'transcoded.jpg')
 
-
     watermark = ""
-    if "9621d236-230d-4a6f-bfbf-5959c15baf28" in filename: #"crb"
-        watermark = watermark_area +"/crb.png"
-    if "995eee9b-3a7d-43b5-9c7e-264804583fbd" in filename: #"ccb"
-        watermark = watermark_area +"/ccb.png"
-    if "15b54855-49c8-437c-9ad3-9226695d2fb4" in filename: #"mct"
-        watermark = watermark_area +"/mct.png"
-    if "d42865cb-d61f-42f6-9c57-20f4d6b1ade3" in filename: #"icec"
+    if "9621d236-230d-4a6f-bfbf-5959c15baf28" in filename:  # "crb"
+        watermark = watermark_area + "/crb.png"
+    if "995eee9b-3a7d-43b5-9c7e-264804583fbd" in filename:  # "ccb"
+        watermark = watermark_area + "/ccb.png"
+    if "15b54855-49c8-437c-9ad3-9226695d2fb4" in filename:  # "mct"
+        watermark = watermark_area + "/mct.png"
+    if "d42865cb-d61f-42f6-9c57-20f4d6b1ade3" in filename:  # "icec"
         pass
-    if "8daa109f-76fd-4422-bfc4-0de6633ca582" in filename: #"dif"
+    if "8daa109f-76fd-4422-bfc4-0de6633ca582" in filename:  # "dif"
         pass
-    if "1ede3472-6abd-453c-844f-e3a656cb21d6" in filename: #"ofm"
+    if "1ede3472-6abd-453c-844f-e3a656cb21d6" in filename:  # "ofm"
         pass
-    if "ac8e5f4d-5534-4e0d-befb-4b00c7a57fa3" in filename: #"dfi"
+    if "ac8e5f4d-5534-4e0d-befb-4b00c7a57fa3" in filename:  # "dfi"
         pass
-    if "9324fc11-68b6-4a41-9294-0227ce8dcd15" in filename: #"tte"
+    if "9324fc11-68b6-4a41-9294-0227ce8dcd15" in filename:  # "tte"
         pass
-    if "9646014f-929c-4e73-88b7-afcff69f3463" in filename: #"sfi"
+    if "9646014f-929c-4e73-88b7-afcff69f3463" in filename:  # "sfi"
         pass
-
 
     log('image_transcode ---------- begin ')
-    if not image_transcode(filename, out_folder, watermark ):
+    if not image_transcode(filename, out_folder, watermark):
         return False
     log('image_transcode ---------- ok ')
 
@@ -752,12 +758,12 @@ def analize(filename, item_type, out_folder, fast=False):
     ''' Item type: "Video" or "Image". '''
 
     if item_type == "Video":
-        return analize_movie( filename, out_folder, fast )
-        
-    if item_type == "Image":
-        return analize_image( filename, out_folder, fast )
+        return analize_movie(filename, out_folder, fast)
 
-    print( "analize error: bad item_type :", item_type )
+    if item_type == "Image":
+        return analize_image(filename, out_folder, fast)
+
+    print("analize error: bad item_type :", item_type)
     return false
 
 
@@ -796,7 +802,7 @@ def main(args):
             movie = a
 
     fast = True
-    clan = False
+    clean = False
 
     filename = os.path.join(stage_area, movie)
     if not os.path.exists(filename):
@@ -811,7 +817,7 @@ def main(args):
     logfile = open(os.path.join(out_folder, "log.txt"), "w")
     log("Analize " + movie)
 
-    if analize(filename, 'Image', out_folder, fast):
+    if analize(filename, 'Video', out_folder, fast):
         log('Analize done')
     else:
         log('Analize terminated with errors')
@@ -820,7 +826,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-    #main(sys.argv[1:])
-    revert_to_origin_framerate( sys.argv[1] )
+    main(sys.argv[1:])
+    # revert_to_origin_framerate(sys.argv[1])
     print('done')
-
