@@ -14,7 +14,7 @@ import pytz
 
 from restapi.services.neo4j.models import (
     StringProperty, ArrayProperty, IntegerProperty, BooleanProperty,
-    FloatProperty, DateTimeProperty, DateProperty, JSONProperty,
+    FloatProperty, DateTimeProperty, DateProperty, JSONProperty, EmailProperty,
     StructuredNode, StructuredRel, IdentifiedNode,
     TimestampedNode, RelationshipTo, RelationshipFrom,
 )
@@ -459,11 +459,21 @@ class Provider(IdentifiedNode):
     identifier   An unambiguous reference to the archive supplying the record.
     scheme       Name of the registration scheme encoding the institution name
                  ("ISIL code" or "Institution acronym")
+    address      The address of the archive
+    phone        The phone number of the archive
+    fax          The fax number of the archive
+    website      The website of the archive
+    email        The email of the archive
     """
     name = StringProperty(index=True, required=True, show=True)
     identifier = StringProperty(required=True, show=True)
     scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+    address = StringProperty(required=False, show=True)
+    phone = StringProperty(required=False, show=True)
+    fax = StringProperty(required=False, show=True)
+    website = StringProperty(required=False, show=True)
+    email = EmailProperty(required=False, show=True)
     record_source = RelationshipFrom(
         'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
 
