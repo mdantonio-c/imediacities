@@ -1,7 +1,7 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.4.1"
+    version: "1.4.2"
     rapydo: 0.6.2
 
 variables:
