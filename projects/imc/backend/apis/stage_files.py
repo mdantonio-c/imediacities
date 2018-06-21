@@ -266,10 +266,10 @@ class Stage(GraphBaseOperations):
                             status_code=hcodes.HTTP_BAD_CONFLICT)
 
                     # cerco se c'è un content stage associato a quel meta stage per vedere se status COMPLETED
-                    query2 = "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) \
-                                MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) \
-                                WHERE ms.uuid='{uuid}' \
-                                RETURN cs"
+                    query2 = "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) " \
+                             "MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) " \
+                             "WHERE ms.uuid='{uuid}' " \
+                             "RETURN cs"
                     results2 = self.graph.cypher(
                         query2.format(uuid=meta_stage.uuid))
                     c2 = [self.graph.ContentStage.inflate(
@@ -277,8 +277,8 @@ class Stage(GraphBaseOperations):
                     if len(c2) == 1:
                         content_stage = c2[0]
                         if content_stage is not None and content_stage.status == 'COMPLETED':
-                            log.debug("Content resource already exists with status: " +
-                                      content_stage.status + ", then mode=skip")
+                            log.warn("This content item has already been "
+                                     "successfully processed. Force SKIP mode.")
                             mode = 'skip'
                 else:
                     log.debug("meta_stage is null")

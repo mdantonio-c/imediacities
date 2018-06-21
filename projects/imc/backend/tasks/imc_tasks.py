@@ -41,14 +41,17 @@ def progress(self, state, info):
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
-        log.debug("Starting task update_metadata for resource_id %s" % resource_id)
+        log.debug("Starting task update_metadata for resource_id %s" %
+                  resource_id)
         progress(self, 'Starting update metadata', path)
         self.graph = celery_app.get_service('neo4j')
         xml_resource = None
-        try:                                           
-            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
-            xml_resource, group, source_id, item_type, item_node = update_meta_stage(self, resource_id, path, metadata_update)
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+        try:
+            metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
+            xml_resource, group, source_id, item_type, item_node = update_meta_stage(
+                self, resource_id, path, metadata_update)
+            log.debug(
+                "Completed task update_metadata for resource_id %s" % resource_id)
 
             progress(self, 'Completed', path)
 
@@ -57,6 +60,7 @@ def update_metadata(self, path, resource_id):
             raise e
 
         return 1
+
 
 @celery_app.task(bind=True)
 def import_file(self, path, resource_id, mode, metadata_update=True):
@@ -67,11 +71,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         self.graph = celery_app.get_service('neo4j')
 
         xml_resource = None
-        try:                                           
-            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
+        try:
+            metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
                 self, resource_id, path, metadata_update)
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            log.debug(
+                "Completed task update_metadata for resource_id %s" % resource_id)
             progress(self, 'Updated metadata', path)
         except Exception as e:
             progress(self, 'Failed updating metadata', path)
@@ -212,7 +217,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             elif xml_resource is not None:
                 xml_resource.warnings.append(str(e))
                 xml_resource.save()
-            #raise e
+            # raise e
 
         return 1
 
@@ -293,11 +298,12 @@ def lookup_content(self, path, source_id):
 
 def update_meta_stage(self, resource_id, path, metadata_update):
     """
-    Update data of MetaStage (that has resource_id) with data 
-     coming from xml file in path
-    If metadata_update=false and creation exists then nothing is updated
-    If Item and Creation don't exist then it creates them
-    Return xml_resource (the updated MetaStage), group, source_id, item_type, item_node
+    Update data of MetaStage (that has resource_id) with data coming from xml
+    file in path
+    - If metadata_update=false and creation exists then nothing is updated
+    - If Item and Creation don't exist then it creates them
+    Return xml_resource (the updated MetaStage), group, source_id, item_type,
+    item_node.
     """
     xml_resource = None
     try:
@@ -328,12 +334,14 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 item_node.ownership.connect(group)
                 item_node.meta_source.connect(xml_resource)
                 item_node.save()
-                log.debug("Item resource created for resource_id=%s" % resource_id)
+                log.debug("Item resource created for resource_id=%s" %
+                          resource_id)
 
             # check for existing creation
             creation = item_node.creation.single()
             if creation is not None and not metadata_update:
-                log.info("Skip updating metadata for resource_id=%s" % resource_id)
+                log.info("Skip updating metadata for resource_id=%s" %
+                         resource_id)
             else:
                 # update metadata
                 log.debug("Updating metadata for resource_id=%s" % resource_id)
@@ -348,7 +356,8 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             log.warning("Not found MetaStage for resource_id=%s" % resource_id)
 
     except Exception as e:
-        log.error("Failed update of resource_id %s, Error: %s" % (resource_id,e))
+        log.error("Failed update of resource_id %s, Error: %s" %
+                  (resource_id, e))
         if xml_resource is not None:
             xml_resource.status = 'ERROR'
             xml_resource.status_message = str(e)
@@ -663,7 +672,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             huge_size = len(region_sequence)
             region_sequence = []
             log.warn('Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.
-                format(objID=key[0], concept=concept['name'], size=huge_size))
+                     format(objID=key[0], concept=concept['name'], size=huge_size))
         od_body = {
             'type': 'ODBody',
             'object_id': key[0],
