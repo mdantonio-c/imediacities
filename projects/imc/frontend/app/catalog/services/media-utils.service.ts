@@ -12,8 +12,9 @@ export class MediaUtilsService {
 		} else {
 			// nonaventity: first choice in english
 			for (let t of media.relationships.titles) {
-				if ('language' in t.attributes && t.attributes.language.key === 'en') {
+				if (t.attributes.hasOwnProperty('language') && t.attributes.language && t.attributes.language.key === 'en') {
 					identifyingTitle = t.attributes.text;
+					break;
 				}
 			}
 			// otherwise take the first on the list 
@@ -33,8 +34,9 @@ export class MediaUtilsService {
 				first = !first;
 				description = d.attributes.text;
 			}
-			if ('language' in d.attributes && d.attributes.language.key === lang) {
+			if (d.attributes.hasOwnProperty('language') && d.attributes.language && d.attributes.language.key === lang) {
 				description = d.attributes.text;
+				break;
 			}
 		}
 		return description;

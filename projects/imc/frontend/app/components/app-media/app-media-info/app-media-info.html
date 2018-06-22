@@ -102,23 +102,26 @@
                     </div>
                 </app-expansion-panel>
 
-                <!-- comment out for the moment
                 <app-expansion-panel title="Contacts">
                         <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
                         <div class="col-12"><strong>Contacts:</strong></div>
                         <div class="col-12">
                             <ul>
-                                <li>Via Riva Reno, 72 - 40122 Bologna</li>
-                                <li>tel: (+39) 05124879656</li>
-                                <li>fax: (-39) 05124879656</li>
-                                <li>http://www.cinetecadibologna.it/</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.address">
+                                    {{info.relationships.record_sources[0].relationships.provider[0].attributes.address}}
+                                </li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">tel: {{info.relationships.record_sources[0].relationships.provider[0].attributes.phone}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">fax: {{info.relationships.record_sources[0].relationships.provider[0].attributes.fax}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</li>
+                                <li></li>
                             </ul>
                         </div>
                         <div class="col-12 space-paragraph-10">
                             <strong>Film ID in Archive: </strong>
                             <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
                         </div>
-                </app-expansion-panel> -->
+                </app-expansion-panel> 
 
             </div>
 
