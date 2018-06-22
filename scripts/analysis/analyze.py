@@ -53,7 +53,8 @@ def log(msg):
 
 
 # -----------------------------------------------------
-def mkdir(path, clean=False):
+def mkdir(path, clean):
+    # print(mkdir, path, clean)
     if clean:
         if os.path.isdir(path):
             shutil.rmtree(path)
@@ -87,22 +88,22 @@ def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
 # -----------------------------------------------------
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
 # and link the given filename as  movie_analize_folder/origin + movie_ext
-def make_movie_analize_folder(filename, clean=False, temporary=False):
+def make_movie_analize_folder(filename, clean=False): # , temporary=False):
 
-    if not mkdir(analize_area):
+    if not mkdir(analize_area, False ):
         return ""
 
     user_folder = filename.replace(stage_area + '/', '').split('/')[0]
     user_analyze_folder = os.path.join(analize_area, user_folder)\
 
-    if not mkdir(user_analyze_folder):
+    if not mkdir(user_analyze_folder, False ):
         return ""
 
     m_name, m_ext = os.path.splitext(os.path.basename(filename))
     movie_analize_folder = os.path.join(user_analyze_folder, m_name)
 
-    if temporary:
-        movie_analize_folder += "_tmp"
+    #if temporary:
+    #    movie_analize_folder += "_tmp"
 
     if not mkdir(movie_analize_folder, clean):
         return ""
@@ -556,13 +557,11 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         frame = filename_to_frame(fn)
         shot_len = 0
         if i != len(lst) - 1:
-            nextframe = filename_to_frame(lst[i + 1])
-            nextframe_FIXED = nextframe - 1
+            nextframe = filename_to_frame(lst[i + 1]) -1
         else:
             nextframe = num_frames
-            nextframe_FIXED  = nextframe
 
-        shot_len = (nextframe - frame) / TRANSCODED_FRAMERATE
+        shot_len = (nextframe - frame + 1) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
 
         d = {}
@@ -801,15 +800,12 @@ def main(args):
         else:
             movie = a
 
-    fast = True
-    clean = False
-
     filename = os.path.join(stage_area, movie)
     if not os.path.exists(filename):
         print('aborting: bad input file', filename)
         return
 
-    out_folder = make_movie_analize_folder(filename)
+    out_folder = make_movie_analize_folder(filename,clean)
     if out_folder == "":
         print('aborting: failed to create out_folder')
         return
