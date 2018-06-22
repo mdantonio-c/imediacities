@@ -149,7 +149,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             if not os.path.exists(content_item):
                 raise Exception('Bad input file', content_item)
 
-            out_folder = make_movie_analize_folder(content_item)
+            out_folder = make_movie_analize_folder(content_item,
+                                                   (mode is not None and mode == 'clean'))
             if out_folder == "":
                 raise Exception('Failed to create out_folder')
 
