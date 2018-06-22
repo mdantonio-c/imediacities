@@ -567,7 +567,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         d = {}
         d['shot_num']    = i
         d['first_frame'] = frame
-        d['last_frame'] = nextframe_FIXED
+        d['last_frame'] = nextframe
         d['timecode']    = frame_to_timecode(frame)
         d['len_seconds'] = shot_len
         d['img']         = im_name
