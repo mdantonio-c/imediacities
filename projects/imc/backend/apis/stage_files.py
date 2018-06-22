@@ -207,6 +207,7 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
+        force_reprocessing = input_parameters.get('force_reprocessing', False)
         mode = input_parameters.get('mode', 'clean').strip().lower()
         if mode not in self.__class__.allowed_import_mode:
             raise RestApiException(
@@ -266,19 +267,19 @@ class Stage(GraphBaseOperations):
                             status_code=hcodes.HTTP_BAD_CONFLICT)
 
                     # cerco se c'è un content stage associato a quel meta stage per vedere se status COMPLETED
-                    query2 = "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) \
-                                MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) \
-                                WHERE ms.uuid='{uuid}' \
-                                RETURN cs"
+                    query2 = "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) " \
+                             "MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) " \
+                             "WHERE ms.uuid='{uuid}' " \
+                             "RETURN cs"
                     results2 = self.graph.cypher(
                         query2.format(uuid=meta_stage.uuid))
                     c2 = [self.graph.ContentStage.inflate(
                         row[0]) for row in results2]
                     if len(c2) == 1:
                         content_stage = c2[0]
-                        if content_stage is not None and content_stage.status == 'COMPLETED':
-                            log.debug("Content resource already exists with status: " +
-                                      content_stage.status + ", then mode=skip")
+                        if content_stage is not None and content_stage.status == 'COMPLETED' and not force_reprocessing:
+                            log.warn("This content item has already been "
+                                     "successfully processed. Force SKIP mode.")
                             mode = 'skip'
                 else:
                     log.debug("meta_stage is null")
