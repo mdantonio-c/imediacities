@@ -207,6 +207,7 @@ class Stage(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         filename = input_parameters['filename']
+        force_reprocessing = input_parameters.get('force_reprocessing', False)
         mode = input_parameters.get('mode', 'clean').strip().lower()
         if mode not in self.__class__.allowed_import_mode:
             raise RestApiException(
@@ -276,7 +277,7 @@ class Stage(GraphBaseOperations):
                         row[0]) for row in results2]
                     if len(c2) == 1:
                         content_stage = c2[0]
-                        if content_stage is not None and content_stage.status == 'COMPLETED':
+                        if content_stage is not None and content_stage.status == 'COMPLETED' and not force_reprocessing:
                             log.warn("This content item has already been "
                                      "successfully processed. Force SKIP mode.")
                             mode = 'skip'
