@@ -238,7 +238,7 @@ class AnnotationRepository():
         return False if (len(node.annotation.all()) > 1 or len(node.annotation_body.all())) else True
 
     @graph_transactions
-    def create_tvs_annotation(self, item, shots):
+    def create_automatic_tvs(self, item, shots):
         if not shots:
             raise ValueError('List of shots cannot be empty')
         # create annotation node
@@ -252,10 +252,73 @@ class AnnotationRepository():
         annotation.bodies.connect(tvs_body)
 
         # foreach shot create a node and connect it properly
-        for shot in shots:
-            shot.save()
+        for shot_num, properties in shots.items():
+            properties['shot_num'] = shot_num
+            shot = self.graph.Shot(**properties).save()
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
+
+    @graph_transactions
+    def update_automatic_tvs(self, item, shots, vim_estimations):
+        '''
+        This procedure updates the automatic shot list preserving existing
+        annotations such as TAG, DSC etc.
+
+        For each incoming shot update the corresponding shot in the database
+        with the same shot_num. If a new shot occurs, it is added to the actual
+        list. If instead the list of shots is shortened, all shot in excess
+        will be eliminated with related anno.
+        '''
+        log.info('Update existing shot list preserving anno(s).')
+        FHG_TVS = item.targeting_annotations.search(
+            annotation_type='TVS', generator='FHG')
+        if not FHG_TVS:
+            raise ValueError('Expected TVS anno from FHG.')
+
+        tvs = FHG_TVS[0]
+        tvs_body = tvs.bodies.single().downcast()
+
+        old_size = len(item.shots.all())
+        log.debug('Existing shot list size: {}'.format(old_size))
+        new_size = len(shots)
+        log.debug('Incoming shot list size: {}'.format(new_size))
+
+        # foreach incoming shot
+        log.debug('----------')
+        for shot_num, properties in shots.items():
+            shot_node = None
+            res = item.shots.search(shot_num=shot_num)
+            if not res:
+                # new incoming shot:
+                # rarely expected (especially for framerate fix)
+                log.info('New incoming shot number: {}'.format(shot_num))
+                shot_node = self.graph.Shot(shot_num=shot_num, **properties).save()
+                tvs_body.segments.connect(shot_node)
+                item.shots.connect(shot_node)
+            else:
+                shot_node = res[0]
+                # props to update
+                shot_node.start_frame_idx = properties['start_frame_idx']
+                shot_node.end_frame_idx = properties['end_frame_idx']
+                shot_node.timestamp = properties['timestamp']
+                shot_node.duration = properties['duration']
+                shot_node.thumbnail_uri = properties['thumbnail_uri']
+                shot_node.save()
+            log.debug(shot_node)
+            log.debug('----------')
+        if old_size > new_size:
+            # no expected
+            # naive solution: delete exceeding shots (TO BE CHECKED)
+            for i in range(new_size, old_size):
+                shot_to_delete = item.shots.search(shot_num=i)
+                log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
+                related_annotations = shot_to_delete.annotation.all()
+                for anno in related_annotations:
+                    bodies = anno.bodies.all()
+                    for b in bodies:
+                        b.delete()
+                    anno.delete()
+                    shot_to_delete.delete()
 
     def create_tvs_manual_annotation(self, user, bodies, target,
                                      is_private=False, embargo_date=None):
