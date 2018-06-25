@@ -5,7 +5,7 @@
         <div class="row modal-body-content">
 
             <!-- Anteprima del video -->
-            <div class="col-12 col-sm-5 row no-gutters modal-media--info">
+            <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
                 <ng-template [ngIf]="media_type === 'video'">
                     <span class="col-6 col-lg-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
                     <span class="col-6 col-lg-6 imc--flex--horizontal-center">frame-range:
@@ -37,7 +37,7 @@
                     </div>
                 </ng-template>
                 <ng-template [ngIf]="media_type !== 'video'">
-                    <img [src]="mediaData.links.content">
+                    <img [src]="mediaData.links.content" class="img-fluid">
                 </ng-template>
             </div>
 
