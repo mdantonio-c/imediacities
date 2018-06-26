@@ -177,15 +177,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 shots, vim_estimations = extract_tvs_vim_results(
                     self, item_node, analyze_path)
 
-                # save or update TVS and VIM annotations
                 repo = AnnotationRepository(self.graph)
-                existing_shots = item_node.shots.all()
-                if not existing_shots:
-                    repo.create_automatic_tvs(item_node, shots)
-                else:
-                    repo.update_automatic_tvs(
-                        item_node, shots, vim_estimations)
-
                 # first remove existing automatic VIM annotations if any
                 vim_annotations = item_node.sourcing_annotations.search(
                     annotation_type='VIM', generator='FHG')
@@ -193,6 +185,16 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                     anno_id = anno.id
                     repo.delete_vim_annotation(anno)
                     log.debug("Deleted existing VIM annotation [%s]" % anno_id)
+
+                # save or update TVS annotations
+                existing_shots = item_node.shots.all()
+                if not existing_shots:
+                    repo.create_automatic_tvs(item_node, shots)
+                else:
+                    repo.update_automatic_tvs(
+                        item_node, shots, vim_estimations)
+
+                # save VIM annotations
                 repo.create_vim_annotation(item_node, vim_estimations)
 
             # extract automatic object detection results

@@ -292,7 +292,8 @@ class AnnotationRepository():
                 # new incoming shot:
                 # rarely expected (especially for framerate fix)
                 log.info('New incoming shot number: {}'.format(shot_num))
-                shot_node = self.graph.Shot(shot_num=shot_num, **properties).save()
+                shot_node = self.graph.Shot(
+                    shot_num=shot_num, **properties).save()
                 tvs_body.segments.connect(shot_node)
                 item.shots.connect(shot_node)
             else:
@@ -307,12 +308,14 @@ class AnnotationRepository():
             log.debug(shot_node)
             log.debug('----------')
         if old_size > new_size:
-            # no expected
-            # naive solution: delete exceeding shots (TO BE CHECKED)
+            # naive solution: delete exceeding shots
+            log.warn('The shot list [size={new_size}] is shorter than the '
+                     'previous one [size={old_size}]'.format(
+                         new_size=new_size, old_size=old_size))
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
                 log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
-                related_annotations = shot_to_delete.annotation.all()
+                related_annotations = shot_to_delete[0].annotation.all()
                 for anno in related_annotations:
                     bodies = anno.bodies.all()
                     for b in bodies:
