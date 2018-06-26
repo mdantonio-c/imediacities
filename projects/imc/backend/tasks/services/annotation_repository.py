@@ -321,7 +321,7 @@ class AnnotationRepository():
                     for b in bodies:
                         b.delete()
                     anno.delete()
-                    shot_to_delete.delete()
+                shot_to_delete[0].delete()
 
     def create_tvs_manual_annotation(self, user, bodies, target,
                                      is_private=False, embargo_date=None):
