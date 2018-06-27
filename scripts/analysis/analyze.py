@@ -8,7 +8,7 @@ import glob
 import shutil
 import xml.etree.ElementTree as ET
 
-os.umask(0)
+os.umask(007)
 
 from PIL import Image
 from subprocess import *
@@ -754,7 +754,7 @@ def analize_image(filename, out_folder, fast=False):
 
 
 # -----------------------------------------------------
-def analize(filename, item_type, out_folder, fast=False):
+def analize(filename, uuid, item_type, out_folder, fast=False):
     ''' Item type: "Video" or "Image". '''
 
     if item_type == "Video":
