@@ -9,28 +9,21 @@ variables:
   frontend:
     framework: angular
 
-  # repos:
-  #   frontend:
-  #     online_url: https://github.com/rapydo/rapydo-angular.git
-  #     branch: 0.6.2
-
   env:
     COMPOSE_PROJECT_NAME: imc
-    PROJECT_DOMAIN: imediacities.hpc.cineca.it
     LETSENCRYPT_MODE: 
   
     ACTIVATE_FTP: 1
     ACTIVATE_CELERY: 1
-
-    # AUTH_REGISTER_FAILED_LOGIN: False
-    # AUTH_FORCE_FIRST_PASSWORD_CHANGE: False
-    # AUTH_VERIFY_PASSWORD_STRENGTH: False
-    # AUTH_MAX_PASSWORD_VALIDITY: 0
-    # AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: 0
-    # AUTH_MAX_LOGIN_ATTEMPTS: 0
-    # AUTH_SECOND_FACTOR_AUTHENTICATION: TOTP
+    ACTIVATE_CELERYUI: 1
+    ACTIVATE_NEO4J: 1
+    ACTIVATE_MONGODB: 1
 
     GRAPHDB_PASSWORD: chooseapassword
+
+    CELERY_BACKEND: MONGODB
+    CELERY_BACKEND_HOST: mongo.dockerized.io
+    CELERY_BACKEND_PORT: 27017
 
     SMTP_ADMIN: m.dantonio@cineca.it
     SMTP_NOREPLY: I-Media-Cities@cinematek.be

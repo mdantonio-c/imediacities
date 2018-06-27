@@ -82,6 +82,7 @@ services:
       - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
     depends_on:
       - rabbit
+      - mongodb
       - neo4j
 
     environment:
@@ -113,6 +114,10 @@ services:
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
     environment:
+
+      CELERYUI_USER: imc
+      CELERYUI_PASSWORD: d43WtSXe49
+
       AUTH_ENABLE: 1
       # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
@@ -128,6 +133,7 @@ services:
 
     depends_on:
       - rabbit
+      - mongodb
       - neo4j
 
   ftp:
