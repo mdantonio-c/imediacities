@@ -9,7 +9,7 @@
 		</span>
 		<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.id" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.links['thumbnail']"></hjs>
 		<img src="{{media.links['thumbnail']+'&size=large'}}" *ngIf="media.links['thumbnail']"
-		style="height: 200px; width: 100%; display: block;"/>
+		style="height: 200px; /*width: 100%;*/ display: block;" class="img-fluid"/>
 	</div>
 	<div class="caption">
 		<div class="clearfix">
