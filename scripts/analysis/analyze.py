@@ -8,7 +8,7 @@ import glob
 import shutil
 import xml.etree.ElementTree as ET
 
-os.umask(007)
+os.umask(int('007', 8))
 
 from PIL import Image
 from subprocess import *

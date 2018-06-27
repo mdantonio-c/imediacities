@@ -11,7 +11,6 @@ from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
-from imc.models.neo4j import Shot
 from imc.models import codelists
 
 # from imc.analysis.fhg import FHG
@@ -155,8 +154,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 raise Exception('Failed to create out_folder')
 
             log.info("Analize " + content_item)
-
-            if analize(content_item, item_type, out_folder, fast):
+            creation = item_node.creation.single()
+            if not creation:
+                raise ValueError('Unexpected missing creation '
+                                 'importing resource {}'.format(resource_id))
+            if analize(content_item, creation.uuid, item_type, out_folder, fast):
                 log.info('Analize executed')
             else:
                 raise Exception('Analize terminated with errors')
