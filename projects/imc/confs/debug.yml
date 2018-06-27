@@ -4,7 +4,6 @@ version: '3'
 
 services:
   backend:
-    # command: sleep infinity
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
@@ -18,8 +17,6 @@ services:
   frontend:
     ports:
       - 80:80
-    environment:
-      APP_MODE: debug
 
   celery:
     environment:

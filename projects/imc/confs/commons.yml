@@ -16,20 +16,8 @@ services:
       # - ftp
       # - swaggerui
     environment:
-      VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
-
-      # base the user/role mechanism on some database
       AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
-
-      AUTH_REGISTER_FAILED_LOGIN: ${AUTH_REGISTER_FAILED_LOGIN}
-      AUTH_FORCE_FIRST_PASSWORD_CHANGE: ${AUTH_FORCE_FIRST_PASSWORD_CHANGE}
-      AUTH_VERIFY_PASSWORD_STRENGTH: ${AUTH_VERIFY_PASSWORD_STRENGTH}
-      AUTH_MAX_PASSWORD_VALIDITY: ${AUTH_MAX_PASSWORD_VALIDITY}
-      AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: ${AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER}
-      AUTH_MAX_LOGIN_ATTEMPTS: ${AUTH_MAX_LOGIN_ATTEMPTS}
-      AUTH_SECOND_FACTOR_AUTHENTICATION: ${AUTH_SECOND_FACTOR_AUTHENTICATION}
 
       # # neo connection
       GRAPHDB_ENABLE: 1
@@ -76,7 +64,6 @@ services:
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
-      # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
       - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
@@ -86,9 +73,7 @@ services:
       - neo4j
 
     environment:
-      # base the user/role mechanism on some database
       AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
 
       # # neo connection
@@ -98,14 +83,13 @@ services:
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
-      CELERY_ENABLE: 1
-
       SMTP_ADMIN: ${SMTP_ADMIN}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
+      # Used to manage analysis script on both prod and pre-prod
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
   celeryui:
@@ -129,8 +113,6 @@ services:
       GRAPHDB_HOST: ${GRAPHDB_HOST}
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
-
-      CELERY_ENABLE: 1
 
     depends_on:
       - rabbit

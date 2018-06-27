@@ -33,9 +33,6 @@ services:
       - letsencrypt_certs:/ssl
 
   frontend:
-    environment:
-      - APP_MODE=production
-      - APP_DEBUG=false 
     networks:
       proxy_net:
         aliases:
@@ -44,4 +41,4 @@ services:
   celery:
     environment:
       DEBUG_LEVEL: INFO
-      ACTIVATE: 1
+      APP_MODE: production
