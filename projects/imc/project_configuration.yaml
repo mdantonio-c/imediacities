@@ -19,6 +19,9 @@ variables:
     PROJECT_DOMAIN: imediacities.hpc.cineca.it
     LETSENCRYPT_MODE: 
   
+    ACTIVATE_FTP: 1
+    ACTIVATE_CELERY: 1
+
     # AUTH_REGISTER_FAILED_LOGIN: False
     # AUTH_FORCE_FIRST_PASSWORD_CHANGE: False
     # AUTH_VERIFY_PASSWORD_STRENGTH: False

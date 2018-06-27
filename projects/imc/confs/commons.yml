@@ -136,8 +136,6 @@ services:
       - "30000-30019:30000-30019"
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
-    environment:
-      ACTIVATE: 1
 
   frontend:
     environment:

@@ -8,7 +8,6 @@ services:
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      ACTIVATE: 1
     ports:
       - 8080:5000
 
@@ -21,13 +20,11 @@ services:
       - 80:80
     environment:
       APP_MODE: debug
-      ACTIVATE: 1
 
   celery:
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      ACTIVATE: 1
 
   ftp:
     environment:
