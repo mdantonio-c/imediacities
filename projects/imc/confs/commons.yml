@@ -113,6 +113,7 @@ services:
     image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${VANILLA_DIR}/scripts:/code/scripts
     environment:
 
       CELERYUI_USER: imc
