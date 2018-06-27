@@ -102,19 +102,20 @@ def make_movie_analize_folder(filename, clean=False): # , temporary=False):
     m_name, m_ext = os.path.splitext(os.path.basename(filename))
     movie_analize_folder = os.path.join(user_analyze_folder, m_name)
 
-    #if temporary:
-    #    movie_analize_folder += "_tmp"
 
     if not mkdir(movie_analize_folder, clean):
         return ""
 
-    origin_link = os.path.join(movie_analize_folder, 'origin')
+    
+    origin_link_name = os.path.join(movie_analize_folder, 'origin')
+    origin_link_target = filename.replace( stage_area, '../../..')
+
+    if os.path.exists( origin_link_name ):
+        os.unlink( origin_link_name )
     try:
-        os.symlink(filename, origin_link)
+        os.symlink( origin_link_target, origin_link_name )
     except BaseException:
-        os.remove(origin_link)
-        print('forcing origin link')
-        os.symlink(filename, origin_link)
+        print('failed to create origin link')
 
     global logfile
     logfile = open(os.path.join(movie_analize_folder, "log.txt"), "w")
