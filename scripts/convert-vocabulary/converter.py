@@ -26,7 +26,7 @@ for ws in wb.worksheets:
     # if ws.title != 'Persons(Gender)':
     #     continue
     # print('--- {} ---'.format(ws.title))
-    vocabulary_class = {'label': ws.title.lower(), 'children': []}
+    vocabulary_class = {'label': ws.title.lower().capitalize(), 'children': []}
 
     # print('min row {}, max row {}'.format(ws.min_row, ws.max_row))
     current_group = ws['H2'].value
