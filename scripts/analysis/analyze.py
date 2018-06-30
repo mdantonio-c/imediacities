@@ -8,7 +8,7 @@ import glob
 import shutil
 import xml.etree.ElementTree as ET
 
-os.umask(0)
+os.umask(int('007', 8))
 
 from PIL import Image
 from subprocess import *
@@ -102,19 +102,20 @@ def make_movie_analize_folder(filename, clean=False): # , temporary=False):
     m_name, m_ext = os.path.splitext(os.path.basename(filename))
     movie_analize_folder = os.path.join(user_analyze_folder, m_name)
 
-    #if temporary:
-    #    movie_analize_folder += "_tmp"
 
     if not mkdir(movie_analize_folder, clean):
         return ""
 
-    origin_link = os.path.join(movie_analize_folder, 'origin')
+    
+    origin_link_name = os.path.join(movie_analize_folder, 'origin')
+    origin_link_target = filename.replace( stage_area, '../../..')
+
+    if os.path.exists( origin_link_name ):
+        os.unlink( origin_link_name )
     try:
-        os.symlink(filename, origin_link)
+        os.symlink( origin_link_target, origin_link_name )
     except BaseException:
-        os.remove(origin_link)
-        print('forcing origin link')
-        os.symlink(filename, origin_link)
+        print('failed to create origin link')
 
     global logfile
     logfile = open(os.path.join(movie_analize_folder, "log.txt"), "w")
@@ -753,7 +754,7 @@ def analize_image(filename, out_folder, fast=False):
 
 
 # -----------------------------------------------------
-def analize(filename, item_type, out_folder, fast=False):
+def analize(filename, uuid, item_type, out_folder, fast=False):
     ''' Item type: "Video" or "Image". '''
 
     if item_type == "Video":

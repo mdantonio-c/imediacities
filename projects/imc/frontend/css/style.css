@@ -170,6 +170,11 @@ button:focus {outline:0 !important;}
 	position: relative;
 }
 
+search-thumbnail div .media-image-wrapper {
+  justify-content: center;
+  display: flex;
+}
+
 .search-item.label {
     position: absolute;
     bottom: -30px;

@@ -400,6 +400,7 @@ class AnnotationRepository():
             tvs_body.delete()
         annotation.delete()
 
+    @graph_transactions
     def delete_tvs_manual_annotation(self, annotation):
         log.debug('Delete existing manual TVS annotation')
         body = annotation.bodies.single()

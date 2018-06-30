@@ -729,7 +729,8 @@ input[type="radio"] {
     flex-direction: column;
     align-self: stretch;
     height: 100%;
-    max-height: 100%; }
+    max-height: 100%;
+    overflow: hidden; }
     .box-shots .tab-content .tab-pane {
       width: 100%;
       overflow-y: auto;
