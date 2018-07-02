@@ -213,7 +213,7 @@ search-thumbnail div .media-image-wrapper {
 
 
 .media-thumbnail {
-    padding: 4px;
+    padding-top: 4px;
     line-height: 1.42857143;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -237,7 +237,7 @@ search-thumbnail div .media-image-wrapper {
 .media-thumbnail .text {
 	display: block;
     display: -webkit-box;
-    max-width: 400px;
+    max-width: 275px;
     height: 100px;
     margin: 0 auto;
     line-height: 1.2;
