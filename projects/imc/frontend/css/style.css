@@ -245,6 +245,8 @@ search-thumbnail div .media-image-wrapper {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 
