@@ -45,16 +45,25 @@ export class AppVocabularyService {
     }
 
     private _vocabolario_init () {
-        this._vocabolario.terms.forEach(t => {
+        /*let unorderedTerms = this._vocabolario.terms;
+        unorderedTerms.sort(this._sort_by_label);
+        this._vocabolario.terms = unorderedTerms;
+        console.log(unorderedTerms);*/
+        /*this._vocabolario.terms.sort(this._sort_by_label);*/
+        this._vocabolario.terms.sort(this._sort_by_label).forEach(t => {
             this._vocabolario_reset(t);
         });
         return this._vocabolario;
     }
 
+    private _sort_by_label (a, b) {
+        return (a.label > b.label) ? 1 : ((b.label > a.label) ? -1 : 0);
+    }
+
     private _vocabolario_reset (term) {
         term.open = false;
         if (term.hasOwnProperty('children')) {
-            term.children.forEach(c => {
+            term.children.sort(this._sort_by_label).forEach(c => {
                 c.description = (term.description ? term.description + ', ' : '') + term.label;
                 c.open = false;
                 c.selected = false;
