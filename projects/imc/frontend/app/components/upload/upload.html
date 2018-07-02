@@ -281,6 +281,7 @@
 	        mwlConfirmationPopover
 	        [popoverTitle]="deleteConfirmation.title"
 	        [popoverMessage]="deleteConfirmation.message"
+            [appendToBody]="true"
 	        placement="left"
 	        (confirm)="remove(row.name)"
 	        (cancel)="cancelRequest()"></i>
