@@ -1,10 +1,11 @@
 <div class="container-search row no-gutters justify-content-md-center">
 	<div class="col">
 		<div class="row">
-			<search-filter class="col col-sm-4 col-md-3"
-			(onFilterChange)="changeFilter($event)"></search-filter>
+			<search-filter class="col-12 col-lg-3 col-sm-6"
+			(onFilterChange)="changeFilter($event)">
+			</search-filter>
 			<!-- results list -->
-			<div class="col col-sm-8 col-md-9">
+			<div class="col-12 col-lg-9 col-sm-6">
 				<div class="row">
 					<div class="col">
 						<!-- search navbar -->
@@ -27,9 +28,9 @@
 						<!-- view results -->
 						<div class="row" *ngIf="!loading && totalItems > 0">
 							<div class="col">
-								<div *ngIf="currentView == 'Grid'" class="row">
+								<div *ngIf="currentView == 'Grid'" style="display:  flex;flex-direction: row;flex-wrap:  wrap;">
 									<search-thumbnail
-									class="col-lg-3 col-md-4 col-sm-6 col"
+									style="min-width: 100px;margin-right: 5px;" 
 									*ngFor="let mediaEntity of results"
 									[media]="mediaEntity">
 									</search-thumbnail>
