@@ -45,11 +45,6 @@ export class AppVocabularyService {
     }
 
     private _vocabolario_init () {
-        /*let unorderedTerms = this._vocabolario.terms;
-        unorderedTerms.sort(this._sort_by_label);
-        this._vocabolario.terms = unorderedTerms;
-        console.log(unorderedTerms);*/
-        /*this._vocabolario.terms.sort(this._sort_by_label);*/
         this._vocabolario.terms.sort(this._sort_by_label).forEach(t => {
             this._vocabolario_reset(t);
         });
