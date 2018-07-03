@@ -103,7 +103,7 @@ button:focus {outline:0 !important;}
 }
 
 .search-thumbnail .search-title {
-	margin-top: 25px;
+	margin-top: 10px;
 	overflow-wrap: break-word;
 }
 
@@ -227,6 +227,18 @@ search-thumbnail div .media-image-wrapper {
 .media-thumbnail .caption {
     padding: 9px;
     color: #333;
+    max-width: 275px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+}
+
+.space-5 { 
+  max-height: 1px; 
+  min-height: 1px; 
+  overflow: hidden; 
+  margin: 12px 0; 
+  margin: 5px 0 5px 
 }
 
 .media-thumbnail .caption .label-city {
@@ -237,9 +249,6 @@ search-thumbnail div .media-image-wrapper {
 .media-thumbnail .text {
 	display: block;
     display: -webkit-box;
-    max-width: 275px;
-    height: 100px;
-    margin: 0 auto;
     line-height: 1.2;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -247,6 +256,9 @@ search-thumbnail div .media-image-wrapper {
     text-overflow: ellipsis;
     margin-left: 5px;
     margin-right: 5px;
+    margin-top: 0;
+    margin-bottom: 0;
+    flex-grow: 1;
 }
 
 
