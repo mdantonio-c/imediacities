@@ -33,11 +33,14 @@ idmt_bin       = root_dir + 'imedia-pipeline/tools'
 idmt_scripts   = root_dir + 'imedia-pipeline/scripts'
 idmt_py        = root_dir + 'imedia-pipeline/scripts/idmt'
 
-# default_movie   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
-# default_movie   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
-default_movie    = '00000000-0000-0000-00000000000000000/test_00.avi'
-# default_movie    = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
-default_filename = os.path.join(stage_area, default_movie)
+# default_media   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
+# default_media   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
+default_media     = '00000000-0000-0000-00000000000000000/test_00.avi'
+# default_media   = '00000000-0000-0000-00000000000000000/test_01.jpg'
+# default_media   = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
+default_filename  = os.path.join(stage_area, default_media)
+default_mediatype = 'Video'  #'Image'
+default_uuid      = '000'
 
 logfile = None
 
@@ -457,6 +460,27 @@ def summary(filename, out_folder):
         return False
     return os.path.exists(out_filename)
 
+# -----------------------------------------------------
+def submit_orf( media, mtype, uuid, out_folder ):
+
+
+    cmd_filename = os.path.join(out_folder,   'submit_orf.sh')
+
+    f = open(cmd_filename, 'w')
+    f.write('export KEY=/home/developer/.ssh/sil_rsa\n')
+    f.write('export R_USER=simboden\n')
+    f.write('export R_PATH=/gpfs/work/cin_staff/simboden/IMCgpu/imc-orf\n')
+    f.write('MEDIA='+media+'\n')
+    f.write('MTYPE='+mtype+'\n')
+    f.write('UUID='+str(uuid)+'\n')
+    f.write('ssh -i $KEY $R_USER@login.galileo.cineca.it "cd $R_PATH && sbatch submit.sh $MTYPE $MEDIA $UUID $PROJECT_DOMAIN"\n')
+    f.write('UUID='+uuid+'\n')
+    f.close()
+
+    if not run('/bin/bash ' + cmd_filename, out_folder, 'submit_orf.log', 'submit_orf.err'):
+        return False
+    return True
+
 
 # -----------------------------------------------------
 def thumbs_index_storyboard(filename, out_folder, num_frames):
@@ -638,7 +662,7 @@ def revert_to_origin_framerate(filename):
 
 
 # -----------------------------------------------------
-def analize_movie(filename, out_folder, fast=False):
+def analize_movie(filename, out_folder, muuid, fast=False):
 
     log('origin_tech_info --- begin')
     if not origin_tech_info(filename, out_folder):
@@ -706,12 +730,18 @@ def analize_movie(filename, out_folder, fast=False):
         return False
     log('index/storyboard---- ok ')
 
+    log('submit_orf --------- begin')
+    media = out_folder.replace( analize_area + '/', '')
+    if not submit_orf( media, 'Video', muuid, out_folder ):
+        return False
+    log('submit_orf --------- ok')
+
     return True
 
 # -----------------------------------------------------
 
 
-def analize_image(filename, out_folder, fast=False):
+def analize_image(filename, out_folder, muuid, fast=False):
 
     log('image_origin_tech_info --- begin')
     if not image_origin_tech_info(filename, out_folder):
@@ -750,6 +780,12 @@ def analize_image(filename, out_folder, fast=False):
         return False
     log('image_transcoded_info ---- ok ')
 
+    log('submit_orf --------- begin')
+    media = out_folder.replace( analize_area + '/','')
+    if not submit_orf( media, 'Image', muuid, out_folder  ):
+        return False
+    log('submit_orf --------- ok')
+
     return True
 
 
@@ -758,10 +794,10 @@ def analize(filename, uuid, item_type, out_folder, fast=False):
     ''' Item type: "Video" or "Image". '''
 
     if item_type == "Video":
-        return analize_movie(filename, out_folder, fast)
+        return analize_movie(filename, out_folder, uuid, fast)
 
     if item_type == "Image":
-        return analize_image(filename, out_folder, fast)
+        return analize_image(filename, out_folder, uuid, fast)
 
     print("analize error: bad item_type :", item_type)
     return false
@@ -785,7 +821,9 @@ def main(args):
 
     clean = False
     fast  = False
-    movie = default_filename
+    media = default_filename
+    mtype = default_mediatype
+    muuid = default_uuid
 
     args = sys.argv[1:]
     # num_args = len(args)
@@ -801,7 +839,7 @@ def main(args):
         else:
             movie = a
 
-    filename = os.path.join(stage_area, movie)
+    filename = os.path.join(stage_area, media)
     if not os.path.exists(filename):
         print('aborting: bad input file', filename)
         return
@@ -812,9 +850,9 @@ def main(args):
         return
 
     logfile = open(os.path.join(out_folder, "log.txt"), "w")
-    log("Analize " + movie)
+    log("Analize " + media)
 
-    if analize(filename, 'Video', out_folder, fast):
+    if analize(filename, muuid, mtype, out_folder, fast):
         log('Analize done')
     else:
         log('Analize terminated with errors')
