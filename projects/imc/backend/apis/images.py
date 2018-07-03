@@ -16,6 +16,9 @@ from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.annotation_repository import AnnotationRepository
+
+from restapi.flask_ext.flask_celery import CeleryExt
 
 logger = get_logger(__name__)
 
@@ -253,3 +256,72 @@ class ImageContent(GraphBaseOperations):
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+
+class ImageTools(GraphBaseOperations):
+
+    __available_tools__ = ('object-detection')
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def post(self, image_id):
+
+        logger.debug('launch automatic tool for image id: %s' % image_id)
+
+        if image_id is None:
+            raise RestApiException(
+                "Please specify a image id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        image = None
+        try:
+            image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
+        except self.graph.NonAVEntity.DoesNotExist:
+            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            raise RestApiException(
+                "Please specify a valid image id.",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = image.item.single()
+        if item is None:
+            raise RestApiException(
+                "Item not available. Execute the pipeline first!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        if item.item_type != 'Image':
+            raise RestApiException(
+                "Content item is not a image. Use a valid image id.",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        params = self.get_input()
+        if 'tool' not in params:
+            raise RestApiException(
+                'Please specify the tool to be launched.',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        tool = params['tool']
+        if tool not in self.__available_tools__:
+            raise RestApiException(
+                "Please specify a valid tool. Expected one of %s." %
+                (self.__available_tools__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        repo = AnnotationRepository(self.graph)
+        if ('operation' in params and params['operation'] == 'delete' and
+                tool == self.__available_tools__[0]):
+            # get all automatic tags
+            for anno in item.sourcing_annotations:
+                if anno.generator == 'FHG' and anno.annotation_type == 'TAG':
+                    repo.delete_auto_annotation(anno)
+            return self.empty_response()
+
+        # DO NOT re-launch object detection twice for the same video!
+        if repo.check_automatic_tagging(item.uuid):
+            raise RestApiException(
+                "Object detection CANNOT be run twice for the same video.",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        task = CeleryExt.launch_tool.apply_async(
+            args=[tool, item.uuid],
+            countdown=10
+        )
+
+        return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)

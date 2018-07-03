@@ -1,0 +1,30 @@
+image_tools:
+  summary: Allow to launch the execution of some image tools.
+  custom:
+    authentication: true
+    authorized:
+      - admin_root
+  parameters:
+    - name: criteria
+      in: body
+      description: Criteria to launch the tool.
+      schema:
+        required:
+          - tool
+        properties:
+          tool:
+            description: Tool to be launched.
+            type: string
+            enum:
+              - object-detection
+  responses:
+    '201':
+      description: Execution launched. 
+    '401':
+      description: This endpoint requires a valid authorization token.
+    '403':
+      description: Request forbidden.
+    '404':
+      description: Image not found.
+    '409':
+      description: Invalid state for the image.
