@@ -39,7 +39,7 @@ for ws in wb.worksheets:
         if en_term is None:
             # ignore groups without entry value
             continue
-        en_term = en_term
+        en_term = en_term.strip()
         iri = ws['M' + str(row_index)].value
         if iri is None:
             iri = generate_iri(en_term)
