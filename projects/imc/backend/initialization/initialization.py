@@ -198,3 +198,12 @@ class Customizer(object):
 
     def custom_user_properties(self, properties):
         return properties
+
+    def custom_post_handle_user_input(self, auth, user_node, properties):
+
+        log.critical("LINK THIS USER TO DEFAULT GROUP")
+        log.warning(auth)
+        log.warning(auth.db)
+        log.warning(properties)
+
+        return True
