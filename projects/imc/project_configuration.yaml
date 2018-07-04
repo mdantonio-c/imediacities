@@ -1,67 +1,28 @@
 project:
     title: "iMediaCities Repository"
     description": "..."
-    version: "1.3.1"
-tags:
-    file: "All endpoints to handle files"
-    admin: "Operations only allowed for admin users"
-    miscellaneous: "Endpoints not classified in other specific sections"
-
-releases:
-  '1.1.0':
-    type: beta
-    rapydo: 0.5.5
-    status: discontinued
-  '1.1.1':
-    type: beta
-    rapydo: 0.5.7
-    status: released
-  '1.1.2':
-    type: beta
-    rapydo: 0.6.0
-    status: discontinued 
-  '1.2.0':
-    type: beta
-    rapydo: 0.5.7
-    status: released 
-  '1.2.1':
-    type: beta
-    rapydo: 0.6.0
-    status: discontinued 
-  '1.2.2':
-    type: beta
-    rapydo: 0.6.1
-    status: discontinued 
-  '1.3.0':
-    type: beta
-    rapydo: 0.6.0
-    status: released
-  '1.3.1':
-    type: beta
-    rapydo: 0.6.0
-    status: developing 
-  '1.4.0':
-    type: beta
-    rapydo: 0.6.1
-    status: developing
-
+    version: "1.4.2"
+    rapydo: 0.6.2
 
 variables:
 
+  frontend:
+    framework: angular
+
   env:
-    COMPOSE_PROJECT_NAME: imc
-    PROJECT_DOMAIN: imediacities.hpc.cineca.it
     LETSENCRYPT_MODE: 
   
-    # AUTH_REGISTER_FAILED_LOGIN: False
-    # AUTH_FORCE_FIRST_PASSWORD_CHANGE: False
-    # AUTH_VERIFY_PASSWORD_STRENGTH: False
-    # AUTH_MAX_PASSWORD_VALIDITY: 0
-    # AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: 0
-    # AUTH_MAX_LOGIN_ATTEMPTS: 0
-    # AUTH_SECOND_FACTOR_AUTHENTICATION: TOTP
+    ACTIVATE_FTP: 1
+    ACTIVATE_CELERY: 1
+    ACTIVATE_CELERYUI: 1
+    ACTIVATE_NEO4J: 1
+    ACTIVATE_MONGODB: 1
 
     GRAPHDB_PASSWORD: chooseapassword
+
+    CELERY_BACKEND: MONGODB
+    CELERY_BACKEND_HOST: mongo.dockerized.io
+    CELERY_BACKEND_PORT: 27017
 
     SMTP_ADMIN: m.dantonio@cineca.it
     SMTP_NOREPLY: I-Media-Cities@cinematek.be
@@ -83,37 +44,7 @@ variables:
       - Researcher
       - Archive
 
-  frontend:
-      enable: true
-bower_components:
-  ng-flow:
-    - "dist/ng-flow-standalone.min.js"
-  angular-tablesort:
-    - js/angular-tablesort.js
-    - tablesort.css
-  ngmap:
-    - build/scripts/ng-map.min.js
-  angular-google-chart:
-    - "ng-google-chart.min.js"
-  font-awesome:
-    - css/font-awesome.min.css
-  lodash:
-    - dist/lodash.min.js
-  angular-file-saver:
-    - dist/angular-file-saver.bundle.min.js
-  angular-ivh-treeview:
-    - dist/ivh-treeview.min.js
-    - dist/ivh-treeview.min.css
-  ng-tags-input:
-    - ng-tags-input.min.css
-    - ng-tags-input.min.js
-  google-marker-cluster:
-    - markerclusterer.js
-  angular-holderjs:
-    - src/holder.js
-  holderjs:
-    - holder.min.js
-
-css: 
-  - "custom/imc.css"
-  - "custom/VideoPlayer_stile.css"
+tags:
+    file: "All endpoints to handle files"
+    admin: "Operations only allowed for admin users"
+    miscellaneous: "Endpoints not classified in other specific sections"

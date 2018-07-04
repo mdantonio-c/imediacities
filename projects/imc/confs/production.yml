@@ -8,17 +8,18 @@ services:
     environment:
       ACTIVATE: 1
     volumes:
-      - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production.conf:/etc/nginx/sites-enabled/production
+      # - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production.conf:/etc/nginx/sites-enabled/production
+      - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production-a2.conf:/etc/nginx/sites-enabled/production
+      - ${VANILLA_DIR}/data/${COMPOSE_PROJECT_NAME}/frontend:/modules
     depends_on:
       - backend
       - frontend
 
   backend:
     environment:
-      - APP_MODE=production
-      - DEBUG_LEVEL=INFO
-      - NGINX_ACTIVE=true
-      - PYTHONPATH=/code
+      APP_MODE: production
+      DEBUG_LEVEL: INFO
+      NGINX_ACTIVE: "True"
     networks:
       proxy_net:
         aliases:
@@ -32,8 +33,7 @@ services:
 
   frontend:
     environment:
-      - APP_MODE=production
-      - APP_DEBUG=false 
+      APP_MODE: production
     networks:
       proxy_net:
         aliases:
@@ -42,4 +42,4 @@ services:
   celery:
     environment:
       DEBUG_LEVEL: INFO
-      ACTIVATE: 1
+      APP_MODE: production

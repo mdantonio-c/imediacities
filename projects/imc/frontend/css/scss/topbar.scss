@@ -1,0 +1,42 @@
+// Topbar nera sotto all'header
+
+@import 'vars';
+
+.imc--topbar {
+  background: $bg-dark;
+  padding: 20px 50px;
+
+  @media (max-width: 991.98px) {
+    padding: 20px 25px;
+  }
+
+  a:hover,
+  a:focus,
+  a:active {
+    outline: none !important;
+  }
+}
+
+// variazione per l'item video
+.page-type-video {
+  .imc--topbar--title,
+  .imc--topbar--title .material-icons {
+    color: $theme-video-color;
+  }
+}
+
+// variazione per l'item immagine
+.page-type-image {
+  .imc--topbar--title,
+  .imc--topbar--title .material-icons {
+    color: $theme-image-color;
+  }
+}
+
+.back-icon,
+.box-icons-share {
+  .material-icons {
+    color: $white;
+    margin-right: 10px;
+  }
+}

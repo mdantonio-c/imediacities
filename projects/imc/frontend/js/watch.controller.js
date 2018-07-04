@@ -1,6 +1,7 @@
 (function() {
 	'use strict';
 
+	var $ = require('jquery');
 	var noteMaxLenght = 500;
 
 	var app = angular.module('web')
@@ -13,7 +14,15 @@
 		.controller('ModalConfirmController', ModalConfirmController);
 
 	// modal view storyboard factory definition
-	app.factory('modalFactory', function($uibModal) {
+	app.factory('modalFactory', modalFactory)
+	   .factory('myTagModalFactory', myTagModalFactory)
+	   .factory('myGeoConfirmFactory', myGeoConfirmFactory)
+	   .factory('myNotesModalFactory', myNotesModalFactory);
+
+	app.config(ivhTreeviewConf);
+	app.service('sharedProperties', sharedProperties);
+
+	function modalFactory($uibModal) {
 		return {
 			open: function(size, template, params) {
 				return $uibModal.open({
@@ -30,7 +39,10 @@
 				});
 			}
 		};
-	}).factory('myTagModalFactory', function($uibModal, $document) {
+	};
+	modalFactory.$inject = ["$uibModal"];
+
+	function myTagModalFactory($uibModal, $document) {
 		/* modal view for adding location and term tags */
 		return {
 			open: function(size, template, params) {
@@ -50,7 +62,32 @@
 				});
 			}
 		};
-	}).factory('myNotesModalFactory', function($uibModal, $document) {
+	}
+	myTagModalFactory.$inject = ["$uibModal", "$document"];
+
+	function myGeoConfirmFactory($uibModal, $document) {
+		/*var parentElem = angular.element($document[0].querySelector('#video-wrapper .tag-modal-parent'));*/
+		var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
+		return {
+			open: function(size, template, params) {
+				return $uibModal.open({
+					animation: true,
+					templateUrl: template || 'result.html',
+					controller: 'geoResultController',
+					controllerAs: '$geoCtrl',
+					size: size,
+					resolve: {
+						params: function() {
+							return params;
+						}
+					}
+				});
+			}
+		};
+	};
+	myGeoConfirmFactory.$inject = ["$uibModal", "$document"];
+
+	function myNotesModalFactory($uibModal, $document) {
 		/* modal view for adding notes */
 		return {
 			open: function(size, template, params) {
@@ -70,27 +107,10 @@
 				});
 			}
 		};
-	}).factory('myGeoConfirmFactory', function($uibModal, $document) {
-		var parentElem = angular.element($document[0].querySelector('#item-wrapper .tag-modal-parent'));
-		return {
-			open: function(size, template, params) {
-				return $uibModal.open({
-					animation: true,
-					templateUrl: template || 'result.html',
-					controller: 'geoResultController',
-					controllerAs: '$geoCtrl',
-					size: size,
-					resolve: {
-						params: function() {
-							return params;
-						}
-					}
-				});
-			}
-		};
-	});
+	};
+	myNotesModalFactory.$inject = ["$uibModal", "$document"];
 
-	app.config(function(ivhTreeviewOptionsProvider) {
+	function ivhTreeviewConf(ivhTreeviewOptionsProvider) {
 		ivhTreeviewOptionsProvider.set({
 			defaultSelectedState: false,
 			twistieExpandedTpl: '<i class="fa fa-minus-square-o imc-icon" aria-hidden="true"></i>',
@@ -98,9 +118,10 @@
 			twistieLeafTpl: '',
 			validate: true
 		});
-	});
+	};
+	ivhTreeviewConf.$inject = ["ivhTreeviewOptionsProvider"];
 
-	app.service('sharedProperties', function($q) {
+	function sharedProperties($q) {
 		var startTime = 'test start value';
 		var endTime = 'test end value';
 		var labelTerm = 'test label value';
@@ -210,13 +231,17 @@
 				defer.notify(recordProvider);
 			}
 		};
-	});
+	};
+	sharedProperties.$inject = ["$q"];
 
-	app.filter('trustUrl', function($sce) {
-			return function(url) {
-				return $sce.trustAsResourceUrl(url);
-			};
-		})
+	function trustUrl($sce) {
+		return function(url) {
+			return $sce.trustAsResourceUrl(url);
+		};
+	};
+	trustUrl.$inject = ["$sce"];
+
+	app.filter('trustUrl', trustUrl)
 		.filter('salientEstimates', function() {
 			return function(estimates, threshold) {
 				threshold = typeof threshold !== 'undefined' ? threshold : 0.5;
@@ -788,36 +813,40 @@
 		var milliseconds = time.getMilliseconds();
 		return 1000 * (seconds + (minutes * 60) + (hours * 3600)) + milliseconds;
 	}
-	function encodeLanguage(language) {
-		// TODO da completare 
-		var code=null;
-		if (language === 'English') { code = 'en'; }
-		else if(language === 'Italian') { code = 'it'; }
-		else if(language === 'Greek') { code = 'el'; }
-		else if(language === 'Spanish') { code = 'es'; }
-		else if(language === 'Dutch') { code = 'nl'; }
-		else if(language === 'French') { code = 'fr'; }
-		else if(language === 'Danish') { code = 'da'; }
-		else if(language === 'German') { code = 'de'; }
-		else if(language === 'Swedish') { code = 'sv'; }
-		return code;
-	}
-	function decodeLanguageCode(code) {
-		// TODO da completare 
-		var language=null;
-		if (code === 'en') { language = 'English'; }
-		else if(code === 'it') { language = 'Italian'; }
-		else if(code === 'el') { language = 'Greek'; }
-		else if(code === 'es') { language = 'Spanish'; }
-		else if(code === 'nl') { language = 'Dutch'; }
-		else if(code === 'fr') { language = 'French'; }
-		else if(code === 'da') { language = 'Danish'; }
-		else if(code === 'de') { language = 'German'; }
-		else if(code === 'sv') { language = 'Swedish'; }
-		return language;
-	}
-	function WatchController($scope, $rootScope, $interval, $http, $log, $document, $uibModal, $stateParams, $filter, $timeout,
-			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties, FormDialogService) {
+
+	function WatchController(
+		$scope, $rootScope, $interval, $http, $log, $document, $uibModal, 
+		$stateParams, $filter, $timeout, DataService, noty, 
+		myTagModalFactory, myNotesModalFactory, sharedProperties, FormDialogService) {
+
+		function encodeLanguage(language) {
+			// TODO da completare 
+			var code=null;
+			if (language === 'English') { code = 'en'; }
+			else if(language === 'Italian') { code = 'it'; }
+			else if(language === 'Greek') { code = 'el'; }
+			else if(language === 'Spanish') { code = 'es'; }
+			else if(language === 'Dutch') { code = 'nl'; }
+			else if(language === 'French') { code = 'fr'; }
+			else if(language === 'Danish') { code = 'da'; }
+			else if(language === 'German') { code = 'de'; }
+			else if(language === 'Swedish') { code = 'sv'; }
+			return code;
+		}
+		function decodeLanguageCode(code) {
+			// TODO da completare 
+			var language=null;
+			if (code === 'en') { language = 'English'; }
+			else if(code === 'it') { language = 'Italian'; }
+			else if(code === 'el') { language = 'Greek'; }
+			else if(code === 'es') { language = 'Spanish'; }
+			else if(code === 'nl') { language = 'Dutch'; }
+			else if(code === 'fr') { language = 'French'; }
+			else if(code === 'da') { language = 'Danish'; }
+			else if(code === 'de') { language = 'German'; }
+			else if(code === 'sv') { language = 'Swedish'; }
+			return language;
+		}
 
 		var self = this;
 		var vid = $stateParams.v;
@@ -1386,6 +1415,7 @@
 						self.storyshots.push(sbFields);
 						
 					});
+
 					// noteShots serve per il tab Notes a destra
 					self.notesShots = self.storyshots;
 					//console.log("self.notesShots=" + angular.toJson(self.notesShots, true));
@@ -1398,12 +1428,6 @@
 						fps: self.video.relationships.item[0].attributes.framerate.replace('/1',''),
 						scene: scene
 					});
-				})
-				.catch(function(response) {
-					console.error('Error loading video shots');
-					// TODO
-				})
-				.finally(function() {
   					// hide loading video bar
 					self.showmeli = false;
 				});
@@ -1857,8 +1881,13 @@
 				}
 			});
 		});
+	};
 
-	}
+	WatchController.$inject = [
+		"$scope", "$rootScope", "$interval", "$http", "$log", "$document", 
+		"$uibModal", "$stateParams", "$filter", "$timeout", "DataService", "noty",
+		"myTagModalFactory", "myNotesModalFactory", "sharedProperties", "FormDialogService"
+	];
 
 	function WatchImageController($scope, $rootScope, $http, $document, $uibModal, $stateParams, $filter,
 			DataService, noty, myTagModalFactory, myNotesModalFactory, sharedProperties) {
@@ -2155,7 +2184,7 @@
 				};						
 			self.annotations.push(anno);
 		});
-	}
+	};
 
 	function MapController($scope, $rootScope, $window, NgMap, NavigatorGeolocation, GeoCoder, $timeout, sharedProperties, GOOGLE_API_KEY) {
 
@@ -2175,14 +2204,20 @@
 
 		// load the map ONLY when the provider info is available
 		sharedProperties.getRecordProvider().then(null, null, function(provider) {
+
 			// look for existing custom location
 			var customLocation;
 			var coverage;
+
 			if ($scope.$parent.watchCtrl.video && $scope.$parent.watchCtrl.video.relationships.coverages !== undefined) {
 				coverage = $scope.$parent.watchCtrl.video.relationships.coverages[0];
 				if (coverage !== undefined) {
 					customLocation = coverage.attributes.spatial[0];
 				}
+			}
+
+			if (coverage !== undefined) {
+				customLocation = coverage.attributes.spatial[0];
 			}
 
 			if (customLocation === undefined) {
@@ -2344,7 +2379,11 @@
 			};
 
 		});
-	}
+	};
+	MapController.$inject = [
+		"$scope", "$rootScope", "$window", "NgMap", "NavigatorGeolocation",
+		"GeoCoder", "$timeout", "sharedProperties"
+	];
 
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $uibModal service used above.

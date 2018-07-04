@@ -1,0 +1,59 @@
+<ngui-map
+    class="search-map"
+    center="45, 14"
+    zoom="4"
+    (mapReady$)="onMapReady($event)"
+    (zoom_changed)="onZoomChanged($event)"
+    (center_changed)="onCenterChanged($event)"
+    [styles]="mapStyle"
+    [disableDefaultUI]="true"
+    [zoomControl]="true">
+        <div id="custom-control" index="1" draggable="false" #customControl>
+            <button draggable="false" title="Center Europe" aria-label="Center Europe" type="button" (click)="centerEurope()">
+            <i class="imc-icon fa fa-crosshairs fa-2x grey"></i>
+            </button>
+            <div class="separator"></div>
+            <button draggable="false" title="Show/Hide Boundary" aria-label="Show/Hide Boundary" type="button" (click)="toggleBoundary()">
+            <i class="imc-icon fa fa-circle fa-2x grey"></i>
+            </button>
+        </div>
+        <div id="place-control" index="1" draggable="false" #placeControl>
+            <input type="text" name="lookup-place" placeholder="Enter a place"
+                places-auto-complete
+                (place_changed)="placeChanged($event)"
+                [types]="['geocode']">
+        </div>
+        <custom-marker
+            *ngFor="let city of counters"
+            [id]="'counter-marker-'+city.provider"
+            [position]="city.position">
+            <div class="map-counter-panel">{{city.counter}}</div>
+        </custom-marker>
+        <info-window id="tag-iw">
+            <div id="infowindow-content">
+                <div class="place-info">
+                    <span id="place-name" class="title">{{marker.name}}</span>
+                    <br/>
+                    <span *ngIf="!marker.address">
+                        <i class="fa fa-spinner fa-spin" aria-hidden="true" style="font-size:12px"></i>
+                    </span>
+                    <span id="place-address">{{marker?.address}}</span>
+                </div>
+                <div class="place-item-list">
+                    <div *ngFor="let source of marker.sources" style="display:list-item;">
+                        <i class="icon-only imc-icon fa fa-video-camera grey bigger-110" [ngClass]="{'fa-video-camera': source.type === 'Video', 'fa-image': source.type === 'Image'}"></i>
+                        <a [routerLink]="['images', source.uuid]" *ngIf="source.type === 'Image'">{{source?.title || 'n/a'}}</a>
+                        <a [routerLink]="['videos', source.uuid]" *ngIf="source.type === 'Video'">{{source?.title || 'n/a'}}</a>
+                        <i *ngIf="source.year">({{source?.year | slice:0:4}})</i>
+                    </div>
+                </div>
+            </div>
+        </info-window>
+        <circle *ngIf="showMapBoundary"
+            [center]="map.getCenter()"
+            [strokeColor]="'#FF0000'"
+            [strokeOpacity]="0.8"
+            [strokeWeight]="2"
+            [radius]="radius"></circle>
+    
+</ngui-map>

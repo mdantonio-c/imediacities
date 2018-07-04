@@ -1,0 +1,36 @@
+/* -------------------
+  Search page
+----------------------*/
+.container-search {
+  box-sizing: border-box;
+  padding: 0px 25px 25px 25px;
+  width: 100%;
+}
+
+.search-pager {
+  /* same as search-filter */
+  background-color: #dfdfdf; /*#ecf1f4*/
+  border-color: #d6e1ea;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+/* no results */
+.container-search .no-results {
+  background-color: #f8f8f8;
+  border: 1px dashed #ccc;
+  margin-bottom: 2rem;
+  padding: 1.6rem;
+
+  margin-left: 5.5%;
+  float: none;
+  width: 80%;
+  padding-left: 1.5%;
+  padding-right: 1.5%;
+}
+
+.map-view {
+  background-color: #d0d0d0;
+  border-color: #d6e1ea;
+  padding: .35em;
+}

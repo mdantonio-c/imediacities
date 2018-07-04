@@ -1,0 +1,85 @@
+<app-media-modal [data]="data" [media_type]="media_type">
+
+    <div class="col-12 col-sm-7 row space-paragraph-20 no-gutters" modal-col>
+       <span class="col-10">
+           <input type="text" class="imc--input imc--input-search" placeholder="Search location" aria-label="Location"
+                  places-auto-complete
+                  (place_changed)="ricerca($event)"
+                  [types]="['geocode']">
+       </span>
+
+        <!--Tag duplicati-->
+        <div class="col-10 new-badge" *ngIf="add_geotag.visible">
+            <app-info  [message]="add_geotag.message" [result]="add_geotag.status"
+                       *ngIf="add_geotag.visible"
+                       (click)="add_geotag.visible = false"></app-info>
+        </div>
+
+        <!-- Tag appena inseriti -->
+        <div class="col-12 new-badge space-paragraph-25" *ngIf="places_to_add.length">
+            <h5>Geotags to be added</h5>
+            <ng-template ngFor let-place [ngForOf]="places_to_add">
+                <app-media-annotation
+                        [annotation]="place"
+                        [can_delete]="true"
+                        [disable_confirmation]="true"
+                        [delete_fn]="place_remove.bind(this)"
+                        ></app-media-annotation>
+            </ng-template>
+        </div>
+
+        <!-- Attivazione della data di pubblicazione -->
+        <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
+
+            <div class="col-12 col-lg-7 box-checkbox imc--flex--vertical-center">
+                <!--@NSI Attiva il campo date sotto -->
+                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="on"
+                       [(ngModel)]="embargo_enable">
+                <label for="multi-annotation">Not public until</label>
+            </div>
+
+            <div class="col-12 col-sm-7 space-paragraph-10">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input class="imc--input imc--input-data"
+                               placeholder="yyyy-mm-dd"
+                               name="dp"
+                               [(ngModel)]="embargo_model"
+                               ngbDatepicker
+                               [disabled]="!embargo_enable"
+                               #d="ngbDatepicker">
+                        <div class="input-group-append">
+                            <button class="btn-reset"
+                                    type="button"
+                                    [disabled]="!embargo_enable"
+                                    (click)="d.toggle()">
+                                <i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">today</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-12 space-paragraph-25">
+            <h5>Current geotags</h5>
+            <ng-template ngFor let-place [ngForOf]="markers">
+                <app-media-annotation [annotation]="place" *ngIf="place.name"></app-media-annotation>
+            </ng-template>
+        </div>
+
+    </div>
+
+    <div class="modal-map" modal-row>
+        <app-media-map #map [markers]="markers" [shots]="data.shots" [media_type]="media_type"></app-media-map>
+    </div>
+
+
+    <button type="button" class="btn btn-accent" modal-button [disabled]="!places_to_add.length" (click)="save()">Save</button>
+    <!--esito-->
+    <app-info modal-button
+              [message]="save_result.message" [result]="save_result.status"
+              *ngIf="save_result.visible"
+              (click)="save_result.visible = false"></app-info>
+</app-media-modal>

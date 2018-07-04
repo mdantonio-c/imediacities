@@ -1,0 +1,59 @@
+.map-result h4 {
+	display: inline;
+	padding-left: 5px;
+}
+.map-result .media-image-wrapper img {
+	border: 2px solid #fff;
+	outline: 1px solid #e4e4e4;
+	height: 150px;
+	width: 100%;
+	display: block;
+}
+
+/* Tag activity */
+.tag-activity {
+	padding: 4px 8px 4px 4px;
+	min-height: 60px;
+	border-bottom: 1px dotted #D0D8E0;
+	position: relative;
+	border-left: 1px dotted #FFF;
+	border-right: 1px dotted #FFF
+}
+
+.tag-activity:first-child {
+	border-top: 1px dotted transparent
+}
+
+.tag-activity:first-child:hover {
+	border-top-color: #D0D8E0
+}
+
+.tag-activity:hover {
+	background-color: #F4F9FD;
+	border-left: 1px dotted #D0D8E0;
+	border-right: 1px dotted #D0D8E0
+}
+
+.tag-activity .annotation {
+	width: 60%;
+	padding-right: 9px;
+	font-size: 13px;
+}
+
+.tag-activity .creator {
+	padding: 2px 5px;
+	border-left: 1px dotted #D0D8E0;
+	font-size: x-small;
+	position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 40%;
+    min-width: 124px;
+}
+
+.tag-activity .creator .time {
+	color: #777;
+	padding-left: 18px;
+}

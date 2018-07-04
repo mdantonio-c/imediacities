@@ -93,9 +93,12 @@ class SearchPlace(GraphBaseOperations):
                 if 'identifying_title' in row[0]:
                     creation['title'] = row[0]['identifying_title']
                 elif 'titles' in row[0] and len(row[0]['titles']) > 0:
-                    # at the moment get the first always!
-                    title_node = self.graph.Title.inflate(row[0]['titles'][0])
-                    creation['title'] = title_node.text
+                    for t in row[0]['titles']:
+                        title_node = self.graph.Title.inflate(t)
+                        title = title_node.text
+                        if title_node.language is not None and title_node.language == 'en':
+                            break
+                    creation['title'] = title
                 annotations = []
                 for col in row[1]:
                     anno = {

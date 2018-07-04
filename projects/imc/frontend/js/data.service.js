@@ -3,80 +3,69 @@
 
 angular.module('web').service('DataService', DataService);
 
-function DataService($log, api, $q, jsonapi_parser) {
+function DataService(ApiService2, jsonapi_parser) {
 
 	var self = this;
 
     self.getParametersSchema = function(endpoint) {
-        return api.apiCall("schemas/"+endpoint, 'GET');
-    };
-
-    self.getToken = function() {
-        return api.checkToken();
+        return ApiService2.get("schemas/"+endpoint).toPromise();
     };
 
     self.searchCreations = function(data, currentpage, perpage) {
-        return api.apiCall('search?currentpage='+currentpage+'&perpage='+perpage, 'POST', data, undefined, true);
+        return ApiService2.post(
+            'search?currentpage='+currentpage+'&perpage='+perpage,
+            data,
+            {"rawResponse": true}
+        ).toPromise();
     };
 
     self.getStageFiles = function(group) {
-
-        if (typeof group !== 'undefined') { 
-            return jsonapi_parser.parseResponse(api.apiCall('stage/'+group, 'GET'));
-        }
-
-        return jsonapi_parser.parseResponse(api.apiCall('stage', 'GET'));
+        return jsonapi_parser.parseResponse(ApiService2.get('stage', group));
     };
     self.importStageFiles = function(file) {
-        var data = {"filename": file};
-        return api.apiCall('stage', 'POST', data);
+        return ApiService2.post('stage', {"filename": file}).toPromise();
     };
     self.deleteStageFile = function(file) {
-        var data = {"filename": file};
-        return api.apiCall('stage', 'DELETE', data);
+        return ApiService2.delete('stage', {"filename": file}).toPromise();
     };
 
     self.downloadStageFile = function(filename) {
         var config = {'responseType': 'arraybuffer'};
-        return api.apiCall('download/'+filename, 'GET', {}, undefined, true, false, false, config);
+        return ApiService2.get('download/'+filename, "", {}, {"rawResponse": true, "conf": config}).toPromise();
     };
 
     //
     // IMAGES
     //
     self.getImageMetadata = function(imageId) {
-        return api.apiCall('images/'+imageId, 'GET');
+        return ApiService2.get('images', imageId).toPromise();
     };
     self.getImageAnnotations = function(imageId) {
-         return api.apiCall('images/'+imageId+'/annotations', 'GET');
-    };
+         return ApiService2.get('images/'+imageId+'/annotations').toPromise();
+     };
 
     //
     // VIDEOS
     //
 
-    // self.getVideos = function() {
-    //     return jsonapi_parser.parseResponse(api.apiCall('video', 'GET'));
-    // }
-
     self.getVideoMetadata = function(videoId) {
-        return api.apiCall('videos/'+videoId, 'GET');
+        return ApiService2.get('videos', videoId).toPromise();
     };
 
     self.getVideoAnnotations = function(videoId) {
-         return api.apiCall('videos/'+videoId+'/annotations', 'GET');
+         return ApiService2.get('videos/'+videoId+'/annotations').toPromise();
     };
 
     self.getVideoContent = function(videoId) {
-        return api.apiCall('videos/'+videoId+'/content', 'GET', {}, undefined, true);
+        return ApiService2.get('videos/'+videoId+'/content',"", {}, {"rawResponse": true});
     };
 
     self.getVideoThumbnail = function(videoId) {
-        return api.apiCall('videos/'+videoId+'/thumbnail', 'GET');
+        return ApiService2.get('videos/'+videoId+'/thumbnail').toPromise();
     };
 
     self.getVideoShots = function(videoId) {
-        return api.apiCall('videos/'+videoId+'/shots', 'GET');
+        return ApiService2.get('videos/'+videoId+'/shots').toPromise();
     };
 
     self.saveTagAnnotations = function(target, tags, selector) {
@@ -114,6 +103,7 @@ function DataService($log, api, $q, jsonapi_parser) {
             });
             data.body = bodies;
         }
+
         data.motivation = "tagging";
         if (selector !== undefined) {
             data.selector = {
@@ -121,7 +111,7 @@ function DataService($log, api, $q, jsonapi_parser) {
                 value: selector
             };
         }
-        return api.apiCall('annotations', 'POST', data);
+        return ApiService2.post('annotations', data).toPromise();
     };
 
     self.saveNote = function(target, note) {
@@ -145,10 +135,10 @@ function DataService($log, api, $q, jsonapi_parser) {
         data.motivation = "describing";
         if(note && note.id){
             // update existing note
-            return api.apiCall('annotations/'+note.id, 'PUT', data);
+            return ApiService2.put('annotations', note.id, data).toPromise();
         }else{
             // create a new note
-            return api.apiCall('annotations', 'POST', data);            
+            return ApiService2.post('annotations', 'POST', data).toPromise();            
         }
     };
 
@@ -169,7 +159,8 @@ function DataService($log, api, $q, jsonapi_parser) {
                 value: selector
             };
         }
-        return api.apiCall('annotations', 'POST', data);  
+        return ApiService2.post('annotations', data).toPromise();
+
     };
 
     self.getManualSegments = function(videoId) {
@@ -222,13 +213,13 @@ function DataService($log, api, $q, jsonapi_parser) {
 
     self.deleteAnnotation = function (annoId, bodyRef) {
         if (bodyRef !== undefined) {
-            return api.apiCall('annotations/'+annoId+'?body_ref='+encodeURIComponent(bodyRef), 'DELETE');
+            return ApiService2.delete('annotations/'+annoId+'?body_ref='+encodeURIComponent(bodyRef)).toPromise();
         } else {
-            return api.apiCall('annotations/'+annoId, 'DELETE');
+            return ApiService2.delete('annotations/', annoId).toPromise();
         }
     };
     self.deleteNote = function (noteId) {
-        return api.apiCall('annotations/'+noteId, 'DELETE');
+        return ApiService2.delete('annotations', noteId).toPromise();
     };
 
     self.getGeoDistanceAnnotations = function (distance, pin, cFilter) {
@@ -247,7 +238,8 @@ function DataService($log, api, $q, jsonapi_parser) {
         if (cFilter !== undefined) {
             filter.filter.creation = cFilter;
         }
-        return api.apiCall('annotations/search', 'POST', filter, undefined, true);
+        /*console.log(angular.toJson(filter, true));*/
+        return ApiService2.post('annotations/search', filter, {"rawResponse": true}).toPromise();
     };
 
     /* Retrieve a list of relevant creations for given creation uuids and related place ids. */
@@ -267,58 +259,37 @@ function DataService($log, api, $q, jsonapi_parser) {
             };
             data['relevant-list'].push(item);
         }
-        return api.apiCall('search_place', 'POST', data, undefined, true);
-    };
-
-    self.saveUser = function(data) {
-        return api.apiCall('custom_admin/users', 'POST', data);
-    };
-
-    self.deleteUser = function(user) {
-        return api.apiCall('custom_admin/users/'+user, 'DELETE');
-    };
-
-    self.updateUser = function(user, data) {
-        return api.apiCall('custom_admin/users/'+user, 'PUT', data);
+        return ApiService2.post('search_place', data, {"rawResponse": true}).toPromise();
     };
 
     self.getGroupSchema = function(study) {
         var data = {'get_schema': true};
-        return api.apiCall('admin/groups', 'POST', data);
+        return ApiService2.post('admin/groups', data).toPromise();
     };
 
     self.getGroups = function() {
-        var endpoint = 'admin/groups';
-        return jsonapi_parser.parseResponse(api.apiCall(endpoint, 'GET'));
+        return jsonapi_parser.parseResponse(ApiService2.get('admin/groups'));
     };
 
     self.saveGroup = function(data) {
-        return api.apiCall('admin/groups', 'POST', data);
+        return ApiService2.post('admin/groups', data).toPromise();
     };
 
     self.deleteGroup = function(group) {
-        return api.apiCall('admin/groups/'+group, 'DELETE');
+        return ApiService2.delete('admin/groups', group).toPromise();
     };
 
     self.updateGroup = function(group, data) {
-        return api.apiCall('admin/groups/'+group, 'PUT', data);
-    };
-
-    self.getUserGroups = function(query) {
-        var endpoint = 'group/'+query;
-        return api.apiCall(endpoint, 'GET');
-    };
-
-    self.getUserRoles = function(query) {
-        var endpoint = 'role/'+query;
-        return api.apiCall(endpoint, 'GET');
+        return ApiService2.put('admin/groups', group, data).toPromise();
     };
 
     self.getFcodelist = function(name,lang) {
         var endpoint = 'fcodelist/'+name+'?lang='+lang;
-        return api.apiCall(endpoint, 'GET');
+        return ApiService2.get(endpoint).toPromise();
     };
 
-}
+};
+
+DataService.$inject = ["ApiService2", "jsonapi_parser"];
 
 })();

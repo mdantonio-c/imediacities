@@ -15,8 +15,8 @@ before_script:
   - python3 --version
   - wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py && python3 get-pip.py && rm *.py
   - pip3 --version
-  - pip3 install --upgrade git+https://github.com/rapydo/utils.git@0.6.0
-  - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.0
+  - pip3 install --upgrade git+https://github.com/rapydo/utils.git@0.6.1
+  - pip3 install --upgrade git+https://github.com/rapydo/do.git@0.6.1
   - rapydo --version
   - docker-compose -v
   - git status
@@ -26,7 +26,7 @@ job:
   script:
     - mkdir data
 
-    - rapydo --project imc init --skip-bower
+    - rapydo --project imc init --skip-npm
     - rapydo --project imc clean
     - rapydo --project imc build -rf
     
@@ -37,4 +37,4 @@ job:
     # - rapydo --project imc test
     
   only:
-    - 0.6.0
+    - 0.6.1

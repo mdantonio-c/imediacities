@@ -1,0 +1,21 @@
+.controls__status {
+
+  select, input {
+    color: $icons_state_off;
+    background: $additional-controls-background;
+    border-color: transparent;
+    outline: 0;
+    font-family:monospace;
+    font-size:90%;
+
+    //&::selection {
+    //  color: $additional-controls-background;
+    //  background: $icons_state_off;
+    //}
+
+    & + input {
+      margin-left: .5em;
+    }
+  }
+
+}

@@ -4,20 +4,16 @@ import os
 import json
 import random
 import re
-# import time
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
-from imc.models.neo4j import Shot
 from imc.models import codelists
 
-# from imc.analysis.fhg import FHG
 from scripts.analysis.analyze import make_movie_analize_folder, analize
 
-# from restapi.basher import BashCommands
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 
@@ -41,14 +37,17 @@ def progress(self, state, info):
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
-        log.debug("Starting task update_metadata for resource_id %s" % resource_id)
+        log.debug("Starting task update_metadata for resource_id %s" %
+                  resource_id)
         progress(self, 'Starting update metadata', path)
         self.graph = celery_app.get_service('neo4j')
         xml_resource = None
-        try:                                           
-            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
-            xml_resource, group, source_id, item_type, item_node = update_meta_stage(self, resource_id, path, metadata_update)
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+        try:
+            metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
+            xml_resource, group, source_id, item_type, item_node = update_meta_stage(
+                self, resource_id, path, metadata_update)
+            log.debug(
+                "Completed task update_metadata for resource_id %s" % resource_id)
 
             progress(self, 'Completed', path)
 
@@ -57,6 +56,7 @@ def update_metadata(self, path, resource_id):
             raise e
 
         return 1
+
 
 @celery_app.task(bind=True)
 def import_file(self, path, resource_id, mode, metadata_update=True):
@@ -67,11 +67,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         self.graph = celery_app.get_service('neo4j')
 
         xml_resource = None
-        try:                                           
-            metadata_update = True # voglio proprio fare l'aggiornamento dei metadati!
+        try:
+            metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
                 self, resource_id, path, metadata_update)
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            log.debug(
+                "Completed task update_metadata for resource_id %s" % resource_id)
             progress(self, 'Updated metadata', path)
         except Exception as e:
             progress(self, 'Failed updating metadata', path)
@@ -144,13 +145,17 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             if not os.path.exists(content_item):
                 raise Exception('Bad input file', content_item)
 
-            out_folder = make_movie_analize_folder(content_item)
+            out_folder = make_movie_analize_folder(content_item,
+                                                   (mode is not None and mode == 'clean'))
             if out_folder == "":
                 raise Exception('Failed to create out_folder')
 
             log.info("Analize " + content_item)
-
-            if analize(content_item, item_type, out_folder, fast):
+            creation = item_node.creation.single()
+            if not creation:
+                raise ValueError('Unexpected missing creation '
+                                 'importing resource {}'.format(resource_id))
+            if analize(content_item, creation.uuid, item_type, out_folder, fast):
                 log.info('Analize executed')
             else:
                 raise Exception('Analize terminated with errors')
@@ -166,29 +171,30 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             extract_tech_info(self, item_node, analyze_path)
 
             # - ONLY for videos -
-            # extract TVS and VIM results
             if item_type == 'Video':
-                # find TVS and VIM annotations with this item as source
-                annotations = item_node.sourcing_annotations.all()
-                if annotations is not None:
-                    repo = AnnotationRepository(self.graph)
-                    # here we expect ONLY one anno if present
-                    for anno in annotations:
-                        anno_id = anno.id
-                        if anno.annotation_type == 'TVS':
-                            log.debug(anno)
-                            repo.delete_tvs_annotation(anno)
-                            log.info(
-                                "Deleted existing TVS annotation [%s]"
-                                % anno_id)
-                        elif anno.annotation_type == 'VIM':
-                            log.debug(anno)
-                            repo.delete_vim_annotation(anno)
-                            log.info(
-                                "Deleted existing VIM annotation [%s]"
-                                % anno_id)
+                # extract TVS and VIM results
+                shots, vim_estimations = extract_tvs_vim_results(
+                    self, item_node, analyze_path)
 
-                extract_tvs_vim_annotations(self, item_node, analyze_path)
+                repo = AnnotationRepository(self.graph)
+                # first remove existing automatic VIM annotations if any
+                vim_annotations = item_node.sourcing_annotations.search(
+                    annotation_type='VIM', generator='FHG')
+                for anno in vim_annotations:
+                    anno_id = anno.id
+                    repo.delete_vim_annotation(anno)
+                    log.debug("Deleted existing VIM annotation [%s]" % anno_id)
+
+                # save or update TVS annotations
+                existing_shots = item_node.shots.all()
+                if not existing_shots:
+                    repo.create_automatic_tvs(item_node, shots)
+                else:
+                    repo.update_automatic_tvs(
+                        item_node, shots, vim_estimations)
+
+                # save VIM annotations
+                repo.create_vim_annotation(item_node, vim_estimations)
 
             # extract automatic object detection results
             try:
@@ -212,7 +218,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             elif xml_resource is not None:
                 xml_resource.warnings.append(str(e))
                 xml_resource.save()
-            #raise e
+            # raise e
 
         return 1
 
@@ -293,11 +299,12 @@ def lookup_content(self, path, source_id):
 
 def update_meta_stage(self, resource_id, path, metadata_update):
     """
-    Update data of MetaStage (that has resource_id) with data 
-     coming from xml file in path
-    If metadata_update=false and creation exists then nothing is updated
-    If Item and Creation don't exist then it creates them
-    Return xml_resource (the updated MetaStage), group, source_id, item_type, item_node
+    Update data of MetaStage (that has resource_id) with data coming from xml
+    file in path
+    - If metadata_update=false and creation exists then nothing is updated
+    - If Item and Creation don't exist then it creates them
+    Return xml_resource (the updated MetaStage), group, source_id, item_type,
+    item_node.
     """
     xml_resource = None
     try:
@@ -328,12 +335,14 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 item_node.ownership.connect(group)
                 item_node.meta_source.connect(xml_resource)
                 item_node.save()
-                log.debug("Item resource created for resource_id=%s" % resource_id)
+                log.debug("Item resource created for resource_id=%s" %
+                          resource_id)
 
             # check for existing creation
             creation = item_node.creation.single()
             if creation is not None and not metadata_update:
-                log.info("Skip updating metadata for resource_id=%s" % resource_id)
+                log.info("Skip updating metadata for resource_id=%s" %
+                         resource_id)
             else:
                 # update metadata
                 log.debug("Updating metadata for resource_id=%s" % resource_id)
@@ -348,7 +357,8 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             log.warning("Not found MetaStage for resource_id=%s" % resource_id)
 
     except Exception as e:
-        log.error("Failed update of resource_id %s, Error: %s" % (resource_id,e))
+        log.error("Failed update of resource_id %s, Error: %s" %
+                  (resource_id, e))
         if xml_resource is not None:
             xml_resource.status = 'ERROR'
             xml_resource.status_message = str(e)
@@ -474,7 +484,7 @@ def extract_tech_info(self, item, analyze_dir_path):
             + 'x' + str(data['image']['geometry']['height'])
 
     else:
-        log.warning('Ivalid type. Technical info CANNOT be extracted for '
+        log.warning('Invalid type. Technical info CANNOT be extracted for '
                     'Item[{uuid}] with type {type}'.format(
                         uuid=item.uuid, type=item.item_type))
         return
@@ -493,10 +503,14 @@ def get_thumbnail(path):
         os.path.dirname(path), jpg_files[index])
 
 
-def extract_tvs_vim_annotations(self, item, analyze_dir_path):
+def extract_tvs_vim_results(self, item, analyze_dir_path):
     """
     Extract temporal video segmentation and video quality results from
-    storyboard.json file and save them as Annotation in the database.
+    storyboard.json file.
+
+    Returns:
+    - shots: <dict(shot_num: {shot_properties})>
+    - vim_estimations: (shot_num, {motions_dict})
     """
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
@@ -510,41 +524,36 @@ def extract_tvs_vim_annotations(self, item, analyze_dir_path):
         raise IOError(
             "Shots CANNOT be extracted: [%s] does not exist", tvs_path)
 
-    log.debug('get shots from file [%s]' % tvs_path)
+    log.debug('Get shots and vimotion from file [%s]' % tvs_path)
 
     # load info from json
     with open(tvs_path) as data_file:
         data = json.load(data_file)
 
-    shots = []
+    shots = {}
     vim_estimations = []
     for s in data['shots']:
-        shot = Shot()
-        shot.shot_num = s['shot_num']
-        shot.start_frame_idx = s['first_frame']
-        shot.end_frame_idx = s['last_frame']
-        shot.timestamp = s['timecode']
         try:
-            shot.duration = s['len_seconds']
+            duration = s['len_seconds']
         except ValueError:
             log.warning("Invalid duration in the shot {0} \
-                for value '{1}'".format(shot.shot_num, s['len_seconds']))
-            shot.duration = None
-
-        shot.thumbnail_uri = os.path.join(tvs_dir_path, s['img'])
-        shots.append(shot)
-        vim_estimations.append((shot.shot_num, s['motions_dict']))
+                for value '{1}'".format(s['shot_num'], s['len_seconds']))
+            duration = None
+        shots[s['shot_num']] = {
+            'start_frame_idx': s['first_frame'],
+            'end_frame_idx': s['last_frame'],
+            'timestamp': s['timecode'],
+            'duration': duration,
+            'thumbnail_uri': os.path.join(tvs_dir_path, s['img'])
+        }
+        vim_estimations.append((s['shot_num'], s['motions_dict']))
 
     if len(shots) == 0:
         log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
         return
 
-    # Save Shots in the database
-    repo = AnnotationRepository(self.graph)
-    repo.create_tvs_annotation(item, shots)
-    repo.create_vim_annotation(item, vim_estimations)
-
     log.info('Extraction of TVS and VIM info completed')
+    return shots, vim_estimations
 
 
 def extract_od_annotations(self, item, analyze_dir_path):
@@ -568,6 +577,9 @@ def extract_od_annotations(self, item, analyze_dir_path):
     shot_list = {}
     for s in shots:
         shot_list[s.shot_num] = set()
+    if item.item_type == 'Image':
+        # consider a image like single frame shot
+        shot_list[0] = set()
     object_ids = set()
     concepts = set()
     report = {}
@@ -579,13 +591,17 @@ def extract_od_annotations(self, item, analyze_dir_path):
         (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
 
         '''
+        log.debug("timestamp: {0}, element: {1}".format(timestamp, od_list))
         for detected_object in od_list:
             concepts.add(detected_object[1])
             if detected_object[0] not in object_ids:
                 report[detected_object[1]] = report.get(
                     detected_object[1], 0) + 1
             object_ids.add(detected_object[0])
-            shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            if item.item_type == 'Video':
+                shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            elif item.item_type == 'Image':
+                shot_num = 0
             if shot_num is not None:
                 shot_list[shot_num].add(detected_object[1])
             # collect timestamp for keys:
@@ -596,13 +612,6 @@ def extract_od_annotations(self, item, analyze_dir_path):
             obj_cat_report[(detected_object[0], detected_object[1])] = tmp
 
     log.info('-----------------------------------------------------')
-    # report_filename = 'orf_import_report_{}.txt'.format(int(1000 * time.time()))
-    # f = open(report_filename, 'w')
-    # f.write('Number of distinct detected objects: {}'.format(len(object_ids)))
-    # f.write('Number of distinct concepts: {}'.format(len(concepts)))
-    # f.write('Report of detected concepts: {}'.format(report))
-    # f.write('Report of detected concepts by shot: {}'.format(shot_list))
-    # f.close()
     log.info('Number of distinct detected objects: {}'.format(len(object_ids)))
     log.info('Number of distinct concepts: {}'.format(len(concepts)))
     log.info('Report of detected concepts per shot: {}'.format(shot_list))
@@ -610,7 +619,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
     repo = AnnotationRepository(self.graph)
     counter = 0  # keep count of saved annotation
     for (key, timestamps) in obj_cat_report.items():
-        if len(timestamps) < 5:
+        if item.item_type == 'Video' and len(timestamps) < 5:
             # discard detections for short times
             continue
         # detect the concept
@@ -626,7 +635,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             'name': concept_name
         }
 
-        # detect the segment
+        # detect target segment ONLY for videos
         start_frame = timestamps[0][0]
         end_frame = timestamps[-1][0]
         selector = {
@@ -634,7 +643,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             'value': 't=' + str(start_frame) + ',' + str(end_frame)
         }
 
-        # detect detection confidence
+        # detection confidence
         confidence = []
         region_sequence = []
         for frame in list(range(start_frame, end_frame + 1)):
@@ -663,7 +672,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             huge_size = len(region_sequence)
             region_sequence = []
             log.warn('Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.
-                format(objID=key[0], concept=concept['name'], size=huge_size))
+                     format(objID=key[0], concept=concept['name'], size=huge_size))
         od_body = {
             'type': 'ODBody',
             'object_id': key[0],
@@ -675,6 +684,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
         try:
             from neomodel import db as transaction
             transaction.begin()
+            # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
+            #     bodies, selector))
             repo.create_tag_annotation(
                 None, bodies, item, selector, False, None, True)
             transaction.commit()

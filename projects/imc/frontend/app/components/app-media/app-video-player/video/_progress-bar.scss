@@ -1,0 +1,39 @@
+$progress-height: 10px;
+
+$timeranges-height: 4px;
+$timeranges-background-color: $progress-value-color-alt;
+
+.control__progress{
+    position:relative;
+    width:100%;
+}
+
+progress {
+    bottom: 0;
+    position:absolute;
+    background-color:rgba(#FFF, .1);
+    height: $progress-height;
+    width: 100%;
+}
+progress[value]::-webkit-progress-bar {
+    background-color: rgba(255,255,255,.5);
+    border-radius: 0;
+}
+progress[value]::-webkit-progress-value {
+    background-color: $progress-value-color;
+
+}
+.timeranges{
+    top:$progress-height;
+    width:100%;
+    height:$timeranges-height;
+    background:#000;
+    //padding:0 8px;
+    z-index:0;
+}
+.timerange{
+    top:0;
+    height:100%;
+    position:absolute;
+    background: $timeranges-background-color;
+}

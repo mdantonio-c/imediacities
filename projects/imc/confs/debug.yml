@@ -4,11 +4,9 @@ version: '3'
 
 services:
   backend:
-    # command: sleep infinity
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      ACTIVATE: 1
     ports:
       - 8080:5000
 
@@ -18,17 +16,12 @@ services:
 
   frontend:
     ports:
-      - 80:5000
-    environment:
-      APP_MODE: debug
-      BACKEND_PORT: 8080
-      ACTIVATE: 1
+      - 80:80
 
   celery:
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
-      ACTIVATE: 1
 
   ftp:
     environment:

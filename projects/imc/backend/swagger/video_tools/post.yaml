@@ -18,6 +18,11 @@ video_tools:
             enum:
               - object-detection
               - vimotion
+          operation:
+            description: At the moment used only to delete automatic tags.
+            type: string
+            enum:
+              - "delete"
   responses:
     '201':
       description: Execution launched. 

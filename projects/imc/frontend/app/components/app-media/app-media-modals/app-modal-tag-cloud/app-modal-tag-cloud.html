@@ -1,0 +1,157 @@
+<!-- Modal del tag cloud con la raccolti di tutti i tag -->
+
+<div class="imc--toolbar">
+    <input type="text" class="imc--input--no-line imc--input-search" placeholder="Search in tags" aria-label="Search in tags"
+           (keyup)="annotations_filter($event)">
+</div>
+
+<div class="accordion modal--accordion" id="accordion">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filters" aria-expanded="false"
+                        aria-controls="filters">
+                    <div class="row no-gutters">
+                        <div class="col">Filters</div>
+                        <div class="col-2 imc--flex--horizontal-end imc--flex--vertical-center">
+                            <i class="material-icons">keyboard_arrow_down</i>
+                        </div>
+                    </div>
+                </button>
+            </h5>
+        </div>
+
+        <div id="filters" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body row no-gutters">
+                <div class="col-12 col-sm-3">
+                    <h3>Sources</h3>
+                    <ul class="modal--list-filter-xs">
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="me" type="checkbox" value="value1">
+                            <label for="me">Me</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="researchers" type="checkbox" value="value1">
+                            <label for="researchers">Researchers</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="archivists" type="checkbox" value="value1">
+                            <label for="archivists">Archivists</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="vocabulary" type="checkbox" value="value1">
+                            <label for="vocabulary">Vocabulary</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="lod" type="checkbox" value="value1">
+                            <label for="lod">LOD</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <h3>Themes</h3>
+                    <ul class="modal--list-filter">
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="activities" type="checkbox" value="value1">
+                            <label for="activities">Activities & Events</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="structures" type="checkbox" value="value1">
+                            <label for="structures">Buildings & Structures</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="nature" type="checkbox" value="value1">
+                            <label for="nature">Nature</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="object" type="checkbox" value="value1">
+                            <label for="object">Objects</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="org" type="checkbox" value="value1">
+                            <label for="org">Organisations & Ideologies</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="people" type="checkbox" value="value1">
+                            <label for="people">People</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="space" type="checkbox" value="value1">
+                            <label for="space">Spaces</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="symbols" type="checkbox" value="value1">
+                            <label for="symbols">Signs & Symbols</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="time" type="checkbox" value="value1">
+                            <label for="time">Time & Period</label>
+                        </li>
+                        <li>
+                            <input class="imc--input-checkbox styled-checkbox" id="transport" type="checkbox" value="value1">
+                            <label for="transport">Transport & Vehicules</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-sm-2">
+                    Order
+                    <select class="imc--input" (change)="options_set_sorting($event)">
+                        <option *ngFor="let opzione of sort_options" [value]="opzione.value" [innerHTML]="opzione.key"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-body--scroll popover-embedded popover-no-arrow">
+
+    <div class="row modal-body-content no-gutters">
+
+        <!--<h4>A</h4>-->
+
+        <div class="col-12 modal--list-tag">
+            <ng-template
+                    ngFor
+                    let-annotation
+                    [ngForOf]="annotations_filtered.count">
+                <app-media-annotation
+                        [clickable]="true"
+                        [annotation]="annotation"
+                        (click)="shots_show($event, annotation)">
+                </app-media-annotation>
+            </ng-template>
+
+            <a href="#" class=""
+               [ngbPopover]="shotContent"
+               #p="ngbPopover"
+               data-placement="bottom"
+               triggers="manual"
+               >
+            </a>
+
+        </div>
+
+        <!-- Questo elemento appare solamente quando viene cliccato un tag -->
+        <ng-template #shotContent>
+
+            <div class="row no-gutters modal--list-item">
+
+                <div class="col-12 imc--flex--horizontal-end">
+                    <i class="material-icons click-event" (click)="p.close()">close</i>
+                </div>
+                <app-modal-lista-shots
+                        [data]="lista_data"
+                        [cols]="3"
+                        [show_title]="true"
+                        *ngIf="lista_data"
+                        class="col-12"></app-modal-lista-shots>
+
+            </div>
+
+        </ng-template>
+
+    </div>
+
+</div>
+

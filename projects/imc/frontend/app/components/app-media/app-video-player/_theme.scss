@@ -1,0 +1,8 @@
+$progress-value-color: #4aa7cc;
+$progress-value-color-alt: complement($progress-value-color);
+
+$additional-controls-background: #171717;
+
+$icons_state_off: #707070;
+$icons_state_on: $progress-value-color;
+$icons_state_hover: #fff;

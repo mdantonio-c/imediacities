@@ -1,0 +1,23 @@
+.search-nav {
+	/* same as search-filter */
+	background-color: #dfdfdf; /* #ecf1f4;*/
+    border-color: #d6e1ea;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+
+.btn-success.active i,
+.btn-primary.active i,
+.btn-warning.active i {
+    color: #fff !important;
+}
+.btn-success.active {
+    box-shadow: 0 0 0 0.2rem rgba(40,167,69,.5);
+}
+.btn-primary.active {
+	box-shadow: 0 0 0 0.2rem rgba(0,123,255,.5);
+}
+.btn-warning.active {
+	box-shadow: 0 0 0 0.2rem rgba(255,193,7,.5);
+}

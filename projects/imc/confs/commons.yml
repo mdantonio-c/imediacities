@@ -4,7 +4,7 @@ version: '3'
 services:
   backend:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
-    image: ${COMPOSE_PROJECT_NAME}/backend:${COMPOSE_PROJECT_NAME}
+    image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
@@ -16,20 +16,8 @@ services:
       # - ftp
       # - swaggerui
     environment:
-      VANILLA_PACKAGE: ${COMPOSE_PROJECT_NAME}
-
-      # base the user/role mechanism on some database
       AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
-
-      AUTH_REGISTER_FAILED_LOGIN: ${AUTH_REGISTER_FAILED_LOGIN}
-      AUTH_FORCE_FIRST_PASSWORD_CHANGE: ${AUTH_FORCE_FIRST_PASSWORD_CHANGE}
-      AUTH_VERIFY_PASSWORD_STRENGTH: ${AUTH_VERIFY_PASSWORD_STRENGTH}
-      AUTH_MAX_PASSWORD_VALIDITY: ${AUTH_MAX_PASSWORD_VALIDITY}
-      AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER: ${AUTH_DISABLE_UNUSED_CREDENTIALS_AFTER}
-      AUTH_MAX_LOGIN_ATTEMPTS: ${AUTH_MAX_LOGIN_ATTEMPTS}
-      AUTH_SECOND_FACTOR_AUTHENTICATION: ${AUTH_SECOND_FACTOR_AUTHENTICATION}
 
       # # neo connection
       GRAPHDB_ENABLE: 1
@@ -43,6 +31,9 @@ services:
       CELERY_BROKER: ${CELERY_BROKER}
       CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
       CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
+      CELERY_BACKEND: ${CELERY_BACKEND}
+      CELERY_BACKEND_HOST: ${CELERY_BACKEND_HOST}
+      CELERY_BACKEND_PORT: ${CELERY_BACKEND_PORT}
 
       SMTP_ADMIN: ${SMTP_ADMIN}
       SMTP_NOREPLY: ${SMTP_NOREPLY}
@@ -69,22 +60,20 @@ services:
 
   celery:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
+    image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
-      # - ${SUBMODULE_DIR}/imedia-pipeline-cin:/imedia-pipeline-cin
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
       - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
     depends_on:
       - rabbit
+      - mongodb
       - neo4j
 
     environment:
-      # base the user/role mechanism on some database
       AUTH_ENABLE: 1
-      # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
 
       # # neo connection
@@ -93,12 +82,6 @@ services:
       GRAPHDB_HOST: ${GRAPHDB_HOST}
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
-
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
 
       SMTP_ADMIN: ${SMTP_ADMIN}
       SMTP_HOST: ${SMTP_HOST}
@@ -106,14 +89,20 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
+      # Used to manage analysis script on both prod and pre-prod
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
   celeryui:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:fraunhofer
+    image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${VANILLA_DIR}/scripts:/code/scripts
     environment:
+
+      CELERYUI_USER: imc
+      CELERYUI_PASSWORD: d43WtSXe49
+
       AUTH_ENABLE: 1
       # putting this here because it should not be configurable in .env
       AUTH_SERVICE: neo4j
@@ -125,13 +114,9 @@ services:
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
-      CELERY_ENABLE: 1
-      CELERY_EXTERNAL: ${CELERY_EXTERNAL}
-      CELERY_BROKER: ${CELERY_BROKER}
-      CELERY_BROKER_HOST: ${CELERY_BROKER_HOST}
-      CELERY_BROKER_PORT: ${CELERY_BROKER_PORT}
     depends_on:
       - rabbit
+      - mongodb
       - neo4j
 
   ftp:
@@ -140,5 +125,8 @@ services:
       - "30000-30019:30000-30019"
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
+
+  frontend:
     environment:
-      ACTIVATE: 1
+      ALLOW_PASSWORD_RESET: "true"
+      ALLOW_REGISTRATION: "false"

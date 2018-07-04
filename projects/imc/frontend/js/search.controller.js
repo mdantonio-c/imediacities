@@ -240,10 +240,23 @@
 				else return provider;
 			};
 		})
+		.directive('holder', [
+		  function() {
+		    return {
+		      link: function(scope, element, attrs) {
+		        if(attrs.holder)
+		          attrs.$set('data-src', attrs.holder);
+		        Holder.run({images:element[0]});
+		      }
+		    };
+		  }])
 		;
 
 	// The controller
-	function SearchController($scope, $log, $document, $state, $stateParams, DataService, CodelistService, noty, $uibModal) {
+	function SearchController(
+		$scope, $state, $stateParams,
+		DataService, CodelistService, noty, $uibModal) 
+	{
 		var self = this;
 
 		self.showmesb = false;
@@ -352,9 +365,9 @@
 			self.showmese = true;
 			DataService.searchCreations(request_data, self.currentPage, self.ItemsByPage).then(
 				function(out_data) {
-					var meta = out_data.data.Meta;
+					var meta = out_data.Meta;
 					self.totalItems = meta.totalItems;
-					self.creations = out_data.data.Response.data;
+					self.creations = out_data.Response.data;
 					self.loading = false;
 					self.loadResults = true;
 					self.showmese = false;
@@ -362,7 +375,7 @@
 					noty.extractErrors(out_data, noty.WARNING);
 				},
 				function(out_data) {
-					var errors = out_data.data.Response.errors;
+					var errors = out_data.Response.errors;
 					angular.forEach(errors, function(error) {
 						self.alerts.push({
 							msg: error
@@ -456,9 +469,17 @@
 		// move codelist provision in a service
 		self.iprstatuses = iprstatuses;
 
-	}
+	};
 
-	function NewSearchController($scope, $stateParams, DataService, NgMap, $timeout, $filter, GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) {
+	SearchController.$inject = [
+		"$scope", "$state", "$stateParams",
+		"DataService", "CodelistService", "noty", "$uibModal"
+	];
+
+	function NewSearchController(
+		$scope, $stateParams, DataService, NgMap, $timeout, $filter, 
+		GeoCoder, GOOGLE_API_KEY, VocabularyService, noty, ivhTreeviewMgr) 
+	{
 		var sc = this;
 		sc.displayMode = "Grid";
 		sc.loading = false;
@@ -750,10 +771,11 @@
 			// console.log(angular.toJson($scope.filter, true));
 			DataService.searchCreations(request_data, sc.pager.currentPage, sc.pager.itemsPerPage).then(
 				function(out_data){
-					var meta = out_data.data.Meta;
+					console.log(out_data);
+					var meta = out_data.Meta;
 					sc.totalItems = meta.totalItems;
 					sc.countByYears = meta.countByYears;
-					sc.creations = out_data.data.Response.data;
+					sc.creations = out_data.Response.data;
 					sc.counters = [];
 					NgMap.getMap().then(function(map) {
 						map.addListener('click', function(event) {
@@ -801,11 +823,17 @@
 						}
 						
 					});
+					sc.loading = false;
 				},
 				function(out_data) {
-					noty.extractErrors(out_data, noty.ERROR);
-				}).finally(function() {
+					var errors = out_data.Response.errors;
+					angular.forEach(errors, function(error) {
+						sc.alerts.push({
+							msg: error
+						});
+					});
 					sc.loading = false;
+					noty.extractErrors(out_data, noty.ERROR);
 				});
 		};
 
@@ -1094,9 +1122,14 @@
 			$scope.filter.yearfrom = decade;
 			$scope.filter.yearto = decade + 9;
 		};
-	}
+	};
 
-	function QuickSearchController($scope, $state, $stateParams) {
+	NewSearchController.$inject = [
+		"$scope", "$stateParams", "DataService", "NgMap", "$timeout", "$filter",
+		"GeoCoder", "GOOGLE_API_KEY", "VocabularyService", "noty", "ivhTreeviewMgr"
+	];
+
+	function QuickSearchController($state) {
 		var self = this;
 		self.goToSearch = function(event, term) {
 			if (event.keyCode === 13) {
@@ -1107,5 +1140,7 @@
 			}
 		};
 	}
+
+	QuickSearchController.$inject = ["$state"];
 
 })();

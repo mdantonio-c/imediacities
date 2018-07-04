@@ -1,0 +1,240 @@
+<div class="imc--tab">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
+               aria-selected="true">General Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
+               aria-selected="false">Technical Info</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+            <div id="general-info_accordion" class="imc--accordion">
+
+                <app-expansion-panel title="Titles" [subtitle]="info.attributes.identifying_title" [allow_expansion]="info.relationships.titles.length">
+                    <div *ngIf="info.relationships.titles.length">
+                        <h5 class="col-12">Other Titles</h5>
+                        <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text"></p>
+                    </div>
+                </app-expansion-panel>
+
+                <div class="card imc--expansion-panel">
+                    <div class="card-header" id="description_head">
+                        <h5 class="mb-0">
+                            <span class="btn btn-link collapsed"
+                                  (click)="expandCard('description')"
+                                  [attr.aria-expanded]="!isCollapsed.description"
+                                  aria-controls="description_content">
+                                <div class="row">
+                                    <div class="col-8 col-sm-7">
+                                        Description
+                                    </div>
+                                    <div class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs">
+                                        <!--option caricate dinamicamente nell'AfterViewInit-->
+                                      <select class="imc--input"
+                                              *ngIf="description_languages.size > 1"
+                                              #description_languages_selector></select>
+                                    </div>
+                                    <div class="col-4 col-sm-2 imc--flex--horizontal-end">
+                                        <i *ngIf="isCollapsed.description" class="material-icons">keyboard_arrow_down</i>
+                                        <i *ngIf="!isCollapsed.description" class="material-icons">keyboard_arrow_up</i>
+                                    </div>
+                                </div>
+                            </span>
+                        </h5>
+                    </div>
+                    <div id="description_content" class="collapse" [ngbCollapse]="isCollapsed.description">
+                        <div class="card-body row">
+                            <ng-template
+                                    ngFor
+                                    let-descrizione
+                                    [ngForOf]="this.info.relationships.descriptions">
+                                <p class="col-12"
+                                   *ngIf="descrizione.attributes.language.key === description_active"
+                                   [attr.data-languagekey]="descrizione.attributes.language.key"
+                                   [innerHTML]="descrizione.attributes.text"></p>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <app-expansion-panel title="Production information">
+
+                    <!--Anno di produzione-->
+                    <div class="col-2"><strong>Year:</strong> <span [innerHTML]="info.attributes.production_years[0]"></span></div>
+                    <!--Paesi di produzione-->
+                    <!-- @NSI non esiste production_countries per le immagini-->
+
+                    <ng-template [ngIf]="info.type === 'aventity'">
+                        <div class="col-2">
+                            <strong>Country:</strong>
+                            <span
+                                    *ngFor="let production_country of info.relationships.production_countries; last as last">
+                                    {{production_country.attributes.code.description}}{{last ? '' : '/'}}
+                            </span>
+                        </div>
+                    </ng-template>
+                    <!--Crediti-->
+                    <ng-template [ngIf]="info.relationships.contributors && info.relationships.contributors.length">
+                        <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
+                        <div class="col-12">
+                            <ul>
+                                <ng-template ngFor let-contributor [ngForOf]="info.relationships.contributors">
+                                    <li
+                                            *ngFor="let role of contributor.attributes.activities">
+                                        {{role}}:
+                                        <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
+                                    </li>
+
+                                </ng-template>
+                            </ul>
+                        </div>
+                    </ng-template>
+                </app-expansion-panel>
+
+                <app-expansion-panel title="Copyright">
+                    <div class="col-12">
+                        <strong>Right Status: </strong>
+                        <span [innerHTML]="info.attributes.rights_status.description"></span>
+                    </div>
+                </app-expansion-panel>
+
+                <app-expansion-panel title="Contacts">
+                        <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
+                        <div class="col-12"><strong>Contacts:</strong></div>
+                        <div class="col-12">
+                            <ul>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.address">
+                                    {{info.relationships.record_sources[0].relationships.provider[0].attributes.address}}
+                                </li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">tel: {{info.relationships.record_sources[0].relationships.provider[0].attributes.phone}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">fax: {{info.relationships.record_sources[0].relationships.provider[0].attributes.fax}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</li>
+                                <li></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 space-paragraph-10">
+                            <strong>Film ID in Archive: </strong>
+                            <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
+                        </div>
+                </app-expansion-panel> 
+
+            </div>
+
+        </div>
+        <!-- tab TECHNICAL INFO -->
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div id="tech-info_accordion" class="imc--accordion">
+
+                <ng-template [ngIf]="info.type === 'aventity'">
+
+                    <app-expansion-panel title="Analogue film format" >
+                        <div class="col-12">
+                            <ul class="list-space">
+
+                                <li *ngIf="info.relationships.video_format[0].attributes.sound">
+                                    <strong>Sound: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
+
+                                </li>
+                                <li *ngIf="info.relationships.video_format[0].attributes.colour">
+                                    <strong>Colour: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
+                                </li>
+                                <li *ngIf="info.relationships.video_format[0].attributes.gauge">
+                                    <strong>Gauge: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
+                                </li>
+                                <li *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
+                                    <strong>Aspect ratio: </strong>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </app-expansion-panel>
+
+                    <app-expansion-panel title="Digital format">
+                        <div class="col-12">
+                            <ul class="list-space">
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
+                                    <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 2">
+                                    <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 3">
+                                    <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 4">
+                                    <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.duration">
+                                    <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
+                                </li>
+
+                                <li *ngIf="info.relationships.item[0].attributes.dimension">
+                                    <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
+                                </li>
+
+                            </ul>
+                        </div>
+                    </app-expansion-panel>
+
+                </ng-template>
+
+                <ng-template [ngIf]="info.type !== 'aventity'">
+
+                    <app-expansion-panel title="Analogue format">
+                        <ul class="list-space">
+
+                            <li *ngIf="info.attributes.specific_type">
+                                <strong>Media type: </strong>
+                                <span [innerHTML]="info.attributes.specific_type.description"></span>
+                            </li>
+
+                            <li *ngIf="info.attributes.phisical_format_size">
+                                <strong>Physical format: </strong>
+                                <span [innerHTML]="info.attributes.phisical_format_size.join(' ')"></span>
+                            </li>
+
+                            <li *ngIf="info.attributes.colour">
+                                <strong>Colour: </strong>
+                                <span [innerHTML]="info.attributes.colour.description"></span>
+                            </li>
+                        </ul>
+                    </app-expansion-panel>
+
+                    <app-expansion-panel title="Digital format" *ngIf="info.relationships.item[0] && info.relationships.item[0].attributes">
+                        <ul class="list-space">
+
+                            <li *ngIf="info.relationships.item[0].attributes.item_type">
+                                <strong>Item type:</strong>
+                                <span [innerHTML]="info.relationships.item[0].attributes.item_type.description"></span>
+                            </li>
+
+                            <li *ngIf="info.relationships.item[0].attributes.digital_format">
+                                <strong>Format:</strong>
+                                <span [innerHTML]="info.relationships.item[0].attributes.digital_format.join(' ')"></span>
+                            </li>
+
+                        </ul>
+                    </app-expansion-panel>
+
+                </ng-template>
+
+            </div>
+        </div>
+    </div>
+</div>

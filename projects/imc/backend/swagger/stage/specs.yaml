@@ -4,5 +4,6 @@ class: Stage
 mapping:
   stage: "/stage"
   archive: "/stage/<group>"
+  deletion: "/stage/<filename>"
 labels:
   - file

@@ -1,0 +1,34 @@
+.notes {
+  border:1px solid $text-color;
+  padding:.5em;
+  display:block;
+
+  .notes-container {
+    display:flex;
+    justify-content: space-between;
+  }
+
+  .notes-text {
+    height:1.5em;
+    overflow:hidden;
+    width:90%;
+  }
+
+  .notes-buttons {
+    display:flex;
+    justify-content:flex-end;
+
+    .material-icons {
+      font-size: 1.3em !important;
+    }
+
+  }
+}
+
+.notes.note-expanded .notes-text {
+  height: auto;
+}
+
+.notes + .notes {
+  border-top:0;
+}

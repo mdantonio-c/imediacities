@@ -1,0 +1,123 @@
+.search-media {
+    border: 1px solid #ddd;
+    margin-top: -1px;
+    padding: 12px 150px 12px 12px;
+    -webkit-transition: border .1s ease-in-out 0s;
+    -o-transition: border .1s ease-in-out 0s;
+    transition: border .1s ease-in-out 0s;
+    position: relative;
+    max-height: 126px;
+}
+
+.search-media:hover {
+    border-color: #75A8CE;
+    z-index: 1
+}
+
+.search-media .search-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    width: 20%;
+    min-width: 100px;
+    max-width: 150px;
+    padding: 16px 9px;
+}
+
+.search-media .search-actions::before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 8px;
+	bottom: 16px;
+	width: 1px;
+	background-image: -webkit-linear-gradient(top, #FFF 0, #DDD 100%);
+	background-image: -o-linear-gradient(top, #FFF 0, #DDD 100%);
+	background-image: linear-gradient(to bottom, #FFF 0, #DDD 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffdddddd', GradientType=0)
+}
+
+.search-media:hover .search-actions {
+	background-color: #F0F4F7
+}
+
+.search-media.disabled:hover .search-actions {
+	background-color: #F6F6F6
+}
+
+.search-media:not(.disabled):hover .search-actions::before {
+	background-image: -webkit-linear-gradient(top, #FFF 0, #84bee5 100%);
+	background-image: -o-linear-gradient(top, #FFF 0, #84bee5 100%);
+	background-image: linear-gradient(to bottom, #FFF 0, #84bee5 100%);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ff84bee5', GradientType=0)
+}
+
+.search-media .media-left>.cn {
+	position: relative;
+    display: table;
+    z-index: 1;
+    opacity: 1;
+    width:76px;
+    vertical-align: middle;
+    text-align: center;
+    margin: 82px 2px;
+    background:rgba(0,0,0,0.5) center no-repeat;
+}
+.search-media .media-left>.cn>.inner {
+	display:table-cell;
+	vertical-align:bottom;
+}
+.search-media .media-left>.cn>.inner>.small {
+    color: #bbb;
+    text-decoration: none;
+    padding: 0 10px 0 10px;
+}
+
+.search-media .media-left>img, .search-media .media-left>.img {
+	width: 80px;
+    height: 80px;
+    float: left;
+    border: 2px solid #fff;
+    outline: 1px solid #e4e4e4;
+    vertical-align: middle;
+    position:absolute; 
+  	display:block;
+  	z-index: 1;
+  	cursor: auto;
+}
+
+.search-media .media-left {
+    padding-right: 10px;
+}
+
+.media-body .text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 72px;
+    transition: .50s all;   
+    transition-delay: 5s; 
+}
+
+.media-body .text:hover {
+    /*overflow: visible;*/
+    height:auto;
+    transition-delay: 1s;
+}
+
+.media-body .search-actions .action-buttons {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    top: auto;
+}
+
+.media-body .search-actions .action-buttons a:focus,
+.media-body .search-actions .action-buttons a:hover {
+    text-decoration: none;
+}

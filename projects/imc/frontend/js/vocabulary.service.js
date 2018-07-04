@@ -1,7 +1,10 @@
 (function() {
 	'use strict';
 
-	angular.module('web').service('VocabularyService', function($http, $q) {
+	angular.module('web').service('VocabularyService', VocabularyService);
+
+
+	function VocabularyService($http, $q) {
 		var vocabulary = {};
 
 		vocabulary.terms = [];
@@ -26,5 +29,7 @@
 		};
 
 		return vocabulary;
-	});
+	};
+
+	VocabularyService.$inject = ["$http", "$q"];
 })();

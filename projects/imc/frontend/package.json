@@ -1,0 +1,19 @@
+{
+  "name": "imc",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "js-marker-clusterer": "1.0.0",
+    "holderjs": "2.9.4",
+    "angular2-holderjs": "0.0.7",
+    "material-icons": "0.2.3",
+    "@ngui/map": "",
+    "@types/googlemaps": "",
+    "ng2-file-upload": "1.3.0",
+    "file-saver": "1.3.8",
+    "@types/file-saver": "1.3.0",
+    "ng2-ion-range-slider": "2.0.0",
+    "ion-rangeslider": ""
+  }
+}
+
+

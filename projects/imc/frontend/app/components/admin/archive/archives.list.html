@@ -1,0 +1,37 @@
+
+<div class='container-fluid'>
+<div class="row justify-content-md-center">
+<div class='col-12'>
+
+<div class='card'>
+<div class='card-header'>
+    <h4>
+    	<i class='fa fa-file-archive-o'></i> Data archive
+    </h4>
+</div>
+
+<div class='card-block'>
+
+<loading *ngIf="loading"></loading>
+
+<ngb-accordion close-others=true *ngIf="!loading">
+
+	<ngb-panel *ngFor="let group of groups | iterate">
+
+      <ng-template ngbPanelTitle>
+      Stage files uploaded by <b>{{group.value.fullname}}</b> (<i>{{group.value.id}}</i>)
+      </ng-template>
+
+      <ng-template ngbPanelContent>
+        <imc-archive [group]="group.value"></imc-archive>
+	  </ng-template>
+	</ngb-panel>
+
+</ngb-accordion>
+
+</div>
+</div>
+
+</div>
+</div>
+</div>

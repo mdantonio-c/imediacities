@@ -26,7 +26,7 @@ for ws in wb.worksheets:
     # if ws.title != 'Persons(Gender)':
     #     continue
     # print('--- {} ---'.format(ws.title))
-    vocabulary_class = {'label': ws.title.lower(), 'children': []}
+    vocabulary_class = {'label': ws.title.lower().capitalize(), 'children': []}
 
     # print('min row {}, max row {}'.format(ws.min_row, ws.max_row))
     current_group = ws['H2'].value
@@ -39,7 +39,7 @@ for ws in wb.worksheets:
         if en_term is None:
             # ignore groups without entry value
             continue
-        en_term = en_term
+        en_term = en_term.strip()
         iri = ws['M' + str(row_index)].value
         if iri is None:
             iri = generate_iri(en_term)

@@ -1,0 +1,10 @@
+<div class="controls__status controls__row">
+    <span>Play from frame to frame</span>
+</div>
+<div class="controls__status controls__row">
+    <app-video-control-field #from [parent]="parent"></app-video-control-field>
+    <app-video-control-field #to [parent]="parent"></app-video-control-field>
+
+    <i class="material-icons control_button" (click)="range_play()">play_arrow</i>
+    <i class="material-icons control_button" (click)="range_save()">save</i>
+</div>

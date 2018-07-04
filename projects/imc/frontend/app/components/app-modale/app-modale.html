@@ -1,0 +1,13 @@
+
+<ng-template #content let-c="close" let-d="dismiss">
+
+    <div class="modal-header">
+        <h4 class="modal-title">{{titolo}}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d()">
+            <span aria-hidden="true" class="material-icons">close</span>
+        </button>
+    </div>
+
+    <ng-content select="[modal-dialog]"></ng-content>
+
+</ng-template>

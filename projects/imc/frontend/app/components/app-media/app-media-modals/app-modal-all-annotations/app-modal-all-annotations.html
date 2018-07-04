@@ -1,0 +1,161 @@
+<!-- Modale visualizzazione di tutte le annotazioni -->
+<app-media-modal [data]="data" [media_type]="media_type">
+
+    <div class="col" modal-col>
+        <ul class="modal--annotation">
+            <li *ngIf="shot.annotations.tags.length">
+                <span><i class="material-icons">bookmark</i></span>
+                <span>
+                    <ng-template
+                            ngFor
+                            let-tag
+                            [ngForOf]="shot.annotations.tags">
+                        <app-media-annotation [annotation]="tag"
+                                              [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
+                    </ng-template>
+                </span>
+            </li>
+            <li class="space-paragraph-20" *ngIf="shot.annotations.locations.length">
+                <span><i class="material-icons">place</i></span>
+                <span>
+                    <ng-template
+                            ngFor
+                            let-location
+                            [ngForOf]="shot.annotations.locations">
+                        <app-media-annotation [annotation]="location"
+                                              [can_delete]="tag_is_deletable(location)"></app-media-annotation>
+                    </ng-template>
+                </span>
+            </li>
+            <li class="space-paragraph-20" *ngIf="shot.annotations.notes.length">
+                <span><i class="material-icons">speaker_notes</i></span>
+                <span class="modal--add-note">
+                    <ng-template
+                            ngFor
+                            let-note
+                            [ngForOf]="shot.annotations.notes">
+                        <app-note [note]="note"
+                                  [can_delete]="tag_is_deletable(note)"
+                                  *ngIf="note.name"></app-note>
+                    </ng-template>
+                </span>
+<!--
+                <span class="modal--add-note">
+                    <ul>
+                        <li>
+                            <div class="input-group">
+                              <input type="text" placeholder="Add note" aria-label="Add note"
+                                     aria-describedby="basic-addon2">
+                              <div class="input-group-append">
+                                <i class="material-icons click-event">delete</i>
+                                <i class="material-icons click-event">add</i>
+                              </div>
+                            </div>
+                        </li>
+                    </ul>
+                </span>
+-->
+            </li>
+            <li class="space-paragraph-20" *ngIf="shot.annotations.references.length">
+                <span><i class="material-icons">library_books</i></span>
+                <span>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                               Mauris vitae neque enim. Ut sed orci eu mauris eleifend vestibulum nec id mi. </p>
+                            <p>Sed ac mollis quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                               Phasellus convallis sed massa a eleifend.</p>
+                        </span>
+            </li>
+            <li class="space-paragraph-20" *ngIf="shot.annotations.links.length">
+                <span class="icon-rotate"><i class="material-icons">link</i></span>
+                <span>
+                            <ul class="modal--link-list">
+                                <li><a href="#">http://www.sa.ka/service.it</a></li>
+                                <li><a href="#">http://www.googlehome/products.it</a></li>
+                            </ul>
+                        </span>
+            </li>
+        </ul>
+    </div>
+
+</app-media-modal>
+<!--
+
+<div class="modal-content">
+
+    <div class="modal-body">
+
+        <div class="row modal-body-content">
+            <div class="col-3">
+                <div class="imc&#45;&#45;thumb-medium"></div>
+                <h4>Shot: 4</h4>
+                <p>sempte: 00:02:00:40 <br>
+                   frame range: 540-821 <br>
+                   duration: 47s</p>
+            </div>
+            <div class="col">
+                <ul class="modal&#45;&#45;annotation">
+                    <li>
+                        <span><i class="material-icons">bookmark</i></span>
+                        <span>
+                            <a href="#" class="badge badge-termtag">porta</a>
+                            <a href="#" class="badge badge-termtag&#45;&#45;auto">bike</a>
+                            <a href="#" class="badge badge-termtag&#45;&#45;auto">tree</a>
+                            <a href="#" class="badge badge-termtag&#45;&#45;auto">car</a>
+                            <a href="#" class="badge badge-termtag&#45;&#45;auto">butterfly</a>
+                            <a href="#" class="badge badge-termtag&#45;&#45;auto">gim</a>
+                        </span>
+                    </li>
+                    <li class="space-paragraph-20">
+                        <span><i class="material-icons">place</i></span>
+                        <span>
+                            <a href="#" class="badge badge-geotag">parco acquatico Genova</a>
+                            <a href="#" class="badge badge-geotag&#45;&#45;auto">Statua Nettuno</a>
+                        </span>
+                    </li>
+                    <li class="space-paragraph-20">
+                        <span><i class="material-icons">speaker_notes</i></span>
+                        <span class="modal&#45;&#45;add-note">
+                            <ul>
+                                <li>
+                                    <div class="input-group">
+                                      <input type="text" placeholder="Add note" aria-label="Add note"
+                                             aria-describedby="basic-addon2">
+                                      <div class="input-group-append">
+                                        <i class="material-icons click-event">delete</i>
+                                        <i class="material-icons click-event">add</i>
+                                      </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </span>
+                    </li>
+                    <li class="space-paragraph-20">
+                        <span><i class="material-icons">library_books</i></span>
+                        <span>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                               Mauris vitae neque enim. Ut sed orci eu mauris eleifend vestibulum nec id mi. </p>
+                            <p>Sed ac mollis quam. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                               Phasellus convallis sed massa a eleifend.</p>
+                        </span>
+                    </li>
+                    <li class="space-paragraph-20">
+                        <span class="icon-rotate"><i class="material-icons">link</i></span>
+                        <span>
+                            <ul class="modal&#45;&#45;link-list">
+                                <li><a href="#">http://www.sa.ka/service.it</a></li>
+                                <li><a href="#">http://www.googlehome/products.it</a></li>
+                            </ul>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Close</button>
+        &lt;!&ndash;<button type="button" class="btn btn-accent">Save</button>&ndash;&gt;
+    </div>
+</div>
+-->

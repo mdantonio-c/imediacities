@@ -1,0 +1,276 @@
+@import 'vars';
+
+// Layout delle tab di fianco al player (shots, segments, areas, ecc)
+
+.box-shots {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  max-height: 500px;
+  min-height: 500px;
+
+  .imc--toolbar {
+    background: $bg-dark-grey;
+    margin: 0;
+    padding: $padding-standard-toolbar;
+    align-self: flex-start;
+    flex-basis: 62px;
+    width: 100%;
+  }
+
+  .tab-content {
+    background: $bg-light-grey;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+
+    .tab-pane {
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: 100%;
+      /*height: calc(430px - 53.5px);*/
+    }
+  }
+
+  .tab-content--footer {
+    background: $bg-dark-grey;
+    height: 65px;
+    width: 100%;
+    padding: 10px $padding-card;
+    text-align: right;
+    margin-top: auto;
+    align-self: flex-end;
+  }
+
+  .imc--toolbar,
+  .tab-content--footer {
+
+    @media (max-width: 991.98px) {
+      padding: 10px 18px !important;
+
+      .btn, button {
+        font-size: 14px;
+        padding: 5px 2.5px;
+      }
+
+      .imc--input--dropdown {
+        font-size: 14px;
+        margin-top: 0;
+      }
+
+      .material-icons {
+        font-size: 20px !important;
+      }
+    }
+  }
+}
+
+.tab-shots{
+  margin: 0 !important;
+  text-align: right;
+
+  .nav-link {
+    background: none !important;
+    display: flex !important;
+    align-items: center;
+    padding: 0 8px;
+  }
+}
+
+.page-type-image {
+  .tab-shots {
+    .nav-link {
+      &.active,
+      &.active i {
+        color: $theme-image-color;
+      }
+    }
+  }
+
+  .box-single-shot {
+    &.active {
+      background-color: rgba($theme-image-color, .2);
+    }
+  }
+
+}
+
+.page-type-video {
+  .tab-shots {
+    .nav-link {
+      &.active,
+      &.active i {
+        color: $theme-video-color;
+      }
+    }
+  }
+
+  .box-single-shot {
+    &.active {
+      background-color: rgba($theme-video-color, .2);
+    }
+  }
+
+}
+
+
+// Tab segment
+
+.container-info-element {
+  display: flex;
+  height: 100%;
+  padding: $padding-card;
+}
+
+.info-element-button {
+  margin-top: auto;
+  text-align: right;
+}
+
+// Shot singola riga
+
+.box-single-shot {
+  background: $bg-light-grey;
+  padding: 10px 0 0;
+
+  &:hover {
+    background: $bg-grey;
+  }
+
+  .collapse > .content {
+    background: inherit;
+  }
+
+  .imc--input-checkbox + label {
+    @media (max-width: 991.98px) {
+      margin: 2px 0 0 4px;
+    }
+  }
+}
+
+.box-single-shot--number {
+  justify-content: center;
+  flex-direction: column;
+}
+
+.shot-number {
+  padding: 0 10px;
+}
+
+.anteprima-shot {
+  background: $bg-dark;
+  min-height: 70px;
+  position: relative;
+  width: 100%;
+
+  & > span {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    padding: 0 4px;
+    background: #000;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  img {
+    width: 100%;
+  }
+}
+
+.anteprima-shot--info {
+  color: $text-dark-color;
+  padding: 0 20px !important;
+
+  strong + span {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  & > span .click-event {
+    transition: $transition-all;
+
+    &:hover {
+      color: $theme-video-color;
+    }
+  }
+
+  .box--icon-list {
+    display: table;
+    font-size: 12px;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: table-cell;
+      padding-right: 8px;
+      text-align: center;
+    }
+
+    i {
+      color: $text-dark-color;
+      display: block;
+      font-size: 21px !important;
+
+      @media (max-width: 991.98px) {
+        font-size: 18px !important;
+      }
+    }
+  }
+
+  & > strong {
+    @media (max-width: 991.98px) {
+      font-size: 13px !important;
+    }
+  }
+}
+
+.icon-rotate {
+  i {
+    transform: rotate(90deg);
+  }
+}
+
+.box--horizontal-icon-list {
+  color: $text-dark-color;
+  font-size: 12px;
+  padding: 0;
+  margin: 10px 0 15px;
+
+  li {
+    display: flex;
+    padding-right: 10px;
+    float: left;
+    align-items: center;
+  }
+
+  i {
+    color: $text-dark-color;
+    font-size: 21px !important;
+    margin-left: 5px;
+  }
+}
+
+.box-annotation-buttons {
+  text-align: right;
+  /*padding-left: 15px !important;*/
+
+  @media (max-width: 991.98px) {
+    /*padding-left: 0 !important;*/
+    margin-top: 15px;
+  }
+
+  .btn-accent {
+    padding: 3.5px 8px;
+  }
+
+  button:last-child {
+    margin-left: 5px;
+    float: right;
+  }
+}

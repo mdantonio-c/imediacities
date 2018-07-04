@@ -1,0 +1,48 @@
+@import 'vars';
+
+.imc--video-tag-bar {
+  background: $bg-dark;
+  border: 1px solid rgba($border, 0.5);
+  border-left: 0;
+  padding: 0 5px !important;
+  overflow: auto;
+
+  & > div {
+    display: flex;
+    width: 100%;
+    padding: 0 4px;
+  }
+}
+
+.imc--video-tag--button {
+  background: $bg-dark;
+  border: 1px solid rgba($border, .5);
+  //cursor: pointer;
+  text-align: center;
+  transition: $transition-all;
+
+  img {
+    width: 65%;
+    padding: 5px;
+
+    @media (max-width: 991.98px) {
+      width: 102%;
+      padding: 2px;
+    }
+  }
+
+  //&:hover {
+  //  background: lighten($bg-dark, 30%);
+  //  //background: $bg-grey;
+  //}
+}
+
+.box-badge {
+  margin-right: 4px;
+
+  .badge {
+    top: -2px;
+    right: 0;
+    width: 100%;
+  }
+}
