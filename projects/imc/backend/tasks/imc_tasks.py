@@ -4,7 +4,6 @@ import os
 import json
 import random
 import re
-# import time
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
@@ -13,10 +12,8 @@ from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.models import codelists
 
-# from imc.analysis.fhg import FHG
 from scripts.analysis.analyze import make_movie_analize_folder, analize
 
-# from restapi.basher import BashCommands
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 
@@ -487,7 +484,7 @@ def extract_tech_info(self, item, analyze_dir_path):
             + 'x' + str(data['image']['geometry']['height'])
 
     else:
-        log.warning('Ivalid type. Technical info CANNOT be extracted for '
+        log.warning('Invalid type. Technical info CANNOT be extracted for '
                     'Item[{uuid}] with type {type}'.format(
                         uuid=item.uuid, type=item.item_type))
         return
@@ -580,6 +577,9 @@ def extract_od_annotations(self, item, analyze_dir_path):
     shot_list = {}
     for s in shots:
         shot_list[s.shot_num] = set()
+    if item.item_type == 'Image':
+        # consider a image like single frame shot
+        shot_list[0] = set()
     object_ids = set()
     concepts = set()
     report = {}
@@ -591,13 +591,17 @@ def extract_od_annotations(self, item, analyze_dir_path):
         (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
 
         '''
+        log.debug("timestamp: {0}, element: {1}".format(timestamp, od_list))
         for detected_object in od_list:
             concepts.add(detected_object[1])
             if detected_object[0] not in object_ids:
                 report[detected_object[1]] = report.get(
                     detected_object[1], 0) + 1
             object_ids.add(detected_object[0])
-            shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            if item.item_type == 'Video':
+                shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            elif item.item_type == 'Image':
+                shot_num = 0
             if shot_num is not None:
                 shot_list[shot_num].add(detected_object[1])
             # collect timestamp for keys:
@@ -608,13 +612,6 @@ def extract_od_annotations(self, item, analyze_dir_path):
             obj_cat_report[(detected_object[0], detected_object[1])] = tmp
 
     log.info('-----------------------------------------------------')
-    # report_filename = 'orf_import_report_{}.txt'.format(int(1000 * time.time()))
-    # f = open(report_filename, 'w')
-    # f.write('Number of distinct detected objects: {}'.format(len(object_ids)))
-    # f.write('Number of distinct concepts: {}'.format(len(concepts)))
-    # f.write('Report of detected concepts: {}'.format(report))
-    # f.write('Report of detected concepts by shot: {}'.format(shot_list))
-    # f.close()
     log.info('Number of distinct detected objects: {}'.format(len(object_ids)))
     log.info('Number of distinct concepts: {}'.format(len(concepts)))
     log.info('Report of detected concepts per shot: {}'.format(shot_list))
@@ -622,7 +619,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
     repo = AnnotationRepository(self.graph)
     counter = 0  # keep count of saved annotation
     for (key, timestamps) in obj_cat_report.items():
-        if len(timestamps) < 5:
+        if item.item_type == 'Video' and len(timestamps) < 5:
             # discard detections for short times
             continue
         # detect the concept
@@ -638,7 +635,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             'name': concept_name
         }
 
-        # detect the segment
+        # detect target segment ONLY for videos
         start_frame = timestamps[0][0]
         end_frame = timestamps[-1][0]
         selector = {
@@ -646,7 +643,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
             'value': 't=' + str(start_frame) + ',' + str(end_frame)
         }
 
-        # detect detection confidence
+        # detection confidence
         confidence = []
         region_sequence = []
         for frame in list(range(start_frame, end_frame + 1)):
@@ -687,6 +684,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
         try:
             from neomodel import db as transaction
             transaction.begin()
+            # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
+            #     bodies, selector))
             repo.create_tag_annotation(
                 None, bodies, item, selector, False, None, True)
             transaction.commit()

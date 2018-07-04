@@ -31,7 +31,7 @@ class AnnotationRepository():
             raise ValueError("Annotation cannot be created.",
                              ["Missing creator for manual annotation"])
 
-        log.debug("Create a new tag annotation")
+        log.debug("Creating a new tag annotation")
         # create annotation node
         anno = Annotation(annotation_type='TAG')
         if automatic:
@@ -51,7 +51,8 @@ class AnnotationRepository():
         else:
             raise ValueError("Invalid Target instance.")
 
-        if selector is not None:
+        # target to a segment only for videos with a provided selector
+        if selector is not None and isinstance(target, Item) and target.item_type == 'Video':
             if not isinstance(target, Item):
                 raise ValueError('Selector allowed only for Item target.')
             s_start, s_end = map(

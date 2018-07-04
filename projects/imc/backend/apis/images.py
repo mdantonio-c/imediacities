@@ -260,7 +260,7 @@ class ImageContent(GraphBaseOperations):
 
 class ImageTools(GraphBaseOperations):
 
-    __available_tools__ = ('object-detection')
+    __available_tools__ = ('object-detection', )
 
     @decorate.catch_error()
     @catch_graph_exceptions

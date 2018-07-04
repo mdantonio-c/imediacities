@@ -17,6 +17,11 @@ image_tools:
             type: string
             enum:
               - object-detection
+          operation:
+            description: At the moment used only to delete automatic tags.
+            type: string
+            enum:
+              - "delete"
   responses:
     '201':
       description: Execution launched. 
