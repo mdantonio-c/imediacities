@@ -114,7 +114,7 @@ class Group(IdentifiedNode):
     coordinator = RelationshipFrom(
         'User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
     stage_files = RelationshipFrom(
-        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=False)
 
 
 class Stage(TimestampedNode, HeritableStructuredNode):
