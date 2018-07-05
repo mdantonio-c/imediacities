@@ -50,7 +50,13 @@ class Initializer(object):
             group.fullname = "test"
             group.shortname = "test"
             group.save()
-            log.info("Group successfully created")
+
+            group = Group()
+            group.fullname = "Default user group"
+            group.shortname = "default"
+            group.save()
+
+            log.info("Groups successfully created")
 
         # Providers
         try:
@@ -201,9 +207,16 @@ class Customizer(object):
 
     def custom_post_handle_user_input(self, auth, user_node, properties):
 
-        log.critical("LINK THIS USER TO DEFAULT GROUP")
-        log.warning(auth)
-        log.warning(auth.db)
-        log.warning(properties)
+        try:
+            group = auth.db.Group.nodes.get(shortname="default")
+        except auth.db.Group.DoesNotExist:
+            log.warning("Unable to find default group, creating")
+            group = auth.db.Group()
+            group.fullname = "Default user group"
+            group.shortname = "default"
+            group.save()
+
+        log.info("Link %s to group %s", user_node.email, group.shortname)
+        user_node.belongs_to.connect(group)
 
         return True
