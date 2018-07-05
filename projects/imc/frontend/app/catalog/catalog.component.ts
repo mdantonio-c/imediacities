@@ -80,7 +80,7 @@ export class CatalogComponent implements OnInit {
 				this.loadingMapResults = false;
 			},
 			error => {
-				this.notify.extractErrors(`Unable to retrieve relevant creations on the map: ${error}`, this.notify.ERROR);
+				this.notify.showError(`Unable to retrieve relevant creations on the map: ${error}`);
 				this.loadingMapResults = false;
 			});
 	}
