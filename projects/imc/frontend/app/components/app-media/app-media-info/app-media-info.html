@@ -53,8 +53,11 @@
                                     let-descrizione
                                     [ngForOf]="this.info.relationships.descriptions">
                                 <p class="col-12"
-                                   *ngIf="descrizione.attributes.language.key === description_active"
+                                   *ngIf="descrizione.attributes.language && descrizione.attributes.language.key === description_active else missingLanguage"
                                    [attr.data-languagekey]="descrizione.attributes.language.key"
+                                   [innerHTML]="descrizione.attributes.text"></p>
+                                <p class="col-12"
+                                   *ngIf="description_active === 'n/a' && !descrizione.attributes.language"
                                    [innerHTML]="descrizione.attributes.text"></p>
                             </ng-template>
                         </div>

@@ -42,8 +42,14 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @private
      */
     _descriptions_get_languages (dati) {
+
         let force_user_language = true;
         dati.forEach(d => {
+            if (!d.attributes.language) {
+                // for missing language
+                this.description_languages.set('n/a', 'n/a');
+                return;
+            }
 
             if (!this.description_active) {
                 this._user_language_set(d.attributes.language.key);
@@ -57,7 +63,8 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         });
 
         if (force_user_language) {
-            this._user_language_set(dati[0].attributes.language.key);
+            let lang =  dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
+            this._user_language_set(lang);
         }
     }
 
