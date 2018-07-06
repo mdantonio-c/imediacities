@@ -13,6 +13,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Input() multiSelection;
     @Input() user;
     @Input() media_type = 'video';
+    @Input() tot_num_shots;
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
     @Output() is_selezionato: EventEmitter<any> = new EventEmitter();

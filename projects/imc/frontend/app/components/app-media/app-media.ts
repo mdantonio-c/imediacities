@@ -33,6 +33,10 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      */
     public annotations_count = 0;
     /**
+     * Consente di visualizzare lo strumento per la shot revision
+     */
+    public shot_revision_is_active: boolean = false;
+    /**
      * Consente di visualizzare lo strumento per la selezione multipla degli shot
      */
     public multi_annotations_is_active: boolean = false;
@@ -107,6 +111,15 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
 
     }
+
+
+    /**
+     * Modifica la visibilità dello strumento per la shot revision
+     */
+    shot_revision_toggle(){
+        this.shot_revision_is_active = !this.shot_revision_is_active;
+    }
+
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot

@@ -20,11 +20,14 @@
 
     </span>
 
-    <span class="col-3 imc--flex--vertical-center">
+    <span class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
         <!-- Anteprima dello shot del video -->
         <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
             <img [src]="shot.links.thumbnail" alt="">
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
+        </span>
+        <span *ngIf="is_attivo">
+            <i class='fa fa-cut revision-tool-icon' ngbTooltip='Split shot'></i>
         </span>
     </span>
 
@@ -100,4 +103,9 @@
     </div>
 </div>
 
+</div>
+
+<div class="revision-tool-div" *ngIf="tot_num_shots > shot.attributes.shot_num +1">
+    <i class="material-icons revision-tool-icon" ngbTooltip='Remove cut'>delete</i>
+    <i class="material-icons revision-tool-icon" ngbTooltip='Move cut'>vertical_align_center</i>
 </div>
