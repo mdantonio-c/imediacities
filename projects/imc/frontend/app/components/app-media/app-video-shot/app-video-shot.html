@@ -26,8 +26,8 @@
             <img [src]="shot.links.thumbnail" alt="">
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
-        <span *ngIf="is_attivo">
-            <i class='fa fa-cut revision-tool-icon' ngbTooltip='Split shot'></i>
+        <span *ngIf="shotRevision && is_attivo">
+            <i class="fa fa-cut revision-tool-icon" ngbTooltip="Split shot" placement="bottom"></i>
         </span>
     </span>
 
@@ -79,7 +79,7 @@
                                       [can_delete]="tag_is_deletable(location)"></app-media-annotation>
             </ng-template>
         </div>
-        <div class="row no-gutters space-paragraph-20">
+        <div class="row no-gutters space-paragraph-20" *ngIf="!shotRevision">
         <!-- modali -->
         <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
             <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
@@ -105,7 +105,7 @@
 
 </div>
 
-<div class="revision-tool-div" *ngIf="tot_num_shots > shot.attributes.shot_num +1">
-    <i class="material-icons revision-tool-icon" ngbTooltip='Remove cut'>delete</i>
-    <i class="material-icons revision-tool-icon" ngbTooltip='Move cut'>vertical_align_center</i>
+<div class="revision-tool-div" *ngIf="shotRevision && tot_num_shots > shot.attributes.shot_num +1">
+    <i class="material-icons revision-tool-icon" ngbTooltip="Remove cut" placement="left">delete</i>
+    <i class="material-icons revision-tool-icon" ngbTooltip="Move cut" placement="right">vertical_align_center</i>
 </div>

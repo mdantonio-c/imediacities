@@ -324,14 +324,15 @@ search-thumbnail div .media-image-wrapper {
     box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3)
 }
 
-
-.revision-tool-div{
-  background-color: #fff;
+/* shot revision */
+.revision-tool-div {
+  background-color: #dfdfdf;
   text-align: center;
   margin: 10px;
+  padding-top: 5px;
 }
  
-.revision-tool-icon{
-  color: #ff51ca !important;
-  margin: 5px 15px 5px 5px;
+.revision-tool-icon {
+  color: #53b8e2 !important;  /* #ff51ca */
+  cursor: pointer;
 }

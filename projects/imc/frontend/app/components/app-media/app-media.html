@@ -128,6 +128,7 @@ picture-->
                                         [shot]="shot"
                                         [user]="user"
                                         [multiSelection]="multi_annotations_is_active"
+                                        [shotRevision]="shot_revision_is_active"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
                                         (current_component)="appVideo.registra($event)" [parent]="appVideo"
@@ -216,19 +217,21 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-
-                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active && !shot_revision_is_active"
-                            (click)="shot_revision_toggle()">Start shot revision</button>
-
-                    <button class="btn btn-border-classic" *ngIf="shot_revision_is_active"
-                            (click)="shot_revision_toggle()">Save and Exit</button>
-
-                    <button class="btn btn-border-classic" *ngIf="shot_revision_is_active"
-                            (click)="shot_revision_toggle()">Cancel shot revision</button>
-
-
-                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active && !shot_revision_is_active"
+                    <ng-container *ngIf="!multi_annotations_is_active && !shot_revision_is_active">
+                        <button class="btn btn-border-classic px-1" 
+                            (click)="shot_revision_toggle()">Shot revision</button>
+                        &nbsp;
+                        <button class="btn btn-border-classic px-1"
                             (click)="multi_annotations_toggle()">Multiple annotation</button>
+                    </ng-container>
+
+                    <ng-container *ngIf="shot_revision_is_active">
+                        <button class="btn btn-border-classic"
+                                (click)="shot_revision_toggle()">Cancel</button>
+                        &nbsp;
+                        <button class="btn btn-border-classic"
+                                (click)="shot_revision_toggle()">Save and Exit</button>
+                    </ng-container>
 
                     <ng-container *ngIf="multi_annotations_is_active">
                         <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
