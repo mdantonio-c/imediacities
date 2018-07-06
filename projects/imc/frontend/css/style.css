@@ -323,3 +323,15 @@ search-thumbnail div .media-image-wrapper {
     -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3);
     box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, .3)
 }
+
+
+.revision-tool-div{
+  background-color: #fff;
+  text-align: center;
+  margin: 10px;
+}
+ 
+.revision-tool-icon{
+  color: #ff51ca !important;
+  margin: 5px 15px 5px 5px;
+}

@@ -131,9 +131,11 @@ picture-->
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
                                         (current_component)="appVideo.registra($event)" [parent]="appVideo"
+                                        [tot_num_shots]=shots.length
                                 ></app-video-shot>
                             </div>
                         </div>
+                        
                         <div class="tab-pane fade" id="pills-segments" role="tabpanel" aria-labelledby="segments">
                             <!-- tab segmenti -->
 
@@ -214,7 +216,18 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active"
+
+                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active && !shot_revision_is_active"
+                            (click)="shot_revision_toggle()">Start shot revision</button>
+
+                    <button class="btn btn-border-classic" *ngIf="shot_revision_is_active"
+                            (click)="shot_revision_toggle()">Save and Exit</button>
+
+                    <button class="btn btn-border-classic" *ngIf="shot_revision_is_active"
+                            (click)="shot_revision_toggle()">Cancel shot revision</button>
+
+
+                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active && !shot_revision_is_active"
                             (click)="multi_annotations_toggle()">Multiple annotation</button>
 
                     <ng-container *ngIf="multi_annotations_is_active">
