@@ -129,4 +129,4 @@ services:
   frontend:
     environment:
       ALLOW_PASSWORD_RESET: "true"
-      ALLOW_REGISTRATION: "false"
+      ALLOW_REGISTRATION: "true"

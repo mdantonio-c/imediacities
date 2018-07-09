@@ -15,6 +15,16 @@ class Initializer(object):
         Provider = self.neo4j.Provider
 
         try:
+            Role.nodes.get(name='local_admin')
+            log.debug("Coordinator role already exists")
+        except Role.DoesNotExist:
+            local_admin = Role()
+            local_admin.name = 'local_admin'
+            local_admin.description = 'Coordinator'
+            local_admin.save()
+            log.info("Coordinator role successfully created")
+
+        try:
             Role.nodes.get(name='Archive')
             log.debug("Archive role already exists")
         except Role.DoesNotExist:
@@ -33,6 +43,16 @@ class Initializer(object):
             researcher.description = 'Researcher'
             researcher.save()
             log.info("Researcher role successfully created")
+
+        try:
+            Role.nodes.get(name='Reviser')
+            log.debug("Reviser role already exists")
+        except Role.DoesNotExist:
+            reviser = Role()
+            reviser.name = 'Reviser'
+            reviser.description = 'Reviser'
+            reviser.save()
+            log.info("Reviser role successfully created")
 
         try:
             admin = Role.nodes.get(name='admin_root')
