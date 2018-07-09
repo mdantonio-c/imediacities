@@ -9,15 +9,16 @@ import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
 
 export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit, OnChanges {
 
-    @Input() shot;
-    @Input() multiSelection;
+    @Input() shot: any;
+    @Input() multiSelection: boolean = false;
     @Input() user;
     @Input() media_type = 'video';
-    @Input() shotRevision;
-    @Input() tot_num_shots;
+    @Input() shotRevision: boolean = false;
+    @Input() tot_num_shots: number;
 
-    @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
-    @Output() is_selezionato: EventEmitter<any> = new EventEmitter();
+    @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();
+    @Output() is_selezionato: EventEmitter<any> = new EventEmitter<any>();
+    @Output() revise_shot: EventEmitter<any> = new EventEmitter<any>();
 
     @is_annotation_owner() is_annotation_owner;
 
@@ -110,6 +111,10 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     remove_upper_cut() {
         console.log('remove upper cut for shot', this.shot);
+        this.revise_shot.emit({
+            op: 'join',
+            index: this.shot.attributes.shot_num,
+        });
     }
 
     //t = current time

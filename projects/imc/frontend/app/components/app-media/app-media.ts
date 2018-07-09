@@ -36,10 +36,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * Consente di visualizzare lo strumento per la shot revision
      */
     public shot_revision_is_active: boolean = false;
+    private shots_to_restore: any[] = [];
     /**
      * Consente di visualizzare lo strumento per la selezione multipla degli shot
      */
     public multi_annotations_is_active: boolean = false;
+
     /**
      * Riceve i risultati della chiamata al servizio media
      */
@@ -110,6 +112,61 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
         }
 
+    }
+
+    start_shot_revision() {
+        console.log('Revision mode activated');
+        this.shot_revision_is_active = true;
+        // create a copy from the actual shot list
+        this.shots_to_restore = JSON.parse(JSON.stringify(this.shots));
+    }
+
+    cancel_shot_revision() {
+        this.shot_revision_is_active = false;
+        this.shots = this.shots_to_restore.slice(0);
+        this.shots_to_restore = [];
+    }
+
+    revise_shot($event) {
+        console.log('revise shot', $event);
+        let op = $event.op;
+        switch ($event.op) {
+            case "join":
+                this.join_shots($event.index, $event.index+1);
+                break;
+            default:
+                console.warn('Invalid operation in revising shot for ' + $event.op);
+        }
+    }
+
+    private join_shots(idxA, idxB) {
+        let shotA = this.shots[idxA];
+        let shotB = this.shots[idxB];
+        shotA.attributes.duration += shotB.attributes.duration;
+        shotA.attributes.end_frame_idx = shotB.attributes.end_frame_idx;
+        Object.keys(shotA.annotations).forEach(e => {
+            // merge annotations
+            shotA.annotations[e].push(...shotB.annotations[e]);
+        });
+        this.shots[idxA] = shotA;
+        // remove shotB from the list
+        /*console.log('remove shot idx', idxB);*/
+        this.shots.splice(idxB, 1);
+        // update the subsequent shot numbers
+        for (let i=idxA+1; i < this.shots.length; i++) {
+            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num -1;
+        }
+    }
+
+    private split_shot(shot) {
+
+    }
+
+    save_revised_shots() {
+        console.log('save revised shots');
+        this.shot_revision_is_active = false;
+        // because the shot list size could have changed then update the list of 'shot_attivi'
+        this.shots_attivi = this.shots.map(s=>false);
     }
 
 

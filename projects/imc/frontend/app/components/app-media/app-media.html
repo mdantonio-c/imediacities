@@ -129,6 +129,7 @@ picture-->
                                         [user]="user"
                                         [multiSelection]="multi_annotations_is_active"
                                         [shotRevision]="shot_revision_is_active"
+                                        (revise_shot)="revise_shot($event)"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
                                         (current_component)="appVideo.registra($event)" [parent]="appVideo"
@@ -219,7 +220,10 @@ picture-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
                     <ng-container *ngIf="!multi_annotations_is_active && !shot_revision_is_active">
                         <button class="btn btn-border-classic px-1" 
-                            (click)="shot_revision_toggle()">Shot revision</button>
+                            mwlConfirmationPopover
+                            [popoverTitle]="'Start Shot Revision'"
+                            [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
+                            (confirm)="start_shot_revision()">Shot revision</button>
                         &nbsp;
                         <button class="btn btn-border-classic px-1"
                             (click)="multi_annotations_toggle()">Multiple annotation</button>
@@ -227,10 +231,10 @@ picture-->
 
                     <ng-container *ngIf="shot_revision_is_active">
                         <button class="btn btn-border-classic"
-                                (click)="shot_revision_toggle()">Cancel</button>
+                                (click)="cancel_shot_revision()">Cancel</button>
                         &nbsp;
                         <button class="btn btn-border-classic"
-                                (click)="shot_revision_toggle()">Save and Exit</button>
+                                (click)="save_revised_shots()">Save and Exit</button>
                     </ng-container>
 
                     <ng-container *ngIf="multi_annotations_is_active">
