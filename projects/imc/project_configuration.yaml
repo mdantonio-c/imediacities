@@ -43,6 +43,7 @@ variables:
     allowed_roles:
       - Researcher
       - Archive
+      - Reviser
 
 tags:
     file: "All endpoints to handle files"

@@ -45,6 +45,16 @@ class Initializer(object):
             log.info("Researcher role successfully created")
 
         try:
+            Role.nodes.get(name='Reviser')
+            log.debug("Reviser role already exists")
+        except Role.DoesNotExist:
+            reviser = Role()
+            reviser.name = 'Reviser'
+            reviser.description = 'Reviser'
+            reviser.save()
+            log.info("Reviser role successfully created")
+
+        try:
             admin = Role.nodes.get(name='admin_root')
             admin.description = 'Admin'
             admin.save()
