@@ -15,14 +15,14 @@ class Initializer(object):
         Provider = self.neo4j.Provider
 
         try:
-            Role.nodes.get(name='Group admin')
-            log.debug("Group admin role already exists")
+            Role.nodes.get(name='local_admin')
+            log.debug("Coordinator role already exists")
         except Role.DoesNotExist:
-            group_admin = Role()
-            group_admin.name = 'group_admin'
-            group_admin.description = 'Group Admin'
-            group_admin.save()
-            log.info("Group admin role successfully created")
+            local_admin = Role()
+            local_admin.name = 'local_admin'
+            local_admin.description = 'Coordinator'
+            local_admin.save()
+            log.info("Coordinator role successfully created")
 
         try:
             Role.nodes.get(name='Archive')
