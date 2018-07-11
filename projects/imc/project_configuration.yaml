@@ -49,3 +49,18 @@ tags:
     file: "All endpoints to handle files"
     admin: "Operations only allowed for admin users"
     miscellaneous: "Endpoints not classified in other specific sections"
+
+controller:
+  commands:
+    ftp-useradd:
+      description: Create FTP credentials
+      name: ftp
+      command: echo 'Not implemented -> pure-pw useradd user@email.org -f /etc/pure-ftpd/passwd/pureftpd.passwd -m -u ftpuser -d /home/ftpusers/group-uuid'
+      service: ftp
+      user: root
+    ftp-userdel:
+      description: Delete FTP credentials
+      name: ftp
+      command: echo 'Not implemented -> pure-pw userdel user@email.org -f /etc/pure-ftpd/passwd/pureftpd.passwd -m'
+      service: ftp
+      user: root
