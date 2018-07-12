@@ -12,7 +12,6 @@ from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.models import codelists
 
-from scripts.analysis.analyze import make_movie_analize_folder, analize
 
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
@@ -22,6 +21,11 @@ from restapi.flask_ext.flask_celery import CeleryExt
 celery_app = CeleryExt.celery_app
 
 log = get_logger(__name__)
+
+try:
+    from scripts.analysis.analyze import make_movie_analize_folder, analize
+except BaseException:
+    log.warning("Unable to import analyze script, not required in backend")
 
 
 ####################
