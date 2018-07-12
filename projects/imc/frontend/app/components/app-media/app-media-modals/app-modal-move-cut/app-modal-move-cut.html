@@ -21,10 +21,10 @@
 							frame range:
 							<span class="paragraph-not-divide">
 								<strong class="click-event" (click)="player_seek_at(shot.attributes.start_frame_idx)" *ngIf="i === 0">{{shot.attributes.start_frame_idx}}</strong>
-								<strong class="click-event" (click)="player_seek_at(current_cut)" *ngIf="i === 1">
+								<strong class="click-event" (click)="player_seek_at(current_cut)" *ngIf="i === 1" [ngClass]="{'text-danger': changed}">
 								{{current_cut}}</strong>
 								-
-								<strong class="click-event" (click)="player_seek_at(current_cut - 1)" *ngIf="i === 0">
+								<strong class="click-event" (click)="player_seek_at(current_cut - 1)" *ngIf="i === 0" [ngClass]="{'text-danger': changed}">
 								{{current_cut - 1}}</strong>
 								<strong class="click-event" (click)="player_seek_at(shot.attributes.end_frame_idx)" *ngIf="i === 1">
 								{{shot.attributes.end_frame_idx}}</strong>
