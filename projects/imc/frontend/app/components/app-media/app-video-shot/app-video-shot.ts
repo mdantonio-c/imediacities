@@ -6,7 +6,6 @@ import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
     selector: 'app-video-shot',
     templateUrl: 'app-video-shot.html'
 })
-
 export class AppVideoShotComponent extends AppVideoControlComponent implements OnInit, OnChanges {
 
     @Input() shot: any;
@@ -47,17 +46,15 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         this.arrow_icon = true;
     }
 
-    modale_show(evento, modale) {
-
-        if (evento.target) {
+    modale_show(event, modale) {
+        if (event.target) {
             this.modale_richiedi.emit({
                 modale: modale,
-                titolo: evento.target.innerText,
+                titolo: event.target.innerText,
                 data: { shots: [this.shot] },
+                next: event.next ? true : false
             });
-
         }
-
     }
 
     shot_play() {
@@ -117,6 +114,11 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         });
     }
 
+    move_cut() {
+        // move to the first frame of the next shot
+        this.parent.jump_to(this.shot.attributes.end_frame_idx+1, true, true);
+    }
+
     //t = current time
     //b = start value
     //c = change in value
@@ -151,6 +153,5 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             this.details_open = false;
         }
     }
-
 
 }

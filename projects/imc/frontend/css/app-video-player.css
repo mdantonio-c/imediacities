@@ -719,3 +719,12 @@ progress[value]::-webkit-progress-value {
   visibility: hidden !important; }
 
 /*# sourceMappingURL=app-video-player.css.map */
+
+/* manual changes (Giuseppe) */
+.video_container--modale .controls__wrapper .controls__center .controls__status {
+  padding: 0;
+}
+
+.video_container--modale .controls__left, .controls__right {
+  min-width: 0;
+}

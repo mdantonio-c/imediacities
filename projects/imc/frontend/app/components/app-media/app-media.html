@@ -8,8 +8,8 @@ picture-->
     <div class="container-media row no-gutters justify-content-md-center">
         <!-- TITLE MEDIA -->
         <div class="box-title-media col-12 col-lg-6 row no-gutters">
-            <h2 class="imc--title-bold col-12"  [innerHTML]="media.attributes.identifying_title"></h2>
-            <p class="col-12 col-sm-8 imc--flex--vertical-start">
+            <h2 class="imc--title-bold col-12">{{media.attributes.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision</span></h2>
+            <p class="col-12 col-sm-8 imc--flex--vertical-start" style="margin-bottom: 0;">
                 <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp;
 
                 <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span>
@@ -29,18 +29,17 @@ picture-->
             <section class="box-media col-12 col-sm-7 col-lg-6">
                 <!-- PICTURE -->
                 <ng-container *ngIf="media_type === 'image'">
-                   <div class="container-picture">
-                       <app-picture [data]="media"></app-picture>
-                   </div>
+                    <div class="container-picture">
+                        <app-picture [data]="media"></app-picture>
+                    </div>
                 </ng-container>
-
                 <!-- VIDEO PLAYER -->
                 <ng-container *ngIf="media_type === 'video'">
-                 <app-video-player
-                         #appVideo
-                         [data]="media"
-                         [shots]="shots"
-                         (video_player_ready)="video_player_set($event)"></app-video-player>
+                    <app-video-player
+                        #appVideo
+                        [data]="media"
+                        [shots]="shots"
+                    (video_player_ready)="video_player_set($event)"></app-video-player>
                 </ng-container>
             </section>
 
@@ -178,11 +177,8 @@ picture-->
                                         (is_selezionato)="shot_selezionato($event)"
                                 ></app-video-shot>
                             </div>
-
-
-
-
                         </div>
+                        
                         <div class="tab-pane fade" id="pills-areas" role="tabpanel" aria-labelledby="areas">
                             <!-- tab aree automatiche -->
 
@@ -231,7 +227,10 @@ picture-->
 
                     <ng-container *ngIf="shot_revision_is_active">
                         <button class="btn btn-border-classic"
-                                (click)="cancel_shot_revision()">Cancel</button>
+                            mwlConfirmationPopover
+                            [popoverTitle]="'Exit shot revision'"
+                            [popoverMessage]="'All changes will be lost.<br/>Do you wish to continue?'"
+                            (confirm)="exit_shot_revision()">Cancel</button>
                         &nbsp;
                         <button class="btn btn-border-classic"
                                 (click)="save_revised_shots()">Save and Exit</button>
@@ -306,6 +305,7 @@ picture-->
         <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-all-annotations>
         <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" [media_type]="media_type" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
         <app-modal-tag-cloud *ngIf="modale.type === 'tag-cloud'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-tag-cloud>
+        <app-modal-move-cut *ngIf="modale.type === 'move-cut'" [data]="modale.data" modal-dialog></app-modal-move-cut>
     </app-modale>
 </div>
 

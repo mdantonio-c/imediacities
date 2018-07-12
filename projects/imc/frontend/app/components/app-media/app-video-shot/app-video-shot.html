@@ -97,8 +97,9 @@
 <div class="revision-tool-div" *ngIf="shotRevision && tot_num_shots > shot.attributes.shot_num +1">
 <i class="material-icons revision-tool-icon"
     mwlConfirmationPopover
-    [popoverTitle]="'Remove cut?'"
+    [popoverTitle]="'Remove cut'"
     [popoverMessage]="'Remove cut between shot '+ (shot.attributes.shot_num+1) + ' and shot ' + (shot.attributes.shot_num+2)+'.<br/>Do you wish to continue?'"
     (confirm)="remove_upper_cut()">delete</i>
-<i class="material-icons revision-tool-icon">vertical_align_center</i>
+<i class="material-icons revision-tool-icon"
+    (click)="modale_show({target: {innerText: 'Move Cut'}, next: true}, 'move-cut')">vertical_align_center</i>
 </div>

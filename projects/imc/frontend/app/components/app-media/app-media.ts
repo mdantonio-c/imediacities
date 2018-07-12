@@ -1,12 +1,12 @@
-import {Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2, DoCheck} from '@angular/core';
-import {Router, Route, ActivatedRoute, Params} from '@angular/router';
-import {AppShotsService} from "../../services/app-shots";
-import {AppMediaService} from "../../services/app-media";
-import {AppModaleComponent} from "../app-modale/app-modale";
-import {AppVideoPlayerComponent} from "./app-video-player/app-video-player";
-import {AuthService} from "/rapydo/src/app/services/auth";
-import {AppVideoService} from "../../services/app-video";
-import {AppAnnotationsService} from "../../services/app-annotations";
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Renderer2, DoCheck } from '@angular/core';
+import { Router, Route, ActivatedRoute, Params } from '@angular/router';
+import { AppShotsService } from "../../services/app-shots";
+import { AppMediaService } from "../../services/app-media";
+import { AppModaleComponent } from "../app-modale/app-modale";
+import { AppVideoPlayerComponent } from "./app-video-player/app-video-player";
+import { AuthService } from "/rapydo/src/app/services/auth";
+import { AppVideoService } from "../../services/app-video";
+import { AppAnnotationsService } from "../../services/app-annotations";
 /**
  * Componente per la visualizzazione del media
  */
@@ -58,7 +58,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         /**
          * Dati da passare al componente
          */
-        data: {}
+        data: {},
     };
     /**
      * Elenco delle location da passare alla mappa
@@ -94,9 +94,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         private AnnotationService: AppAnnotationsService,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
-        private VideoService: AppVideoService ) {}
+        private VideoService: AppVideoService) { }
 
-    media_type_set (url) {
+    media_type_set(url) {
 
         if (url.indexOf('/video') !== -1) {
 
@@ -117,12 +117,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     start_shot_revision() {
         console.log('Revision mode activated');
         this.shot_revision_is_active = true;
-        // create a copy from the actual shot list
+        // create a copy from the actual shot list (DEEP CLONE)
+        // this.shots_to_restore = $.extend(true, {}, this.shots);
         this.shots_to_restore = JSON.parse(JSON.stringify(this.shots));
     }
 
-    cancel_shot_revision() {
+    exit_shot_revision() {
         this.shot_revision_is_active = false;
+        // shallow clone is enough here!
         this.shots = this.shots_to_restore.slice(0);
         this.shots_to_restore = [];
     }
@@ -132,7 +134,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         let op = $event.op;
         switch ($event.op) {
             case "join":
-                this.join_shots($event.index, $event.index+1);
+                this.join_shots($event.index, $event.index + 1);
                 break;
             default:
                 console.warn('Invalid operation in revising shot for ' + $event.op);
@@ -153,8 +155,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         /*console.log('remove shot idx', idxB);*/
         this.shots.splice(idxB, 1);
         // update the subsequent shot numbers
-        for (let i=idxA+1; i < this.shots.length; i++) {
-            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num -1;
+        for (let i = idxA + 1; i < this.shots.length; i++) {
+            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num - 1;
         }
     }
 
@@ -166,14 +168,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         console.log('save revised shots');
         this.shot_revision_is_active = false;
         // because the shot list size could have changed then update the list of 'shot_attivi'
-        this.shots_attivi = this.shots.map(s=>false);
+        this.shots_attivi = this.shots.map(s => false);
     }
 
 
     /**
      * Modifica la visibilità dello strumento per la shot revision
      */
-    shot_revision_toggle(){
+    shot_revision_toggle() {
         this.shot_revision_is_active = !this.shot_revision_is_active;
     }
 
@@ -182,7 +184,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * Modifica la visibilità dello strumento per la selezione multipla degli shot
      * e ne resetta lo stato deselezionando tutti
      */
-    multi_annotations_toggle(){
+    multi_annotations_toggle() {
         this.multi_annotations_is_active = !this.multi_annotations_is_active;
         this.shots_attivi_reset();
     }
@@ -191,17 +193,21 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * Apre una modale visualizzando al suo interno il compontente coi dati ricevuti
      * @param componente Configurazione del componente daq visualizzare nella modale
      */
-    modal_show (componente){
+    modal_show(componente) {
 
         //  fermo il video principale
         if (this.appVideo) {
             this.appVideo.video.pause();
         }
         this.modale.type = componente.modale;
+        if (componente.next) {
+            // use the next flag to add the next shot to the list
+            let next_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num + 1;
+            componente.data.shots.push(this.shots[next_shot_num]);
+        }
         this.modale.data = componente.data;
 
         this.appModale.open(componente.titolo, this.MediaService.type(), componente.classe);
-
     }
 
     /**
@@ -210,14 +216,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * @param evento Evento richiamante
      * @param componente Componente selezionato
      */
-    modal_show_multi (evento, componente) {
+    modal_show_multi(evento, componente) {
 
         let data = this.shots_attivi.reduce((acc, value, index) => {
             if (value) {
                 acc.push(this.shots[index])
             }
             return acc;
-        },[]);
+        }, []);
 
         if (!data.length) return;
 
@@ -226,33 +232,33 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             data: {
                 shots: data
             },
-            titolo:evento.target.innerText
+            titolo: evento.target.innerText
         };
 
         this.modal_show(comp);
     }
 
-    shot_selezionato (evento) {
+    shot_selezionato(evento) {
         this.shots_attivi[evento.index] = evento.stato;
     }
 
-    shots_attivi_reset () {
+    shots_attivi_reset() {
         this.shots_attivi = this.shots_attivi.map(s => false);
     }
 
-    shots_init (shots) {
+    shots_init(shots) {
         //  Questo tipo di aggiornamento serve per non ridisegnare tutti i componenti collegati agli shots
         if (this.shots.length) {
-            this.shots.forEach((s,idx) => {
+            this.shots.forEach((s, idx) => {
                 s.annotations = shots[idx].annotations;
             })
         } else {
             this.shots = shots;
         }
-        this.shots_attivi = shots.map(s=>false);
+        this.shots_attivi = shots.map(s => false);
     }
 
-    shots_update (evento) {
+    shots_update(evento) {
         if (this.media_type === 'video') {
             this.ShotsService.get();
         } else if (this.media_type === 'image') {
@@ -260,7 +266,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
-    video_player_set (event) {
+    video_player_set(event) {
         this.VideoService.video_set(event);
     }
 
@@ -277,7 +283,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         this.tab_title = target.attributes.getNamedItem('data-title').value;
     }
 
-    media_entity_normalize (mediaEntity) {
+    media_entity_normalize(mediaEntity) {
 
         //  Normalizzo i dati delle immagini
         if (this.media_type === 'image') {
@@ -298,12 +304,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
         //  elimino i titoli aggiuntivi se sono identici a quello identificativo
         if (mediaEntity.relationships.titles.length) {
-            mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title )
+            mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title)
         }
 
         return mediaEntity;
     }
-    
+
     /**
      * Esegue le richieste del video e degli shot
      */
@@ -324,7 +330,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 // To be confirmed
                 setTimeout(() => {
                     this.Element.nativeElement.querySelector('#pills-tab > li').click();
-                },100);
+                }, 100);
 
                 if (this.media_type === 'video') {
                     this.ShotsService.get(this.media_id, endpoint);

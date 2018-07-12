@@ -266,7 +266,7 @@ input[type="radio"] {
 .switch {
   display: inline-block;
   position: relative;
-  margin: 0 0 10px;
+  /*margin: 0 0 10px;*/
   font-size: 16px;
   line-height: 24px; }
   .switch__input {
@@ -280,6 +280,7 @@ input[type="radio"] {
   .switch__label {
     display: block;
     padding: 0 0 0 44px;
+    margin-bottom: 0;
     cursor: pointer; }
     .switch__label:before {
       content: '';
