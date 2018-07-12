@@ -1,36 +1,32 @@
 <!-- Template per il singolo shot, da mettere in loop per la creazione di tutti gli shot o segmenti -->
 <div class="row no-gutters box-single-shot" *ngIf="shot" [ngClass]="{'active': is_attivo}">
-
     <span class="col-1 container-checkbox" *ngIf="multiSelection">
         <!-- Checkbox per la selezione multipla -->
-       <div class="box-checkbox">
-           <input class="imc--input-checkbox styled-checkbox"
-                  [id]="checkbox_selection_label" type="checkbox"
-                  [value]="shot.attributes.shot_num"
-                  (click)="shot_seleziona($event)"
-           >
-           <label [for]="checkbox_selection_label"></label>
-       </div>
+        <div class="box-checkbox">
+            <input class="imc--input-checkbox styled-checkbox"
+            [id]="checkbox_selection_label" type="checkbox"
+            [value]="shot.attributes.shot_num"
+            (click)="shot_seleziona($event)"
+            >
+            <label [for]="checkbox_selection_label"></label>
+        </div>
     </span>
     <span class="col-1 imc--flex--vertical-center box-single-shot--number">
         <!-- Numero dello shot, da scambiare con l'icona dell'active -->
         <span class="shot-number"><strong [innerHTML]="shot.attributes.shot_num +1" ></strong></span>
         <!-- Icona freccia azzurra per l'active sullo shot -->
         <i class="material-icons font-media-color" *ngIf="is_attivo">play_arrow</i>
-
     </span>
-
     <span class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
         <!-- Anteprima dello shot del video -->
         <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
             <img [src]="shot.links.thumbnail" alt="">
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
-        <span *ngIf="is_attivo">
-            <i class='fa fa-cut revision-tool-icon' ngbTooltip='Split shot'></i>
+        <span *ngIf="shotRevision && is_attivo">
+            <i class="fa fa-cut revision-tool-icon" ngbTooltip="Split shot" placement="bottom"></i>
         </span>
     </span>
-
     <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">
         <strong [innerHTML]="shot.attributes.timestamp || '&nbsp;'"></strong>
         <span *ngIf="media_type === 'video'">
@@ -50,62 +46,60 @@
             <li class="click-event icon-rotate"><i class="material-icons">link</i><span><strong [innerHTML]="shot.annotations.links.length"></strong></span></li>
         </ul>
     </span>
-
     <span class="col-1 imc--flex--vertical-center imc--flex--horizontal-center">
         <i class="material-icons click-event" (click)="details_toggle()">
-            <ng-container *ngIf="!arrow_icon; else dropArrow">keyboard_arrow_down</ng-container>
-           <ng-template #dropArrow>keyboard_arrow_up</ng-template></i>
+        <ng-container *ngIf="!arrow_icon; else dropArrow">keyboard_arrow_down</ng-container>
+        <ng-template #dropArrow>keyboard_arrow_up</ng-template></i>
     </span>
-<!--</div>-->
-
-<!-- Dettagli del singolo shot -->
-<div class="collapse col-12"  [id]="collapse_id" [ngbCollapse]="!details_open">
-    <div class="content">
-        <div>
-            <ng-template
-                    ngFor
-                    let-tag
-                    [ngForOf]="shot.annotations.tags">
-                <app-media-annotation [annotation]="tag"
-                                      [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
+    <!-- Dettagli del singolo shot -->
+    <div class="collapse col-12"  [id]="collapse_id" [ngbCollapse]="!details_open">
+        <div class="content">
+            <div>
+                <ng-template
+                ngFor
+                let-tag
+                [ngForOf]="shot.annotations.tags">
+            <app-media-annotation [annotation]="tag" [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
             </ng-template>
         </div>
         <div>
             <ng-template
-                    ngFor
-                    let-location
-                    [ngForOf]="shot.annotations.locations">
-                <app-media-annotation [annotation]="location"
-                                      [can_delete]="tag_is_deletable(location)"></app-media-annotation>
+            ngFor
+            let-location
+            [ngForOf]="shot.annotations.locations">
+            <app-media-annotation [annotation]="location"
+            [can_delete]="tag_is_deletable(location)"></app-media-annotation>
             </ng-template>
         </div>
-        <div class="row no-gutters space-paragraph-20">
-        <!-- modali -->
-        <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
-            <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
-            <div ngbDropdownMenu [attr.aria-labelledby]="dropdown_id" class="imc--input--dropdown">
-                <span (click)="modale_show($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
-                <span (click)="modale_show($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
-                <span (click)="modale_show($event, 'insert-note')" class="dropdown-item">Add Note</span>
-                <!--
-                <span (click)="modale_show($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
-                <span (click)="modale_show($event, 'insert-link')" class="dropdown-item">Add Link</span>
-                -->
+        <div class="row no-gutters space-paragraph-20" *ngIf="!shotRevision">
+            <!-- modali -->
+            <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
+                <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
+                <div ngbDropdownMenu [attr.aria-labelledby]="dropdown_id" class="imc--input--dropdown">
+                    <span (click)="modale_show($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                    <span (click)="modale_show($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                    <span (click)="modale_show($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                    <!--
+                    <span (click)="modale_show($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                    <span (click)="modale_show($event, 'insert-link')" class="dropdown-item">Add Link</span>
+                    -->
+                </div>
             </div>
-        </div>
-
-        <div class="col-7 col-lg-5 box-annotation-buttons">
-            <!-- bottone vedi tutte le annotazioni -->
-            <button class="btn btn-accent" (click)="modale_show($event, 'all-annotations')">See All</button>
-            <!-- aggiungi a una lista -->
+            <div class="col-7 col-lg-5 box-annotation-buttons">
+                <!-- bottone vedi tutte le annotazioni -->
+                <button class="btn btn-accent" (click)="modale_show($event, 'all-annotations')">See All</button>
+                <!-- aggiungi a una lista -->
             <button class="btn btn-icon-border-classic tmp_hidden"><i class="material-icons">playlist_add</i></button></div>
         </div>
     </div>
 </div>
-
 </div>
-
-<div class="revision-tool-div" *ngIf="tot_num_shots > shot.attributes.shot_num +1">
-    <i class="material-icons revision-tool-icon" ngbTooltip='Remove cut'>delete</i>
-    <i class="material-icons revision-tool-icon" ngbTooltip='Move cut'>vertical_align_center</i>
+<div class="revision-tool-div" *ngIf="shotRevision && tot_num_shots > shot.attributes.shot_num +1">
+<i class="material-icons revision-tool-icon"
+    mwlConfirmationPopover
+    [popoverTitle]="'Remove cut'"
+    [popoverMessage]="'Remove cut between shot '+ (shot.attributes.shot_num+1) + ' and shot ' + (shot.attributes.shot_num+2)+'.<br/>Do you wish to continue?'"
+    (confirm)="remove_upper_cut()">delete</i>
+<i class="material-icons revision-tool-icon"
+    (click)="modale_show({target: {innerText: 'Move Cut'}, next: true}, 'move-cut')">vertical_align_center</i>
 </div>

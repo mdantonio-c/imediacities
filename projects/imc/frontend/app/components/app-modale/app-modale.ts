@@ -1,5 +1,5 @@
-import {Component, ViewChild, OnInit} from '@angular/core';
-import {AppModaleService} from "../../services/app-modale";
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { AppModaleService } from "../../services/app-modale";
 
 @Component({
     selector: 'app-modale',
@@ -12,18 +12,18 @@ export class AppModaleComponent implements OnInit {
 
     public titolo = '';
 
-    constructor (private ModalService: AppModaleService) {
+    constructor(private ModalService: AppModaleService) {
     }
 
-    open (title, media_type, classi = '') {
+    open(title, media_type, classi = '') {
         this.title_set(title);
-        this.ModalService.open(this.content,{windowClass:`imc--modal page-type-${media_type} ${classi}`})
+        this.ModalService.open(this.content, { windowClass: `imc--modal page-type-${media_type} ${classi}` })
     }
 
-    title_set (title) {
+    title_set(title) {
         this.titolo = title;
     }
 
-    ngOnInit () {}
+    ngOnInit() { }
 
 }

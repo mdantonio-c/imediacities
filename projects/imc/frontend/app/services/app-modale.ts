@@ -7,8 +7,8 @@ import {
     ComponentRef
 } from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {AppModalInsertGeotagComponent} from "../components/app-media/app-media-modals/app-modal-insert-geotag/app-modal-insert-geotag";
-import {AppModalInsertNoteComponent} from "../components/app-media/app-media-modals/app-modal-insert-note/app-modal-insert-note";
+/*import {AppModalInsertGeotagComponent} from "../components/app-media/app-media-modals/app-modal-insert-geotag/app-modal-insert-geotag";
+import {AppModalInsertNoteComponent} from "../components/app-media/app-media-modals/app-modal-insert-note/app-modal-insert-note";*/
 /**
  * Servizio per la gestione delle modali
  */

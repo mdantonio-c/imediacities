@@ -1,21 +1,22 @@
-import {Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import {Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, OnDestroy, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import {rangePlayer} from "../../../decorators/app-range";
 
+import { ShotRevisionService } from '../../../services/shot-revision.service';
+import { Subscription }   from 'rxjs';
 
 
 @Component({
     selector: 'app-video-player',
     templateUrl: 'app-video-player.html'
 })
-
-
-export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
+export class AppVideoPlayerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @Input() data: any;
     @Input() shots: any;
-    @Input() layout: any;
+    @Input() layout: any = 'main';
+    @Input() revision: boolean = false;
 
-    @Output() video_player_ready: EventEmitter<any> = new EventEmitter();
+    @Output() video_player_ready: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild('videoPlayer') videoPlayer: ElementRef;
 
@@ -41,7 +42,15 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
      */
     restart_time = null;
 
-    constructor(private cdRef: ChangeDetectorRef, private elRef: ElementRef ) {}
+    /* subscription to get feedback from the Parent (e.g. set under revision?) */
+    subscription: Subscription;
+
+    constructor(private cdRef: ChangeDetectorRef, private elRef: ElementRef, private shotRevisionService: ShotRevisionService) {
+        /*this.subscription = shotRevisionService.revisionAnnounced$.subscribe(
+            revision => {
+              this.revision = true;
+        });*/
+    }
 
     @rangePlayer() range;
 
@@ -196,11 +205,11 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.video.currentTime = time_or_frames;
     }
 
-    public shot_play (shot_number) {
-        this.jump_to(1/ this.fps * this.shots[shot_number].attributes.start_frame_idx);
+    public shot_play(shot_number) {
+        this.jump_to(1 / this.fps * this.shots[shot_number].attributes.start_frame_idx);
     }
 
-    public segement_play (segment) {
+    public segment_play (segment) {
 
     }
 
@@ -228,6 +237,10 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         return this.time_to_frame(this.video.currentTime);
     }
 
+    cut_changed() {
+        this.shotRevisionService.changeCut(this.frame_current());
+    }
+
     _floor (number, decimal_places) {
         return Math.floor(parseFloat(number) * Math.pow(10, decimal_places)) / Math.pow(10, decimal_places);
     }
@@ -245,7 +258,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     public layout_check (layout) {
-        return this.shots && this.shots.length && this.layout !== layout
+        return this.shots && this.shots.length && this.layout === layout
     }
 
     public advanced_control_show (stato) {
@@ -270,6 +283,11 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.video_player_ready.emit(this);
 
         this.cdRef.detectChanges();
+    }
+
+    ngOnDestroy() {
+        // prevent memory leak when component destroyed
+        this.subscription.unsubscribe();
     }
 
 }
