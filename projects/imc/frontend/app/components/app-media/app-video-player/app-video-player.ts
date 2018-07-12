@@ -1,15 +1,12 @@
-import {Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, OnDestroy, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import {rangePlayer} from "../../../decorators/app-range";
-
+import { Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { rangePlayer } from "../../../decorators/app-range";
 import { ShotRevisionService } from '../../../services/shot-revision.service';
-import { Subscription }   from 'rxjs';
-
 
 @Component({
     selector: 'app-video-player',
     templateUrl: 'app-video-player.html'
 })
-export class AppVideoPlayerComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
     @Input() data: any;
     @Input() shots: any;
@@ -42,15 +39,11 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit, OnDestroy
      */
     restart_time = null;
 
-    /* subscription to get feedback from the Parent (e.g. set under revision?) */
-    subscription: Subscription;
-
-    constructor(private cdRef: ChangeDetectorRef, private elRef: ElementRef, private shotRevisionService: ShotRevisionService) {
-        /*this.subscription = shotRevisionService.revisionAnnounced$.subscribe(
-            revision => {
-              this.revision = true;
-        });*/
-    }
+    constructor(
+        private cdRef: ChangeDetectorRef,
+        private elRef: ElementRef,
+        private shotRevisionService: ShotRevisionService)
+    { }
 
     @rangePlayer() range;
 
@@ -283,11 +276,6 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit, OnDestroy
         this.video_player_ready.emit(this);
 
         this.cdRef.detectChanges();
-    }
-
-    ngOnDestroy() {
-        // prevent memory leak when component destroyed
-        this.subscription.unsubscribe();
     }
 
 }
