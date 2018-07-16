@@ -20,11 +20,16 @@
     <span class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
         <!-- Anteprima dello shot del video -->
         <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
-            <img [src]="shot.links.thumbnail" alt="">
+            <img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail; else no_thumbnail">
+            <ng-template #no_thumbnail>
+                <hjs class="media-object" alt="no thumbnail" [holderId]="'hjs-'+shot.id" [imgSrc]="'holder.js/100px67?bg=707070&text=NO THUMBNAIL&auto'"></hjs>
+            </ng-template>
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
         <span *ngIf="shotRevision && is_attivo">
-            <i class="fa fa-cut revision-tool-icon" ngbTooltip="Split shot" placement="bottom"></i>
+            <i class="fa fa-cut revision-tool-icon"
+                ngbTooltip="Split shot" placement="bottom"
+                (click)="modale_show({target: {innerText: 'Add Cut'}, next: false}, 'move-cut')"></i>
         </span>
     </span>
     <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">

@@ -7,6 +7,7 @@ import { AppVideoPlayerComponent } from "./app-video-player/app-video-player";
 import { AuthService } from "/rapydo/src/app/services/auth";
 import { AppVideoService } from "../../services/app-video";
 import { AppAnnotationsService } from "../../services/app-annotations";
+import { ShotRevisionService } from "../../services/shot-revision.service";
 /**
  * Componente per la visualizzazione del media
  */
@@ -14,7 +15,6 @@ import { AppAnnotationsService } from "../../services/app-annotations";
     selector: 'app-media',
     templateUrl: 'app-media.html'
 })
-
 export class AppMediaComponent implements OnInit, OnDestroy {
 
     //Riferimento alla pagina contenente il media
@@ -94,7 +94,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         private AnnotationService: AppAnnotationsService,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
-        private VideoService: AppVideoService) { }
+        private VideoService: AppVideoService,
+        private shotRevisionService: ShotRevisionService)
+    {
+        shotRevisionService.cutAdded$.subscribe(
+            shots => { this.split_shot(shots); }
+        );
+    }
 
     media_type_set(url) {
 
@@ -160,8 +166,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
-    private split_shot(shot) {
-
+    private split_shot(shots) {
+        let next_idx = shots[0].attributes.shot_num + 1;
+        this.shots.splice(next_idx, 0, shots[1]);
+        // update the subsequent shot numbers
+        for (let i = next_idx + 1; i < this.shots.length; i++) {
+            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num + 1;
+        }
     }
 
     save_revised_shots() {
@@ -355,8 +366,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                     this.locations = annotations.filter(a => a.group === 'location');
                 });
                 this._subscription.add(shots_subscription);
-
-
             });
 
 

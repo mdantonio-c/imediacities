@@ -82,6 +82,8 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             this.is_attivo = true;
             this.details_open = true;
         }
+
+        if (element.parentElement === undefined) { return; }
         this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
     }
 

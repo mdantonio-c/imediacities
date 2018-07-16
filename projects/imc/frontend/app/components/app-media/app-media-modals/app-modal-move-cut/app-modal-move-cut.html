@@ -11,7 +11,10 @@
 					<div class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
 						<!-- Anteprima dello shot del video -->
 						<span class="anteprima-shot">
-							<img [src]="shot.links.thumbnail" alt="">
+							<img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail; else no_thumbnail">
+							<ng-template #no_thumbnail>
+								<hjs class="media-object" alt="no thumbnail" [holderId]="'hjs-'+shot.id" [imgSrc]="'holder.js/135x102?bg=707070&text=NO THUMBNAIL&?auto=yes'"></hjs>
+							</ng-template>
 							<span>{{shot.attributes.duration | number:'2.2'}}</span>
 						</span>
 					</div>
