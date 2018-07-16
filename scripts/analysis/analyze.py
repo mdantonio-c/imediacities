@@ -76,7 +76,7 @@ def filename_to_frame(f):
 
 
 # -----------------------------------------------------
-def frame_to_timecode(f, fps=TRANSCODED_FRAMERATE):
+def frame_to_timecode(f, fps):
     f = int(f)
     t_hour  = int(f / (3600 * fps))
     t_min   = int((f - t_hour * 3600 * fps) / (60 * fps))
@@ -593,7 +593,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         d['shot_num']    = i
         d['first_frame'] = frame
         d['last_frame'] = nextframe
-        d['timecode']    = frame_to_timecode(frame)
+        d['timecode']    = frame_to_timecode(frame, TRANSCODED_FRAMERATE)
         d['len_seconds'] = shot_len
         d['img']         = im_name
         sb['shots'].append(d)
@@ -668,6 +668,9 @@ def analize_movie(filename, out_folder, muuid, fast=False):
     if not origin_tech_info(filename, out_folder):
         return False
     log('origin_tech_info --- ok ')
+    log('fast_mode ---------- ' + str(fast))
+    log('frame_rate --------- ' + str(TRANSCODED_FRAMERATE))
+
 
     tr_movie = os.path.join(out_folder, 'transcoded.mp4')
 
