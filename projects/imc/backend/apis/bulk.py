@@ -54,7 +54,7 @@ class Bulk(GraphBaseOperations):
         item_node = resource.item.single()
         if item_node is not None:
             logger.info("There is an Item associated to MetaStage %s" % resource.uuid)
-            #checking for item_type coherence
+            # checking for item_type coherence
             existent_item_type = item_node.item_type
             if existent_item_type is None:
                 logger.warning("No item_type found for item id %s" % item_node.uuid)
@@ -84,13 +84,13 @@ class Bulk(GraphBaseOperations):
 
         found_date = None
         found_dir = None
-        dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d)) ]
+        dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for d in dirs:
             parsed_date = None
-            for format in POSSIBLE_FORMATS :
+            for format in POSSIBLE_FORMATS:
                 try:
                     parsed_date = datetime.strptime(d, format)
-                    break;
+                    break
                 except Exception as e:
                     # il nome della dir non e' nel formato
                     pass
@@ -161,17 +161,17 @@ class Bulk(GraphBaseOperations):
             #  (scaricato con oai-pmh solo delta rispetto all'ultimo harvest
             #    prendere dir= /uploads/<guid>/upload/<date>/ con date la data più recente)
             upload_dir = "/uploads/" + group.uuid
-            #logger.debug("upload_dir %s" % upload_dir)
+            # logger.debug("upload_dir %s" % upload_dir)
             upload_delta_dir = os.path.join(upload_dir, "upload")
-            #logger.debug("upload_delta_dir %s" % upload_delta_dir)
+            # logger.debug("upload_delta_dir %s" % upload_delta_dir)
             if not os.path.exists(upload_delta_dir):
                 return self.force_response(
                     [], errors=["Upload dir " + upload_delta_dir + " not found"])
 
-            # dentro la upload_delta_dir devo cercare la sotto-dir 
-            #  che corrisponde alla data più recente
+            # dentro la upload_delta_dir devo cercare la sotto-dir
+            # che corrisponde alla data più recente
             upload_latest_dir = self.lookup_latest_dir(upload_delta_dir)
-            
+
             if upload_latest_dir is None:
                 logger.debug("Upload dir not found")
                 return self.force_response(
@@ -208,7 +208,7 @@ class Bulk(GraphBaseOperations):
 
                 logger.info("Found source id %s" % source_id)
 
-                # To use source id in the filename we must 
+                # To use source id in the filename we must
                 # replace non alpha-numeric characters with a dash
                 source_id_clean = re.sub(r'[\W_]+', '-', source_id.strip())
 
@@ -226,7 +226,7 @@ class Bulk(GraphBaseOperations):
                 properties['filename'] = standard_filename
                 properties['path'] = standard_path
 
-                #cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
+                # cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
                 # e appartenente al gruppo
                 meta_stage = None
                 try:
@@ -244,7 +244,7 @@ class Bulk(GraphBaseOperations):
                         # TODO gestire meglio questo caso
                         # there are more than one MetaStage related to the same source id: Database incoherence!
                         logger.warning("Database incoherence: there is more than one MetaStage \
-                            related to the same source id %s: SKIPPED file %s" % (source_id,standard_filename))
+                            related to the same source id %s: SKIPPED file %s" % (source_id, standard_filename))
                         skipped += 1
                         continue
 
@@ -270,14 +270,14 @@ class Bulk(GraphBaseOperations):
                     #  Quindi:
                     #  - se esiste MetaStage associato allo stesso filename che e' associato
                     #     a un Item di tipo diverso allora lancio eccezione e non proseguo.
-                    #     (Per poter cambiare il tipo bisognerebbe aggiornare Item, Creation e 
+                    #     (Per poter cambiare il tipo bisognerebbe aggiornare Item, Creation e
                     #     cancellare il ContentStage e ricrearlo, allora non è un aggiornamento
-                    #     dei metadati, meglio cancellare tutto il pezzetto di grafo relativo e 
+                    #     dei metadati, meglio cancellare tutto il pezzetto di grafo relativo e
                     #     crearne uno nuovo).
                     #  - se esiste MetaStage associato allo stesso filename che ha già una
                     #     Creation associata (e quindi avrà un source_id diverso) allora lancio
                     #     eccezione e non proseguo.
-                    #  
+                    #
                     if meta_stage is None:
 
                         try:
@@ -314,7 +314,7 @@ class Bulk(GraphBaseOperations):
                             resource.save()
                             updated += 1
 
-                        except self.graph.MetaStage.DoesNotExist:                            
+                        except self.graph.MetaStage.DoesNotExist:
                             # import di un nuovo contenuto
                             logger.debug("Creating MetaStage for file %s" % standard_path)
                             meta_stage = self.graph.MetaStage(**properties).save()
@@ -342,13 +342,13 @@ class Bulk(GraphBaseOperations):
                             meta_stage.save()
                             failed += 1
                             continue
-                        #update dei soli metadati
+                        # update dei soli metadati
                         logger.info("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
 
                         # devo aggiornare nel MetaStage i campi nomefile e path con quelli che
                         #  vado a usare per l'aggiornamento dei metadati
 
-                        # Attenzione: prima bisogna verificare che non esista già un altro metastage 
+                        # Attenzione: prima bisogna verificare che non esista già un altro metastage
                         #              che ha lo stesso standard_path che stiamo andando ad associare
                         #              al nostro meta_stage (ovviamente avranno source_id diverso)
                         #              altrimenti viene lanciata una eccezione
@@ -387,7 +387,8 @@ class Bulk(GraphBaseOperations):
                             updated += 1
 
                 except Exception as e:
-                    logger.error("Update operation failed for filename %s, error message=%s" % (file_path,e))
+                    logger.error(
+                        "Update operation failed for filename %s, error message=%s" % (file_path, e))
                     failed += 1
                     continue
 
@@ -442,7 +443,7 @@ class Bulk(GraphBaseOperations):
                 # ignore previous failures
                 if not retry:
                     try:
-                        #props = {'status': 'ERROR', 'filename': f} #OLD
+                        # props = {'status': 'ERROR', 'filename': f} #OLD
                         props = {'status': 'ERROR', 'path': path}
                         self.graph.MetaStage.nodes.get(**props)
                         skipped += 1
