@@ -197,5 +197,8 @@ class CreationRepository():
     def move_video_under_revision(self, item, user):
         item.revision.connect(user, {'when': datetime.now(pytz.utc)})
 
+    def exit_video_under_revision(self, item):
+        item.revision.disconnect_all()
+
     def is_video_under_revision(self, item):
         return False if item.revision.single() is None else True
