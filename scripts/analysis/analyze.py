@@ -811,6 +811,7 @@ help = ''' usage:  python3 analyze.py [options] [filename]
 options:
 [-fast  ]       skip transcoding, tvs, quality, vimotion and summary if their output files already exists.
 [-clean ]       clean any previous data before analize
+[-image ]       indicate that filename is an image ( not a movie)
 [filename ]     if omitted use the default movie
 '''
 
@@ -839,8 +840,14 @@ def main(args):
         elif a == '-fast':
             fast = True
             clean = False  # fast is stronger than clean
+        elif a == '-image':
+            mtype = 'Image'
         else:
-            movie = a
+            media = a
+
+    if media.startswith( stage_area):
+        # allow to specify media with full-path  
+        media = media.replace( stage_area+'/', '' )
 
     filename = os.path.join(stage_area, media)
     if not os.path.exists(filename):
