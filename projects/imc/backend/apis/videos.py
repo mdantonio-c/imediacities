@@ -209,7 +209,8 @@ class VideoAnnotations(GraphBaseOperations):
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
                                     continue
-                            s_anno = self.getJsonResponse(anno, max_relationship_depth=0)
+                            s_anno = self.getJsonResponse(
+                                anno, max_relationship_depth=0)
                             del(s_anno['links'])
                             if (anno.annotation_type in ('TAG', 'DSC') and
                                     creator is not None):
@@ -243,7 +244,8 @@ class VideoAnnotations(GraphBaseOperations):
                                             'hits': 1
                                         }
                                         if spatial is not None:
-                                            tags[(iri, name)]['spatial'] = spatial
+                                            tags[(iri, name)
+                                                 ]['spatial'] = spatial
                                     else:
                                         tag['hits'] += 1
                             json_segment['annotations'].append(s_anno)
@@ -584,3 +586,69 @@ class VideoTools(GraphBaseOperations):
         )
 
         return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)
+
+
+class VideoShotRevision(GraphBaseOperations):
+    """Shot revision endpoint"""
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self):
+        """Get all videos under revision"""
+        logger.debug('Getting videos under revision.')
+        self.graph = self.get_service_instance('neo4j')
+        data = []
+
+        # videos = self.graph.AVEntity.nodes.all()
+        videos = []
+        for v in videos:
+            video = self.getJsonResponse(v)
+            data.append(video)
+
+        return self.force_response(data)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def put(self, video_id):
+        """Put a video under revision"""
+        logger.debug('Put video {0} under revision'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        raise RestApiException(
+            "Not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+        # TODO
+        # 400: description: Assignee not valid.
+
+        # 204: Video under revision successfully.
+        # return self.empty_response()
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def post(self, video_id):
+        """Start a shot revision procedure"""
+        logger.debug('Start shot revision for video {0}'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        raise RestApiException(
+            "Not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def delete(self, video_id):
+        """Take off revision from a video"""
+        logger.debug('Exit revision for video {0}'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        raise RestApiException(
+            "Not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+        # TODO
+        # return self.empty_response()
