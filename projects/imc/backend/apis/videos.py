@@ -599,11 +599,32 @@ class VideoShotRevision(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
         data = []
 
-        # videos = self.graph.AVEntity.nodes.all()
-        videos = []
-        for v in videos:
-            video = self.getJsonResponse(v)
-            data.append(video)
+        # naive solution for getting VideoInRevision
+        items = self.graph.Item.nodes.has(revision=True)
+        for i in items:
+            creation = i.creation.single()
+            video = creation.downcast()
+            assignee = i.revision.single()
+            rel = i.revision.relationship(assignee)
+            shots = i.shots.all()
+            number_of_shots = len(shots)
+            number_of_confirmed = len([s for s in shots if s.revision_confirmed])
+            # logger.debug('number_of_shots {}'.format(number_of_shots))
+            # logger.debug('number_of_confirmed {}'.format(number_of_confirmed))
+            percentage = 100 * number_of_confirmed / number_of_shots
+            res = {
+                'video': {
+                    'uuid': video.uuid,
+                    'title': video.identifying_title
+                },
+                'assignee': {
+                    'uuid': assignee.uuid,
+                    'name': assignee.name + ' ' + assignee.surname
+                },
+                'since': rel.when,
+                'progress': percentage
+            }
+            data.append(res)
 
         return self.force_response(data)
 
