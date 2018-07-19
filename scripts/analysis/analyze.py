@@ -805,6 +805,9 @@ def analize(filename, uuid, item_type, out_folder, fast=False):
     print("analize error: bad item_type :", item_type)
     return false
 
+# -----------------------------------------------------
+def update_storyboard( revised_cuts, out_folder ):
+    return False
 
 # -----------------------------------------------------
 help = ''' usage:  python3 analyze.py [options] [filename]
