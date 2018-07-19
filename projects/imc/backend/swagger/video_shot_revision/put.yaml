@@ -21,6 +21,8 @@ video_shot_revision:
       description: Video under revision successfully.
     400:
       description: Assignee not valid.
+    409:
+      description: Video is already under revision or it is not ready for revision.
     401:
       description: This endpoint requires a valid authorization token
     403:

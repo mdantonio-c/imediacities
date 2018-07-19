@@ -609,6 +609,7 @@ class VideoShotRevision(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @graph_transactions
     def put(self, video_id):
         """Put a video under revision"""
         logger.debug('Put video {0} under revision'.format(video_id))
@@ -616,14 +617,64 @@ class VideoShotRevision(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
-        raise RestApiException(
-            "Not yet implemented",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
-        # TODO
-        # 400: description: Assignee not valid.
 
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            # 409: Video is not ready for revision. (should never be reached)
+            raise RestApiException(
+                "This AVEntity may not have been correctly imported. "
+                "No ready for revision!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        logger.debug("Request for revision from user [{0}, {1} {2}]".format(
+            user.uuid, user.name, user.surname))
+        # Be sure user can revise this specific video
+        assignee = user
+        assignee_is_admin = iamadmin
+        # allow admin to pass the assignee
+        data = self.get_input()
+        if iamadmin and 'assignee' in data:
+            assignee = self.graph.User.nodes.get_or_none(uuid=data['assignee'])
+            if assignee is None:
+                # 400: description: Assignee not valid.
+                raise RestApiException(
+                    "Invalid candidate. User [{uuid}] does not exist".format(
+                        uuid=data['assignee']),
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            # is the assignee an admin_root?
+            assignee_is_admin = False
+            for role in assignee.roles.all():
+                if role.name == 'admin_root':
+                    assignee_is_admin = True
+                    break
+            logger.debug('Candidate assignee is admin? {}'.format(assignee_is_admin))
+
+        repo = CreationRepository(self.graph)
+
+        if not assignee_is_admin or not repo.item_belongs_to_user(item, assignee):
+            raise RestApiException(
+                "User [{0}, {1} {2}] cannot revise video that does not belong to him/her".format(
+                    user.uuid, user.name, user.surname),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+        if repo.is_video_under_revision(item):
+            # 409: Video is already under revision.
+            raise RestApiException(
+                "Video [{uuid}] is already under revision".format(uuid=v.uuid),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+
+        repo.move_video_under_revision(item, assignee)
         # 204: Video under revision successfully.
-        # return self.empty_response()
+        return self.empty_response()
 
     @decorate.catch_error()
     @catch_graph_exceptions
