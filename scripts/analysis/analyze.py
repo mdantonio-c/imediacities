@@ -22,7 +22,7 @@ else:
     host = 'imc_vm'
 
 if host == 'sil_pc':
-    root_dir = '/home/simboden/Desktop/IMC/worker_env/'
+    root_dir = '/home/simboden/Desktop/IMC/sb_update/'
 else:
     root_dir = '/'
 
@@ -527,41 +527,6 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         im_small = im.resize(th_sz, Image.BILINEAR)
         im_small.save(fn.replace(out_folder, th_folder), quality=90)
 
-    # prepare index --- not used anymore
-    '''
-    idx_folder = os.path.join(out_folder, 'index')
-    if not mkdir(idx_folder, True):
-        return False
-
-    num_col  = 5
-    num_row  = num_shot // num_col
-    if num_shot % num_col:
-        num_row += 1
-    idx_sz = (100 * num_col, int(100 * ar * num_row))
-    idx_img = Image.new("RGB", idx_sz, '#ffffff')
-
-    for i, fn in enumerate(lst):
-        x = (i % num_col) * 100
-        y = (i // num_col) * int(100 * ar)
-        im = Image.open(fn)
-        im_small = im.resize(th_sz, Image.BILINEAR)
-        im_cp = im_small.copy()
-        idx_img.paste(im_cp, (x, y))
-
-    idx_img.save(idx_folder + '/index.jpg', quality=90)
-
-    d = {}
-    d['thumb_w'] = 100
-    d['thumb_h'] = int(100 * ar)
-    d['num_row'] = num_row
-    d['num_col'] = num_col
-    d['help'] = 'determine shot index from mouse pos as: index = x/thumb_w + (y/thumb_h)*num_col'
-    str = json.dumps(d, indent=4)
-    f = open(idx_folder + "/index.json", 'w')
-    f.write(str)
-    f.close()
-    '''
-
     # prepare storyboard
     sb_folder = os.path.join(out_folder, 'storyboard')
     if not mkdir(sb_folder, True):
@@ -598,7 +563,29 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         d['img']         = im_name
         sb['shots'].append(d)
 
-    # insert video motion estimation
+
+    ### insert vim
+    insert_vim_in_storyboard( out_folder, sb )
+
+    ### save
+
+    text = json.dumps(sb, indent=4)
+    f = open(sb_folder + "/storyboard.json", 'w')
+    f.write(text)
+    f.close()
+
+    return True
+
+# -----------------------------------------------------
+def insert_vim_in_storyboard( out_folder, sb ):
+
+
+    # retrieve last_frame_number
+    num_frames = transcoded_num_frames(out_folder)
+    if num_frames == 0 :
+        log( 'num_frames == 0, quitting')
+        return False;
+
     vim_filename = os.path.join(out_folder, 'vimotion.xml')
 
     vim = {}
@@ -640,15 +627,8 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         shot_vim.sort(reverse=True)
 
         shot['estimated_motions'] = shot_vim
-
-    str = json.dumps(sb, indent=4)
-    f = open(sb_folder + "/storyboard.json", 'w')
-    f.write(str)
-    f.close()
-
-    return True
-
-
+    
+    
 # -----------------------------------------------------
 def revert_to_origin_framerate(filename):
 
@@ -807,7 +787,146 @@ def analize(filename, uuid, item_type, out_folder, fast=False):
 
 # -----------------------------------------------------
 def update_storyboard( revised_cuts, out_folder ):
-    return False
+
+    # check out_folder ( must be an absolute path )
+    if( not os.path.exists(out_folder) ):
+        print( 'bad_out_folder:', out_folder)
+        return False
+
+    # check storyboard folder 
+    sb_folder = os.path.join( out_folder, 'storyboard')
+    if( not os.path.exists(sb_folder) ):
+        print( 'no sb_folder:', sb_folder)
+        return False
+
+    # open storyboard logfile ( overwrite any previous )
+    global logfile
+    logfile = open(os.path.join(sb_folder, "log.txt"), "w")
+    log( "update_storyboard_begin")
+
+    # check movie
+    movie = os.path.join( out_folder, 'transcoded.mp4')
+    if( not os.path.exists(movie) ):
+        log( 'no movie:', movie)
+        return False
+
+    # retrieve last_frame_number
+    last_frame = transcoded_num_frames(out_folder)
+    if last_frame == 0 :
+        log( 'total num frames == 0, quitting')
+        return False;
+
+    # prepend 0 and append last_frame to revised_cuts -- ( side-effect: revised_cuts can't be empty )
+    revised_cuts.insert(0,0)          # -- to generate frame 0 thumbnail
+    revised_cuts.append(last_frame+1) # -- needed later ( next_frame is cuts[i+1]-1 )
+    # check for duplicated cuts, (prevent 0-sized shots)
+    revised_cuts = list( set( revised_cuts )  )
+    revised_cuts.sort()
+    # check cuts ranges
+    first_cut = min( revised_cuts )
+    last_cut  = max( revised_cuts ) 
+    if first_cut < 0 or last_cut > last_frame+1:
+        log('bad cut range: [ ' +str(first_cut) +' .. '+ str(last_cut) +' ] should be in [0 .. ' + str(last_frame+1) +'] --- quitting' )
+        return False
+    
+    # backup old storyboard.json
+    storyboard = os.path.join( sb_folder, 'storyboard.json' )
+    if( os.path.exists( storyboard )):
+        counter = 0
+        bk_name_root = storyboard.replace('.json', '.bk')
+        counter = 0
+        bk_name = bk_name_root + str(counter).rjust(3,'0')
+        while counter<100 and os.path.exists( bk_name ):
+            counter += 1
+            bk_name = bk_name_root + str(counter).rjust(3,'0')
+        if os.path.exists( bk_name ):
+            log( 'too many backups -- quitting' )
+            return False
+        os.rename( storyboard, bk_name )
+
+
+    # remove any shot_*.jpg file and any ../thumbs/tvs_s_*.jpg
+    old_pics = glob.glob( sb_folder + "/shot_*.jpg" )
+    for name in old_pics :
+        os.remove( name )
+    old_pics = glob.glob( out_folder + "/thumbs/tvs_s_*.jpg" )
+    for name in old_pics :
+        os.remove( name )
+
+
+    def pic_name( num ):
+        return 'f_' + str(num).rjust(6,'0') + '.jpg'
+
+    # update frames pics 
+    cmd  = 'export MOVIE=' + movie + '\n'
+    cmd += 'export FOLDER=' + sb_folder + '\n'
+    new_pics = []    
+    for num in revised_cuts[:-1]: # skipping num_frames+1 
+        name = pic_name(num)
+        path = os.path.join(  sb_folder, name )
+        if not os.path.exists( path ):
+            cmd += 'ffmpeg -i $MOVIE -vf "select=gte(n\,{})" -vframes 1 $FOLDER/{} \n'.format( num, name )
+            new_pics.append(path)
+            
+    cmd_filename = os.path.join( sb_folder, 'update_frames.sh' )
+    if os.path.exists( cmd_filename ):
+        os.remove(cmd_filename)
+    if os.path.exists( cmd_filename ):
+        log( 'cant remove previous "update_frames.sh" file -- quitting' )
+        return False
+    cmd_file = open( cmd_filename, 'w' )
+    if not cmd_file:
+        log( 'failed to create "update_frames.sh" file -- quitting' )
+        return False
+    cmd_file.write( cmd )
+    cmd_file.close()
+    if not run('/bin/bash ' + cmd_filename, sb_folder, 'update_frames.log', 'update_frames.err'):
+        log( 'update frames failed')
+        return False
+
+    # update thumbs
+    for n in new_pics:
+        im = Image.open(n)
+        w1, h1 = 200,  int(200.0 * im.height / im.width)
+        im_small = im.resize((w1, h1), Image.BILINEAR)
+        im_name = n.replace('/storyboard/', '/thumbs/' )
+        im_small.save( im_name, quality=90 )
+        
+    # make storyboard
+    sb = {}
+    sb["movie"] = os.path.basename( out_folder )
+    sb["shots"] = []
+
+    for i in range( len(revised_cuts)-1 ):
+
+        frame_start = revised_cuts[i]       # 0 was prepended to the cut_list
+        frame_end   = revised_cuts[i+1] -1  # last_frame+1 was appended to the cut_list
+
+        shot_len = (frame_end - frame_start + 1) / TRANSCODED_FRAMERATE
+
+        d = {}
+        d['shot_num']    = i
+        d['first_frame'] = frame_start
+        d['last_frame']  = frame_end
+        d['timecode']    = frame_to_timecode(frame_start, TRANSCODED_FRAMERATE)
+        d['len_seconds'] = round( shot_len, 2)
+        d['img']         = pic_name(frame_start)
+        sb['shots'].append(d)
+
+    ### insert vim
+    insert_vim_in_storyboard( out_folder, sb )
+
+    # save 
+    text = json.dumps(sb, indent=4)
+    f = open(sb_folder + "/storyboard.json", 'w')
+    f.write(text)
+    f.close()
+
+
+    log( "update_storyboard done")
+    logfile.close()
+
+    return True
 
 # -----------------------------------------------------
 help = ''' usage:  python3 analyze.py [options] [filename]
@@ -875,5 +994,5 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-    # revert_to_origin_framerate(sys.argv[1])
     print('done')
+
