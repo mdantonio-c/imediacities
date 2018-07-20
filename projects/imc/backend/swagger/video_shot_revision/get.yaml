@@ -1,0 +1,32 @@
+videos_under_revision:
+  summary: List of videos under revision.
+  description: Returns a list containing all videos under revision together with the assignee. The list supports paging.
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - Reviser
+      - admin_root
+    required_roles: any
+  parameters:
+    - name: pageSize
+      in: query
+      description: Number of videos returned
+      type: integer
+    - name: pageNumber
+      in: query
+      description: Page number
+      type: integer
+    - name: assignee
+      in: query
+      description: Assignee's uuid of the revision
+      type: string
+  responses:
+    '200':
+      description: List of videos under revision successfully retrieved
+      schema:
+        type: array
+        items:
+          $ref: "#/definitions/VideoInRevision"
+    '401':
+      description: This endpoint requires a valid authorization token

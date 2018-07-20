@@ -30,15 +30,15 @@
 							<div class="col">
 								<div *ngIf="currentView == 'Grid'" style="display:  flex;flex-direction: row;flex-wrap:  wrap;">
 									<search-thumbnail
-									style="min-width: 100px;margin-right: 5px;" 
-									*ngFor="let mediaEntity of results"
-									[media]="mediaEntity">
+										style="min-width: 100px;margin-right: 5px;" 
+										*ngFor="let mediaEntity of results"
+										[media]="mediaEntity">
 									</search-thumbnail>
 								</div>
 								<div *ngIf="currentView == 'List'">
 									<search-media
-									*ngFor="let mediaEntity of results"
-									[media]="mediaEntity">
+										*ngFor="let mediaEntity of results"
+										[media]="mediaEntity">
 									</search-media>
 								</div>
 								<div class="space-8"></div>

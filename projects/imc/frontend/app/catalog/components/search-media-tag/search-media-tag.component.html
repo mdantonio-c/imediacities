@@ -1,20 +1,24 @@
 <div class="media-thumbnail search-thumbnail map-result">
-	<div class="row">
+	<div class="row no-gutters">
 		<div class="col">
 			<div class="space-4"></div>
-			<h4 class="search-title">
-			<i class="imc-icon fa light-blue" [ngClass]="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image'}"></i>
-			<a [routerLink]="['images', media.source.uuid]" *ngIf="media.source.type == 'Image'" class="blue">{{media.source.title}}</a>
-			<a [routerLink]="['videos', media.source.uuid]" *ngIf="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
+			<h4 class="search-title" *ngIf="!underRevision() || canRevise(); else other_title">
+				<i class="imc-icon fa light-blue" [ngClass]="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image'}"></i>
+				<a [routerLink]="['images', media.source.uuid]" *ngIf="media.source.type == 'Image'" class="blue">{{media.source.title}}</a>
+				<a [routerLink]="['videos', media.source.uuid]" *ngIf="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
 			</h4>
+			<ng-template #other_title><h4 class="search-title"><span style="font-size: 16px !important;">{{media.source.title}}</span></h4></ng-template>
 			<span *ngIf="media?.source?.year">
 				<i>({{media.source.year | slice:0:4}})</i>
+			</span>
+			<span class="badge badge-warning revision" *ngIf="underRevision()">
+				<i class="fa fa-wrench"></i>
 			</span>
 			<div class="space-4"></div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-sm-4" style="padding-right: 5px;">
+	<div class="row no-gutters">
+		<div class="col-sm-4 pr-1">
 			<div class="media-image-wrapper">
 				<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.source.uuid" [imgSrc]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.source.links['thumbnail']"></hjs>
 				<img class="media-object" alt="100%x150" src="{{media.source.links['thumbnail']+'&size=large'}}" *ngIf="media.source.links['thumbnail']">
@@ -31,7 +35,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-sm-8" style="padding-left: 0px;">
+		<div class="col-sm-8 pl-0">
 			<div class="widget-box transparent">
 				<div class="widget-header mb-2">
 					<h4 class="smaller">

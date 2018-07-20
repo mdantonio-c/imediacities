@@ -1,0 +1,9 @@
+file: videos
+class: VideoShotRevision
+schema:
+  expose: true
+mapping:
+  videos_under_revision: "/videos-under-revision"
+  video_shot_revision: "/videos/<video_id>/shot-revision"
+labels:
+  - video_shot_revision

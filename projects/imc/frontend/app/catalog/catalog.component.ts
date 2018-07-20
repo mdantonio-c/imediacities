@@ -21,8 +21,10 @@ export class CatalogComponent implements OnInit {
 	pageSize: number = 12;
 	mediaTags: any[];
 
-	constructor(private catalogService: CatalogService,
-		private notify: NotificationService) {}	
+	constructor(
+		private catalogService: CatalogService,
+		private notify: NotificationService)
+	{}	
 
 	ngOnInit() {
 		this.catalogService.init();

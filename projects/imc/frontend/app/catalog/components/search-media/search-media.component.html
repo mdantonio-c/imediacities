@@ -1,5 +1,8 @@
 <div class="media search-media">
 	<div class="media-left">
+		<span class="badge badge-warning revision" *ngIf="underRevision()">
+			<i class="fa fa-wrench"></i>
+		</span>
 		<img src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
 		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
 		<div class="cn">
@@ -10,10 +13,11 @@
 	</div>
 	<div class="media-body">
 		<div>
-			<h4 class="media-heading">
+			<h4 class="media-heading" *ngIf="!underRevision() || canRevise(); else other_title">
 			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
 			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
 			</h4>
+			<ng-template #other_title><h4 class="media-heading"><span style="font-size: 16px !important;">{{identifyingTitle}}</span></h4></ng-template>
 			<span>
 				<i *ngIf="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
 				<i *ngIf="media.attributes.date_created > 0">({{media.attributes.date_created[0]}})</i>

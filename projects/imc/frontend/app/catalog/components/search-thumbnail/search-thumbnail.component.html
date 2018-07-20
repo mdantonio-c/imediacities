@@ -1,5 +1,8 @@
 <div class="media-thumbnail search-thumbnail">
 	<div class="media-image-wrapper">
+		<span class="badge badge-warning revision" *ngIf="underRevision()">
+			revision
+		</span>
 		<span class="search-item label bigger-180">
 			<span class="fa-stack">
 				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.links['thumbnail']"></i>
@@ -20,10 +23,11 @@
 				<i class="imc-icon fa fa-heart light-blue"></i>
 			</div>
 		</div>
-		<h3 class="search-title">
+		<h3 class="search-title" *ngIf="!underRevision() || canRevise(); else other_title">
 			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
 			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
 		</h3>
+		<ng-template #other_title><h3 class="search-title"><span style="font-size: 16px !important;">{{identifyingTitle}}</span></h3></ng-template>
 		<div class="space-5"></div>
 		<p class="text">
 			<i class="imc-icon fa fa-quote-left"></i>

@@ -209,7 +209,8 @@ class VideoAnnotations(GraphBaseOperations):
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
                                     continue
-                            s_anno = self.getJsonResponse(anno, max_relationship_depth=0)
+                            s_anno = self.getJsonResponse(
+                                anno, max_relationship_depth=0)
                             del(s_anno['links'])
                             if (anno.annotation_type in ('TAG', 'DSC') and
                                     creator is not None):
@@ -243,7 +244,8 @@ class VideoAnnotations(GraphBaseOperations):
                                             'hits': 1
                                         }
                                         if spatial is not None:
-                                            tags[(iri, name)]['spatial'] = spatial
+                                            tags[(iri, name)
+                                                 ]['spatial'] = spatial
                                     else:
                                         tag['hits'] += 1
                             json_segment['annotations'].append(s_anno)
@@ -584,3 +586,161 @@ class VideoTools(GraphBaseOperations):
         )
 
         return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)
+
+
+class VideoShotRevision(GraphBaseOperations):
+    """Shot revision endpoint"""
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def get(self):
+        """Get all videos under revision"""
+        logger.debug('Getting videos under revision.')
+        self.graph = self.get_service_instance('neo4j')
+        data = []
+
+        # naive solution for getting VideoInRevision
+        items = self.graph.Item.nodes.has(revision=True)
+        for i in items:
+            creation = i.creation.single()
+            video = creation.downcast()
+            assignee = i.revision.single()
+            rel = i.revision.relationship(assignee)
+            shots = i.shots.all()
+            number_of_shots = len(shots)
+            number_of_confirmed = len([s for s in shots if s.revision_confirmed])
+            # logger.debug('number_of_shots {}'.format(number_of_shots))
+            # logger.debug('number_of_confirmed {}'.format(number_of_confirmed))
+            percentage = 100 * number_of_confirmed / number_of_shots
+            res = {
+                'video': {
+                    'uuid': video.uuid,
+                    'title': video.identifying_title
+                },
+                'assignee': {
+                    'uuid': assignee.uuid,
+                    'name': assignee.name + ' ' + assignee.surname
+                },
+                'since': rel.when.isoformat(),
+                'progress': percentage
+            }
+            data.append(res)
+
+        return self.force_response(data)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def put(self, video_id):
+        """Put a video under revision"""
+        logger.debug('Put video {0} under revision'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            # 409: Video is not ready for revision. (should never be reached)
+            raise RestApiException(
+                "This AVEntity may not have been correctly imported. "
+                "No ready for revision!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        logger.debug("Request for revision from user [{0}, {1} {2}]".format(
+            user.uuid, user.name, user.surname))
+        # Be sure user can revise this specific video
+        assignee = user
+        assignee_is_admin = iamadmin
+        # allow admin to pass the assignee
+        data = self.get_input()
+        if iamadmin and 'assignee' in data:
+            assignee = self.graph.User.nodes.get_or_none(uuid=data['assignee'])
+            if assignee is None:
+                # 400: description: Assignee not valid.
+                raise RestApiException(
+                    "Invalid candidate. User [{uuid}] does not exist".format(
+                        uuid=data['assignee']),
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            # is the assignee an admin_root?
+            assignee_is_admin = False
+            for role in assignee.roles.all():
+                if role.name == 'admin_root':
+                    assignee_is_admin = True
+                    break
+        logger.debug('Assignee is admin? {}'.format(assignee_is_admin))
+
+        repo = CreationRepository(self.graph)
+
+        if not assignee_is_admin and not repo.item_belongs_to_user(item, assignee):
+            raise RestApiException(
+                "User [{0}, {1} {2}] cannot revise video that does not belong to him/her".format(
+                    user.uuid, user.name, user.surname),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+        if repo.is_video_under_revision(item):
+            # 409: Video is already under revision.
+            raise RestApiException(
+                "Video [{uuid}] is already under revision".format(uuid=v.uuid),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+
+        repo.move_video_under_revision(item, assignee)
+        # 204: Video under revision successfully.
+        return self.empty_response()
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def post(self, video_id):
+        """Start a shot revision procedure"""
+        logger.debug('Start shot revision for video {0}'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        raise RestApiException(
+            "Not yet implemented",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    def delete(self, video_id):
+        """Take off revision from a video"""
+        logger.debug('Exit revision for video {0}'.format(video_id))
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            # 409: Video is not ready for revision. (should never be reached)
+            raise RestApiException(
+                "This AVEntity may not have been correctly imported. "
+                "No ready for revision!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+
+        repo = CreationRepository(self.graph)
+        if not repo.is_video_under_revision(item):
+            # 409: Video is already under revision.
+            raise RestApiException(
+                "Video [{uuid}] is not under revision".format(uuid=v.uuid),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        repo.exit_video_under_revision(item)
+        # 204: Video revision successfully exited.
+        return self.empty_response()

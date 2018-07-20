@@ -46,7 +46,7 @@ class HeritableStructuredNode(StructuredNode):
         Re-instantiate this node as an instance its most derived derived class.
         """
         # TODO: there is probably a far more robust way to do this.
-        _get_class = lambda cname: getattr(sys.modules[__name__], cname)
+        def _get_class(cname): return getattr(sys.modules[__name__], cname)
 
         # inherited_labels() only returns the labels for the current class and
         #  any super-classes, whereas labels() will return all labels on the
@@ -94,6 +94,14 @@ class HeritableStructuredNode(StructuredNode):
 # Extension of User model for accounting in API login/logout
 
 
+class RevisionRel(StructuredRel):
+    """
+    Attributes:
+        when  Date of start or approval of a revision.
+    """
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
+
+
 class User(UserBase):
     # name_surname = StringProperty(required=True, unique_index=True)
 
@@ -103,6 +111,10 @@ class User(UserBase):
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    items_under_revision = RelationshipFrom(
+        'Item', 'REVISION_BY', cardinality=ZeroOrMore)
+    revised_shots = RelationshipFrom(
+        'Shot', 'REVISED_BY', cardinality=ZeroOrMore)
 
 
 class Group(IdentifiedNode):
@@ -205,6 +217,8 @@ class Item(TimestampedNode, AnnotationTarget):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
     shots = RelationshipTo(
         'Shot', 'SHOT', cardinality=ZeroOrMore)
+    revision = RelationshipTo(
+        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True)
 
 
 class ContributionRel(StructuredRel):
@@ -658,7 +672,8 @@ class ResourceBody(AnnotationBody):
     iri = StringProperty(required=True, index=True, show=True)
     name = StringProperty(index=True, show=True)
     spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
-    detected_objects = RelationshipFrom('ODBody', 'CONCEPT', cardinality=ZeroOrMore)
+    detected_objects = RelationshipFrom(
+        'ODBody', 'CONCEPT', cardinality=ZeroOrMore)
 
 
 class ODBody(AnnotationBody):
@@ -733,9 +748,12 @@ class Shot(VideoSegment):
     thumbnail_uri = StringProperty()
     timestamp = StringProperty(show=True)
     duration = FloatProperty(show=True)
+    revision_confirmed = BooleanProperty(default=False, show=True)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
         'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
+    revised_by = RelationshipTo('User', 'REVISED_BY', cardinality=ZeroOrMore,
+                                model=RevisionRel)
 
 
 class FragmentSelector(HeritableStructuredNode):

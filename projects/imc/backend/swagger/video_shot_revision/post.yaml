@@ -1,0 +1,25 @@
+video_shot_revision:
+  summary: Launch the execution of the shot revision tool.
+  custom:
+    authentication: true
+    authorized:
+      - Reviser
+      - admin_root
+    required_roles: any
+  parameters:
+    - name: revision
+      in: body
+      description: The new list of cut.
+      schema:
+        $ref: "#/definitions/ShotRevision"
+  responses:
+    '201':
+      description: Execution launched. 
+    '401':
+      description: This endpoint requires a valid authorization token.
+    '403':
+      description: Request forbidden.
+    '404':
+      description: Video not found.
+    '409':
+      description: Invalid state for the video.
