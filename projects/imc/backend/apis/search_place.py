@@ -56,10 +56,12 @@ class SearchPlace(GraphBaseOperations):
                 "MATCH (anno)-[:IS_ANNOTATED_BY]-(c:User) " \
                 "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider) " \
                 "OPTIONAL MATCH (anno)-[:HAS_TARGET]-(target:Shot) " \
+                "OPTIONAL MATCH (i)-[:REVISION_BY]-(r:User) " \
                 "WITH n, collect(distinct title) AS titles, p," \
-                " i, anno, body, target AS shot, c{{.uuid, .name, .surname, .email}} AS creator " \
-                "RETURN n{{.*, type:i.item_type, titles, provider:p.identifier}}, collect(anno{{.*, body, shot, creator}})".format(
+                " i, anno, body, target AS shot, c{{.uuid, .name, .surname, .email}} AS creator, r{{.uuid, .name, .surname}} AS reviser " \
+                "RETURN n{{.*, type:i.item_type, titles, provider:p.identifier, reviser:reviser}}, collect(anno{{.*, body, shot, creator}})".format(
                     uuid=creation_id, place_ids=place_ids)
+            logger.debug(query)
             result = self.graph.cypher(query)
             for row in result:
                 creation_uuid = row[0]['uuid']
@@ -69,7 +71,8 @@ class SearchPlace(GraphBaseOperations):
                     'external_ids': row[0]['external_ids'],
                     'rights_status': row[0]['rights_status'],
                     'type': creation_type,
-                    'provider': row[0]['provider']
+                    'provider': row[0]['provider'],
+                    'reviser': row[0]['reviser'],
                 }
                 # add some useful links
                 if creation_type == 'Video':

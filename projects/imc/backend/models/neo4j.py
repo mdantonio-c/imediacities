@@ -99,9 +99,7 @@ class RevisionRel(StructuredRel):
     Attributes:
         when  Date of start or approval of a revision.
     """
-    when = DateTimeProperty(
-        default=lambda: datetime.now(pytz.utc, show=True)
-    )
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
 
 
 class User(UserBase):
@@ -220,7 +218,7 @@ class Item(TimestampedNode, AnnotationTarget):
     shots = RelationshipTo(
         'Shot', 'SHOT', cardinality=ZeroOrMore)
     revision = RelationshipTo(
-        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel)
+        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True)
 
 
 class ContributionRel(StructuredRel):

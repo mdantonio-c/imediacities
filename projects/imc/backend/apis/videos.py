@@ -621,7 +621,7 @@ class VideoShotRevision(GraphBaseOperations):
                     'uuid': assignee.uuid,
                     'name': assignee.name + ' ' + assignee.surname
                 },
-                'since': rel.when,
+                'since': rel.when.isoformat(),
                 'progress': percentage
             }
             data.append(res)

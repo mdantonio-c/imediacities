@@ -1,20 +1,10 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { MediaUtilsService } from '../../services/media-utils.service'
+import { Component } from '@angular/core';
+import { SearchResultComponent } from "../search-result.component";
 
 @Component({
 	selector: 'search-thumbnail',
 	templateUrl: './search-thumbnail.component.html',
 	styleUrls: ['./search-thumbnail.component.css']
 })
-export class SearchThumbnailComponent implements OnChanges {
-	@Input() media;
-	identifyingTitle: string;
-	description: string;
-
-	constructor() { }
-
-	ngOnChanges() {
-		this.identifyingTitle = MediaUtilsService.getIdentifyingTitle(this.media);
-		this.description = MediaUtilsService.getDescription(this.media);
-	}
+export class SearchThumbnailComponent extends SearchResultComponent {
 }
