@@ -599,12 +599,26 @@ class VideoShotRevision(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
         data = []
 
+        input_parameters = self.get_input()
+        input_assignee = input_parameters['assignee']
+        offset, limit = self.get_paging()
+        offset -= 1
+        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        if offset < 0:
+            raise RestApiException('Page number cannot be a negative value',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
+        if limit < 0:
+            raise RestApiException('Page size cannot be a negative value',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
+
         # naive solution for getting VideoInRevision
         items = self.graph.Item.nodes.has(revision=True)
         for i in items:
             creation = i.creation.single()
             video = creation.downcast()
             assignee = i.revision.single()
+            if input_assignee is not None and input_assignee != assignee.uuid:
+                continue
             rel = i.revision.relationship(assignee)
             shots = i.shots.all()
             number_of_shots = len(shots)

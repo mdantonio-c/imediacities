@@ -9,11 +9,11 @@ videos_under_revision:
       - admin_root
     required_roles: any
   parameters:
-    - name: pageSize
+    - name: perpage
       in: query
       description: Number of videos returned
       type: integer
-    - name: pageNumber
+    - name: currentpage
       in: query
       description: Page number
       type: integer
