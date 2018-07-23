@@ -3,7 +3,9 @@ video_shot_revision:
   custom:
     authentication: true
     authorized:
+      - Reviser
       - admin_root
+    required_roles: any
   responses:
     '204':
       description: Video revision successfully exited.

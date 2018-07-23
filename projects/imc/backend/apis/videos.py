@@ -824,6 +824,16 @@ class VideoShotRevision(GraphBaseOperations):
             raise RestApiException(
                 "Video [{uuid}] is not under revision".format(uuid=v.uuid),
                 status_code=hcodes.HTTP_BAD_REQUEST)
+        # ONLY the reviser and the administrator can exit revision
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
+            raise RestApiException(
+                "User [{0}, {1} {2}] cannot exit revision for video that is "
+                "not assigned to him/her".format(
+                    user.uuid, user.name, user.surname),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
         repo.exit_video_under_revision(item)
         # 204: Video revision successfully exited.
         return self.empty_response()

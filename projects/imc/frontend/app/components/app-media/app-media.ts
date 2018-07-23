@@ -115,12 +115,16 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             this.media_class = 'page-type-image';
             this.media_type = 'image';
             // this.type_shot = false;
-
         }
-
     }
 
     start_shot_revision() {
+        this.shotRevisionService.putVideoUnderRevision(this.media_id, () => {
+            this.under_revision();
+        });
+    }
+
+    private under_revision() {
         console.log('Revision mode activated');
         this.shot_revision_is_active = true;
         // create a copy from the actual shot list (DEEP CLONE)
@@ -129,10 +133,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     exit_shot_revision() {
-        this.shot_revision_is_active = false;
-        // shallow clone is enough here!
-        this.shots = this.shots_to_restore.slice(0);
-        this.shots_to_restore = [];
+        this.shotRevisionService.exitRevision(this.media_id, () => {
+            this.shot_revision_is_active = false;
+            // shallow clone is enough here!
+            this.shots = this.shots_to_restore.slice(0);
+            this.shots_to_restore = [];
+        });
     }
 
     revise_shot($event) {
@@ -364,6 +370,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                     const annotations = this.ShotsService.annotations();
                     this.annotations_count = annotations.length;
                     this.locations = annotations.filter(a => a.group === 'location');
+                    if (this.media.relationships.item[0].relationships.revision) {
+                        this.under_revision();
+                    }
                 });
                 this._subscription.add(shots_subscription);
             });
