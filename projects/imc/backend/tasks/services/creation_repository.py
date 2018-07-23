@@ -202,3 +202,6 @@ class CreationRepository():
 
     def is_video_under_revision(self, item):
         return False if item.revision.single() is None else True
+
+    def is_revision_assigned_to_user(self, item, user):
+        return item.revision.is_connected(user)

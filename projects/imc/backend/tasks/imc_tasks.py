@@ -11,6 +11,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.models import codelists
+from operator import itemgetter
 
 
 from utilities.logs import get_logger
@@ -23,7 +24,9 @@ celery_app = CeleryExt.celery_app
 log = get_logger(__name__)
 
 try:
-    from scripts.analysis.analyze import make_movie_analize_folder, analize
+    from scripts.analysis.analyze import (make_movie_analize_folder,
+                                          analize,
+                                          update_storyboard)
 except BaseException:
     log.warning("Unable to import analyze script, not required in backend")
 
@@ -257,6 +260,56 @@ def launch_tool(self, tool_name, item_id):
             log.error("Task error, %s" % e)
             raise e
         return 1
+
+
+@celery_app.task(bind=True)
+def shot_revision(self, revision, item_id):
+    log.info('Start shot revision task for video item [{0}]'.format(item_id))
+    self.graph = celery_app.get_service('neo4j')
+    try:
+        item = self.graph.Item.nodes.get(uuid=item_id)
+        content_source = GraphBaseOperations.getSingleLinkedNode(
+            item.content_source)
+        group = GraphBaseOperations.getSingleLinkedNode(
+            item.ownership)
+        movie = content_source.filename
+        analyze_path = '/uploads/Analize/' + \
+            group.uuid + '/' + movie.split('.')[0] + '/'
+        log.debug('analyze path: {0}'.format(analyze_path))
+
+        revised_cuts = []
+        for s in sorted(revision['shots'], key=itemgetter('shot_num'))[1:]:
+            revised_cuts.append(s['cut'])
+        log.debug('new list of cuts: {}'.format(revised_cuts))
+        update_storyboard(revised_cuts, analyze_path)
+
+        # extract new TVS and VIM results
+        shots, vim_estimations = extract_tvs_vim_results(
+            self, item, analyze_path)
+
+        repo = AnnotationRepository(self.graph)
+        # first remove existing automatic VIM annotations if any
+        vim_annotations = item.sourcing_annotations.search(
+            annotation_type='VIM', generator='FHG')
+        for anno in vim_annotations:
+            anno_id = anno.id
+            repo.delete_vim_annotation(anno)
+            log.debug("Deleted existing VIM annotation [%s]" % anno_id)
+
+        # update TVS annotations
+        repo.update_automatic_tvs(item, shots, vim_estimations)
+
+        # save VIM annotations
+        repo.create_vim_annotation(item, vim_estimations)
+
+        if 'exitRevision' in revision and revision['exitRevision'] is True:
+            log.debug('exit revision')
+            item.revision.disconnect_all()
+
+    except Exception as e:
+        log.error("Task error, %s" % e)
+        raise e
+    return 1
 
 
 def extract_creation_ref(self, path):

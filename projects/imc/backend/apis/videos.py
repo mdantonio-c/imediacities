@@ -622,7 +622,8 @@ class VideoShotRevision(GraphBaseOperations):
             rel = i.revision.relationship(assignee)
             shots = i.shots.all()
             number_of_shots = len(shots)
-            number_of_confirmed = len([s for s in shots if s.revision_confirmed])
+            number_of_confirmed = len(
+                [s for s in shots if s.revision_confirmed])
             # logger.debug('number_of_shots {}'.format(number_of_shots))
             # logger.debug('number_of_confirmed {}'.format(number_of_confirmed))
             percentage = 100 * number_of_confirmed / number_of_shots
@@ -720,9 +721,77 @@ class VideoShotRevision(GraphBaseOperations):
             raise RestApiException(
                 "Please specify a video id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
-        raise RestApiException(
-            "Not yet implemented",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            # 409: Video is not ready for revision. (should never be reached)
+            raise RestApiException(
+                "This AVEntity may not have been correctly imported. "
+                "No ready for revision!",
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        repo = CreationRepository(self.graph)
+        # be sure video is under revision
+        if not repo.is_video_under_revision(item):
+            raise RestApiException(
+                "This video [{vid}] is not under revision!".format(
+                    vid=video_id),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        # ONLY the reviser and the administrator can provide a new list of cuts
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
+            raise RestApiException(
+                "User [{0}, {1} {2}] cannot revise video that is not assigned to him/her".format(
+                    user.uuid, user.name, user.surname),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
+        revision = self.get_input()
+        # validate request body
+        if 'shots' not in revision:
+            raise RestApiException(
+                'Provide a valid list of cuts',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        for idx, s in enumerate(revision['shots']):
+            if 'shot_num' not in s:
+                raise RestApiException(
+                    'Missing shot_num in shot: {}'.format(s),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if idx > 0 and 'cut' not in s:
+                raise RestApiException(
+                    'Missing cut for shot[{0}]'.format(s['shot_num']),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'confirmed' in s and not isinstance(s['confirmed'], bool):
+                raise RestApiException(
+                    'Invalid confirmed value',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if (
+                'annotations' in s and
+                not isinstance(s['annotations'], type(list)) and
+                not all(isinstance(val, str) for val in s['annotations'])
+            ):
+                raise RestApiException(
+                    'Invalid annotations value. Expected list<str>',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+        if 'exitReviosion' in revision and not isinstance(revision['exitRevision'], bool):
+            raise RestApiException(
+                'Invalid exitRevision',
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        # launch asynch task???
+        task = CeleryExt.shot_revision.apply_async(
+            args=[revision, item.uuid],
+            countdown=10
+        )
+
+        # 202: OK ACCEPTED
+        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
 
     @decorate.catch_error()
     @catch_graph_exceptions

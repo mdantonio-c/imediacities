@@ -304,8 +304,12 @@ definitions:
   SceneCut:
     description: Rapresent the scene cut that is the first frame of the shot. For homogeneity, the first zero cut must also be provided.
     required:
-      - "cut"
+      - shot_num
     properties:
+      shot_num:
+        type: integer
+        format: int32
+        minimum: 0
       cut:
         type: integer
         format: int32
