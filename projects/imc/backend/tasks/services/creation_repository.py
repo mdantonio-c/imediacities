@@ -195,7 +195,7 @@ class CreationRepository():
         return item.ownership.is_connected(group)
 
     def move_video_under_revision(self, item, user):
-        item.revision.connect(user, {'when': datetime.now(pytz.utc)})
+        item.revision.connect(user, {'when': datetime.now(pytz.utc), 'state': 'W'})
 
     def exit_video_under_revision(self, item):
         item.revision.disconnect_all()

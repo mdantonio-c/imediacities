@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {ApiService} from '/rapydo/src/app/services/api';
-import {Router} from '@angular/router';
+import { Injectable } from '@angular/core';
+import { ApiService } from '/rapydo/src/app/services/api';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AppMediaService {
@@ -9,13 +9,13 @@ export class AppMediaService {
     private _media_id = null;
     public _owner = null;
 
-    constructor (
+    constructor(
         private api: ApiService,
         private Router: Router) {
 
     }
 
-    get (media_id, endpoint, cb) {
+    get(media_id, endpoint, cb) {
 
         if (!cb || typeof cb !== 'function') {
             console.log("AppMediaService", "Callback mancante");
@@ -40,26 +40,29 @@ export class AppMediaService {
                 console.log("err", err);
             }
         );
-
     }
 
-    owner () {
+    owner() {
         return this._owner
     }
 
 
-    media () {
+    media() {
         return this._media;
     }
 
-    media_id () {
+    media_id() {
         return this._media_id;
     }
 
 
-    type () {
+    type() {
         return this._media.type === 'aventity' ? 'video' : 'image';
     }
 
+    revisionState(): string {
+        return (this._media.relationships.item[0].relationships.revision) ?
+            this._media.relationships.item[0].relationships.revision[0].attributes.state.key : '';
+    }
 
 }

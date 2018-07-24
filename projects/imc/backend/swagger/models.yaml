@@ -254,6 +254,7 @@ definitions:
       - "since"
       - "video"
       - "progress"
+      - "state"
       - "assignee"
     properties:
       since:
@@ -276,6 +277,12 @@ definitions:
         format: int32
         minimum: 0
         maximum: 100
+      state:
+        description: Revision status
+        type: string
+        enum:
+          - "R"
+          - "W"
       assignee:
         description: assignee of the revision
         required:

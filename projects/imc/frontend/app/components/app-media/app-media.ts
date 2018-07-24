@@ -7,7 +7,8 @@ import { AppVideoPlayerComponent } from "./app-video-player/app-video-player";
 import { AuthService } from "/rapydo/src/app/services/auth";
 import { AppVideoService } from "../../services/app-video";
 import { AppAnnotationsService } from "../../services/app-annotations";
-import { ShotRevisionService } from "../../services/shot-revision.service";
+import { ShotRevisionService, SceneCut } from "../../services/shot-revision.service";
+import { NotificationService } from '/rapydo/src/app/services/notification';
 /**
  * Componente per la visualizzazione del media
  */
@@ -35,7 +36,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     /**
      * Consente di visualizzare lo strumento per la shot revision
      */
-    public shot_revision_is_active: boolean = false;
+    shot_revision_is_active: boolean = false;
+    shot_revision_state: string = '';
     private shots_to_restore: any[] = [];
     /**
      * Consente di visualizzare lo strumento per la selezione multipla degli shot
@@ -95,7 +97,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
         private VideoService: AppVideoService,
-        private shotRevisionService: ShotRevisionService)
+        private shotRevisionService: ShotRevisionService,
+        private notify: NotificationService)
     {
         shotRevisionService.cutAdded$.subscribe(
             shots => { this.split_shot(shots); }
@@ -127,13 +130,18 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     private under_revision() {
         console.log('Revision mode activated');
         this.shot_revision_is_active = true;
+        this.shot_revision_state = this.MediaService.revisionState();
         // create a copy from the actual shot list (DEEP CLONE)
         // this.shots_to_restore = $.extend(true, {}, this.shots);
         this.shots_to_restore = JSON.parse(JSON.stringify(this.shots));
     }
 
     exit_shot_revision() {
-        this.shotRevisionService.exitRevision(this.media_id, () => {
+        this.shotRevisionService.exitRevision(this.media_id, (err) => {
+            if(err) {
+                this.notify.extractErrors(err, this.notify.ERROR);
+                return;
+            }
             this.shot_revision_is_active = false;
             // shallow clone is enough here!
             this.shots = this.shots_to_restore.slice(0);
@@ -182,12 +190,22 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     save_revised_shots() {
-        console.log('save revised shots');
-        this.shot_revision_is_active = false;
+        console.log('saving revised shots...');
+        let shots: SceneCut[] = this.shots.map(s => {
+            return {
+                shot_num: s.attributes.shot_num,
+                cut: s.attributes.start_frame_idx,
+                confirmed: s.attributes.revision_confirmed
+            } as SceneCut;
+        });
+        this.shotRevisionService.reviseVideoShots(this.media_id, shots, () => {
+            this.shot_revision_state = 'R';
+            this.notify.showSuccess("Your request has been successfully submitted");
+        });
+
         // because the shot list size could have changed then update the list of 'shot_attivi'
         this.shots_attivi = this.shots.map(s => false);
     }
-
 
     /**
      * Modifica la visibilità dello strumento per la shot revision
@@ -195,7 +213,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     shot_revision_toggle() {
         this.shot_revision_is_active = !this.shot_revision_is_active;
     }
-
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot

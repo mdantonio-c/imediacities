@@ -637,6 +637,7 @@ class VideoShotRevision(GraphBaseOperations):
                     'name': assignee.name + ' ' + assignee.surname
                 },
                 'since': rel.when.isoformat(),
+                'state': rel.state,
                 'progress': percentage
             }
             data.append(res)
@@ -779,19 +780,25 @@ class VideoShotRevision(GraphBaseOperations):
                 raise RestApiException(
                     'Invalid annotations value. Expected list<str>',
                     status_code=hcodes.HTTP_BAD_REQUEST)
-        if 'exitReviosion' in revision and not isinstance(revision['exitRevision'], bool):
+        if 'exitRevision' in revision and not isinstance(revision['exitRevision'], bool):
             raise RestApiException(
                 'Invalid exitRevision',
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # launch asynch task???
-        task = CeleryExt.shot_revision.apply_async(
-            args=[revision, item.uuid],
-            countdown=10
-        )
-
-        # 202: OK ACCEPTED
-        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        # launch asynch task
+        try:
+            task = CeleryExt.shot_revision.apply_async(
+                args=[revision, item.uuid],
+                countdown=10
+            )
+            assignee = item.revision.single()
+            rel = item.revision.relationship(assignee)
+            rel.state = 'R'
+            rel.save()
+            # 202: OK_ACCEPTED
+            return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        except BaseException as e:
+            raise e
 
     @decorate.catch_error()
     @catch_graph_exceptions

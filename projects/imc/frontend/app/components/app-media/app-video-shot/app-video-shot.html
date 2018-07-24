@@ -26,7 +26,7 @@
             </ng-template>
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
-        <span *ngIf="shotRevision && is_attivo">
+        <span *ngIf="shotRevision && shotRevisionState != 'R' && is_attivo">
             <i class="fa fa-cut revision-tool-icon"
                 ngbTooltip="Split shot" placement="bottom"
                 (click)="modale_show({target: {innerText: 'Add Cut'}, next: false}, 'move-cut')"></i>
@@ -99,12 +99,21 @@
     </div>
 </div>
 </div>
-<div class="revision-tool-div" *ngIf="shotRevision && tot_num_shots > shot.attributes.shot_num +1">
-<i class="material-icons revision-tool-icon"
-    mwlConfirmationPopover
-    [popoverTitle]="'Remove cut'"
-    [popoverMessage]="'Remove cut between shot '+ (shot.attributes.shot_num+1) + ' and shot ' + (shot.attributes.shot_num+2)+'.<br/>Do you wish to continue?'"
-    (confirm)="remove_upper_cut()">delete</i>
-<i class="material-icons revision-tool-icon"
-    (click)="modale_show({target: {innerText: 'Move Cut'}, next: true}, 'move-cut')">vertical_align_center</i>
+<div class="revision-tool-div" *ngIf="shotRevision && shotRevisionState != 'R' && tot_num_shots > shot.attributes.shot_num +1">
+    <div class="d-inline mr-1">
+        <i class="material-icons revision-tool-icon"
+        mwlConfirmationPopover
+        [popoverTitle]="'Remove cut'"
+        [popoverMessage]="'Remove cut between shot '+ (shot.attributes.shot_num+1) + ' and shot ' + (shot.attributes.shot_num+2)+'.<br/>Do you wish to continue?'"
+        (confirm)="remove_upper_cut()">delete</i>
+    </div>
+    <div class="d-inline mr-1">
+        <i class="material-icons revision-tool-icon"
+        (click)="modale_show({target: {innerText: 'Move Cut'}, next: true}, 'move-cut')">vertical_align_center</i>
+    </div>
+    <!-- <div class="box-checkbox float-right">
+        <input class="imc--input-checkbox styled-checkbox" id="cut-confimed" type="checkbox" value="on">
+        <label for="cut-confimed" style="margin: 0 !important;"
+        ngbTooltip="confirmed" placement="bottom"></label>
+    </div> -->
 </div>

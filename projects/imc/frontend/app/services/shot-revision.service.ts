@@ -3,6 +3,13 @@ import { ApiService } from '/rapydo/src/app/services/api';
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
 
+export interface SceneCut {
+	shot_num: number;
+	cut?: number;
+	annotations?: string[];
+	confirmed?: boolean;
+}
+
 @Injectable()
 export class ShotRevisionService {
 
@@ -47,15 +54,17 @@ export class ShotRevisionService {
 		this.api.delete(
             'videos/'+videoId+'/shot-revision'
         ).subscribe(
-            response => {
+            resp => {
             	console.log('video ['+videoId+'] exit from revision');
                 cb();
             },
-            err => {}
+            err => {
+            	cb(err);
+            }
         );
 	}
 
-	putVideoUnderRevision(videoId, cb) {
+	putVideoUnderRevision(videoId: string, cb) {
 		if (!cb || typeof cb !== 'function') {
             console.log("ShotRevisionService", "Callback mancante");
             return
@@ -66,6 +75,27 @@ export class ShotRevisionService {
         ).subscribe(
             response => {
             	console.log('video ['+videoId+'] is now under revision');
+            	cb();
+            },
+            err => {}
+        );
+	}
+
+	reviseVideoShots(videoId: string, shots: SceneCut[], cb, exit=true) {
+		if (!cb || typeof cb !== 'function') {
+            console.log("ShotRevisionService", "Callback mancante");
+            return
+        }
+
+        this.api.post(
+            'videos/'+videoId+'/shot-revision',
+            {
+            	shots: shots,
+            	exitRevision: exit
+            }
+        ).subscribe(
+            response => {
+            	console.log('shot revision for video ['+videoId+'] successfully completed');
             	cb();
             },
             err => {}

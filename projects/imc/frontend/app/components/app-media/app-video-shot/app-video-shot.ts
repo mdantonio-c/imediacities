@@ -13,6 +13,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Input() user;
     @Input() media_type = 'video';
     @Input() shotRevision: boolean = false;
+    @Input() shotRevisionState: string = '';
     @Input() tot_num_shots: number;
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();

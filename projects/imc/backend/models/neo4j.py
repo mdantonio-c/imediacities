@@ -98,8 +98,10 @@ class RevisionRel(StructuredRel):
     """
     Attributes:
         when  Date of start or approval of a revision.
+        state Revision status: Waiting or Running
     """
     when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
+    state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
 
 class User(UserBase):

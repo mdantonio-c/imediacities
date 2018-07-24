@@ -301,10 +301,16 @@ def shot_revision(self, revision, item_id):
 
         # save VIM annotations
         repo.create_vim_annotation(item, vim_estimations)
-
-        if 'exitRevision' in revision and revision['exitRevision'] is True:
-            log.debug('exit revision')
+        exitRevision = True if 'exitRevision' in revision and revision['exitRevision'] else False
+        if exitRevision:
             item.revision.disconnect_all()
+        else:
+            assignee = item.revision.single()
+            rel = item.revision.relationship(assignee)
+            rel.state = 'W'
+            rel.save()
+        log.info('Shot revision task completed successfully (exit: {exit})'.format(
+            exit=exitRevision))
 
     except Exception as e:
         log.error("Task error, %s" % e)
