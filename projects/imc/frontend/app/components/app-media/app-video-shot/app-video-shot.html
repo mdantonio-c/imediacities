@@ -26,7 +26,7 @@
             </ng-template>
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
-        <span *ngIf="shotRevision && shotRevisionState != 'R' && is_attivo">
+        <span *ngIf="canRevise && is_attivo">
             <i class="fa fa-cut revision-tool-icon"
                 ngbTooltip="Split shot" placement="bottom"
                 (click)="modale_show({target: {innerText: 'Add Cut'}, next: false}, 'move-cut')"></i>
@@ -76,7 +76,7 @@
             [can_delete]="tag_is_deletable(location)"></app-media-annotation>
             </ng-template>
         </div>
-        <div class="row no-gutters space-paragraph-20" *ngIf="!shotRevision">
+        <div class="row no-gutters space-paragraph-20" *ngIf="!underRevision">
             <!-- modali -->
             <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
                 <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
@@ -99,7 +99,7 @@
     </div>
 </div>
 </div>
-<div class="revision-tool-div" *ngIf="shotRevision && shotRevisionState != 'R' && tot_num_shots > shot.attributes.shot_num +1">
+<div class="revision-tool-div" *ngIf="canRevise && tot_num_shots > shot.attributes.shot_num +1">
     <div class="d-inline mr-1">
         <i class="material-icons revision-tool-icon"
         mwlConfirmationPopover

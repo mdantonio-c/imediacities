@@ -129,8 +129,8 @@ picture-->
                                         [shot]="shot"
                                         [user]="user"
                                         [multiSelection]="multi_annotations_is_active"
-                                        [shotRevision]="shot_revision_is_active"
-                                        [shotRevisionState]="shot_revision_state"
+                                        [underRevision]="shot_revision_is_active"
+                                        [canRevise]="canRevise()"
                                         (revise_shot)="revise_shot($event)"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
@@ -228,7 +228,7 @@ picture-->
                             (click)="multi_annotations_toggle()">Multiple annotation</button>
                     </ng-container>
 
-                    <ng-container *ngIf="shot_revision_is_active && shot_revision_state != 'R'">
+                    <ng-container *ngIf="canRevise()">
                         <button class="btn btn-border-classic"
                             mwlConfirmationPopover
                             [popoverTitle]="'Exit shot revision'"

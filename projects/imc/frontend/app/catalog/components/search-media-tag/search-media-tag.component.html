@@ -2,12 +2,11 @@
 	<div class="row no-gutters">
 		<div class="col">
 			<div class="space-4"></div>
-			<h4 class="search-title" *ngIf="!underRevision() || canRevise(); else other_title">
+			<h4 class="search-title">
 				<i class="imc-icon fa light-blue" [ngClass]="{'fa-video-camera': media.source.type === 'Video', 'fa-camera': media.source.type === 'Image'}"></i>
 				<a [routerLink]="['images', media.source.uuid]" *ngIf="media.source.type == 'Image'" class="blue">{{media.source.title}}</a>
 				<a [routerLink]="['videos', media.source.uuid]" *ngIf="media.source.type == 'Video'" class="blue">{{media.source.title}}</a>
 			</h4>
-			<ng-template #other_title><h4 class="search-title"><span style="font-size: 16px !important;">{{media.source.title}}</span></h4></ng-template>
 			<span *ngIf="media?.source?.year">
 				<i>({{media.source.year | slice:0:4}})</i>
 			</span>

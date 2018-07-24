@@ -77,7 +77,9 @@ export class ShotRevisionService {
             	console.log('video ['+videoId+'] is now under revision');
             	cb();
             },
-            err => {}
+            err => {
+                cb(err);
+            }
         );
 	}
 

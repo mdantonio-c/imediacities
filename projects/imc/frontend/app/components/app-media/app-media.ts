@@ -77,7 +77,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * @type {string}
      */
     public user_language = 'it';
-    public user = {};
+    public user: any = {};
     //public type_shot: boolean;
 
     public media_class = '';
@@ -122,9 +122,22 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     start_shot_revision() {
-        this.shotRevisionService.putVideoUnderRevision(this.media_id, () => {
+        this.shotRevisionService.putVideoUnderRevision(this.media_id, (err) => {
+            if(err) {
+                this.notify.extractErrors(err, this.notify.ERROR);
+                return;
+            }
             this.under_revision();
+            this.media.relationships.item[0].relationships.revision = [{id: this.user.uuid}]
         });
+    }
+
+    canRevise() {
+        return this.user.roles.hasOwnProperty('Reviser') &&
+            this.shot_revision_is_active &&
+            this.shot_revision_state != 'R' &&
+            this.media.relationships.item[0].relationships.revision &&
+            this.user.uuid === this.media.relationships.item[0].relationships.revision[0].id;
     }
 
     private under_revision() {
