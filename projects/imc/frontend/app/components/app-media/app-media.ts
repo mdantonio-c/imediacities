@@ -127,8 +127,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 this.notify.extractErrors(err, this.notify.ERROR);
                 return;
             }
+            let revision = {
+                id: this.user.uuid,
+                attributes: {
+                    state: {key: 'W'}
+                }
+            }
+            this.media.relationships.item[0].relationships.revision = [revision]
             this.under_revision();
-            this.media.relationships.item[0].relationships.revision = [{id: this.user.uuid}]
         });
     }
 
