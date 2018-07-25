@@ -27,6 +27,9 @@ export class ProjectOptions {
                 "templateOptions": {
                     "label": 'Do you work at one of the following institutions:',
                     "required": true,
+                    "addonLeft": {
+                        "class": "fa fa-bank"
+                    },
                     "options": [
                       { label: 'Archive', value: 'archive' },
                       { label: 'University', value: 'university' },
@@ -49,7 +52,6 @@ export class ProjectOptions {
                 "validators": {
                     "fieldMatch": {
                         "expression": (control) => control.value,
-                        "message": "This check is mandatory"
                     }
                 }
             },
@@ -63,7 +65,6 @@ export class ProjectOptions {
                 "validators": {
                     "fieldMatch": {
                         "expression": (control) => control.value,
-                        "message": "This check is mandatory"
                     }
                 }
             },
@@ -77,7 +78,6 @@ export class ProjectOptions {
                 "validators": {
                     "fieldMatch": {
                         "expression": (control) => control.value,
-                        "message": "This check is mandatory"
                     }
                 }
             }
