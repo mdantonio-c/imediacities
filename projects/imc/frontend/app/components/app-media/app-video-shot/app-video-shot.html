@@ -20,10 +20,7 @@
     <span class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
         <!-- Anteprima dello shot del video -->
         <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
-            <img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail; else no_thumbnail">
-            <ng-template #no_thumbnail>
-                <hjs class="media-object" alt="no thumbnail" [holderId]="'hjs-'+shot.id" [imgSrc]="'holder.js/100px67?bg=707070&text=NO THUMBNAIL&auto'"></hjs>
-            </ng-template>
+            <img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail">
             <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
         </span>
         <span *ngIf="canRevise && is_attivo">
