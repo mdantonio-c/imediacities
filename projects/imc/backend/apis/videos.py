@@ -490,6 +490,16 @@ class VideoContent(GraphBaseOperations):
             thumbnail_uri = item.thumbnail
             logger.debug("thumbnail content uri: %s" % thumbnail_uri)
             thumbnail_size = input_parameters.get('size')
+            # workaround when original thumnail is renamed by revision procedure
+            if thumbnail_size is None and not os.path.exists(thumbnail_uri):
+                logger.debug('File {0} not found'.format(thumbnail_uri))
+                thumbnail_filename = os.path.basename(thumbnail_uri)
+                thumbs_dir = os.path.dirname(thumbnail_uri)
+                f_name, f_ext = os.path.splitext(thumbnail_filename)
+                tokens = f_name.split('_')
+                if len(tokens) > 0:
+                    f = 'f_' + tokens[-1] + f_ext
+                    thumbnail_uri = os.path.join(thumbs_dir, f)
             if thumbnail_size is not None and thumbnail_size.lower() == 'large':
                 # load image file in the parent folder with the same name
                 thumbnail_filename = os.path.basename(thumbnail_uri)
@@ -499,7 +509,7 @@ class VideoContent(GraphBaseOperations):
                     thumbs_parent_dir, thumbnail_filename)
                 logger.debug(
                     'request for large thumbnail: {}'.format(thumbnail_uri))
-            if thumbnail_uri is None:
+            if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise RestApiException(
                     "Thumbnail not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
