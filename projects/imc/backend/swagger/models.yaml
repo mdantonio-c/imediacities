@@ -248,6 +248,89 @@ definitions:
       type: string 
       description: A string containing a JSON Pointer value.
 
+  VideoInRevision:
+    description: Video under revision
+    required:
+      - "since"
+      - "video"
+      - "progress"
+      - "state"
+      - "assignee"
+    properties:
+      since:
+        description: Date of start of a revision.
+        type: string
+        format: date
+      video:
+        description: Video under revision
+        required:
+          - uuid
+          - title
+        properties:
+          uuid:
+            type: string
+          title:
+            type: string
+      progress:
+        description: Progress of the revision in percentange
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 100
+      state:
+        description: Revision status
+        type: string
+        enum:
+          - "R"
+          - "W"
+      assignee:
+        description: assignee of the revision
+        required:
+          - uuid
+          - name
+        properties:
+          uuid:
+            type: string
+          name:
+            type: string
+
+  ShotRevision:
+    description: Shot revision request.
+    required:
+      - shots
+    properties:
+      shots:
+        description: The new list of scene cuts.
+        type: array
+        items:
+          $ref: '#/definitions/SceneCut'
+      exitRevision:
+        type: boolean
+        default: true
+
+  SceneCut:
+    description: Rapresent the scene cut that is the first frame of the shot. For homogeneity, the first zero cut must also be provided.
+    required:
+      - shot_num
+    properties:
+      shot_num:
+        type: integer
+        format: int32
+        minimum: 0
+      cut:
+        type: integer
+        format: int32
+        minimum: 0
+      confirmed:
+        type: boolean
+        default: false
+      annotations:
+        type: array
+        uniqueItems: true
+        items:
+          description: Annotation's uuid
+          type: string
+
 FormDataParameters:
   AdminUsers:
     - name: group

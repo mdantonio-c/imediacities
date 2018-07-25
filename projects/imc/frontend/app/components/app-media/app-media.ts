@@ -7,6 +7,8 @@ import { AppVideoPlayerComponent } from "./app-video-player/app-video-player";
 import { AuthService } from "/rapydo/src/app/services/auth";
 import { AppVideoService } from "../../services/app-video";
 import { AppAnnotationsService } from "../../services/app-annotations";
+import { ShotRevisionService, SceneCut } from "../../services/shot-revision.service";
+import { NotificationService } from '/rapydo/src/app/services/notification';
 /**
  * Componente per la visualizzazione del media
  */
@@ -14,7 +16,6 @@ import { AppAnnotationsService } from "../../services/app-annotations";
     selector: 'app-media',
     templateUrl: 'app-media.html'
 })
-
 export class AppMediaComponent implements OnInit, OnDestroy {
 
     //Riferimento alla pagina contenente il media
@@ -35,7 +36,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     /**
      * Consente di visualizzare lo strumento per la shot revision
      */
-    public shot_revision_is_active: boolean = false;
+    shot_revision_is_active: boolean = false;
+    shot_revision_state: string = '';
     private shots_to_restore: any[] = [];
     /**
      * Consente di visualizzare lo strumento per la selezione multipla degli shot
@@ -75,7 +77,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * @type {string}
      */
     public user_language = 'it';
-    public user = {};
+    public user: any = {};
     //public type_shot: boolean;
 
     public media_class = '';
@@ -94,7 +96,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         private AnnotationService: AppAnnotationsService,
         private MediaService: AppMediaService,
         private ShotsService: AppShotsService,
-        private VideoService: AppVideoService) { }
+        private VideoService: AppVideoService,
+        private shotRevisionService: ShotRevisionService,
+        private notify: NotificationService)
+    {
+        shotRevisionService.cutAdded$.subscribe(
+            shots => { this.split_shot(shots); }
+        );
+    }
 
     media_type_set(url) {
 
@@ -109,24 +118,48 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             this.media_class = 'page-type-image';
             this.media_type = 'image';
             // this.type_shot = false;
-
         }
-
     }
 
     start_shot_revision() {
+        this.shotRevisionService.putVideoUnderRevision(this.media_id, (err) => {
+            if(err) {
+                this.notify.extractErrors(err, this.notify.ERROR);
+                return;
+            }
+            this.under_revision();
+            this.media.relationships.item[0].relationships.revision = [{id: this.user.uuid}]
+        });
+    }
+
+    canRevise() {
+        return this.user.roles.hasOwnProperty('Reviser') &&
+            this.shot_revision_is_active &&
+            this.shot_revision_state != 'R' &&
+            this.media.relationships.item[0].relationships.revision &&
+            this.user.uuid === this.media.relationships.item[0].relationships.revision[0].id;
+    }
+
+    private under_revision() {
         console.log('Revision mode activated');
         this.shot_revision_is_active = true;
+        this.shot_revision_state = this.MediaService.revisionState();
         // create a copy from the actual shot list (DEEP CLONE)
         // this.shots_to_restore = $.extend(true, {}, this.shots);
         this.shots_to_restore = JSON.parse(JSON.stringify(this.shots));
     }
 
     exit_shot_revision() {
-        this.shot_revision_is_active = false;
-        // shallow clone is enough here!
-        this.shots = this.shots_to_restore.slice(0);
-        this.shots_to_restore = [];
+        this.shotRevisionService.exitRevision(this.media_id, (err) => {
+            if(err) {
+                this.notify.extractErrors(err, this.notify.ERROR);
+                return;
+            }
+            this.shot_revision_is_active = false;
+            // shallow clone is enough here!
+            this.shots = this.shots_to_restore.slice(0);
+            this.shots_to_restore = [];
+        });
     }
 
     revise_shot($event) {
@@ -160,17 +193,32 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
-    private split_shot(shot) {
-
+    private split_shot(shots) {
+        let next_idx = shots[0].attributes.shot_num + 1;
+        this.shots.splice(next_idx, 0, shots[1]);
+        // update the subsequent shot numbers
+        for (let i = next_idx + 1; i < this.shots.length; i++) {
+            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num + 1;
+        }
     }
 
     save_revised_shots() {
-        console.log('save revised shots');
-        this.shot_revision_is_active = false;
+        console.log('saving revised shots...');
+        let shots: SceneCut[] = this.shots.map(s => {
+            return {
+                shot_num: s.attributes.shot_num,
+                cut: s.attributes.start_frame_idx,
+                confirmed: s.attributes.revision_confirmed
+            } as SceneCut;
+        });
+        this.shotRevisionService.reviseVideoShots(this.media_id, shots, () => {
+            this.shot_revision_state = 'R';
+            this.notify.showSuccess("Your request has been successfully submitted");
+        });
+
         // because the shot list size could have changed then update the list of 'shot_attivi'
         this.shots_attivi = this.shots.map(s => false);
     }
-
 
     /**
      * Modifica la visibilità dello strumento per la shot revision
@@ -178,7 +226,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     shot_revision_toggle() {
         this.shot_revision_is_active = !this.shot_revision_is_active;
     }
-
 
     /**
      * Modifica la visibilità dello strumento per la selezione multipla degli shot
@@ -353,10 +400,11 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                     const annotations = this.ShotsService.annotations();
                     this.annotations_count = annotations.length;
                     this.locations = annotations.filter(a => a.group === 'location');
+                    if (this.media.relationships.item[0].relationships.revision) {
+                        this.under_revision();
+                    }
                 });
                 this._subscription.add(shots_subscription);
-
-
             });
 
 

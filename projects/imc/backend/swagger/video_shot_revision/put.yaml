@@ -1,0 +1,33 @@
+video_shot_revision:
+  summary: Put a video under revision
+  custom:
+    # publish: true
+    authentication: true
+    authorized:
+      - Reviser
+      - admin_root
+    required_roles: any
+  parameters:
+    - name: revision
+      in: body
+      description: The revision request.
+      schema:
+        properties:
+          assignee:
+            description: The assignee for the revision (user uuid with Reviser role).
+            type: string
+  responses:
+    204:
+      description: Video under revision successfully.
+    400:
+      description: Assignee not valid.
+    409:
+      description: Video is already under revision or it is not ready for revision.
+    401:
+      description: This endpoint requires a valid authorization token
+    403:
+      description: Operation forbidden.
+    404:
+      description: Video does not exist.
+    500:
+      description: An unexpected error occured.

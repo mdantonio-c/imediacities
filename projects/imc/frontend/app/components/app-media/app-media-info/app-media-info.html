@@ -150,11 +150,11 @@
                                 </li>
                                 <li *ngIf="info.relationships.video_format[0].attributes.gauge">
                                     <strong>Gauge: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge.description"></span>
                                 </li>
                                 <li *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
                                     <strong>Aspect ratio: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio.description"></span>
                                 </li>
                             </ul>
                         </div>

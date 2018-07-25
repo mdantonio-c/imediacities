@@ -8,7 +8,9 @@ picture-->
     <div class="container-media row no-gutters justify-content-md-center">
         <!-- TITLE MEDIA -->
         <div class="box-title-media col-12 col-lg-6 row no-gutters">
-            <h2 class="imc--title-bold col-12">{{media.attributes.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision</span></h2>
+            <h2 class="imc--title-bold col-12">{{media.attributes.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision
+                <i class="fa fa-cogs" *ngIf="shot_revision_state == 'R'"></i>
+            </span></h2>
             <p class="col-12 col-sm-8 imc--flex--vertical-start" style="margin-bottom: 0;">
                 <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp;
 
@@ -127,7 +129,8 @@ picture-->
                                         [shot]="shot"
                                         [user]="user"
                                         [multiSelection]="multi_annotations_is_active"
-                                        [shotRevision]="shot_revision_is_active"
+                                        [underRevision]="shot_revision_is_active"
+                                        [canRevise]="canRevise()"
                                         (revise_shot)="revise_shot($event)"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
@@ -225,7 +228,7 @@ picture-->
                             (click)="multi_annotations_toggle()">Multiple annotation</button>
                     </ng-container>
 
-                    <ng-container *ngIf="shot_revision_is_active">
+                    <ng-container *ngIf="canRevise()">
                         <button class="btn btn-border-classic"
                             mwlConfirmationPopover
                             [popoverTitle]="'Exit shot revision'"

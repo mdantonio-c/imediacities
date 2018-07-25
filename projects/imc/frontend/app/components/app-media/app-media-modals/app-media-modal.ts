@@ -36,7 +36,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
 
         this.shot_corrente = this.data.shots[shot_index];
 
-        if (this.videoPlayer && this.videoPlayer.video) {
+        if (!this.revision && this.videoPlayer && this.videoPlayer.video) {
             this.videoPlayer.range.set({
                 index: this.shot_corrente.attributes.shot_num,
                 start: this.shot_corrente.attributes.start_frame_idx,

@@ -12,7 +12,8 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Input() multiSelection: boolean = false;
     @Input() user;
     @Input() media_type = 'video';
-    @Input() shotRevision: boolean = false;
+    @Input() underRevision: boolean = false;
+    @Input() canRevise: boolean = false;
     @Input() tot_num_shots: number;
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();
@@ -82,11 +83,13 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
             this.is_attivo = true;
             this.details_open = true;
         }
+
+        if (element.parentElement === undefined) { return; }
         this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
     }
 
     tag_is_deletable(tag) {
-        return this.is_annotation_owner(this.user, tag.creator);
+        return this.is_annotation_owner(this.user, tag.creator) && !this.underRevision;
     }
 
     scrollTo(element, to, duration) {

@@ -1480,3 +1480,6 @@ body, a {
 .search-pager .pagination > li.page-item.active > a.page-link {
   background: #53b8e2;
 }
+
+/* workaround for enabling auto-comple-places from modal */
+.pac-container { z-index: 100000; }

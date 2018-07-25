@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from datetime import datetime
+import pytz
 
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
@@ -183,3 +187,21 @@ class CreationRepository():
     def find_rightholder_by_name(self, name):
         log.debug('Find rightholder by name: {}'.format(name))
         return self.graph.Rightholder.nodes.get_or_none(name=name)
+
+    def item_belongs_to_user(self, item, user):
+        group = user.belongs_to.single()
+        if group is None:
+            return False
+        return item.ownership.is_connected(group)
+
+    def move_video_under_revision(self, item, user):
+        item.revision.connect(user, {'when': datetime.now(pytz.utc), 'state': 'W'})
+
+    def exit_video_under_revision(self, item):
+        item.revision.disconnect_all()
+
+    def is_video_under_revision(self, item):
+        return False if item.revision.single() is None else True
+
+    def is_revision_assigned_to_user(self, item, user):
+        return item.revision.is_connected(user)

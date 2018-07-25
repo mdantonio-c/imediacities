@@ -1,53 +1,55 @@
+<div class="modal-body">
+    
+    <h4>Shot: {{shot_corrente.attributes.shot_num+1}}
+        <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.attributes.shot_num+2}}</ng-container>
+    </h4>
 
-    <div class="modal-body">
+    <div class="row modal-body-content">
 
-        <h4>Shot: <span>{{shot_corrente.attributes.shot_num+1}}</span></h4>
-        <div class="row modal-body-content">
+        <!-- Video preview -->
+        <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
+            <ng-template [ngIf]="media_type === 'video'">
+                <ng-container *ngIf="!revision">
+                <span class="col-6 col-lg-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
+                <span class="col-6 col-lg-6 imc--flex--horizontal-center">frame-range:
+                    <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
+                    -
+                    <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
+                </span>
+                <span class="col-12 col-lg-3 imc--flex--horizontal-end">
+                   duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
+                </span>
+                </ng-container>
 
-            <!-- Anteprima del video -->
-            <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
-                <ng-template [ngIf]="media_type === 'video'">
-                    <span class="col-6 col-lg-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
-                    <span class="col-6 col-lg-6 imc--flex--horizontal-center">frame-range:
-                        <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
-                        -
-                        <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
-                   </span>
-                    <span class="col-12 col-lg-3 imc--flex--horizontal-end">
-                       duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
-                   </span>
+                <!-- Video player -->
+                <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
+                   <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots" [revision]="revision"></app-video-player>
+               </span>
 
-                    <!-- Video player -->
-                    <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
-                       <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots" [revision]="revision"></app-video-player>
-                   </span>
-
-                    <!-- Anteprime di altri shots dopo la selezione multipla -->
-                    <div class="col-12 row no-gutters mt-2" *ngIf="data.shots.length > 1">
-                       <span class="imc--thumb"
-                             *ngFor="let shot of data.shots let index = index"
-                             [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
-                             [ngStyle]="{border: shot.attributes.shot_num === shot_corrente.attributes.shot_num ? '5px solid' : 0}"
-                             (click)="shot_cambia(index)">
-                            <img [src]="shot.links.thumbnail" alt="">
-                            <span [innerHTML]="shot.attributes.duration | number:'2.2'" class="duration"></span>
-                           <span class="shot-number" [innerHTML]="shot.attributes.shot_num+1">3</span>
-                        </span>
-                    </div>
-                </ng-template>
-                <ng-template [ngIf]="media_type !== 'video'">
-                    <img [src]="mediaData.links.content" class="img-fluid">
-                </ng-template>
-            </div>
-
-            <ng-content select="[modal-col]"></ng-content>
-
+                <!-- Previews of other shots after multiple selection -->
+                <div class="col-12 row no-gutters mt-2" *ngIf="!revision && data.shots.length > 1">
+                   <span class="imc--thumb"
+                         *ngFor="let shot of data.shots let index = index"
+                         [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
+                         [ngStyle]="{border: shot.attributes.shot_num === shot_corrente.attributes.shot_num ? '5px solid' : 0}"
+                         (click)="shot_cambia(index)">
+                        <img [src]="shot.links.thumbnail" alt="">
+                        <span [innerHTML]="shot.attributes.duration | number:'2.2'" class="duration"></span>
+                       <span class="shot-number" [innerHTML]="shot.attributes.shot_num+1">3</span>
+                    </span>
+                </div>
+            </ng-template>
+            <ng-template [ngIf]="media_type !== 'video'">
+                <img [src]="mediaData.links.content" class="img-fluid">
+            </ng-template>
         </div>
+
+        <ng-content select="[modal-col]"></ng-content>
+
     </div>
+</div>
 
-    <ng-content select="[modal-row]"></ng-content>
-
-
+<ng-content select="[modal-row]"></ng-content>
 
 <div class="modal-footer" modal-footer>
     <button type="button" class="btn btn-border-classic" (click)="chiudi()">Cancel</button>

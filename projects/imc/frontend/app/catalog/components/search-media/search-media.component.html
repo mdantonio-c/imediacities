@@ -1,5 +1,8 @@
 <div class="media search-media">
 	<div class="media-left">
+		<span class="badge badge-warning revision" *ngIf="underRevision()">
+			<i class="fa fa-wrench"></i>
+		</span>
 		<img src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
 		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
 		<div class="cn">
