@@ -1,6 +1,3 @@
-/* reduces the space between navbar and body */
-navbar:first-of-type + br { display: none; }
-
 .no-padding { padding: 0 !important }
 .no-padding-bottom { padding-bottom: 0 !important }
 .no-padding-top { padding-top: 0 !important }
