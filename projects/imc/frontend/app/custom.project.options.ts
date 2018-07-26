@@ -96,7 +96,7 @@ export class ProjectOptions {
         let disclaimer = `
 Welcome to the registration page of I-Media-Cities. Registering a personal account is free of charge, in compliance with European law, and will allow you to enjoy a whole list of additional platform functionalities, such as adding your own information to films and photographs.<br>
 <br>
-It's quick and simple – register now and join a large community all over Europe. 
+<strong>In order to explore the I Media Cities platform you have to register yourself with a valid e-mail address. We will send you a confirmation link after the registration.</strong>
 `;
 		return {"fields": fields, "disclaimer": disclaimer}
 	}
