@@ -105,8 +105,8 @@ class RevisionRel(StructuredRel):
 
 
 class User(UserBase):
-    # name_surname = StringProperty(required=True, unique_index=True)
 
+    declared_institution = StringProperty(required=False)
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     annotations = RelationshipFrom(
         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)

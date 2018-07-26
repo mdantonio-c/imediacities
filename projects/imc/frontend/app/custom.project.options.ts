@@ -22,7 +22,7 @@ export class ProjectOptions {
 
 		fields.push(
             {
-                "key": 'institution',
+                "key": 'declared_institution',
                 "type": 'select',
                 "templateOptions": {
                     "label": 'Do you work at one of the following institutions:',
