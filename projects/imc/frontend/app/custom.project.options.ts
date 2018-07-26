@@ -12,6 +12,15 @@ export class ProjectOptions {
 			return this.registration_options()
 		}
 
+        if (opt == 'user_page') {
+            return {
+                "group": true,
+                "custom": [
+                    {name: 'Institution', prop: "declared_institution", flexGrox: 1.0}
+                ]
+            }
+        }
+
 		return null;
 	}
 
