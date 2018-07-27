@@ -173,7 +173,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         let op = $event.op;
         switch ($event.op) {
             case "join":
-                this.join_shots($event.index, $event.index + 1);
+                this.join_shots($event.index - 1, $event.index);
                 break;
             default:
                 console.warn('Invalid operation in revising shot for ' + $event.op);
@@ -253,10 +253,10 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             this.appVideo.video.pause();
         }
         this.modale.type = componente.modale;
-        if (componente.next) {
-            // use the next flag to add the next shot to the list
-            let next_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num + 1;
-            componente.data.shots.push(this.shots[next_shot_num]);
+        if (componente.previous) {
+            // use the previous flag to add the previous shot to the list
+            let previous_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num - 1;
+            componente.data.shots.unshift(this.shots[previous_shot_num]);
         }
         this.modale.data = componente.data;
 

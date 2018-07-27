@@ -326,6 +326,7 @@ search-thumbnail div .media-image-wrapper {
   text-align: center;
   margin: 10px;
   padding-top: 5px;
+  height: 36px;
 }
 
 .revision-tool-icon {
