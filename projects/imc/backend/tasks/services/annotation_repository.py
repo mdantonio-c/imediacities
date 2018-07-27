@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 
+from datetime import datetime
+import pytz
 import json
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
@@ -260,7 +263,7 @@ class AnnotationRepository():
             item.shots.connect(shot)
 
     @graph_transactions
-    def update_automatic_tvs(self, item, shots, vim_estimations):
+    def update_automatic_tvs(self, item, shots, vim_estimations, rev=False, reviser=None):
         '''
         This procedure updates the automatic shot list preserving existing
         annotations such as TAG, DSC etc.
@@ -286,6 +289,7 @@ class AnnotationRepository():
 
         # foreach incoming shot
         log.debug('----------')
+        current_time = datetime.now(pytz.utc)
         for shot_num, properties in shots.items():
             shot_node = None
             res = item.shots.search(shot_num=shot_num)
@@ -294,12 +298,23 @@ class AnnotationRepository():
                 # rarely expected (especially for framerate fix)
                 log.info('New incoming shot number: {}'.format(shot_num))
                 shot_node = self.graph.Shot(
-                    shot_num=shot_num, **properties).save()
+                    shot_num=shot_num, **properties)
+                if rev:
+                    shot_node.revision_confirmed = True
+                shot_node.save()
+                if reviser is not None:
+                    shot_node.revised_by.connect(reviser,
+                                                 {'when': current_time})
                 tvs_body.segments.connect(shot_node)
                 item.shots.connect(shot_node)
             else:
                 shot_node = res[0]
                 # props to update
+                if rev and properties['start_frame_idx'] != shot_node.start_frame_idx:
+                    shot_node.revision_confirmed = True
+                    if reviser is not None:
+                        shot_node.revised_by.connect(reviser,
+                                                     {'when': current_time})
                 shot_node.start_frame_idx = properties['start_frame_idx']
                 shot_node.end_frame_idx = properties['end_frame_idx']
                 shot_node.timestamp = properties['timestamp']

@@ -296,11 +296,15 @@ def shot_revision(self, revision, item_id):
             repo.delete_vim_annotation(anno)
             log.debug("Deleted existing VIM annotation [%s]" % anno_id)
 
+        # get reviser
+        reviser = self.graph.User.nodes.get_or_none(uuid=revision['reviser'])
+
         # update TVS annotations
-        repo.update_automatic_tvs(item, shots, vim_estimations)
+        repo.update_automatic_tvs(item, shots, vim_estimations, True, reviser)
 
         # save VIM annotations
         repo.create_vim_annotation(item, vim_estimations)
+
         exitRevision = True if 'exitRevision' in revision and revision['exitRevision'] else False
         if exitRevision:
             item.revision.disconnect_all()

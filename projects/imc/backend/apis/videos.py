@@ -795,6 +795,7 @@ class VideoShotRevision(GraphBaseOperations):
                 'Invalid exitRevision',
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
+        revision['reviser'] = user.uuid
         # launch asynch task
         try:
             task = CeleryExt.shot_revision.apply_async(
