@@ -1,27 +1,31 @@
 <!-- Template per il singolo shot, da mettere in loop per la creazione di tutti gli shot o segmenti -->
-<div class="revision-tool-div" *ngIf="canRevise && shot.attributes.shot_num > 0">
-    <ng-container *ngIf="!shot.attributes.revision_confirmed">
-    <div class="d-inline mr-1">
-        <i class="material-icons revision-tool-icon"
-        mwlConfirmationPopover
-        [popoverTitle]="'Remove cut'"
-        [popoverMessage]="'Remove cut between shot '+ shot.attributes.shot_num + ' and shot ' + (shot.attributes.shot_num+1)+'.<br/>Do you wish to continue?'"
-        (confirm)="remove_cut()">delete</i>
-    </div>
-    <div class="d-inline mr-1">
-        <i class="material-icons revision-tool-icon"
-        (click)="modale_show({target: {innerText: 'Move Cut'}, previous: true}, 'move-cut')">vertical_align_center</i>
-    </div>
-    </ng-container>
-    <div class="box-checkbox float-right">
-        <input class="imc--input-checkbox styled-checkbox" 
-            id="cut-confimed-{{shot.attributes.shot_num}}" type="checkbox" value="on"
-            [(ngModel)]="shot.attributes.revision_confirmed">
-        <label for="cut-confimed-{{shot.attributes.shot_num}}" style="margin: 0 !important;"
-            ngbTooltip="confirmed" placement="bottom"></label>
-    </div>
-</div>
 <div class="row no-gutters box-single-shot" *ngIf="shot" [ngClass]="{'active': is_attivo}">
+    <span class="col-12" *ngIf="canRevise && shot.attributes.shot_num > 0">
+        <div class="row no-gutters">
+            <div class="col-11 revision-tool-div">
+                <ng-container *ngIf="!shot.attributes.revision_confirmed">
+                    <div class="d-inline mr-1">
+                        <i class="material-icons revision-tool-icon"
+                        mwlConfirmationPopover
+                        [popoverTitle]="'Remove cut'"
+                        [popoverMessage]="'Remove cut between shot '+ shot.attributes.shot_num + ' and shot ' + (shot.attributes.shot_num+1)+'.<br/>Do you wish to continue?'"
+                        (confirm)="remove_cut()">delete</i>
+                    </div>
+                    <div class="d-inline mr-1">
+                        <i class="material-icons revision-tool-icon"
+                        (click)="modale_show({target: {innerText: 'Move Cut'}, previous: true}, 'move-cut')">vertical_align_center</i>
+                    </div>
+                </ng-container>
+                <div class="box-checkbox float-right">
+                    <input class="imc--input-checkbox styled-checkbox" 
+                        id="cut-confimed-{{shot.attributes.shot_num}}" type="checkbox" value="on"
+                        [(ngModel)]="shot.attributes.revision_confirmed">
+                    <label for="cut-confimed-{{shot.attributes.shot_num}}" style="margin: 0 !important;"
+                        ngbTooltip="confirmed" placement="bottom"></label>
+                </div>
+            </div>
+        </div>
+    </span>
     <span class="col-1 container-checkbox" *ngIf="multiSelection">
         <!-- Checkbox per la selezione multipla -->
         <div class="box-checkbox">
