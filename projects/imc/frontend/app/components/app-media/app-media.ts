@@ -202,6 +202,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     private split_shot(shots) {
         let next_idx = shots[0].attributes.shot_num + 1;
         this.shots.splice(next_idx, 0, shots[1]);
+        this.shots[next_idx].attributes.revision_confirmed = true;
         // update the subsequent shot numbers
         for (let i = next_idx + 1; i < this.shots.length; i++) {
             this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num + 1;
