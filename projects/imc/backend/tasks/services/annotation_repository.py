@@ -299,10 +299,10 @@ class AnnotationRepository():
                 log.info('New incoming shot number: {}'.format(shot_num))
                 shot_node = self.graph.Shot(
                     shot_num=shot_num, **properties)
-                if rev:
-                    shot_node.revision_confirmed = True
+                if rev and 'revision_confirmed' in properties:
+                    shot_node.revision_confirmed = properties['revision_confirmed']
                 shot_node.save()
-                if reviser is not None:
+                if reviser is not None and shot_node.revision_confirmed:
                     shot_node.revised_by.connect(reviser,
                                                  {'when': current_time})
                 tvs_body.segments.connect(shot_node)
@@ -310,9 +310,11 @@ class AnnotationRepository():
             else:
                 shot_node = res[0]
                 # props to update
-                if rev and properties['start_frame_idx'] != shot_node.start_frame_idx:
-                    shot_node.revision_confirmed = True
-                    if reviser is not None:
+                if rev and 'revision_confirmed' in properties:
+                    previous_confirmed = shot_node.revision_confirmed
+                    shot_node.revision_confirmed = properties['revision_confirmed']
+                    if reviser is not None and ((not previous_confirmed and shot_node.revision_confirmed) or
+                                                properties['start_frame_idx'] != shot_node.start_frame_idx):
                         shot_node.revised_by.connect(reviser,
                                                      {'when': current_time})
                 shot_node.start_frame_idx = properties['start_frame_idx']

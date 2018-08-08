@@ -60,6 +60,7 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 		this.data.shots[1].attributes.start_frame_idx = this.shots[1].attributes.start_frame_idx;
 		this.data.shots[1].attributes.timestamp = this.shots[1].attributes.timestamp;
 		this.data.shots[1].attributes.duration = this.shots[1].attributes.duration;
+		this.data.shots[1].attributes.revision_confirmed = true;
 	}
 
 	ok() {
