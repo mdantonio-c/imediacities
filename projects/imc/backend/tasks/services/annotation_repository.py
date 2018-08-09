@@ -503,9 +503,12 @@ class AnnotationRepository():
         object_type = None
         if body:
             od_body = body.downcast()
-            log.debug(type(od_body))
             object_id = od_body.object_id
-            concept = od_body.object_type.single()
+            concept = None
+            try:
+                concept = od_body.object_type.single()
+            except Exception as e:
+                log.warning(e)
             if concept is not None:
                 object_type = concept.name
             od_body.delete()
