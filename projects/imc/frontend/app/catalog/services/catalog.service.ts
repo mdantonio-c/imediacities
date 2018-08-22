@@ -13,7 +13,8 @@ export interface SearchFilter {
 	country: string,
 	productionYearFrom: number,
 	productionYearTo: number,
-	iprstatus: string
+	iprstatus: string,
+	missingDate: boolean
 }
 
 export interface SearchTerm {
@@ -43,7 +44,8 @@ export class CatalogService {
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
-			iprstatus: null
+			iprstatus: null,
+			missingDate: true
 		});
 	}
 
@@ -64,7 +66,8 @@ export class CatalogService {
 				iprstatus: filter.iprstatus,
 				yearfrom: filter.productionYearFrom,
 				yearto: filter.productionYearTo,
-				terms: filter.terms
+				terms: filter.terms,
+				missingDate: filter.missingDate
 			}
 		}
 		if (filter.searchTerm) {
@@ -103,7 +106,8 @@ export class CatalogService {
 					provider: filter.provider,
 					iprstatus: filter.iprstatus,
 					yearfrom: filter.productionYearFrom,
-					yearto: filter.productionYearTo
+					yearto: filter.productionYearTo,
+					missingDate: filter.missingDate
 				}
 			}
 			if (filter.searchTerm) {
@@ -160,7 +164,8 @@ export class CatalogService {
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
-			iprstatus: null
+			iprstatus: null,
+			missingDate: true
 		};
 		this.cacheValues();
 	}

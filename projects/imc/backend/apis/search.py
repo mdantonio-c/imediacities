@@ -162,26 +162,29 @@ class Search(GraphBaseOperations):
                     "MATCH (n) WHERE n.rights_status = '{iprstatus}'".format(
                         iprstatus=iprstatus))
             # PRODUCTION YEAR RANGE
-            year_from = filtering.get('yearfrom')
-            year_to = filtering.get('yearto')
-            if year_from is not None or year_to is not None:
-                # set defaults if year is missing
-                year_from = '1890' if year_from is None else str(year_from)
-                year_to = '1999' if year_to is None else str(year_to)
-                # FIXME: this DO NOT work with image
-                date_clauses = []
-                if item_type == 'video' or item_type == 'all':
-                    date_clauses.append(
-                        "ANY(item in n.production_years where item >= '{yfrom}') "
-                        "and ANY(item in n.production_years where item <= '{yto}')".format(
-                            yfrom=year_from, yto=year_to))
-                if item_type == 'image' or item_type == 'all':
-                    date_clauses.append(
-                        "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') "
-                        "and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
-                            yfrom=year_from, yto=year_to))
-                filters.append("MATCH (n) WHERE {clauses}".format(
-                    clauses=' or '.join(date_clauses)))
+            missingDate = filtering.get('missingDate')
+            #logger.debug("missingDate: {0}".format(missingDate))
+            if not missingDate:
+                year_from = filtering.get('yearfrom')
+                year_to = filtering.get('yearto')
+                if year_from is not None or year_to is not None:
+                    # set defaults if year is missing
+                    year_from = '1890' if year_from is None else str(year_from)
+                    year_to = '1999' if year_to is None else str(year_to)
+                    # FIXME: this DO NOT work with image
+                    date_clauses = []
+                    if item_type == 'video' or item_type == 'all':
+                        date_clauses.append(
+                            "ANY(item in n.production_years where item >= '{yfrom}') "
+                            "and ANY(item in n.production_years where item <= '{yto}')".format(
+                                yfrom=year_from, yto=year_to))
+                    if item_type == 'image' or item_type == 'all':
+                        date_clauses.append(
+                            "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') "
+                            "and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
+                                yfrom=year_from, yto=year_to))
+                    filters.append("MATCH (n) WHERE {clauses}".format(
+                        clauses=' or '.join(date_clauses)))
             # TERMS
             terms = filtering.get('terms')
             if terms:
@@ -209,6 +212,8 @@ class Search(GraphBaseOperations):
                 filters=' '.join(filters),
                 match=multi_match_query)
 
+        #logger.debug("QUERY to get number of elements: {0}".format(countv))
+
         # get total number of elements
         numels = [row[0] for row in self.graph.cypher(countv)][0]
         logger.debug("Number of elements retrieved: {0}".format(numels))
@@ -222,7 +227,7 @@ class Search(GraphBaseOperations):
                     match=multi_match_query,
                     offset=offset * limit,
                     limit=limit)
-        # logger.debug(query)
+        #logger.debug(query)
 
         data = []
         result = self.graph.cypher(query)

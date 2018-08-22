@@ -22,6 +22,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   cities: string[] = [];
   minProductionYear: number = 1890;
   maxProductionYear: number = 1999;
+  enableProdDateText: string = "Enable Production Date";
+  disableProdDateText: string = "Disable Production Date";
+  missingDateParam: boolean = true;
+  prodDateTooltip: string = this.enableProdDateText;
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
@@ -31,19 +35,30 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     private formBuilder: FormBuilder,
     private vocabularyService: AppVocabularyService,
     private catalogService: CatalogService) {
-    this.searchForm = this.formBuilder.group({
-      searchTerm: [''],
-      videoType: [true],
-      imageType: [false],
-      term: [''],
-      city: [''],
-      productionYearFrom: [1890],
-      productionYearTo: [1999],
-      iprstatus: [null]
-    });
+      this.searchForm = this.formBuilder.group({
+        searchTerm: [''],
+        videoType: [true],
+        imageType: [false],
+        term: [''],
+        city: [''],
+        productionYearFrom: [1890],
+        productionYearTo: [1999],
+        iprstatus: [null]
+      });
+      //console.log('constructor: this.catalogService.filter=' + this.catalogService.filter);
+      if(this.catalogService.filter){
+        //console.log('constructor: this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
+        this.missingDateParam = this.catalogService.filter.missingDate;
+        if(this.missingDateParam){
+          this.prodDateTooltip = this.enableProdDateText;
+        }else{
+          this.prodDateTooltip = this.disableProdDateText;
+        }
+      }
   }
 
   ngOnInit() {
+    //console.log('ngOnInit: this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
     for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
     this.vocabularyService.get((vocabulary) => { 
       this.vocabulary = vocabulary;
@@ -113,6 +128,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   applyFilter() {
     let form = this.searchForm.value;
     /*console.log('Form', form);*/
+    //console.log('applyFilter: this missingDateParam=' + this.missingDateParam);
     let filter: SearchFilter = {
       searchTerm: null,
       itemType: null,
@@ -121,7 +137,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       country: null,
       productionYearFrom: form.productionYearFrom,
       productionYearTo: form.productionYearTo,
-      iprstatus: null
+      iprstatus: null,
+      missingDate: this.missingDateParam
     }
     if (form.searchTerm !== '') { filter.searchTerm = form.searchTerm; }
     // item type
@@ -137,6 +154,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
     if (form.iprstatus !== '') { filter.iprstatus = form.iprstatus; }
+    //console.log('applyFilter: filter missingdate=' + filter.missingDate);
     this.onFilterChange.emit(filter);
   }
 
@@ -180,6 +198,18 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   changeYearFrom(newVal) {
     this.searchForm.get('productionYearFrom').setValue(newVal, { emitEvent: false })
+  }
+
+  changeMissingDate() {
+    var newVal = ! this.missingDateParam;
+    this.missingDateParam = newVal;
+    //console.log('changeMissingDate: after this missingDateParam=' + this.missingDateParam);
+    //console.log('changeMissingDate: after this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
+    if(this.missingDateParam){
+      this.prodDateTooltip = this.enableProdDateText;
+    }else{
+      this.prodDateTooltip = this.disableProdDateText;
+    }
   }
 
   expandTerm(term, parent = null) {
