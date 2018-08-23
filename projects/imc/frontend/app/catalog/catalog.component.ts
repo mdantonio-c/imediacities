@@ -14,6 +14,7 @@ export class CatalogComponent implements OnInit {
 	totalItems: number = 0;
 	results: MediaEntity[];
 	countByYears: any;
+	countMissingDate: number = 0;
 	countByProviders: any;
 	currentView: string = 'Grid';
 	filter: SearchFilter;
@@ -42,6 +43,7 @@ export class CatalogComponent implements OnInit {
 				this.results = response["Response"].data;
 				this.totalItems = response["Meta"].totalItems;
 				this.countByYears = response["Meta"].countByYears;
+				this.calculateCountMissingDate();
 				this.countByProviders = response["Meta"].countByProviders;
 				this.loading = false;
 			},
@@ -49,6 +51,18 @@ export class CatalogComponent implements OnInit {
 				this.notify.extractErrors(error.error.Response, this.notify.ERROR);
 				this.loading = false;
 			});
+	}
+
+	calculateCountMissingDate() {
+		var totalItemsByYears = 0;
+		for (let key of Object.keys(this.countByYears)) {
+      		totalItemsByYears += this.countByYears[key];
+    	}
+    	if(this.totalItems > totalItemsByYears){
+    		this.countMissingDate = this.totalItems - totalItemsByYears;
+    	}else{
+    		this.countMissingDate = 0;
+    	}
 	}
 
 	changeFilter(newFilter: SearchFilter) {

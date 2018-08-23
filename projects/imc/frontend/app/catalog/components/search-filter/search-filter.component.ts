@@ -45,20 +45,17 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         productionYearTo: [1999],
         iprstatus: [null]
       });
-      //console.log('constructor: this.catalogService.filter=' + this.catalogService.filter);
-      if(this.catalogService.filter){
-        //console.log('constructor: this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
-        this.missingDateParam = this.catalogService.filter.missingDate;
-        if(this.missingDateParam){
-          this.prodDateTooltip = this.enableProdDateText;
-        }else{
-          this.prodDateTooltip = this.disableProdDateText;
-        }
-      }
   }
 
   ngOnInit() {
-    //console.log('ngOnInit: this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
+    if(this.catalogService.filter){
+      this.missingDateParam = this.catalogService.filter.missingDate;
+      if(this.missingDateParam){
+        this.prodDateTooltip = this.enableProdDateText;
+      }else{
+        this.prodDateTooltip = this.disableProdDateText;
+      }
+    }
     for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
     this.vocabularyService.get((vocabulary) => { 
       this.vocabulary = vocabulary;
@@ -128,7 +125,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   applyFilter() {
     let form = this.searchForm.value;
     /*console.log('Form', form);*/
-    //console.log('applyFilter: this missingDateParam=' + this.missingDateParam);
     let filter: SearchFilter = {
       searchTerm: null,
       itemType: null,
@@ -154,7 +150,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
     if (form.iprstatus !== '') { filter.iprstatus = form.iprstatus; }
-    //console.log('applyFilter: filter missingdate=' + filter.missingDate);
     this.onFilterChange.emit(filter);
   }
 
@@ -162,6 +157,9 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.catalogService.reset();
     this.searchForm.setValue(this.toForm(this.catalogService.filter));
     this.vocabularyService.reset();
+
+    this.missingDateParam = true;
+    this.prodDateTooltip = this.enableProdDateText;
   }
 
   private cityToProvider(city) {
@@ -203,8 +201,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   changeMissingDate() {
     var newVal = ! this.missingDateParam;
     this.missingDateParam = newVal;
-    //console.log('changeMissingDate: after this missingDateParam=' + this.missingDateParam);
-    //console.log('changeMissingDate: after this.catalogService.filter.missingDate=' + this.catalogService.filter.missingDate);
     if(this.missingDateParam){
       this.prodDateTooltip = this.enableProdDateText;
     }else{
