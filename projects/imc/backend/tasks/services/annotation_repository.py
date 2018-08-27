@@ -301,6 +301,8 @@ class AnnotationRepository():
                     shot_num=shot_num, **properties)
                 if rev and 'revision_confirmed' in properties:
                     shot_node.revision_confirmed = properties['revision_confirmed']
+                if rev and 'revision_check' in properties:
+                    shot_node.revision_check = properties['revision_check']
                 shot_node.save()
                 if reviser is not None and shot_node.revision_confirmed:
                     shot_node.revised_by.connect(reviser,
@@ -317,6 +319,8 @@ class AnnotationRepository():
                                                 properties['start_frame_idx'] != shot_node.start_frame_idx):
                         shot_node.revised_by.connect(reviser,
                                                      {'when': current_time})
+                    if 'revision_check' in properties:
+                        shot_node.revision_check = properties['revision_check']
                 shot_node.start_frame_idx = properties['start_frame_idx']
                 shot_node.end_frame_idx = properties['end_frame_idx']
                 shot_node.timestamp = properties['timestamp']
@@ -499,9 +503,12 @@ class AnnotationRepository():
         object_type = None
         if body:
             od_body = body.downcast()
-            log.debug(type(od_body))
             object_id = od_body.object_id
-            concept = od_body.object_type.single()
+            concept = None
+            try:
+                concept = od_body.object_type.single()
+            except Exception as e:
+                log.warning(e)
             if concept is not None:
                 object_type = concept.name
             od_body.delete()

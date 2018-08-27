@@ -782,6 +782,10 @@ class VideoShotRevision(GraphBaseOperations):
                 raise RestApiException(
                     'Invalid confirmed value',
                     status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'double_check' in s and not isinstance(s['double_check'], bool):
+                raise RestApiException(
+                    'Invalid double_check value',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
             if (
                 'annotations' in s and
                 not isinstance(s['annotations'], type(list)) and

@@ -258,6 +258,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.advanced_show = stato;
     }
 
+    disableSaveAs() { return false; }
+
     ngOnInit () {
         this._frame_set(this.data.relationships.item[0].attributes.framerate);
     }
