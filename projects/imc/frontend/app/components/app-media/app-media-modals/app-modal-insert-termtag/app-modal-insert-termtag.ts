@@ -186,6 +186,9 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
                     this.p.close();
                 }
                 return vocabolario;
+            },
+            function() {
+                console.log("An error occurred in LodService.search");
             })
 
 
@@ -210,17 +213,14 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
      * @param event
      */
     term_add (event) {
-
         let close_results = false;
         if (event.source === 'vocabulary') {
             this.VocabularyService.toggle_term(event);
         }
-
         if (typeof event === 'string') {
             event = {name:event};
             close_results = true;
         }
-
         if (event && event.name) {
             //  prevengo duplicazioni
             let esistente = this.terms.some(t => {
@@ -236,12 +236,12 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
                 this.terms.push(
                     this.VocabularyService.annotation_create(event)
                 );
+                // reset input field
+                this.ricerca_model = '';
             }
-
             if (close_results) {
                 this.p.close();
             }
-
         }
     }
     /**
@@ -327,7 +327,6 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     }
 
     ngOnChanges () {
-
         this.terms_all = this.AnnotationsService.merge(this.data.shots, 'tags');
 
         this.VocabularyService.get((vocabolario)=>{this.vocabolario = vocabolario});

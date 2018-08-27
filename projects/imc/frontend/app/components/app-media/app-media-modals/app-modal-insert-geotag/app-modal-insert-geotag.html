@@ -2,10 +2,14 @@
 
     <div class="col-12 col-sm-7 row space-paragraph-20 no-gutters" modal-col>
        <span class="col-10">
-           <input type="text" class="imc--input imc--input-search" placeholder="Search location" aria-label="Location"
-                  places-auto-complete
-                  (place_changed)="ricerca($event)"
-                  [types]="['geocode']">
+           <input type="text"
+              [(ngModel)]="geotagSearchField"
+              class="imc--input imc--input-search" 
+              placeholder="Search location" 
+              aria-label="Location"
+              places-auto-complete
+              (place_changed)="ricerca($event)"
+              [types]="['geocode']">
        </span>
 
         <!--Tag duplicati-->

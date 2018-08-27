@@ -48,8 +48,12 @@
                 <!--<input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag"
                        (keyup)="search_vocabulary_and_lods($event)" [(ngModel)]="ricerca_model"
                 >-->
-                <input type="text" class="imc--input imc--input-search" placeholder="Search here" aria-label="Tag"
-                       (keyup)="onKeyup($event)" [(ngModel)]="ricerca_model"
+                <input type="text" 
+                    class="imc--input imc--input-search" 
+                    placeholder="Search here" 
+                    aria-label="Tag" 
+                    (keyup)="onKeyup($event)" 
+                    [(ngModel)]="ricerca_model"
                 >
                 <span
                     [ngbPopover]="popContent"
