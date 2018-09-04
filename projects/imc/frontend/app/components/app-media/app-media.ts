@@ -215,7 +215,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             return {
                 shot_num: s.attributes.shot_num,
                 cut: s.attributes.start_frame_idx,
-                confirmed: s.attributes.revision_confirmed
+                confirmed: s.attributes.revision_confirmed,
+                double_check: s.attributes.revision_check
             } as SceneCut;
         });
         this.shotRevisionService.reviseVideoShots(this.media_id, shots, () => {

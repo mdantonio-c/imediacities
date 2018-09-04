@@ -287,7 +287,7 @@ def shot_revision(self, revision, item_id):
         shots, vim_estimations = extract_tvs_vim_results(
             self, item, analyze_path)
 
-        # extract 'confirmed' flags
+        # extract 'confirmed' and 'double_check' flags
         for s in revision['shots']:
             shot_num = s['shot_num']
             if shot_num == 0:
@@ -296,7 +296,9 @@ def shot_revision(self, revision, item_id):
             if shot is None:
                 # should never be reached
                 log.warn('Shot {} cannot be found'.format(shot_num))
+                continue
             shot['revision_confirmed'] = s.get('confirmed', False)
+            shot['revision_check'] = s.get('double_check', False)
 
         repo = AnnotationRepository(self.graph)
         # first remove existing automatic VIM annotations if any

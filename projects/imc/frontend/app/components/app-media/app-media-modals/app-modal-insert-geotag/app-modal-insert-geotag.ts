@@ -32,6 +32,8 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     embargo_enable = false;
     embargo_model;
 
+    geotagSearchField;
+
     constructor (
         private AnnotationsService: AppAnnotationsService,
         private ref: ChangeDetectorRef
@@ -50,20 +52,15 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
      * @param place
      */
     ricerca (place) {
-
         if (!place || !place.geometry) {
             return;
         }
-
         this.address = {};
-
         this.center = place.geometry.location;
-
         for (let i = 0; i < place.address_components.length; i++) {
             let addressType = place.address_components[i].types[0];
             this.address[addressType] = place.address_components[i].long_name;
         }
-
         let marker = {
             name: this.address.route || this.address.locality || this.address.country || this.address.administrative_area_level_2 || this.address.administrative_area_level_1,
             creator_type: 'user',
@@ -72,27 +69,22 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
             icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
             spatial: [place.geometry.location.lat(), place.geometry.location.lng()],
         };
-
         let esistente = this.places_to_add.some(e => {
             return e.spatial[0] === marker.spatial[0] && e.spatial[1] === marker.spatial[1]
         });
-
         esistente = esistente || this.mappa.markers.some(e => {
             return e.spatial[0] === marker.spatial[0] && e.spatial[1] === marker.spatial[1]
         });
-
         if (esistente) {
             return this.add_geotag.show('info', 'This geotag has already been added');
         } else {
             this.add_geotag.hide();
         }
-
         this.places_to_add.push(marker);
         this.mappa.marker_push(marker);
-
         this.fit_bounds();
         this.ref.detectChanges();
-
+        this.geotagSearchField = '';
     }
     /**
      * Rimuove un place precedente aggiunto

@@ -3,6 +3,16 @@
     <span class="col-12" *ngIf="canRevise && shot.attributes.shot_num > 0">
         <div class="row no-gutters">
             <div class="col-11 revision-tool-div">
+                <div class="box-checkbox float-left ml-2">
+                    <span class="click-event" (click)=doubleCheck()>
+                        <i class="fa fa-thumb-tack revision-tool-icon" aria-hidden="true" *ngIf="shot.attributes.revision_check; else rotateThumbtack"
+                        ngbTooltip="uncheck" placement="right"></i>
+                        <ng-template #rotateThumbtack>
+                            <i class="fa fa-thumb-tack fa-rotate-180" aria-hidden="true"
+                                ngbTooltip="double check" placement="right"></i>
+                        </ng-template>
+                    </span>
+                </div>
                 <ng-container *ngIf="!shot.attributes.revision_confirmed">
                     <div class="d-inline mr-1">
                         <i class="material-icons revision-tool-icon"
@@ -52,7 +62,7 @@
         <span *ngIf="canRevise && is_attivo">
             <i class="fa fa-cut revision-tool-icon"
                 ngbTooltip="Split shot" placement="bottom"
-                (click)="modale_show({target: {innerText: 'Add Cut'}, next: false}, 'move-cut')"></i>
+                (click)="modale_show({target: {innerText: 'Add Cut'}, previous: false}, 'move-cut')"></i>
         </span>
     </span>
     <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">

@@ -342,3 +342,19 @@ search-thumbnail div .media-image-wrapper {
   padding: 2px 6px;
   z-index: 1;
 }
+
+/* CINZIA */
+.btn-icon-invisible{
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+}
+
+#missingDateButtonId .tooltip .tooltip-inner {
+  font-size: 25%  !important;
+}
+
+.date-div-disabled {
+    pointer-events: none;
+    opacity: 0.3 !important;
+}

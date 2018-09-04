@@ -108,6 +108,10 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         animateScroll();
     }
 
+    doubleCheck() {
+        this.shot.attributes.revision_check = !this.shot.attributes.revision_check;
+    }
+
     remove_cut() {
         console.log('remove (lower) cut for shot', this.shot);
         this.revise_shot.emit({
