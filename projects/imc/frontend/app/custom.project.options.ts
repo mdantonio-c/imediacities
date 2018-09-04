@@ -12,6 +12,10 @@ export class ProjectOptions {
 			return this.registration_options()
 		}
 
+        if (opt == 'privacy_acceptance') {
+            return this.privacy_acceptance()
+        }
+
         if (opt == 'user_page') {
             return {
                 "group": true,
@@ -24,6 +28,14 @@ export class ProjectOptions {
 		return null;
 	}
 
+    private privacy_acceptance() {
+
+        return [
+            {'label': 'Terms of Use', 'text': require("./terms_of_use.html")},
+            {'label': 'Privacy Policy', 'text': require("./privacy_policy.html")},
+            {'label': 'Research declaration', 'text': require("./research_declaration.html")}
+        ];
+    }
 	
 	private registration_options() {
 
