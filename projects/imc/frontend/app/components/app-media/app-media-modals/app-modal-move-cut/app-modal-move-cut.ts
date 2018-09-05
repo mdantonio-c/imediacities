@@ -1,19 +1,21 @@
-import { Component, OnChanges, AfterViewInit, Input, ViewChild } from '@angular/core';
+import { Component, OnChanges, AfterViewInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { AppMediaModal } from "../app-media-modal";
 import { ShotRevisionService } from "../../../../services/shot-revision.service";
 import { AppVideoService } from "../../../../services/app-video";
+import { Subscription }   from 'rxjs';
 
 @Component({
 	selector: 'app-modal-move-cut',
 	templateUrl: 'app-modal-move-cut.html'
 })
-export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
+export class AppModalMoveCutComponent implements AfterViewInit, OnChanges, OnDestroy {
 
 	@Input() data: any;
 	@Input() current_cut: number;
 
 	changed: boolean = false;
 	shots: any[] = [];
+	subscription: Subscription;
 	
 	private fps;
 	private split = false;
@@ -136,6 +138,11 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 	ngAfterViewInit() {
 		this.init_player();
 	}
+
+	ngOnDestroy() {
+   		// prevent memory leak when component destroyed
+    	this.subscription.unsubscribe();
+  	}
 
 	private init_player() {
 		this.modal.videoPlayer.range.set({

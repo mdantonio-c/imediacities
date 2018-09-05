@@ -14,7 +14,8 @@ import { NotificationService } from '/rapydo/src/app/services/notification';
  */
 @Component({
     selector: 'app-media',
-    templateUrl: 'app-media.html'
+    templateUrl: 'app-media.html',
+    providers: [ShotRevisionService]
 })
 export class AppMediaComponent implements OnInit, OnDestroy {
 
@@ -200,6 +201,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     private split_shot(shots) {
+        if (shots === undefined || shots.length != 2) {
+            console.warn('Invalid input in split_shot', shots);
+        }
         let next_idx = shots[0].attributes.shot_num + 1;
         this.shots.splice(next_idx, 0, shots[1]);
         this.shots[next_idx].attributes.revision_confirmed = true;
