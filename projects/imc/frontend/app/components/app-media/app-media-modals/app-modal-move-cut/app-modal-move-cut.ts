@@ -26,7 +26,7 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges, OnDes
 		private shotRevisionService: ShotRevisionService,
 		private videoService: AppVideoService)
 	{
-		shotRevisionService.cutChanged$.subscribe(
+		this.subscription = shotRevisionService.cutChanged$.subscribe(
 			cut => { this.change_cut(cut); }
 		);
 	}
