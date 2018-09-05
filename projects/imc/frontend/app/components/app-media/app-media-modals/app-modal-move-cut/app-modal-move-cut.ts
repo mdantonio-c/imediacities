@@ -69,7 +69,12 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 	}
 
 	ngOnChanges() {
+		/* init component */
 		this.fps = this.videoService.fps();
+		this.changed = false;
+		this.shots = [];
+		this.split = false;
+		
 		if (this.data.shots.length === 1) {
 			// expected exactly one shot for 'add cut'
 			let shot = this.data.shots[0];
@@ -78,6 +83,8 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 				shot.attributes.start_frame_idx + Math.floor((shot.attributes.end_frame_idx - shot.attributes.start_frame_idx) / 2) + 1;
 			// split the shot
 			this.shots = this.split_shot(shot, this.current_cut);
+			/*console.log('shot[0]', JSON.stringify(this.shots[0]));
+			console.log('shot[1]', JSON.stringify(this.shots[1]));*/
 			this.changed = true;
 			this.split = true;
 		} else {
