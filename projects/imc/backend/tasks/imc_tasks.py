@@ -4,6 +4,7 @@ import os
 import json
 import random
 import re
+import traceback
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
@@ -285,7 +286,6 @@ def shot_revision(self, revision, item_id):
         for s in sorted(revision['shots'], key=itemgetter('shot_num'))[1:]:
             revised_cuts.append(s['cut'])
         log.info('new list of cuts: {}'.format(revised_cuts))
-        raise Exception('Force Exception')
         update_storyboard(revised_cuts, analyze_path)
 
         # extract new TVS and VIM results
@@ -326,12 +326,15 @@ def shot_revision(self, revision, item_id):
             item.creation).downcast()
         replaces = {
             "title": aventity.identifying_title,
-            "vid": aventity.uuid
+            "vid": aventity.uuid,
+            "task_id": "",
+            "failure": ""
         }
         # send an email to the reviser (and to the administrator)
+        failure = traceback.format_exc()
         send_notification(self, reviser.email, 'Error in shot revision',
                           'shot_revision_failure.html', replaces,
-                          self.request.id, e)
+                          self.request.id, failure)
     finally:
         if exitRevision:
             item.revision.disconnect_all()
@@ -807,16 +810,9 @@ def send_notification(self, recipient, subject, template, replaces, task_id,
     an email is also sent to the system administrator with some more details
     about failure.
     """
-    log.debug("Send mail to %s" % recipient)
-    log.debug("Subject %s" % subject)
-    log.debug("Template %s" % template)
-    log.debug("replaces %s" % replaces)
-    log.debug("replaces type %s" % type(replaces.get('title')))
-    log.debug("replaces type %s" % type(replaces.get('vid')))
-    log.debug("Task id %s" % task_id)
-    log.debug("Failure %s" % failure)
-    body = get_html_template(template, {})
-    send_mail(body, subject, recipient)
+    body = get_html_template(template, replaces)
+    send_mail(body, subject, recipient,
+              plain_body="Sorry User, your job ID {task} is failed".format(task=task_id))
 
     if failure is not None:
         replaces['task_id'] = task_id
