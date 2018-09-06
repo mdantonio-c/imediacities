@@ -1,19 +1,21 @@
-import { Component, OnChanges, AfterViewInit, Input, ViewChild } from '@angular/core';
+import { Component, OnChanges, AfterViewInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { AppMediaModal } from "../app-media-modal";
 import { ShotRevisionService } from "../../../../services/shot-revision.service";
 import { AppVideoService } from "../../../../services/app-video";
+import { Subscription }   from 'rxjs';
 
 @Component({
 	selector: 'app-modal-move-cut',
 	templateUrl: 'app-modal-move-cut.html'
 })
-export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
+export class AppModalMoveCutComponent implements AfterViewInit, OnChanges, OnDestroy {
 
 	@Input() data: any;
 	@Input() current_cut: number;
 
 	changed: boolean = false;
 	shots: any[] = [];
+	subscription: Subscription;
 	
 	private fps;
 	private split = false;
@@ -24,7 +26,7 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 		private shotRevisionService: ShotRevisionService,
 		private videoService: AppVideoService)
 	{
-		shotRevisionService.cutChanged$.subscribe(
+		this.subscription = shotRevisionService.cutChanged$.subscribe(
 			cut => { this.change_cut(cut); }
 		);
 	}
@@ -60,6 +62,7 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 		this.data.shots[1].attributes.start_frame_idx = this.shots[1].attributes.start_frame_idx;
 		this.data.shots[1].attributes.timestamp = this.shots[1].attributes.timestamp;
 		this.data.shots[1].attributes.duration = this.shots[1].attributes.duration;
+		this.data.shots[1].attributes.revision_confirmed = true;
 	}
 
 	ok() {
@@ -68,7 +71,12 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 	}
 
 	ngOnChanges() {
+		/* init component */
 		this.fps = this.videoService.fps();
+		this.changed = false;
+		this.shots = [];
+		this.split = false;
+		
 		if (this.data.shots.length === 1) {
 			// expected exactly one shot for 'add cut'
 			let shot = this.data.shots[0];
@@ -77,6 +85,8 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 				shot.attributes.start_frame_idx + Math.floor((shot.attributes.end_frame_idx - shot.attributes.start_frame_idx) / 2) + 1;
 			// split the shot
 			this.shots = this.split_shot(shot, this.current_cut);
+			/*console.log('shot[0]', JSON.stringify(this.shots[0]));
+			console.log('shot[1]', JSON.stringify(this.shots[1]));*/
 			this.changed = true;
 			this.split = true;
 		} else {
@@ -97,19 +107,30 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 
 	/* */
 	private split_shot(shot: any, cut: number): any[] {
-		/*let shot_1 = Object.assign({}, shot);
-		let shot_2 = Object.assign({}, shot);*/
 		let shot_1 = JSON.parse(JSON.stringify(shot));
-		let shot_2 = JSON.parse(JSON.stringify(shot));
 		// update shot 1
 		shot_1.attributes.end_frame_idx = cut -1;
 		shot_1.attributes.duration = this.shotRevisionService.shot_duration(shot_1, this.fps);
-		// update shot 2
-		shot_2.id = null;
-		shot_2.links = null;
-		shot_2.attributes.shot_num += 1;
-		shot_2.attributes.start_frame_idx = cut;
-		shot_2.attributes.timestamp = this.shotRevisionService.shot_timestamp(cut, this.fps);
+		// create a new shot 2
+		let shot_2 = {
+			id: null,
+			links: null,
+			attivo: false,
+			attributes: {
+				shot_num: shot_1.attributes.shot_num + 1,
+				start_frame_idx: cut,
+				end_frame_idx: shot.attributes.end_frame_idx,
+				timestamp: this.shotRevisionService.shot_timestamp(cut, this.fps),
+				duration: null
+			},
+			annotations: {
+				links: [],
+				locations: [],
+				notes: [],
+				references: [],
+				tags: []
+			}
+		}
 		shot_2.attributes.duration = this.shotRevisionService.shot_duration(shot_2, this.fps);
 		return [shot_1, shot_2];
 	}
@@ -117,6 +138,11 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges {
 	ngAfterViewInit() {
 		this.init_player();
 	}
+
+	ngOnDestroy() {
+   		// prevent memory leak when component destroyed
+    	this.subscription.unsubscribe();
+  	}
 
 	private init_player() {
 		this.modal.videoPlayer.range.set({

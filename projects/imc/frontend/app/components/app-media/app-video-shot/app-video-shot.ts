@@ -14,7 +14,6 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     @Input() media_type = 'video';
     @Input() underRevision: boolean = false;
     @Input() canRevise: boolean = false;
-    @Input() tot_num_shots: number;
 
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();
     @Output() is_selezionato: EventEmitter<any> = new EventEmitter<any>();
@@ -53,7 +52,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
                 modale: modale,
                 titolo: event.target.innerText,
                 data: { shots: [this.shot] },
-                next: event.next ? true : false
+                previous: event.previous ? true : false
             });
         }
     }
@@ -109,8 +108,12 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         animateScroll();
     }
 
-    remove_upper_cut() {
-        console.log('remove upper cut for shot', this.shot);
+    doubleCheck() {
+        this.shot.attributes.revision_check = !this.shot.attributes.revision_check;
+    }
+
+    remove_cut() {
+        console.log('remove (lower) cut for shot', this.shot);
         this.revise_shot.emit({
             op: 'join',
             index: this.shot.attributes.shot_num,
@@ -118,8 +121,8 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     }
 
     move_cut() {
-        // move to the first frame of the next shot
-        this.parent.jump_to(this.shot.attributes.end_frame_idx+1, true, true);
+        // move to the start frame
+        this.parent.jump_to(this.shot.attributes.start_frame_idx, true, true);
     }
 
     //t = current time

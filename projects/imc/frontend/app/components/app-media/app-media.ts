@@ -14,7 +14,8 @@ import { NotificationService } from '/rapydo/src/app/services/notification';
  */
 @Component({
     selector: 'app-media',
-    templateUrl: 'app-media.html'
+    templateUrl: 'app-media.html',
+    providers: [ShotRevisionService]
 })
 export class AppMediaComponent implements OnInit, OnDestroy {
 
@@ -173,7 +174,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         let op = $event.op;
         switch ($event.op) {
             case "join":
-                this.join_shots($event.index, $event.index + 1);
+                this.join_shots($event.index - 1, $event.index);
                 break;
             default:
                 console.warn('Invalid operation in revising shot for ' + $event.op);
@@ -200,8 +201,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     private split_shot(shots) {
+        if (shots === undefined || shots.length != 2) {
+            console.warn('Invalid input in split_shot', shots);
+            this.notify.showError('Invalid input in split shot');
+            return;
+        }
         let next_idx = shots[0].attributes.shot_num + 1;
         this.shots.splice(next_idx, 0, shots[1]);
+        this.shots[next_idx].attributes.revision_confirmed = true;
         // update the subsequent shot numbers
         for (let i = next_idx + 1; i < this.shots.length; i++) {
             this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num + 1;
@@ -214,7 +221,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             return {
                 shot_num: s.attributes.shot_num,
                 cut: s.attributes.start_frame_idx,
-                confirmed: s.attributes.revision_confirmed
+                confirmed: s.attributes.revision_confirmed,
+                double_check: s.attributes.revision_check
             } as SceneCut;
         });
         this.shotRevisionService.reviseVideoShots(this.media_id, shots, () => {
@@ -253,10 +261,10 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             this.appVideo.video.pause();
         }
         this.modale.type = componente.modale;
-        if (componente.next) {
-            // use the next flag to add the next shot to the list
-            let next_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num + 1;
-            componente.data.shots.push(this.shots[next_shot_num]);
+        if (componente.previous) {
+            // use the previous flag to add the previous shot to the list
+            let previous_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num - 1;
+            componente.data.shots.unshift(this.shots[previous_shot_num]);
         }
         this.modale.data = componente.data;
 

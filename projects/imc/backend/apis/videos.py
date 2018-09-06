@@ -782,6 +782,10 @@ class VideoShotRevision(GraphBaseOperations):
                 raise RestApiException(
                     'Invalid confirmed value',
                     status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'double_check' in s and not isinstance(s['double_check'], bool):
+                raise RestApiException(
+                    'Invalid double_check value',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
             if (
                 'annotations' in s and
                 not isinstance(s['annotations'], type(list)) and
@@ -795,11 +799,13 @@ class VideoShotRevision(GraphBaseOperations):
                 'Invalid exitRevision',
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
+        revision['reviser'] = user.uuid
         # launch asynch task
         try:
             task = CeleryExt.shot_revision.apply_async(
                 args=[revision, item.uuid],
-                countdown=10
+                countdown=10,
+                priority=5
             )
             assignee = item.revision.single()
             rel = item.revision.relationship(assignee)

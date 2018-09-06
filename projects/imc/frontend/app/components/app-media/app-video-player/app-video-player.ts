@@ -151,7 +151,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
                 let current_frame = Math.ceil(this.fps * this.video.currentTime);
                 let shot_corrente = 0;
                 this.shots.forEach((s,idx) => {
-                    if (current_frame >= s.attributes.start_frame_idx && current_frame < s.attributes.end_frame_idx) {
+                    if (current_frame >= s.attributes.start_frame_idx && current_frame <= s.attributes.end_frame_idx) {
                         s.attivo = true;
                         shot_corrente = idx;
                     } else {
@@ -257,6 +257,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     public advanced_control_show (stato) {
         this.advanced_show = stato;
     }
+
+    disableSaveAs() { return false; }
 
     ngOnInit () {
         this._frame_set(this.data.relationships.item[0].attributes.framerate);

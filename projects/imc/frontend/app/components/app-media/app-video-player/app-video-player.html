@@ -3,7 +3,7 @@
     <div class="video_container col-12" *ngIf="data">
     <div class="video_wrapper">
         <div class="video-box">
-            <video #videoPlayer preload></video>
+            <video (contextmenu)="disableSaveAs($event)" #videoPlayer preload></video>
         </div>
         <div class="controls" *ngIf="showComponents">
             <!--progress bar-->

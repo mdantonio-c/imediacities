@@ -135,7 +135,6 @@ picture-->
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
                                         (current_component)="appVideo.registra($event)" [parent]="appVideo"
-                                        [tot_num_shots]=shots.length
                                 ></app-video-shot>
                             </div>
                         </div>
@@ -217,7 +216,7 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-                    <ng-container *ngIf="!multi_annotations_is_active && !shot_revision_is_active">
+                    <ng-container *ngIf="media_type === 'video' && !multi_annotations_is_active && !shot_revision_is_active">
                         <button class="btn btn-border-classic px-1" 
                             mwlConfirmationPopover
                             [popoverTitle]="'Start Shot Revision'"

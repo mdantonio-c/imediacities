@@ -752,6 +752,7 @@ class Shot(VideoSegment):
     timestamp = StringProperty(show=True)
     duration = FloatProperty(show=True)
     revision_confirmed = BooleanProperty(default=False, show=True)
+    revision_check = BooleanProperty(default=False, show=True)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
         'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
