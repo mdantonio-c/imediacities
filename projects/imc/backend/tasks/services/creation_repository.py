@@ -170,6 +170,7 @@ class CreationRepository():
 
     def find_agents_by_name(self, name):
         log.debug('Find all agents with name: {}'.format(name))
+        name = self.graph.sanitize_input(name)
         query = "MATCH (a:Agent) WHERE '{name}' in a.names RETURN a"
         results = self.graph.cypher(query.format(name=name))
         return [self.graph.Agent.inflate(row[0]) for row in results]
