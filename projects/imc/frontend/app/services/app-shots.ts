@@ -227,8 +227,8 @@ export class AppShotsService {
 
         return {
             creation_date: annotation.attributes.creation_datetime,
-            creator: annotation.creator.id,
-            creator_type: annotation.creator.type,
+            creator: annotation.creator ? annotation.creator.id : null,
+            creator_type: annotation.creator ? annotation.creator.type : null,
             embargo: annotation.embargo || null,
             group: annotation_body.attributes.spatial ? 'location' : 'term',
             body_id: annotation_body.id,

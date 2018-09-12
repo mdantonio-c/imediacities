@@ -94,41 +94,47 @@
         <div class="content">
             <div>
                 <ng-template
-                ngFor
-                let-tag
-                [ngForOf]="shot.annotations.tags">
-            <app-media-annotation [annotation]="tag" [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
-            </ng-template>
-        </div>
-        <div>
-            <ng-template
-            ngFor
-            let-location
-            [ngForOf]="shot.annotations.locations">
-            <app-media-annotation [annotation]="location"
-            [can_delete]="tag_is_deletable(location)"></app-media-annotation>
-            </ng-template>
-        </div>
-        <div class="row no-gutters space-paragraph-20" *ngIf="!underRevision">
-            <!-- modali -->
-            <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
-                <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
-                <div ngbDropdownMenu [attr.aria-labelledby]="dropdown_id" class="imc--input--dropdown">
-                    <span (click)="modale_show($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
-                    <span (click)="modale_show($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
-                    <span (click)="modale_show($event, 'insert-note')" class="dropdown-item">Add Note</span>
-                    <!--
-                    <span (click)="modale_show($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
-                    <span (click)="modale_show($event, 'insert-link')" class="dropdown-item">Add Link</span>
-                    -->
-                </div>
+                    ngFor
+                    let-tag
+                    [ngForOf]="shot.annotations.tags">
+                    <app-media-annotation [annotation]="tag" [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
+                </ng-template>
+                <!-- TODO add here automatic tags -->
+                <!-- <ng-template
+                    ngFor
+                    let-tag
+                    [ngForOf]="shot.auto_tags">
+                    <app-media-annotation [annotation]="tag.name"></app-media-annotation>
+                </ng-template> -->
             </div>
-            <div class="col-7 col-lg-5 box-annotation-buttons">
-                <!-- bottone vedi tutte le annotazioni -->
-                <button class="btn btn-accent" (click)="modale_show($event, 'all-annotations')">See All</button>
-                <!-- aggiungi a una lista -->
-            <button class="btn btn-icon-border-classic tmp_hidden"><i class="material-icons">playlist_add</i></button></div>
+            <div>
+                <ng-template
+                    ngFor
+                    let-location
+                    [ngForOf]="shot.annotations.locations">
+                    <app-media-annotation [annotation]="location" [can_delete]="tag_is_deletable(location)"></app-media-annotation>
+                </ng-template>
+            </div>
+            <div class="row no-gutters space-paragraph-20" *ngIf="!underRevision">
+                <!-- modali -->
+                <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
+                    <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>
+                    <div ngbDropdownMenu [attr.aria-labelledby]="dropdown_id" class="imc--input--dropdown">
+                        <span (click)="modale_show($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                        <span (click)="modale_show($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                        <span (click)="modale_show($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                        <!--
+                        <span (click)="modale_show($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                        <span (click)="modale_show($event, 'insert-link')" class="dropdown-item">Add Link</span>
+                        -->
+                    </div>
+                </div>
+                <div class="col-7 col-lg-5 box-annotation-buttons">
+                    <!-- bottone vedi tutte le annotazioni -->
+                    <button class="btn btn-accent" (click)="modale_show($event, 'all-annotations')">See All</button>
+                    <!-- aggiungi a una lista -->
+                <button class="btn btn-icon-border-classic tmp_hidden"><i class="material-icons">playlist_add</i></button></div>
+            </div>
         </div>
     </div>
-</div>
 </div>

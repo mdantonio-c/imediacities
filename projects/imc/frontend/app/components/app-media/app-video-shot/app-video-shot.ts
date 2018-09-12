@@ -88,7 +88,11 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     }
 
     tag_is_deletable(tag) {
-        return this.is_annotation_owner(this.user, tag.creator) && !this.underRevision;
+        return !this.tag_is_automatic(tag) && this.is_annotation_owner(this.user, tag.creator) && !this.underRevision;
+    }
+
+    tag_is_automatic(tag) {
+        return tag.creator ? false : true;
     }
 
     scrollTo(element, to, duration) {
