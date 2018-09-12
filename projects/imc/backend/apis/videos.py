@@ -296,9 +296,6 @@ class VideoShots(GraphBaseOperations):
             # get all shot annotations:
             # at the moment filter by vim and tag annotations
             shot['annotations'] = []
-            shot['tags'] = []
-            # <dict(iri, name)>{iri, name, spatial, auto, hits}
-            tags = {}
             for anno in s.annotation.all():
                 creator = anno.creator.single()
                 if anno.private:
@@ -320,51 +317,31 @@ class VideoShots(GraphBaseOperations):
                     mdb = b.downcast()  # most derivative body
                     res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
-                    if anno.annotation_type == 'TAG':
-                        spatial = None
-                        if 'ResourceBody' in mdb.labels():
-                            iri = mdb.iri
-                            name = mdb.name
-                            spatial = mdb.spatial
-                        elif 'TextualBody' in mdb.labels():
-                            iri = None
-                            name = mdb.value
-                        else:
-                            # unmanaged body type for tag
-                            continue
-                        ''' only for manual tag annotations  '''
-                        tag = tags.get((iri, name))
-                        if tag is None:
-                            tags[(iri, name)] = {
-                                'iri': iri,
-                                'name': name,
-                                'hits': 1
-                            }
-                            if spatial is not None:
-                                tags[(iri, name)]['spatial'] = spatial
-                        else:
-                            tag['hits'] += 1
                 shot['annotations'].append(res)
 
-            # add any other tags from "embedded segments"
+            # add automatic tags from "embedded segments"
+            shot['auto_tags'] = []
+            # <dict(iri, name)>{iri, name, spatial, auto, hits}
+            auto_tags = {}
             for segment in s.embedded_segments.all():
                 # get ONLY public tags
-                for s_anno in segment.annotation.search(annotation_type='TAG', private=False):
+                for s_anno in segment.annotation.search(
+                        annotation_type='TAG', generator='FHG', private=False):
                     for b in s_anno.bodies.all():
                         mdb = b.downcast()  # most derivative body
                         if 'ODBody' in mdb.labels():
                             # object detection body
                             concept = mdb.object_type.single()
-                            tag = tags.get((concept.iri, concept.name))
+                            tag = auto_tags.get((concept.iri, concept.name))
                             if tag is None:
-                                tags[(concept.iri, concept.name)] = {
+                                auto_tags[(concept.iri, concept.name)] = {
                                     'iri': concept.iri,
                                     'name': concept.name,
                                     'hits': 1
                                 }
                             else:
                                 tag['hits'] += 1
-            shot['tags'] = list(tags.values())
+            shot['auto_tags'] = list(auto_tags.values())
             data.append(shot)
 
         return self.force_response(data)
