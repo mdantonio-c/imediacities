@@ -804,7 +804,8 @@ class VideoShotRevision(GraphBaseOperations):
         try:
             task = CeleryExt.shot_revision.apply_async(
                 args=[revision, item.uuid],
-                countdown=10
+                countdown=10,
+                priority=5
             )
             assignee = item.revision.single()
             rel = item.revision.relationship(assignee)

@@ -4,6 +4,7 @@ import os
 import json
 import random
 import re
+import traceback
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
@@ -16,8 +17,8 @@ from operator import itemgetter
 
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
-
 from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.services.mail import send_mail, get_html_template
 
 celery_app = CeleryExt.celery_app
 
@@ -266,6 +267,10 @@ def launch_tool(self, tool_name, item_id):
 def shot_revision(self, revision, item_id):
     log.info('Start shot revision task for video item [{0}]'.format(item_id))
     self.graph = celery_app.get_service('neo4j')
+    # get reviser
+    reviser = self.graph.User.nodes.get_or_none(uuid=revision['reviser'])
+    exitRevision = True if 'exitRevision' in revision and revision['exitRevision'] else False
+    item = None
     try:
         item = self.graph.Item.nodes.get(uuid=item_id)
         content_source = GraphBaseOperations.getSingleLinkedNode(
@@ -280,7 +285,7 @@ def shot_revision(self, revision, item_id):
         revised_cuts = []
         for s in sorted(revision['shots'], key=itemgetter('shot_num'))[1:]:
             revised_cuts.append(s['cut'])
-        log.debug('new list of cuts: {}'.format(revised_cuts))
+        log.info('new list of cuts: {}'.format(revised_cuts))
         update_storyboard(revised_cuts, analyze_path)
 
         # extract new TVS and VIM results
@@ -309,16 +314,28 @@ def shot_revision(self, revision, item_id):
             repo.delete_vim_annotation(anno)
             log.debug("Deleted existing VIM annotation [%s]" % anno_id)
 
-        # get reviser
-        reviser = self.graph.User.nodes.get_or_none(uuid=revision['reviser'])
-
         # update TVS annotations
         repo.update_automatic_tvs(item, shots, vim_estimations, True, reviser)
 
         # save VIM annotations
         repo.create_vim_annotation(item, vim_estimations)
 
-        exitRevision = True if 'exitRevision' in revision and revision['exitRevision'] else False
+    except Exception as e:
+        log.error("Shot revision task has encountered some problems. %s" % e)
+        aventity = GraphBaseOperations.getSingleLinkedNode(
+            item.creation).downcast()
+        replaces = {
+            "title": aventity.identifying_title,
+            "vid": aventity.uuid,
+            "task_id": "",
+            "failure": ""
+        }
+        # send an email to the reviser (and to the administrator)
+        failure = traceback.format_exc()
+        send_notification(self, reviser.email, 'Error in shot revision',
+                          'shot_revision_failure.html', replaces,
+                          self.request.id, failure)
+    finally:
         if exitRevision:
             item.revision.disconnect_all()
         else:
@@ -326,12 +343,9 @@ def shot_revision(self, revision, item_id):
             rel = item.revision.relationship(assignee)
             rel.state = 'W'
             rel.save()
-        log.info('Shot revision task completed successfully (exit: {exit})'.format(
-            exit=exitRevision))
 
-    except Exception as e:
-        log.error("Task error, %s" % e)
-        raise e
+    log.info('Shot revision task completed successfully (exit: {exit})'.format(
+        exit=exitRevision))
     return 1
 
 
@@ -787,3 +801,21 @@ def shot_lookup(self, shots, timestamp):
     for s in shots:
         if timestamp >= s.start_frame_idx and timestamp <= s.end_frame_idx:
             return s.uuid, s.shot_num
+
+
+def send_notification(self, recipient, subject, template, replaces, task_id,
+                      failure=None):
+    """
+    Send a notification email to a given recipient. If the failure is passed,
+    an email is also sent to the system administrator with some more details
+    about failure.
+    """
+    body = get_html_template(template, replaces)
+    send_mail(body, subject, recipient,
+              plain_body="Sorry User, your job ID {task} is failed".format(task=task_id))
+
+    if failure is not None:
+        replaces['task_id'] = task_id
+        replaces['failure'] = failure
+        body = get_html_template(template, replaces)
+        send_mail(body, subject)

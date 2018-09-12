@@ -268,10 +268,10 @@ class AnnotationRepository():
         This procedure updates the automatic shot list preserving existing
         annotations such as TAG, DSC etc.
 
-        For each incoming shot update the corresponding shot in the database
-        with the same shot_num. If a new shot occurs, it is added to the actual
-        list. If instead the list of shots is shortened, all shot in excess
-        will be eliminated with related anno.
+        For each incoming shot it updates the corresponding shot in the
+        database with the same shot_num. If a new shot occurs, it is added to
+        the actual list. If instead the list of shots is shortened, all shot in
+        excess will be eliminated with related anno(s).
         '''
         log.info('Update existing shot list preserving anno(s).')
         FHG_TVS = item.targeting_annotations.search(
@@ -341,7 +341,12 @@ class AnnotationRepository():
                 for anno in related_annotations:
                     bodies = anno.bodies.all()
                     for b in bodies:
-                        b.delete()
+                        original_body = b.downcast()
+                        if isinstance(original_body, ResourceBody):
+                            # disconnect this body
+                            anno.bodies.disconnect(b)
+                        else:
+                            b.delete()
                     anno.delete()
                 shot_to_delete[0].delete()
 
