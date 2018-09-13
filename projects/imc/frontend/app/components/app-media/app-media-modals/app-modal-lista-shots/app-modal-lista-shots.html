@@ -5,7 +5,7 @@
     <div class="row modal-body-content">
         <div class="col-12 modal--list-tag">
             <h5 *ngIf="show_title">
-                tag selected: <app-media-annotation *ngFor="let annotation of data.annotations" [annotation]="annotation"></app-media-annotation>
+                tag selected: <app-media-annotation *ngFor="let annotation of data.annotations" [annotation]="annotation" [tag]="true"></app-media-annotation>
             </h5>
         </div>
         <ng-template

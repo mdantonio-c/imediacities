@@ -49,7 +49,7 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges, OnDestroy {
 
     shots_show (event, annotation) {
 
-        let shots = this.data.shots.filter( s => this.ShotsService.shot_has_annotation(s, annotation));
+        let shots = this.data.shots.filter( s => this.ShotsService.shot_has_tag(s, annotation));
 
         this.lista_data = {
             annotations: [annotation],

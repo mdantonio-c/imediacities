@@ -51,7 +51,7 @@ export class AppMediaTagsComponent implements OnInit, OnDestroy{
     annotation_show (evento, annotation) {
 
         //  filtra gli shot ai quali è assegnata l'annotazione
-        let shots = this.shots.filter( s => this.ShotsService.shot_has_annotation(s, annotation));
+        let shots = this.shots.filter( s => this.ShotsService.shot_has_tag(s, annotation));
 
         this.modale_richiedi.emit({
             modale: 'lista-shots',
@@ -69,7 +69,9 @@ export class AppMediaTagsComponent implements OnInit, OnDestroy{
         if (shots) {
             this.shots = shots;
         }
-        this.annotations.elenco = this.ShotsService.annotations().filter(a => a.type === 'TAG');
+        /*this.annotations.elenco = this.ShotsService.annotations().filter(a => a.type === 'TAG');
+        this.annotations.visualizzate = this.annotations.elenco.slice();*/
+        this.annotations.elenco = this.ShotsService.tags();
         this.annotations.visualizzate = this.annotations.elenco.slice();
     }
 

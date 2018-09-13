@@ -99,13 +99,6 @@
                     [ngForOf]="shot.annotations.tags">
                     <app-media-annotation [annotation]="tag" [can_delete]="tag_is_deletable(tag)"></app-media-annotation>
                 </ng-template>
-                <!-- TODO add here automatic tags -->
-                <!-- <ng-template
-                    ngFor
-                    let-tag
-                    [ngForOf]="shot.auto_tags">
-                    <app-media-annotation [annotation]="tag.name"></app-media-annotation>
-                </ng-template> -->
             </div>
             <div>
                 <ng-template

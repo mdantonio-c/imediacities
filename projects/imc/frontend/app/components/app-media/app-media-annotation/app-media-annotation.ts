@@ -13,6 +13,7 @@ export class AppMediaAnnotationComponent implements OnInit {
     @Input() can_delete;
     @Input() delete_fn;
     @Input() disable_confirmation = false;
+    @Input() tag = false;
 
     public popover;
 
@@ -20,6 +21,7 @@ export class AppMediaAnnotationComponent implements OnInit {
     }
 
     delete () {
+        if (this.tag) return;
         if (!this.can_delete) return;
         if (this.annotation.id) {
             this.AnnotationsService.delete_tag(this.annotation, this.annotation.source);
@@ -42,9 +44,13 @@ export class AppMediaAnnotationComponent implements OnInit {
             classe = 'badge-geotag'
         }
 
-        if (this.annotation.creator_type !== 'user') {
+        if (!this.tag && this.annotation.creator_type !== 'user') {
             classe += '--auto';
         }
+
+        /*if (this.tag) {
+            classe += '--count';
+        }*/
 
         this.element.nativeElement.querySelector('span').classList.add(classe);
 
