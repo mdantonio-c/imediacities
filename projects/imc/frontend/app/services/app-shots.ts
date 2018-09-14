@@ -224,7 +224,7 @@ export class AppShotsService {
         target.push(annotation);
 
         // add annotation to annotation_from_map
-        /*if (this._annotations_map.has(annotation.id)) {
+        if (this._annotations_map.has(annotation.id)) {
             let annotation_from_map = this._annotations_map.get(annotation.id);
             annotation_from_map.count += 1;
             annotation_from_map.shots_idx.push(shot_indice);
@@ -232,7 +232,7 @@ export class AppShotsService {
             annotation.count = 1;
             annotation.shots_idx = [shot_indice];
             this._annotations_map.set(annotation.id, annotation);
-        }*/
+        }
         // add tags to tag_from_map
         if (annotation.type === 'TAG') {
             let iri = (annotation.iri != null) ? annotation.iri : 'textual:' + annotation.name;
