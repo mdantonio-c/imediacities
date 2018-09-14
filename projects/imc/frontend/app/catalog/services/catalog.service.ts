@@ -22,7 +22,7 @@ export interface SearchTerm {
 	label: string
 }
 
-const matchFields = ["title", "contributor", "keyword"];
+const matchFields = ["title", "contributor", "keyword", "description"];
 
 @Injectable()
 export class CatalogService {
