@@ -61,7 +61,7 @@
 							[inputFormatter]="formatter"
 							[resultTemplate]="rt"
 							(selectItem)="selectTerm($event)"
-							(keydown.enter)="$event.preventDefault(); addTerm(searchForm.get('term').value);"
+							(keydown.enter)="$event.preventDefault();"
 							style="width: 80%;">
 							<div class="input-group-append">
 								<button class="btn-reset" type="button" (click)="addTerm(searchForm.get('term').value)">
