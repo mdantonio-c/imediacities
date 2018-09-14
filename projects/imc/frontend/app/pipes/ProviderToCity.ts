@@ -26,7 +26,9 @@ export class ProviderToCityPipe implements PipeTransform {
         else if (provider === 'DFI') return 'Copenhagen';
         else if (provider === 'DIF') return 'Frankfurt am Main';
         else if (provider === 'FDC') return 'Barcelona';
+        else if (provider === 'ICEC') return 'Barcelona';
         else if (provider === 'MNC') return 'Turin';
+        else if (provider === 'MCT') return 'Turin';
         else if (provider === 'OFM') return 'Vienna';
         else if (provider === 'SFI') return 'Stockholm';
         else if (provider === 'TTE') return 'Athens';

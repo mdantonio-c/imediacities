@@ -453,12 +453,15 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
                 this.map.fitBounds(bounds);
                 this.map.panToBounds(bounds);
             } else {
-                const currentCenter = this.map.getCenter();
-                if (currentCenter.lat() !== 0 && currentCenter.lng() !== 0) return;
-                this.map.panTo(this.center);
-                this.map.setZoom(14);
+                if(this.center.lat !== 0 || this.center.lng !== 0){
+                    this.map.panTo(this.center);
+                    this.map.setZoom(14);
+                }else{
+                    const currentCenter = this.map.getCenter();
+                    if (currentCenter)
+                        if (currentCenter.lat() !== 0 && currentCenter.lng() !== 0) return;
+                }
             }
-
         }
     }
     /**
@@ -468,6 +471,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
      */
     onMapReady (map) {
         this.map = map;
+
+        this.set_center_from_owner();
+
         this.fit_bounds();
     }
 
@@ -476,15 +482,17 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         const _media_owner = this.MediaService.owner();
 
         if (_media_owner && _media_owner.attributes && _media_owner.attributes.shortname) {
-
-            //  Aggiunto il codice sottostante perchè l'immagine di prova aveva "test" come owner
+            /*
+            //  NSI: aggiunto il codice sottostante perchè l'immagine
+            //        di prova aveva "test" come owner
             let location_to_find = null;
             if (_media_owner.attributes.shortname.length === 3) {
                 location_to_find = _media_owner.attributes.shortname;
             } else {
                 location_to_find = 'ccb';
             }
-
+            */
+            let location_to_find = _media_owner.attributes.shortname;
             if (location_to_find) {
 
                 const geocode = this.geoCoder.geocode(
@@ -514,27 +522,21 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
         this.popover = this.AnnotationsService.popover();
         this._subscription = this.ShotsService.update.subscribe(shots => {this.shots = shots;});
-
         this._current_user = this.AuthService.getUser();
-        this.set_center_from_owner();
     }
 
     ngOnChanges () {
-
         //  Elimino tutti i marker eventualmente residui
         this._markers.forEach(m => {
             if (m.hasOwnProperty('map')) {
                 m.setMap(null)
             }
         });
-
         //  Reimposto i marker
         if (this.markers && this.markers.length) {
             this._markers = this.markers.slice();
         }
-
         this.fit_bounds();
-
     }
 
     ngOnDestroy () {
