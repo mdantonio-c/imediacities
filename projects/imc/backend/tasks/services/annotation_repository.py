@@ -350,6 +350,33 @@ class AnnotationRepository():
                     anno.delete()
                 shot_to_delete[0].delete()
 
+        # rearrange the relationships between existing segments and the new
+        # shot list
+        self.arrange_video_segments(item)
+
+    def arrange_video_segments(self, item):
+        '''
+        Rearrange the relationships between existing segments and the new shots
+        (:VideoSegment)-[:WITHIN_SHOT]->(:Shot)
+        '''
+        query = "MATCH (i:Item {{uuid: '{item_id}'}})<-[:SOURCE]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}}) " \
+                "MATCH (anno)-[:HAS_TARGET]->(sgm:VideoSegment) WHERE NOT sgm:Shot " \
+                "RETURN sgm"
+        results = self.graph.cypher(query.format(
+            item_id=item.uuid))
+        segments = [self.graph.VideoSegment.inflate(row[0]) for row in results]
+        for segment in segments:
+            # disconnect the segment from its current shots
+            segment.within_shots.disconnect_all()
+            # re-connect the shot where the segment is enclosed
+            shots = self.get_enclosing_shots(segment, item)
+            if shots is None or len(shots) == 0:
+                raise ValueError('Invalid state: cannot be found shot(s) enclosing '
+                                 'selected segment [t={start},{end}]'
+                                 .format(start=segment.start_frame_idx, end=segment.end_frame_idx))
+            for shot in shots:
+                segment.within_shots.connect(shot)
+
     def create_tvs_manual_annotation(self, user, bodies, target,
                                      is_private=False, embargo_date=None):
         '''
