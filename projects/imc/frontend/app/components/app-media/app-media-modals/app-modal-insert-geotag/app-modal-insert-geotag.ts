@@ -55,14 +55,31 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
         if (!place || !place.geometry) {
             return;
         }
-        this.address = {};
+        //console.log("ricerca: place=" + JSON.stringify(place));
         this.center = place.geometry.location;
+        /*
+        this.address = {};
         for (let i = 0; i < place.address_components.length; i++) {
             let addressType = place.address_components[i].types[0];
             this.address[addressType] = place.address_components[i].long_name;
         }
+        */
+        if(!place.formatted_address || (place.formatted_address === '')){
+            return this.add_geotag.show('error', 'Cannot handle this address. Please contact the administrator.');
+        }else{
+            this.add_geotag.hide();
+        }
+        // Compongo il marker name come unione di place.formatted_address e 
+        //  place.name di google (se place.name non e' gia' contenuto dentro 
+        //  place.formatted)
+        var markerName = place.formatted_address;
+        if(place.name && (!place.formatted_address.includes(place.name))){
+            markerName = place.name + ", " + markerName;
+        }
+        console.log("markerName: " + markerName);
         let marker = {
-            name: this.address.route || this.address.locality || this.address.country || this.address.administrative_area_level_2 || this.address.administrative_area_level_1,
+            //name: this.address.route || this.address.locality || this.address.country || this.address.administrative_area_level_2 || this.address.administrative_area_level_1,
+            name: markerName,
             creator_type: 'user',
             group: 'location',
             place: place,
