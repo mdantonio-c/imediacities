@@ -7,6 +7,10 @@ services:
     environment:
       ACTIVATE: 0
 
+  neo4j:
+    environment:
+      ACTIVATE: 0
+
   celery:
     depends_on:
       - rabbit
