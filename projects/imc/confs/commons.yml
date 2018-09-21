@@ -9,7 +9,6 @@ services:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
     networks:
-      worker_net:
       ftp_net:
     depends_on:
       - neo4j

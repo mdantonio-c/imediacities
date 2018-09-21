@@ -22,6 +22,7 @@ services:
       DEBUG_LEVEL: INFO
       NGINX_ACTIVE: "True"
     networks:
+      worker_net:
       proxy_net:
         aliases:
           - ${FLASK_HOST}
@@ -40,28 +41,17 @@ services:
         aliases:
           - html
 
-  mongodb:
-    environment:
-      ACTIVATE: 0
-
   celery:
     environment:
-      ACTIVATE: 0
-
-  celery:
-    environment:
-      ACTIVATE: 0
-  #     DEBUG_LEVEL: INFO
-  #     APP_MODE: production
-  #   depends_on:
-  #     - rabbit
-  #     - mongodb
-  #     - neo4j
+      DEBUG_LEVEL: INFO
+      APP_MODE: production
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
 
   celeryui:
-    environment:
-      ACTIVATE: 0
-  #   depends_on:
-  #     - rabbit
-  #     - mongodb
-  #     - neo4j
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
