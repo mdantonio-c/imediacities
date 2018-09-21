@@ -6,8 +6,8 @@ services:
   neo4j:
     ports:
       - 9090:7473
-    volumes:
-      - letsencrypt_certs:/ssl
+    # volumes:
+    #   - letsencrypt_certs:/ssl
     environment:
       ACTIVATE: 1
 
