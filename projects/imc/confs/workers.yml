@@ -30,6 +30,8 @@ services:
     depends_on:
       - rabbit
       - mongodb
+    networks:
+      worker_net:
 
   celeryui:
     environment:
@@ -38,3 +40,5 @@ services:
     depends_on:
       - rabbit
       - mongodb
+    networks:
+      worker_net:

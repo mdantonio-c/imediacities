@@ -67,10 +67,6 @@ services:
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
       - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
 
     environment:
       AUTH_ENABLE: 1
@@ -114,11 +110,6 @@ services:
       GRAPHDB_HOST: ${GRAPHDB_HOST}
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
-
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
 
   ftp:
     ports:

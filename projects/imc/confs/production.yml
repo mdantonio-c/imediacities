@@ -44,3 +44,13 @@ services:
     environment:
       DEBUG_LEVEL: INFO
       APP_MODE: production
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
+
+  celeryui:
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
