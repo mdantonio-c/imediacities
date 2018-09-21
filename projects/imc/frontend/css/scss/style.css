@@ -514,7 +514,7 @@ input[type="radio"] {
 .badge {
   border-radius: 5px;
   right: -5px;
-  padding: 3px 9px;
+  padding: 3px 3px;
   color: #fff;
   font-size: 12px !important;
   font-weight: 500;

@@ -83,10 +83,12 @@ button:focus {outline:0 !important;}
   top: -4px;
   right: -15px;
   padding: 1px 3px;
-  text-align: center;
+  text-align: center !important;
   font-size: 12px;
   color: #FFF;
   border-radius: 4px;
+  white-space: normal;
+  margin-bottom: 2px;
 }
 .badge-warning, .badge.badge-warning { background-color: #f89406; }
 .label-location, .badge-location { background-color: #603913; }

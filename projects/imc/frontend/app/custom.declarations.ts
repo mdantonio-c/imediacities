@@ -24,6 +24,7 @@ import { SliderRangeComponent } from './catalog/components/search-filter/slider-
 
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
 import {DurationPipe} from "./pipes/duration.pipe";
+import {SecondsToTimePipe} from "./pipes/secondsToTime.pipe";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
 import {AppMediaTopBarComponent} from "./components/app-media/app-media-top-bar/app-media-top-bar";
@@ -103,6 +104,7 @@ export const declarations: any[] = [
 	ProviderToCityPipe,
 	NoCommaPipe,
 	DurationPipe,
+    SecondsToTimePipe,
 	AppExpansionPanelComponent,
 	AppInfoComponent,
 	AppModaleComponent,

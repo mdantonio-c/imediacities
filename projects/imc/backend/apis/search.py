@@ -163,7 +163,7 @@ class Search(GraphBaseOperations):
                         iprstatus=iprstatus))
             # PRODUCTION YEAR RANGE
             missingDate = filtering.get('missingDate')
-            #logger.debug("missingDate: {0}".format(missingDate))
+            # logger.debug("missingDate: {0}".format(missingDate))
             if not missingDate:
                 year_from = filtering.get('yearfrom')
                 year_to = filtering.get('yearto')
@@ -212,7 +212,7 @@ class Search(GraphBaseOperations):
                 filters=' '.join(filters),
                 match=multi_match_query)
 
-        #logger.debug("QUERY to get number of elements: {0}".format(countv))
+        # logger.debug("QUERY to get number of elements: {0}".format(countv))
 
         # get total number of elements
         numels = [row[0] for row in self.graph.cypher(countv)][0]
@@ -227,7 +227,7 @@ class Search(GraphBaseOperations):
                     match=multi_match_query,
                     offset=offset * limit,
                     limit=limit)
-        #logger.debug(query)
+        # logger.debug(query)
 
         data = []
         result = self.graph.cypher(query)

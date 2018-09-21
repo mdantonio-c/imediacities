@@ -104,6 +104,7 @@ export class CatalogService {
 				filter: {
 					type: filter.itemType,
 					provider: filter.provider,
+					terms: filter.terms,
 					iprstatus: filter.iprstatus,
 					yearfrom: filter.productionYearFrom,
 					yearto: filter.productionYearTo,
