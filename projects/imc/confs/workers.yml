@@ -7,18 +7,35 @@ services:
     environment:
       ACTIVATE: 0
 
+  proxy:
+    environment:
+      ACTIVATE: 0
+
   neo4j:
     environment:
       ACTIVATE: 0
 
+  frontend:
+    environment:
+      ACTIVATE: 0
+
+  ftp:
+    environment:
+      ACTIVATE: 0
+
   celery:
+    environment:
+      DEBUG_LEVEL: INFO
+      APP_MODE: production
     depends_on:
       - rabbit
       - mongodb
       - neo4j
 
   celeryui:
-
+    environment:
+      DEBUG_LEVEL: INFO
+      APP_MODE: production
     depends_on:
       - rabbit
       - mongodb
