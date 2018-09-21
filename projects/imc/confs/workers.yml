@@ -30,7 +30,6 @@ services:
     depends_on:
       - rabbit
       - mongodb
-      - neo4j
 
   celeryui:
     environment:
