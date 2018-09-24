@@ -1,0 +1,42 @@
+# Customize this file to include compose configurations common to bluprints
+version: '3'
+
+services:
+
+  neo4j:
+    ports:
+      - 9090:7474
+    # ports:
+    #   - 9090:7473
+    # volumes:
+    #   - letsencrypt_certs:/ssl
+    environment:
+      ACTIVATE: 1
+
+  mongodb:
+    environment:
+      ACTIVATE: 0
+
+  backend:
+    environment:
+      ACTIVATE: 0
+
+  proxy:
+    environment:
+      ACTIVATE: 0
+
+  frontend:
+    environment:
+      ACTIVATE: 0
+
+  ftp:
+    environment:
+      ACTIVATE: 0
+
+  celery:
+    environment:
+      ACTIVATE: 0
+
+  celeryui:
+    environment:
+      ACTIVATE: 0

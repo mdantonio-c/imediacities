@@ -9,6 +9,8 @@ services:
       DEBUG_LEVEL: VERBOSE
     ports:
       - 8080:5000
+    networks:
+      worker_net:
 
   neo4j:
     ports:

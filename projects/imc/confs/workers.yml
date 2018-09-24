@@ -42,3 +42,11 @@ services:
       - mongodb
     networks:
       worker_net:
+
+  rabbit:
+    ports:
+      - 5672:5672
+
+  mongodb:
+    ports:
+      - 27017:27017
