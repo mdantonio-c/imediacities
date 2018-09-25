@@ -200,13 +200,15 @@ export class AppShotsService {
                     this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice)
                 })
 
-                //  Note
+            //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
                 this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
+            // Link
+            } else if (annotation.attributes.annotation_type.key === 'LNK') {
+                this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
             }
 
-            //  todo non so come individuare referenze e links
-
+            //  TODO add references
         })
 
     }

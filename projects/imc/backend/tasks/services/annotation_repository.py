@@ -169,6 +169,45 @@ class AnnotationRepository():
 
         return anno
 
+    def create_link_annotation(self, user, bodies, target, selector,
+                               is_private=False, embargo_date=None):
+        '''
+        Create a link annotation.
+        '''
+        visibility = 'private' if is_private else 'public'
+        log.debug("Create a new {} description annotation".format(visibility))
+        # create annotation node
+        anno = Annotation(annotation_type='LNK', private=is_private).save()
+        if embargo_date is not None:
+            anno.embargo = embargo_date
+            anno.save()
+        # should we allow to create anno without a user of the system?
+        if user is not None:
+            anno.creator.connect(user)
+
+        if isinstance(target, Item):
+            anno.source_item.connect(target)
+        elif isinstance(target, Annotation):
+            anno.source_item.connect(target.source_item.single())
+        elif isinstance(target, Shot):
+            anno.source_item.connect(target.item.single())
+
+        # ignore at the moment segment selector
+        if selector is not None:
+            log.warn('Selector not yet applicable for the target {0}'
+                     .format(target))
+        anno.targets.connect(target)
+
+        # ONLY textual body allowed at the moment
+        for body in bodies:
+            if body['type'] != 'TextualBody':
+                raise ValueError('Invalid body for link annotation: {}'
+                                 .format(body['type']))
+            bodyNode = TextualBody(value=body['value']).save()
+            anno.bodies.connect(bodyNode)
+
+        return anno
+
     def delete_manual_annotation(self, anno, btype, bid):
         '''
         b_type and b_id can be used to delete only a single body in the

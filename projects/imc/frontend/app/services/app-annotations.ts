@@ -1,8 +1,8 @@
-import {Injectable, Output, EventEmitter} from '@angular/core';
-import {ApiService} from '/rapydo/src/app/services/api';
-import {Observable} from 'rxjs/Observable';
+import { Injectable, Output, EventEmitter } from '@angular/core';
+import { ApiService } from '/rapydo/src/app/services/api';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
-import {AppShotsService} from "./app-shots";
+import { AppShotsService } from "./app-shots";
 
 @Injectable()
 export class AppAnnotationsService {
@@ -17,10 +17,10 @@ export class AppAnnotationsService {
 
     @Output() update: EventEmitter<any> = new EventEmitter();
 
-    constructor(private api: ApiService, private ShotsService: AppShotsService) {}
+    constructor(private api: ApiService, private ShotsService: AppShotsService) { }
 
-    create_tag (shots_ids, sources, media_type, cb) {
-        let  observables:Observable<any>[] = [];
+    create_tag(shots_ids, sources, media_type, cb) {
+        let observables: Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
                 'annotations',
@@ -35,22 +35,20 @@ export class AppAnnotationsService {
                         }
                     })
                 }
-            ).map((res)=>res))
+            ).map((res) => res))
         );
 
         Observable.forkJoin(
             observables
         ).subscribe(
-            res => cb(null ,res),
+            res => cb(null, res),
             err => cb(err, null)
         );
-
-
     }
 
-    create_note (shots_ids, note, media_type, cb) {
+    create_note(shots_ids, note, media_type, cb) {
 
-        let  observables:Observable<any>[] = [];
+        let observables: Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
                 'annotations',
@@ -61,23 +59,42 @@ export class AppAnnotationsService {
                     body: AppAnnotationsService.textual_body(note),
                     private: note.private
                 }
-            ).map((res)=>res))
+            ).map((res) => res))
         );
 
         Observable.forkJoin(
             observables
         ).subscribe(res => cb(res));
-
     }
 
-    delete_request (annotation, media_type) {
+    create_link(shots_ids, link, media_type, cb) {
+
+        let observables: Observable<any>[] = [];
+        shots_ids.forEach(shot_id => observables.push(
+            this.api.post(
+                'annotations',
+                {
+                    target: media_type === 'video' ? `shot:${shot_id}` : `item:${shot_id}`,
+                    motivation: 'linking',
+                    body: AppAnnotationsService.textual_body(link),
+                    private: link.private
+                }
+            ).map((res) => res))
+        );
+        
+        Observable.forkJoin(
+            observables
+        ).subscribe(res => cb(res));
+    }
+
+    delete_request(annotation, media_type) {
         let confirm = window.confirm('Delete the annotation "' + annotation.name + '"?');
         if (confirm) {
             this.delete_tag(annotation, media_type);
         }
     }
 
-    delete_tag (annotation, media_type) {
+    delete_tag(annotation, media_type) {
 
         const bodyRef = annotation.iri ? `resource:${annotation.iri}` : `textual:${annotation.name}`;
 
@@ -86,19 +103,18 @@ export class AppAnnotationsService {
             `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
         ).subscribe(
             response => {
-                console.log("media_type",  media_type);
+                console.log("media_type", media_type);
                 if (media_type === 'video') {
                     this.ShotsService.get();
                 } else if (media_type === 'image') {
                     this.get(annotation.source_uuid, 'images');
                 }
             },
-            err => {}
+            err => { }
         );
-
     }
 
-    get (media_id, endpoint) {
+    get(media_id, endpoint) {
 
         this.api.get(
             endpoint,
@@ -109,13 +125,12 @@ export class AppAnnotationsService {
                 this.update.emit(this._annotations);
             },
             err => {
-                console.log("err",  err);
+                console.log("err", err);
             }
         )
-
     }
 
-    merge (shots, gruppo) {
+    merge(shots, gruppo) {
         let mappa = new Map();
 
         shots.forEach(s => {
@@ -130,19 +145,19 @@ export class AppAnnotationsService {
 
     }
 
-    popover () {
+    popover() {
         let popover_conf = Object.assign({}, this.confirmationPopover_config);
         return popover_conf;
     }
 
-    static source (s) {
+    static source(s) {
         return {
             iri: s.iri,
             name: s.name
         }
     }
 
-    static spatial (s) {
+    static spatial(s) {
         if (s.lat && s.lng) {
             return {
                 lat: s.lat,
@@ -153,7 +168,7 @@ export class AppAnnotationsService {
         }
     }
 
-    static textual_body (note) {
+    static textual_body(note) {
         return {
             type: 'TextualBody',
             value: note.value,
@@ -161,7 +176,7 @@ export class AppAnnotationsService {
         }
     }
 
-    static textual_body_term (term) {
+    static textual_body_term(term) {
         return {
             type: 'TextualBody',
             value: term.value || term.name,
@@ -169,7 +184,7 @@ export class AppAnnotationsService {
         }
     }
 
-    static resource_body (source) {
+    static resource_body(source) {
         const spatial = AppAnnotationsService.spatial(source);
         const s = {
             type: 'ResourceBody',

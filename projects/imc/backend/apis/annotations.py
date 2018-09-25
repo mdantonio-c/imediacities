@@ -32,7 +32,7 @@ class Annotations(GraphBaseOperations):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
-    allowed_motivations = ('tagging', 'describing',
+    allowed_motivations = ('tagging', 'describing', 'linking',
                            'commenting', 'replying', 'segmentation')
     allowed_patch_operations = ('add', 'remove')
 
@@ -227,6 +227,13 @@ class Annotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             try:
                 created_anno = repo.create_tvs_manual_annotation(
+                    user, bodies, targetNode, is_private, embargo_date)
+            except DuplicatedAnnotationError as error:
+                raise RestApiException(error.args[0],
+                                       status_code=hcodes.HTTP_BAD_CONFLICT)
+        elif motivation == 'linking':
+            try:
+                created_anno = repo.create_link_annotation(
                     user, bodies, targetNode, is_private, embargo_date)
             except DuplicatedAnnotationError as error:
                 raise RestApiException(error.args[0],

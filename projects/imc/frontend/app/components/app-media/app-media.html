@@ -287,8 +287,7 @@ picture-->
                 <app-media-tags *ngIf="shots && shots.length" [shots]="shots" (modale_richiedi)="modal_show($event)"></app-media-tags>
 
                 <!-- RELATED ITEMS -->
-                <!-- comment out for the moment
-                <app-media-related-items></app-media-related-items> -->
+                <!-- <app-media-related-items></app-media-related-items> -->
             </section>
 
             <!-- COMMENTI
@@ -304,7 +303,7 @@ picture-->
         <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-termtag>
         <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-geotag>
         <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-note>
-        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-link>
+        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-link>
         <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-reference>
         <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-all-annotations>
         <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" [media_type]="media_type" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
