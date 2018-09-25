@@ -27,10 +27,12 @@ services:
           - ${FLASK_HOST}
 
   neo4j:
-    ports:
-      - 9090:7473
-    volumes:
-      - letsencrypt_certs:/ssl
+    environment:
+      ACTIVATE: 0
+    # ports:
+    #   - 9090:7473
+    # volumes:
+    #   - letsencrypt_certs:/ssl
 
   frontend:
     environment:
