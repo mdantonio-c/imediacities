@@ -10,10 +10,10 @@ services:
       - ${VANILLA_DIR}/scripts:/code/scripts
     networks:
       ftp_net:
-    depends_on:
-      - neo4j
-      # - ftp
-      # - swaggerui
+    # depends_on:
+    #   - neo4j
+    #   - ftp
+    #   - swaggerui
     environment:
       AUTH_ENABLE: 1
       AUTH_SERVICE: neo4j
