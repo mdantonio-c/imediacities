@@ -360,3 +360,8 @@ search-thumbnail div .media-image-wrapper {
     pointer-events: none;
     opacity: 0.3 !important;
 }
+.keyword-div{
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
