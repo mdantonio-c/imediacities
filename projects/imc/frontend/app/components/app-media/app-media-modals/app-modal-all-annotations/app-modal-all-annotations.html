@@ -1,6 +1,6 @@
 <!-- Modale visualizzazione di tutte le annotazioni -->
 <app-media-modal [data]="data" [media_type]="media_type">
-    <div class="col" modal-col>
+    <div class="col-12 col-sm-7 col-lg-7 no-gutter" modal-col>
         <ul class="modal--annotation">
             <li *ngIf="shot.annotations.tags.length">
                 <span><i class="material-icons">bookmark</i></span>
@@ -66,7 +66,7 @@
             </li>
             <li class="space-paragraph-20" *ngIf="shot.annotations.links.length">
                 <span class="icon-rotate"><i class="material-icons">link</i></span>
-                <span>
+                <span class="d-inline-block text-truncate">
                     <ul class="modal--link-list">
                         <li *ngFor="let link of shot.annotations.links">
                             <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>

@@ -4,6 +4,9 @@ import { AppAnnotationsService } from "../../../../services/app-annotations";
 import { IMC_Annotation } from "../../../../services/app-shots";
 import { infoResult } from "../../../../decorators/app-info";
 
+const url_regex = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+const url_protocol = /^https?:\/\//i;
+
 @Component({
     selector: 'app-modal-insert-link',
     templateUrl: 'app-modal-insert-link.html'
@@ -39,18 +42,31 @@ export class AppModalInsertLinkComponent implements OnChanges {
      * Adds the link to the list of terms to be saved.
      */
     addLink() {
-        let exists = this.links_all.some(e => {
+        let linkURL = this.link.url.trim();
+        let valid = true;
+        let errorMsg = '';
+        // check for valid URL
+        if (valid && !url_regex.test(linkURL)) {
+            errorMsg = 'This link is not valid';
+            if (!url_protocol.test(linkURL)) { errorMsg += '. Missing protocol?'; } 
+            valid = false;
+        }
+        // check for existing link
+        if (valid && this.links_all.some(e => {
             // if site has an end slash (like: www.example.com/),
             // then remove it and return the site without the end slash
-            return this.link.url.trim().replace(/\/$/, '') === e.name.replace(/\/$/, '');
-        });
-        if (exists) {
-            this.add_link_info.show('error', 'This link has already been added');
+            return linkURL.replace(/\/$/, '') === e.name.replace(/\/$/, '');
+        })) {
+            errorMsg = 'This link has already been added';
+            valid = false;
+        }
+        if (!valid) {
+            this.add_link_info.show('error', errorMsg);
         } else {
             this.add_link_info.hide();
             let l = {
                 private: this.link.private,
-                value: this.link.url.trim()
+                value: linkURL
             };
             this.AnnotationsService.create_link(
                 this.data.shots.map(s => s.id),
@@ -82,10 +98,18 @@ export class AppModalInsertLinkComponent implements OnChanges {
                     this.links_all.push(anno);
                     this.save_result.show('success', 'Link added successfully');
                     this.shots_update.emit(r);
+                    this.link.url = '';
                 }
             );
         }
-        this.link.url = '';
+    }
+
+    removeLink(link: IMC_Annotation) {
+        /*if (!this.can_delete) return;*/
+        if (link.id) {
+            this.AnnotationsService.delete_tag(link, link.source);
+            this.links_all = this.links_all.filter(anno => anno.id !== link.id);
+        }
     }
 
     ok() {
