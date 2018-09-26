@@ -32,7 +32,8 @@ export const appRoutes: Routes = [
 		runGuardsAndResolvers: 'always',
 		data: { roles: ['Archive'] }
 	},
-	{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+	//{ path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+	{ path: 'app/catalog', component: CatalogComponent},
 	{ path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
 	{ path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
 	{ path: 'app', redirectTo: '/app/catalog', pathMatch: 'full' },
