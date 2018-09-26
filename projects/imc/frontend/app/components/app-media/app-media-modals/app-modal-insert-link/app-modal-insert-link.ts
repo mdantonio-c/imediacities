@@ -28,8 +28,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
         url: '',
         private: false
     };
-    //links_all: IMC_Annotation[] = [];
-    links_all: any[] = [];
+    links_all: IMC_Annotation[] = [];
 
     @ViewChild(AppMediaModal) modal: AppMediaModal;
 
@@ -61,14 +60,25 @@ export class AppModalInsertLinkComponent implements OnChanges {
 
                     if (err) {
                         this.save_result.show('error');
-                        // FIXME
+                        return;
                     }
-                    let anno = {
-                        name: l.value,
-                        private: l.private,
-                        type: "LNK"
+                    let resp = r[0].data;
+                    let anno: IMC_Annotation = {
+                        creation_date: resp.attributes.creation_datetime,
+                        creator: resp.creator ? resp.creator.id : null,
+                        creator_type: resp.creator ? resp.creator.type : null,
+                        embargo: resp.embargo || null,
+                        group: null,
+                        body_id: resp.bodies[0].id,
+                        id: resp.id,
+                        iri: null,
+                        name: resp.bodies[0].attributes.value,
+                        private: resp.attributes.private,
+                        spatial: null,
+                        type: resp.attributes.annotation_type.key,
+                        source: resp.source.attributes.item_type.key,
+                        source_uuid: resp.source.id
                     }
-                    console.log(anno);
                     this.links_all.push(anno);
                     this.save_result.show('success', 'Link added successfully');
                     this.shots_update.emit(r);
@@ -84,7 +94,6 @@ export class AppModalInsertLinkComponent implements OnChanges {
 
     ngOnChanges() {
         this.links_all = this.AnnotationsService.merge(this.data.shots, 'links');
-        console.log(this.links_all);
         this.add_link_info.hide();
         this.link.url = '';
     }

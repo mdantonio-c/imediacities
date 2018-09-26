@@ -84,7 +84,9 @@ export class AppAnnotationsService {
         
         Observable.forkJoin(
             observables
-        ).subscribe(res => cb(res));
+        ).subscribe(
+            res => cb(null, res),
+            err => cb(err, null));
     }
 
     delete_request(annotation, media_type) {
