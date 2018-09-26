@@ -1,252 +1,258 @@
-<!-- Modale per l'iserimento di link -->
+<!-- Modal for inserting links -->
 <app-media-modal [data]="data" [media_type]="media_type">
-
-    <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
-               <span class="col-11">
-                   <div class="custom-control custom-radio custom-control-inline">
-                      <input type="radio"
-                             id="insertUrl"
-                             name="insertUrl"
-                             [(ngModel)]="options"
-                             [value]="true"
-                             [checked]="options"
-                             class="custom-control-input">
-                      <label class="custom-control-label imc--radio-label" for="insertUrl">Insert URL</label>
-                    </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                      <input type="radio"
-                             id="insertLink"
-                             name="insertLink"
-                             [(ngModel)]="options"
-                             [value]="false"
-                             [checked]="!options"
-                             class="custom-control-input">
-                      <label class="custom-control-label imc--radio-label" for="insertLink">Search in IMC</label>
-                    </div>
-               </span>
-        <span *ngIf="options" class="col-11 row imc--flex--vertical-center space-paragraph-20">
-                   <span class="col-9">
-                       <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url">
-                   </span>
-                    <span class="col-3">
-                        <button class="btn btn-accent">Add</button>
-                    </span>
-               </span>
-        <span *ngIf="!options" class="col-12 row no-gutters imc--flex--vertical-center space-paragraph-20">
-                   <span class="col-7 col-sm-8">
-                       <input type="text" class="imc--input imc--input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
-                   </span>
-                    <span class="col-4 col-sm-3 imc--flex--horizontal-end">
-                        <button class="btn btn-accent">Search</button>
-                    </span>
-                    <div class="col-12 space-paragraph-20 box-checkbox-group">
-                        <!-- @NSI checkbox per filtrare i media da linkare -->
-                        <span *ngFor="let opt of optionsCheckbox; let i = index">
-                            <input class="imc--input-checkbox styled-checkbox"
-                                   id="multi-link"
-                                   type="checkbox"
-                                   value="opt"
-                                   [checked]="opt.checked">
-                            <label for="multi-link">{{opt.label}}</label>
-                        </span>
-                    </div>
-                    <div class="col-12 row no-gutters">
-                        <span class="col-6 modal--media-link row no-gutters">
-                            <span class="col imc--thumb"></span>
-                            <div class="col modal--media-link--info">
-                                <span>
-                                    <!-- @NSI cambia l'icona in base a che media o elemento si sta cercando -->
-                                    <!--<i class="material-icons icon-foto">insert_photo</i>-->
-                                    <!-- (per le note) <i class="material-icons">speaker_notes</i> -->
-                                    <!-- (per le referenze) <i class="material-icons">library_books</i> -->
-                                    <i class="material-icons icon-video">videocam</i> shot 7
-                                </span>
-                                <p>Attentato terroristico alla stazione di Bologna</p>
-                            </div>
-                        </span>
-                        <!-- @NSI la mettere in loop coi dati corretti e da cancellare -->
-                        <span class="col-6 modal--media-link row no-gutters">
-                            <span class="col imc--thumb"></span>
-                            <div class="col modal--media-link--info">
-                                <span>
-                                    <i class="material-icons icon-foto">insert_photo</i>
-                                </span>
-                                <p>Attentato terroristico alla stazione di Bologna</p>
-                            </div>
-                        </span>
-                    </div>
-
-            <!-- Paginator -->
-                    <div class="col-12 imc--flex--horizontal-end">
-                        <nav aria-label="Page navigation example">
-                          <ul class="pagination">
-                            <li class="page-item">
-                              <a href="#" aria-label="Previous">
-                                <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i>
-                                <span class="sr-only">Previous</span>
-                              </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                              <a href="#" aria-label="Next">
-                                <i class="material-icons" aria-hidden="true">keyboard_arrow_right</i>
-                                <span class="sr-only">Next</span>
-                              </a>
-                            </li>
-                          </ul>
-                        </nav>
-                    </div>
-
-               </span>
-
+  <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
+    <span class="col-11">
+      <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio"
+        id="insertUrl"
+        name="insertUrl"
+        [(ngModel)]="options"
+        [value]="true"
+        [checked]="options"
+        class="custom-control-input">
+        <label class="custom-control-label imc--radio-label" for="insertUrl">Insert URL</label>
+      </div>
+      <!-- <div class="custom-control custom-radio custom-control-inline">
+        <input type="radio"
+        id="insertLink"
+        name="insertLink"
+        [(ngModel)]="options"
+        [value]="false"
+        [checked]="!options"
+        class="custom-control-input">
+        <label class="custom-control-label imc--radio-label" for="insertLink">Search in IMC</label>
+      </div> -->
+    </span>
+    <span *ngIf="options" class="col-11 row imc--flex--vertical-center space-paragraph-20">
+      <span class="col-9">
+        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url" [(ngModel)]="link.url" required>
+      </span>
+      <span class="col-3">
+        <button class="btn btn-accent" (click)="addLink()">Add</button>
+      </span>
+    </span>
+    <!-- show error -->
+    <div class="col-10 new-badge" *ngIf="add_link_info.visible">
+      <app-info  [message]="add_link_info.message" [result]="add_link_info.status"
+        *ngIf="add_link_info.visible"
+      (click)="add_link_info.visible = false"></app-info>
     </div>
 
-    <button type="button" class="btn btn-accent" modal-button>Save</button>
+    <div class="col-12 space-paragraph-25" *ngIf="links_all.length">
+        <h5>Current links</h5>
+        <span>
+            <ul class="modal--link-list">
+                <li *ngFor="let link of links_all">
+                    <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
+                </li>
+            </ul>
+        </span>
+    </div>
 
+    <span *ngIf="!options" class="col-12 row no-gutters imc--flex--vertical-center space-paragraph-20">
+      <span class="col-7 col-sm-8">
+        <input type="text" class="imc--input imc--input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
+      </span>
+      <span class="col-4 col-sm-3 imc--flex--horizontal-end">
+        <button class="btn btn-accent">Search</button>
+      </span>
+      <div class="col-12 space-paragraph-20 box-checkbox-group">
+        <!-- @NSI checkbox per filtrare i media da linkare -->
+        <span *ngFor="let opt of optionsCheckbox; let i = index">
+          <input class="imc--input-checkbox styled-checkbox"
+          id="multi-link"
+          type="checkbox"
+          value="opt"
+          [checked]="opt.checked">
+          <label for="multi-link">{{opt.label}}</label>
+        </span>
+      </div>
+      <div class="col-12 row no-gutters">
+        <span class="col-6 modal--media-link row no-gutters">
+          <span class="col imc--thumb"></span>
+          <div class="col modal--media-link--info">
+            <span>
+              <!-- @NSI cambia l'icona in base a che media o elemento si sta cercando -->
+              <!--<i class="material-icons icon-foto">insert_photo</i>-->
+              <!-- (per le note) <i class="material-icons">speaker_notes</i> -->
+              <!-- (per le referenze) <i class="material-icons">library_books</i> -->
+              <i class="material-icons icon-video">videocam</i> shot 7
+            </span>
+            <p>Attentato terroristico alla stazione di Bologna</p>
+          </div>
+        </span>
+        <!-- @NSI la mettere in loop coi dati corretti e da cancellare -->
+        <span class="col-6 modal--media-link row no-gutters">
+          <span class="col imc--thumb"></span>
+          <div class="col modal--media-link--info">
+            <span>
+              <i class="material-icons icon-foto">insert_photo</i>
+            </span>
+            <p>Attentato terroristico alla stazione di Bologna</p>
+          </div>
+        </span>
+      </div>
+      <!-- Paginator -->
+      <div class="col-12 imc--flex--horizontal-end">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a href="#" aria-label="Previous">
+                <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i>
+                <span class="sr-only">Previous</span>
+              </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a href="#" aria-label="Next">
+                <i class="material-icons" aria-hidden="true">keyboard_arrow_right</i>
+                <span class="sr-only">Next</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </span>
+  </div>
+  <!-- <button type="button" class="btn btn-accent" modal-button (click)="ok()">Ok</button> -->
+  <!--esito-->
+  <app-info modal-button
+    [message]="save_result.message" [result]="save_result.status"
+    *ngIf="save_result.visible"
+    (click)="save_result.visible = false"></app-info>
 </app-media-modal>
 <!--
-
 <div class="modal-content">
-&lt;!&ndash;
-    <div class="modal-header">
-        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Link</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="material-icons">close</span>
-        </button>
-    </div>
-    &ndash;&gt;
-    <div class="modal-body">
-        <h4>Shot: 4</h4>
-
-        <div class="row modal-body-content">
-
-            &lt;!&ndash; Anteprima del video &ndash;&gt;
-            <div class="col-5 row no-gutters modal-media&#45;&#45;info">
-                <span class="col-3"><strong>00:02:00:40</strong></span>
-                <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-end">frame-range: 540-821</span>
-                <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">duration: 47s</span>
-
-                &lt;!&ndash; Video palyer &ndash;&gt;
-                <span class="col-12 modal-media&#45;&#45;anteprima"></span>
-
-                &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
-                <div class="col-12 row no-gutters">
-                    <span class="imc&#45;&#45;thumb"></span>
-                    <span class="imc&#45;&#45;thumb"></span>
-                </div>
-            </div>
-
-            &lt;!&ndash; Aggiunta della nota &ndash;&gt;
-            <div class="col-7 row no-gutters">
-               <span class="col-11">
-                   <div class="custom-control custom-radio custom-control-inline">
-                      <input type="radio"
-                             id="insertUrl"
-                             name="insertUrl"
-                             [(ngModel)]="options"
-                             [value]="true"
-                             [checked]="options"
-                             class="custom-control-input">
-                      <label class="custom-control-label imc&#45;&#45;radio-label" for="insertUrl">Insert URL</label>
-                    </div>
-                    <div class="custom-control custom-radio custom-control-inline">
-                      <input type="radio"
-                             id="insertLink"
-                             name="insertLink"
-                             [(ngModel)]="options"
-                             [value]="false"
-                             [checked]="!options"
-                             class="custom-control-input">
-                      <label class="custom-control-label imc&#45;&#45;radio-label" for="insertLink">Search in IMC</label>
-                    </div>
-               </span>
-                <span *ngIf="options" class="col-11 row imc&#45;&#45;flex&#45;&#45;vertical-center space-paragraph-20">
-                   <span class="col-9">
-                       <input type="text" class="imc&#45;&#45;input space-paragraph-20" placeholder="Insert URL" aria-label="url">
-                   </span>
-                    <span class="col-3">
-                        <button class="btn btn-accent">Add</button>
-                    </span>
-               </span>
-                <span *ngIf="!options" class="col-12 row no-gutters imc&#45;&#45;flex&#45;&#45;vertical-center space-paragraph-20">
-                   <span class="col-8">
-                       <input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
-                   </span>
-                    <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">
-                        <button class="btn btn-accent">Search</button>
-                    </span>
-                    <div class="col-12 space-paragraph-20 box-checkbox-group">
-                        &lt;!&ndash; @NSI checkbox per filtrare i media da linkare &ndash;&gt;
-                        <span *ngFor="let opt of optionsCheckbox; let i = index">
-                            <input class="imc&#45;&#45;input-checkbox styled-checkbox"
-                                   id="multi-link"
-                                   type="checkbox"
-                                   value="opt"
-                                   [checked]="opt.checked">
-                            <label for="multi-link">{{opt.label}}</label>
-                        </span>
-                    </div>
-                    <div class="col-12 row no-gutters">
-                        <span class="col-6 modal&#45;&#45;media-link row no-gutters">
-                            <span class="col imc&#45;&#45;thumb"></span>
-                            <div class="col modal&#45;&#45;media-link&#45;&#45;info">
-                                <span>
-                                    &lt;!&ndash; @NSI cambia l'icona in base a che media o elemento si sta cercando &ndash;&gt;
-                                    &lt;!&ndash;<i class="material-icons icon-foto">insert_photo</i>&ndash;&gt;
-                                    &lt;!&ndash; (per le note) <i class="material-icons">speaker_notes</i> &ndash;&gt;
-                                    &lt;!&ndash; (per le referenze) <i class="material-icons">library_books</i> &ndash;&gt;
-                                    <i class="material-icons icon-video">videocam</i> shot 7
-                                </span>
-                                <p>Attentato terroristico alla stazione di Bologna</p>
-                            </div>
-                        </span>
-                        &lt;!&ndash; @NSI la mettere in loop coi dati corretti e da cancellare &ndash;&gt;
-                        <span class="col-6 modal&#45;&#45;media-link row no-gutters">
-                            <span class="col imc&#45;&#45;thumb"></span>
-                            <div class="col modal&#45;&#45;media-link&#45;&#45;info">
-                                <span>
-                                    <i class="material-icons icon-foto">insert_photo</i>
-                                </span>
-                                <p>Attentato terroristico alla stazione di Bologna</p>
-                            </div>
-                        </span>
-                    </div>
-
-                    &lt;!&ndash; Paginator &ndash;&gt;
-                    <div class="col-12 imc&#45;&#45;flex&#45;&#45;horizontal-end">
-                        <nav aria-label="Page navigation example">
-                          <ul class="pagination">
-                            <li class="page-item">
-                              <a href="#" aria-label="Previous">
-                                <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i>
-                                <span class="sr-only">Previous</span>
-                              </a>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                              <a href="#" aria-label="Next">
-                                <i class="material-icons" aria-hidden="true">keyboard_arrow_right</i>
-                                <span class="sr-only">Next</span>
-                              </a>
-                            </li>
-                          </ul>
-                        </nav>
-                    </div>
-
-               </span>
-
-            </div>
+  &lt;!&ndash;
+  <div class="modal-header">
+    <h4 class="modal-title" id="exampleModalCenterTitle">Insert Link</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true" class="material-icons">close</span>
+    </button>
+  </div>
+  &ndash;&gt;
+  <div class="modal-body">
+    <h4>Shot: 4</h4>
+    <div class="row modal-body-content">
+      &lt;!&ndash; Anteprima del video &ndash;&gt;
+      <div class="col-5 row no-gutters modal-media&#45;&#45;info">
+        <span class="col-3"><strong>00:02:00:40</strong></span>
+        <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-end">frame-range: 540-821</span>
+        <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">duration: 47s</span>
+        &lt;!&ndash; Video palyer &ndash;&gt;
+        <span class="col-12 modal-media&#45;&#45;anteprima"></span>
+        &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
+        <div class="col-12 row no-gutters">
+          <span class="imc&#45;&#45;thumb"></span>
+          <span class="imc&#45;&#45;thumb"></span>
         </div>
-
+      </div>
+      &lt;!&ndash; Aggiunta della nota &ndash;&gt;
+      <div class="col-7 row no-gutters">
+        <span class="col-11">
+          <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio"
+            id="insertUrl"
+            name="insertUrl"
+            [(ngModel)]="options"
+            [value]="true"
+            [checked]="options"
+            class="custom-control-input">
+            <label class="custom-control-label imc&#45;&#45;radio-label" for="insertUrl">Insert URL</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input type="radio"
+            id="insertLink"
+            name="insertLink"
+            [(ngModel)]="options"
+            [value]="false"
+            [checked]="!options"
+            class="custom-control-input">
+            <label class="custom-control-label imc&#45;&#45;radio-label" for="insertLink">Search in IMC</label>
+          </div>
+        </span>
+        <span *ngIf="options" class="col-11 row imc&#45;&#45;flex&#45;&#45;vertical-center space-paragraph-20">
+          <span class="col-9">
+            <input type="text" class="imc&#45;&#45;input space-paragraph-20" placeholder="Insert URL" aria-label="url">
+          </span>
+          <span class="col-3">
+            <button class="btn btn-accent">Add</button>
+          </span>
+        </span>
+        <span *ngIf="!options" class="col-12 row no-gutters imc&#45;&#45;flex&#45;&#45;vertical-center space-paragraph-20">
+          <span class="col-8">
+            <input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
+          </span>
+          <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">
+            <button class="btn btn-accent">Search</button>
+          </span>
+          <div class="col-12 space-paragraph-20 box-checkbox-group">
+            &lt;!&ndash; @NSI checkbox per filtrare i media da linkare &ndash;&gt;
+            <span *ngFor="let opt of optionsCheckbox; let i = index">
+              <input class="imc&#45;&#45;input-checkbox styled-checkbox"
+              id="multi-link"
+              type="checkbox"
+              value="opt"
+              [checked]="opt.checked">
+              <label for="multi-link">{{opt.label}}</label>
+            </span>
+          </div>
+          <div class="col-12 row no-gutters">
+            <span class="col-6 modal&#45;&#45;media-link row no-gutters">
+              <span class="col imc&#45;&#45;thumb"></span>
+              <div class="col modal&#45;&#45;media-link&#45;&#45;info">
+                <span>
+                  &lt;!&ndash; @NSI cambia l'icona in base a che media o elemento si sta cercando &ndash;&gt;
+                  &lt;!&ndash;<i class="material-icons icon-foto">insert_photo</i>&ndash;&gt;
+                  &lt;!&ndash; (per le note) <i class="material-icons">speaker_notes</i> &ndash;&gt;
+                  &lt;!&ndash; (per le referenze) <i class="material-icons">library_books</i> &ndash;&gt;
+                  <i class="material-icons icon-video">videocam</i> shot 7
+                </span>
+                <p>Attentato terroristico alla stazione di Bologna</p>
+              </div>
+            </span>
+            &lt;!&ndash; @NSI la mettere in loop coi dati corretti e da cancellare &ndash;&gt;
+            <span class="col-6 modal&#45;&#45;media-link row no-gutters">
+              <span class="col imc&#45;&#45;thumb"></span>
+              <div class="col modal&#45;&#45;media-link&#45;&#45;info">
+                <span>
+                  <i class="material-icons icon-foto">insert_photo</i>
+                </span>
+                <p>Attentato terroristico alla stazione di Bologna</p>
+              </div>
+            </span>
+          </div>
+          &lt;!&ndash; Paginator &ndash;&gt;
+          <div class="col-12 imc&#45;&#45;flex&#45;&#45;horizontal-end">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination">
+                <li class="page-item">
+                  <a href="#" aria-label="Previous">
+                    <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a href="#" aria-label="Next">
+                    <i class="material-icons" aria-hidden="true">keyboard_arrow_right</i>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </span>
+      </div>
     </div>
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-accent">Save</button>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-accent">Save</button>
+  </div>
 </div>
 -->
