@@ -7,7 +7,7 @@ from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 
 from imc.models.neo4j import (
-    Annotation, TVSBody, VIMBody,
+    Annotation, TVSBody, VIMBody, BibliographicReference,
     VideoSegment, Shot, ResourceBody, TextualBody, Item
 )
 
@@ -198,12 +198,16 @@ class AnnotationRepository():
                      .format(target))
         anno.targets.connect(target)
 
-        # ONLY textual body allowed at the moment
+        # ONLY textual and reference body allowed at the moment
         for body in bodies:
-            if body['type'] != 'TextualBody':
+            if body['type'] == 'TextualBody':
+                bodyNode = TextualBody(value=body['value']).save()
+            elif body['type'] == 'BibliographicReference':
+                properties = body['value']
+                bodyNode = BibliographicReference(**properties).save()
+            else:
                 raise ValueError('Invalid body for link annotation: {}'
                                  .format(body['type']))
-            bodyNode = TextualBody(value=body['value']).save()
             anno.bodies.connect(bodyNode)
 
         return anno
