@@ -25,7 +25,8 @@
     </span>
     <span *ngIf="options" class="col-11 row imc--flex--vertical-center space-paragraph-20">
       <span class="col-9">
-        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url" [(ngModel)]="link.url" required>
+        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url"
+          [(ngModel)]="link.url" (keydown.enter)="addLink()" required>
       </span>
       <span class="col-3">
         <button class="btn btn-accent" (click)="addLink()">Add</button>
