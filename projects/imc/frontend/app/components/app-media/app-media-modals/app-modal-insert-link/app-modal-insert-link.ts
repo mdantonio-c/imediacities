@@ -4,7 +4,6 @@ import { AppAnnotationsService } from "../../../../services/app-annotations";
 import { IMC_Annotation } from "../../../../services/app-shots";
 import { infoResult } from "../../../../decorators/app-info";
 
-const url_regex = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 const url_protocol = /^https?:\/\//i;
 
 @Component({
@@ -46,9 +45,9 @@ export class AppModalInsertLinkComponent implements OnChanges {
         let valid = true;
         let errorMsg = '';
         // check for valid URL
-        if (valid && !url_regex.test(linkURL)) {
+        if (valid && !this.isValidURL(linkURL)) {
             errorMsg = 'This link is not valid';
-            if (!url_protocol.test(linkURL)) { errorMsg += '. Missing protocol?'; } 
+            if (!url_protocol.test(linkURL)) { errorMsg += '. Missing protocol?'; }
             valid = false;
         }
         // check for existing link
@@ -121,4 +120,21 @@ export class AppModalInsertLinkComponent implements OnChanges {
         this.add_link_info.hide();
         this.link.url = '';
     }
+
+    private isValidURL(str) {
+        var pattern = new RegExp('^https?:\\/\\/' + // protocol
+            '(?:\\S+(?::\\S*)?@)?' + // authentication
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            /*'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$' + // fragment locater*/
+            '', 'i');
+        if (!pattern.test(str)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }
