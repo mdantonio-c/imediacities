@@ -3,6 +3,8 @@ import { AppMediaModal } from "../app-media-modal";
 import { AppAnnotationsService } from "../../../../services/app-annotations";
 import { IMC_Annotation } from "../../../../services/app-shots";
 import { infoResult } from "../../../../decorators/app-info";
+import { AuthService } from "/rapydo/src/app/services/auth";
+import { is_annotation_owner } from "../../../../decorators/app-annotation-owner";
 
 const url_protocol = /^https?:\/\//i;
 
@@ -14,6 +16,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
 
     @Input() data;
     @Input() media_type: string;
+    @is_annotation_owner() is_annotation_owner;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
     @infoResult() add_link_info;
@@ -31,10 +34,13 @@ export class AppModalInsertLinkComponent implements OnChanges {
         private: false
     };
     links_all: IMC_Annotation[] = [];
+    private _current_user;
 
     @ViewChild(AppMediaModal) modal: AppMediaModal;
 
-    constructor(private AnnotationsService: AppAnnotationsService) {
+    constructor(
+        private AnnotationsService: AppAnnotationsService,
+        private AuthService: AuthService) {
     }
 
     /**
@@ -111,8 +117,16 @@ export class AppModalInsertLinkComponent implements OnChanges {
         }
     }
 
+    canRemoveLink(link: IMC_Annotation) {
+        return this.is_annotation_owner(this._current_user, link.creator);
+    }
+
     ok() {
         this.modal.chiudi();
+    }
+
+    ngOnInit() {
+        this._current_user = this.AuthService.getUser();
     }
 
     ngOnChanges() {

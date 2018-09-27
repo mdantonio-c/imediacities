@@ -46,7 +46,7 @@
                     <div class="col-11 px-0 text-truncate">
                       <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
                     </div>
-                    <div class="col-1">
+                    <div class="col-1" *ngIf="canRemoveLink(link)">
                       <i class="material-icons click-event"
                         mwlConfirmationPopover
                         [popoverTitle]="'Remove link'"
