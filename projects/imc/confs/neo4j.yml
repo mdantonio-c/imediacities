@@ -23,7 +23,7 @@ services:
 
   proxy:
     environment:
-      ACTIVATE: 0
+      ACTIVATE: 1
 
   frontend:
     environment:
