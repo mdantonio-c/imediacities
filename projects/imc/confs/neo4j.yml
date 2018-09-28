@@ -24,6 +24,8 @@ services:
   proxy:
     environment:
       ACTIVATE: 1
+    depends_on:
+      # nothing
 
   frontend:
     environment:
