@@ -73,6 +73,7 @@ import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-
 import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
 import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
+import {AppReferenceComponent} from "./components/app-reference/app-reference";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
@@ -131,6 +132,7 @@ export const declarations: any[] = [
 	AppMediaInfoComponent,
 	AppMediaTagsComponent,
 	AppNoteComponent,
+    AppReferenceComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,

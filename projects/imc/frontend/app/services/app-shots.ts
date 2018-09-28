@@ -194,19 +194,20 @@ export class AppShotsService {
                     if (body.attributes.spatial !== null && typeof body.attributes.spatial === 'object') {
                         tipo = 'locations';
                     }
-                    this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice)
+                    this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice);
                 })
             //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
-                this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
+                this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
             // Link
             } else if (annotation.attributes.annotation_type.key === 'LNK') {
                 let body_linked = annotation.bodies[0];
                 if (body_linked.type == 'textualbody') {
                     // external link
-                    this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
-                } else if (body_linked.type == 'textualbody') {
-                    // TODO manage bibliographic references
+                    this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
+                } else if (body_linked.type == 'bibliographicreference') {
+                    // bibliographic references
+                    this._annotation_add(target.references, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
                 } else {
                     // TODO add internal link to shot/item/(?)
                 }
@@ -276,22 +277,33 @@ export class AppShotsService {
      * @private
      */
     private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
-
+        let name, group = null;
+        if (annotation_body.type === 'textualbody') {
+            name = annotation_body.attributes.value;
+            group = (annotation.type === 'TAG') ? 'term' : null;
+        } else if (annotation_body.type === 'resourcebody') {
+            name = annotation_body.attributes.name;
+            group = annotation_body.attributes.spatial ? 'location' : 'term';
+        } else if (annotation_body.type === 'bibliographicreference') {
+            name = annotation_body.type;
+            group = 'reference';
+        }
         return {
             creation_date: annotation.attributes.creation_datetime,
             creator: annotation.creator ? annotation.creator.id : null,
             creator_type: annotation.creator ? annotation.creator.type : null,
             embargo: annotation.embargo || null,
-            group: annotation_body.attributes.spatial ? 'location' : 'term',
+            group: group,
             body_id: annotation_body.id,
             id: annotation.id,
             iri: annotation_body.attributes.iri || null,
-            name: annotation_body.type == 'textualbody' ? annotation_body.attributes.value : annotation_body.attributes.name,
+            name: name,
             private: annotation.private || false,
             spatial: annotation_body.attributes.spatial || null,
             type: annotation.attributes.annotation_type.key,
             source: media_type,
-            source_uuid: this._media_id
+            source_uuid: this._media_id,
+            reference: (annotation_body.type === 'bibliographicreference') ? annotation_body.attributes : null
         };
     }
 
@@ -338,7 +350,8 @@ export interface IMC_Annotation {
     spatial: number[],
     type: string,
     source: string,
-    source_uuid: string
+    source_uuid: string,
+    reference?: BibliographicReference
 }
 
 export interface IMC_Shot {

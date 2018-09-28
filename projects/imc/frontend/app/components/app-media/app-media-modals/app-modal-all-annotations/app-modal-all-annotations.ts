@@ -21,8 +21,8 @@ export class AppModalAllAnnotationsComponent implements OnInit, OnChanges {
     ) {
     }
 
-    tag_is_deletable (tag) {
-        return this.is_annotation_owner(this._current_user, tag.creator);
+    anno_is_deletable (anno) {
+        return this.is_annotation_owner(this._current_user, anno.creator);
     }
 
     ngOnInit() {
