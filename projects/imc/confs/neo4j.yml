@@ -4,12 +4,12 @@ version: '3'
 services:
 
   neo4j:
-    # ports:
-    #   - 9090:7474
     ports:
-      - 9090:7473
-    volumes:
-      - letsencrypt_certs:/ssl
+      - 9090:7474
+    # ports:
+    #   - 9090:7473
+    # volumes:
+    #   - letsencrypt_certs:/ssl
     environment:
       ACTIVATE: 1
 
@@ -23,7 +23,7 @@ services:
 
   proxy:
     environment:
-      ACTIVATE: 1
+      ACTIVATE: 0
     depends_on:
       # nothing is not allowed... 
       - neo4j
