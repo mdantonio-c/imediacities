@@ -36,7 +36,8 @@
                                         <!--option caricate dinamicamente nell'AfterViewInit-->
                                       <select class="imc--input"
                                               *ngIf="description_languages.size > 1"
-                                              #description_languages_selector>
+                                              #description_languages_selector
+                                              id="description-language-select">
                                       </select>
                                     </div>
                                     <div class="col-4 col-sm-2 imc--flex--horizontal-end">
@@ -65,7 +66,7 @@
                     </div>
                 </div>
 
-                <div class="card imc--expansion-panel">
+                <div class="card imc--expansion-panel" *ngIf="this.info.relationships.keywords">
                     <div class="card-header" id="keyword_head">
                         <h5 class="mb-0">
                             <span class="btn btn-link collapsed"
@@ -80,7 +81,9 @@
                                         <!--option caricate dinamicamente nell'AfterViewInit-->
                                       <select class="imc--input"
                                               *ngIf="keyword_languages.size > 1"
-                                              #keyword_languages_selector></select>
+                                              #keyword_languages_selector
+                                              id="keyword-language-select">              
+                                      </select>
                                     </div>
                                     <div class="col-4 col-sm-2 imc--flex--horizontal-end">
                                         <i *ngIf="isCollapsed.keyword" class="material-icons">keyboard_arrow_down</i>
@@ -96,13 +99,13 @@
                                     ngFor
                                     let-pchiave
                                     [ngForOf]="this.info.relationships.keywords">
-                                <p class="col-12"
+                                <div class="d-inline keyword-div"
                                    *ngIf="pchiave.attributes.language && pchiave.attributes.language.key === keyword_active else missingLanguage"
                                    [attr.data-languagekey]="pchiave.attributes.language.key"
-                                   [innerHTML]="pchiave.attributes.term"></p>
-                                <p class="col-12"
+                                   [innerHTML]="pchiave.attributes.term"></div>
+                                <div class="d-inline keyword-div"
                                    *ngIf="keyword_active === 'n/a' && !pchiave.attributes.language"
-                                   [innerHTML]="pchiave.attributes.term"></p>
+                                   [innerHTML]="pchiave.attributes.term"></div>
                             </ng-template>
                         </div>
                     </div>
