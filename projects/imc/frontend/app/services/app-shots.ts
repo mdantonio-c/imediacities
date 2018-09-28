@@ -186,29 +186,31 @@ export class AppShotsService {
     private _annotations_parse (target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
-
             //  Term tag e locations
             if (annotation.attributes.annotation_type.key === 'TAG') {
 
                 annotation.bodies.forEach(body => {
                     let tipo = 'tags';
-
                     if (body.attributes.spatial !== null && typeof body.attributes.spatial === 'object') {
                         tipo = 'locations';
                     }
-
                     this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice)
                 })
-
             //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
                 this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
             // Link
             } else if (annotation.attributes.annotation_type.key === 'LNK') {
-                this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
+                let body_linked = annotation.bodies[0];
+                if (body_linked.type == 'textualbody') {
+                    // external link
+                    this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
+                } else if (body_linked.type == 'textualbody') {
+                    // TODO manage bibliographic references
+                } else {
+                    // TODO add internal link to shot/item/(?)
+                }
             }
-
-            //  TODO add references
         })
 
     }
@@ -358,4 +360,21 @@ export interface IMC_Tag {
     group: string,
     count: number,
     shots_idx: number[]
+}
+
+export interface BibliographicReference {
+    title: string,
+    authors: string[],
+    book_title?: string,
+    journal?: string,
+    volume?: string,
+    number?: string,
+    year?: number,
+    month?: number,
+    editor?: string,
+    publisher?: string,
+    address?: string,
+    url?: string,
+    isbn?: string,
+    doi?: string
 }
