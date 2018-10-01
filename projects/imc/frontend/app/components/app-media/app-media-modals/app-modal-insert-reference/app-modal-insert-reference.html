@@ -1,83 +1,101 @@
 <!-- Modale per l'iserimento di nuove note -->
 <app-media-modal [data]="data" [media_type]="media_type">
-
     <div class="col-12 col-sm-7 row no-gutters justify-content-between space-paragraph-xs-20" modal-col>
-        <input type="text" class="col-12 imc--input space-paragraph-20" placeholder="Author*" aria-label="author" required>
-        <input type="text" class="col-12 imc--input space-paragraph-20" placeholder="Booktitle" aria-label="booktitle">
-        <input type="text" class="col-12 imc--input space-paragraph-20" placeholder="Title*" aria-label="title" required>
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Journal" aria-label="journal">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Volume" aria-label="volume">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Number" aria-label="number">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Year" aria-label="year">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Month" aria-label="month">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Editor" aria-label="editor">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Publisher" aria-label="publisher">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="Address" aria-label="address">
-        <input type="text" class="col-12 imc--input space-paragraph-20" placeholder="URL" aria-label="url">
-        <input type="text" class="col-5 imc--input space-paragraph-20" placeholder="ISBN" aria-label="isbn">
-        <input type="text" class="col-5 imc--input space-paragraph-20 imc--flex--item-end" placeholder="DOI" aria-label="doi">
-    </div>
-
-    <button type="button" class="btn btn-accent" modal-button>Save</button>
-
-</app-media-modal>
-<!--
-
-<div class="modal-content">
-&lt;!&ndash;
-    <div class="modal-header">
-        <h4 class="modal-title" id="exampleModalCenterTitle">Insert Reference</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true" class="material-icons">close</span>
-        </button>
-    </div>
-&ndash;&gt;
-
-    <div class="modal-body">
-        <h4>Shot: 4</h4>
-
-        <div class="row modal-body-content">
-
-            &lt;!&ndash; Anteprima del video &ndash;&gt;
-            <div class="col-5 row no-gutters modal-media&#45;&#45;info">
-                <span class="col-3"><strong>00:02:00:40</strong></span>
-                <span class="col-6 imc&#45;&#45;flex&#45;&#45;horizontal-end">frame-range: 540-821</span>
-                <span class="col-3 imc&#45;&#45;flex&#45;&#45;horizontal-end">duration: 47s</span>
-
-                &lt;!&ndash; Video palyer &ndash;&gt;
-                <span class="col-12 modal-media&#45;&#45;anteprima"></span>
-
-                &lt;!&ndash; Anteprime di altri shots dopo la selezione multipla &ndash;&gt;
-                <div class="col-12 row no-gutters">
-                    <span class="imc&#45;&#45;thumb"></span>
-                    <span class="imc&#45;&#45;thumb"></span>
+        <form [formGroup]="referenceForm" class="w-100">
+            <div class="form-group">
+                <label for="authors" class="small mb-0">Author(s)*</label>
+                <input id="authors" type="text" class="imc--input"aria-label="authors" 
+                    formControlName="authors" required>
+                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('authors').touched && referenceForm.get('authors').invalid">At least one author is required</div>
+            </div>
+            <div class="form-group">
+                <label for="bookTitle" class="small mb-0">Book title</label>
+                <input id="bookTitle" type="text" class="imc--input" aria-label="booktitle"
+                    formControlName="book_title">
+            </div>
+            <div class="form-group">
+                <label for="_title" class="small mb-0">Title*</label>
+                <input id="_title" type="text" class="imc--input" aria-label="title"
+                    formControlName="title" required>
+                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('title').touched && referenceForm.get('title').invalid">Title is required</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label for="journal" class="small mb-0">Journal</label>
+                    <input id="Journal" type="text" class="imc--input" aria-label="journal"
+                        formControlName="journal">
+                </div>
+                <div class="form-group offset-2 col-5">
+                    <label for="volume" class="small mb-0">Volume</label>
+                    <input id="volume" type="text" class="imc--input" aria-label="volume"
+                        formControlName="volume">
                 </div>
             </div>
-
-            &lt;!&ndash; Campi per aggiungere un reference &ndash;&gt;
-            <div class="col-7 row no-gutters justify-content-between">
-                <input type="text" class="col-12 imc&#45;&#45;input space-paragraph-20" placeholder="Author*" aria-label="author" required>
-                <input type="text" class="col-12 imc&#45;&#45;input space-paragraph-20" placeholder="Booktitle" aria-label="booktitle">
-                <input type="text" class="col-12 imc&#45;&#45;input space-paragraph-20" placeholder="Title*" aria-label="title" required>
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Journal" aria-label="journal">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Volume" aria-label="volume">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Number" aria-label="number">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Year" aria-label="year">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Month" aria-label="month">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Editor" aria-label="editor">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Publisher" aria-label="publisher">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="Address" aria-label="address">
-                <input type="text" class="col-12 imc&#45;&#45;input space-paragraph-20" placeholder="URL" aria-label="url">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20" placeholder="ISBN" aria-label="isbn">
-                <input type="text" class="col-5 imc&#45;&#45;input space-paragraph-20 imc&#45;&#45;flex&#45;&#45;item-end" placeholder="DOI" aria-label="doi">
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label for="number" class="small mb-0">Number</label>
+                    <input id="number" type="text" class="imc--input" aria-label="number"
+                        formControlName="number">
+                </div>
+                <div class="form-group offset-2 col-5">
+                    <label for="year" class="small mb-0">Year</label>
+                    <input id="year" type="number" class="imc--input" aria-label="year"
+                        formControlName="year">
+                </div>
             </div>
-        </div>
-
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label for="month" class="small mb-0">Month</label>
+                    <select id="month" class="imc--input" id="month" aria-label="month" formControlName="month">
+                        <option value=""></option>
+                        <option *ngFor="let m of months" [value]="m.value">{{m.key}}</option>
+                    </select>
+                </div>
+                <div class="form-group offset-2 col-5">
+                    <label for="editor" class="small mb-0">Editor</label>
+                    <input id="editor" type="text" class="imc--input" aria-label="editor"
+                        formControlName="editor">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label for="publisher" class="small mb-0">Publisher</label>
+                    <input id="publisher" type="text" class="imc--input" aria-label="publisher"
+                        formControlName="publisher">
+                </div>
+                <div class="form-group offset-2 col-5">
+                    <label for="address" class="small mb-0">Address</label>
+                    <input id="address" type="text" class="imc--input" aria-label="address"
+                        formControlName="address">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="url" class="small mb-0">URL</label>
+                <input id="url" type="text" class="imc--input" aria-label="url"
+                    formControlName="url">
+                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('url').dirty && referenceForm.get('url').invalid">Please provide a valid URL</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label for="isbn" class="small mb-0">ISBN</label>
+                    <input id="isbn" type="text" class="imc--input" aria-label="isbn"
+                        formControlName="isbn">
+                    <div class="invalid-feedback d-block" *ngIf="referenceForm.get('isbn').dirty && referenceForm.get('isbn').invalid">Please provide a valid ISBN</div>
+                </div>
+                <div class="form-group offset-2 col-5">
+                    <label for="doi" class="small mb-0">DOI</label>
+                    <input id="doi" type="text" class="imc--input imc--flex--item-end" aria-label="doi"
+                        formControlName="doi">
+                    <div class="invalid-feedback d-block" *ngIf="referenceForm.get('doi').dirty && referenceForm.get('doi').invalid">Please provide a valid DOI</div>
+                </div>
+            </div>
+        </form>
     </div>
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-border-classic" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-accent">Save</button>
-    </div>
-</div>
--->
+    <button type="button" class="btn btn-accent" modal-button
+        [disabled]="referenceForm.invalid" (click)="save()">Save</button>
+    <!--esito-->
+    <app-info modal-button
+              [message]="save_result.message" [result]="save_result.status"
+              *ngIf="save_result.visible"
+              (click)="save_result.visible = false"></app-info>
+</app-media-modal>

@@ -89,6 +89,28 @@ export class AppAnnotationsService {
             err => cb(err, null));
     }
 
+    create_reference(shots_ids, reference, media_type, cb) {
+
+        let observables: Observable<any>[] = [];
+        shots_ids.forEach(shot_id => observables.push(
+            this.api.post(
+                'annotations',
+                {
+                    target: media_type === 'video' ? `shot:${shot_id}` : `item:${shot_id}`,
+                    motivation: 'linking',
+                    body: AppAnnotationsService.bibliographic_reference(reference),
+                    private: reference.private
+                }
+            ).map((res) => res))
+        );
+        
+        Observable.forkJoin(
+            observables
+        ).subscribe(
+            res => cb(null, res),
+            err => cb(err, null));
+    }
+
     delete_request(annotation, media_type) {
         let confirm = window.confirm('Delete the annotation "' + annotation.name + '"?');
         if (confirm) {
@@ -197,6 +219,13 @@ export class AppAnnotationsService {
             s['spatial'] = spatial;
         }
         return s;
+    }
+
+    static bibliographic_reference(reference) {
+        return {
+            type: "BibliographicReference",
+            value: reference 
+        };
     }
 
 }
