@@ -2,14 +2,7 @@
 	<div class="col-11">
 		<blockquote class="float-left" style="font-size: 12px;">
 			<p style="margin: 0 !important">
-				<ng-container *ngFor="let author of biblio.reference.authors; let last=last">{{author}}{{last ? '' : ', '}}</ng-container> <ng-container *ngIf="biblio.reference.year"> (<span *ngIf="biblio.reference.month">{{printMonth(biblio.reference.month)}}&nbsp;</span>{{biblio.reference.year}})</ng-container>;&nbsp;<span>"{{biblio.reference.title}}"</span>
-				<ng-container *ngIf="biblio.reference.journal">&nbsp;<em>{{biblio.reference.journal}}</em>,</ng-container>
-				<ng-container *ngIf="biblio.reference.volume">&nbsp;Vol. {{biblio.reference.volume}},</ng-container>
-				<ng-container *ngIf="biblio.reference.number">&nbsp;no. {{biblio.reference.number}},</ng-container>
-				<ng-container *ngIf="biblio.reference.book_title">in <em>{{biblio.reference.book_title}}</em>,</ng-container>
-				<ng-container *ngIf="biblio.reference.editor">&nbsp;{{biblio.reference.editor}} (eds),</ng-container>
-				<ng-container *ngIf="biblio.reference.address">&nbsp;{{biblio.reference.address}}<span *ngIf="biblio.reference.publisher">:</span></ng-container>
-				<ng-container *ngIf="biblio.reference.publisher">{{biblio.reference.publisher}}</ng-container>.
+				<ng-container *ngFor="let author of biblio.reference.authors; let last=last">{{author}}{{last ? '' : ', '}}</ng-container> <ng-container *ngIf="biblio.reference.year"> (<span *ngIf="biblio.reference.month">{{printMonth(biblio.reference.month)}}&nbsp;</span>{{biblio.reference.year}})</ng-container>;&nbsp;<span>"{{biblio.reference.title}}"</span><ng-container *ngIf="biblio.reference.journal">, <em>{{biblio.reference.journal}}</em></ng-container><ng-container *ngIf="biblio.reference.volume">, Vol. {{biblio.reference.volume}}</ng-container><ng-container *ngIf="biblio.reference.number">, no. {{biblio.reference.number}}</ng-container><ng-container *ngIf="biblio.reference.book_title">, in <em>{{biblio.reference.book_title}}</em></ng-container><ng-container *ngIf="biblio.reference.editor">, {{biblio.reference.editor}} (eds)</ng-container><ng-container *ngIf="biblio.reference.address">, {{biblio.reference.address}}<span *ngIf="biblio.reference.publisher">:</span></ng-container><ng-container *ngIf="biblio.reference.publisher"><ng-container *ngIf="!biblio.reference.address">, </ng-container> {{biblio.reference.publisher}}</ng-container>.
 				<ng-container *ngIf="biblio.reference.isbn"><br/>isbn: {{biblio.reference.isbn}}</ng-container>
 				<ng-container *ngIf="biblio.reference.doi"><br/>doi: {{biblio.reference.doi}}</ng-container>
 				<ng-container *ngIf="biblio.reference.url"><br/><a href="{{biblio.reference.url}}" target="_blank" style="font-size: 13px !important;">{{biblio.reference.url}}</a></ng-container>
