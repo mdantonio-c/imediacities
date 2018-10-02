@@ -1,6 +1,6 @@
-import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {AppAnnotationsService} from "../../../../services/app-annotations";
-import {infoResult} from "../../../../decorators/app-info";
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { AppAnnotationsService } from "../../../../services/app-annotations";
+import { infoResult } from "../../../../decorators/app-info";
 
 @Component({
     selector: 'app-modal-insert-note',
@@ -22,9 +22,9 @@ export class AppModalInsertNoteComponent {
         language: 'it'
     };
 
-    constructor (private AnnotationsService: AppAnnotationsService) {}
+    constructor(private AnnotationsService: AppAnnotationsService) { }
 
-    save () {
+    save() {
 
         let n = {
             private: this.note.private,

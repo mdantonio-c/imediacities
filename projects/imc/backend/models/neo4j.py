@@ -695,6 +695,23 @@ class AudioBody(AnnotationBody):
     language = StringProperty(show=True)
 
 
+class BibliographicReference(AnnotationBody):
+    title = StringProperty(required=True, show=True)
+    authors = ArrayProperty(StringProperty(), required=True, show=True)
+    book_title = StringProperty(show=True)
+    journal = StringProperty(show=True)
+    volume = StringProperty(show=True)
+    number = StringProperty(show=True)
+    year = IntegerProperty(show=True)
+    month = IntegerProperty(show=True)
+    editor = StringProperty(show=True)
+    publisher = StringProperty(show=True)
+    address = StringProperty(show=True)
+    url = StringProperty(show=True)
+    isbn = StringProperty(show=True)
+    doi = StringProperty(show=True)
+
+
 # class VQBody(AnnotationBody):
 #     """Class for Video Quality Annotation."""
 #     module = StringProperty(required=True)
