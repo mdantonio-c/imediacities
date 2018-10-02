@@ -61,7 +61,7 @@ export class AppModalInsertReferenceComponent {
 		if (form.url &&  form.url.trim() !== '') { reference.url = form.url.trim(); }
 		if (form.isbn &&  form.isbn.trim() !== '') { reference.isbn = form.isbn.trim(); }
 		if (form.doi &&  form.doi.trim() !== '') { reference.doi = form.doi.trim(); }
-		console.log('save reference', reference);
+		/*console.log('save reference', reference);*/
 		this.AnnotationsService.create_reference(
 			this.data.shots.map(s => s.id),
 			reference,

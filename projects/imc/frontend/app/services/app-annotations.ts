@@ -138,6 +138,25 @@ export class AppAnnotationsService {
         );
     }
 
+    delete_anno(annotation, media_type) {
+        this.api.delete(
+            'annotations',
+            `${annotation.id}`
+        ).subscribe(
+            response => {
+                console.log("media_type", media_type);
+                if (media_type === 'video') {
+                    this.ShotsService.get();
+                } else if (media_type === 'image') {
+                    this.get(annotation.source_uuid, 'images');
+                }
+            },
+            err => {
+                console.error("Error deleting annotation " + annotation.id);
+            }
+        );
+    }
+
     get(media_id, endpoint) {
 
         this.api.get(

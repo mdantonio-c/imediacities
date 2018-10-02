@@ -20,7 +20,7 @@ export class AppReferenceComponent implements OnInit {
 	delete() {
 		if (!this.can_delete) return;
 		if (this.biblio.id) {
-			this.AnnotationsService.delete_tag(this.biblio, this.biblio.source);
+			this.AnnotationsService.delete_anno(this.biblio, this.biblio.source);
 		}
 	}
 
