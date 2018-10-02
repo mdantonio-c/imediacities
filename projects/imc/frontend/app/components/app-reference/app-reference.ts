@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AppAnnotationsService } from "../../services/app-annotations";
 import { IMC_Annotation } from "../../services/app-shots";
+import * as moment from 'moment';
 
 @Component({
 	selector: 'app-reference',
@@ -22,6 +23,10 @@ export class AppReferenceComponent implements OnInit {
 		if (this.biblio.id) {
 			this.AnnotationsService.delete_anno(this.biblio, this.biblio.source);
 		}
+	}
+
+	printMonth(monthNum) {
+		return moment.monthsShort(monthNum - 1);
 	}
 
 	ngOnInit() { }
