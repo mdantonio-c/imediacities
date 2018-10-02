@@ -811,11 +811,12 @@ def send_notification(self, recipient, subject, template, replaces, task_id,
     about failure.
     """
     body = get_html_template(template, replaces)
-    send_mail(body, subject, recipient,
-              plain_body="Sorry User, your job ID {task} is failed".format(task=task_id))
+    plain = "Sorry User, your job ID {task} is failed".format(task=task_id)
+    send_mail(body, subject, recipient, plain_body=plain)
 
     if failure is not None:
         replaces['task_id'] = task_id
         replaces['failure'] = failure
         body = get_html_template(template, replaces)
-        send_mail(body, subject)
+        plain = "Job ID {task} is failed".format(task=task_id)
+        send_mail(body, subject, plain_body=plain)
