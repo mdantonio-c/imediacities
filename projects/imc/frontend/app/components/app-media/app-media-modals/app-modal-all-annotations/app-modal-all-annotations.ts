@@ -33,4 +33,12 @@ export class AppModalAllAnnotationsComponent implements OnInit, OnChanges {
     ngOnChanges() {
         this.shot = this.data.shots[0];
     }
+
+    removeLink(link) {
+        console.log('remove link', link);
+    }
+
+    canRemoveLink(link) {
+        return true;
+    }
 }
