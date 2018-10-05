@@ -50,3 +50,7 @@ services:
   mongodb:
     ports:
       - 27017:27017
+
+  mongoui:
+    ports:
+      - 8081:8081
