@@ -74,6 +74,7 @@ import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-e
 import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
 import {AppReferenceComponent} from "./components/app-reference/app-reference";
+import {AppLinkComponent} from "./components/app-link/app-link";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
@@ -133,6 +134,7 @@ export const declarations: any[] = [
 	AppMediaTagsComponent,
 	AppNoteComponent,
     AppReferenceComponent,
+    AppLinkComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,

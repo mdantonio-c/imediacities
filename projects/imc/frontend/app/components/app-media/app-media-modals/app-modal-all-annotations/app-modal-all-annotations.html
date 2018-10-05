@@ -41,24 +41,24 @@
             </li>
             <li class="space-paragraph-20" *ngIf="shot.annotations.references.length">
                 <span><i class="material-icons">library_books</i></span>
-                <span>
+                <span class="w-100">
                     <ng-template
                     ngFor
                     let-reference
                     [ngForOf]="shot.annotations.references">
-                   <app-reference [reference]="reference"
-                        [can_delete]="anno_is_deletable(reference)"></app-reference>
+                        <app-reference [reference]="reference" [can_delete]="anno_is_deletable(reference)"></app-reference>
                     </ng-template>
                 </span>
             </li>
             <li class="space-paragraph-20" *ngIf="shot.annotations.links.length">
                 <span class="icon-rotate"><i class="material-icons">link</i></span>
-                <span class="d-inline-block text-truncate">
-                    <ul class="modal--link-list">
-                        <li *ngFor="let link of shot.annotations.links">
-                            <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
-                        </li>
-                    </ul>
+                <span class="w-100">
+                    <ng-template
+                    ngFor
+                    let-link
+                    [ngForOf]="shot.annotations.links">
+                        <app-link [link]="link" [can_delete]="anno_is_deletable(link)"></app-link>
+                    </ng-template>
                 </span>
             </li>
         </ul>

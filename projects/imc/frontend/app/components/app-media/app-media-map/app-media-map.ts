@@ -295,15 +295,12 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         )
 
     }
-
     marker_new_set (event, result, shots_idx) {
-
         //  Verifico se esiste un marker precedente
         //  ed eventualmente lo rimuovo
         if (this.marker_edit.marker && this.marker_edit.state !== 'saved') {
             this.marker_edit.marker.setMap(null);
         }
-
         let m = new google.maps.Marker({
             position:{
                 lat: event.latLng.lat(),
@@ -312,27 +309,41 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
             map: this.map
         });
-
         this._markers.push(m);
-
-        this.marker_edit = {
-            marker: m,
-            address: result.formatted_address,
-            description: result.formatted_address,
-            iri: result.place_id,
-            location: {
-                lat: event.latLng.lat(),
-                lng: event.latLng.lng()
-            },
-            shots_idx: shots_idx,
-            state: 'saving',
-        };
-
-        this.marker_edit.iw = this.ngMap.infoWindows.edit;
-        this.ngMap.openInfoWindow('edit', m)
-
-
+            this.marker_edit = {
+                marker: m,
+                address: result.formatted_address,
+                description: result.formatted_address,
+                iri: result.place_id,
+                location: {
+                    lat: event.latLng.lat(),
+                    lng: event.latLng.lng()
+                },
+                shots_idx: shots_idx,
+                state: 'saving',
+            };
+        // mi serve il place name di google da salvare dentro description
+        //  dentro result non c'è, faccio una richiesta a google
+        const placeDetails = new google.maps.places.PlacesService(this.map).getDetails({
+                placeId: result.place_id
+            }, (placeResult, status) => {
+                //console.log("marker_new_set: placeResult="+JSON.stringify(placeResult));
+                //console.log("marker_new_set: status="+JSON.stringify(status));
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    if (placeResult) {
+                        //this.marker_new_set2(event, shots_idx, placeResult, m);
+                        //console.log("marker_new_set: placeResult.name="+JSON.stringify(placeResult.name));
+                        this.marker_edit.description = placeResult.name;
+                        
+                    }
+                }else{
+                    console.log("Error in Google maps PlacesService");
+                }
+                this.marker_edit.iw = this.ngMap.infoWindows.edit;
+                this.ngMap.openInfoWindow('edit', m);
+        });
     }
+
     /**
      * Riporta il marker che è stato spostato alla posizione iniziale
      */
@@ -494,7 +505,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             */
             let location_to_find = _media_owner.attributes.shortname;
             if (location_to_find) {
-
+                //console.log("set_center_from_owner location_to_find: ",  location_to_find);
                 const geocode = this.geoCoder.geocode(
                     {address: this.ProviderToCity.transform(location_to_find)},
                 ).subscribe(
@@ -508,7 +519,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
                     },
                     err => {
-                        console.log("set_center_from_owner err",  err);
+                        console.log("set_center_from_owner err: ",  err);
                     }
                 );
                 this._subscription.add(geocode);
