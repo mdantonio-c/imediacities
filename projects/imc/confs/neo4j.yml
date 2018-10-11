@@ -13,6 +13,13 @@ services:
     environment:
       ACTIVATE: 1
 
+  proxy:
+    environment:
+      ACTIVATE: 1
+    depends_on:
+      # nothing is not allowed... 
+      - neo4j
+
   mongodb:
     environment:
       ACTIVATE: 0
@@ -20,13 +27,6 @@ services:
   backend:
     environment:
       ACTIVATE: 0
-
-  proxy:
-    environment:
-      ACTIVATE: 0
-    depends_on:
-      # nothing is not allowed... 
-      - neo4j
 
   frontend:
     environment:
