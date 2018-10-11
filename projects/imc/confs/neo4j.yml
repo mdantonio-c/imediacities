@@ -22,6 +22,8 @@ services:
     depends_on:
       # nothing is not allowed... 
       - neo4j
+    networks:
+      proxy_net:
 
   mongodb:
     environment:
