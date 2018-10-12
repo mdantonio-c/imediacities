@@ -307,7 +307,7 @@ class VideoShots(GraphBaseOperations):
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
-                if (anno.annotation_type in ('TAG', 'DSC') and
+                if (anno.annotation_type in ('TAG', 'DSC', 'LNK') and
                         creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
