@@ -19,7 +19,7 @@ export class AppModalInsertNoteComponent {
         title: '',
         text: '',
         private: true,
-        language: 'it'
+        language: 'en'
     };
 
     constructor(private AnnotationsService: AppAnnotationsService) { }
@@ -31,6 +31,7 @@ export class AppModalInsertNoteComponent {
             language: this.note.language,
             value: this.note.text
         };
+        console.log('note ro send', n)
 
         this.AnnotationsService.create_note(
             this.data.shots.map(s => s.id),
