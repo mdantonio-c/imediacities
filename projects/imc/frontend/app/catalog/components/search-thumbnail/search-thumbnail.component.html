@@ -1,5 +1,5 @@
 <div class="media-thumbnail search-thumbnail">
-	<div class="media-image-wrapper">
+	<div class="media-image-wrapper click-event" (click)="route(media.id, media.type)" style="outline: none;">
 		<span class="badge badge-warning revision" *ngIf="underRevision()">
 			revision
 		</span>
@@ -25,8 +25,7 @@
 			</div>
 		</div>
 		<h3 class="search-title">
-			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
-			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
+			<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
 		</h3>
 		<div class="space-5"></div>
 		<p class="text">

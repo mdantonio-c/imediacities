@@ -127,7 +127,7 @@ export class AppAnnotationsService {
             `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
         ).subscribe(
             response => {
-                console.log("media_type", media_type);
+                /*console.log("media_type", media_type);*/
                 if (media_type === 'video') {
                     this.ShotsService.get();
                 } else if (media_type === 'image') {
