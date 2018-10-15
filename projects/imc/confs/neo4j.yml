@@ -13,17 +13,36 @@ services:
     environment:
       ACTIVATE: 1
 
-  proxy:
-    environment:
-      ACTIVATE: 1
-      SMTP_ADMIN: ${SMTP_ADMIN}
+  # Cloned from proxy service
+  proxy-neo4j:
+    build:
+      context: ${SUBMODULE_DIR}/build-templates/proxy
+      args:
+        RAPYDO_VERSION: ${RAPYDO_VERSION}
+        CURRENT_UID: ${CURRENT_UID}
+    image: rapydo/proxy:${RAPYDO_VERSION}
+    hostname: reverseproxy
     volumes:
-      - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production-a2.conf:/etc/nginx/sites-enabled/production
-    depends_on:
-      # nothing is not allowed... 
-      - neo4j
+      - letsencrypt_certs:/etc/letsencrypt
+      - ssl_dhparam:/etc/nginx/ssl/
+    volumes:
+      - ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/confs/nginx-neo4j.conf:/etc/nginx/sites-enabled/production
+
     networks:
       proxy_net:
+        aliases:
+          - ${PROXY_HOST}
+    ports:
+      - ${PROXY_DEV_PORT}:${PROXY_DEV_PORT}   # 80 redirect
+      - ${PROXY_PROD_PORT}:${PROXY_PROD_PORT} # 443 SSL
+    environment:
+      ACTIVATE: 1
+      DOMAIN: ${PROJECT_DOMAIN}
+      MODE: ${LETSENCRYPT_MODE}
+      SMTP_ADMIN: ${SMTP_ADMIN}
+      CURRENT_UID: ${CURRENT_UID}
+    depends_on:
+      - neo4j
 
   mongodb:
     environment:
