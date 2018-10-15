@@ -162,6 +162,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 this.notify.extractErrors(err, this.notify.ERROR);
                 return;
             }
+            delete this.media.relationships.item[0].relationships.revision;
             this.shot_revision_is_active = false;
             // shallow clone is enough here!
             this.shots = this.shots_to_restore.slice(0);
