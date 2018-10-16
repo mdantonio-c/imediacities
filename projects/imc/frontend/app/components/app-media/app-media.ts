@@ -182,6 +182,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
+    /**  Join two shots. */
     private join_shots(idxA, idxB) {
         let shotA = this.shots[idxA];
         let shotB = this.shots[idxB];
@@ -193,7 +194,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         });
         this.shots[idxA] = shotA;
         // remove shotB from the list
-        /*console.log('remove shot idx', idxB);*/
         this.shots.splice(idxB, 1);
         // update the subsequent shot numbers
         for (let i = idxA + 1; i < this.shots.length; i++) {
@@ -219,11 +219,18 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     save_revised_shots() {
         console.log('saving revised shots...');
         let shots: SceneCut[] = this.shots.map(s => {
+            let shot_anno_ids = [];
+            for (let key in s.annotations) {
+                // filter only manual anno
+                shot_anno_ids.push(...s.annotations[key].filter(anno =>  anno.creator != null).map(anno => anno.id));
+            }
+            /*console.log('current annotations for shot_num ' + s.attributes.shot_num, shot_anno_ids);*/
             return {
                 shot_num: s.attributes.shot_num,
                 cut: s.attributes.start_frame_idx,
                 confirmed: s.attributes.revision_confirmed,
-                double_check: s.attributes.revision_check
+                double_check: s.attributes.revision_check,
+                annotations: shot_anno_ids
             } as SceneCut;
         });
         this.shotRevisionService.reviseVideoShots(this.media_id, shots, () => {
