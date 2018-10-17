@@ -395,41 +395,33 @@ class AnnotationRepository():
             log.debug('----------')
         if old_size > new_size:
             # delete exceeding shots
+            # NOTE: we can do this because no annotation targets the shot
             log.warn('The shot list [size={new_size}] is shorter than the '
                      'previous one [size={old_size}]'.format(
                          new_size=new_size, old_size=old_size))
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
                 log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
-                # related_annotations = shot_to_delete[0].annotation.all()
-                # for anno in related_annotations:
-                #     bodies = anno.bodies.all()
-                #     for b in bodies:
-                #         original_body = b.downcast()
-                #         if isinstance(original_body, ResourceBody):
-                #             # disconnect this body
-                #             anno.bodies.disconnect(b)
-                #         else:
-                #             b.delete()
-                #     anno.delete()
                 shot_to_delete[0].delete()
 
-        # clean-up "orphan" manual annotation
+        # clean-up "orphan" manual annotations
         for anno in existing_annotations:
             try:
                 anno.targets.all()
             except CardinalityViolation:
                 log.warn('orphan annotation to delete: {}'.format(anno))
                 # delete anno
-                # bodies = anno.bodies.all()
-                # for b in bodies:
-                #     original_body = b.downcast()
-                #     if isinstance(original_body, ResourceBody):
-                #         # disconnect this body
-                #         anno.bodies.disconnect(b)
-                #     else:
-                #         b.delete()
-                # anno.delete()
+                # NOTE: this could occur if an exisitng manual anno is not
+                # passed in the shot revision request.
+                bodies = anno.bodies.all()
+                for b in bodies:
+                    original_body = b.downcast()
+                    if isinstance(original_body, ResourceBody):
+                        # disconnect this body
+                        anno.bodies.disconnect(b)
+                    else:
+                        b.delete()
+                anno.delete()
 
         # rearrange the relationships between existing segments and the new
         # shot list
