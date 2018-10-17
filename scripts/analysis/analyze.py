@@ -796,6 +796,11 @@ def update_storyboard(revised_cuts, out_folder):
         print('bad_out_folder:', out_folder)
         return False
 
+    global TRANSCODED_FRAMERATE
+    TRANSCODED_FRAMERATE = get_framerate(os.path.join(out_folder, 'origin_info.json'))
+    if TRANSCODED_FRAMERATE == 0:
+        return False  # (errors already logged)
+
     # check storyboard folder
     sb_folder = os.path.join(out_folder, 'storyboard')
     if(not os.path.exists(sb_folder)):
