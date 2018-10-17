@@ -222,7 +222,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             let shot_anno_ids = [];
             for (let key in s.annotations) {
                 // filter only manual anno
-                shot_anno_ids.push(...s.annotations[key].filter(anno =>  anno.creator != null).map(anno => anno.id));
+                // ensure unique anno ids
+                shot_anno_ids.push(...Array.from(new Set(
+                    s.annotations[key].filter(anno =>  anno.creator != null).map(anno => anno.id))));
             }
             /*console.log('current annotations for shot_num ' + s.attributes.shot_num, shot_anno_ids);*/
             return {

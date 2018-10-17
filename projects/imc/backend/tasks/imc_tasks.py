@@ -295,8 +295,8 @@ def shot_revision(self, revision, item_id):
         # extract 'confirmed' and 'double_check' flags
         for s in revision['shots']:
             shot_num = s['shot_num']
-            if shot_num == 0:
-                continue
+            # if shot_num == 0:
+            #     continue
             shot = shots.get(shot_num)
             if shot is None:
                 # should never be reached
@@ -304,6 +304,7 @@ def shot_revision(self, revision, item_id):
                 continue
             shot['revision_confirmed'] = s.get('confirmed', False)
             shot['revision_check'] = s.get('double_check', False)
+            shot['annotations'] = s.get('annotations', [])
 
         repo = AnnotationRepository(self.graph)
         # first remove existing automatic VIM annotations if any

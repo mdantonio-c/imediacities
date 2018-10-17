@@ -5,6 +5,7 @@ import pytz
 import json
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
+from neomodel.cardinality import CardinalityViolation
 
 from imc.models.neo4j import (
     Annotation, TVSBody, VIMBody, BibliographicReference,
@@ -330,6 +331,17 @@ class AnnotationRepository():
         new_size = len(shots)
         log.debug('Incoming shot list size: {}'.format(new_size))
 
+        # for each existing shot we gather and disconnect all the manual
+        # annotations
+        existing_annotations = []
+        for segment in tvs_body.segments.all():
+            old_shot = segment.downcast()
+            for a in old_shot.annotation.all():
+                existing_annotations.append(a)
+                segment.annotation.disconnect(a)
+        # log.debug(existing_annotations)
+        log.debug('total existing annotations: %s' % len(existing_annotations))
+
         # foreach incoming shot
         log.debug('----------')
         current_time = datetime.now(pytz.utc)
@@ -370,28 +382,54 @@ class AnnotationRepository():
                 shot_node.duration = properties['duration']
                 shot_node.thumbnail_uri = properties['thumbnail_uri']
                 shot_node.save()
+                # manage annotations
+                if 'annotations' in properties:
+                    for anno_id in properties['annotations']:
+                        # look up ID from existing_annotations
+                        log.debug('look up for annotation ID %s' % anno_id)
+                        found = [x for x in existing_annotations if x.uuid == anno_id]
+                        if len(found) == 0:
+                            continue
+                        found[0].targets.connect(shot_node)
             log.debug(shot_node)
             log.debug('----------')
         if old_size > new_size:
-            # naive solution: delete exceeding shots
+            # delete exceeding shots
             log.warn('The shot list [size={new_size}] is shorter than the '
                      'previous one [size={old_size}]'.format(
                          new_size=new_size, old_size=old_size))
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
                 log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
-                related_annotations = shot_to_delete[0].annotation.all()
-                for anno in related_annotations:
-                    bodies = anno.bodies.all()
-                    for b in bodies:
-                        original_body = b.downcast()
-                        if isinstance(original_body, ResourceBody):
-                            # disconnect this body
-                            anno.bodies.disconnect(b)
-                        else:
-                            b.delete()
-                    anno.delete()
+                # related_annotations = shot_to_delete[0].annotation.all()
+                # for anno in related_annotations:
+                #     bodies = anno.bodies.all()
+                #     for b in bodies:
+                #         original_body = b.downcast()
+                #         if isinstance(original_body, ResourceBody):
+                #             # disconnect this body
+                #             anno.bodies.disconnect(b)
+                #         else:
+                #             b.delete()
+                #     anno.delete()
                 shot_to_delete[0].delete()
+
+        # clean-up "orphan" manual annotation
+        for anno in existing_annotations:
+            try:
+                anno.targets.all()
+            except CardinalityViolation:
+                log.warn('orphan annotation to delete: {}'.format(anno))
+                # delete anno
+                # bodies = anno.bodies.all()
+                # for b in bodies:
+                #     original_body = b.downcast()
+                #     if isinstance(original_body, ResourceBody):
+                #         # disconnect this body
+                #         anno.bodies.disconnect(b)
+                #     else:
+                #         b.delete()
+                # anno.delete()
 
         # rearrange the relationships between existing segments and the new
         # shot list
