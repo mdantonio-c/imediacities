@@ -217,7 +217,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             progress(self, 'Completed', path)
 
         except Exception as e:
-            progress(self, 'Import error', None)
+            # progress(self, 'Import error', None)
+            progress(self, 'FAILED', None)
             log.error("Task error, %s" % e)
             if content_node is not None:
                 content_node.status = 'ERROR'
