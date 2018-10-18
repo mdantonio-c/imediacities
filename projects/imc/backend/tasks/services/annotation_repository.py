@@ -310,12 +310,24 @@ class AnnotationRepository():
     def update_automatic_tvs(self, item, shots, vim_estimations, rev=False, reviser=None):
         '''
         This procedure updates the automatic shot list preserving existing
-        annotations such as TAG, DSC etc.
+        annotations such as TAG, DSC, LNK etc.
 
         For each incoming shot it updates the corresponding shot in the
         database with the same shot_num. If a new shot occurs, it is added to
         the actual list. If instead the list of shots is shortened, all shot in
-        excess will be eliminated with related anno(s).
+        excess will be removed.
+
+        Regarding existing annotations, for the manual ones, this procedure
+        expects the binding passed as argument. The shots parameter conveys
+        together with shot info also the releted manual annotations (list of
+        anno IDs).
+        If an bad annotation ID is passed (it doesn't belong to any shot) it is
+        ignored. If instead some of the existing annotations are not passed,
+        then these "orphan" annotations are deleted.
+
+        On the other hand, for automatic annotations, the segment is
+        re-organized after updating the shot list. The segments are reassigned
+        to the shots (WITHIN_SHOT) after updating the list of cuts.
         '''
         log.info('Update existing shot list preserving anno(s).')
         FHG_TVS = item.targeting_annotations.search(

@@ -772,6 +772,10 @@ class VideoShotRevision(GraphBaseOperations):
                 raise RestApiException(
                     'Invalid double_check value',
                     status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'annotations' not in s:
+                raise RestApiException(
+                    'Missing annotations in shot: {}'.format(s),
+                    status_code=hcodes.HTTP_BAD_REQUEST)
             if (
                 'annotations' in s and
                 not isinstance(s['annotations'], type(list)) and
