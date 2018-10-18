@@ -607,8 +607,12 @@ def insert_vim_in_storyboard(out_folder, sb):
         shot_vim_dic = {}
         for n in vim_names:
             values = vim[n][f0:f1]
-            max_value = max(values)
-            avg_value = sum(values) / float(len(values))
+            if values:
+                max_value = max(values)
+                avg_value = sum(values) / float(len(values))
+            else:
+                max_value = 0
+                avg_value = 0
             shot_vim_dic[n] = (round(avg_value, 3), round(max_value, 3))
         shot['motions_dict'] = shot_vim_dic
 
@@ -617,7 +621,10 @@ def insert_vim_in_storyboard(out_folder, sb):
         shot_vim = []
         for n in vim_names:
             values = vim[n][f0:f1]
-            avg_value = sum(values) / float(len(values))
+            if values:
+                avg_value = sum(values) / float(len(values))
+            else:
+                avg_value = 0
             if avg_value > 0.1:
                 shot_vim.append((round(avg_value, 3), n))
         shot_vim.sort(reverse=True)
@@ -788,6 +795,11 @@ def update_storyboard(revised_cuts, out_folder):
     if(not os.path.exists(out_folder)):
         print('bad_out_folder:', out_folder)
         return False
+
+    global TRANSCODED_FRAMERATE
+    TRANSCODED_FRAMERATE = get_framerate(os.path.join(out_folder, 'origin_info.json'))
+    if TRANSCODED_FRAMERATE == 0:
+        return False  # (errors already logged)
 
     # check storyboard folder
     sb_folder = os.path.join(out_folder, 'storyboard')
