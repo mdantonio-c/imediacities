@@ -325,8 +325,8 @@ class AnnotationRepository():
         ignored. If instead some of the existing annotations are not passed,
         then these "orphan" annotations are deleted.
 
-        On the other hand, for automatic annotations, the segment is
-        re-organized after updating the shot list. The segments are reassigned
+        On the other hand, for automatic annotations, the segments are
+        reorganized after updating the shot list. The segments are reassigned
         to the shots (WITHIN_SHOT) after updating the list of cuts.
         '''
         log.info('Update existing shot list preserving anno(s).')
@@ -343,8 +343,8 @@ class AnnotationRepository():
         new_size = len(shots)
         log.debug('Incoming shot list size: {}'.format(new_size))
 
-        # for each existing shot we gather and disconnect all the manual
-        # annotations
+        # for each existing shot we gather and disconnect from them all the 
+        # manual annotations
         existing_annotations = []
         for segment in tvs_body.segments.all():
             old_shot = segment.downcast()

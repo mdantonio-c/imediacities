@@ -149,9 +149,25 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             # EXECUTE AUTOMATC TOOLS
 
+            # Before starting I want to be sure that no automatic annotations
+            # exist. It is dangerous re-processing in case of different fps.
+            repo = AnnotationRepository(self.graph)
+            if repo.check_automatic_tagging(item_node.uuid):
+                log.warn(
+                    "Pipeline cannot be started: " +
+                    "delete automatic tags before re-processing!")
+                content_node.status = "COMPLETED"
+                content_node.save()
+                return 1
+
             content_item = os.path.join('/uploads', content_path)
             if not os.path.exists(content_item):
                 raise Exception('Bad input file', content_item)
+
+            creation = item_node.creation.single()
+            if not creation:
+                raise ValueError('Unexpected missing creation '
+                                 'importing resource {}'.format(resource_id))
 
             out_folder = make_movie_analize_folder(content_item,
                                                    (mode is not None and mode == 'clean'))
@@ -159,10 +175,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 raise Exception('Failed to create out_folder')
 
             log.info("Analize " + content_item)
-            creation = item_node.creation.single()
-            if not creation:
-                raise ValueError('Unexpected missing creation '
-                                 'importing resource {}'.format(resource_id))
             if analize(content_item, creation.uuid, item_type, out_folder, fast):
                 log.info('Analize executed')
             else:
@@ -176,15 +188,21 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             progress(self, 'Extracting automatic annotations', path)
 
+            # take the previous fps apart
+            old_fps = item_node.framerate 
             extract_tech_info(self, item_node, analyze_path)
 
             # - ONLY for videos -
             if item_type == 'Video':
+
+                if old_fps != item_node.framerate:
+                    log.info("Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}"
+                        .format(id=item_node.uuid, old_fps=old_fps, new_fps=item_node.framerate))
+
                 # extract TVS and VIM results
                 shots, vim_estimations = extract_tvs_vim_results(
                     self, item_node, analyze_path)
 
-                repo = AnnotationRepository(self.graph)
                 # first remove existing automatic VIM annotations if any
                 vim_annotations = item_node.sourcing_annotations.search(
                     annotation_type='VIM', generator='FHG')
@@ -192,7 +210,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                     anno_id = anno.id
                     repo.delete_vim_annotation(anno)
                     log.debug("Deleted existing VIM annotation [%s]" % anno_id)
-
                 # save or update TVS annotations
                 existing_shots = item_node.shots.all()
                 if not existing_shots:
