@@ -125,6 +125,9 @@ picture-->
                     <ng-container *ngIf="media_type === 'video'">
                         <div class="tab-pane fade show active" id="pills-shots" role="tabpanel" aria-labelledby="shots">
                             <!-- tab shots -->
+                            <div class="loader col mt-2" *ngIf="shots && !shots.length" style="text-align: center">
+                                <i class="fa fa-spinner fa-spin" style="font-size:36px;" aria-hidden="true"></i>
+                            </div>
                             <div *ngIf="shots && shots.length">
                                 <app-video-shot
                                         *ngFor="let shot of shots"
@@ -218,44 +221,47 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-                    <ng-container *ngIf="media_type === 'video' && !multi_annotations_is_active && !shot_revision_is_active">
-                        <button class="btn btn-border-classic px-1" 
-                            mwlConfirmationPopover
-                            [popoverTitle]="'Start Shot Revision'"
-                            [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
-                            (confirm)="start_shot_revision()">Shot revision</button>
-                        &nbsp;
-                        <button class="btn btn-border-classic px-1"
-                            (click)="multi_annotations_toggle()">Multiple annotation</button>
-                    </ng-container>
+                    <ng-container *ngIf="media_type === 'video' && shots.length > 0">
+                        <ng-container *ngIf="!shot_revision_is_active && !multi_annotations_is_active">
+                            <button class="btn btn-border-classic px-1" 
+                                mwlConfirmationPopover
+                                [popoverTitle]="'Start Shot Revision'"
+                                [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
+                                (confirm)="start_shot_revision()"
+                                *ngIf="user.roles.hasOwnProperty('Reviser')">Shot revision</button>
+                            &nbsp;
+                            <button class="btn btn-border-classic px-1"
+                                (click)="multi_annotations_toggle()">Multiple annotation</button>
+                        </ng-container>
 
-                    <ng-container *ngIf="canRevise()">
-                        <button class="btn btn-border-classic"
-                            mwlConfirmationPopover
-                            [popoverTitle]="'Exit shot revision'"
-                            [popoverMessage]="'All changes will be lost.<br/>Do you wish to continue?'"
-                            (confirm)="exit_shot_revision()">Cancel</button>
-                        &nbsp;
-                        <button class="btn btn-border-classic"
-                                (click)="save_revised_shots()">Save and Exit</button>
-                    </ng-container>
+                        <ng-container *ngIf="canRevise()">
+                            <button class="btn btn-border-classic"
+                                mwlConfirmationPopover
+                                [popoverTitle]="'Exit shot revision'"
+                                [popoverMessage]="'All changes will be lost.<br/>Do you wish to continue?'"
+                                (confirm)="exit_shot_revision()">Cancel</button>
+                            &nbsp;
+                            <button class="btn btn-border-classic"
+                                    (click)="save_revised_shots()">Save and Exit</button>
+                        </ng-container>
 
-                    <ng-container *ngIf="multi_annotations_is_active">
-                        <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
-                            <button id="dropdownBasic" ngbDropdownToggle>Add Annotation</button>
-                            <div ngbDropdownMenu aria-labelledby="dropdownBasic">
-                                <span (click)="modal_show_multi($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
-                                <span (click)="modal_show_multi($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
-                                <span (click)="modal_show_multi($event, 'insert-note')" class="dropdown-item">Add Note</span>
-                                <!--
-                                <span (click)="modal_show_multi($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
-                                <span (click)="modal_show_multi($event, 'insert-link')" class="dropdown-item">Add Link</span>
-                                -->
+                        <ng-container *ngIf="multi_annotations_is_active">
+                            <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
+                                <button id="dropdownBasic" ngbDropdownToggle>Add Annotation</button>
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic">
+                                    <span (click)="modal_show_multi($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                                    <span (click)="modal_show_multi($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                                    <span (click)="modal_show_multi($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                                    <!--
+                                    <span (click)="modal_show_multi($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                                    <span (click)="modal_show_multi($event, 'insert-link')" class="dropdown-item">Add Link</span>
+                                    -->
+                                </div>
                             </div>
-                        </div>
-                        <span class="col-6 col-lg-6 col-lg-offset-1">
-                                <button class="btn btn-border-classic" (click)="multi_annotations_toggle()">Cancel selection</button>
-                            </span>
+                            <span class="col-6 col-lg-6 col-lg-offset-1">
+                                    <button class="btn btn-border-classic" (click)="multi_annotations_toggle()">Cancel selection</button>
+                                </span>
+                        </ng-container>
                     </ng-container>
                 </div>
 

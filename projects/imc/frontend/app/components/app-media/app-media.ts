@@ -218,6 +218,11 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
     save_revised_shots() {
         console.log('saving revised shots...');
+        if (this.shots.length === 0) {
+            // should never be reached
+            console.warn("Trying to save an empty revision list");
+            return;
+        }
         let shots: SceneCut[] = this.shots.map(s => {
             let shot_anno_ids = [];
             for (let key in s.annotations) {
