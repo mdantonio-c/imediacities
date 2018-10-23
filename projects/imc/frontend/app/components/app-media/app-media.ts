@@ -122,6 +122,28 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
+    show_only_public_domain() {
+        // No user logged-in
+        if (this.user === null) return true;
+        // The logged user has no role
+        if (!this.user.roles) return true;
+        // The logged user has no role
+        if (Object.keys(this.user.roles).length <= 0) return true;
+
+        // Users with special roles always see everything
+        if ('admin_root' in this.user.roles) return false;
+        if ('local_admin' in this.user.roles) return false;
+        if ('Archive' in this.user.roles) return false;
+        if ('Researcher' in this.user.roles) return false;
+        if ('Reviser' in this.user.roles) return false;
+
+        // normal users does not see protected contents
+        if ('normal_user' in this.user.roles) return true;
+            
+        // you should not reach this final return
+        console.log("You should not reach this final return")
+        return true;
+    }
     is_public_domain() {
         let k = this.media.attributes.rights_status.key;
 

@@ -33,21 +33,21 @@ picture-->
             <section class="box-media col-12 col-sm-7 col-lg-6">
                 <!-- PICTURE -->
                 <ng-container *ngIf="media_type === 'image'" >
-                    <div class="container-picture" *ngIf='user || is_public_domain()'>
+                    <div class="container-picture" *ngIf='!show_only_public_domain() || is_public_domain()'>
                         <app-picture [data]="media"></app-picture>
                     </div>
                 </ng-container>
                 <!-- VIDEO PLAYER -->
                 <ng-container *ngIf="media_type === 'video'">
                     <app-video-player
-                        *ngIf='user || is_public_domain()'
+                        *ngIf='!show_only_public_domain() || is_public_domain()'
                         #appVideo
                         [data]="media"
                         [shots]="shots"
                     (video_player_ready)="video_player_set($event)"></app-video-player>
                 </ng-container>
 
-                <ng-container *ngIf='!user && !is_public_domain()'>
+                <ng-container *ngIf='show_only_public_domain() && !is_public_domain()'>
                     <div class="container-picture">
                         <br><br>
                         <i class="fa fa-ban"></i> Under copyright
@@ -59,7 +59,7 @@ picture-->
             </section>
 
             <!-- TAB SHOTS / SEGMENTS / AREAS-->
-            <section class="col-12 col-sm-5 col-lg-3 box-shots" *ngIf='user || is_public_domain()'>
+            <section class="col-12 col-sm-5 col-lg-3 box-shots" *ngIf='!show_only_public_domain() || is_public_domain()'>
 
                 <div class="imc--toolbar row no-gutters">
                     <span class="col-5 col-lg-6 imc--flex--vertical-center" [innerHTML]="tab_title"></span>
