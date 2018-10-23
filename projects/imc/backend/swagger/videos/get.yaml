@@ -1,13 +1,15 @@
-common:
-  custom:
-    # publish: true
-    authentication: true
-    authorized:
-      - admin_root
 
 videos:
   summary: List of videos
   description: Returns a list containing all videos. The list supports paging.
+  tags:
+    - videos
+    - admin
+  custom:
+    # publish: false
+    authentication: true
+    authorized:
+      - admin_root
   parameters:
     - name: pageSize
       in: query
@@ -26,17 +28,17 @@ videos:
 video:
   summary: Gets information about a video
   description: Returns a single video for its uuid
-  # tags:
-  #   # - logout
-  #   - authentication
+  tags:
+    - videos
   custom:
     # publish: true
-    authentication: true
+    # authentication: true
+    authentication: false
   responses:
     '200':
       description: Video information successfully retrieved
-    '401':
-      description: This endpoint requires a valid authorization token
+    # '401':
+    #   description: This endpoint requires a valid authorization token
     '404':
       description: The video does not exists.
 

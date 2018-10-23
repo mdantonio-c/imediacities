@@ -108,7 +108,7 @@
                     <app-media-annotation [annotation]="location" [can_delete]="tag_is_deletable(location)"></app-media-annotation>
                 </ng-template>
             </div>
-            <div class="row no-gutters space-paragraph-20" *ngIf="!underRevision">
+            <div class="row no-gutters space-paragraph-20" *ngIf="user && !underRevision">
                 <!-- modali -->
                 <div ngbDropdown ngbDropdownReposition class="imc--input--dropdown col-12 col-lg-7">
                     <button [id]="dropdown_id" ngbDropdownToggle>Add Annotation</button>

@@ -8,5 +8,6 @@ export function is_annotation_owner() {
 }
 
 function owns_annotation (user, annotation_owner) {
+	if (user == null) return false;
     return (annotation_owner === user.uuid) || user.isAdmin;
 }

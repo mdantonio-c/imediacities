@@ -125,6 +125,7 @@ picture-->
                     <ng-container *ngIf="media_type === 'video'">
                         <div class="tab-pane fade show active" id="pills-shots" role="tabpanel" aria-labelledby="shots">
                             <!-- tab shots -->
+                            <loading *ngIf="!shots || !shots.length"></loading>
                             <div *ngIf="shots && shots.length">
                                 <app-video-shot
                                         *ngFor="let shot of shots"
@@ -218,7 +219,7 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-                    <ng-container *ngIf="media_type === 'video' && !multi_annotations_is_active && !shot_revision_is_active">
+                    <ng-container *ngIf="media_type === 'video' && !multi_annotations_is_active && !shot_revision_is_active && user">
                         <button class="btn btn-border-classic px-1" 
                             mwlConfirmationPopover
                             [popoverTitle]="'Start Shot Revision'"
@@ -240,7 +241,7 @@ picture-->
                                 (click)="save_revised_shots()">Save and Exit</button>
                     </ng-container>
 
-                    <ng-container *ngIf="multi_annotations_is_active">
+                    <ng-container *ngIf="user && multi_annotations_is_active">
                         <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
                             <button id="dropdownBasic" ngbDropdownToggle>Add Annotation</button>
                             <div ngbDropdownMenu aria-labelledby="dropdownBasic">

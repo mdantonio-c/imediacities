@@ -140,6 +140,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     canRevise() {
+        if (this.user === null) return false;
         return this.user.roles.hasOwnProperty('Reviser') &&
             this.shot_revision_is_active &&
             this.shot_revision_state != 'R' &&
@@ -413,7 +414,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                     this.shots_init(shots);
                     const annotations = this.ShotsService.annotations();
                     this.annotations_count = annotations.length;
-                    this.locations = annotations.filter(a => a.group === 'location');
+                    if (this.user !== null) {
+                        this.locations = annotations.filter(a => a.group === 'location');
+                    }
                     if (this.media.relationships.item[0].relationships.revision) {
                         this.under_revision();
                     }
