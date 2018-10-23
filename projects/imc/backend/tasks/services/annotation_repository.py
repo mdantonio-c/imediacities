@@ -5,6 +5,7 @@ import pytz
 import json
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
+from neomodel.cardinality import CardinalityViolation
 
 from imc.models.neo4j import (
     Annotation, TVSBody, VIMBody, BibliographicReference,
@@ -309,12 +310,24 @@ class AnnotationRepository():
     def update_automatic_tvs(self, item, shots, vim_estimations, rev=False, reviser=None):
         '''
         This procedure updates the automatic shot list preserving existing
-        annotations such as TAG, DSC etc.
+        annotations such as TAG, DSC, LNK etc.
 
         For each incoming shot it updates the corresponding shot in the
         database with the same shot_num. If a new shot occurs, it is added to
         the actual list. If instead the list of shots is shortened, all shot in
-        excess will be eliminated with related anno(s).
+        excess will be removed.
+
+        Regarding existing annotations, for the manual ones, this procedure
+        expects the binding passed as argument. The shots parameter conveys
+        together with shot info also the releted manual annotations (list of
+        anno IDs).
+        If an bad annotation ID is passed (it doesn't belong to any shot) it is
+        ignored. If instead some of the existing annotations are not passed,
+        then these "orphan" annotations are deleted.
+
+        On the other hand, for automatic annotations, the segments are
+        reorganized after updating the shot list. The segments are reassigned
+        to the shots (WITHIN_SHOT) after updating the list of cuts.
         '''
         log.info('Update existing shot list preserving anno(s).')
         FHG_TVS = item.targeting_annotations.search(
@@ -329,6 +342,17 @@ class AnnotationRepository():
         log.debug('Existing shot list size: {}'.format(old_size))
         new_size = len(shots)
         log.debug('Incoming shot list size: {}'.format(new_size))
+
+        # for each existing shot we gather and disconnect from them all the 
+        # manual annotations
+        existing_annotations = []
+        for segment in tvs_body.segments.all():
+            old_shot = segment.downcast()
+            for a in old_shot.annotation.all():
+                existing_annotations.append(a)
+                segment.annotation.disconnect(a)
+        # log.debug(existing_annotations)
+        log.debug('total existing annotations: %s' % len(existing_annotations))
 
         # foreach incoming shot
         log.debug('----------')
@@ -370,28 +394,46 @@ class AnnotationRepository():
                 shot_node.duration = properties['duration']
                 shot_node.thumbnail_uri = properties['thumbnail_uri']
                 shot_node.save()
+                # manage annotations
+                if 'annotations' in properties:
+                    for anno_id in properties['annotations']:
+                        # look up ID from existing_annotations
+                        log.debug('look up for annotation ID %s' % anno_id)
+                        found = [x for x in existing_annotations if x.uuid == anno_id]
+                        if len(found) == 0:
+                            continue
+                        found[0].targets.connect(shot_node)
             log.debug(shot_node)
             log.debug('----------')
         if old_size > new_size:
-            # naive solution: delete exceeding shots
+            # delete exceeding shots
+            # NOTE: we can do this because no annotation targets the shot
             log.warn('The shot list [size={new_size}] is shorter than the '
                      'previous one [size={old_size}]'.format(
                          new_size=new_size, old_size=old_size))
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
                 log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
-                related_annotations = shot_to_delete[0].annotation.all()
-                for anno in related_annotations:
-                    bodies = anno.bodies.all()
-                    for b in bodies:
-                        original_body = b.downcast()
-                        if isinstance(original_body, ResourceBody):
-                            # disconnect this body
-                            anno.bodies.disconnect(b)
-                        else:
-                            b.delete()
-                    anno.delete()
                 shot_to_delete[0].delete()
+
+        # clean-up "orphan" manual annotations
+        for anno in existing_annotations:
+            try:
+                anno.targets.all()
+            except CardinalityViolation:
+                log.warn('orphan annotation to delete: {}'.format(anno))
+                # delete anno
+                # NOTE: this could occur if an exisitng manual anno is not
+                # passed in the shot revision request.
+                bodies = anno.bodies.all()
+                for b in bodies:
+                    original_body = b.downcast()
+                    if isinstance(original_body, ResourceBody):
+                        # disconnect this body
+                        anno.bodies.disconnect(b)
+                    else:
+                        b.delete()
+                anno.delete()
 
         # rearrange the relationships between existing segments and the new
         # shot list
