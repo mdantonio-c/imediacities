@@ -122,6 +122,30 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         }
     }
 
+    is_public_domain() {
+        let k = this.media.attributes.rights_status.key;
+
+        // EU Orphan Work
+        if (k == "02") return true;
+
+        // Public Domain
+        if (k == "05") return true;
+
+        // No Copyright - Contractual Restrictions
+        if (k == "06") return true;
+
+        // No Copyright - Non-Commercial Use Only
+        if (k == "07") return true;
+
+        // No Copyright - Other Known Legal Restrictions
+        if (k == "08") return true;
+
+        // No Copyright - United States
+        if (k == "09") return true;
+
+        return false;
+    }
+
     start_shot_revision() {
         this.shotRevisionService.putVideoUnderRevision(this.media_id, (err) => {
             if(err) {

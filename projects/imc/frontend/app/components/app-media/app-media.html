@@ -27,12 +27,16 @@ picture-->
         </div>
         <span class="col-lg-3"></span>
 
+        <div *ngIf='!user && !is_public_domain()'>
+             <i class="fa fa-ban"></i> Under copyright
+        </div>
+
         <!-- container video and shot -->
-        <div class="container-media--content row no-gutters col-12 justify-content-md-center">
+        <div class="container-media--content row no-gutters col-12 justify-content-md-center" *ngIf='user || is_public_domain()'>
             <!-- box media -->
             <section class="box-media col-12 col-sm-7 col-lg-6">
                 <!-- PICTURE -->
-                <ng-container *ngIf="media_type === 'image'">
+                <ng-container *ngIf="media_type === 'image'" >
                     <div class="container-picture">
                         <app-picture [data]="media"></app-picture>
                     </div>
