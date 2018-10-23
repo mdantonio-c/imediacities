@@ -37,7 +37,6 @@ services:
     environment:
       DEBUG_LEVEL: INFO
       APP_MODE: production
-    command: flower --basic_auth=${CELERYUI_USER}:${CELERYUI_PASSWORD} --port=${CELERYUI_PORT} --persistent --db=/var/flower/flower -A restapi.flask_ext.flask_celery.worker.celery_app -n flower_monitor
     depends_on:
       - rabbit
       - mongodb
