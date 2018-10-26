@@ -304,6 +304,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SceneCut'
+        minItems: 1
       exitRevision:
         type: boolean
         default: true

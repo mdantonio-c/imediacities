@@ -751,7 +751,7 @@ class VideoShotRevision(GraphBaseOperations):
 
         revision = self.get_input()
         # validate request body
-        if 'shots' not in revision:
+        if 'shots' not in revision or not revision['shots']:
             raise RestApiException(
                 'Provide a valid list of cuts',
                 status_code=hcodes.HTTP_BAD_REQUEST)
