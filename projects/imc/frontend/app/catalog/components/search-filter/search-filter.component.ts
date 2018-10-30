@@ -57,6 +57,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       }
     }
     for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
+    this.cities = this.cities.sort();
     this.vocabularyService.get((vocabulary) => { 
       this.vocabulary = vocabulary;
       for (let t of this.terms) {

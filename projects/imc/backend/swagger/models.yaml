@@ -304,6 +304,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/SceneCut'
+        minItems: 1
       exitRevision:
         type: boolean
         default: true
@@ -312,6 +313,8 @@ definitions:
     description: Rapresent the scene cut that is the first frame of the shot. For homogeneity, the first zero cut must also be provided.
     required:
       - shot_num
+      - cut
+      - annotations
     properties:
       shot_num:
         type: integer

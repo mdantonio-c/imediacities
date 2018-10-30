@@ -44,6 +44,7 @@ variables:
       - Researcher
       - Archive
       - Reviser
+      - normal_user
 
 tags:
     file: "All endpoints to handle files"

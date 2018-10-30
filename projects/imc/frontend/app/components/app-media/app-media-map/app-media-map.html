@@ -24,7 +24,9 @@
                           [appendToBody]="popover.appendToBody"
                           (confirm)="marker_delete(info_window_data.annotations[0])"
                     >delete</span>
+                    <!--
                     <span class="material-icons click-event" (click)="marker_update(info_window_data.annotations[0], info_window_data.marker)">edit</span>
+                    -->
                 </div>
             <div></div>
         </div>
@@ -42,13 +44,17 @@
     -->
     <info-window id="edit" (closeclick)="marker_edit_closeclick()">
         <div>
+          <div><h6>Geotag</h6></div>
+          <div style="width: 95%;padding:5px;margin: 5px;">
+            <span>
+              <span name="marker_edit" [innerHTML]="marker_edit.description" class="badge badge-geotag"></span>
+            </span>
+          </div>
+          <div><h6>Address</h6></div>
+          <div>
+            <span [innerHTML]="marker_edit.address"></span>
+          </div>
 
-            <div>
-                Address: <br>
-                <h6 [innerHTML]="marker_edit.address"></h6>
-                Description: <br>
-                <input name="marker_edit" id="marker_edit" [(ngModel)]="marker_edit.description" style="width:100%">
-            </div>
             <div *ngIf="media_type === 'video'">
                 <br>
                 <strong>This geotag will be added to:<br></strong>

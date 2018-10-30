@@ -10,15 +10,17 @@
         <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
             <ng-template [ngIf]="media_type === 'video'">
                 <ng-container *ngIf="!revision">
-                <span class="col-6 col-lg-3"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
-                <span class="col-6 col-lg-6 imc--flex--horizontal-center">frame-range:
-                    <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
-                    -
-                    <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
-                </span>
-                <span class="col-12 col-lg-3 imc--flex--horizontal-end">
-                   duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
-                </span>
+                <div class="row">
+                    <span class="col-12 col-lg-3 pr-0"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
+                    <span class="col-6 col-lg-7 imc--flex--horizontal-center">frame-range:
+                        <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
+                        -
+                        <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
+                    </span>
+                    <span class="col-6 col-lg-2 imc--flex--horizontal-end">
+                       duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
+                    </span>
+                </div>
                 </ng-container>
 
                 <!-- Video player -->

@@ -204,6 +204,22 @@ class Annotations(GraphBaseOperations):
                         raise RestApiException(
                             'Invalid selector value for: ' + s_val,
                             status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'BibliographicReference':
+                # validate reference body
+                if 'value' not in body:
+                    raise RestApiException(
+                        'Invalid BibliographicReference',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                value = body.get('value')
+                if 'title' not in value:
+                    raise RestApiException(
+                        'Invalid BibliographicReference: missing title',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                authors = value.get('authors')
+                if authors is None or len(authors) == 0:
+                    raise RestApiException(
+                        'Invalid BibliographicReference: missing authors',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
             else:
                 raise RestApiException(
                     'Invalid body type for: {}'.format(b_type))
@@ -490,10 +506,12 @@ class Annotations(GraphBaseOperations):
                 if patch_op == 'remove':
                     logger.debug('remove a segment with uuid:{uuid}'
                                  .format(uuid=value))
-                    segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+                    segment = self.graph.VideoSegment.nodes.get_or_none(
+                        uuid=value)
                     if segment is None:
                         raise RestApiException(
-                            'Segment with ID {uuid} not found.'.format(uuid=value),
+                            'Segment with ID {uuid} not found.'.format(
+                                uuid=value),
                             status_code=hcodes.HTTP_BAD_NOTFOUND)
                     try:
                         repo.remove_segment(anno, segment)

@@ -3,6 +3,10 @@ import { AppMediaModal } from "../app-media-modal";
 import { AppAnnotationsService } from "../../../../services/app-annotations";
 import { IMC_Annotation } from "../../../../services/app-shots";
 import { infoResult } from "../../../../decorators/app-info";
+import { AuthService } from "/rapydo/src/app/services/auth";
+import { is_annotation_owner } from "../../../../decorators/app-annotation-owner";
+
+const url_protocol = /^https?:\/\//i;
 
 @Component({
     selector: 'app-modal-insert-link',
@@ -12,6 +16,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
 
     @Input() data;
     @Input() media_type: string;
+    @is_annotation_owner() is_annotation_owner;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
     @infoResult() add_link_info;
@@ -29,28 +34,44 @@ export class AppModalInsertLinkComponent implements OnChanges {
         private: false
     };
     links_all: IMC_Annotation[] = [];
+    private _current_user;
 
     @ViewChild(AppMediaModal) modal: AppMediaModal;
 
-    constructor(private AnnotationsService: AppAnnotationsService) {
+    constructor(
+        private AnnotationsService: AppAnnotationsService,
+        private AuthService: AuthService) {
     }
 
     /**
      * Adds the link to the list of terms to be saved.
      */
     addLink() {
-        let exists = this.links_all.some(e => {
+        let linkURL = this.link.url.trim();
+        let valid = true;
+        let errorMsg = '';
+        // check for valid URL
+        if (valid && !this.isValidURL(linkURL)) {
+            errorMsg = 'This link is not valid';
+            if (!url_protocol.test(linkURL)) { errorMsg += '. Missing protocol?'; }
+            valid = false;
+        }
+        // check for existing link
+        if (valid && this.links_all.some(e => {
             // if site has an end slash (like: www.example.com/),
             // then remove it and return the site without the end slash
-            return this.link.url.trim().replace(/\/$/, '') === e.name.replace(/\/$/, '');
-        });
-        if (exists) {
-            this.add_link_info.show('error', 'This link has already been added');
+            return linkURL.replace(/\/$/, '') === e.name.replace(/\/$/, '');
+        })) {
+            errorMsg = 'This link has already been added';
+            valid = false;
+        }
+        if (!valid) {
+            this.add_link_info.show('error', errorMsg);
         } else {
             this.add_link_info.hide();
             let l = {
                 private: this.link.private,
-                value: this.link.url.trim()
+                value: linkURL
             };
             this.AnnotationsService.create_link(
                 this.data.shots.map(s => s.id),
@@ -82,14 +103,30 @@ export class AppModalInsertLinkComponent implements OnChanges {
                     this.links_all.push(anno);
                     this.save_result.show('success', 'Link added successfully');
                     this.shots_update.emit(r);
+                    this.link.url = '';
                 }
             );
         }
-        this.link.url = '';
+    }
+
+    removeLink(link: IMC_Annotation) {
+        /*if (!this.can_delete) return;*/
+        if (link.id) {
+            this.AnnotationsService.delete_tag(link, link.source);
+            this.links_all = this.links_all.filter(anno => anno.id !== link.id);
+        }
+    }
+
+    canRemoveLink(link: IMC_Annotation) {
+        return this.is_annotation_owner(this._current_user, link.creator);
     }
 
     ok() {
         this.modal.chiudi();
+    }
+
+    ngOnInit() {
+        this._current_user = this.AuthService.getUser();
     }
 
     ngOnChanges() {
@@ -97,4 +134,21 @@ export class AppModalInsertLinkComponent implements OnChanges {
         this.add_link_info.hide();
         this.link.url = '';
     }
+
+    private isValidURL(str) {
+        var pattern = new RegExp('^https?:\\/\\/' + // protocol
+            '(?:\\S+(?::\\S*)?@)?' + // authentication
+            '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+            /*'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+            '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+            '(\\#[-a-z\\d_]*)?$' + // fragment locater*/
+            '', 'i');
+        if (!pattern.test(str)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }

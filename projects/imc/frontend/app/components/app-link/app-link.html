@@ -1,0 +1,14 @@
+<div class="container row no-gutter modal--link-list">
+	<div class="col-11 text-truncate">
+      <a href="{{link.name}}" target="_blank">{{link.name}}</a>
+  </div>
+	<div class="col-1">
+		<div *ngIf="can_delete">
+			<i class="material-icons click-event" style="font-size: 1.3em !important;"
+			mwlConfirmationPopover
+			[popoverTitle]="'Remove link'"
+			[popoverMessage]="'This operation cannot be undone. Do you wish to continue?'"
+			(confirm)="delete()">delete</i>
+		</div>
+	</div>
+</div>

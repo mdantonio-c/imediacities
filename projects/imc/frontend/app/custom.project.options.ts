@@ -20,7 +20,7 @@ export class ProjectOptions {
             return {
                 "group": true,
                 "custom": [
-                    {name: 'Institution', prop: "declared_institution", flexGrox: 1.0}
+                    {name: 'Institution', prop: "declared_institution", flexGrow: 0.7}
                 ]
             }
         }

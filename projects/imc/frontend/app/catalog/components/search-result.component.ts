@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { Router } from '@angular/router';
 import { MediaUtilsService } from '../services/media-utils.service'
 import { AuthService } from "/rapydo/src/app/services/auth";
 
@@ -13,7 +14,7 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	description: string;
 	private user: any;
 
-	constructor(private authService: AuthService) { }
+	constructor(private authService: AuthService, private router: Router) { }
 
 	ngOnInit() {
 		this.user = this.authService.getUser();
@@ -32,6 +33,14 @@ export class SearchResultComponent implements OnInit, OnChanges {
 
 	underRevision() {
 		return (this.media.relationships.item[0].relationships.revision) ? true : false;
+	}
+
+	route(mediaId, mediaType) {
+		if (mediaType === 'nonaventity') {
+			this.router.navigate(['/app/catalog/images', mediaId]);
+		} else {
+			this.router.navigate(['/app/catalog/videos', mediaId]);
+		}
 	}
 
 	protected getUser() {

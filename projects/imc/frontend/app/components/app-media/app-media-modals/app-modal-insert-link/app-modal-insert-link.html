@@ -25,7 +25,8 @@
     </span>
     <span *ngIf="options" class="col-11 row imc--flex--vertical-center space-paragraph-20">
       <span class="col-9">
-        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url" [(ngModel)]="link.url" required>
+        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url"
+          [(ngModel)]="link.url" (keydown.enter)="addLink()" required>
       </span>
       <span class="col-3">
         <button class="btn btn-accent" (click)="addLink()">Add</button>
@@ -41,9 +42,18 @@
     <div class="col-12 space-paragraph-25" *ngIf="links_all.length">
         <h5>Current links</h5>
         <span>
-            <ul class="modal--link-list">
-                <li *ngFor="let link of links_all">
-                    <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
+            <ul class="list-group modal--link-list list-group-flush">
+                <li *ngFor="let link of links_all" class="list-group-item d-flex justify-content-between align-items-center py-1 pl-1">
+                    <div class="col-11 px-0 text-truncate">
+                      <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
+                    </div>
+                    <div class="col-1" *ngIf="canRemoveLink(link)">
+                      <i class="material-icons click-event"
+                        mwlConfirmationPopover
+                        [popoverTitle]="'Remove link'"
+                        [popoverMessage]="'This operation cannot be undone. Do you wish to continue?'"
+                        (confirm)="removeLink(link)">delete</i>
+                    </div>
                 </li>
             </ul>
         </span>

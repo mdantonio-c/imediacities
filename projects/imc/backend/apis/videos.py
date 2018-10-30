@@ -307,7 +307,7 @@ class VideoShots(GraphBaseOperations):
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
-                if (anno.annotation_type in ('TAG', 'DSC') and
+                if (anno.annotation_type in ('TAG', 'DSC', 'LNK') and
                         creator is not None):
                     res['creator'] = self.getJsonResponse(
                         anno.creator.single(), max_relationship_depth=0)
@@ -751,7 +751,7 @@ class VideoShotRevision(GraphBaseOperations):
 
         revision = self.get_input()
         # validate request body
-        if 'shots' not in revision:
+        if 'shots' not in revision or not revision['shots']:
             raise RestApiException(
                 'Provide a valid list of cuts',
                 status_code=hcodes.HTTP_BAD_REQUEST)
@@ -771,6 +771,10 @@ class VideoShotRevision(GraphBaseOperations):
             if 'double_check' in s and not isinstance(s['double_check'], bool):
                 raise RestApiException(
                     'Invalid double_check value',
+                    status_code=hcodes.HTTP_BAD_REQUEST)
+            if 'annotations' not in s:
+                raise RestApiException(
+                    'Missing annotations in shot: {}'.format(s),
                     status_code=hcodes.HTTP_BAD_REQUEST)
             if (
                 'annotations' in s and
