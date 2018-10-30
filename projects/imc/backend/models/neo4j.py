@@ -273,7 +273,7 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     keywords = RelationshipTo(
         'Keyword', 'HAS_KEYWORD', cardinality=ZeroOrMore, show=True)
     descriptions = RelationshipTo(
-        'Description', 'HAS_DESCRIPTION', cardinality=OneOrMore, show=True)
+        'Description', 'HAS_DESCRIPTION', cardinality=ZeroOrMore, show=True)
     languages = RelationshipTo(
         'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel,
         show=True)

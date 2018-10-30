@@ -28,7 +28,7 @@
 			<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
 		</h3>
 		<div class="space-5"></div>
-		<p class="text">
+		<p class="text" *ngIf="description">
 			<i class="imc-icon fa fa-quote-left"></i>
 			{{description}}
 		</p>
