@@ -189,7 +189,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             progress(self, 'Extracting automatic annotations', path)
 
             # take the previous fps apart
-            old_fps = item_node.framerate 
+            old_fps = item_node.framerate
             extract_tech_info(self, item_node, analyze_path)
 
             # - ONLY for videos -
@@ -197,7 +197,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
                 if old_fps != item_node.framerate:
                     log.info("Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}"
-                        .format(id=item_node.uuid, old_fps=old_fps, new_fps=item_node.framerate))
+                             .format(id=item_node.uuid, old_fps=old_fps, new_fps=item_node.framerate))
 
                 # extract TVS and VIM results
                 shots, vim_estimations = extract_tvs_vim_results(
@@ -215,6 +215,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 if not existing_shots:
                     repo.create_automatic_tvs(item_node, shots)
                 else:
+                    # in order to preserve annotations we need to pass the list
+                    # of annotations together with the new shot list and
+                    # reposition accordingly them all in case of different a
+                    # fps.
+                    arrange_manual_annotations(self, item_node, shots, old_fps)
                     repo.update_automatic_tvs(
                         item_node, shots, vim_estimations)
 
@@ -247,6 +252,52 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # raise e
 
         return 1
+
+
+def arrange_manual_annotations(self, item, new_shot_list, old_fps):
+    '''
+    Set the new shot list with the current annotations from the existing shot
+    list. If the framerate is changed then those annotations have to be
+    rearranged accordingly.
+
+    Parameters
+    ----------
+    item : <node>
+    new_shot_list : <dict>
+    '''
+    log.info("Set the new shot list with the current annotations for video [{}]"
+             .format(item.uuid))
+    for shot in item.shots.all():
+        log.debug('-----------------------------------------------------')
+        # key frame
+        fk = (shot.end_frame_idx + shot.start_frame_idx) / 2
+        log.debug('shot[{}] - key frame: {}'.format(shot.shot_num, fk))
+        # target frame
+        ft = round(fk * eval(item.framerate) / eval(old_fps))
+        log.debug('target frame: {}'.format(ft))
+
+        # get current manual annotations for this shot
+        annotations = []
+        for anno in shot.annotation.search(generator__isnull=True):
+            log.debug(anno)
+            annotations.append(anno.uuid)
+        log.debug('shot[{}] - manual annotations:{}'
+                  .format(shot.shot_num, annotations))
+
+        # get target shot in the new shot list
+        for shot_num, properties in new_shot_list.items():
+            if properties['start_frame_idx'] <= ft <= properties['end_frame_idx']:
+                log.info('Append annotation list {list} to the new shot '
+                         '{shot_num} [{shot_start}-{shot_end}]'.format(
+                             list=annotations,
+                             shot_num=shot_num,
+                             shot_start=properties['start_frame_idx'],
+                             shot_end=properties['end_frame_idx']))
+                if 'annotations' not in properties:
+                    properties['annotations'] = []
+                properties['annotations'].extend(annotations)
+                break
+        log.debug('-----------------------------------------------------')
 
 
 @celery_app.task(bind=True)
