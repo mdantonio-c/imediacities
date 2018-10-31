@@ -338,21 +338,20 @@ class AnnotationRepository():
         tvs = FHG_TVS[0]
         tvs_body = tvs.bodies.single().downcast()
 
-        old_size = len(item.shots.all())
+        existing_shots = item.shots.all()
+        old_size = len(existing_shots)
         log.debug('Existing shot list size: {}'.format(old_size))
         new_size = len(shots)
         log.debug('Incoming shot list size: {}'.format(new_size))
 
-        # for each existing shot we gather and disconnect from them all the 
+        # for each existing shot we gather and disconnect from them all the
         # manual annotations
         existing_annotations = []
-        for segment in tvs_body.segments.all():
-            old_shot = segment.downcast()
-            for a in old_shot.annotation.all():
+        for old_shot in existing_shots:
+            for a in old_shot.annotation.search(generator__isnull=True):
                 existing_annotations.append(a)
-                segment.annotation.disconnect(a)
-        # log.debug(existing_annotations)
-        log.debug('total existing annotations: %s' % len(existing_annotations))
+                old_shot.annotation.disconnect(a)
+        log.info('total existing annotations: %s' % len(existing_annotations))
 
         # foreach incoming shot
         log.debug('----------')
@@ -394,15 +393,15 @@ class AnnotationRepository():
                 shot_node.duration = properties['duration']
                 shot_node.thumbnail_uri = properties['thumbnail_uri']
                 shot_node.save()
-                # manage annotations
-                if 'annotations' in properties:
-                    for anno_id in properties['annotations']:
-                        # look up ID from existing_annotations
-                        log.debug('look up for annotation ID %s' % anno_id)
-                        found = [x for x in existing_annotations if x.uuid == anno_id]
-                        if len(found) == 0:
-                            continue
-                        found[0].targets.connect(shot_node)
+            # manage annotations
+            if 'annotations' in properties:
+                for anno_id in properties['annotations']:
+                    # look up ID from existing_annotations
+                    log.debug('look up for annotation ID %s' % anno_id)
+                    found = [x for x in existing_annotations if x.uuid == anno_id]
+                    if len(found) == 0:
+                        continue
+                    found[0].targets.connect(shot_node)
             log.debug(shot_node)
             log.debug('----------')
         if old_size > new_size:
