@@ -188,7 +188,9 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
             this._description_language_set(this.user_language);
             this._keyword_language_set(this.user_language);
         }
-        this._descriptions_get_languages(this.info.relationships.descriptions);
+        if(this.info.relationships.descriptions){
+            this._descriptions_get_languages(this.info.relationships.descriptions);
+        }
         if(this.info.relationships.keywords){
             this._keywords_get_languages(this.info.relationships.keywords);            
         }

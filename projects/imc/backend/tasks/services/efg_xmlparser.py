@@ -290,8 +290,9 @@ class EFG_XMLParser():
             description['text'] = node.text.strip()
             log.debug('description: {}'.format(description))
             descriptions.append(description)
-        if len(descriptions) == 0:
-            raise ValueError('Description is missing')
+        # october 2018: change: description is optional 
+        #if len(descriptions) == 0:
+        #    raise ValueError('Description is missing')
         return descriptions
 
     def parse_coverages(self, record, audio_visual=False):
