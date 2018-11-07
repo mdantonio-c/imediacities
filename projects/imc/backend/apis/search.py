@@ -79,7 +79,7 @@ class Search(GraphBaseOperations):
                         "t.text =~ '(?i).*{term}.*'".format(term=term))
                 elif f == 'description':
                     multi_match.append(
-                        "MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
+                        "OPTIONAL MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
                     multi_match_fields.append('d')
                     multi_match_where.append(
                         "d.text =~ '(?i).*{term}.*'".format(term=term))
