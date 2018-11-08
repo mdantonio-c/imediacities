@@ -218,12 +218,26 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.video.remove();
     }
 
+    /**
+     * Returns the time in the video for a given frame number
+     *
+     * @param  {Number} frame - The frame number in the video to seek to.
+     * @return {Number} - Time in seconds
+     */
     frame_to_time (frame) {
-        return frame * this.frame_length;
+        /* To seek forward in the video, we must add 0.00001 to the video runtime for proper interactivity */
+        //return (frame+.4) * this.frame_length;
+        return (frame * this.frame_length) + 0.00001;
     }
 
+    /**
+     * Returns the frame number for a given time
+     *
+     * @param  {Number} time - The time in the video in seconds
+     * @return {Number} - Frame number in video
+     */
     time_to_frame (time) {
-        return Math.ceil(time / this.frame_length);
+        return Math.floor(time.toFixed(5) / this.frame_length);
     }
 
     frame_current () {
