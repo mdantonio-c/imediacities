@@ -142,6 +142,11 @@ class Bulk(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         # ##################################################################
+        # Cinzia: NOV 2018: aggiungo un parametro per forzare il 
+        #                   reprocessing anche nel caso
+        #                   che la action sia 'update'
+        #
+        # ##################################################################
         if req_action == 'update':
             # check group uid
             guid = action.get('guid')
@@ -156,6 +161,9 @@ class Bulk(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
             logger.info(
                 "Update procedure for Group '{0}' ".format(group.shortname))
+            # check if the parameter 'force_reprocessing' has been specified
+            force_reprocessing = action.get('force_reprocessing', False)
+            logger.debug('force_reprocessing: {}'.format(force_reprocessing))
 
             # retrieve XML files from delta upload dir
             #  (scaricato con oai-pmh solo delta rispetto all'ultimo harvest
@@ -183,6 +191,7 @@ class Bulk(GraphBaseOperations):
             total_to_be_imported = len(files)
             skipped = 0
             updated = 0
+            updatedAndReprocessing = 0
             created = 0
             failed = 0
             for f in files:
@@ -304,15 +313,28 @@ class Bulk(GraphBaseOperations):
                                     failed += 1
                                     continue
 
-                            task = CeleryExt.update_metadata.apply_async(
-                                args=[standard_path, resource.uuid],
+                            if force_reprocessing:
+                                mode = "clean"
+                                metadata_update=True
+                                task = CeleryExt.import_file.apply_async(
+                                args=[standard_path, resource.uuid, mode, metadata_update],
                                 countdown=10
-                            )
-                            logger.debug("Task id=%s" % task.id)
-                            resource.status = "UPDATING METADATA"
-                            resource.task_id = task.id
-                            resource.save()
-                            updated += 1
+                                )
+                                logger.debug("Task id=%s" % task.id)
+                                resource.status = "UPDATING METADATA + FORCE REPROCESSING"
+                                resource.task_id = task.id
+                                resource.save()
+                                updatedAndReprocessing += 1
+                            else:
+                                task = CeleryExt.update_metadata.apply_async(
+                                    args=[standard_path, resource.uuid],
+                                    countdown=10
+                                )
+                                logger.debug("Task id=%s" % task.id)
+                                resource.status = "UPDATING METADATA"
+                                resource.task_id = task.id
+                                resource.save()
+                                updated += 1
 
                         except self.graph.MetaStage.DoesNotExist:
                             # import di un nuovo contenuto
@@ -331,6 +353,8 @@ class Bulk(GraphBaseOperations):
                             created += 1
 
                     else:
+                        #nel database esiste già un META_STAGE collegato a quel SOURCE_ID
+
                         #  anche qui devo fare il
                         # checking for item_type coherence
                         related_item, coherent = self.check_item_type_coherence(meta_stage, standard_path)
@@ -342,8 +366,6 @@ class Bulk(GraphBaseOperations):
                             meta_stage.save()
                             failed += 1
                             continue
-                        # update dei soli metadati
-                        logger.info("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
 
                         # devo aggiornare nel MetaStage i campi nomefile e path con quelli che
                         #  vado a usare per l'aggiornamento dei metadati
@@ -376,6 +398,23 @@ class Bulk(GraphBaseOperations):
                             meta_stage.path = standard_path
                             meta_stage.save()
 
+                        if force_reprocessing:
+                            # update dei metadati e reprocessing
+                            logger.info("Starting task import_file for meta_stage.uuid %s" % meta_stage.uuid)
+                            mode = "clean"
+                            metadata_update=True
+                            task = CeleryExt.import_file.apply_async(
+                                args=[standard_path, meta_stage.uuid, mode, metadata_update],
+                                ountdown=10
+                            )
+                            logger.debug("Task id=%s" % task.id)
+                            meta_stage.status = "UPDATING METADATA + FORCE REPROCESSING"
+                            meta_stage.task_id = task.id
+                            meta_stage.save()
+                            updatedAndReprocessing += 1
+                        else:
+                            # update dei soli metadati
+                            logger.info("Starting task update_metadata for meta_stage.uuid %s" % meta_stage.uuid)
                             task = CeleryExt.update_metadata.apply_async(
                                 args=[standard_path, meta_stage.uuid],
                                 countdown=10
@@ -395,6 +434,7 @@ class Bulk(GraphBaseOperations):
             logger.info("------------------------------------")
             logger.info("Total record: {}".format(total_to_be_imported))
             logger.info("updating: {}".format(updated))
+            logger.info("updating and reprocessing: {}".format(updatedAndReprocessing))
             logger.info("creating: {}".format(created))
             logger.info("skipped {}".format(skipped))
             logger.info("failed {}".format(failed))
