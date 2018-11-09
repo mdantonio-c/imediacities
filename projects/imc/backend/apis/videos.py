@@ -21,7 +21,7 @@ from imc.tasks.services.annotation_repository import AnnotationRepository
 
 from restapi.flask_ext.flask_celery import CeleryExt
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
 
 #####################################
@@ -34,7 +34,7 @@ class Videos(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id=None):
-        logger.debug("getting AVEntity id: %s", video_id)
+        log.debug("getting AVEntity id: %s", video_id)
         self.graph = self.get_service_instance('neo4j')
         data = []
 
@@ -43,7 +43,7 @@ class Videos(GraphBaseOperations):
             try:
                 v = self.graph.AVEntity.nodes.get(uuid=video_id)
             except self.graph.AVEntity.DoesNotExist:
-                logger.debug("AVEntity with uuid %s does not exist" % video_id)
+                log.debug("AVEntity with uuid %s does not exist" % video_id)
                 raise RestApiException(
                     "Please specify a valid video id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -89,7 +89,7 @@ class Videos(GraphBaseOperations):
 
         data = self.get_input()
 
-        logger.critical(data)
+        log.critical(data)
 
         return self.empty_response()
 
@@ -100,7 +100,7 @@ class Videos(GraphBaseOperations):
         """
         Delete existing video description.
         """
-        logger.debug("deliting AVEntity id: %s", video_id)
+        log.debug("deliting AVEntity id: %s", video_id)
         self.graph = self.get_service_instance('neo4j')
 
         if video_id is None:
@@ -113,7 +113,7 @@ class Videos(GraphBaseOperations):
             repo.delete_av_entity(v)
             return self.empty_response()
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -126,7 +126,7 @@ class VideoAnnotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
-        logger.info("get annotations for AVEntity id: %s", video_id)
+        log.info("get annotations for AVEntity id: %s", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -144,7 +144,7 @@ class VideoAnnotations(GraphBaseOperations):
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -168,7 +168,7 @@ class VideoAnnotations(GraphBaseOperations):
                 continue
             if a.private:
                 if creator is None:
-                    logger.warn('Invalid state: missing creator for private '
+                    log.warn('Invalid state: missing creator for private '
                                 'note [UUID:{}]'.format(a.uuid))
                     continue
                 if creator.uuid != user.uuid:
@@ -204,7 +204,7 @@ class VideoAnnotations(GraphBaseOperations):
                         for anno in segment.annotation.all():
                             if anno.private:
                                 if creator is None:
-                                    logger.warn('Invalid state: missing creator for private '
+                                    log.warn('Invalid state: missing creator for private '
                                                 'note [UUID:{}]'.format(anno.uuid))
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
@@ -265,7 +265,7 @@ class VideoShots(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
-        logger.info("get shots for AVEntity id: %s", video_id)
+        log.info("get shots for AVEntity id: %s", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -278,7 +278,7 @@ class VideoShots(GraphBaseOperations):
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -300,7 +300,7 @@ class VideoShots(GraphBaseOperations):
                 creator = anno.creator.single()
                 if anno.private:
                     if creator is None:
-                        logger.warn('Invalid state: missing creator for private '
+                        log.warn('Invalid state: missing creator for private '
                                     'note [UUID:{}]'.format(anno.uuid))
                         continue
                     if creator is not None and creator.uuid != user.uuid:
@@ -364,10 +364,10 @@ class VideoSegments(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self, video_id, segment_id):
         if segment_id is not None:
-            logger.debug("get manual segment [uuid:{sid}] for AVEntity "
+            log.debug("get manual segment [uuid:{sid}] for AVEntity "
                          "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         else:
-            logger.debug("get all manual segments for AVEntity [uuid:{vid}]"
+            log.debug("get all manual segments for AVEntity [uuid:{vid}]"
                          .format(vid=video_id))
         if video_id is None:
             raise RestApiException(
@@ -381,7 +381,7 @@ class VideoSegments(GraphBaseOperations):
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -389,7 +389,7 @@ class VideoSegments(GraphBaseOperations):
         # user = self.get_current_user()
 
         item = video.item.single()
-        logger.debug('get manual segments for Item [{}]'.format(item.uuid))
+        log.debug('get manual segments for Item [{}]'.format(item.uuid))
         # api_url = get_api_url(request, PRODUCTION)
 
         # TODO
@@ -399,7 +399,7 @@ class VideoSegments(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def delete(self, video_id, segment_id):
-        logger.debug("delete manual segment [uuid:{sid}] for AVEntity "
+        log.debug("delete manual segment [uuid:{sid}] for AVEntity "
                      "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         raise RestApiException(
             "Delete operation not yet implemented",
@@ -408,7 +408,7 @@ class VideoSegments(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def put(self, video_id, segment_id):
-        logger.debug("update manual segment [uuid:{sid}] for AVEntity "
+        log.debug("update manual segment [uuid:{sid}] for AVEntity "
                      "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         raise RestApiException(
             "Update operation not yet implemented",
@@ -422,7 +422,7 @@ class VideoContent(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
-        logger.info("get video content for id %s" % video_id)
+        log.info("get video content for id %s" % video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -443,7 +443,7 @@ class VideoContent(GraphBaseOperations):
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -451,7 +451,7 @@ class VideoContent(GraphBaseOperations):
         item = video.item.single()
         if content_type == 'video':
             video_uri = item.uri
-            logger.debug("video content uri: %s" % video_uri)
+            log.debug("video content uri: %s" % video_uri)
             if video_uri is None:
                 raise RestApiException(
                     "Video not found",
@@ -474,11 +474,11 @@ class VideoContent(GraphBaseOperations):
             return download.send_file_partial(orf_uri, mime)
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
-            logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            log.debug("thumbnail content uri: %s" % thumbnail_uri)
             thumbnail_size = input_parameters.get('size')
             # workaround when original thumnail is renamed by revision procedure
             if thumbnail_size is None and not os.path.exists(thumbnail_uri):
-                logger.debug('File {0} not found'.format(thumbnail_uri))
+                log.debug('File {0} not found'.format(thumbnail_uri))
                 thumbnail_filename = os.path.basename(thumbnail_uri)
                 thumbs_dir = os.path.dirname(thumbnail_uri)
                 f_name, f_ext = os.path.splitext(thumbnail_filename)
@@ -493,7 +493,7 @@ class VideoContent(GraphBaseOperations):
                     os.path.dirname(os.path.abspath(thumbnail_uri)))
                 thumbnail_uri = os.path.join(
                     thumbs_parent_dir, thumbnail_filename)
-                logger.debug(
+                log.debug(
                     'request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise RestApiException(
@@ -502,7 +502,7 @@ class VideoContent(GraphBaseOperations):
             return send_file(thumbnail_uri, mimetype='image/jpeg')
         elif content_type == 'summary':
             summary_uri = item.summary
-            logger.debug("summary content uri: %s" % summary_uri)
+            log.debug("summary content uri: %s" % summary_uri)
             if summary_uri is None:
                 raise RestApiException(
                     "Summary not found",
@@ -523,7 +523,7 @@ class VideoTools(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self, video_id):
 
-        logger.debug('launch automatic tool for video id: %s' % video_id)
+        log.debug('launch automatic tool for video id: %s' % video_id)
 
         if video_id is None:
             raise RestApiException(
@@ -535,7 +535,7 @@ class VideoTools(GraphBaseOperations):
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id.",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -591,7 +591,7 @@ class VideoShotRevision(GraphBaseOperations):
     @catch_graph_exceptions
     def get(self):
         """Get all videos under revision"""
-        logger.debug('Getting videos under revision.')
+        log.debug('Getting videos under revision.')
         self.graph = self.get_service_instance('neo4j')
         data = []
 
@@ -599,7 +599,7 @@ class VideoShotRevision(GraphBaseOperations):
         input_assignee = input_parameters['assignee']
         offset, limit = self.get_paging()
         offset -= 1
-        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        log.debug("paging: offset {0}, limit {1}".format(offset, limit))
         if offset < 0:
             raise RestApiException('Page number cannot be a negative value',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
@@ -620,8 +620,8 @@ class VideoShotRevision(GraphBaseOperations):
             number_of_shots = len(shots)
             number_of_confirmed = len(
                 [s for s in shots if s.revision_confirmed])
-            # logger.debug('number_of_shots {}'.format(number_of_shots))
-            # logger.debug('number_of_confirmed {}'.format(number_of_confirmed))
+            # log.debug('number_of_shots {}'.format(number_of_shots))
+            # log.debug('number_of_confirmed {}'.format(number_of_confirmed))
             percentage = 100 * number_of_confirmed / number_of_shots
             res = {
                 'video': {
@@ -645,7 +645,7 @@ class VideoShotRevision(GraphBaseOperations):
     @graph_transactions
     def put(self, video_id):
         """Put a video under revision"""
-        logger.debug('Put video {0} under revision'.format(video_id))
+        log.debug('Put video {0} under revision'.format(video_id))
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -655,7 +655,7 @@ class VideoShotRevision(GraphBaseOperations):
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -669,7 +669,7 @@ class VideoShotRevision(GraphBaseOperations):
 
         user = self.get_current_user()
         iamadmin = self.auth.verify_admin()
-        logger.debug("Request for revision from user [{0}, {1} {2}]".format(
+        log.debug("Request for revision from user [{0}, {1} {2}]".format(
             user.uuid, user.name, user.surname))
         # Be sure user can revise this specific video
         assignee = user
@@ -690,7 +690,7 @@ class VideoShotRevision(GraphBaseOperations):
                 if role.name == 'admin_root':
                     assignee_is_admin = True
                     break
-        logger.debug('Assignee is admin? {}'.format(assignee_is_admin))
+        log.debug('Assignee is admin? {}'.format(assignee_is_admin))
 
         repo = CreationRepository(self.graph)
 
@@ -713,7 +713,7 @@ class VideoShotRevision(GraphBaseOperations):
     @catch_graph_exceptions
     def post(self, video_id):
         """Start a shot revision procedure"""
-        logger.debug('Start shot revision for video {0}'.format(video_id))
+        log.debug('Start shot revision for video {0}'.format(video_id))
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -722,7 +722,7 @@ class VideoShotRevision(GraphBaseOperations):
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -810,7 +810,7 @@ class VideoShotRevision(GraphBaseOperations):
     @catch_graph_exceptions
     def delete(self, video_id):
         """Take off revision from a video"""
-        logger.debug('Exit revision for video {0}'.format(video_id))
+        log.debug('Exit revision for video {0}'.format(video_id))
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -819,7 +819,7 @@ class VideoShotRevision(GraphBaseOperations):
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("AVEntity with uuid %s does not exist" % video_id)
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
             raise RestApiException(
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
