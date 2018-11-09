@@ -169,7 +169,7 @@ class VideoAnnotations(GraphBaseOperations):
             if a.private:
                 if creator is None:
                     log.warn('Invalid state: missing creator for private '
-                                'note [UUID:{}]'.format(a.uuid))
+                             'note [UUID:{}]'.format(a.uuid))
                     continue
                 if creator.uuid != user.uuid:
                     continue
@@ -205,7 +205,7 @@ class VideoAnnotations(GraphBaseOperations):
                             if anno.private:
                                 if creator is None:
                                     log.warn('Invalid state: missing creator for private '
-                                                'note [UUID:{}]'.format(anno.uuid))
+                                             'note [UUID:{}]'.format(anno.uuid))
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
                                     continue
@@ -301,9 +301,9 @@ class VideoShots(GraphBaseOperations):
                 if anno.private:
                     if creator is None:
                         log.warn('Invalid state: missing creator for private '
-                                    'note [UUID:{}]'.format(anno.uuid))
+                                 'note [UUID:{}]'.format(anno.uuid))
                         continue
-                    if creator is not None and creator.uuid != user.uuid:
+                    if user is None or (creator is not None and creator.uuid != user.uuid):
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
                 del(res['links'])
@@ -338,7 +338,8 @@ class VideoShots(GraphBaseOperations):
             #         shot['annotations'].append(res)
             query_auto_tags = "MATCH (s:Shot {{ uuid:'{shot_id}'}})-[:WITHIN_SHOT]-(sgm:VideoSegment) " \
                               "MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody) " \
-                              "RETURN anno, collect(res)".format(shot_id=s.uuid)
+                              "RETURN anno, collect(res)".format(
+                                  shot_id=s.uuid)
             result = self.graph.cypher(query_auto_tags)
             for row in result:
                 auto_anno = self.graph.Annotation.inflate(row[0])
@@ -365,10 +366,10 @@ class VideoSegments(GraphBaseOperations):
     def get(self, video_id, segment_id):
         if segment_id is not None:
             log.debug("get manual segment [uuid:{sid}] for AVEntity "
-                         "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+                      "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         else:
             log.debug("get all manual segments for AVEntity [uuid:{vid}]"
-                         .format(vid=video_id))
+                      .format(vid=video_id))
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -400,7 +401,7 @@ class VideoSegments(GraphBaseOperations):
     @catch_graph_exceptions
     def delete(self, video_id, segment_id):
         log.debug("delete manual segment [uuid:{sid}] for AVEntity "
-                     "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+                  "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         raise RestApiException(
             "Delete operation not yet implemented",
             status_code=hcodes.HTTP_NOT_IMPLEMENTED)
@@ -409,7 +410,7 @@ class VideoSegments(GraphBaseOperations):
     @catch_graph_exceptions
     def put(self, video_id, segment_id):
         log.debug("update manual segment [uuid:{sid}] for AVEntity "
-                     "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
+                  "[uuid:{vid}]".format(vid=video_id, sid=segment_id))
         raise RestApiException(
             "Update operation not yet implemented",
             status_code=hcodes.HTTP_NOT_IMPLEMENTED)
