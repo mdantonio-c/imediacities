@@ -283,7 +283,7 @@ class VideoShots(GraphBaseOperations):
                 "Please specify a valid video id",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-        user = self.get_current_user()
+        user = self.get_user_if_logged()
 
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
