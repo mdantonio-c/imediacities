@@ -18,11 +18,11 @@
 	<div class="caption">
 		<div class="clearfix">
 			<span class="float-right badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
-			<div class="float-left bigger-110">
+			<!-- <div class="float-left bigger-110">
 				<i class="imc-icon fa fa-eye light-blue"></i>
 				<i class="imc-icon fa fa-asterisk light-blue"></i>
 				<i class="imc-icon fa fa-heart light-blue"></i>
-			</div>
+			</div> -->
 		</div>
 		<h3 class="search-title">
 			<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
