@@ -1,17 +1,18 @@
 <!-- Componente per l'IMMAGINE -->
 <div class="imc--picture">
+    <!--
     <svg (mousedown)="mousedown($event)" (mousemove)="mousemove($event)" (mouseup)="mouseup($event)">
         <defs>
             <mask id="mask-image">
                 <rect height="100%" width="100%" fill="white" opacity="0.5"  />
-                <!--Selezione finale-->
+                <!- - Selezione finale - ->
                 <rect id="maschera" #maschera x="0" y="0" width="0" height="0"></rect>
             </mask>
         </defs>
-        <!--Selezione durante il trascinamento-->
+        <!- - Selezione durante il trascinamento - ->
         <rect #mouse_track stroke="white" stroke-width="1" stroke-dasharray="4 4" fill="none"/>
         <rect width="100%" height="100%" mask="url(#mask-image)"/>
     </svg>
-
-    <img #picture [src]="data.links.content">
+    -->
+    <img #picture [src]="data.links.content" class="img-fluid">
 </div>
