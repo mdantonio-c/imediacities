@@ -114,14 +114,14 @@
                 <app-expansion-panel title="Production information">
 
                     <!--Anno di produzione-->
-                    <div class="col-2"><strong>Year:</strong> 
+                    <div class="col-3"><strong>Year:</strong> 
                         <span *ngIf="info.attributes.production_years" [innerHTML]="info.attributes.production_years[0]"></span>
                     </div>
                     <!--Paesi di produzione-->
                     <!-- @NSI non esiste production_countries per le immagini-->
 
                     <ng-template [ngIf]="info.type === 'aventity'">
-                        <div class="col-2">
+                        <div class="col-3">
                             <strong>Country:</strong>
                             <span
                                     *ngFor="let production_country of info.relationships.production_countries; last as last">
@@ -154,7 +154,7 @@
                     </div>
                 </app-expansion-panel>
 
-                <app-expansion-panel title="Contacts">
+                <app-expansion-panel title="More information on film">
                         <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
                         <div class="col-12"><strong>Contacts:</strong></div>
                         <div class="col-12">
@@ -164,8 +164,8 @@
                                 </li>
                                 <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">tel: {{info.relationships.record_sources[0].relationships.provider[0].attributes.phone}}</li>
                                 <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">fax: {{info.relationships.record_sources[0].relationships.provider[0].attributes.fax}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email"><a [href]="'mailto:' + info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</a></li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website"><a href="//{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}" target="_blank">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</a></li>
                                 <li></li>
                             </ul>
                         </div>
