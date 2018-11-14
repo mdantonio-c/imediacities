@@ -283,7 +283,12 @@ picture-->
     </div>
 
     <!-- MAPPA -->
-    <app-media-map-wrapper [locations]="locations" [shots]="shots" [media_type]="media_type"></app-media-map-wrapper>
+    <app-media-map-wrapper 
+        *ngIf='user'
+        [locations]="locations"
+        [shots]="shots"
+        [media_type]="media_type"
+    ></app-media-map-wrapper>
 
     <!-- CONTAINER INFO -->
     <div class="container-fluid imc--container">
