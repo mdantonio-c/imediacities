@@ -239,8 +239,8 @@ search-thumbnail div .media-image-wrapper {
   padding: 9px;
   color: #333;
   height: 200px;
-  /*display: flex;
-  flex-direction: column;*/
+  display: flex;
+  flex-direction: column;
 }
 
 .space-5 {
@@ -257,8 +257,6 @@ search-thumbnail div .media-image-wrapper {
 }
 
 .media-thumbnail .text {
-  display: block;
-  display: -webkit-box;
   line-height: 1.2;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -268,7 +266,6 @@ search-thumbnail div .media-image-wrapper {
   margin-right: 5px;
   margin-top: 0;
   margin-bottom: 0;
-  flex-grow: 1;
 }
 
 /*.irs-line-mid, .irs-line-left, .irs-line-right, .irs-bar, .irs-bar-edge, .irs-slider {
