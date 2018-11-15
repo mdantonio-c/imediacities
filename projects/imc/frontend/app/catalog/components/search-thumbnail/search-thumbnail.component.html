@@ -15,22 +15,24 @@
 		style="height: 200px; /*width: 100%;*/ display: block;" class="img-fluid"/>
 		<span *ngIf="media.type == 'aventity'" class="anteprima-duration" [innerHTML]="media.relationships.item[0].attributes.duration | secondsToTime"></span>
 	</div>
-	<div class="caption">
-		<div class="clearfix">
-			<span class="float-right badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
-			<!-- <div class="float-left bigger-110">
-				<i class="imc-icon fa fa-eye light-blue"></i>
-				<i class="imc-icon fa fa-asterisk light-blue"></i>
-				<i class="imc-icon fa fa-heart light-blue"></i>
-			</div> -->
+	<div class="caption-wrapper">
+		<div class="caption">
+			<div class="clearfix">
+				<span class="float-right badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+				<!-- <div class="float-left bigger-110">
+					<i class="imc-icon fa fa-eye light-blue"></i>
+					<i class="imc-icon fa fa-asterisk light-blue"></i>
+					<i class="imc-icon fa fa-heart light-blue"></i>
+				</div> -->
+			</div>
+			<h3 class="search-title">
+				<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
+			</h3>
+			<div class="space-5"></div>
+			<p class="text" *ngIf="description">
+				<i class="imc-icon fa fa-quote-left"></i>
+				{{description}}
+			</p>
 		</div>
-		<h3 class="search-title">
-			<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
-		</h3>
-		<div class="space-5"></div>
-		<p class="text" *ngIf="description">
-			<i class="imc-icon fa fa-quote-left"></i>
-			{{description}}
-		</p>
 	</div>
 </div>

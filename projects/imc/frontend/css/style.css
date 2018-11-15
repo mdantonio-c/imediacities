@@ -224,13 +224,18 @@ search-thumbnail div .media-image-wrapper {
   margin-bottom: 10px;
 }
 
+.media-thumbnail .caption-wrapper {
+  display: flex;
+}
+
 .media-thumbnail .caption {
+  flex-grow: 1;
+  width: 0;
   padding: 9px;
   color: #333;
-  max-width: 275px;
   height: 200px;
-  display: flex;
-  flex-direction: column;
+  /*display: flex;
+  flex-direction: column;*/
 }
 
 .space-5 {
