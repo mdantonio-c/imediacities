@@ -95,6 +95,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
                         iri: null,
                         name: resp.bodies[0].attributes.value,
                         private: resp.attributes.private,
+                        language: null,
                         spatial: null,
                         type: resp.attributes.annotation_type.key,
                         source: resp.source.attributes.item_type.key,

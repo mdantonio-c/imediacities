@@ -1,6 +1,6 @@
 <div class="modal-body">
     
-    <h4>Shot: {{shot_corrente.attributes.shot_num+1}}
+    <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.attributes.shot_num+1}}
         <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.attributes.shot_num+2}}</ng-container>
     </h4>
 

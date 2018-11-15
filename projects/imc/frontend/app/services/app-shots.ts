@@ -186,6 +186,7 @@ export class AppShotsService {
     private _annotations_parse (target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
+            console.log("_annotations_parse: annotation="+JSON.stringify(annotation));
             //  Term tag e locations
             if (annotation.attributes.annotation_type.key === 'TAG') {
 
@@ -268,6 +269,46 @@ export class AppShotsService {
         this._tags_all.sort(AppShotsService._sort_alpha);
         this._tags_map.clear();
     }
+    private _decode_language (lang): string {
+        let language;
+        switch (lang){
+            case 'ca':
+                language='Català';
+                break;
+            case 'da':
+                language='Dansk';
+                break;
+            case 'de':
+                language='Deutsche';
+                break;
+            case 'en':
+                language='English';
+                break;
+            case 'es':
+                language='Español';
+                break;
+            case 'fr':
+                language='Français';
+                break;
+            case 'it':
+                language='Italiano';
+                break;
+            case 'nl':
+                language='Nederlands';
+                break;
+            case 'sv':
+                language='Svenska';
+                break;
+            case 'el':
+                language='Ελληνικά';
+                break;
+            default:
+                language='';
+                break;
+        }
+
+        return language;
+    }
     /**
      * Crea un'annotazione riorganizzando i dati
      * @param annotation
@@ -277,10 +318,13 @@ export class AppShotsService {
      * @private
      */
     private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
-        let name, group = null;
+        let name, group, language = null;
         if (annotation_body.type === 'textualbody') {
             name = annotation_body.attributes.value;
             group = (annotation.type === 'TAG') ? 'term' : null;
+            if(annotation_body.attributes.language){
+                language = this._decode_language(annotation_body.attributes.language);
+            }
         } else if (annotation_body.type === 'resourcebody') {
             name = annotation_body.attributes.name;
             group = annotation_body.attributes.spatial ? 'location' : 'term';
@@ -298,7 +342,8 @@ export class AppShotsService {
             id: annotation.id,
             iri: annotation_body.attributes.iri || null,
             name: name,
-            private: annotation.private || false,
+            private: annotation.attributes.private || false,
+            language: language || '',
             spatial: annotation_body.attributes.spatial || null,
             type: annotation.attributes.annotation_type.key,
             source: media_type,
@@ -347,6 +392,7 @@ export interface IMC_Annotation {
     iri: string,
     name: string,
     private: boolean,
+    language: string,
     spatial: number[],
     type: string,
     source: string,

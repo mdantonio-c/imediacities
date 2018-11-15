@@ -1,5 +1,13 @@
 <div class="notes-container">
-    <div class="notes-text" [innerHTML]="note.name"></div>
+    <div class="notes-text">
+    	<div [innerHTML]="note.name"></div>
+    	<div style="margin: 3px;padding: 3px;">
+    		<span class="note-attribute" *ngIf="note.private">Private</span>
+    		<span class="note-attribute" *ngIf="!note.private">Public</span>
+    		<span class="note-attribute" *ngIf="note.language" [innerHTML]="note.language"></span>
+
+    	</div>
+    </div>
     <i class="material-icons click-event" [innerHTML]="icon" (click)="toggle()"></i>
 </div>
 <div class="notes-buttons" *ngIf="can_delete">
