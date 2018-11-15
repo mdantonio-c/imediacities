@@ -103,6 +103,11 @@ button:focus {outline:0 !important;}
 	border-color: #75A8CE
 }
 
+.div-min-width {
+  min-width: 210px;
+}
+
+
 .search-thumbnail .search-title {
 	margin-top: 10px;
 	overflow-wrap: break-word;
@@ -370,3 +375,10 @@ search-thumbnail div .media-image-wrapper {
   padding-left: 15px;
 }
 
+.note-attribute{
+  font-size: smaller;
+  margin: 15px;
+  color: #53b8e2;
+  background-color: #f8f8f8;
+  padding: 5px;
+}
