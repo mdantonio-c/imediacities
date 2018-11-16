@@ -38,7 +38,7 @@ export class CatalogService {
 	init() {
 		this._filter = this.localStorageService.get('filter', {
 			searchTerm: null,
-			itemType: 'video',
+			itemType: 'all',
 			terms: [],
 			provider: null,
 			country: null,
