@@ -262,16 +262,14 @@ class Search(GraphBaseOperations):
             elif isinstance(v, self.graph.NonAVEntity):
                 # image
                 image_url = api_url + 'api/images/' + v.uuid
-                # use depth 2 to get provider info from record source
-                # TO BE FIXED
                 image = self.getJsonResponse(
                     v, max_relationship_depth=1,
                     relationships_expansion=[
                         'record_sources.provider',
+                        'item.ownership',
                         # 'titles.creation',
                         # 'keywords.creation',
                         # 'descriptions.creation',
-                        'item.ownership'
                     ]
                 )
                 logger.debug("image links %s" % image['links'])
