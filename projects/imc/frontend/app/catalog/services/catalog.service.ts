@@ -156,12 +156,12 @@ export class CatalogService {
 		}
 	}
 
-	reset() {
+	reset(provider?: string) {
 		this._filter = {
 			searchTerm: null,
-			itemType: 'video',
+			itemType: 'all',
 			terms: [],
-			provider: null,
+			provider: provider || null,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
