@@ -248,9 +248,13 @@ class Search(GraphBaseOperations):
             if isinstance(v, self.graph.AVEntity):
                 # video
                 video_url = api_url + 'api/videos/' + v.uuid
-                # use depth 2 to get provider info from record source
-                # TO BE FIXED
-                video = self.getJsonResponse(v, max_relationship_depth=2)
+                video = self.getJsonResponse(
+                    v, max_relationship_depth=1,
+                    relationships_expansion=[
+                        'record_sources.provider',
+                        'item.ownership'
+                    ]
+                )
                 logger.debug("video links %s" % video['links'])
                 video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
