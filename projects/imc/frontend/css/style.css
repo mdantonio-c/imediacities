@@ -103,6 +103,11 @@ button:focus {outline:0 !important;}
 	border-color: #75A8CE
 }
 
+.div-min-width {
+  min-width: 210px;
+}
+
+
 .search-thumbnail .search-title {
 	margin-top: 10px;
 	overflow-wrap: break-word;
@@ -224,10 +229,15 @@ search-thumbnail div .media-image-wrapper {
   margin-bottom: 10px;
 }
 
+.media-thumbnail .caption-wrapper {
+  display: flex;
+}
+
 .media-thumbnail .caption {
+  flex-grow: 1;
+  width: 0;
   padding: 9px;
   color: #333;
-  max-width: 275px;
   height: 200px;
   display: flex;
   flex-direction: column;
@@ -247,8 +257,6 @@ search-thumbnail div .media-image-wrapper {
 }
 
 .media-thumbnail .text {
-  display: block;
-  display: -webkit-box;
   line-height: 1.2;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -258,7 +266,6 @@ search-thumbnail div .media-image-wrapper {
   margin-right: 5px;
   margin-top: 0;
   margin-bottom: 0;
-  flex-grow: 1;
 }
 
 /*.irs-line-mid, .irs-line-left, .irs-line-right, .irs-bar, .irs-bar-edge, .irs-slider {
@@ -365,3 +372,10 @@ search-thumbnail div .media-image-wrapper {
   padding-left: 15px;
 }
 
+.note-attribute{
+  font-size: smaller;
+  margin: 15px;
+  color: #53b8e2;
+  background-color: #f8f8f8;
+  padding: 5px;
+}

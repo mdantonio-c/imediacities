@@ -22,15 +22,17 @@
 				<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.source.uuid" [imgSrc]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.source.links['thumbnail']"></hjs>
 				<img class="media-object" alt="100%x150" src="{{media.source.links['thumbnail']+'&size=large'}}" *ngIf="media.source.links['thumbnail']">
 			</div>
-			<div class="caption">
-				<div class="clearfix">
-					<span class="float-right badge badge-primary label-city">{{(media.source.provider | providerToCity) || 'n/a'}}
-					</span>
-					<!-- <div class="float-left bigger-110">
-						<i class="imc-icon fa fa-eye light-blue"></i>
-						<i class="imc-icon fa fa-asterisk light-blue"></i>
-						<i class="imc-icon fa fa-heart light-blue"></i>
-					</div> -->
+			<div class="caption-wrapper">
+				<div class="caption">
+					<div class="clearfix">
+						<span class="float-right badge badge-primary label-city">{{(media.source.provider | providerToCity) || 'n/a'}}
+						</span>
+						<!-- <div class="float-left bigger-110">
+							<i class="imc-icon fa fa-eye light-blue"></i>
+							<i class="imc-icon fa fa-asterisk light-blue"></i>
+							<i class="imc-icon fa fa-heart light-blue"></i>
+						</div> -->
+					</div>
 				</div>
 			</div>
 		</div>

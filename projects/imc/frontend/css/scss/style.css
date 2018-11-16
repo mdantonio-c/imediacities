@@ -1328,7 +1328,9 @@ input[type="radio"] {
   height: 100%;
   display: inline-block; }
   .imc--picture img {
-    height: 100%; }
+    height: 100%;
+    object-fit: cover;
+  }
   .imc--picture svg {
     position: absolute;
     width: 100%;
