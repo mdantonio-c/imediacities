@@ -251,7 +251,7 @@ class Search(GraphBaseOperations):
                 # use depth 2 to get provider info from record source
                 # TO BE FIXED
                 video = self.getJsonResponse(v, max_relationship_depth=2)
-                logger.info("links %s" % video['links'])
+                logger.debug("video links %s" % video['links'])
                 video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
                 if item.thumbnail is not None:
@@ -262,10 +262,17 @@ class Search(GraphBaseOperations):
             elif isinstance(v, self.graph.NonAVEntity):
                 # image
                 image_url = api_url + 'api/images/' + v.uuid
-                # use depth 2 to get provider info from record source
-                # TO BE FIXED
-                image = self.getJsonResponse(v, max_relationship_depth=2)
-                logger.info("image links %s" % image['links'])
+                image = self.getJsonResponse(
+                    v, max_relationship_depth=1,
+                    relationships_expansion=[
+                        'record_sources.provider',
+                        'item.ownership',
+                        # 'titles.creation',
+                        # 'keywords.creation',
+                        # 'descriptions.creation',
+                    ]
+                )
+                logger.debug("image links %s" % image['links'])
                 image['links']['self'] = image_url
                 image['links']['content'] = image_url + '/content?type=image'
                 if item.thumbnail is not None:
