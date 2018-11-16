@@ -264,7 +264,10 @@ class Search(GraphBaseOperations):
                 image_url = api_url + 'api/images/' + v.uuid
                 # use depth 2 to get provider info from record source
                 # TO BE FIXED
-                image = self.getJsonResponse(v, max_relationship_depth=2)
+                image = self.getJsonResponse(
+                    v, max_relationship_depth=1,
+                    relationships_expansion=['record_sources.provider']
+                )
                 logger.info("image links %s" % image['links'])
                 image['links']['self'] = image_url
                 image['links']['content'] = image_url + '/content?type=image'
