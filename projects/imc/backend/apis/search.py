@@ -268,9 +268,9 @@ class Search(GraphBaseOperations):
                     v, max_relationship_depth=1,
                     relationships_expansion=[
                         'record_sources.provider',
-                        'titles.creation',
-                        'keywords.creation',
-                        'descriptions.creation',
+                        # 'titles.creation',
+                        # 'keywords.creation',
+                        # 'descriptions.creation',
                         'item.ownership'
                     ]
                 )
