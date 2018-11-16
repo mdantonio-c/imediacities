@@ -38,7 +38,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       this.searchForm = this.formBuilder.group({
         searchTerm: [''],
         videoType: [true],
-        imageType: [false],
+        imageType: [true],
         term: [''],
         city: [''],
         productionYearFrom: [1890],

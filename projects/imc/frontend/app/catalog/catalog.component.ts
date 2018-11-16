@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CatalogService, SearchFilter } from './services/catalog.service'
 import { NotificationService } from '/rapydo/src/app/services/notification';
-import { MediaEntity } from './services/data'
+import { MediaEntity, Providers } from './services/data'
 
 @Component({
 	selector: 'app-catalog',
@@ -23,13 +24,31 @@ export class CatalogComponent implements OnInit {
 	mediaTags: any[];
 
 	constructor(
+		private route: ActivatedRoute,
+		private router: Router,
 		private catalogService: CatalogService,
-		private notify: NotificationService)
-	{}	
+		private notify: NotificationService) { }
 
 	ngOnInit() {
-		this.catalogService.init();
-		this.changeFilter(this.catalogService.filter);
+		this.route.queryParams.subscribe(params => {
+			let preset = false;
+			if (params['city']) {
+				// preset filter with city value if valid
+				let cityCode = params['city'].toUpperCase()
+				let p = Providers.filter(provider => provider.code === cityCode);
+				if (p && p.length) {
+					this.catalogService.reset(cityCode);
+					preset = true;
+				}
+				// clean the url from the query parameter
+				this.router.navigate([], { queryParams: { city: null }, queryParamsHandling: 'merge' });
+			}
+
+			if (!preset) {
+				this.catalogService.init();
+			}
+			this.changeFilter(this.catalogService.filter);
+		});
 	}
 
 	load() {
@@ -56,13 +75,13 @@ export class CatalogComponent implements OnInit {
 	calculateCountMissingDate() {
 		var totalItemsByYears = 0;
 		for (let key of Object.keys(this.countByYears)) {
-      		totalItemsByYears += this.countByYears[key];
-    	}
-    	if(this.totalItems > totalItemsByYears){
-    		this.countMissingDate = this.totalItems - totalItemsByYears;
-    	}else{
-    		this.countMissingDate = 0;
-    	}
+			totalItemsByYears += this.countByYears[key];
+		}
+		if (this.totalItems > totalItemsByYears) {
+			this.countMissingDate = this.totalItems - totalItemsByYears;
+		} else {
+			this.countMissingDate = 0;
+		}
 	}
 
 	changeFilter(newFilter: SearchFilter) {
@@ -71,7 +90,7 @@ export class CatalogComponent implements OnInit {
 	}
 
 	resetFilter() {
-		this.catalogService.reset();	
+		this.catalogService.reset();
 	}
 
 	changePage(page: number) {
