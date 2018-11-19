@@ -238,7 +238,7 @@ search-thumbnail div .media-image-wrapper {
   width: 0;
   padding: 9px;
   color: #333;
-  height: 200px;
+  max-height: 200px;
   display: flex;
   flex-direction: column;
 }

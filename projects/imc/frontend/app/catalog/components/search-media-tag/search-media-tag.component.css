@@ -1,3 +1,7 @@
+.map-result {
+	padding: 10px !important;
+}
+
 .map-result h4 {
 	display: inline;
 	padding-left: 5px;
