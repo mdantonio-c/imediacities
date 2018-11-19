@@ -607,9 +607,10 @@ def extract_tech_info(self, item, analyze_dir_path):
         item.digital_format[1] = data["streams"][0]["codec_long_name"]
         # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
         item.digital_format[2] = data["format"]["format_long_name"]
-        # resolution: The degree of sharpness of the digital object expressed in
-        # lines or pixel
-        item.digital_format[3] = data["format"]["bit_rate"]
+        # resolution: The degree of sharpness of the digital object expressed
+        # in pixel
+        item.digital_format[3] = str(data["streams"][0]['width']) \
+            + 'x' + str(data['streams'][0]['height'])
 
         item.uri = data["format"]["filename"]
 
