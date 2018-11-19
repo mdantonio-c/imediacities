@@ -52,9 +52,13 @@ class Images(GraphBaseOperations):
 
         api_url = get_api_url(request, PRODUCTION)
         for v in images:
-            # use depth 2 to get provider info from record source
-            # TO BE FIXED
-            image = self.getJsonResponse(v, max_relationship_depth=2)
+            image = self.getJsonResponse(
+                    v, max_relationship_depth=1,
+                    relationships_expansion=[
+                        'record_sources.provider',
+                        'item.ownership'
+                    ]
+                )
             item = v.item.single()
             # image['links']['self'] = api_url + \
             #     'api/images/' + v.uuid

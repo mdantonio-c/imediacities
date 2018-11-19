@@ -53,9 +53,13 @@ class Videos(GraphBaseOperations):
 
         api_url = get_api_url(request, PRODUCTION)
         for v in videos:
-            # use depth 2 to get provider info from record source
-            # TO BE FIXED
-            video = self.getJsonResponse(v, max_relationship_depth=2)
+            video = self.getJsonResponse(
+                    v, max_relationship_depth=1,
+                    relationships_expansion=[
+                        'record_sources.provider',
+                        'item.ownership'
+                    ]
+                )
             item = v.item.single()
             # video['links']['self'] = api_url + \
             #     'api/videos/' + v.uuid
