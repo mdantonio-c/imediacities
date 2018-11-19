@@ -126,6 +126,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
         return false;
 
+        /*
         // No user logged-in
         if (this.user === null) return true;
         // The logged user has no role
@@ -146,6 +147,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         // you should not reach this final return
         console.log("You should not reach this final return")
         return true;
+        */
     }
     is_public_domain() {
         let k = this.media.attributes.rights_status.key;
