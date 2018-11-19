@@ -4,7 +4,7 @@ search:
   description: Search videos previously staged in the area.
   custom:
     # publish: true
-    authentication: false
+    authentication: true
   parameters:
     - name: criteria
       in: body

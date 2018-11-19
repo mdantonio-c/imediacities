@@ -32,8 +32,7 @@ video:
     - videos
   custom:
     # publish: true
-    # authentication: true
-    authentication: false
+    authentication: true
   responses:
     '200':
       description: Video information successfully retrieved

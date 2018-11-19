@@ -2,8 +2,7 @@ video_shots:
   summary: Gets video shots
   description: Returns a list of shots belonging to the given video item.
   custom:
-    # authentication: true
-    authentication: false
+    authentication: true
   responses:
     '200':
       description: An list of shots.
