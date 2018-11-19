@@ -8,11 +8,10 @@ import glob
 import shutil
 import xml.etree.ElementTree as ET
 
-os.umask(int('007', 8))
-
 from PIL import Image
 from subprocess import *
 
+os.umask(int('007', 8))
 
 TRANSCODED_FRAMERATE = 24  # now used as a default
 
@@ -252,7 +251,7 @@ def transcode(filename, out_folder):
     cmd_list.append('/usr/bin/ffmpeg -hide_banner -nostdin -y')
     # cmd_list.append('-threads 4')
     cmd_list.append('-i ' + filename)
-    cmd_list.append('-vf yadif=1:-1:0')                                                                       # deinterlacing
+    cmd_list.append('-vf yadif=0:-1:0')                                                                       # deinterlacing
     cmd_list.append('-vcodec libx264 -crf 15.0 -pix_fmt yuv420p -coder 1 -rc_lookahead 60 -r ' + str(TRANSCODED_FRAMERATE) + ' -strict -2')  # video codec
     cmd_list.append('-g ' + str(TRANSCODED_FRAMERATE) + ' -forced-idr 1 -sc_threshold 40 -bf 16 -refs 6 ')                                   # keyframes
     cmd_list.append('-acodec aac -b:a 128k')                                                                  # audio codec
