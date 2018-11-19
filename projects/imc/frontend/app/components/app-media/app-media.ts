@@ -123,6 +123,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     show_only_public_domain() {
+
+        return false;
+
         // No user logged-in
         if (this.user === null) return true;
         // The logged user has no role
