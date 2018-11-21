@@ -252,7 +252,8 @@ class Search(GraphBaseOperations):
                     v, max_relationship_depth=1,
                     relationships_expansion=[
                         'record_sources.provider',
-                        'item.ownership'
+                        'item.ownership',
+                        'item.revision'
                     ]
                 )
                 logger.debug("video links %s" % video['links'])
