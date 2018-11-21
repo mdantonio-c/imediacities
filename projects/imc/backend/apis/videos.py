@@ -585,7 +585,7 @@ class VideoContent(GraphBaseOperations):
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
-        return self.force_response(code=hcodes.HTTP_OK_BASIC, headers=headers)
+        return self.force_response([], headers=headers)
 
 
 class VideoTools(GraphBaseOperations):
