@@ -186,7 +186,6 @@ export class AppShotsService {
     private _annotations_parse (target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
-            console.log("_annotations_parse: annotation="+JSON.stringify(annotation));
             //  Term tag e locations
             if (annotation.attributes.annotation_type.key === 'TAG') {
 

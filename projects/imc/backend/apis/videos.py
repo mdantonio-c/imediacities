@@ -104,7 +104,7 @@ class Videos(GraphBaseOperations):
         """
         Delete existing video description.
         """
-        log.debug("deliting AVEntity id: %s", video_id)
+        log.debug("deleting AVEntity id: %s", video_id)
         self.graph = self.get_service_instance('neo4j')
 
         if video_id is None:
@@ -421,12 +421,15 @@ class VideoSegments(GraphBaseOperations):
 
 
 class VideoContent(GraphBaseOperations):
-    """
-    Gets video content such as video strem and thumbnail
-    """
+
+    __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
+    
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
+        """
+        Gets video content such as video strem and thumbnail
+        """
         log.info("get video content for id %s" % video_id)
         if video_id is None:
             raise RestApiException(
@@ -435,12 +438,10 @@ class VideoContent(GraphBaseOperations):
 
         input_parameters = self.get_input()
         content_type = input_parameters['type']
-        if content_type is None or (content_type != 'video' and
-                                    content_type != 'thumbnail' and
-                                    content_type != 'summary' and
-                                    content_type != 'orf'):
+        if content_type is None or content_type not in self.__available_content_types__:
             raise RestApiException(
-                "Bad type parameter: expected 'video' or 'thumbnail'",
+                "Bad type parameter: expected one of %s." %
+                (self.__available_content_types__, ),
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         self.graph = self.get_service_instance('neo4j')
@@ -518,6 +519,72 @@ class VideoContent(GraphBaseOperations):
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def head(self, video_id):
+        """
+        Check for video content existance.
+        """
+        log.debug("check for video content existence with id %s" % video_id)
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        input_parameters = self.get_input()
+        content_type = input_parameters['type']
+        if content_type is None or content_type not in self.__available_content_types__:
+            raise RestApiException(
+                "Bad type parameter: expected one of %s." %
+                (self.__available_content_types__, ),
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        self.graph = self.get_service_instance('neo4j')
+        video = None
+        try:
+            video = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        item = video.item.single()
+        headers = {}
+        if content_type == 'video':
+            if item.uri is None or not os.path.exists(item.uri):
+                raise RestApiException(
+                    "Video not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            headers['Content-Type'] = 'video/mp4'
+        elif content_type == 'orf':
+            orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
+            log.debug(orf_uri)
+            if item.uri is None or not os.path.exists(orf_uri):
+                raise RestApiException(
+                    "Video ORF not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            headers['Content-Type'] = 'video/mp4'
+        elif content_type == 'thumbnail':
+            if item.thumbnail is None or not os.path.exists(item.thumbnail):
+                raise RestApiException(
+                    "Thumbnail not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            headers['Content-Type'] = 'image/jpeg'
+        elif content_type == 'summary':
+            if item.summary is None or not os.path.exists(item.summary):
+                raise RestApiException(
+                    "Summary not found",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            headers['Content-Type'] = 'image/jpeg'
+        else:
+            # it should never be reached
+            raise RestApiException(
+                "Invalid content type: {0}".format(content_type),
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+        return self.force_response(code=hcodes.HTTP_OK_BASIC, headers=headers)
 
 
 class VideoTools(GraphBaseOperations):

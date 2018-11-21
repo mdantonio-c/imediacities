@@ -1,0 +1,15 @@
+video_content:
+  summary: Check for video existence
+  custom:
+    authentication: false
+  parameters:
+    - name: type
+      in: query
+      required: true
+      description: content type (e.g. video, thumbnail, summary, orf)
+      type: string
+  responses:
+    '200':
+      description: The video content exists.
+    '404':
+      description: The video content does not exists.

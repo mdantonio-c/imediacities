@@ -1,11 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {AppVideoControlComponent} from "../app-video-control";
+import { Component, OnInit } from '@angular/core';
+import { AppVideoControlComponent } from "../app-video-control";
 
 @Component({
     selector: 'app-video-control-switch',
     templateUrl: 'app-video-control-switch.html'
 })
-
 export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
 
     source = null;
@@ -16,7 +15,7 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
         super();
     }
 
-    ngOnInit () {
+    ngOnInit() {
         super.ngOnInit();
         this.source = this.video.currentSrc.split('?')[0];
 
@@ -30,9 +29,8 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
 
     /**
      * Setta il tipo di video da visualizzare
-
      */
-    source_set () {
+    source_set() {
 
         this.orf_load = !this.orf_load;
         const type = this.orf_load ? 'orf' : 'video';
@@ -56,7 +54,7 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
      * @param type {string} il formato di video di cui ottenere l'url
      * @returns {string}
      */
-    source_create (type) {
+    source_create(type) {
         return `${this.source}?type=${type}`
     }
 
@@ -66,25 +64,24 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
      * @param callback funzione da eseguire alla ricezione degli header
      * @param {string} type il tipo da verificare
      */
-    type_check (url, callback, type='orf') {
+    type_check(url, callback, type = 'orf') {
 
         const request = new XMLHttpRequest();
         //  todo con un HEAD verrebbe meglio
-        const method = 'GET';
+        const method = 'HEAD';
 
         request.onreadystatechange = () => {
             //  readyState 2 => headers ricevuti
             if (request.readyState === 2) {
                 let headers = request.getAllResponseHeaders();
+                console.log('headers', headers);
                 callback(headers);
                 request.abort();
             }
-
         };
 
         request.open(method, this.source_create(type));
         request.send();
-
     }
 
 }
