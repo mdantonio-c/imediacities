@@ -714,11 +714,15 @@ def analize_movie(filename, out_folder, muuid, fast=False):
         return False
     log('index/storyboard---- ok ')
 
-    log('submit_orf --------- begin')
-    media = out_folder.replace(analize_area + '/', '')
-    if not submit_orf(media, 'Video', muuid, out_folder):
-        return False
-    log('submit_orf --------- ok')
+    orf_out = os.path.join(out_folder, 'orf.xml')
+    if fast and os.path.exists(orf_out):
+        log('submit_orf ----------- skipped ')
+    else:
+        log('submit_orf --------- begin')
+        media = out_folder.replace(analize_area + '/', '')
+        if not submit_orf(media, 'Video', muuid, out_folder):
+            return False
+        log('submit_orf --------- ok')
 
     return True
 
