@@ -74,7 +74,6 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
             //  readyState 2 => headers ricevuti
             if (request.readyState === 2) {
                 let headers = request.getAllResponseHeaders();
-                console.log('headers', headers);
                 callback(headers);
                 request.abort();
             }
