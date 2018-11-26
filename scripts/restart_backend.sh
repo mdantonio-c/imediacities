@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker restart imc_backend_1
+docker restart $(docker ps | grep imc_backend_ | awk {'print $1'})
