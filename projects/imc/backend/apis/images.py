@@ -136,7 +136,6 @@ class ImageAnnotations(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         params = self.get_input()
-        logger.debug("inputs %s" % params)
         anno_type = params.get('type')
         if anno_type is not None:
             anno_type = anno_type.upper()
@@ -156,40 +155,37 @@ class ImageAnnotations(GraphBaseOperations):
         user = self.get_current_user()
 
         item = image.item.single()
-        for a in item.targeting_annotations:
-            if anno_type is not None and a.annotation_type != anno_type:
+        for anno in item.targeting_annotations:
+            if anno_type is not None and anno.annotation_type != anno_type:
                 continue
-            if a.private:
-                if a.creator is None:
+            if anno.private:
+                if anno.creator is None:
+                    # expected ALWAYS a creator for private annotation
                     logger.warn('Invalid state: missing creator for private '
-                                'note [UUID:{}]'.format(a.uuid))
+                                'anno [UUID:{}]'.format(anno.uuid))
                     continue
-                creator = a.creator.single()
+                creator = anno.creator.single()
                 if creator.uuid != user.uuid:
                     continue
-            res = self.getJsonResponse(a, max_relationship_depth=0)
+            res = self.getJsonResponse(anno, max_relationship_depth=0)
             del(res['links'])
-            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+            if anno.annotation_type in ('TAG', 'DSC', 'LNK') and anno.creator is not None:
                 res['creator'] = self.getJsonResponse(
-                    a.creator.single(), max_relationship_depth=0)
+                    anno.creator.single(), max_relationship_depth=0)
             # attach bodies
             res['bodies'] = []
-            for b in a.bodies.all():
-                anno_body = b.downcast()
-                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+            for b in anno.bodies.all():
+                mdb = b.downcast()
+                if anno.annotation_type == 'TAG' and 'ODBody' in mdb.labels():
+                    # object detection body
+                    body = self.getJsonResponse(
+                        mdb.object_type.single(), max_relationship_depth=0)
+                else:
+                    body = self.getJsonResponse(
+                        mdb, max_relationship_depth=0)
                 if 'links' in body:
                     del(body['links'])
-                if a.annotation_type == 'TVS':
-                    segments = []
-                    for segment in anno_body.segments:
-                        # look at the most derivative class
-                        json_segment = self.getJsonResponse(
-                            segment.downcast(), max_relationship_depth=0)
-                        if 'links' in json_segment:
-                            del(json_segment['links'])
-                        segments.append(json_segment)
-                    body['segments'] = segments
-                res['bodies'] .append(body)
+                res['bodies'].append(body)
             data.append(res)
 
         return self.force_response(data)
