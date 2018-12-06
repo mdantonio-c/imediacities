@@ -210,42 +210,53 @@ def image_origin_tech_info(filename, out_folder):
 
 
 # -----------------------------------------------------
-def transcoded_tech_info(filename, out_folder):
+def transcoded_tech_info(filename, out_folder, v2=''):
 
     cmd_list = []
     cmd_list.append('/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams')
     cmd_list.append(filename)
     cmd = ' \\\n'.join(cmd_list) + '\n'
 
-    res = run(cmd, out_folder, 'transcoded_info.json', 'transcoded_info.err', 'transcoded_info.sh')
+    res = run(cmd, out_folder,  v2 + 'transcoded_info.json',  v2 + 'transcoded_info.err',  v2 + 'transcoded_info.sh')
     return res
 
 
 # -----------------------------------------------------
-def image_transcoded_tech_info(filename, out_folder):
+def image_transcoded_tech_info(filename, out_folder, v2=''):
 
     cmd_list = []
     cmd_list.append('/usr/bin/convert')
     cmd_list.append(filename)
-    cmd_list.append(os.path.join(out_folder, 'transcoded_info.json'))
+    cmd_list.append(os.path.join(out_folder, v2 + 'transcoded_info.json'))
     cmd = ' \\\n'.join(cmd_list) + '\n'
 
-    res = run(cmd, out_folder, 'transcoded_info.out', 'transcoded_info.err', 'transcoded_info.sh')
+    res = run(cmd, out_folder, v2 + 'transcoded_info.out', v2 + 'transcoded_info.err', v2 + 'transcoded_info.sh')
     return res
 
 
 # -----------------------------------------------------
-def transcoded_num_frames(out_folder):
-    out_filename = os.path.join(out_folder, 'transcoded_info.json')
+def transcoded_num_frames(out_folder, v2=''):
+    out_filename = os.path.join(out_folder, v2 + 'transcoded_info.json')
     out_file = open(out_filename, 'r')
     data = json.load(out_file)
     return int(data['streams'][0]['nb_frames'])
 
 
 # -----------------------------------------------------
-def transcode(filename, out_folder):
+def lookup_v2(filename):
+    dirname = os.path.dirname(filename)
+    other_filename = os.path.join(dirname, 'v2_' + os.path.basename(filename))
+    if os.path.exists(other_filename):
+        return other_filename
+    other_filename = os.path.join(dirname, 'V2_' + os.path.basename(filename))
+    if os.path.exists(other_filename):
+        return other_filename
 
-    out_filename = os.path.join(out_folder, 'transcoded.mp4')
+
+# -----------------------------------------------------
+def transcode(filename, out_folder, v2=''):
+
+    out_filename = os.path.join(out_folder, v2 + 'transcoded.mp4')
 
     cmd_list = []
     cmd_list.append('/usr/bin/ffmpeg -hide_banner -nostdin -y')
@@ -265,7 +276,7 @@ def transcode(filename, out_folder):
     if os.path.exists(out_filename):
         os.rename(out_filename, bk_filename)
 
-    if not run(cmd, out_folder, 'transcode.log', 'transcode.err', 'transcode.sh'):
+    if not run(cmd, out_folder, v2 + 'transcode.log', v2 + 'transcode.err', v2 + 'transcode.sh'):
         return False
     return os.path.exists(out_filename)
 
@@ -646,83 +657,118 @@ def revert_to_origin_framerate(filename):
 # -----------------------------------------------------
 def analize_movie(filename, out_folder, muuid, fast=False):
 
-    log('origin_tech_info --- begin')
+    log('origin_tech_info -------- begin')
     if not origin_tech_info(filename, out_folder):
         return False
-    log('origin_tech_info --- ok ')
-    log('fast_mode ---------- ' + str(fast))
-    log('frame_rate --------- ' + str(TRANSCODED_FRAMERATE))
+    log('origin_tech_info -------- ok')
+    log('fast_mode --------------- ' + str(fast))
+    log('frame_rate -------------- ' + str(TRANSCODED_FRAMERATE))
 
     tr_movie = os.path.join(out_folder, 'transcoded.mp4')
 
     if fast and os.path.exists(tr_movie):
-        log('transcode ---------- skipped')
+        log('transcode --------------- skipped')
     else:
-        log('transcode ---------- begin ')
+        log('transcode --------------- begin ')
         if not transcode(filename, out_folder):
             return False
-        log('transcode ---------- ok ')
+        log('transcode --------------- ok')
 
-    log('transcoded_info ---- begin ')
+    log('transcoded_info --------- begin')
     if not transcoded_tech_info(tr_movie, out_folder):
         return False
-    log('transcoded_info ---- ok ')
+    log('transcoded_info --------- ok')
 
     nf = transcoded_num_frames(out_folder)
+    log('transcoded_nb_frames ---- ' + str(nf))
+
+    # other version
+    v2_movie = os.path.join(out_folder, 'v2_transcoded.mp4')
+    if fast and os.path.exists(v2_movie):
+        log('transcode v2 ------------ skipped')
+    else:
+        # look for the other version
+        other_version = lookup_v2(filename)
+        if other_version is not None:
+            # create symbolic link
+            v2_link_name = os.path.join(out_folder, 'v2')
+            v2_link_target = other_version.replace(stage_area, '../../..')
+
+            if os.path.exists(v2_link_name):
+                os.unlink(v2_link_name)
+            try:
+                os.symlink(v2_link_target, v2_link_name)
+            except BaseException:
+                print('failed to create v2 link')
+
+            # transcode v2 movie
+            log('transcode v2 ------------ begin')
+            if not transcode(other_version, out_folder, 'v2_'):
+                return False
+            log('transcode v2 ------------ ok')
+
+    if os.path.exists(v2_movie):
+        log('v2_transcoded_info ------ begin')
+        if not transcoded_tech_info(v2_movie, out_folder, 'v2_'):
+            return False
+        log('v2_transcoded_info ------ end')
+
+        v2_nf = transcoded_num_frames(out_folder, 'v2_')
+        log('v2_transcoded_nb_frames - ' + str(v2_nf))
 
     tvs_out = os.path.join(out_folder, 'tvs.xml')
 
     if fast and os.path.exists(tvs_out):
-        log('tvs ---------------- skipped')
+        log('tvs --------------------- skipped')
     else:
-        log('tvs ---------------- begin ')
+        log('tvs --------------------- begin')
         if not tvs(tr_movie, out_folder):
             return False
-        log('tvs ---------------- ok ')
+        log('tvs --------------------- ok')
 
     quality_out = os.path.join(out_folder, 'quality.xml')
 
     if fast and os.path.exists(quality_out):
-        log('quality ------------ skipped ')
+        log('quality ----------------- skipped')
     else:
-        log('quality ------------ begin ')
+        log('quality ----------------- begin')
         if not quality(tr_movie, out_folder):
             return False
-        log('quality ------------ ok ')
+        log('quality ----------------- ok')
 
     vimotion_out = os.path.join(out_folder, 'vimotion.xml')
 
     if fast and os.path.exists(vimotion_out):
-        log('vimotion ----------- skipped ')
+        log('vimotion ---------------- skipped')
     else:
-        log('vimotion ----------- begin ')
+        log('vimotion ---------------- begin')
         if not vimotion(tr_movie, out_folder):
             return False
-        log('vimotion ----------- ok ')
+        log('vimotion ---------------- ok ')
 
     # summary_out = os.path.join(out_folder, 'summary.jpg')
     # if fast and os.path.exists(summary_out):
-    #     log('summary ------------ skipped ')
+    #     log('summary ----------------- skipped')
     # else:
-    #     log('summary ------------ begin ')
+    #     log('summary ----------------- begin')
     #     if not summary(tr_movie, out_folder):
     #         return False
-    #     log('summary ------------ ok ')
+    #     log('summary ----------------- ok')
 
-    log('index/storyboard---- begin ')
+    log('index/storyboard -------- begin')
     if not thumbs_index_storyboard(tr_movie, out_folder, nf):
         return False
-    log('index/storyboard---- ok ')
+    log('index/storyboard -------- ok')
 
     orf_out = os.path.join(out_folder, 'orf.xml')
     if fast and os.path.exists(orf_out):
-        log('submit_orf ----------- skipped ')
+        log('submit_orf ---------------- skipped')
     else:
-        log('submit_orf --------- begin')
+        log('submit_orf -------------- begin')
         media = out_folder.replace(analize_area + '/', '')
         if not submit_orf(media, 'Video', muuid, out_folder):
             return False
-        log('submit_orf --------- ok')
+        log('submit_orf -------------- ok')
 
     return True
 

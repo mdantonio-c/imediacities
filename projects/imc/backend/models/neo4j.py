@@ -222,6 +222,8 @@ class Item(TimestampedNode, AnnotationTarget):
         'Shot', 'SHOT', cardinality=ZeroOrMore)
     revision = RelationshipTo(
         'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True)
+    other_version = RelationshipTo(
+        'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True)
 
 
 class ContributionRel(StructuredRel):

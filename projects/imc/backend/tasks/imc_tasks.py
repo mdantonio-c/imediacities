@@ -88,6 +88,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             raise e
 
         try:
+            content_node = None
+
             # To ensure that the content item and its metadata will be
             # correctly linked in the system and its repositories,
             # FHI-Partners are expected to name the content item file,
@@ -105,7 +107,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             content_path, content_filename = lookup_content(
                 self, basedir, source_id)
 
-            content_node = None
             if content_path is not None:
                 # Create content resource
                 properties = {}
@@ -131,10 +132,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
                 if mode == 'skip':
                     log.info('Analyze skipped for source id: ' + source_id)
-                    if content_node is not None:
-                        content_node.status = 'SKIPPED'
-                        content_node.status_message = 'Nothing to declare'
-                        content_node.save()
                     return 1
                 fast = (mode == 'fast')
 
@@ -190,7 +187,21 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             # take the previous fps apart
             old_fps = item_node.framerate
-            extract_tech_info(self, item_node, analyze_path)
+            extract_tech_info(self, item_node, analyze_path, 'transcoded_info.json')
+
+            # other version
+            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
+            if os.path.exists(other_version_uri):
+                other_item = item_node.other_version.single()
+                if other_item is None:
+                    other_item_properties = {}
+                    other_item_properties['item_type'] = item_type
+                    other_item = self.graph.Item(**other_item_properties).save()
+                    item_node.other_version.connect(other_item)
+                extract_tech_info(self, other_item, analyze_path, 'v2_transcoded_info.json')
+                # same cover as the origin item
+                other_item.thumbnail = item_node.thumbnail
+                other_item.save()
 
             # - ONLY for videos -
             if item_type == 'Video':
@@ -239,17 +250,17 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             progress(self, 'Completed', path)
 
         except Exception as e:
-            # progress(self, 'Import error', None)
-            progress(self, 'FAILED', None)
-            log.error("Task error, %s" % e)
+            progress(self, 'Import error', None)
             if content_node is not None:
                 content_node.status = 'ERROR'
                 content_node.status_message = str(e)
                 content_node.save()
             elif xml_resource is not None:
+                # TO CHECK why this?
                 xml_resource.warnings.append(str(e))
                 xml_resource.save()
-            # raise e
+            # ensure task failure
+            raise e
 
         return 1
 
@@ -436,10 +447,11 @@ def extract_item_type(self, path):
 
 
 def lookup_content(self, path, source_id):
-    '''
+    """
     Look for a filename in the form of:
     ARCHIVE_SOURCEID.[extension]
-    '''
+    """
+
     # nel source_id i caratteri che non sono lettere
     # o numeri vanno sostituiti con trattino per la ricerca
     # del file del contenuto
@@ -447,17 +459,26 @@ def lookup_content(self, path, source_id):
     log.debug('source_id_encoded: ' + source_id_encoded)
 
     content_path = None
-    content_filename = None
+    content_filename = []
     files = [f for f in os.listdir(path) if not f.endswith('.xml')]
     for f in files:
+        # discard filename that stats with v2_ (case insensitive)
+        # v2_ is used for the 'other version'
+        if re.match(r'^v2_.*', f, re.I):
+            continue
         tokens = os.path.splitext(f)[0].split('_')
         if len(tokens) == 0:
             continue
         if tokens[-1] == source_id_encoded:
-            log.info('Content file FOUND: {0}'.format(f))
-            content_path = os.path.join(path, f)
-            content_filename = f
-            break
+            content_filename.append(f)
+    if not content_filename:
+        content_filename = None
+    elif len(content_filename) > 1:
+        raise Exception('Multiple content FOUND: {}'.format(content_filename))
+    else:
+        content_filename = content_filename[0]
+        content_path = os.path.join(path, content_filename)
+        log.info('Content file FOUND: {}'.format(content_filename))
     return content_path, content_filename
 
 
@@ -567,17 +588,16 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     return parser.warnings
 
 
-def extract_tech_info(self, item, analyze_dir_path):
+def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     """
-    Extract technical information about the given content from result file
-    origin_info.json and save them as Item properties in the database.
+    Extract technical information about the given content from the given result
+    file tech_info_filename and save them as Item properties in the database.
     """
     if not os.path.exists(analyze_dir_path):
         raise IOError(
             "Analyze results does not exist in the path %s", analyze_dir_path)
 
     # check for info result
-    tech_info_filename = 'transcoded_info.json'
     tech_info_path = os.path.join(
         os.path.dirname(analyze_dir_path), tech_info_filename)
     if not os.path.exists(tech_info_path):
@@ -655,7 +675,8 @@ def extract_tech_info(self, item, analyze_dir_path):
         return
 
     item.save()
-    log.info('Extraction of techincal info completed')
+    log.info('Extraction of techincal info completed [{}]'
+             .format(tech_info_filename))
 
 
 def get_thumbnail(path):
