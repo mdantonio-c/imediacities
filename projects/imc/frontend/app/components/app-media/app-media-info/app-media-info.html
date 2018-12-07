@@ -212,32 +212,32 @@
                     <app-expansion-panel title="Digital format">
                         <div class="col-12">
                             <ul class="list-space">
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.digital_format.length >= 1">
-                                    <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 1">
+                                    <strong>Container: </strong> <span [innerHTML]="item.attributes.digital_format[0]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.digital_format.length >= 2">
-                                    <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 2">
+                                    <strong>Encoding: </strong> <span [innerHTML]="item.attributes.digital_format[1]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.digital_format.length >= 3">
-                                    <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 3">
+                                    <strong>Format: </strong> <span [innerHTML]="item.attributes.digital_format[2]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.digital_format.length >= 4">
-                                    <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 4">
+                                    <strong>Resolution: </strong> <span [innerHTML]="item.attributes.digital_format[3]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.framerate">
-                                    <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
+                                <li *ngIf="item && item.attributes.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="item.attributes.framerate"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.duration">
-                                    <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
+                                <li *ngIf="item && item.attributes.duration">
+                                    <strong>Duration: </strong><span [innerHTML]="item.attributes.duration | secondsToTime"></span> s
                                 </li>
 
-                                <li *ngIf="info.relationships.item && info.relationships.item[0].attributes.dimension">
-                                    <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
+                                <li *ngIf="item && item.attributes.dimension">
+                                    <strong>Size: </strong> <span [innerHTML]="item.attributes.dimension"></span> kb
                                 </li>
 
                             </ul>

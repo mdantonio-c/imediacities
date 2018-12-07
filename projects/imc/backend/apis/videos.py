@@ -58,7 +58,8 @@ class Videos(GraphBaseOperations):
                 relationships_expansion=[
                     'record_sources.provider',
                     'item.ownership',
-                    'item.revision'
+                    'item.revision',
+                    'item.other_version'
                 ]
             )
             item = v.item.single()
@@ -424,7 +425,7 @@ class VideoSegments(GraphBaseOperations):
 class VideoContent(GraphBaseOperations):
 
     __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
-    
+
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
@@ -457,15 +458,18 @@ class VideoContent(GraphBaseOperations):
 
         item = video.item.single()
         if content_type == 'video':
+            # TODO manage here content access (see issue 190)
+            # always return the other version if available
             video_uri = item.uri
+            other_version = item.other_version.single()
+            if other_version is not None:
+                video_uri = other_version.uri
             log.debug("video content uri: %s" % video_uri)
             if video_uri is None:
                 raise RestApiException(
                     "Video not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
-
-            # mime = item.digital_format[2]
-            # TO FIX: stored mime is MOV, non MP4, overwriting
+            # all videos are converted to mp4
             mime = "video/mp4"
             download = Downloader()
             return download.send_file_partial(video_uri, mime)

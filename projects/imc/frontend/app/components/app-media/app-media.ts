@@ -151,6 +151,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         // EU Orphan Work
         if (k == "02") return true;
 
+        // In copyright - Non-commercial use permitted
+        if (k == "04") return true;
+
         // Public Domain
         if (k == "05") return true;
 

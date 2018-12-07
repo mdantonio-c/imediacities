@@ -1,4 +1,4 @@
-import {Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef} from '@angular/core';
+import { Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 
 @Component({
     selector: 'app-media-info',
@@ -6,7 +6,7 @@ import {Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef} from '@a
 })
 
 export class AppMediaInfoComponent implements AfterViewInit, OnInit {
-    
+
     @Input() info: any;
     @Input() user_language: any;
     @ViewChild('description_languages_selector') description_languages_selector: ElementRef;
@@ -26,6 +26,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         analogue: true,
         format: true
     };
+    item: any;
 
     constructor() {
     }
@@ -35,7 +36,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @param new_description_language
      * @private
      */
-    _description_language_set (new_description_language) {
+    _description_language_set(new_description_language) {
         this.description_active = new_description_language;
     }
     /**
@@ -43,7 +44,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @param new_keyword_language
      * @private
      */
-    _keyword_language_set (new_keyword_language) {
+    _keyword_language_set(new_keyword_language) {
         this.keyword_active = new_keyword_language;
     }
 
@@ -53,7 +54,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @param dati
      * @private
      */
-    _descriptions_get_languages (dati) {
+    _descriptions_get_languages(dati) {
 
         let force_user_language = true;
         dati.forEach(d => {
@@ -75,7 +76,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         });
 
         if (force_user_language) {
-            let lang =  dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
+            let lang = dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
             this._description_language_set(lang);
         }
     }
@@ -86,7 +87,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * @param dati
      * @private
      */
-    _keywords_get_languages (dati) {
+    _keywords_get_languages(dati) {
         let force_user_language = true;
         dati.forEach(d => {
             if (!d.attributes.language) {
@@ -102,9 +103,9 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
                 force_user_language = false;
             }
             this.keyword_languages.set(d.attributes.language.key, d.attributes.language.description);
-        });        
+        });
         if (force_user_language) {
-            let lang =  dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
+            let lang = dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
             this._keyword_language_set(lang);
         }
     }
@@ -113,7 +114,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * Eventi per la gestione del cambio della lingua delle descrizioni
      * @private
      */
-    _description_languages_selector_events () {
+    _description_languages_selector_events() {
 
         //  Fermo propagazione evento in modo da non provocare l'attivazione dell'accordion al click sul selettore delle lingue
         this.description_languages_selector.nativeElement.onclick = function(e) {
@@ -130,7 +131,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * Eventi per la gestione del cambio della lingua delle keyword
      * @private
      */
-    _keyword_languages_selector_events () {
+    _keyword_languages_selector_events() {
 
         //  Fermo propagazione evento in modo da non provocare l'attivazione dell'accordion al click sul selettore delle lingue
         this.keyword_languages_selector.nativeElement.onclick = function(e) {
@@ -147,13 +148,13 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * Crea le opzioni per la gestione della lignua delle descrizioni
      * @private
      */
-    _description_languages_selector_set_options () {
+    _description_languages_selector_set_options() {
 
         this.description_languages.forEach((value, key, map) => {
 
             const option = document.createElement('option');
             option.innerText = value;
-            option.value= key;
+            option.value = key;
             option.selected = key === this.description_active;
 
             this.description_languages_selector.nativeElement.appendChild(option);
@@ -164,20 +165,20 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
      * Crea le opzioni per la gestione della lignua delle keyword
      * @private
      */
-    _keyword_languages_selector_set_options () {
+    _keyword_languages_selector_set_options() {
 
         this.keyword_languages.forEach((value, key, map) => {
 
             const option = document.createElement('option');
             option.innerText = value;
-            option.value= key;
+            option.value = key;
             option.selected = key === this.keyword_active;
 
             this.keyword_languages_selector.nativeElement.appendChild(option);
         })
 
     }
-    expandCard(card){
+    expandCard(card) {
         this.isCollapsed[card] = !this.isCollapsed[card];
     }
 
@@ -188,15 +189,19 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
             this._description_language_set(this.user_language);
             this._keyword_language_set(this.user_language);
         }
-        if(this.info.relationships.descriptions){
+        if (this.info.relationships.descriptions) {
             this._descriptions_get_languages(this.info.relationships.descriptions);
         }
-        if(this.info.relationships.keywords){
-            this._keywords_get_languages(this.info.relationships.keywords);            
+        if (this.info.relationships.keywords) {
+            this._keywords_get_languages(this.info.relationships.keywords);
+        }
+        if (this.info.relationships.item) {
+            this.item = this.info.relationships.item[0].relationships.other_version ? 
+                this.info.relationships.item[0].relationships.other_version[0] : this.info.relationships.item[0]
         }
     }
 
-    ngAfterViewInit () {
+    ngAfterViewInit() {
         if (this.description_languages.size > 1) {
             //  Imposto eventi
             this._description_languages_selector_events();
