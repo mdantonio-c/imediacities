@@ -49,13 +49,15 @@ picture-->
 
                 <ng-container *ngIf='show_only_public_domain() && !is_public_domain()'>
                     <div class="container-picture">
-                        <br><br>
-                        <i class="fa fa-ban"></i> Under copyright
-                        <br><br>
-                        Please 
-                        <a routerLink='/app/login' routerLinkActive="active">login</a>
+                        <p style="padding: 50px 40px; text-align: left !important;">
+                        <i class="fa fa-ban"></i> <span>We’re sorry, you do not have permission to view this film/photograph.  You can apply for this permission by sending a message to the archive who has contributed this item.</span>
+                        </p>
                     </div>
                 </ng-container>
+            </section>
+
+            <section class="col-12 col-sm-5 col-lg-3 box-shots" *ngIf='show_only_public_domain() && !is_public_domain()'>
+                <!-- empty section -->
             </section>
 
             <!-- TAB SHOTS / SEGMENTS / AREAS-->
