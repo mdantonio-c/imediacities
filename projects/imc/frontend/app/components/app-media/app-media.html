@@ -242,7 +242,7 @@ picture-->
                                 [popoverTitle]="'Start Shot Revision'"
                                 [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
                                 (confirm)="start_shot_revision()"
-                                *ngIf="user.roles.hasOwnProperty('Reviser')">Shot revision</button>
+                                *ngIf="user?.roles.hasOwnProperty('Reviser')">Shot revision</button>
                             &nbsp;
                             <button class="btn btn-border-classic px-1"
                                 (click)="multi_annotations_toggle()">Multiple annotation</button>

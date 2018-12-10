@@ -165,7 +165,6 @@ export class AppAnnotationsService {
         ).subscribe(
             response => {
                 this._annotations = response.data;
-                console.log("note="+JSON.stringify(this._annotations));
                 this.update.emit(this._annotations);
             },
             err => {
