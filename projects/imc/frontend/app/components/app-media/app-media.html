@@ -236,7 +236,7 @@ picture-->
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
                     <ng-container *ngIf="media_type === 'video' && shots.length > 0">
-                        <ng-container *ngIf="!shot_revision_is_active && !multi_annotations_is_active">
+                        <ng-container *ngIf="user && !shot_revision_is_active && !multi_annotations_is_active">
                             <button class="btn btn-border-classic px-1" 
                                 mwlConfirmationPopover
                                 [popoverTitle]="'Start Shot Revision'"
@@ -248,7 +248,7 @@ picture-->
                                 (click)="multi_annotations_toggle()">Multiple annotation</button>
                         </ng-container>
 
-                        <ng-container *ngIf="canRevise()">
+                        <ng-container *ngIf="user && canRevise()">
                             <button class="btn btn-border-classic"
                                 mwlConfirmationPopover
                                 [popoverTitle]="'Exit shot revision'"
