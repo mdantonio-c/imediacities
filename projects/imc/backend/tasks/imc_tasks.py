@@ -27,6 +27,10 @@ log = get_logger(__name__)
 try:
     from scripts.analysis.analyze import (make_movie_analize_folder,
                                           analize,
+                                          stage_area,
+                                          transcode,
+                                          transcoded_tech_info,
+                                          transcoded_num_frames,
                                           update_storyboard)
 except BaseException:
     log.warning("Unable to import analyze script, not required in backend")
@@ -337,6 +341,85 @@ def launch_tool(self, tool_name, item_id):
 
             # here we expect object detection results in orf.xml
             extract_od_annotations(self, item, analyze_path)
+        except Exception as e:
+            log.error("Task error, %s" % e)
+            raise e
+        return 1
+
+
+@celery_app.task(bind=True)
+def load_v2(self, other_version, item_id):
+    with celery_app.app.app_context():
+        log.debug('load v2 {0} for item {1}'.format(other_version, item_id))
+
+        self.graph = celery_app.get_service('neo4j')
+        try:
+            item = self.graph.Item.nodes.get(uuid=item_id)
+            content_source = GraphBaseOperations.getSingleLinkedNode(
+                item.content_source)
+            group = GraphBaseOperations.getSingleLinkedNode(
+                item.ownership)
+            source_filename = content_source.filename
+            analyze_path = '/uploads/Analize/' + \
+                group.uuid + '/' + source_filename.split('.')[0] + '/'
+            log.debug('analyze path: {0}'.format(analyze_path))
+
+            # create symbolic link
+            v2_link_name = os.path.join(analyze_path, 'v2')
+            v2_link_target = other_version.replace(stage_area, '../../..')
+
+            if os.path.exists(v2_link_name):
+                os.unlink(v2_link_name)
+            try:
+                os.symlink(v2_link_target, v2_link_name)
+            except BaseException:
+                print('failed to create v2 link')
+
+            if item.item_type == "Video":
+                # ######################################################
+                # run transcoding for v2
+                v2_movie = os.path.join(analyze_path, 'v2_transcoded.mp4')
+
+                if os.path.exists(v2_movie):
+                    log.info('transcode v2 ------------ skipped')
+                else:
+                    log.info('transcode v2 ------------ begin')
+                    if not transcode(other_version, analyze_path, 'v2_'):
+                        raise Exception('transcoding for v2 failed!')
+                    log.info('transcode v2 ------------ ok')
+
+                log.info('v2_transcoded_info ------ begin')
+                if not transcoded_tech_info(v2_movie, analyze_path, 'v2_'):
+                    raise Exception('tech info for v2 failed!')
+                log.info('v2_transcoded_info ------ ok')
+
+                v2_nf = transcoded_num_frames(analyze_path, 'v2_')
+                log.info('v2_transcoded_nb_frames - ' + str(v2_nf))
+
+            if item.item_type == "Image":
+                # TODO
+                # return analize_image(filename, out_folder, uuid, fast)
+                pass
+
+            # raise Exception("bad item_type :", item_type)
+
+            # ######################################################
+            # bind v2 to origin item as other version
+
+            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
+            if not os.path.exists(other_version_uri):
+                raise Exception('Unable to find transcoded v2 at {}'.format(other_version_uri))
+            other_item = item.other_version.single()
+            if other_item is None:
+                other_item_properties = {}
+                other_item_properties['item_type'] = item.item_type
+                other_item = self.graph.Item(**other_item_properties).save()
+                item.other_version.connect(other_item)
+            extract_tech_info(self, other_item, analyze_path, 'v2_transcoded_info.json')
+            # same cover as the origin item
+            other_item.thumbnail = item.thumbnail
+            other_item.save()
+
         except Exception as e:
             log.error("Task error, %s" % e)
             raise e
