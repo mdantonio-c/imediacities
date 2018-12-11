@@ -191,7 +191,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             # take the previous fps apart
             old_fps = item_node.framerate
-            extract_tech_info(self, item_node, analyze_path, 'transcoded_info.json')
+            extract_tech_info(self, item_node, analyze_path,
+                              'transcoded_info.json')
 
             # other version
             other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
@@ -200,9 +201,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 if other_item is None:
                     other_item_properties = {}
                     other_item_properties['item_type'] = item_type
-                    other_item = self.graph.Item(**other_item_properties).save()
+                    other_item = self.graph.Item(
+                        **other_item_properties).save()
                     item_node.other_version.connect(other_item)
-                extract_tech_info(self, other_item, analyze_path, 'v2_transcoded_info.json')
+                extract_tech_info(self, other_item, analyze_path,
+                                  'v2_transcoded_info.json')
                 # same cover as the origin item
                 other_item.thumbnail = item_node.thumbnail
                 other_item.save()
@@ -396,6 +399,12 @@ def load_v2(self, other_version, item_id):
                 v2_nf = transcoded_num_frames(analyze_path, 'v2_')
                 log.info('v2_transcoded_nb_frames - ' + str(v2_nf))
 
+                # check for nb_frames matching with the origin version
+                v1_nf = transcoded_num_frames(analyze_path)
+                log.info('v1_transcoded_nb_frames - ' + str(v1_nf))
+                if v1_nf != v2_nf:
+                    raise ValueError('v2 transcoded version does NOT match the number of frames')
+
             if item.item_type == "Image":
                 # TODO
                 # return analize_image(filename, out_folder, uuid, fast)
@@ -408,14 +417,16 @@ def load_v2(self, other_version, item_id):
 
             other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
             if not os.path.exists(other_version_uri):
-                raise Exception('Unable to find transcoded v2 at {}'.format(other_version_uri))
+                raise Exception(
+                    'Unable to find transcoded v2 at {}'.format(other_version_uri))
             other_item = item.other_version.single()
             if other_item is None:
                 other_item_properties = {}
                 other_item_properties['item_type'] = item.item_type
                 other_item = self.graph.Item(**other_item_properties).save()
                 item.other_version.connect(other_item)
-            extract_tech_info(self, other_item, analyze_path, 'v2_transcoded_info.json')
+            extract_tech_info(self, other_item, analyze_path,
+                              'v2_transcoded_info.json')
             # same cover as the origin item
             other_item.thumbnail = item.thumbnail
             other_item.save()
