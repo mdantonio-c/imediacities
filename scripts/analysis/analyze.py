@@ -285,6 +285,24 @@ def transcode(filename, out_folder, v2=''):
 
 
 # -----------------------------------------------------
+def v2_image_transcode(filename, out_folder):
+    out_filename              = os.path.join(out_folder, 'v2_transcoded.jpg')
+
+    cmd_list = []
+    cmd_list.append('/usr/bin/convert')
+    cmd_list.append(filename)
+    # cmd_list.append('-resize')
+    # cmd_list.append('800x600\>')
+    cmd_list.append('-quality')
+    cmd_list.append('95')
+    cmd_list.append(out_filename)
+    cmd = ' \\\n'.join(cmd_list) + '\n'
+
+    if not run(cmd, out_folder, 'v2_transcode.log', 'v2_transcode.err', 'v2_transcode.sh'):
+        return False
+
+
+# -----------------------------------------------------
 def image_transcode(filename, out_folder, watermark):
     ''' transcode an image to jpg, with a compression quality of 95
         rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
@@ -715,6 +733,9 @@ def analize_movie(filename, out_folder, muuid, fast=False):
 
         v2_nf = transcoded_num_frames(out_folder, 'v2_')
         log('v2_transcoded_nb_frames - ' + str(v2_nf))
+        if nf != v2_nf:
+            # v2 transcoded version does NOT match the number of frames
+            return False
 
     tvs_out = os.path.join(out_folder, 'tvs.xml')
 
@@ -814,11 +835,45 @@ def analize_image(filename, out_folder, muuid, fast=False):
         return False
     log('image_transcoded_info ---- ok ')
 
-    log('submit_orf --------- begin')
-    media = out_folder.replace(analize_area + '/', '')
-    if not submit_orf(media, 'Image', muuid, out_folder):
-        return False
-    log('submit_orf --------- ok')
+    # other version
+    v2_image = os.path.join(out_folder, 'v2_transcoded.jpg')
+    if fast and os.path.exists(v2_image):
+        log('image_transcode v2 ------- skipped')
+    else:
+        # look for the other version
+        other_version = lookup_v2(filename)
+        if other_version is not None:
+            # create symbolic link
+            v2_link_name = os.path.join(out_folder, 'v2')
+            v2_link_target = other_version.replace(stage_area, '../../..')
+
+            if os.path.exists(v2_link_name):
+                os.unlink(v2_link_name)
+            try:
+                os.symlink(v2_link_target, v2_link_name)
+            except BaseException:
+                print('failed to create v2 link')
+
+            # transcode v2 image
+            log('image_transcode v2 ------ begin')
+            v2_image_transcode(other_version, out_folder)
+            log('image_transcode v2 ------ end')
+
+    if os.path.exists(v2_image):
+        log('v2_image_transcoded_info - begin')
+        if not image_transcoded_tech_info(v2_image, out_folder, 'v2_'):
+            return False
+        log('v2_image_transcoded_info - end')
+
+    orf_out = os.path.join(out_folder, 'orf.xml')
+    if fast and os.path.exists(orf_out):
+        log('submit_orf ---------------- skipped')
+    else:
+        log('submit_orf --------- begin')
+        media = out_folder.replace(analize_area + '/', '')
+        if not submit_orf(media, 'Image', muuid, out_folder):
+            return False
+        log('submit_orf --------- ok')
 
     return True
 

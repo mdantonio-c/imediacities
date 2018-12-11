@@ -225,15 +225,18 @@ class ImageContent(GraphBaseOperations):
         item = image.item.single()
         logger.debug("item data: " + format(item))
         if content_type == 'image':
+            # TODO manage here content access (see issue 190)
+            # always return the other version if available
             image_uri = item.uri
+            other_version = item.other_version.single()
+            if other_version is not None:
+                image_uri = other_version.uri
             logger.debug("image content uri: %s" % image_uri)
             if image_uri is None:
                 raise RestApiException(
                     "Image not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
-
-            # mime = item.digital_format[2]
-            # TO FIX: is it always jpeg?
+            # image is always jpeg
             mime = "image/jpeg"
             download = Downloader()
             return download.send_file_partial(image_uri, mime)

@@ -31,6 +31,8 @@ try:
                                           transcode,
                                           transcoded_tech_info,
                                           transcoded_num_frames,
+                                          v2_image_transcode,
+                                          image_transcoded_tech_info,
                                           update_storyboard)
 except BaseException:
     log.warning("Unable to import analyze script, not required in backend")
@@ -378,6 +380,7 @@ def load_v2(self, other_version, item_id):
             except BaseException:
                 print('failed to create v2 link')
 
+            ext = 'mp4'
             if item.item_type == "Video":
                 # ######################################################
                 # run transcoding for v2
@@ -405,17 +408,29 @@ def load_v2(self, other_version, item_id):
                 if v1_nf != v2_nf:
                     raise ValueError('v2 transcoded version does NOT match the number of frames')
 
-            if item.item_type == "Image":
-                # TODO
-                # return analize_image(filename, out_folder, uuid, fast)
-                pass
+            elif item.item_type == "Image":
+                ext = 'jpg'
+                v2_image = os.path.join(analyze_path, 'v2_transcoded.jpg')
+                if os.path.exists(v2_image):
+                    log('image_transcode v2 ------- skipped')
+                else:
+                    # transcode v2 image
+                    log.info('image_transcode v2 ------ begin')
+                    v2_image_transcode(other_version, analyze_path)
+                    log.info('image_transcode v2 ------ end')
 
-            # raise Exception("bad item_type :", item_type)
+                log.info('v2_image_transcoded_info - begin')
+                if not image_transcoded_tech_info(v2_image, analyze_path, 'v2_'):
+                    return False
+                log.info('v2_image_transcoded_info - end')
+
+            else:
+                raise ValueError("Bad item_type:", item.item_type)
 
             # ######################################################
             # bind v2 to origin item as other version
 
-            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
+            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.' + ext)
             if not os.path.exists(other_version_uri):
                 raise Exception(
                     'Unable to find transcoded v2 at {}'.format(other_version_uri))
