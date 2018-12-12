@@ -31,7 +31,7 @@ image:
   #   - authentication
   custom:
     # publish: true
-    authentication: true
+    authentication: false
   responses:
     '200':
       description: Image information successfully retrieved
