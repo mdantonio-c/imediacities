@@ -1,3 +1,8 @@
+.grid-result {
+	min-width:210px;
+	margin-right:5px;
+}
+
 .search-title {
 	line-height: 0.6;
 }

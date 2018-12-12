@@ -103,11 +103,6 @@ button:focus {outline:0 !important;}
 	border-color: #75A8CE
 }
 
-.div-min-width {
-  min-width: 210px;
-}
-
-
 .search-thumbnail .search-title {
 	margin-top: 10px;
 	overflow-wrap: break-word;
@@ -239,6 +234,7 @@ search-thumbnail div .media-image-wrapper {
   padding: 9px;
   color: #333;
   max-height: 200px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
 }
