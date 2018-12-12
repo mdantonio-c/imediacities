@@ -456,7 +456,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
                 // To be confirmed
                 setTimeout(() => {
-                    this.Element.nativeElement.querySelector('#pills-tab > li').click();
+                    let tabs = this.Element.nativeElement.querySelector('#pills-tab > li');
+                    if (tabs) tabs.click();
                 }, 100);
 
                 if (this.media_type === 'video') {

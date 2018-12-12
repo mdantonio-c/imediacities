@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {AppVideoService} from "../../../services/app-video";
+import { Component, Input, OnInit } from '@angular/core';
+import { AppVideoService } from "../../../services/app-video";
 
 @Component({
     selector: 'app-shot-reference',
@@ -13,10 +13,16 @@ export class AppShotReferenceComponent implements OnInit {
     constructor(private VideoService: AppVideoService) {
     }
 
-    shot_play () {
+    shot_play() {
         this.VideoService.shot_play(this.shot.attributes.shot_num)
     }
 
     ngOnInit() {
+    }
+
+    isVideo() {
+        return (this.shot.links 
+            && this.shot.links.content 
+            && this.shot.links.content.indexOf('type=image') !== -1) ? false : true;
     }
 }

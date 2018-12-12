@@ -42,7 +42,8 @@ class Images(GraphBaseOperations):
             try:
                 v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             except self.graph.NonAVEntity.DoesNotExist:
-                logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+                logger.debug(
+                    "NonAVEntity with uuid %s does not exist" % image_id)
                 raise RestApiException(
                     "Please specify a valid image id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -53,12 +54,12 @@ class Images(GraphBaseOperations):
         api_url = get_api_url(request, PRODUCTION)
         for v in images:
             image = self.getJsonResponse(
-                    v, max_relationship_depth=1,
-                    relationships_expansion=[
-                        'record_sources.provider',
-                        'item.ownership'
-                    ]
-                )
+                v, max_relationship_depth=1,
+                relationships_expansion=[
+                    'record_sources.provider',
+                    'item.ownership'
+                ]
+            )
             item = v.item.single()
             # image['links']['self'] = api_url + \
             #     'api/images/' + v.uuid
@@ -129,7 +130,7 @@ class ImageAnnotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id):
-        logger.info("get annotations for NonAVEntity id: %s", image_id)
+        logger.debug("get annotations for NonAVEntity id: %s", image_id)
         if image_id is None:
             raise RestApiException(
                 "Please specify a image id",
@@ -165,8 +166,8 @@ class ImageAnnotations(GraphBaseOperations):
                                 'anno [UUID:{}]'.format(anno.uuid))
                     continue
                 creator = anno.creator.single()
-                if creator.uuid != user.uuid:
-                    continue
+                if user is None or creator.uuid != user.uuid:
+                        continue
             res = self.getJsonResponse(anno, max_relationship_depth=0)
             del(res['links'])
             if anno.annotation_type in ('TAG', 'DSC', 'LNK') and anno.creator is not None:
