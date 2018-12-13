@@ -206,3 +206,8 @@ class CreationRepository():
 
     def is_revision_assigned_to_user(self, item, user):
         return item.revision.is_connected(user)
+
+    def get_right_status(self, entity_id):
+        entity = self.graph.Creation.nodes.get_or_none(uuid=entity_id)
+        if entity is not None:
+            return entity.rights_status

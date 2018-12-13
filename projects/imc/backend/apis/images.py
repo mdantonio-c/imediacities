@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-Handle your iamge metadata
+Handle your image entity
 """
 from flask import request, send_file
 from utilities.helpers import get_api_url
 from restapi.confs import PRODUCTION
 
 from utilities.logs import get_logger
+from imc.security import authz
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.download import Downloader
@@ -198,6 +199,7 @@ class ImageContent(GraphBaseOperations):
     """
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authz.pre_authorize
     def get(self, image_id):
         logger.info("get image content for id %s" % image_id)
         if image_id is None:
