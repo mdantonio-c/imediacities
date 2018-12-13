@@ -37,11 +37,14 @@ def pre_authorize(func):
         """verify if user has permission to access the specified content id"""
         entity_id = kwargs.get('video_id') or kwargs.get('image_id')
         if entity_id is None:
+            # do not yet raise the exception but ignore it
             return func(self, entity_id)
         params = self.get_input()
         ct = params['type']
-        if ct is None or ct != 'video' or ct != 'video':
+        if ct is None or (ct != 'image' and ct != 'video'):
+            # do not yet raise the exception but ignore it
             return func(self, entity_id)
+        # FIXME: it does not seem to always work for logged in users
         user = self.get_user_if_logged()
         logger.debug('Logged in user: {}'.format(user))
         logger.debug("Has permission to access entity[{}]?".format(entity_id))
