@@ -37,7 +37,11 @@ def pre_authorize(func):
         """verify if user has permission to access the specified content id"""
         entity_id = kwargs.get('video_id') or kwargs.get('image_id')
         if entity_id is None:
-            return
+            return func(self, entity_id)
+        params = self.get_input()
+        ct = params['type']
+        if ct is None or ct != 'video' or ct != 'video':
+            return func(self, entity_id)
         user = self.get_user_if_logged()
         logger.debug('Logged in user: {}'.format(user))
         logger.debug("Has permission to access entity[{}]?".format(entity_id))
