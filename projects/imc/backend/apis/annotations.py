@@ -76,6 +76,7 @@ class Annotations(GraphBaseOperations):
     @graph_transactions
     def post(self):
         """ Create a new annotation. """
+        # TODO access control (annotation cannot be created by general user if not in public domain)
         data = self.get_input()
         # logger.debug(data)
         if len(data) == 0:
