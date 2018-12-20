@@ -34,6 +34,8 @@ services:
       worker_net:
 
   celeryui:
+    # Production command:
+    command: flower --basic_auth=${CELERYUI_USER}:${CELERYUI_PASSWORD} --port=${CELERYUI_PORT} --persistent --db=${CELERYUI_DBDIR}/flower --certfile=/ssl/real/fullchain1.pem --keyfile=/ssl/real/privkey1.pem -A restapi.flask_ext.flask_celery.worker.celery_app -n flower_monitor
     environment:
       DEBUG_LEVEL: INFO
       APP_MODE: production
