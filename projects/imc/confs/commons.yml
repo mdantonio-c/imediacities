@@ -123,7 +123,7 @@ services:
       - "30000-30019:30000-30019"
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
-      - ${VANILLA_DIR}/data/ftp:/etc/pure-ftpd/passwd/
+      - ${VANILLA_DIR}/data/ftp:/etc/pure-ftpd/passwd
 
   frontend:
     environment:
