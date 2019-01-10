@@ -216,7 +216,7 @@ class Search(GraphBaseOperations):
                 term = self.graph.sanitize_input(term)
 
             fulltext = """
-                CALL db.index.fulltext.queryNodes("titles", "{term}")
+                CALL db.index.fulltext.queryNodes("titles", '{term}')
                 YIELD node, score
                 WITH node, score
                 MATCH (n:{entity})-[:HAS_TITLE|HAS_DESCRIPTION|HAS_KEYWORD]->(node)
