@@ -46,63 +46,67 @@ class Search(GraphBaseOperations):
 
         # check request for term matching
         provider = None
-        multi_match_query = ''
-        multi_match = []
-        multi_match_where = []
-        match = input_parameters.get('match')
-        if match is not None:
-            term = match.get('term')
-            if term is not None:
-                term = self.graph.sanitize_input(term)
 
-            fields = match.get('fields')
-            if term is not None and (fields is None or len(fields) == 0):
-                raise RestApiException('Match term fields cannot be empty',
-                                       status_code=hcodes.HTTP_BAD_REQUEST)
-            if fields is None:
-                fields = []
-            multi_match_fields = []
-            multi_optional_match = []
-            for f in fields:
-                if f not in self.__class__.allowed_term_fields:
-                    raise RestApiException(
-                        "Bad field: expected one of %s" %
-                        (self.__class__.allowed_term_fields, ),
-                        status_code=hcodes.HTTP_BAD_REQUEST)
-                if not term:
-                    # catch '*'
-                    break
-                if f == 'title':
-                    multi_match.append("MATCH (n)-[:HAS_TITLE]->(t:Title)")
-                    multi_match_fields.append('t')
-                    multi_match_where.append(
-                        "t.text =~ '(?i).*{term}.*'".format(term=term))
-                elif f == 'description':
-                    multi_match.append(
-                        "OPTIONAL MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
-                    multi_match_fields.append('d')
-                    multi_match_where.append(
-                        "d.text =~ '(?i).*{term}.*'".format(term=term))
-                elif f == 'keyword':
-                    multi_optional_match.append("OPTIONAL MATCH (n)-[:HAS_KEYWORD]->(k:Keyword)")
-                    multi_match_fields.append('k')
-                    multi_match_where.append(
-                        "k.term =~ '(?i){term}'".format(term=term))
-                elif f == 'contributor':
-                    multi_optional_match.append("OPTIONAL MATCH (n)-[:CONTRIBUTED_BY]->(a:Agent)")
-                    multi_match_fields.append('a')
-                    multi_match_where.append(
-                        "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
-                else:
-                    # should never be reached
-                    raise RestApiException(
-                        'Unexpected field type',
-                        status_code=hcodes.HTTP_SERVER_ERROR)
-            if len(multi_match) > 0:
-                multi_match_query = ' '.join(multi_match) \
-                    + " " + ' '.join(multi_optional_match) \
-                    + " WITH n, " + ', '.join(multi_match_fields) \
-                    + " WHERE " + ' OR '.join(multi_match_where)
+        # TODO: no longer used, to be removed
+        multi_match_query = ''
+
+        # multi_match = []
+        # multi_match_where = []
+        # match = input_parameters.get('match')
+
+        # if match is not None:
+        #     term = match.get('term')
+        #     if term is not None:
+        #         term = self.graph.sanitize_input(term)
+
+        #     fields = match.get('fields')
+        #     if term is not None and (fields is None or len(fields) == 0):
+        #         raise RestApiException('Match term fields cannot be empty',
+        #                                status_code=hcodes.HTTP_BAD_REQUEST)
+        #     if fields is None:
+        #         fields = []
+        #     multi_match_fields = []
+        #     multi_optional_match = []
+        #     for f in fields:
+        #         if f not in self.__class__.allowed_term_fields:
+        #             raise RestApiException(
+        #                 "Bad field: expected one of %s" %
+        #                 (self.__class__.allowed_term_fields, ),
+        #                 status_code=hcodes.HTTP_BAD_REQUEST)
+        #         if not term:
+        #             # catch '*'
+        #             break
+        #         if f == 'title':
+        #             multi_match.append("MATCH (n)-[:HAS_TITLE]->(t:Title)")
+        #             multi_match_fields.append('t')
+        #             multi_match_where.append(
+        #                 "t.text =~ '(?i).*{term}.*'".format(term=term))
+        #         elif f == 'description':
+        #             multi_match.append(
+        #                 "OPTIONAL MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
+        #             multi_match_fields.append('d')
+        #             multi_match_where.append(
+        #                 "d.text =~ '(?i).*{term}.*'".format(term=term))
+        #         elif f == 'keyword':
+        #             multi_optional_match.append("OPTIONAL MATCH (n)-[:HAS_KEYWORD]->(k:Keyword)")
+        #             multi_match_fields.append('k')
+        #             multi_match_where.append(
+        #                 "k.term =~ '(?i){term}'".format(term=term))
+        #         elif f == 'contributor':
+        #             multi_optional_match.append("OPTIONAL MATCH (n)-[:CONTRIBUTED_BY]->(a:Agent)")
+        #             multi_match_fields.append('a')
+        #             multi_match_where.append(
+        #                 "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
+        #         else:
+        #             # should never be reached
+        #             raise RestApiException(
+        #                 'Unexpected field type',
+        #                 status_code=hcodes.HTTP_SERVER_ERROR)
+        #     if len(multi_match) > 0:
+        #         multi_match_query = ' '.join(multi_match) \
+        #             + " " + ' '.join(multi_optional_match) \
+        #             + " WITH n, " + ', '.join(multi_match_fields) \
+        #             + " WHERE " + ' OR '.join(multi_match_where)
 
         # check request for filtering
         filters = []
@@ -203,22 +207,44 @@ class Search(GraphBaseOperations):
                         "WHERE {clauses}".format(
                             clauses=' or '.join(term_clauses)))
 
+        match = input_parameters.get('match')
+        fulltext = None
+        if match is not None:
+
+            term = match.get('term')
+            if term is not None:
+                term = self.graph.sanitize_input(term)
+
+            fulltext = """
+                CALL db.index.fulltext.queryNodes("titles", "{term}")
+                YIELD node, score
+                WITH node, score
+                MATCH (n:{entity})-[:HAS_TITLE|HAS_DESCRIPTION|HAS_KEYWORD]->(node)
+            """.format(term=term, entity=entity)
+            # RETURN node, n, score
+
         # first request to get the number of elements to be returned
-        countv = "MATCH (n:{entity})" \
-            " {filters} " \
-            " {match} " \
-            " RETURN COUNT(DISTINCT(n))".format(
-                entity=entity,
-                filters=' '.join(filters),
-                match=multi_match_query)
+        if fulltext is not None:
+            countv = "{fulltext} {filters} RETURN COUNT(DISTINCT(n))".format(
+                fulltext=fulltext,
+                filters=' '.join(filters)
+            )
+            query = "{fulltext} {filters} " \
+                "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
+                    fulltext=fulltext,
+                    filters=' '.join(filters),
+                    offset=offset * limit,
+                    limit=limit)
 
-        # logger.debug("QUERY to get number of elements: {0}".format(countv))
-
-        # get total number of elements
-        numels = [row[0] for row in self.graph.cypher(countv)][0]
-        logger.debug("Number of elements retrieved: {0}".format(numels))
-
-        query = "MATCH (n:{entity})" \
+        else:
+            countv = "MATCH (n:{entity})" \
+                " {filters} " \
+                " {match} " \
+                " RETURN COUNT(DISTINCT(n))".format(
+                    entity=entity,
+                    filters=' '.join(filters),
+                    match=multi_match_query)
+            query = "MATCH (n:{entity})" \
                 " {filters} " \
                 " {match} " \
                 "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
@@ -227,6 +253,13 @@ class Search(GraphBaseOperations):
                     match=multi_match_query,
                     offset=offset * limit,
                     limit=limit)
+
+        # logger.debug("QUERY to get number of elements: {0}".format(countv))
+
+        # get total number of elements
+        numels = [row[0] for row in self.graph.cypher(countv)][0]
+        logger.debug("Number of elements retrieved: {0}".format(numels))
+
         # logger.debug(query)
 
         data = []
