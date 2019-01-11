@@ -214,6 +214,7 @@ class Search(GraphBaseOperations):
             term = match.get('term')
             if term is not None:
                 term = self.graph.sanitize_input(term)
+                term = self.graph.fuzzy_tokenize(term)
 
             fulltext = """
                 CALL db.index.fulltext.queryNodes("titles", '{term}')
