@@ -24,8 +24,10 @@ video_tools:
             enum:
               - "delete"
   responses:
-    '201':
-      description: Execution launched. 
+    '202':
+      description: Execution task accepted. 
+    '200':
+      description: Execution completed successfully. Only with delete operation.
     '401':
       description: This endpoint requires a valid authorization token.
     '403':
@@ -33,4 +35,4 @@ video_tools:
     '404':
       description: Video not found.
     '409':
-      description: Invalid state for the video.
+      description: Invalid state. E.g. object detection results cannot be imported twice.

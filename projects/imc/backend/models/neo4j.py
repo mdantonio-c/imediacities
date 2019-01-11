@@ -688,6 +688,11 @@ class ODBody(AnnotationBody):
     object_type = RelationshipTo('ResourceBody', 'CONCEPT', cardinality=One)
 
 
+class BRBody(ODBody):
+    """Building Recognition"""
+    pass
+
+
 class ImageBody(AnnotationBody):
     pass
 
