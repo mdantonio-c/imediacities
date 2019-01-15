@@ -31,7 +31,7 @@ export class AppModalInsertNoteComponent {
             language: this.note.language,
             value: this.note.text
         };
-        console.log('note ro send', n)
+        //console.log('note to send', n)
 
         this.AnnotationsService.create_note(
             this.data.shots.map(s => s.id),

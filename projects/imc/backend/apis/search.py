@@ -137,10 +137,18 @@ class Search(GraphBaseOperations):
                     status_code=hcodes.HTTP_SERVER_ERROR)
             # PROVIDER
             provider = filtering.get('provider')
-            if provider is not None:
+            logger.info("provider {0}".format(provider))
+            #if provider is not None:
+            #    filters.append(
+            #        "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
+            #        " WHERE p.identifier='{provider}'".format(provider=provider.strip()))
+            # CITY
+            city = filtering.get('city')
+            if city is not None:
                 filters.append(
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
-                    " WHERE p.identifier='{provider}'".format(provider=provider.strip()))
+                    " WHERE p.city='{city}'".format(city=city.strip())) 
+            logger.info("city {0}".format(city))           
             # COUNTRY
             country = filtering.get('country')
             if country is not None:
