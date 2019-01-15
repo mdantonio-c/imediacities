@@ -596,7 +596,7 @@ class VideoContent(GraphBaseOperations):
 
 class VideoTools(GraphBaseOperations):
 
-    __available_tools__ = ('object-detection', 'vimotion')
+    __available_tools__ = ('object-detection', 'building-recognition')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -641,26 +641,56 @@ class VideoTools(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         repo = AnnotationRepository(self.graph)
-        if ('operation' in params and params['operation'] == 'delete' and
-                tool == self.__available_tools__[0]):
-            # get all automatic tags
-            for anno in item.sourcing_annotations:
-                if anno.generator == 'FHG' and anno.annotation_type == 'TAG':
-                    repo.delete_auto_annotation(anno)
-            return self.empty_response()
-
-        # DO NOT re-launch object detection twice for the same video!
-        if repo.check_automatic_tagging(item.uuid):
+        if tool == self.__available_tools__[0]:  # object-detection
+            if ('operation' in params and params['operation'] == 'delete'):
+                # get all automatic object detection tags
+                deleted = 0
+                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                    # expected always single body for automatic tags
+                    body = anno.bodies.single()
+                    if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
+                        deleted += 1
+                        repo.delete_auto_annotation(anno)
+                return self.force_response(
+                    "There are no more automatic object detection tags for video {}. Deleted {}".format(
+                        video_id, deleted),
+                    code=hcodes.HTTP_OK_BASIC)
+            # DO NOT re-import object detection twice for the same video!
+            if repo.check_automatic_od(item.uuid):
+                raise RestApiException(
+                    "Object detection CANNOT be import twice for the same video.",
+                    status_code=hcodes.HTTP_BAD_CONFLICT)
+        elif tool == self.__available_tools__[1]:  # building-recognition
+            if ('operation' in params and params['operation'] == 'delete'):
+                # get all automatic building recognition tags
+                deleted = 0
+                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                    # expected always single body for automatic tags
+                    body = anno.bodies.single()
+                    if 'BRBody' in body.labels():
+                        deleted += 1
+                        repo.delete_auto_annotation(anno)
+                return self.force_response(
+                    "There are no more automatic building recognition tags for video {}. Deleted {}".format(
+                        video_id, deleted),
+                    code=hcodes.HTTP_OK_BASIC)
+            # DO NOT re-import building recognition twice for the same video!
+            if repo.check_automatic_br(item.uuid):
+                raise RestApiException(
+                    "Building recognition CANNOT be import twice for the same video.",
+                    status_code=hcodes.HTTP_BAD_CONFLICT)
+        else:
+            # should never be reached
             raise RestApiException(
-                "Object detection CANNOT be run twice for the same video.",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Specified tool '{}' NOT implemented".format(tool),
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
         task = CeleryExt.launch_tool.apply_async(
             args=[tool, item.uuid],
             countdown=10
         )
 
-        return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)
+        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
 
 
 class VideoShotRevision(GraphBaseOperations):

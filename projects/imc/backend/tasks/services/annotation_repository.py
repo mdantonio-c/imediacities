@@ -127,6 +127,24 @@ class AnnotationRepository():
                     conceptNode = ResourceBody(
                         iri=concept['iri'], name=concept['name']).save()
                 bodyNode.object_type.connect(conceptNode)
+            elif body['type'] == 'BRBody':
+                properties = {
+                    'object_id': body['object_id'],
+                    'confidence': body['confidence']
+                }
+                bodyNode = self.graph.BRBody(**properties).save()
+                # connect the concept
+                concept = body['concept']['source']
+                conceptNode = self.graph.ResourceBody.nodes.get_or_none(
+                    iri=concept['iri'])
+                if conceptNode is None:
+                    log.debug(
+                        'new ResourceBody for concept: {}'.format(concept))
+                    conceptNode = ResourceBody(
+                        iri=concept['iri'],
+                        name=concept['name'],
+                        spatial=concept['spatial']).save()
+                bodyNode.object_type.connect(conceptNode)
             else:
                 # should never be reached
                 raise ValueError('Invalid body: {}'.format(body['type']))
@@ -734,6 +752,34 @@ class AnnotationRepository():
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]
         log.debug("Number of automatic annotations found: {0}".format(count))
+        return True if count > 0 else False
+
+    def check_automatic_od(self, item_id):
+        '''
+        Check if at least one automatic object detection exists for the given
+        content item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "MATCH (a)-[:HAS_BODY]-(b:ODBody) WHERE NOT b:BRBody " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic object detections found: {0}".format(count))
+        return True if count > 0 else False
+
+    def check_automatic_br(self, item_id):
+        '''
+        Check if at least one automatic building recognition exists for the
+        given content item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "MATCH (a)-[:HAS_BODY]-(:BRBody) " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic building recognitions found: {0}".format(count))
         return True if count > 0 else False
 
     def remove_segment(self, anno, segment):
