@@ -127,6 +127,24 @@ class AnnotationRepository():
                     conceptNode = ResourceBody(
                         iri=concept['iri'], name=concept['name']).save()
                 bodyNode.object_type.connect(conceptNode)
+            elif body['type'] == 'BRBody':
+                properties = {
+                    'object_id': body['object_id'],
+                    'confidence': body['confidence']
+                }
+                bodyNode = self.graph.BRBody(**properties).save()
+                # connect the concept
+                concept = body['concept']['source']
+                conceptNode = self.graph.ResourceBody.nodes.get_or_none(
+                    iri=concept['iri'])
+                if conceptNode is None:
+                    log.debug(
+                        'new ResourceBody for concept: {}'.format(concept))
+                    conceptNode = ResourceBody(
+                        iri=concept['iri'],
+                        name=concept['name'],
+                        spatial=concept['spatial']).save()
+                bodyNode.object_type.connect(conceptNode)
             else:
                 # should never be reached
                 raise ValueError('Invalid body: {}'.format(body['type']))
@@ -757,7 +775,7 @@ class AnnotationRepository():
         '''
         query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
                 "WHERE a.generator IS NOT NULL " \
-                "MATCH (a)-[:HAS_BODY]-(BRBody) " \
+                "MATCH (a)-[:HAS_BODY]-(:BRBody) " \
                 "RETURN count(a)"
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]

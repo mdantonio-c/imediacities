@@ -483,6 +483,7 @@ class Provider(IdentifiedNode):
     fax          The fax number of the archive
     website      The website of the archive
     email        The email of the archive
+    city         The city which the items refer to
     """
     name = StringProperty(index=True, required=True, show=True)
     identifier = StringProperty(required=True, show=True)
@@ -493,6 +494,7 @@ class Provider(IdentifiedNode):
     fax = StringProperty(required=False, show=True)
     website = StringProperty(required=False, show=True)
     email = EmailProperty(required=False, show=True)
+    city = StringProperty(required=False, show=True)
     record_source = RelationshipFrom(
         'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
 
