@@ -17,7 +17,7 @@ video_tools:
             type: string
             enum:
               - object-detection
-              - vimotion
+              - building-recognition
           operation:
             description: At the moment used only to delete automatic tags.
             type: string
@@ -25,7 +25,7 @@ video_tools:
               - "delete"
   responses:
     '202':
-      description: Execution task accepted. 
+      description: Execution task accepted.
     '200':
       description: Execution completed successfully. Only with delete operation.
     '401':

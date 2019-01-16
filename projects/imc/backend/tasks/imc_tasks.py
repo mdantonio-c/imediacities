@@ -253,6 +253,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             except IOError:
                 log.warn('Could not find OD results file.')
 
+            # extract automatic building recognition results
+            try:
+                extract_br_annotations(self, item_node, analyze_path)
+            except IOError:
+                log.warn('Could not find BR results file.')
+
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
             content_node.save()
@@ -349,7 +355,7 @@ def launch_tool(self, tool_name, item_id):
                 extract_od_annotations(self, item, analyze_path)
             elif tool_name == 'building-recognition':
                 # here we expect building recognition results in brf.xml
-                extract_bf_annotations(self, item, analyze_path)
+                extract_br_annotations(self, item, analyze_path)
             else:
                 raise NotImplementedError(
                     'Invalid tool name: '.format(tool_name))
@@ -860,7 +866,7 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
     return shots, vim_estimations
 
 
-def extract_bf_annotations(self, item, analyze_dir_path):
+def extract_br_annotations(self, item, analyze_dir_path):
     '''
     Extract building recognition results given by automatic analysis tool and
     ingest valueable annotations as 'automatic' TAGs.

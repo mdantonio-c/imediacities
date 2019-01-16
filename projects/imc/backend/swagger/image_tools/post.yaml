@@ -17,14 +17,17 @@ image_tools:
             type: string
             enum:
               - object-detection
+              - building-recognition
           operation:
             description: At the moment used only to delete automatic tags.
             type: string
             enum:
               - "delete"
   responses:
-    '201':
-      description: Execution launched. 
+    '202':
+      description: Execution task accepted.
+    '200':
+      description: Execution completed successfully. Only with delete operation.
     '401':
       description: This endpoint requires a valid authorization token.
     '403':
@@ -32,4 +35,4 @@ image_tools:
     '404':
       description: Image not found.
     '409':
-      description: Invalid state for the image.
+      description: Invalid state. E.g. object detection results cannot be imported twice.
