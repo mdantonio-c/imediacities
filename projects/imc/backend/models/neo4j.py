@@ -478,6 +478,7 @@ class Provider(IdentifiedNode):
     identifier   An unambiguous reference to the archive supplying the record.
     scheme       Name of the registration scheme encoding the institution name
                  ("ISIL code" or "Institution acronym")
+    city         The city is used in the search filter
     address      The address of the archive
     phone        The phone number of the archive
     fax          The fax number of the archive
@@ -489,6 +490,7 @@ class Provider(IdentifiedNode):
     identifier = StringProperty(required=True, show=True)
     scheme = StringProperty(
         choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+    city = StringProperty(required=False, show=True)
     address = StringProperty(required=False, show=True)
     phone = StringProperty(required=False, show=True)
     fax = StringProperty(required=False, show=True)

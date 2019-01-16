@@ -131,6 +131,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       itemType: null,
       terms: [],
       provider: null,
+      city: null,
       country: null,
       productionYearFrom: form.productionYearFrom,
       productionYearTo: form.productionYearTo,
@@ -149,7 +150,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     for (let t of this.terms) {
       filter.terms.push({ iri: t.iri, label: t.name });
     }
-    if (form.city !== '') { filter.provider = this.cityToProvider(form.city); }
+    if (form.city !== '') {
+      filter.city = this.cityToCode(form.city);
+      filter.provider = this.cityToProvider(form.city); 
+    }
     if (form.iprstatus !== '') { filter.iprstatus = form.iprstatus; }
     this.onFilterChange.emit(filter);
   }
@@ -176,7 +180,19 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     else if (city === 'Stockholm') { p = 'SFI'; }
     return p;
   }
-
+  private cityToCode(city) {
+    let p = null;
+    if (city === 'Athens') { p = 'Athens'; }
+    else if (city === 'Bologna') { p = 'Bologna'; }
+    else if (city === 'Brussels') { p = 'Brussels'; }
+    else if (city === 'Copenhagen') { p = 'Copenhagen'; }
+    else if (city === 'Frankfurt am Main') { p = 'Frankfurt'; }
+    else if (city === 'Barcelona') { p = 'Barcelona'; }
+    else if (city === 'Turin') { p = 'Turin'; }
+    else if (city === 'Vienna') { p = 'Vienna'; }
+    else if (city === 'Stockholm') { p = 'Stockholm'; }
+    return p;
+  }
   private providerToCity(provider) {
     let c = null;
     if (provider === 'TTE') { c = 'Athens'; }
@@ -187,6 +203,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     else if (provider === 'FDC') { c = 'Barcelona'; }
     else if (provider === 'MNC') { c = 'Turin'; }
     else if (provider === 'OFM') { c = 'Vienna'; }
+    else if (provider === 'WSTLA') { c = 'Vienna'; }
     else if (provider === 'SFI') { c = 'Stockholm'; }
     return c;
   }

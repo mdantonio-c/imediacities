@@ -10,6 +10,7 @@ export interface SearchFilter {
 	itemType: string,
 	terms: SearchTerm[],
 	provider: string,
+	city: string,
 	country: string,
 	productionYearFrom: number,
 	productionYearTo: number,
@@ -41,6 +42,7 @@ export class CatalogService {
 			itemType: 'all',
 			terms: [],
 			provider: null,
+			city: null,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
@@ -63,6 +65,7 @@ export class CatalogService {
 			filter: {
 				type: filter.itemType,
 				provider: filter.provider,
+				city: filter.city,
 				iprstatus: filter.iprstatus,
 				yearfrom: filter.productionYearFrom,
 				yearto: filter.productionYearTo,
@@ -104,6 +107,7 @@ export class CatalogService {
 				filter: {
 					type: filter.itemType,
 					provider: filter.provider,
+					city: filter.city,
 					terms: filter.terms,
 					iprstatus: filter.iprstatus,
 					yearfrom: filter.productionYearFrom,

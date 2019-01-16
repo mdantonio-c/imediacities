@@ -130,7 +130,7 @@ class EFG_XMLParser():
             provider = {}
             provider_el = node.find('efg:provider', self.ns)
             provider['name'] = provider_el.text.strip()
-            provider['identifier'] = provider_el.get('id')
+            provider['identifier'] = provider_el.get('id').upper()
             p_scheme = provider_el.get('schemeID')
             scheme = codelists.fromDescription(
                 p_scheme, codelists.PROVIDER_SCHEMES)
