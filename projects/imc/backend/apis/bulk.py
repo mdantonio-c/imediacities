@@ -615,8 +615,8 @@ class Bulk(GraphBaseOperations):
                 c = [self.graph.Item.inflate(row[0]) for row in results]
                 if len(c) == 0:
                     logger.warn('Cannot load {v2} because origin content does '
-                                'not exist or its status is NOT completed')
-                    skipped += 1
+                                'not exist or its status is NOT completed'.format(v2=f))
+                    warnings += 1
                     continue
                 else:
                     item = c[0]
@@ -635,7 +635,8 @@ class Bulk(GraphBaseOperations):
             logger.info("------------------------------------")
             logger.info("Total v2 content: {}".format(total_available))
             logger.info("loading: {}".format(imported))
-            logger.info("skipped {}".format(skipped))
+            logger.info("skipped: {}".format(skipped))
+            logger.info("warning: {}".format(warnings))
             logger.info("------------------------------------")
 
         # ##################################################################
