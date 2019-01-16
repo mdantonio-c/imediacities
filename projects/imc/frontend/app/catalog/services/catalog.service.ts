@@ -166,6 +166,7 @@ export class CatalogService {
 			itemType: 'all',
 			terms: [],
 			provider: provider || null,
+			city: null,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
