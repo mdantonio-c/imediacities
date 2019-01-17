@@ -18,6 +18,7 @@ from operator import itemgetter
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.flask_ext.flask_celery import send_errors_by_email
 from restapi.services.mail import send_mail, get_html_template
 
 celery_app = CeleryExt.celery_app
@@ -48,6 +49,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
+@send_errors_by_email()
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
