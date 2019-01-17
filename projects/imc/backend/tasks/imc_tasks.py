@@ -366,7 +366,7 @@ def launch_tool(self, tool_name, item_id):
         return 1
 
 
-@send_errors_by_email()
+@send_errors_by_email
 @celery_app.task(bind=True)
 def load_v2(self, other_version, item_id):
     with celery_app.app.app_context():
