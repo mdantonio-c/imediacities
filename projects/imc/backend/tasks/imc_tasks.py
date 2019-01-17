@@ -50,6 +50,7 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
+@send_errors_by_email
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
@@ -75,6 +76,7 @@ def update_metadata(self, path, resource_id):
 
 
 @celery_app.task(bind=True)
+@send_errors_by_email
 def import_file(self, path, resource_id, mode, metadata_update=True):
     with celery_app.app.app_context():
 
@@ -329,6 +331,7 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
 
 
 @celery_app.task(bind=True)
+@send_errors_by_email
 def launch_tool(self, tool_name, item_id):
     with celery_app.app.app_context():
         log.debug('launch tool {0} for item {1}'.format(tool_name, item_id))
@@ -470,6 +473,7 @@ def load_v2(self, other_version, item_id):
 
 
 @celery_app.task(bind=True)
+@send_errors_by_email
 def shot_revision(self, revision, item_id):
     log.info('Start shot revision task for video item [{0}]'.format(item_id))
     self.graph = celery_app.get_service('neo4j')
