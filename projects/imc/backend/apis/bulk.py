@@ -604,7 +604,7 @@ class Bulk(GraphBaseOperations):
                 "Total v2 files currently available: {}".format(total_available))
             skipped = 0
             imported = 0
-            warning = 0
+            warnings = 0
             for f in files:
                 # cut away prefix and look for the related content
                 origin = f.split("_", 1)[1]
