@@ -50,7 +50,6 @@ def progress(self, state, info):
 
 
 @celery_app.task(bind=True)
-@send_errors_by_email()
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
@@ -367,6 +366,7 @@ def launch_tool(self, tool_name, item_id):
         return 1
 
 
+@send_errors_by_email()
 @celery_app.task(bind=True)
 def load_v2(self, other_version, item_id):
     with celery_app.app.app_context():
