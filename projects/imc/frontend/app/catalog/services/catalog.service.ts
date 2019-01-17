@@ -160,13 +160,32 @@ export class CatalogService {
 		}
 	}
 
+	private providerToCity(provider) {
+	    let c = null;
+	    if (provider === 'TTE') { c = 'Athens'; }
+	    else if (provider === 'CCB') { c = 'Bologna'; }
+	    else if (provider === 'CRB') { c = 'Brussels'; }
+	    else if (provider === 'DFI') { c = 'Copenhagen'; }
+	    else if (provider === 'DIF') { c = 'Frankfurt'; }
+	    else if (provider === 'FDC') { c = 'Barcelona'; }
+	    else if (provider === 'MNC') { c = 'Turin'; }
+	    else if (provider === 'OFM') { c = 'Vienna'; }
+	    else if (provider === 'WSTLA') { c = 'Vienna'; }
+	    else if (provider === 'SFI') { c = 'Stockholm'; }
+	    return c;
+	}
+
 	reset(provider?: string) {
+		let city = null;
+		if(provider){
+			city = this.providerToCity(provider);
+		}
 		this._filter = {
 			searchTerm: null,
 			itemType: 'all',
 			terms: [],
 			provider: provider || null,
-			city: null,
+			city: city,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
