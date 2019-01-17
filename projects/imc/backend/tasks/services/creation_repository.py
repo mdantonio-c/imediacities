@@ -211,3 +211,11 @@ class CreationRepository():
         entity = self.graph.Creation.nodes.get_or_none(uuid=entity_id)
         if entity is not None:
             return entity.rights_status
+
+    def get_belonging_city(self, item):
+        log.debug('Look for belonging city for item {}'.format(item.uuid))
+        query = "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()" \
+                "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) " \
+                "RETURN p.city"
+        results = self.graph.cypher(query.format(item_id=item.uuid))
+        return [row[0] for row in results][0] if results else None

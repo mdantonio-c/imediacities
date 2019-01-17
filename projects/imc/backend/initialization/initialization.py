@@ -87,6 +87,7 @@ class Initializer(object):
             ccb.identifier = 'CCB'
             ccb.scheme = 'ACRO'
             ccb.name = 'Fondazione Cineteca di Bologna'
+            ccb.city = 'Bologna'
             ccb.address = 'Via Riva di Reno, 72, 40122 Bologna BO, Italy'
             ccb.phone = '+39 (0) 512194820'
             ccb.fax = '+39 (0) 512194821'
@@ -103,6 +104,7 @@ class Initializer(object):
             tte.identifier = 'TTE'
             tte.scheme = 'ACRO'
             tte.name = 'Tainiothiki tis Ellados'
+            tte.city = 'Athens'
             tte.address = 'Iera Odos 48 and Megalou Alexandrou 134-136 10435 Athens'
             tte.phone = '+30 210 3612046'
             tte.fax = '+39 210 3628468'
@@ -119,6 +121,7 @@ class Initializer(object):
             crb.identifier = 'CRB'
             crb.scheme = 'ACRO'
             crb.name = 'Cinémathèque Royale de Belgique'
+            crb.city = 'Brussels'
             crb.address = 'Rue Ravenstein 3, 1000 Bruxelles, Belgium'
             crb.phone = '+32 (0) 25511900'
             crb.fax = '+32 (0) 25511907'
@@ -135,6 +138,7 @@ class Initializer(object):
             sfi.identifier = 'SFI'
             sfi.scheme = 'ACRO'
             sfi.name = 'Svenska Filminstitutet'
+            sfi.city = 'Stockholm'
             sfi.address = 'Box 27 126, 102 52 Stockholm, Sweden'
             sfi.phone = '08-665 11 00'
             sfi.email = 'filmarkivet.se@filminstitutet.se'
@@ -150,6 +154,7 @@ class Initializer(object):
             dfi.identifier = 'DFI'
             dfi.scheme = 'ACRO'
             dfi.name = 'Det Danske Filminstitut'
+            dfi.city = 'Copenhagen'
             dfi.address = 'Gothersgade 55, DK-1123 Copenhagen K, Denmark'
             dfi.phone = '+45 33743400'
             dfi.fax = '+45 33743403'
@@ -166,6 +171,7 @@ class Initializer(object):
             dif.identifier = 'DIF'
             dif.scheme = 'ACRO'
             dif.name = 'Deutsches Filminstitut'
+            dif.city = 'Frankfurt'
             dif.address = 'Schaumainkai 41, 60596 Frankfurt am Main, Germany'
             dif.phone = '+49 69 961220 403'
             dif.fax = '+49 69 961220 999'
@@ -182,10 +188,27 @@ class Initializer(object):
             ofm.identifier = 'OFM'
             ofm.scheme = 'ACRO'
             ofm.name = 'Österreichisches Filmmuseum'
+            ofm.city = 'Vienna'
             ofm.address = 'Augustinerstraße 1, 1010 Vienna, Austria'
             ofm.phone = '+43 1 533 70 54'
             ofm.fax = '+43 1 533 70 54 25'
             ofm.website = 'www.filmmuseum.at'
+            ofm.save()
+            log.info("Provider OFM successfully created")
+
+        try:
+            Provider.nodes.get(identifier='WSTLA')
+            log.debug("Provider WSTLA already exists")
+        except Provider.DoesNotExist:
+            ofm = Provider()
+            ofm.identifier = 'WSTLA'
+            ofm.scheme = 'ACRO'
+            ofm.name = 'Wiener Stadt- und Landesarchiv'
+            ofm.city = 'Vienna'
+            ofm.address = 'Gasometer D | Guglgasse 14, A-1110 Wien, Austria'
+            ofm.phone = '+43 1 4000 84808 | +43 1 4000 84819'
+            ofm.fax = '+43 1 4000 84809'
+            ofm.email = 'post@ma08.wien.gv.at'
             ofm.save()
             log.info("Provider OFM successfully created")
 
@@ -197,6 +220,7 @@ class Initializer(object):
             fdc.identifier = 'FDC'
             fdc.scheme = 'ACRO'
             fdc.name = 'Filmoteca de Catalunya'
+            fdc.city = 'Barcelona'
             fdc.address = 'Plaça Salvador Seguí, 1 – 9, 08001 Barcelona, Spain'
             fdc.phone = '+34 935 671 070'
             fdc.website = 'www.filmoteca.cat'
@@ -211,6 +235,7 @@ class Initializer(object):
             mnc.identifier = 'MNC'
             mnc.scheme = 'ACRO'
             mnc.name = 'Museo Nazionale del Cinema'
+            mnc.city = 'Turin'
             mnc.address = 'Via Montebello, 20 10124 Torino, Italia'
             mnc.phone = '+39 011.8138.580'
             mnc.fax = '+39 011 8138 585'

@@ -11,6 +11,7 @@ from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.od_concept_mapping import concept_mapping
+from imc.tasks.services.building_mapping import building_mapping
 from imc.models import codelists
 from operator import itemgetter
 
@@ -254,6 +255,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             except IOError:
                 log.warn('Could not find OD results file.')
 
+            # extract automatic building recognition results
+            try:
+                extract_br_annotations(self, item_node, analyze_path)
+            except IOError:
+                log.warn('Could not find BR results file.')
+
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
             content_node.save()
@@ -326,7 +333,7 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
 def launch_tool(self, tool_name, item_id):
     with celery_app.app.app_context():
         log.debug('launch tool {0} for item {1}'.format(tool_name, item_id))
-        if tool_name != 'object-detection':
+        if tool_name not in ['object-detection', 'building-recognition']:
             raise ValueError('Unexpected tool for: {}'.format(tool_name))
 
         self.graph = celery_app.get_service('neo4j')
@@ -345,9 +352,15 @@ def launch_tool(self, tool_name, item_id):
             #     log.info('Object detection executed')
             # else:
             #     raise Exception('Object detection terminated with errors')
-
-            # here we expect object detection results in orf.xml
-            extract_od_annotations(self, item, analyze_path)
+            if tool_name == 'object-detection':
+                # here we expect object detection results in orf.xml
+                extract_od_annotations(self, item, analyze_path)
+            elif tool_name == 'building-recognition':
+                # here we expect building recognition results in brf.xml
+                extract_br_annotations(self, item, analyze_path)
+            else:
+                raise NotImplementedError(
+                    'Invalid tool name: '.format(tool_name))
         except Exception as e:
             log.error("Task error, %s" % e)
             raise e
@@ -408,7 +421,8 @@ def load_v2(self, other_version, item_id):
                 v1_nf = transcoded_num_frames(analyze_path)
                 log.info('v1_transcoded_nb_frames - ' + str(v1_nf))
                 if v1_nf != v2_nf:
-                    raise ValueError('v2 transcoded version does NOT match the number of frames')
+                    raise ValueError(
+                        'v2 transcoded version does NOT match the number of frames')
 
             elif item.item_type == "Image":
                 ext = 'jpg'
@@ -432,7 +446,8 @@ def load_v2(self, other_version, item_id):
             # ######################################################
             # bind v2 to origin item as other version
 
-            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.' + ext)
+            other_version_uri = os.path.join(
+                analyze_path, 'v2_transcoded.' + ext)
             if not os.path.exists(other_version_uri):
                 raise Exception(
                     'Unable to find transcoded v2 at {}'.format(other_version_uri))
@@ -851,6 +866,171 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
 
     log.info('Extraction of TVS and VIM info completed')
     return shots, vim_estimations
+
+
+def extract_br_annotations(self, item, analyze_dir_path):
+    '''
+    Extract building recognition results given by automatic analysis tool and
+    ingest valueable annotations as 'automatic' TAGs.
+    '''
+    brf_results_filename = 'brf.xml'
+    brf_results_path = os.path.join(
+        os.path.dirname(analyze_dir_path), brf_results_filename)
+    if not os.path.exists(brf_results_path):
+        raise IOError(
+            "Analyze results does not exist in the path %s", brf_results_path)
+    log.info(
+        'get automatic building recognition from file [%s]' % brf_results_path)
+    parser = ORF_XMLParser()
+    frames = parser.parse(brf_results_path)
+
+    # get the shot list of the item
+    shots = item.shots.all()
+    shot_list = {}
+    for s in shots:
+        shot_list[s.shot_num] = set()
+    if item.item_type == 'Image':
+        # consider a image like single frame shot
+        shot_list[0] = set()
+    object_ids = set()
+    concepts = set()
+    report = {}
+    obj_cat_report = {}
+    for timestamp, bf_list in frames.items():
+        '''
+        A frame is a <dict> with timestamp<int> as key and a <list> as value.
+        Each element in the list is a <tuple> that contains:
+        (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
+        '''
+        if bf_list:
+            log.debug("timestamp: {0}, element: {1}".format(
+                timestamp, bf_list))
+        for recognized_building in bf_list:
+            concepts.add(recognized_building[1])
+            if recognized_building[0] not in object_ids:
+                report[recognized_building[1]] = report.get(
+                    recognized_building[1], 0) + 1
+            object_ids.add(recognized_building[0])
+            if item.item_type == 'Video':
+                shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
+            elif item.item_type == 'Image':
+                shot_num = 0
+            if shot_num is not None:
+                shot_list[shot_num].add(recognized_building[1])
+            # collect timestamp for keys:
+            # (cat,shot) --> [(id1, t1, confidence1), (id2, t2, confidence2), ...]
+            tmp = obj_cat_report.get(
+                (recognized_building[1], shot_num), [])
+            tmp.append(
+                (recognized_building[0], timestamp, recognized_building[2]))
+            obj_cat_report[(recognized_building[1], shot_num)] = tmp
+
+    log.info('-----------------------------------------------------')
+    log.info('Number of distinct recognized buildings: {}'.format(len(object_ids)))
+    log.info('Number of distinct concepts: {}'.format(len(concepts)))
+    print_out = 'Report of detected concepts per shot:\n'
+    for k in sorted(shot_list.keys()):
+        v = '{ }' if len(shot_list[k]) == 0 else shot_list[k]
+        print_out += ("{}:\t{}\n".format(k, v))
+    log.info(print_out)
+
+    # get item "city" code
+    crepo = CreationRepository(self.graph)
+    city = crepo.get_belonging_city(item)
+    log.debug('This item belong to city: {0}'.format(city))
+
+    repo = AnnotationRepository(self.graph)
+    saved_counter = 0  # keep count of saved annotation
+    wrong_city_counter = 0
+    for (key, timestamps) in obj_cat_report.items():
+        # detect the concept
+        concept_name = key[0]
+        building_resource = building_mapping.get(concept_name)
+        if building_resource is None:
+            log.warn('Cannot find building <{0}> in the mapping'
+                     .format(concept_name))
+            # DO NOT create this annotation
+            continue
+        # filter by belonging city
+        if city != building_resource.get('city'):
+            # log.debug('Building {0} does NOT belong to city of {1}'
+            #           .format(concept_name, city))
+            wrong_city_counter += 1
+            continue
+        concept = {
+            'iri': building_resource.get('iri'),
+            'name': building_resource.get('name'),
+            'spatial': building_resource.get('coord')
+        }
+        log.debug(concept)
+
+        # use first id as building recognition id
+        br_id = timestamps[0][0]
+        log.debug("Building Recognition ID: {}".format(br_id))
+
+        # detect target segment ONLY for videos
+        start_frame = timestamps[0][1]
+        end_frame = timestamps[-1][1]
+        selector = {
+            'type': 'FragmentSelector',
+            'value': 't=' + str(start_frame) + ',' + str(end_frame)
+        }
+        log.debug(selector)
+
+        # detection confidence
+        confidence = []
+        for frame in list(range(start_frame, end_frame + 1)):
+            found = False
+            for value in timestamps:
+                # value is a tuple like (id<str>, timestamp<int>, confidence<float>)
+                if value[1] == frame:
+                    confidence.append(value[2])
+                    found = True
+                    break
+            if not found:
+                confidence.append(None)
+
+        od_confidences = [e for e in confidence if e is not None]
+        avg_confidence = sum(od_confidences) / float(len(od_confidences))
+        log.debug('AVG confidence for building {0} in shot {1}: {2}'
+                  .format(key[0], key[1], avg_confidence))
+        if avg_confidence < 0.5:
+            # discard detections with low confidence
+            continue
+        log.debug('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+        # save annotation
+        bodies = []
+        br_body = {
+            'type': 'BRBody',
+            'object_id': br_id,
+            'confidence': avg_confidence
+        }
+        br_body['concept'] = {'type': 'ResourceBody', 'source': concept}
+        bodies.append(br_body)
+        try:
+            from neomodel import db as transaction
+            transaction.begin()
+            # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
+            #     bodies, selector))
+            repo.create_tag_annotation(
+                None, bodies, item, selector, False, None, True)
+            transaction.commit()
+        except Exception as e:
+            log.verbose("Neomodel transaction ROLLBACK")
+            try:
+                transaction.rollback()
+            except Exception as rollback_exp:
+                log.warning(
+                    "Exception raised during rollback: %s" % rollback_exp)
+            raise e
+        saved_counter += 1
+
+    log.info('Number of discarded recognized buildings with wrong city: {counter}'
+             .format(counter=wrong_city_counter))
+    log.info('Number of saved automatic annotations: {counter}'
+             .format(counter=saved_counter))
+    log.info('-----------------------------------------------------')
 
 
 def extract_od_annotations(self, item, analyze_dir_path):

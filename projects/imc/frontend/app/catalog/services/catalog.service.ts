@@ -10,6 +10,7 @@ export interface SearchFilter {
 	itemType: string,
 	terms: SearchTerm[],
 	provider: string,
+	city: string,
 	country: string,
 	productionYearFrom: number,
 	productionYearTo: number,
@@ -41,6 +42,7 @@ export class CatalogService {
 			itemType: 'all',
 			terms: [],
 			provider: null,
+			city: null,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,
@@ -63,6 +65,7 @@ export class CatalogService {
 			filter: {
 				type: filter.itemType,
 				provider: filter.provider,
+				city: filter.city,
 				iprstatus: filter.iprstatus,
 				yearfrom: filter.productionYearFrom,
 				yearto: filter.productionYearTo,
@@ -104,6 +107,7 @@ export class CatalogService {
 				filter: {
 					type: filter.itemType,
 					provider: filter.provider,
+					city: filter.city,
 					terms: filter.terms,
 					iprstatus: filter.iprstatus,
 					yearfrom: filter.productionYearFrom,
@@ -156,12 +160,32 @@ export class CatalogService {
 		}
 	}
 
+	private providerToCity(provider) {
+	    let c = null;
+	    if (provider === 'TTE') { c = 'Athens'; }
+	    else if (provider === 'CCB') { c = 'Bologna'; }
+	    else if (provider === 'CRB') { c = 'Brussels'; }
+	    else if (provider === 'DFI') { c = 'Copenhagen'; }
+	    else if (provider === 'DIF') { c = 'Frankfurt'; }
+	    else if (provider === 'FDC') { c = 'Barcelona'; }
+	    else if (provider === 'MNC') { c = 'Turin'; }
+	    else if (provider === 'OFM') { c = 'Vienna'; }
+	    else if (provider === 'WSTLA') { c = 'Vienna'; }
+	    else if (provider === 'SFI') { c = 'Stockholm'; }
+	    return c;
+	}
+
 	reset(provider?: string) {
+		let city = null;
+		if(provider){
+			city = this.providerToCity(provider);
+		}
 		this._filter = {
 			searchTerm: null,
 			itemType: 'all',
 			terms: [],
 			provider: provider || null,
+			city: city,
 			country: null,
 			productionYearFrom: 1890,
 			productionYearTo: 1999,

@@ -38,6 +38,6 @@ export class AppNoteComponent implements OnInit {
 
     ngOnInit() {
         this.popover = this.AnnotationsService.popover();
-        console.log("note="+JSON.stringify(this.note));
+        //console.log("note="+JSON.stringify(this.note));
     }
 }

@@ -34,7 +34,7 @@ class ORF_XMLParser():
                 oref  = m.attrib['object_ref']
                 lref  = int(m.attrib['label_ref'])
                 conf  = float(m.attrib['confidence'])
-
+                # always take the object with the highest confidence
                 if (oref not in mappings) or (mappings[oref][1] < conf):
                     mappings[oref] = (labels[lref], conf)
 
@@ -49,9 +49,9 @@ class ORF_XMLParser():
                     y = float(p.attrib['posY'])
                     i = int(p.attrib['orderIdx'])
                     rect[i] = (x, y)
-                if not rect[0] is None:
-                    lab, conf = mappings[oid]
-                    frames[timestamp].append((oid, lab, conf, rect))
+                # regions are not always present (e.g. for buildings)
+                lab, conf = mappings[oid]
+                frames[timestamp].append((oid, lab, conf, rect))
 
         logger.debug('done reading orf')
         return frames

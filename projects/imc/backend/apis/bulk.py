@@ -604,6 +604,7 @@ class Bulk(GraphBaseOperations):
                 "Total v2 files currently available: {}".format(total_available))
             skipped = 0
             imported = 0
+            warning = 0
             for f in files:
                 # cut away prefix and look for the related content
                 origin = f.split("_", 1)[1]
@@ -615,8 +616,8 @@ class Bulk(GraphBaseOperations):
                 c = [self.graph.Item.inflate(row[0]) for row in results]
                 if len(c) == 0:
                     logger.warn('Cannot load {v2} because origin content does '
-                                'not exist or its status is NOT completed')
-                    skipped += 1
+                                'not exist or its status is NOT completed'.format(v2=f))
+                    warnings += 1
                     continue
                 else:
                     item = c[0]
@@ -635,7 +636,8 @@ class Bulk(GraphBaseOperations):
             logger.info("------------------------------------")
             logger.info("Total v2 content: {}".format(total_available))
             logger.info("loading: {}".format(imported))
-            logger.info("skipped {}".format(skipped))
+            logger.info("skipped: {}".format(skipped))
+            logger.info("warning: {}".format(warnings))
             logger.info("------------------------------------")
 
         # ##################################################################
