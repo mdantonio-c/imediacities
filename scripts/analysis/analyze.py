@@ -254,7 +254,7 @@ def lookup_v2(filename):
 
 
 # -----------------------------------------------------
-def transcode(filename, out_folder, v2=''):
+def transcode(filename, out_folder, v2='', fps=str(TRANSCODED_FRAMERATE)):
 
     out_filename = os.path.join(out_folder, v2 + 'transcoded.mp4')
 
@@ -263,8 +263,8 @@ def transcode(filename, out_folder, v2=''):
     # cmd_list.append('-threads 4')
     cmd_list.append('-i ' + filename)
     cmd_list.append('-vf yadif=0:-1:0')                                                                       # deinterlacing
-    cmd_list.append('-vcodec libx264 -crf 15.0 -pix_fmt yuv420p -coder 1 -rc_lookahead 60 -r ' + str(TRANSCODED_FRAMERATE) + ' -strict -2')  # video codec
-    cmd_list.append('-g ' + str(TRANSCODED_FRAMERATE) + ' -forced-idr 1 -sc_threshold 40 -bf 16 -refs 6 ')                                   # keyframes
+    cmd_list.append('-vcodec libx264 -crf 15.0 -pix_fmt yuv420p -coder 1 -rc_lookahead 60 -r ' + fps + ' -strict -2')  # video codec
+    cmd_list.append('-g ' + fps + ' -forced-idr 1 -sc_threshold 40 -bf 16 -refs 6 ')                                   # keyframes
     cmd_list.append('-acodec aac -b:a 128k')                                                                  # audio codec
     cmd_list.append(out_filename)
 
