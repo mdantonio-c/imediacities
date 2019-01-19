@@ -254,9 +254,9 @@ def lookup_v2(filename):
 
 
 # -----------------------------------------------------
-def transcode(filename, out_folder, v2='', fps=str(TRANSCODED_FRAMERATE)):
+def transcode(filename, out_folder, fps, prefix=''):
 
-    out_filename = os.path.join(out_folder, v2 + 'transcoded.mp4')
+    out_filename = os.path.join(out_folder, prefix + 'transcoded.mp4')
 
     cmd_list = []
     cmd_list.append('/usr/bin/ffmpeg -hide_banner -nostdin -y')
@@ -276,7 +276,7 @@ def transcode(filename, out_folder, v2='', fps=str(TRANSCODED_FRAMERATE)):
     if os.path.exists(out_filename):
         os.rename(out_filename, bk_filename)
 
-    if not run(cmd, out_folder, v2 + 'transcode.log', v2 + 'transcode.err', v2 + 'transcode.sh'):
+    if not run(cmd, out_folder, prefix + 'transcode.log', prefix + 'transcode.err', prefix + 'transcode.sh'):
         return False
     return os.path.exists(out_filename)
 
@@ -688,7 +688,7 @@ def analize_movie(filename, out_folder, muuid, fast=False):
         log('transcode --------------- skipped')
     else:
         log('transcode --------------- begin ')
-        if not transcode(filename, out_folder):
+        if not transcode(filename, out_folder, fps=str(TRANSCODED_FRAMERATE)):
             return False
         log('transcode --------------- ok')
 
@@ -721,7 +721,8 @@ def analize_movie(filename, out_folder, muuid, fast=False):
 
             # transcode v2 movie
             log('transcode v2 ------------ begin')
-            if not transcode(other_version, out_folder, 'v2_'):
+            if not transcode(other_version, out_folder,
+                             fps=str(TRANSCODED_FRAMERATE), prefix='v2_'):
                 return False
             log('transcode v2 ------------ ok')
 

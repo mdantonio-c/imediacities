@@ -401,7 +401,8 @@ def load_v2(self, other_version, item_id):
                     if fps is None:
                         raise Exception('Cannot get origin fps')
                     log.debug("origin fps: {}".format(fps))
-                    if not transcode(other_version, analyze_path, 'v2_', fps=str(fps)):
+                    if not transcode(other_version, analyze_path,
+                                     fps=str(fps), prefix='v2_'):
                         raise Exception('transcoding for v2 failed!')
                     log.info('transcode v2 ------------ ok')
 
