@@ -575,7 +575,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         if i != len(lst) - 1:
             nextframe = filename_to_frame(lst[i + 1]) - 1
         else:
-            nextframe = num_frames
+            nextframe = num_frames - 1
 
         shot_len = (nextframe - frame + 1) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
@@ -931,7 +931,7 @@ def update_storyboard(revised_cuts, out_folder):
 
     # prepend 0 and append last_frame to revised_cuts -- ( side-effect: revised_cuts can't be empty )
     revised_cuts.insert(0, 0)          # -- to generate frame 0 thumbnail
-    revised_cuts.append(last_frame + 1)  # -- needed later ( next_frame is cuts[i+1]-1 )
+    revised_cuts.append(last_frame)  # -- needed later ( next_frame is cuts[i+1]-1 )
     # check for duplicated cuts, (prevent 0-sized shots)
     revised_cuts = list(set(revised_cuts))
     revised_cuts.sort()
