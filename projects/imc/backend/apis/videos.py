@@ -367,8 +367,10 @@ class VideoShots(GraphBaseOperations):
             shot_url = api_url + 'api/shots/' + s.uuid
             shot['links']['self'] = shot_url
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
+
             # get all shot annotations:
             # at the moment filter by vim and tag annotations
+            """
             shot['annotations'] = []
             for anno in s.annotation.all():
                 creator = anno.creator.single()
@@ -409,9 +411,10 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(self.graph.ResourceBody.inflate(concept), max_relationship_depth=0))
                 shot['annotations'].append(res)
-                if s.uuid in annotations:
-                    log.warning(annotations[s.uuid])
-                    log.warning(shot['annotations'])
+            """
+
+            # Retrieving annotations from prefetched data
+            shot['annotations'] = annotations.get(s.uuid, [])
 
             data.append(shot)
 
