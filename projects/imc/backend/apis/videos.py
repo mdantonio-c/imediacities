@@ -298,32 +298,38 @@ class VideoShots(GraphBaseOperations):
         annotations = {}
 
         manual_annotations_query = """
-            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[]-(creator:User)
-            WHERE manual_a.annotation_type IN ['TAG', 'DSC', 'LNK']
-            AND (NOT(manual_a.private) OR creator.uuid = '%s')
-            MATCH (manual_a)-[:HAS_BODY]->(b:AnnotationBody)
+            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[:HAS_BODY]->(b:AnnotationBody)
+            OPTIONAL MATCH (manual_a)-[:IS_ANNOTATED_BY]->(creator:User)
             RETURN shot.uuid, manual_a, creator, collect(b)
-        """ % (video_id, user.uuid)
+        """ % video_id
 
         log.info("Prefetching manual annotations...")
-        """
         result = self.graph.cypher(manual_annotations_query)
         for row in result:
             shot_uuid = row[0]
-            if shot_uuid not in annotations:
-                annotations[shot_uuid] = []
 
-            res = self.getJsonResponse(
-                self.graph.Annotation.inflate(row[1]),
-                max_relationship_depth=0
-            )
+            annotation = self.graph.Annotation.inflate(row[1])
+            creator = self.graph.User.inflate(row[2])
+
+            if annotation.private:
+                if creator is None:
+                    log.warn('Invalid state: missing creator for private '
+                             'note [UUID:{}]'.format(annotation.uuid))
+                    continue
+                if user is None:
+                    continue
+                if creator is not None and creator.uuid != user.uuid:
+                    continue
+
+            res = self.getJsonResponse(annotation, max_relationship_depth=0)
             del(res['links'])
 
             # attach creator
-            res['creator'] = self.getJsonResponse(
-                self.graph.User.inflate(row[2]),
-                max_relationship_depth=0
-            )
+            if annotation.annotation_type in ('TAG', 'DSC', 'LNK'):
+                if creator is not None:
+
+                    res['creator'] = self.getJsonResponse(
+                        creator, max_relationship_depth=0)
 
             # attach bodies
             res['bodies'] = []
@@ -333,8 +339,11 @@ class VideoShots(GraphBaseOperations):
                 res['bodies'].append(
                     self.getJsonResponse(b, max_relationship_depth=0)
                 )
+
+            if shot_uuid not in annotations:
+                annotations[shot_uuid] = []
             annotations[shot_uuid].append(res)
-        """
+
         log.info("Prefetching automatic tags from embedded segments...")
 
         query_auto_tags = """
@@ -394,7 +403,6 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                 shot['annotations'].append(res)
-            """
 
             # add automatic tags from "embedded segments"
             query_auto_tags = "MATCH (s:Shot {{ uuid:'{shot_id}'}})-[:WITHIN_SHOT]-(sgm:VideoSegment) " \
@@ -411,9 +419,7 @@ class VideoShots(GraphBaseOperations):
                 for concept in row[1]:
                     res['bodies'].append(
                         self.getJsonResponse(self.graph.ResourceBody.inflate(concept), max_relationship_depth=0))
-                # shot['annotations'].append(res)
-                log.info(shot.uuid)
-                log.warning(res)
+                shot['annotations'].append(res)
             """
 
             # Retrieving annotations from prefetched data
