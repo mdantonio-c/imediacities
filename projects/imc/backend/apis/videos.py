@@ -338,7 +338,7 @@ class VideoShots(GraphBaseOperations):
         log.info("Prefetching automatic tags from embedded segments...")
 
         query_auto_tags = """
-            (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)-[:WITHIN_SHOT]-(sgm:VideoSegment)
+            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)-[:WITHIN_SHOT]-(sgm:VideoSegment)
             MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {annotation_type:'TAG', generator:'FHG'})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody)
             RETURN shot.uuid, anno, collect(res)
         """ % video_id
