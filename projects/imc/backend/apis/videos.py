@@ -327,11 +327,10 @@ class VideoShots(GraphBaseOperations):
             # attach bodies
             res['bodies'] = []
             for concept in row[3]:
+                b = self.graph.AnnotationBody.inflate(concept)
+                b = b.downcast()  # most derivative body
                 res['bodies'].append(
-                    self.getJsonResponse(
-                        self.graph.AnnotationBody.inflate(concept),
-                        max_relationship_depth=0
-                    )
+                    self.getJsonResponse(b, max_relationship_depth=0)
                 )
             annotations[shot_uuid].append(res)
 
