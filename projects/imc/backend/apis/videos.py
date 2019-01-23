@@ -303,7 +303,7 @@ class VideoShots(GraphBaseOperations):
             RETURN shot.uuid, manual_a, creator, collect(b)
         """ % video_id
 
-        log.info("Prefetching manual annotations...")
+        log.info("Prefetching annotations...")
         result = self.graph.cypher(manual_annotations_query)
         for row in result:
             shot_uuid = row[0]
@@ -316,12 +316,14 @@ class VideoShots(GraphBaseOperations):
 
             if annotation.private:
                 if creator is None:
-                    log.warn('Invalid state: missing creator for private '
-                             'note [UUID:{}]'.format(annotation.uuid))
+                    log.warning(
+                        'Invalid state: missing creator for private note [UUID: %s]',
+                        annotation.uuid
+                    )
                     continue
                 if user is None:
                     continue
-                if creator is not None and creator.uuid != user.uuid:
+                if creator.uuid != user.uuid:
                     continue
 
             res = self.getJsonResponse(annotation, max_relationship_depth=0)
@@ -330,7 +332,6 @@ class VideoShots(GraphBaseOperations):
             # attach creator
             if annotation.annotation_type in ('TAG', 'DSC', 'LNK'):
                 if creator is not None:
-
                     res['creator'] = self.getJsonResponse(
                         creator, max_relationship_depth=0)
 
