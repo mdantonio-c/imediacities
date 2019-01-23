@@ -295,6 +295,46 @@ class VideoShots(GraphBaseOperations):
         item = video.item.single()
         api_url = get_api_url(request, PRODUCTION)
 
+        annotations = {}
+
+        manual_annotations_query = """
+            MATCH (:AVEntity {uuid: '%2'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[]-(creator:User)
+            WHERE manual_a.annotation_type IN ['TAG', 'DSC', 'LNK']
+            AND (NOT(manual_a.private) OR creator.uuid = '%s')
+            MATCH (manual_a)-[:HAS_BODY]->(b:AnnotationBody)
+            RETURN shot.uuid, manual_a, creator, collect(b)
+        """ % (video_id, user.uuid)
+
+        log.info("Prefetching manual annotations...")
+        result = self.graph.cypher(manual_annotations_query)
+        for row in result:
+            shot_uuid = row[0]
+            if shot_uuid not in annotations:
+                annotations[shot_uuid] = []
+
+            res = self.getJsonResponse(
+                self.graph.Annotation.inflate(row[1]),
+                max_relationship_depth=0
+            )
+            del(res['links'])
+
+            # attach creator
+            res['creator'] = self.getJsonResponse(
+                self.graph.User.inflate(row[2]),
+                max_relationship_depth=0
+            )
+
+            # attach bodies
+            res['bodies'] = []
+            for concept in row[3]:
+                res['bodies'].append(
+                    self.getJsonResponse(
+                        self.graph.AnnotationBody.inflate(concept),
+                        max_relationship_depth=0
+                    )
+                )
+            annotations[shot_uuid].append(res)
+
         for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
             shot_url = api_url + 'api/shots/' + s.uuid
@@ -325,6 +365,9 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                 shot['annotations'].append(res)
+            if s.uuid in annotations:
+                log.info(annotations[s.uuid])
+                log.info(shot['annotations'])
 
             # add automatic tags from "embedded segments"
             # for segment in s.embedded_segments.all():
