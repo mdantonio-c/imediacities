@@ -359,7 +359,7 @@ def launch_tool(self, tool_name, item_id):
 
 @celery_app.task(bind=True)
 @send_errors_by_email
-def load_v2(self, other_version, item_id):
+def load_v2(self, other_version, item_id, retry=False):
     with celery_app.app.app_context():
         log.debug('load v2 {0} for item {1}'.format(other_version, item_id))
 
@@ -392,7 +392,7 @@ def load_v2(self, other_version, item_id):
                 # run transcoding for v2
                 v2_movie = os.path.join(analyze_path, 'v2_transcoded.mp4')
 
-                if os.path.exists(v2_movie):
+                if not retry and os.path.exists(v2_movie):
                     log.info('transcode v2 ------------ skipped')
                 else:
                     log.info('transcode v2 ------------ begin')
