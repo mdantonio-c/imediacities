@@ -297,14 +297,14 @@ class VideoShots(GraphBaseOperations):
 
         annotations = {}
 
-        manual_annotations_query = """
-            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[:HAS_BODY]->(b:AnnotationBody)
-            OPTIONAL MATCH (manual_a)-[:IS_ANNOTATED_BY]->(creator:User)
-            RETURN shot.uuid, manual_a, creator, collect(b)
+        annotations_query = """
+            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(anno:Annotation)-[:HAS_BODY]->(b:AnnotationBody)
+            OPTIONAL MATCH (anno)-[:IS_ANNOTATED_BY]->(creator:User)
+            RETURN shot.uuid, anno, creator, collect(b)
         """ % video_id
 
         log.info("Prefetching annotations...")
-        result = self.graph.cypher(manual_annotations_query)
+        result = self.graph.cypher(annotations_query)
         for row in result:
             shot_uuid = row[0]
 
