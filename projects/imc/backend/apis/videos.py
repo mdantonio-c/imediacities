@@ -309,7 +309,10 @@ class VideoShots(GraphBaseOperations):
             shot_uuid = row[0]
 
             annotation = self.graph.Annotation.inflate(row[1])
-            creator = self.graph.User.inflate(row[2])
+            if row[2] is not None:
+                creator = self.graph.User.inflate(row[2])
+            else:
+                creator = None
 
             if annotation.private:
                 if creator is None:
