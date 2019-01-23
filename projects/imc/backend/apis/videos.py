@@ -306,6 +306,7 @@ class VideoShots(GraphBaseOperations):
         """ % (video_id, user.uuid)
 
         log.info("Prefetching manual annotations...")
+        """
         result = self.graph.cypher(manual_annotations_query)
         for row in result:
             shot_uuid = row[0]
@@ -331,6 +332,33 @@ class VideoShots(GraphBaseOperations):
                 b = b.downcast()  # most derivative body
                 res['bodies'].append(
                     self.getJsonResponse(b, max_relationship_depth=0)
+                )
+            annotations[shot_uuid].append(res)
+        """
+        log.info("Prefetching automatic tags from embedded segments...")
+
+        query_auto_tags = """
+            (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)-[:WITHIN_SHOT]-(sgm:VideoSegment)
+            MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody)
+            RETURN shot.uuid, anno, collect(res)
+        """ % video_id
+        result = self.graph.cypher(query_auto_tags)
+        for row in result:
+            shot_uuid = row[0]
+            if shot_uuid not in annotations:
+                annotations[shot_uuid] = []
+
+            auto_anno = self.graph.Annotation.inflate(row[1])
+            res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
+            del(res['links'])
+            # attach bodies
+            res['bodies'] = []
+            for concept in row[2]:
+                res['bodies'].append(
+                    self.getJsonResponse(
+                        self.graph.ResourceBody.inflate(concept),
+                        max_relationship_depth=0
+                    )
                 )
             annotations[shot_uuid].append(res)
 
@@ -364,27 +392,8 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                 shot['annotations'].append(res)
-            if s.uuid in annotations:
-                log.warning(annotations[s.uuid])
-                log.warning(shot['annotations'])
 
             # add automatic tags from "embedded segments"
-            # for segment in s.embedded_segments.all():
-            #     # get ONLY public tags
-            #     for s_anno in segment.annotation.search(
-            #             annotation_type='TAG', generator='FHG', private=False):
-            #         res = self.getJsonResponse(s_anno, max_relationship_depth=0)
-            #         del(res['links'])
-            #         # attach bodies
-            #         res['bodies'] = []
-            #         for b in s_anno.bodies.all():
-            #             mdb = b.downcast()  # most derivative body
-            #             if 'ODBody' in mdb.labels():
-            #                 # object detection body
-            #                 concept = mdb.object_type.single()
-            #                 res['bodies'].append(
-            #                     self.getJsonResponse(concept, max_relationship_depth=0))
-            #         shot['annotations'].append(res)
             query_auto_tags = "MATCH (s:Shot {{ uuid:'{shot_id}'}})-[:WITHIN_SHOT]-(sgm:VideoSegment) " \
                               "MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody) " \
                               "RETURN anno, collect(res)".format(
@@ -400,6 +409,9 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(self.graph.ResourceBody.inflate(concept), max_relationship_depth=0))
                 shot['annotations'].append(res)
+                if s.uuid in annotations:
+                    log.warning(annotations[s.uuid])
+                    log.warning(shot['annotations'])
 
             data.append(shot)
 
