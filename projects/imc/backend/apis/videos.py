@@ -339,7 +339,7 @@ class VideoShots(GraphBaseOperations):
 
         query_auto_tags = """
             (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)-[:WITHIN_SHOT]-(sgm:VideoSegment)
-            MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody)
+            MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {annotation_type:'TAG', generator:'FHG'})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody)
             RETURN shot.uuid, anno, collect(res)
         """ % video_id
         result = self.graph.cypher(query_auto_tags)
