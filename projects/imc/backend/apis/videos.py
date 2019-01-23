@@ -298,7 +298,7 @@ class VideoShots(GraphBaseOperations):
         annotations = {}
 
         manual_annotations_query = """
-            MATCH (:AVEntity {uuid: '%2'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[]-(creator:User)
+            MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(manual_a:Annotation)-[]-(creator:User)
             WHERE manual_a.annotation_type IN ['TAG', 'DSC', 'LNK']
             AND (NOT(manual_a.private) OR creator.uuid = '%s')
             MATCH (manual_a)-[:HAS_BODY]->(b:AnnotationBody)
@@ -366,8 +366,8 @@ class VideoShots(GraphBaseOperations):
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                 shot['annotations'].append(res)
             if s.uuid in annotations:
-                log.info(annotations[s.uuid])
-                log.info(shot['annotations'])
+                log.warning(annotations[s.uuid])
+                log.warning(shot['annotations'])
 
             # add automatic tags from "embedded segments"
             # for segment in s.embedded_segments.all():
