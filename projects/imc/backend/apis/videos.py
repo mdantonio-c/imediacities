@@ -394,6 +394,7 @@ class VideoShots(GraphBaseOperations):
                     res['bodies'].append(
                         self.getJsonResponse(mdb, max_relationship_depth=0))
                 shot['annotations'].append(res)
+            """
 
             # add automatic tags from "embedded segments"
             query_auto_tags = "MATCH (s:Shot {{ uuid:'{shot_id}'}})-[:WITHIN_SHOT]-(sgm:VideoSegment) " \
@@ -410,7 +411,9 @@ class VideoShots(GraphBaseOperations):
                 for concept in row[1]:
                     res['bodies'].append(
                         self.getJsonResponse(self.graph.ResourceBody.inflate(concept), max_relationship_depth=0))
-                shot['annotations'].append(res)
+                # shot['annotations'].append(res)
+                log.info(shot.uuid)
+                log.warning(res)
             """
 
             # Retrieving annotations from prefetched data
