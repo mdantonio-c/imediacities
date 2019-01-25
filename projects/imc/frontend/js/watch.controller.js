@@ -856,15 +856,6 @@
 		self.videoType = 'video';
 		var intervalRewind;
 
-/* 		// << NSI >> //
-		setTimeout( function(){
-			var v = new VideoPlayer({
-			selector: '#disagio',
-			sources: ["http://192.168.2.37:8080/api/videos/cbdebde9-0ccb-40d9-8dbe-bad3d201a3e5/content?type=video"],
-			fps: 24,
-		});
-		}, 2000) */		
-
 		$scope.rew = function() {
         // Don't start a new rewind if we are already doing it
         if ( angular.isDefined(intervalRewind) ) return;
@@ -1293,7 +1284,7 @@
 					// build items for the carousel and the storyboard
 					var numberOfShots = self.shots.length;
 
-					// << NSI >> //
+					// [ NSI ] //
 					//	scenette
 					var scene = [];
 					//	durata e fps
@@ -1339,7 +1330,7 @@
 						// loop annotations
 						for (var i = 0; i < shot.annotations.length; i++) {
 
-							// << NSI >> //
+							// [ NSI ] //
 							var scena = {
 								id: shot.attributes.end_frame_idx,
 								title: shot.attributes.start_frame_idx,
@@ -1420,7 +1411,7 @@
 					self.notesShots = self.storyshots;
 					//console.log("self.notesShots=" + angular.toJson(self.notesShots, true));
 
-					// << NSI >> //
+					// [ NSI ] //
 					//	e se il video lo caricassi qui??
 					$scope.videoplayer = new VideoPlayer({
 						selector: '#videotest',

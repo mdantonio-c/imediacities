@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+from datetime import datetime
+import pytz
 
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
@@ -166,6 +170,7 @@ class CreationRepository():
 
     def find_agents_by_name(self, name):
         log.debug('Find all agents with name: {}'.format(name))
+        name = self.graph.sanitize_input(name)
         query = "MATCH (a:Agent) WHERE '{name}' in a.names RETURN a"
         results = self.graph.cypher(query.format(name=name))
         return [self.graph.Agent.inflate(row[0]) for row in results]
@@ -183,3 +188,34 @@ class CreationRepository():
     def find_rightholder_by_name(self, name):
         log.debug('Find rightholder by name: {}'.format(name))
         return self.graph.Rightholder.nodes.get_or_none(name=name)
+
+    def item_belongs_to_user(self, item, user):
+        group = user.belongs_to.single()
+        if group is None:
+            return False
+        return item.ownership.is_connected(group)
+
+    def move_video_under_revision(self, item, user):
+        item.revision.connect(user, {'when': datetime.now(pytz.utc), 'state': 'W'})
+
+    def exit_video_under_revision(self, item):
+        item.revision.disconnect_all()
+
+    def is_video_under_revision(self, item):
+        return False if item.revision.single() is None else True
+
+    def is_revision_assigned_to_user(self, item, user):
+        return item.revision.is_connected(user)
+
+    def get_right_status(self, entity_id):
+        entity = self.graph.Creation.nodes.get_or_none(uuid=entity_id)
+        if entity is not None:
+            return entity.rights_status
+
+    def get_belonging_city(self, item):
+        log.debug('Look for belonging city for item {}'.format(item.uuid))
+        query = "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()" \
+                "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) " \
+                "RETURN p.city"
+        results = self.graph.cypher(query.format(item_id=item.uuid))
+        return [row[0] for row in results][0] if results else None

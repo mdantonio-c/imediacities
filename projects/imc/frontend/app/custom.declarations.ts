@@ -24,6 +24,7 @@ import { SliderRangeComponent } from './catalog/components/search-filter/slider-
 
 import {ProviderToCityPipe} from "./pipes/ProviderToCity";
 import {DurationPipe} from "./pipes/duration.pipe";
+import {SecondsToTimePipe} from "./pipes/secondsToTime.pipe";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
 import {AppMediaTopBarComponent} from "./components/app-media/app-media-top-bar/app-media-top-bar";
@@ -53,6 +54,7 @@ import {AppModalInsertNoteComponent} from "./components/app-media/app-media-moda
 import {AppModalAllAnnotationsComponent} from "./components/app-media/app-media-modals/app-modal-all-annotations/app-modal-all-annotations";
 import {AppModalInsertLinkComponent} from "./components/app-media/app-media-modals/app-modal-insert-link/app-modal-insert-link";
 import {AppModalInsertReferenceComponent} from "./components/app-media/app-media-modals/app-modal-insert-reference/app-modal-insert-reference";
+import {AppModalMoveCutComponent} from "./components/app-media/app-media-modals/app-modal-move-cut/app-modal-move-cut";
 import {AppModaleComponent} from "./components/app-modale/app-modale";
 import {AppMediaModal} from "./components/app-media/app-media-modals/app-media-modal";
 import {NoCommaPipe} from "./pipes/NoComma";
@@ -71,6 +73,8 @@ import {AppMediaMapWrapperComponent} from "./components/app-media/app-media-map-
 import {AppExpansionPanelComponent} from "./components/app-expansion-panel/app-expansion-panel";
 import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
+import {AppReferenceComponent} from "./components/app-reference/app-reference";
+import {AppLinkComponent} from "./components/app-link/app-link";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
@@ -83,6 +87,7 @@ import {AppModaleService} from "./services/app-modale";
 import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fast-play";
 import {AppVideoService} from "./services/app-video";
 import {AppLodService} from "./services/app-lod";
+import {ShotRevisionService} from "./services/shot-revision.service";
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent,
@@ -101,6 +106,7 @@ export const declarations: any[] = [
 	ProviderToCityPipe,
 	NoCommaPipe,
 	DurationPipe,
+    SecondsToTimePipe,
 	AppExpansionPanelComponent,
 	AppInfoComponent,
 	AppModaleComponent,
@@ -121,11 +127,14 @@ export const declarations: any[] = [
 	AppModalInsertLinkComponent,
 	AppModalInsertNoteComponent,
 	AppModalInsertReferenceComponent,
+    AppModalMoveCutComponent,
     AppModalInsertTermtagComponent,
 	AppModalListaShotsComponent,
 	AppMediaInfoComponent,
 	AppMediaTagsComponent,
 	AppNoteComponent,
+    AppReferenceComponent,
+    AppLinkComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,
@@ -151,6 +160,7 @@ export const entryComponents: any[] = [
     AppModalInsertNoteComponent,
     AppModalInsertLinkComponent,
     AppModalInsertReferenceComponent,
+    AppModalMoveCutComponent,
 ];
 
 export const providers: any[] = [
@@ -159,6 +169,7 @@ export const providers: any[] = [
     LocalStorageService,
     AppAnnotationsService,
     AppLodService,
+    ShotRevisionService,
     AppMediaService,
     AppModaleService,
     AppShotsService,

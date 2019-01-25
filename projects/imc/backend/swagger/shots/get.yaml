@@ -1,7 +1,6 @@
 common:
   custom:
     # publish: true
-    # fixme auth = true
     authentication: false
     authorized:
       - admin_root
@@ -14,7 +13,6 @@ video:
   #   - authentication
   custom:
     # publish: true
-    # fixme auth = true
     authentication: false
   parameters:
     - name: content

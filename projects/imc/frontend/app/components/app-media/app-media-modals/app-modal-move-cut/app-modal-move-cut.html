@@ -1,0 +1,72 @@
+<app-media-modal [data]="data" [media_type]="'video'" [revision]="true">
+	
+	<!-- The two shots -->
+	<div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
+		<div class="row no-gutters box-single-shot w-100 mb-1" *ngFor="let shot of shots; let i = index">
+			<div class="col-12">
+				<div class="row no-gutters">
+					<div class="col-1 imc--flex--vertical-center box-single-shot--number">
+						<span class="shot-number"><strong>{{shot.attributes.shot_num +1}}</strong></span>
+					</div>
+					<div class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
+						<!-- Anteprima dello shot del video -->
+						<span class="anteprima-shot">
+							<img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail; else no_thumbnail">
+							<ng-template #no_thumbnail>
+								<hjs class="media-object" alt="no thumbnail" [holderId]="'hjs-'+shot.attributes.shot_num" [imgSrc]="'holder.js/135x102?bg=707070&text=NO THUMBNAIL&?auto=yes'"></hjs>
+							</ng-template>
+							<span>{{shot.attributes.duration | number:'2.2'}}</span>
+						</span>
+					</div>
+					<div class="col-8 imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">
+						<strong [innerHTML]="shot.attributes.timestamp || '&nbsp;'"></strong>
+						<span>
+							frame range:
+							<span class="paragraph-not-divide">
+								<strong class="click-event" (click)="player_seek_at(shot.attributes.start_frame_idx)" *ngIf="i === 0">{{shot.attributes.start_frame_idx}}</strong>
+								<strong class="click-event" (click)="player_seek_at(current_cut)" *ngIf="i === 1" [ngClass]="{'text-danger': changed}">
+								{{current_cut}}</strong>
+								-
+								<strong class="click-event" (click)="player_seek_at(current_cut - 1)" *ngIf="i === 0" [ngClass]="{'text-danger': changed}">
+								{{current_cut - 1}}</strong>
+								<strong class="click-event" (click)="player_seek_at(shot.attributes.end_frame_idx)" *ngIf="i === 1">
+								{{shot.attributes.end_frame_idx}}</strong>
+							</span>
+						</span>
+						<ul class="box--icon-list">
+							<li><i class="material-icons">place</i><span><strong>{{shot.annotations.locations.length}}</strong></span></li>
+							<li><i class="material-icons">turned_in</i><span><strong>{{shot.annotations.tags.length}}</strong></span></li>
+							<li><i class="material-icons">speaker_notes</i><span><strong>{{shot.annotations.notes.length}}</strong></span></li>
+							<li><i class="material-icons">library_books</i><span><strong>{{shot.annotations.references.length}}</strong></span></li>
+							<li><i class="material-icons">link</i><span><strong>{{shot.annotations.links.length}}</strong></span></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="col-12">
+				<div class="py-3 offset-md-1">
+					<div>
+						<ng-template
+						ngFor
+						let-tag
+						[ngForOf]="shot.annotations.tags">
+					<app-media-annotation [annotation]="tag"></app-media-annotation>
+					</ng-template>
+				</div>
+				<div>
+					<ng-template
+					ngFor
+					let-location
+					[ngForOf]="shot.annotations.locations">
+				<app-media-annotation [annotation]="location"></app-media-annotation>
+				</ng-template>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<button type="button" class="btn btn-accent" modal-button
+	[disabled]="!changed"
+	(click)="ok()">Ok</button>
+</app-media-modal>

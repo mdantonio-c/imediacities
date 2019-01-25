@@ -32,7 +32,7 @@ class Annotations(GraphBaseOperations):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
-    allowed_motivations = ('tagging', 'describing',
+    allowed_motivations = ('tagging', 'describing', 'linking',
                            'commenting', 'replying', 'segmentation')
     allowed_patch_operations = ('add', 'remove')
 
@@ -76,6 +76,7 @@ class Annotations(GraphBaseOperations):
     @graph_transactions
     def post(self):
         """ Create a new annotation. """
+        # TODO access control (annotation cannot be created by general user if not in public domain)
         data = self.get_input()
         # logger.debug(data)
         if len(data) == 0:
@@ -204,6 +205,22 @@ class Annotations(GraphBaseOperations):
                         raise RestApiException(
                             'Invalid selector value for: ' + s_val,
                             status_code=hcodes.HTTP_BAD_REQUEST)
+            elif b_type == 'BibliographicReference':
+                # validate reference body
+                if 'value' not in body:
+                    raise RestApiException(
+                        'Invalid BibliographicReference',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                value = body.get('value')
+                if 'title' not in value:
+                    raise RestApiException(
+                        'Invalid BibliographicReference: missing title',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                authors = value.get('authors')
+                if authors is None or len(authors) == 0:
+                    raise RestApiException(
+                        'Invalid BibliographicReference: missing authors',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
             else:
                 raise RestApiException(
                     'Invalid body type for: {}'.format(b_type))
@@ -227,6 +244,13 @@ class Annotations(GraphBaseOperations):
                     status_code=hcodes.HTTP_BAD_REQUEST)
             try:
                 created_anno = repo.create_tvs_manual_annotation(
+                    user, bodies, targetNode, is_private, embargo_date)
+            except DuplicatedAnnotationError as error:
+                raise RestApiException(error.args[0],
+                                       status_code=hcodes.HTTP_BAD_CONFLICT)
+        elif motivation == 'linking':
+            try:
+                created_anno = repo.create_link_annotation(
                     user, bodies, targetNode, is_private, embargo_date)
             except DuplicatedAnnotationError as error:
                 raise RestApiException(error.args[0],
@@ -483,10 +507,12 @@ class Annotations(GraphBaseOperations):
                 if patch_op == 'remove':
                     logger.debug('remove a segment with uuid:{uuid}'
                                  .format(uuid=value))
-                    segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+                    segment = self.graph.VideoSegment.nodes.get_or_none(
+                        uuid=value)
                     if segment is None:
                         raise RestApiException(
-                            'Segment with ID {uuid} not found.'.format(uuid=value),
+                            'Segment with ID {uuid} not found.'.format(
+                                uuid=value),
                             status_code=hcodes.HTTP_BAD_NOTFOUND)
                     try:
                         repo.remove_segment(anno, segment)

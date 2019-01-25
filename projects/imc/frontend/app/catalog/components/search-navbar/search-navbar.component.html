@@ -19,8 +19,12 @@
 				[ngClass]="{'active btn-primary': displayMode==='List'}" placement="top" ngbTooltip="List view">
 				<i class="material-icons">view_list</i>
 				</button>
-				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('Map')"
-				[ngClass]="{'active btn-warning': displayMode==='Map'}" placement="top" ngbTooltip="Map&nbsp;view">
+				<button *ngIf="user && !user.roles['normal_user']" 
+					type="button" class="btn btn-icon-border-classic" 
+					(click)="changeView('Map')"				
+					[ngClass]="{'active btn-warning': displayMode==='Map'}" 
+					placement="top" 
+					ngbTooltip="Map&nbsp;view">
 				<i class="material-icons">location_searching</i>
 				</button>
 			</div>

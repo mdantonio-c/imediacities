@@ -39,7 +39,7 @@
 					    	<input type="checkbox" formControlName="videoType" ngbButton>
         					<i class="material-icons button-filter">videocam</i>
 					    </label>
-						    <label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('image')">
+						<label class="btn-basic imc-search-filter" ngbButtonLabel (click)="verifyItemType('image')">
 					    	<input type="checkbox" formControlName="imageType" ngbButton> 
       						<i class="material-icons button-filter">photo_camera</i>
 					    </label>					
@@ -61,7 +61,7 @@
 							[inputFormatter]="formatter"
 							[resultTemplate]="rt"
 							(selectItem)="selectTerm($event)"
-							(keydown.enter)="$event.preventDefault(); addTerm(searchForm.get('term').value);"
+							(keydown.enter)="$event.preventDefault();"
 							style="width: 80%;">
 							<div class="input-group-append">
 								<button class="btn-reset" type="button" (click)="addTerm(searchForm.get('term').value)">
@@ -127,10 +127,17 @@
 				</div>
 				<div class="hr hr-dotted"></div>
 				<h4 class="smaller">
-				<i class="fa fa-calendar light-grey bigger-110"></i>
+					<button type="button" id="missingDateButtonId" class="btn btn-icon-invisible" (click)="changeMissingDate()"
+						placement="right" ngbTooltip="{{prodDateTooltip}}">
+						<span *ngIf="missingDateParam" class="fa-stack">
+  						<i class="fa fa-calendar fa-stack-1x"></i>
+  						<i class="fa fa-ban fa-stack-2x text-danger"></i>
+					</span>
+  						<i *ngIf="!missingDateParam" class="fa fa-calendar fa-stack"></i>
+  					</button>
 				Production Date
 				</h4>
-				<div class="search-filter-element">
+				<div id="divDateSliderId" class="search-filter-element" [ngClass]="{'date-div-disabled': missingDateParam}">
 					<div class="form-group">
 						<div class="input-group date-range">
 							<div class="input-group-prepend">

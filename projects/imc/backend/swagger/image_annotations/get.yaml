@@ -10,7 +10,7 @@ image_annotations:
         - TAG
         - DSC
   custom:
-    authentication: true
+    authentication: false
   responses:
     '200':
       description: An annotation object.

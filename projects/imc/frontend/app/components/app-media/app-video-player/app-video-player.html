@@ -3,7 +3,7 @@
     <div class="video_container col-12" *ngIf="data">
     <div class="video_wrapper">
         <div class="video-box">
-            <video #videoPlayer preload></video>
+            <video (contextmenu)="disableSaveAs($event)" #videoPlayer preload></video>
         </div>
         <div class="controls" *ngIf="showComponents">
             <!--progress bar-->
@@ -32,17 +32,17 @@
                     <!--dx-->
                     <div class="controls__row controls__right">
                         <!-- file orf -->
-                        <app-video-control-switch (current_component)="registra($event)" [parent]="this" *ngIf="layout_check('modale')"></app-video-control-switch>
+                        <app-video-control-switch (current_component)="registra($event)" [parent]="this" *ngIf="layout_check('main')"></app-video-control-switch>
                         <!--volume-->
                         <app-video-control-volume (current_component)="registra($event)" [parent]="this"></app-video-control-volume>
                         <!--controlli avanzati-->
-                        <app-video-control-advanced (current_component)="registra($event)" [parent]="this" (advanced_show)="advanced_control_show($event)" *ngIf="layout_check('modale')"></app-video-control-advanced>
+                        <app-video-control-advanced (current_component)="registra($event)" [parent]="this" (advanced_show)="advanced_control_show($event)" *ngIf="layout_check('main')"></app-video-control-advanced>
                         <!--fullscreen-->
-                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this" *ngIf="layout_check('modale')"></app-video-control-fullscreen>
+                        <app-video-control-fullscreen (current_component)="registra($event)" (fullscreen)="fullscreen($event)" [parent]="this" *ngIf="layout_check('main')"></app-video-control-fullscreen>
                     </div>
                 </div>
-                <!-- test -->
-                <div class="controls__row controls__row--container" *ngIf="advanced_show && layout_check('modale')">
+                <!-- advanced controls -->
+                <div class="controls__row controls__row--container" *ngIf="advanced_show && !layout_check('modale')">
                     <div class="controls__row controls__left">
                         <app-video-control-step (current_component)="registra($event)" [parent]="this"></app-video-control-step>
                     </div>
@@ -54,6 +54,15 @@
                     </div>
                     <div class="controls__row controls__left">
                         <app-video-control-fps (current_component)="registra($event)" [parent]="this"></app-video-control-fps>
+                    </div>
+                </div>
+                <!-- revision controls -->
+                <div class="controls__row controls__row--container" *ngIf="revision">
+                    <div class="controls__row controls__left">
+                        <app-video-control-step (current_component)="registra($event)" [parent]="this"></app-video-control-step>
+                    </div>
+                    <div class="controls__row controls__right">
+                        <button class="btn btn-border-classic" (click)="cut_changed()">Move cut<!-- <i class="material-icons">save</i> --></button>
                     </div>
                 </div>
             </div>
@@ -68,7 +77,7 @@
 
     <!-- Barre sotto al player degli shot -->
     <div class="video_tag-container col-12">
-        <app-video-tag *ngIf="layout_check('modale')"
+        <app-video-tag *ngIf="layout_check('main')"
                    [data]="shots"
                    (modale_richiedi)="modal_show($event)"
                    (scena_visualizza)="jump_to($event)"

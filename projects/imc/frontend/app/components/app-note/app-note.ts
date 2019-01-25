@@ -14,7 +14,7 @@ export class AppNoteComponent implements OnInit {
     @Input() note;
     @Input() can_delete = false;
 
-    public icon = 'keyboard_arrow_up';
+    public icon = 'keyboard_arrow_down';
     public popover;
 
     constructor(
@@ -33,10 +33,11 @@ export class AppNoteComponent implements OnInit {
 
     toggle () {
         this.icon = (this.icon === 'keyboard_arrow_up') ? 'keyboard_arrow_down' : 'keyboard_arrow_up';
-        this.note_expanded = this.icon === 'keyboard_arrow_down';
+        this.note_expanded = this.icon === 'keyboard_arrow_up';
     }
 
     ngOnInit() {
         this.popover = this.AnnotationsService.popover();
+        //console.log("note="+JSON.stringify(this.note));
     }
 }

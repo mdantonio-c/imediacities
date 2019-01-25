@@ -21,7 +21,7 @@
                     </div>
                 </app-expansion-panel>
 
-                <div class="card imc--expansion-panel">
+                <div class="card imc--expansion-panel" *ngIf="this.info.relationships.descriptions">
                     <div class="card-header" id="description_head">
                         <h5 class="mb-0">
                             <span class="btn btn-link collapsed"
@@ -36,7 +36,9 @@
                                         <!--option caricate dinamicamente nell'AfterViewInit-->
                                       <select class="imc--input"
                                               *ngIf="description_languages.size > 1"
-                                              #description_languages_selector></select>
+                                              #description_languages_selector
+                                              id="description-language-select">
+                                      </select>
                                     </div>
                                     <div class="col-4 col-sm-2 imc--flex--horizontal-end">
                                         <i *ngIf="isCollapsed.description" class="material-icons">keyboard_arrow_down</i>
@@ -53,9 +55,57 @@
                                     let-descrizione
                                     [ngForOf]="this.info.relationships.descriptions">
                                 <p class="col-12"
-                                   *ngIf="descrizione.attributes.language.key === description_active"
+                                   *ngIf="descrizione.attributes.language && descrizione.attributes.language.key === description_active else missingLanguage"
                                    [attr.data-languagekey]="descrizione.attributes.language.key"
                                    [innerHTML]="descrizione.attributes.text"></p>
+                                <p class="col-12"
+                                   *ngIf="description_active === 'n/a' && !descrizione.attributes.language"
+                                   [innerHTML]="descrizione.attributes.text"></p>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card imc--expansion-panel" *ngIf="this.info.relationships.keywords">
+                    <div class="card-header" id="keyword_head">
+                        <h5 class="mb-0">
+                            <span class="btn btn-link collapsed"
+                                  (click)="expandCard('keyword')"
+                                  [attr.aria-expanded]="!isCollapsed.keyword"
+                                  aria-controls="keyword_content">
+                                <div class="row">
+                                    <div class="col-8 col-sm-7">
+                                        Keywords
+                                    </div>
+                                    <div class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs">
+                                        <!--option caricate dinamicamente nell'AfterViewInit-->
+                                      <select class="imc--input"
+                                              *ngIf="keyword_languages.size > 1"
+                                              #keyword_languages_selector
+                                              id="keyword-language-select">              
+                                      </select>
+                                    </div>
+                                    <div class="col-4 col-sm-2 imc--flex--horizontal-end">
+                                        <i *ngIf="isCollapsed.keyword" class="material-icons">keyboard_arrow_down</i>
+                                        <i *ngIf="!isCollapsed.keyword" class="material-icons">keyboard_arrow_up</i>
+                                    </div>
+                                </div>
+                            </span>
+                        </h5>
+                    </div>
+                    <div id="keyword_content" class="collapse" [ngbCollapse]="isCollapsed.keyword">
+                        <div class="card-body row">
+                            <ng-template
+                                    ngFor
+                                    let-pchiave
+                                    [ngForOf]="this.info.relationships.keywords">
+                                <div class="d-inline keyword-div"
+                                   *ngIf="pchiave.attributes.language && pchiave.attributes.language.key === keyword_active else missingLanguage"
+                                   [attr.data-languagekey]="pchiave.attributes.language.key"
+                                   [innerHTML]="pchiave.attributes.term"></div>
+                                <div class="d-inline keyword-div"
+                                   *ngIf="keyword_active === 'n/a' && !pchiave.attributes.language"
+                                   [innerHTML]="pchiave.attributes.term"></div>
                             </ng-template>
                         </div>
                     </div>
@@ -64,12 +114,14 @@
                 <app-expansion-panel title="Production information">
 
                     <!--Anno di produzione-->
-                    <div class="col-2"><strong>Year:</strong> <span [innerHTML]="info.attributes.production_years[0]"></span></div>
+                    <div class="col-3"><strong>Year:</strong> 
+                        <span *ngIf="info.attributes.production_years" [innerHTML]="info.attributes.production_years[0]"></span>
+                    </div>
                     <!--Paesi di produzione-->
                     <!-- @NSI non esiste production_countries per le immagini-->
 
                     <ng-template [ngIf]="info.type === 'aventity'">
-                        <div class="col-2">
+                        <div class="col-3">
                             <strong>Country:</strong>
                             <span
                                     *ngFor="let production_country of info.relationships.production_countries; last as last">
@@ -102,7 +154,7 @@
                     </div>
                 </app-expansion-panel>
 
-                <app-expansion-panel title="Contacts">
+                <app-expansion-panel title="More information on film">
                         <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
                         <div class="col-12"><strong>Contacts:</strong></div>
                         <div class="col-12">
@@ -112,8 +164,8 @@
                                 </li>
                                 <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">tel: {{info.relationships.record_sources[0].relationships.provider[0].attributes.phone}}</li>
                                 <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">fax: {{info.relationships.record_sources[0].relationships.provider[0].attributes.fax}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email"><a [href]="'mailto:' + info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</a></li>
+                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website"><a href="//{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}" target="_blank">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</a></li>
                                 <li></li>
                             </ul>
                         </div>
@@ -136,22 +188,22 @@
                         <div class="col-12">
                             <ul class="list-space">
 
-                                <li *ngIf="info.relationships.video_format[0].attributes.sound">
+                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.sound">
                                     <strong>Sound: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
 
                                 </li>
-                                <li *ngIf="info.relationships.video_format[0].attributes.colour">
+                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.colour">
                                     <strong>Colour: </strong>
                                     <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
                                 </li>
-                                <li *ngIf="info.relationships.video_format[0].attributes.gauge">
+                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.gauge">
                                     <strong>Gauge: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge"></span>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge.description"></span>
                                 </li>
-                                <li *ngIf="info.relationships.video_format[0].attributes.aspect_ratio">
+                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.aspect_ratio">
                                     <strong>Aspect ratio: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio"></span>
+                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio.description"></span>
                                 </li>
                             </ul>
                         </div>
@@ -160,32 +212,32 @@
                     <app-expansion-panel title="Digital format">
                         <div class="col-12">
                             <ul class="list-space">
-                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 1">
-                                    <strong>Container: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[0]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 1">
+                                    <strong>Container: </strong> <span [innerHTML]="item.attributes.digital_format[0]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 2">
-                                    <strong>Encoding: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[1]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 2">
+                                    <strong>Encoding: </strong> <span [innerHTML]="item.attributes.digital_format[1]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 3">
-                                    <strong>Format: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[2]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 3">
+                                    <strong>Format: </strong> <span [innerHTML]="item.attributes.digital_format[2]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.digital_format.length >= 4">
-                                    <strong>Resolution: </strong> <span [innerHTML]="info.relationships.item[0].attributes.digital_format[3]"></span>
+                                <li *ngIf="item && item.attributes.digital_format.length >= 4">
+                                    <strong>Resolution: </strong> <span [innerHTML]="item.attributes.digital_format[3]"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.framerate">
-                                    <strong>Frame rate: </strong> <span [innerHTML]="info.relationships.item[0].attributes.framerate"></span>
+                                <li *ngIf="item && item.attributes.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="item.attributes.framerate"></span>
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.duration">
-                                    <strong>Duration: </strong><span [innerHTML]="info.relationships.item[0].attributes.duration"></span> s
+                                <li *ngIf="item && item.attributes.duration">
+                                    <strong>Duration: </strong><span [innerHTML]="item.attributes.duration | secondsToTime"></span> s
                                 </li>
 
-                                <li *ngIf="info.relationships.item[0].attributes.dimension">
-                                    <strong>Size: </strong> <span [innerHTML]="info.relationships.item[0].attributes.dimension"></span> kb
+                                <li *ngIf="item && item.attributes.dimension">
+                                    <strong>Size: </strong> <span [innerHTML]="item.attributes.dimension"></span> kb
                                 </li>
 
                             </ul>

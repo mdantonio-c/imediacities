@@ -61,6 +61,11 @@ AV_TITLE_UNIT = (
     ('Issue',   'Issue')
 )
 
+REVISION_STATUS = (
+    ('R', 'Running'),
+    ('W', 'Waiting')
+)
+
 KEYWORD_TYPES = (
     ('00', 'Building'),
     ('01', 'Person'),

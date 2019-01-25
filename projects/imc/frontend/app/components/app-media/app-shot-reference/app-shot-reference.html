@@ -1,7 +1,7 @@
 <div class="col-5 modal--list-thumb click-event" (click)="shot_play()">
     <span><img [src]="shot.links.thumbnail" alt=""></span>
 </div>
-<div class="col-7 modal--list-info">
+<div class="col-7 modal--list-info" *ngIf="isVideo()">
     <strong>SHOT <span [innerHTML]="shot.attributes.shot_num +1"></span></strong>
     <p>
         smpte: <span [innerHTML]="shot.attributes.timestamp"></span> <br>

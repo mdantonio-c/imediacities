@@ -3,18 +3,17 @@ version: '3'
 
 services:
   backend:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
-    image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
+    # build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    # image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
     networks:
-      worker_net:
       ftp_net:
-    depends_on:
-      - neo4j
-      # - ftp
-      # - swaggerui
+    # depends_on:
+    #   - neo4j
+    #   - ftp
+    #   - swaggerui
     environment:
       AUTH_ENABLE: 1
       AUTH_SERVICE: neo4j
@@ -42,9 +41,9 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME}
       SMTP_PASSWORD: ${SMTP_PASSWORD}
 
-  proxy:
-    environment:
-      SMTP_ADMIN: ${SMTP_ADMIN}
+  # proxy:
+  #   environment:
+  #     SMTP_ADMIN: ${SMTP_ADMIN}
 
   neo4j:
     restart: on-failure:5
@@ -58,6 +57,12 @@ services:
       NEO4J_AUTH: neo4j/${GRAPHDB_PASSWORD}
       # NEO4J_dbms_allowFormatMigration: "true"
 
+  rabbit:
+    expose:
+      - "15672"
+    ports:
+      -  15672:15672
+
   celery:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
     image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
@@ -67,10 +72,6 @@ services:
       - /opt/idmt:/opt/idmt
       - ${VANILLA_DIR}/scripts:/code/scripts
       - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
 
     environment:
       AUTH_ENABLE: 1
@@ -84,6 +85,7 @@ services:
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
       SMTP_ADMIN: ${SMTP_ADMIN}
+      SMTP_NOREPLY: ${SMTP_NOREPLY}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USERNAME: ${SMTP_USERNAME}
@@ -98,6 +100,7 @@ services:
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
+      - ${VANILLA_DIR}/data/flower_db:${CELERYUI_DBDIR}
     environment:
 
       CELERYUI_USER: imc
@@ -114,19 +117,15 @@ services:
       GRAPHDB_PORT: ${GRAPHDB_BOLT_PORT}
       GRAPHDB_PASSWORD: ${GRAPHDB_PASSWORD}
 
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
-
   ftp:
     ports:
       - "21:21"
       - "30000-30019:30000-30019"
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
+      - ${VANILLA_DIR}/data/ftp:/etc/pure-ftpd/passwd
 
   frontend:
     environment:
       ALLOW_PASSWORD_RESET: "true"
-      ALLOW_REGISTRATION: "false"
+      ALLOW_REGISTRATION: "true"

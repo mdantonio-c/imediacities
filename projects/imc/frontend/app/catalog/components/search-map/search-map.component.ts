@@ -286,7 +286,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 			this.onMapChange.emit(relevantCreations);
 
 		}, error => {
-			this.notify.extractErrors(`There was an error loading geo-tags: ${error}`, this.notify.ERROR);
+			this.notify.showError(`There was an error loading geo-tags: ${error}`);
 		});
 	}
 

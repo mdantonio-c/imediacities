@@ -28,6 +28,7 @@ export class MediaUtilsService {
 	static getDescription(media: any, lang: string = 'en'): string {
 		let description: string;
 		let first: boolean = true;
+		if (!media.relationships.descriptions) return null;
 		for (let d of media.relationships.descriptions) {
 			// take the first as default
 			if (first) {

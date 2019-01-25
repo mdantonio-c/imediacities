@@ -130,7 +130,7 @@ class EFG_XMLParser():
             provider = {}
             provider_el = node.find('efg:provider', self.ns)
             provider['name'] = provider_el.text.strip()
-            provider['identifier'] = provider_el.get('id')
+            provider['identifier'] = provider_el.get('id').upper()
             p_scheme = provider_el.get('schemeID')
             scheme = codelists.fromDescription(
                 p_scheme, codelists.PROVIDER_SCHEMES)
@@ -290,8 +290,9 @@ class EFG_XMLParser():
             description['text'] = node.text.strip()
             log.debug('description: {}'.format(description))
             descriptions.append(description)
-        if len(descriptions) == 0:
-            raise ValueError('Description is missing')
+        # october 2018: change: description is optional 
+        #if len(descriptions) == 0:
+        #    raise ValueError('Description is missing')
         return descriptions
 
     def parse_coverages(self, record, audio_visual=False):

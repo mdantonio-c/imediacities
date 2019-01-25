@@ -70,7 +70,6 @@ export class AppVocabularyService {
     search (search_key) {
 
         let filtro = [];
-        let search_re = new RegExp( search_key, 'gi' );
 
         let ricerca = (terms, search_key) => {
 
@@ -79,6 +78,7 @@ export class AppVocabularyService {
                 if (t.hasOwnProperty('children')) {
                     ricerca(t.children, search_key);
                 } else {
+                    let search_re = new RegExp( search_key, 'ig' );
                     if (search_re.test(t.label)) {
                         filtro.push(
                             this.annotation_create(t)

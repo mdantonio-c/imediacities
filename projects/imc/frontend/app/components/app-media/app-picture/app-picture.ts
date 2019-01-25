@@ -67,6 +67,8 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
         })
     }
 
+    disableSaveAs() { return false; }
+
     getMousePos(evento) {
         const rect = this._picture.getBoundingClientRect();
         return {
@@ -80,7 +82,7 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit () {
         this._picture = this.picture.nativeElement;
-        this._track = this.mouse_track.nativeElement;
-        this._maschera = this.maschera.nativeElement;
+        /*this._track = this.mouse_track.nativeElement;
+        this._maschera = this.maschera.nativeElement;*/
     }
 }

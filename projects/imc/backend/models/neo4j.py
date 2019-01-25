@@ -46,7 +46,7 @@ class HeritableStructuredNode(StructuredNode):
         Re-instantiate this node as an instance its most derived derived class.
         """
         # TODO: there is probably a far more robust way to do this.
-        _get_class = lambda cname: getattr(sys.modules[__name__], cname)
+        def _get_class(cname): return getattr(sys.modules[__name__], cname)
 
         # inherited_labels() only returns the labels for the current class and
         #  any super-classes, whereas labels() will return all labels on the
@@ -94,15 +94,30 @@ class HeritableStructuredNode(StructuredNode):
 # Extension of User model for accounting in API login/logout
 
 
-class User(UserBase):
-    # name_surname = StringProperty(required=True, unique_index=True)
+class RevisionRel(StructuredRel):
+    """
+    Attributes:
+        when  Date of start or approval of a revision.
+        state Revision status: Waiting or Running
+    """
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
+    state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
+
+class User(UserBase):
+
+    declared_institution = StringProperty(
+        required=False, show=True, default="none")
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     annotations = RelationshipFrom(
         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo(
         'Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    items_under_revision = RelationshipFrom(
+        'Item', 'REVISION_BY', cardinality=ZeroOrMore)
+    revised_shots = RelationshipFrom(
+        'Shot', 'REVISED_BY', cardinality=ZeroOrMore)
 
 
 class Group(IdentifiedNode):
@@ -114,7 +129,7 @@ class Group(IdentifiedNode):
     coordinator = RelationshipFrom(
         'User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
     stage_files = RelationshipFrom(
-        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=False)
 
 
 class Stage(TimestampedNode, HeritableStructuredNode):
@@ -205,6 +220,10 @@ class Item(TimestampedNode, AnnotationTarget):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
     shots = RelationshipTo(
         'Shot', 'SHOT', cardinality=ZeroOrMore)
+    revision = RelationshipTo(
+        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True)
+    other_version = RelationshipTo(
+        'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True)
 
 
 class ContributionRel(StructuredRel):
@@ -256,7 +275,7 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     keywords = RelationshipTo(
         'Keyword', 'HAS_KEYWORD', cardinality=ZeroOrMore, show=True)
     descriptions = RelationshipTo(
-        'Description', 'HAS_DESCRIPTION', cardinality=OneOrMore, show=True)
+        'Description', 'HAS_DESCRIPTION', cardinality=ZeroOrMore, show=True)
     languages = RelationshipTo(
         'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel,
         show=True)
@@ -464,6 +483,7 @@ class Provider(IdentifiedNode):
     fax          The fax number of the archive
     website      The website of the archive
     email        The email of the archive
+    city         The city which the items refer to
     """
     name = StringProperty(index=True, required=True, show=True)
     identifier = StringProperty(required=True, show=True)
@@ -474,6 +494,7 @@ class Provider(IdentifiedNode):
     fax = StringProperty(required=False, show=True)
     website = StringProperty(required=False, show=True)
     email = EmailProperty(required=False, show=True)
+    city = StringProperty(required=False, show=True)
     record_source = RelationshipFrom(
         'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
 
@@ -658,7 +679,8 @@ class ResourceBody(AnnotationBody):
     iri = StringProperty(required=True, index=True, show=True)
     name = StringProperty(index=True, show=True)
     spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
-    detected_objects = RelationshipFrom('ODBody', 'CONCEPT', cardinality=ZeroOrMore)
+    detected_objects = RelationshipFrom(
+        'ODBody', 'CONCEPT', cardinality=ZeroOrMore)
 
 
 class ODBody(AnnotationBody):
@@ -668,6 +690,11 @@ class ODBody(AnnotationBody):
     object_type = RelationshipTo('ResourceBody', 'CONCEPT', cardinality=One)
 
 
+class BRBody(ODBody):
+    """Building Recognition"""
+    pass
+
+
 class ImageBody(AnnotationBody):
     pass
 
@@ -675,6 +702,23 @@ class ImageBody(AnnotationBody):
 class AudioBody(AnnotationBody):
     audio_format = StringProperty(show=True)
     language = StringProperty(show=True)
+
+
+class BibliographicReference(AnnotationBody):
+    title = StringProperty(required=True, show=True)
+    authors = ArrayProperty(StringProperty(), required=True, show=True)
+    book_title = StringProperty(show=True)
+    journal = StringProperty(show=True)
+    volume = StringProperty(show=True)
+    number = StringProperty(show=True)
+    year = IntegerProperty(show=True)
+    month = IntegerProperty(show=True)
+    editor = StringProperty(show=True)
+    publisher = StringProperty(show=True)
+    address = StringProperty(show=True)
+    url = StringProperty(show=True)
+    isbn = StringProperty(show=True)
+    doi = StringProperty(show=True)
 
 
 # class VQBody(AnnotationBody):
@@ -733,9 +777,13 @@ class Shot(VideoSegment):
     thumbnail_uri = StringProperty()
     timestamp = StringProperty(show=True)
     duration = FloatProperty(show=True)
+    revision_confirmed = BooleanProperty(default=False, show=True)
+    revision_check = BooleanProperty(default=False, show=True)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
         'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
+    revised_by = RelationshipTo('User', 'REVISED_BY', cardinality=ZeroOrMore,
+                                model=RevisionRel)
 
 
 class FragmentSelector(HeritableStructuredNode):

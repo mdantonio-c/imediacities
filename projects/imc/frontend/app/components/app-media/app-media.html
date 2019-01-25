@@ -8,18 +8,22 @@ picture-->
     <div class="container-media row no-gutters justify-content-md-center">
         <!-- TITLE MEDIA -->
         <div class="box-title-media col-12 col-lg-6 row no-gutters">
-            <h2 class="imc--title-bold col-12"  [innerHTML]="media.attributes.identifying_title"></h2>
-            <p class="col-12 col-sm-8 imc--flex--vertical-start">
-                <a href="#" class="imc--icon-link"><i class="material-icons">add_location</i></a>&nbsp;
+            <h2 class="imc--title-bold col-12">{{media.attributes.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision
+                <i class="fa fa-cogs" *ngIf="shot_revision_state == 'R'"></i>
+            </span></h2>
+            <p class="col-12 col-sm-8 imc--flex--vertical-start" style="margin-bottom: 0;">
+                <a href="#" class="imc--icon-link" onclick="return false;"><i class="material-icons">add_location</i></a>&nbsp;
 
-                <span [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span>
+                <span 
+                    *ngIf="media.relationships.record_sources && media.relationships.record_sources[0].relationships.provider"
+                 [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span>
                 &nbsp;-&nbsp;
-                <span [innerHTML]="media.attributes.production_years[0]"></span>
+                <span 
+                    *ngIf="media.attributes.production_years"
+                [innerHTML]="media.attributes.production_years[0]"></span>
             </p>
-            <span class="col-6 col-sm-2"><!-- 1.000 views --></span>
-            <span class="col-6 col-sm-2" *ngIf="annotations_count">
-                <span [innerHTML]="annotations_count"></span> annotations
-            </span>
+            <!-- <span class="col-6 col-sm-2">1.000 views</span> -->
+            <span class="col-12 col-sm-4 text-right" *ngIf="annotations_count">{{annotations_count}} annotations</span>
         </div>
         <span class="col-lg-3"></span>
 
@@ -28,24 +32,36 @@ picture-->
             <!-- box media -->
             <section class="box-media col-12 col-sm-7 col-lg-6">
                 <!-- PICTURE -->
-                <ng-container *ngIf="media_type === 'image'">
-                   <div class="container-picture">
-                       <app-picture [data]="media"></app-picture>
-                   </div>
+                <ng-container *ngIf="media_type === 'image'" >
+                    <div class="container-picture" *ngIf='!show_only_public_domain() || is_public_domain()'>
+                        <app-picture [data]="media"></app-picture>
+                    </div>
                 </ng-container>
-
                 <!-- VIDEO PLAYER -->
                 <ng-container *ngIf="media_type === 'video'">
-                 <app-video-player
-                         #appVideo
-                         [data]="media"
-                         [shots]="shots"
-                         (video_player_ready)="video_player_set($event)"></app-video-player>
+                    <app-video-player
+                        *ngIf='!show_only_public_domain() || is_public_domain()'
+                        #appVideo
+                        [data]="media"
+                        [shots]="shots"
+                    (video_player_ready)="video_player_set($event)"></app-video-player>
+                </ng-container>
+
+                <ng-container *ngIf='show_only_public_domain() && !is_public_domain()'>
+                    <div class="container-picture">
+                        <p style="padding: 50px 40px; text-align: left !important;">
+                        <i class="fa fa-ban"></i> <span>We’re sorry, you do not have permission to view this film/photograph.  You can apply for this permission by sending a message to the archive who has contributed this item.</span>
+                        </p>
+                    </div>
                 </ng-container>
             </section>
 
+            <section class="col-12 col-sm-5 col-lg-3 box-shots" *ngIf='show_only_public_domain() && !is_public_domain()'>
+                <!-- empty section -->
+            </section>
+
             <!-- TAB SHOTS / SEGMENTS / AREAS-->
-            <section class="col-12 col-sm-5 col-lg-3 box-shots">
+            <section class="col-12 col-sm-5 col-lg-3 box-shots" *ngIf='!show_only_public_domain() || is_public_domain()'>
 
                 <div class="imc--toolbar row no-gutters">
                     <span class="col-5 col-lg-6 imc--flex--vertical-center" [innerHTML]="tab_title"></span>
@@ -91,7 +107,7 @@ picture-->
                                         <i class="material-icons" data-title="Whole Picture">crop_original</i>
                                     </a>
                                 </li>
-                                <li class="nav-item" (click)="tab_title_set($event)">
+                                <!-- <li class="nav-item" (click)="tab_title_set($event)">
                                     <a class="nav-link"
                                        id="areas"
                                        data-toggle="pill"
@@ -112,7 +128,7 @@ picture-->
                                        aria-selected="false">
                                         <i class="material-icons" data-title="My Areas">crop</i>
                                     </a>
-                                </li>
+                                </li> -->
                             </ng-container>
                         </ul>
                     </span>
@@ -122,18 +138,26 @@ picture-->
                     <ng-container *ngIf="media_type === 'video'">
                         <div class="tab-pane fade show active" id="pills-shots" role="tabpanel" aria-labelledby="shots">
                             <!-- tab shots -->
+
+                            <div class="loader col mt-2" *ngIf="shots && !shots.length" style="text-align: center">
+                                <i class="fa fa-spinner fa-spin" style="font-size:36px;" aria-hidden="true"></i>
+                            </div>
                             <div *ngIf="shots && shots.length">
                                 <app-video-shot
                                         *ngFor="let shot of shots"
                                         [shot]="shot"
                                         [user]="user"
                                         [multiSelection]="multi_annotations_is_active"
+                                        [underRevision]="shot_revision_is_active"
+                                        [canRevise]="canRevise()"
+                                        (revise_shot)="revise_shot($event)"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"
                                         (current_component)="appVideo.registra($event)" [parent]="appVideo"
                                 ></app-video-shot>
                             </div>
                         </div>
+                        
                         <div class="tab-pane fade" id="pills-segments" role="tabpanel" aria-labelledby="segments">
                             <!-- tab segmenti -->
 
@@ -174,11 +198,8 @@ picture-->
                                         (is_selezionato)="shot_selezionato($event)"
                                 ></app-video-shot>
                             </div>
-
-
-
-
                         </div>
+                        
                         <div class="tab-pane fade" id="pills-areas" role="tabpanel" aria-labelledby="areas">
                             <!-- tab aree automatiche -->
 
@@ -214,25 +235,47 @@ picture-->
                 </div>
                 <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
                 <div class="tab-content--footer row no-gutters imc--flex--horizontal-end">
-                    <button class="btn btn-border-classic" *ngIf="!multi_annotations_is_active"
-                            (click)="multi_annotations_toggle()">Multiple annotation</button>
+                    <ng-container *ngIf="media_type === 'video' && shots.length > 0">
+                        <ng-container *ngIf="user && !shot_revision_is_active && !multi_annotations_is_active">
+                            <button class="btn btn-border-classic px-1" 
+                                mwlConfirmationPopover
+                                [popoverTitle]="'Start Shot Revision'"
+                                [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
+                                (confirm)="start_shot_revision()"
+                                *ngIf="user?.roles.hasOwnProperty('Reviser')">Shot revision</button>
+                            &nbsp;
+                            <button class="btn btn-border-classic px-1"
+                                (click)="multi_annotations_toggle()">Multiple annotation</button>
+                        </ng-container>
 
-                    <ng-container *ngIf="multi_annotations_is_active">
-                        <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
-                            <button id="dropdownBasic" ngbDropdownToggle>Add Annotation</button>
-                            <div ngbDropdownMenu aria-labelledby="dropdownBasic">
-                                <span (click)="modal_show_multi($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
-                                <span (click)="modal_show_multi($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
-                                <span (click)="modal_show_multi($event, 'insert-note')" class="dropdown-item">Add Note</span>
-                                <!--
-                                <span (click)="modal_show_multi($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
-                                <span (click)="modal_show_multi($event, 'insert-link')" class="dropdown-item">Add Link</span>
-                                -->
+                        <ng-container *ngIf="user && canRevise()">
+                            <button class="btn btn-border-classic"
+                                mwlConfirmationPopover
+                                [popoverTitle]="'Exit shot revision'"
+                                [popoverMessage]="'All changes will be lost.<br/>Do you wish to continue?'"
+                                (confirm)="exit_shot_revision()">Cancel</button>
+                            &nbsp;
+                            <button class="btn btn-border-classic"
+                                    (click)="save_revised_shots()">Save and Exit</button>
+                        </ng-container>
+
+                        <ng-container *ngIf="multi_annotations_is_active">
+                            <div ngbDropdown class="imc--input--dropdown col-6 col-lg-5">
+                                <button id="dropdownBasic" ngbDropdownToggle>Add Annotation</button>
+                                <div ngbDropdownMenu aria-labelledby="dropdownBasic">
+                                    <span (click)="modal_show_multi($event, 'insert-tag')" class="dropdown-item">Add Tag</span>
+                                    <span (click)="modal_show_multi($event, 'insert-geotag')" class="dropdown-item">Add Geotag</span>
+                                    <span (click)="modal_show_multi($event, 'insert-note')" class="dropdown-item">Add Note</span>
+                                    <!--
+                                    <span (click)="modal_show_multi($event, 'insert-reference')" class="dropdown-item">Add Reference</span>
+                                    <span (click)="modal_show_multi($event, 'insert-link')" class="dropdown-item">Add Link</span>
+                                    -->
+                                </div>
                             </div>
-                        </div>
-                        <span class="col-6 col-lg-6 col-lg-offset-1">
-                                <button class="btn btn-border-classic" (click)="multi_annotations_toggle()">Cancel selection</button>
-                            </span>
+                            <span class="col-6 col-lg-6 col-lg-offset-1">
+                                    <button class="btn btn-border-classic" (click)="multi_annotations_toggle()">Cancel selection</button>
+                                </span>
+                        </ng-container>
                     </ng-container>
                 </div>
 
@@ -242,7 +285,12 @@ picture-->
     </div>
 
     <!-- MAPPA -->
-    <app-media-map-wrapper [locations]="locations" [shots]="shots" [media_type]="media_type"></app-media-map-wrapper>
+    <app-media-map-wrapper 
+        *ngIf='user'
+        [locations]="locations"
+        [shots]="shots"
+        [media_type]="media_type"
+    ></app-media-map-wrapper>
 
     <!-- CONTAINER INFO -->
     <div class="container-fluid imc--container">
@@ -264,8 +312,7 @@ picture-->
                 <app-media-tags *ngIf="shots && shots.length" [shots]="shots" (modale_richiedi)="modal_show($event)"></app-media-tags>
 
                 <!-- RELATED ITEMS -->
-                <!-- comment out for the moment
-                <app-media-related-items></app-media-related-items> -->
+                <!-- <app-media-related-items></app-media-related-items> -->
             </section>
 
             <!-- COMMENTI
@@ -281,13 +328,11 @@ picture-->
         <app-modal-insert-termtag *ngIf="modale.type === 'insert-tag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-termtag>
         <app-modal-insert-geotag *ngIf="modale.type === 'insert-geotag'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-geotag>
         <app-modal-insert-note *ngIf="modale.type === 'insert-note'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-note>
-        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-link>
-        <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-insert-reference>
+        <app-modal-insert-link *ngIf="modale.type === 'insert-link'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-link>
+        <app-modal-insert-reference *ngIf="modale.type === 'insert-reference'" [data]="modale.data" [media_type]="media_type" (shots_update)="shots_update($event)" modal-dialog></app-modal-insert-reference>
         <app-modal-all-annotations *ngIf="modale.type === 'all-annotations'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-all-annotations>
         <app-modal-lista-shots *ngIf="modale.type === 'lista-shots'" [data]="modale.data" [media_type]="media_type" modal-dialog [modal]="true" [show_title]="true"></app-modal-lista-shots>
         <app-modal-tag-cloud *ngIf="modale.type === 'tag-cloud'" [data]="modale.data" [media_type]="media_type" modal-dialog></app-modal-tag-cloud>
+        <app-modal-move-cut *ngIf="modale.type === 'move-cut'" [data]="modale.data" modal-dialog></app-modal-move-cut>
     </app-modale>
 </div>
-
-
-

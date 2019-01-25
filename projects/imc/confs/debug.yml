@@ -9,6 +9,8 @@ services:
       DEBUG_LEVEL: VERBOSE
     ports:
       - 8080:5000
+    networks:
+      worker_net:
 
   neo4j:
     ports:
@@ -22,6 +24,16 @@ services:
     environment:
       APP_MODE: debug
       DEBUG_LEVEL: VERBOSE
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
+
+  celeryui:
+    depends_on:
+      - rabbit
+      - mongodb
+      - neo4j
 
   ftp:
     environment:

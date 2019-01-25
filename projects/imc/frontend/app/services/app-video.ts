@@ -44,4 +44,8 @@ export class AppVideoService {
     video_set (video) {
         this._video_component = video;
     }
+
+    fps() {
+        if (this._video_component) return this._video_component.fps;
+    }
 }

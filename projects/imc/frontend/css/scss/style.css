@@ -266,7 +266,7 @@ input[type="radio"] {
 .switch {
   display: inline-block;
   position: relative;
-  margin: 0 0 10px;
+  /*margin: 0 0 10px;*/
   font-size: 16px;
   line-height: 24px; }
   .switch__input {
@@ -280,6 +280,7 @@ input[type="radio"] {
   .switch__label {
     display: block;
     padding: 0 0 0 44px;
+    margin-bottom: 0;
     cursor: pointer; }
     .switch__label:before {
       content: '';
@@ -513,7 +514,7 @@ input[type="radio"] {
 .badge {
   border-radius: 5px;
   right: -5px;
-  padding: 3px 9px;
+  padding: 3px 3px;
   color: #fff;
   font-size: 12px !important;
   font-weight: 500;
@@ -1327,7 +1328,9 @@ input[type="radio"] {
   height: 100%;
   display: inline-block; }
   .imc--picture img {
-    height: 100%; }
+    height: 100%;
+    object-fit: cover;
+  }
   .imc--picture svg {
     position: absolute;
     width: 100%;
@@ -1479,3 +1482,6 @@ body, a {
 .search-pager .pagination > li.page-item.active > a.page-link {
   background: #53b8e2;
 }
+
+/* workaround for enabling auto-comple-places from modal */
+.pac-container { z-index: 100000; }

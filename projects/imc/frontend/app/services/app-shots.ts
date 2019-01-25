@@ -8,6 +8,8 @@ export class AppShotsService {
     private _annotations_map = new Map();
     private _media_id = '';
     private _shots: IMC_Shot[] = [];
+    private _tags_all: IMC_Tag[] = [];
+    private _tags_map = new Map();
 
     @Output() update: EventEmitter<any> = new EventEmitter();
     private _others_data_as_object;
@@ -78,11 +80,24 @@ export class AppShotsService {
      * @returns {boolean}
      */
     shot_has_annotation (shot, annotation) {
-
         let found = 0;
         for (let key in shot.annotations) {
             if (shot.annotations[key].length) {
                 found += shot.annotations[key].filter(s =>  s.id === annotation.id ).length;
+            }
+        }
+        return found > 0;
+    }
+
+    shot_has_tag (shot, tag) {
+        let found = 0;
+        for (let key in shot.annotations) {
+            if (shot.annotations[key].length) {
+                if (tag.id != null) {
+                    found += shot.annotations[key].filter(s =>  s.iri === tag.id ).length;
+                } else {
+                    found += shot.annotations[key].filter(s =>  s.name === tag.name ).length;
+                }
             }
         }
         return found > 0;
@@ -93,6 +108,14 @@ export class AppShotsService {
      */
     annotations (): IMC_Annotation[] {
         return this._annotations_all;
+    }
+
+    /**
+     * Ritorna un oggetto con tutti tag ordinati alfabeticamente
+     * @returns {IMC_Tag[]}
+     */
+    tags (): IMC_Tag[] {
+        return this._tags_all;
     }
 
     /**
@@ -148,6 +171,7 @@ export class AppShotsService {
         });
         this._shots = shots_processed;
         this._annotations_all_from_map();
+        this._tags_all_from_map();
         return this.shots();
 
     }
@@ -162,27 +186,32 @@ export class AppShotsService {
     private _annotations_parse (target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
-
             //  Term tag e locations
             if (annotation.attributes.annotation_type.key === 'TAG') {
 
                 annotation.bodies.forEach(body => {
                     let tipo = 'tags';
-
                     if (body.attributes.spatial !== null && typeof body.attributes.spatial === 'object') {
                         tipo = 'locations';
                     }
-
-                    this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice)
+                    this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice);
                 })
-
-                //  Note
+            //  Note
             } else if (annotation.attributes.annotation_type.key === 'DSC') {
-                this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice)
+                this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
+            // Link
+            } else if (annotation.attributes.annotation_type.key === 'LNK') {
+                let body_linked = annotation.bodies[0];
+                if (body_linked.type == 'textualbody') {
+                    // external link
+                    this._annotation_add(target.links, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
+                } else if (body_linked.type == 'bibliographicreference') {
+                    // bibliographic references
+                    this._annotation_add(target.references, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
+                } else {
+                    // TODO add internal link to shot/item/(?)
+                }
             }
-
-            //  todo non so come individuare referenze e links
-
         })
 
     }
@@ -199,6 +228,7 @@ export class AppShotsService {
         annotation.shots_idx = [shot_indice];
         target.push(annotation);
 
+        // add annotation to annotation_from_map
         if (this._annotations_map.has(annotation.id)) {
             let annotation_from_map = this._annotations_map.get(annotation.id);
             annotation_from_map.count += 1;
@@ -208,12 +238,75 @@ export class AppShotsService {
             annotation.shots_idx = [shot_indice];
             this._annotations_map.set(annotation.id, annotation);
         }
+        // add tags to tag_from_map
+        if (annotation.type === 'TAG') {
+            let iri = (annotation.iri != null) ? annotation.iri : 'textual:' + annotation.name;
+            if (this._tags_map.has(iri)) {
+                let tag = this._tags_map.get(iri);
+                tag.count += 1;
+                tag.shots_idx.push(shot_indice);
+            } else {
+                this._tags_map.set(iri, {
+                    id: annotation.iri,
+                    name: annotation.name,
+                    count: 1,
+                    group: annotation.group,
+                    shots_idx: [shot_indice]
+                });
+            }
+        }
 
     }
     private _annotations_all_from_map () {
         this._annotations_all = Array.from(this._annotations_map).map(annotation => annotation[1]);
         this._annotations_all.sort(AppShotsService._sort_alpha);
         this._annotations_map.clear();
+    }
+    private _tags_all_from_map () {
+        this._tags_all = Array.from(this._tags_map).map(tag => tag[1]);
+        /*console.log(this._tags_all);*/
+        this._tags_all.sort(AppShotsService._sort_alpha);
+        this._tags_map.clear();
+    }
+    private _decode_language (lang): string {
+        let language;
+        switch (lang){
+            case 'ca':
+                language='Català';
+                break;
+            case 'da':
+                language='Dansk';
+                break;
+            case 'de':
+                language='Deutsche';
+                break;
+            case 'en':
+                language='English';
+                break;
+            case 'es':
+                language='Español';
+                break;
+            case 'fr':
+                language='Français';
+                break;
+            case 'it':
+                language='Italiano';
+                break;
+            case 'nl':
+                language='Nederlands';
+                break;
+            case 'sv':
+                language='Svenska';
+                break;
+            case 'el':
+                language='Ελληνικά';
+                break;
+            default:
+                language='';
+                break;
+        }
+
+        return language;
     }
     /**
      * Crea un'annotazione riorganizzando i dati
@@ -224,22 +317,37 @@ export class AppShotsService {
      * @private
      */
     private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
-
+        let name, group, language = null;
+        if (annotation_body.type === 'textualbody') {
+            name = annotation_body.attributes.value;
+            group = (annotation.type === 'TAG') ? 'term' : null;
+            if(annotation_body.attributes.language){
+                language = this._decode_language(annotation_body.attributes.language);
+            }
+        } else if (annotation_body.type === 'resourcebody') {
+            name = annotation_body.attributes.name;
+            group = annotation_body.attributes.spatial ? 'location' : 'term';
+        } else if (annotation_body.type === 'bibliographicreference') {
+            name = annotation_body.type;
+            group = 'reference';
+        }
         return {
             creation_date: annotation.attributes.creation_datetime,
-            creator: annotation.creator.id,
-            creator_type: annotation.creator.type,
+            creator: annotation.creator ? annotation.creator.id : null,
+            creator_type: annotation.creator ? annotation.creator.type : null,
             embargo: annotation.embargo || null,
-            group: annotation_body.attributes.spatial ? 'location' : 'term',
+            group: group,
             body_id: annotation_body.id,
             id: annotation.id,
             iri: annotation_body.attributes.iri || null,
-            name: annotation_body.type == 'textualbody' ? annotation_body.attributes.value : annotation_body.attributes.name,
-            private: annotation.private || false,
+            name: name,
+            private: annotation.attributes.private || false,
+            language: language || '',
             spatial: annotation_body.attributes.spatial || null,
             type: annotation.attributes.annotation_type.key,
             source: media_type,
-            source_uuid: this._media_id
+            source_uuid: this._media_id,
+            reference: (annotation_body.type === 'bibliographicreference') ? annotation_body.attributes : null
         };
     }
 
@@ -283,10 +391,12 @@ export interface IMC_Annotation {
     iri: string,
     name: string,
     private: boolean,
+    language: string,
     spatial: number[],
     type: string,
     source: string,
-    source_uuid: string
+    source_uuid: string,
+    reference?: BibliographicReference
 }
 
 export interface IMC_Shot {
@@ -300,4 +410,29 @@ export interface IMC_Shot {
         references: IMC_Annotation[],
         links: IMC_Annotation[]
     }
+}
+
+export interface IMC_Tag {
+    id: string,
+    name: string,
+    group: string,
+    count: number,
+    shots_idx: number[]
+}
+
+export interface BibliographicReference {
+    title: string,
+    authors: string[],
+    book_title?: string,
+    journal?: string,
+    volume?: string,
+    number?: string,
+    year?: number,
+    month?: number,
+    editor?: string,
+    publisher?: string,
+    address?: string,
+    url?: string,
+    isbn?: string,
+    doi?: string
 }

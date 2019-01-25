@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
 
+from datetime import datetime
+import pytz
 import json
 from utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import graph_transactions
+from neomodel.cardinality import CardinalityViolation
 
 from imc.models.neo4j import (
-    Annotation, TVSBody, VIMBody,
+    Annotation, TVSBody, VIMBody, BibliographicReference,
     VideoSegment, Shot, ResourceBody, TextualBody, Item
 )
 
@@ -123,6 +127,24 @@ class AnnotationRepository():
                     conceptNode = ResourceBody(
                         iri=concept['iri'], name=concept['name']).save()
                 bodyNode.object_type.connect(conceptNode)
+            elif body['type'] == 'BRBody':
+                properties = {
+                    'object_id': body['object_id'],
+                    'confidence': body['confidence']
+                }
+                bodyNode = self.graph.BRBody(**properties).save()
+                # connect the concept
+                concept = body['concept']['source']
+                conceptNode = self.graph.ResourceBody.nodes.get_or_none(
+                    iri=concept['iri'])
+                if conceptNode is None:
+                    log.debug(
+                        'new ResourceBody for concept: {}'.format(concept))
+                    conceptNode = ResourceBody(
+                        iri=concept['iri'],
+                        name=concept['name'],
+                        spatial=concept['spatial']).save()
+                bodyNode.object_type.connect(conceptNode)
             else:
                 # should never be reached
                 raise ValueError('Invalid body: {}'.format(body['type']))
@@ -162,6 +184,49 @@ class AnnotationRepository():
             text_lang = body.get('language')
             bodyNode = TextualBody(
                 value=body['value'], language=text_lang).save()
+            anno.bodies.connect(bodyNode)
+
+        return anno
+
+    def create_link_annotation(self, user, bodies, target, selector,
+                               is_private=False, embargo_date=None):
+        '''
+        Create a link annotation.
+        '''
+        visibility = 'private' if is_private else 'public'
+        log.debug("Create a new {} description annotation".format(visibility))
+        # create annotation node
+        anno = Annotation(annotation_type='LNK', private=is_private).save()
+        if embargo_date is not None:
+            anno.embargo = embargo_date
+            anno.save()
+        # should we allow to create anno without a user of the system?
+        if user is not None:
+            anno.creator.connect(user)
+
+        if isinstance(target, Item):
+            anno.source_item.connect(target)
+        elif isinstance(target, Annotation):
+            anno.source_item.connect(target.source_item.single())
+        elif isinstance(target, Shot):
+            anno.source_item.connect(target.item.single())
+
+        # ignore at the moment segment selector
+        if selector is not None:
+            log.warn('Selector not yet applicable for the target {0}'
+                     .format(target))
+        anno.targets.connect(target)
+
+        # ONLY textual and reference body allowed at the moment
+        for body in bodies:
+            if body['type'] == 'TextualBody':
+                bodyNode = TextualBody(value=body['value']).save()
+            elif body['type'] == 'BibliographicReference':
+                properties = body['value']
+                bodyNode = BibliographicReference(**properties).save()
+            else:
+                raise ValueError('Invalid body for link annotation: {}'
+                                 .format(body['type']))
             anno.bodies.connect(bodyNode)
 
         return anno
@@ -260,15 +325,27 @@ class AnnotationRepository():
             item.shots.connect(shot)
 
     @graph_transactions
-    def update_automatic_tvs(self, item, shots, vim_estimations):
+    def update_automatic_tvs(self, item, shots, vim_estimations, rev=False, reviser=None):
         '''
         This procedure updates the automatic shot list preserving existing
-        annotations such as TAG, DSC etc.
+        annotations such as TAG, DSC, LNK etc.
 
-        For each incoming shot update the corresponding shot in the database
-        with the same shot_num. If a new shot occurs, it is added to the actual
-        list. If instead the list of shots is shortened, all shot in excess
-        will be eliminated with related anno.
+        For each incoming shot it updates the corresponding shot in the
+        database with the same shot_num. If a new shot occurs, it is added to
+        the actual list. If instead the list of shots is shortened, all shot in
+        excess will be removed.
+
+        Regarding existing annotations, for the manual ones, this procedure
+        expects the binding passed as argument. The shots parameter conveys
+        together with shot info also the releted manual annotations (list of
+        anno IDs).
+        If an bad annotation ID is passed (it doesn't belong to any shot) it is
+        ignored. If instead some of the existing annotations are not passed,
+        then these "orphan" annotations are deleted.
+
+        On the other hand, for automatic annotations, the segments are
+        reorganized after updating the shot list. The segments are reassigned
+        to the shots (WITHIN_SHOT) after updating the list of cuts.
         '''
         log.info('Update existing shot list preserving anno(s).')
         FHG_TVS = item.targeting_annotations.search(
@@ -279,13 +356,24 @@ class AnnotationRepository():
         tvs = FHG_TVS[0]
         tvs_body = tvs.bodies.single().downcast()
 
-        old_size = len(item.shots.all())
+        existing_shots = item.shots.all()
+        old_size = len(existing_shots)
         log.debug('Existing shot list size: {}'.format(old_size))
         new_size = len(shots)
         log.debug('Incoming shot list size: {}'.format(new_size))
 
+        # for each existing shot we gather and disconnect from them all the
+        # manual annotations
+        existing_annotations = []
+        for old_shot in existing_shots:
+            for a in old_shot.annotation.search(generator__isnull=True):
+                existing_annotations.append(a)
+                old_shot.annotation.disconnect(a)
+        log.info('total existing annotations: %s' % len(existing_annotations))
+
         # foreach incoming shot
         log.debug('----------')
+        current_time = datetime.now(pytz.utc)
         for shot_num, properties in shots.items():
             shot_node = None
             res = item.shots.search(shot_num=shot_num)
@@ -294,35 +382,102 @@ class AnnotationRepository():
                 # rarely expected (especially for framerate fix)
                 log.info('New incoming shot number: {}'.format(shot_num))
                 shot_node = self.graph.Shot(
-                    shot_num=shot_num, **properties).save()
+                    shot_num=shot_num, **properties)
+                if rev and 'revision_confirmed' in properties:
+                    shot_node.revision_confirmed = properties['revision_confirmed']
+                if rev and 'revision_check' in properties:
+                    shot_node.revision_check = properties['revision_check']
+                shot_node.save()
+                if reviser is not None and shot_node.revision_confirmed:
+                    shot_node.revised_by.connect(reviser,
+                                                 {'when': current_time})
                 tvs_body.segments.connect(shot_node)
                 item.shots.connect(shot_node)
             else:
                 shot_node = res[0]
                 # props to update
+                if rev and 'revision_confirmed' in properties:
+                    previous_confirmed = shot_node.revision_confirmed
+                    shot_node.revision_confirmed = properties['revision_confirmed']
+                    if reviser is not None and ((not previous_confirmed and shot_node.revision_confirmed) or
+                                                properties['start_frame_idx'] != shot_node.start_frame_idx):
+                        shot_node.revised_by.connect(reviser,
+                                                     {'when': current_time})
+                    if 'revision_check' in properties:
+                        shot_node.revision_check = properties['revision_check']
                 shot_node.start_frame_idx = properties['start_frame_idx']
                 shot_node.end_frame_idx = properties['end_frame_idx']
                 shot_node.timestamp = properties['timestamp']
                 shot_node.duration = properties['duration']
                 shot_node.thumbnail_uri = properties['thumbnail_uri']
                 shot_node.save()
+            # manage annotations
+            if 'annotations' in properties:
+                for anno_id in properties['annotations']:
+                    # look up ID from existing_annotations
+                    log.debug('look up for annotation ID %s' % anno_id)
+                    found = [x for x in existing_annotations if x.uuid == anno_id]
+                    if len(found) == 0:
+                        continue
+                    found[0].targets.connect(shot_node)
             log.debug(shot_node)
             log.debug('----------')
         if old_size > new_size:
-            # naive solution: delete exceeding shots
+            # delete exceeding shots
+            # NOTE: we can do this because no annotation targets the shot
             log.warn('The shot list [size={new_size}] is shorter than the '
                      'previous one [size={old_size}]'.format(
                          new_size=new_size, old_size=old_size))
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
                 log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
-                related_annotations = shot_to_delete[0].annotation.all()
-                for anno in related_annotations:
-                    bodies = anno.bodies.all()
-                    for b in bodies:
-                        b.delete()
-                    anno.delete()
                 shot_to_delete[0].delete()
+
+        # clean-up "orphan" manual annotations
+        for anno in existing_annotations:
+            try:
+                anno.targets.all()
+            except CardinalityViolation:
+                log.warn('orphan annotation to delete: {}'.format(anno))
+                # delete anno
+                # NOTE: this could occur if an exisitng manual anno is not
+                # passed in the shot revision request.
+                bodies = anno.bodies.all()
+                for b in bodies:
+                    original_body = b.downcast()
+                    if isinstance(original_body, ResourceBody):
+                        # disconnect this body
+                        anno.bodies.disconnect(b)
+                    else:
+                        b.delete()
+                anno.delete()
+
+        # rearrange the relationships between existing segments and the new
+        # shot list
+        self.arrange_video_segments(item)
+
+    def arrange_video_segments(self, item):
+        '''
+        Rearrange the relationships between existing segments and the new shots
+        (:VideoSegment)-[:WITHIN_SHOT]->(:Shot)
+        '''
+        query = "MATCH (i:Item {{uuid: '{item_id}'}})<-[:SOURCE]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}}) " \
+                "MATCH (anno)-[:HAS_TARGET]->(sgm:VideoSegment) WHERE NOT sgm:Shot " \
+                "RETURN sgm"
+        results = self.graph.cypher(query.format(
+            item_id=item.uuid))
+        segments = [self.graph.VideoSegment.inflate(row[0]) for row in results]
+        for segment in segments:
+            # disconnect the segment from its current shots
+            segment.within_shots.disconnect_all()
+            # re-connect the shot where the segment is enclosed
+            shots = self.get_enclosing_shots(segment, item)
+            if shots is None or len(shots) == 0:
+                raise ValueError('Invalid state: cannot be found shot(s) enclosing '
+                                 'selected segment [t={start},{end}]'
+                                 .format(start=segment.start_frame_idx, end=segment.end_frame_idx))
+            for shot in shots:
+                segment.within_shots.connect(shot)
 
     def create_tvs_manual_annotation(self, user, bodies, target,
                                      is_private=False, embargo_date=None):
@@ -482,9 +637,12 @@ class AnnotationRepository():
         object_type = None
         if body:
             od_body = body.downcast()
-            log.debug(type(od_body))
             object_id = od_body.object_id
-            concept = od_body.object_type.single()
+            concept = None
+            try:
+                concept = od_body.object_type.single()
+            except Exception as e:
+                log.warning(e)
             if concept is not None:
                 object_type = concept.name
             od_body.delete()
@@ -594,6 +752,34 @@ class AnnotationRepository():
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]
         log.debug("Number of automatic annotations found: {0}".format(count))
+        return True if count > 0 else False
+
+    def check_automatic_od(self, item_id):
+        '''
+        Check if at least one automatic object detection exists for the given
+        content item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "MATCH (a)-[:HAS_BODY]-(b:ODBody) WHERE NOT b:BRBody " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic object detections found: {0}".format(count))
+        return True if count > 0 else False
+
+    def check_automatic_br(self, item_id):
+        '''
+        Check if at least one automatic building recognition exists for the
+        given content item.
+        '''
+        query = "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) " \
+                "WHERE a.generator IS NOT NULL " \
+                "MATCH (a)-[:HAS_BODY]-(:BRBody) " \
+                "RETURN count(a)"
+        results = self.graph.cypher(query.format(item_id=item_id))
+        count = [row[0] for row in results][0]
+        log.debug("Number of automatic building recognitions found: {0}".format(count))
         return True if count > 0 else False
 
     def remove_segment(self, anno, segment):

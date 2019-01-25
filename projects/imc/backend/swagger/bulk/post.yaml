@@ -1,11 +1,10 @@
 common:
   custom:
-    # publish: true
     authentication: true
     authorized:
       - admin_root
 bulk:
-  summary: Create a new video description
+  summary: Perform many operations such as import, update, delete etc.
   description: The bulk API makes it possible to perform many operations in a single API call.
   responses:
     '202':

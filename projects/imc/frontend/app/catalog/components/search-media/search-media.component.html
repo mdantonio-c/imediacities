@@ -1,6 +1,9 @@
 <div class="media search-media">
 	<div class="media-left">
-		<img src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
+		<span class="badge badge-warning revision" *ngIf="underRevision()">
+			<i class="fa fa-wrench"></i>
+		</span>
+		<img (contextmenu)="disableSaveAs($event)" src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
 		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
 		<div class="cn">
 			<div class="card inner bg-secondary small">
@@ -20,7 +23,7 @@
 			</span>
 		</div>
 		<div class="space-4"></div>
-		<p class="text">
+		<p class="text" *ngIf="description">
 			<i class="imc-icon fa fa-quote-left"></i>
 			{{description}}
 		</p>
@@ -30,7 +33,7 @@
 				<span class="blue">{{media.relationships.item[0].attributes.duration | duration}}</span>
 			</div>
 			<span class="badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
-			<div class="action-buttons bigger-125 pull-down">
+			<!-- <div class="action-buttons bigger-125 pull-down">
 				<a href="#">
 					<i class="imc-icon fa fa-eye light-blue"></i>
 				</a>
@@ -40,8 +43,7 @@
 				<a href="#">
 					<i class="imc-icon fa fa-heart light-blue"></i>
 				</a>
-			</div>
-			<!-- <a class="search-btn-action btn btn-sm btn-block btn-info">Tag it!</a> -->
+			</div> -->
 		</div>
 	</div>
 </div>

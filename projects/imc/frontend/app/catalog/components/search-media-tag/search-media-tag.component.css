@@ -1,3 +1,7 @@
+.map-result {
+	padding: 10px !important;
+}
+
 .map-result h4 {
 	display: inline;
 	padding-left: 5px;
@@ -8,6 +12,9 @@
 	height: 150px;
 	width: 100%;
 	display: block;
+}
+.map-result .caption {
+	min-height: 85px !important;
 }
 
 /* Tag activity */
@@ -21,11 +28,7 @@
 }
 
 .tag-activity:first-child {
-	border-top: 1px dotted transparent
-}
-
-.tag-activity:first-child:hover {
-	border-top-color: #D0D8E0
+	border-top: 1px dotted #D0D8E0;
 }
 
 .tag-activity:hover {

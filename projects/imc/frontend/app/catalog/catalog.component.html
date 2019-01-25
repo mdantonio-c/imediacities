@@ -28,17 +28,16 @@
 						<!-- view results -->
 						<div class="row" *ngIf="!loading && totalItems > 0">
 							<div class="col">
-								<div *ngIf="currentView == 'Grid'" style="display:  flex;flex-direction: row;flex-wrap:  wrap;">
+								<div *ngIf="currentView == 'Grid'" style="display:flex; flex-direction:row;flex-wrap:  wrap;">
 									<search-thumbnail
-									style="min-width: 100px;margin-right: 5px;" 
-									*ngFor="let mediaEntity of results"
-									[media]="mediaEntity">
+										*ngFor="let mediaEntity of results"
+										[media]="mediaEntity">
 									</search-thumbnail>
 								</div>
 								<div *ngIf="currentView == 'List'">
 									<search-media
-									*ngFor="let mediaEntity of results"
-									[media]="mediaEntity">
+										*ngFor="let mediaEntity of results"
+										[media]="mediaEntity">
 									</search-media>
 								</div>
 								<div class="space-8"></div>
@@ -64,7 +63,7 @@
 														<search-map [countByProviders]="countByProviders" [filter]="filter" (onMapChange)="loadMediaTags($event)"></search-map>
 													</div>
 													<div class="view-content">
-														<search-timeline [countByYears]="countByYears"></search-timeline>
+														<search-timeline [countByYears]="countByYears" [countMissingDate]="countMissingDate"></search-timeline>
 													</div>
 												</div>
 											</div>

@@ -9,7 +9,7 @@ from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 
 from utilities.logs import get_logger
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
@@ -51,11 +51,27 @@ class AdminGroups(GraphBaseOperations):
                 if val["name"] == "coordinator":
                     schema[idx]["enum"] = []
                     for n in users.all():
-                        schema[idx]["enum"].append(
-                            {
-                                n.uuid: n.email
-                            }
-                        )
+                        r = self.auth.get_roles_from_user(n)
+
+                        can_coordinate = False
+                        if self.auth.role_admin in r:
+                            can_coordinate = True
+                        elif 'local_admin' in r:
+                            can_coordinate = True
+
+                        if can_coordinate:
+
+                            label = "%s %s (%s)" % (
+                                n.name,
+                                n.surname,
+                                n.email
+                            )
+
+                            schema[idx]["enum"].append(
+                                {
+                                    n.uuid: label
+                                }
+                            )
 
             return self.force_response(schema)
 

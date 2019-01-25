@@ -4,12 +4,15 @@
       Upload
     </a>
   </li>
+  <!--
   <li class='nav-item' *ngIf="user">
+  -->
+  <li class='nav-item'>
     <a class='nav-link' routerLink="/app/catalog">
-      Catalog
+      Catalogue
     </a>
   </li>
-  <li class='nav-item' *ngIf="user && (user.isAdmin || user.isGroupAdmin)">
+  <li class='nav-item' *ngIf="user && (user.isAdmin || user.isLocalAdmin)">
     <a class='nav-link' routerLink="/app/admin/users">
       Users
     </a>

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-Handle your iamge metadata
+Handle your image entity
 """
 from flask import request, send_file
 from utilities.helpers import get_api_url
 from restapi.confs import PRODUCTION
 
 from utilities.logs import get_logger
+from imc.security import authz
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.download import Downloader
@@ -42,7 +43,8 @@ class Images(GraphBaseOperations):
             try:
                 v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             except self.graph.NonAVEntity.DoesNotExist:
-                logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+                logger.debug(
+                    "NonAVEntity with uuid %s does not exist" % image_id)
                 raise RestApiException(
                     "Please specify a valid image id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
@@ -52,9 +54,13 @@ class Images(GraphBaseOperations):
 
         api_url = get_api_url(request, PRODUCTION)
         for v in images:
-            # use depth 2 to get provider info from record source
-            # TO BE FIXED
-            image = self.getJsonResponse(v, max_relationship_depth=2)
+            image = self.getJsonResponse(
+                v, max_relationship_depth=1,
+                relationships_expansion=[
+                    'record_sources.provider',
+                    'item.ownership'
+                ]
+            )
             item = v.item.single()
             # image['links']['self'] = api_url + \
             #     'api/images/' + v.uuid
@@ -125,14 +131,13 @@ class ImageAnnotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id):
-        logger.info("get annotations for NonAVEntity id: %s", image_id)
+        logger.debug("get annotations for NonAVEntity id: %s", image_id)
         if image_id is None:
             raise RestApiException(
                 "Please specify a image id",
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         params = self.get_input()
-        logger.debug("inputs %s" % params)
         anno_type = params.get('type')
         if anno_type is not None:
             anno_type = anno_type.upper()
@@ -152,40 +157,37 @@ class ImageAnnotations(GraphBaseOperations):
         user = self.get_current_user()
 
         item = image.item.single()
-        for a in item.targeting_annotations:
-            if anno_type is not None and a.annotation_type != anno_type:
+        for anno in item.targeting_annotations:
+            if anno_type is not None and anno.annotation_type != anno_type:
                 continue
-            if a.private:
-                if a.creator is None:
+            if anno.private:
+                if anno.creator is None:
+                    # expected ALWAYS a creator for private annotation
                     logger.warn('Invalid state: missing creator for private '
-                                'note [UUID:{}]'.format(a.uuid))
+                                'anno [UUID:{}]'.format(anno.uuid))
                     continue
-                creator = a.creator.single()
-                if creator.uuid != user.uuid:
-                    continue
-            res = self.getJsonResponse(a, max_relationship_depth=0)
+                creator = anno.creator.single()
+                if user is None or creator.uuid != user.uuid:
+                        continue
+            res = self.getJsonResponse(anno, max_relationship_depth=0)
             del(res['links'])
-            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
+            if anno.annotation_type in ('TAG', 'DSC', 'LNK') and anno.creator is not None:
                 res['creator'] = self.getJsonResponse(
-                    a.creator.single(), max_relationship_depth=0)
+                    anno.creator.single(), max_relationship_depth=0)
             # attach bodies
             res['bodies'] = []
-            for b in a.bodies.all():
-                anno_body = b.downcast()
-                body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+            for b in anno.bodies.all():
+                mdb = b.downcast()
+                if anno.annotation_type == 'TAG' and 'ODBody' in mdb.labels():
+                    # object detection body
+                    body = self.getJsonResponse(
+                        mdb.object_type.single(), max_relationship_depth=0)
+                else:
+                    body = self.getJsonResponse(
+                        mdb, max_relationship_depth=0)
                 if 'links' in body:
                     del(body['links'])
-                if a.annotation_type == 'TVS':
-                    segments = []
-                    for segment in anno_body.segments:
-                        # look at the most derivative class
-                        json_segment = self.getJsonResponse(
-                            segment.downcast(), max_relationship_depth=0)
-                        if 'links' in json_segment:
-                            del(json_segment['links'])
-                        segments.append(json_segment)
-                    body['segments'] = segments
-                res['bodies'] .append(body)
+                res['bodies'].append(body)
             data.append(res)
 
         return self.force_response(data)
@@ -197,6 +199,7 @@ class ImageContent(GraphBaseOperations):
     """
     @decorate.catch_error()
     @catch_graph_exceptions
+    # @authz.pre_authorize
     def get(self, image_id):
         logger.info("get image content for id %s" % image_id)
         if image_id is None:
@@ -225,15 +228,18 @@ class ImageContent(GraphBaseOperations):
         item = image.item.single()
         logger.debug("item data: " + format(item))
         if content_type == 'image':
+            # TODO manage here content access (see issue 190)
+            # always return the other version if available
             image_uri = item.uri
+            other_version = item.other_version.single()
+            if other_version is not None:
+                image_uri = other_version.uri
             logger.debug("image content uri: %s" % image_uri)
             if image_uri is None:
                 raise RestApiException(
                     "Image not found",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
-
-            # mime = item.digital_format[2]
-            # TO FIX: is it always jpeg?
+            # image is always jpeg
             mime = "image/jpeg"
             download = Downloader()
             return download.send_file_partial(image_uri, mime)
@@ -260,7 +266,7 @@ class ImageContent(GraphBaseOperations):
 
 class ImageTools(GraphBaseOperations):
 
-    __available_tools__ = ('object-detection', )
+    __available_tools__ = ('object-detection', 'building-recognition')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -305,23 +311,53 @@ class ImageTools(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_REQUEST)
 
         repo = AnnotationRepository(self.graph)
-        if ('operation' in params and params['operation'] == 'delete' and
-                tool == self.__available_tools__[0]):
-            # get all automatic tags
-            for anno in item.sourcing_annotations:
-                if anno.generator == 'FHG' and anno.annotation_type == 'TAG':
-                    repo.delete_auto_annotation(anno)
-            return self.empty_response()
-
-        # DO NOT re-launch object detection twice for the same video!
-        if repo.check_automatic_tagging(item.uuid):
+        if tool == self.__available_tools__[0]:  # object-detection
+            if ('operation' in params and params['operation'] == 'delete'):
+                # get all automatic object detection tags
+                deleted = 0
+                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                    # expected always single body for automatic tags
+                    body = anno.bodies.single()
+                    if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
+                        deleted += 1
+                        repo.delete_auto_annotation(anno)
+                return self.force_response(
+                    "There are no more automatic object detection tags for image {}. Deleted {}".format(
+                        image_id, deleted),
+                    code=hcodes.HTTP_OK_BASIC)
+            # DO NOT re-import object detection twice for the same image!
+            if repo.check_automatic_od(item.uuid):
+                raise RestApiException(
+                    "Object detection CANNOT be import twice for the same image.",
+                    status_code=hcodes.HTTP_BAD_CONFLICT)
+        elif tool == self.__available_tools__[1]:  # building-recognition
+            if ('operation' in params and params['operation'] == 'delete'):
+                # get all automatic building recognition tags
+                deleted = 0
+                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                    # expected always single body for automatic tags
+                    body = anno.bodies.single()
+                    if 'BRBody' in body.labels():
+                        deleted += 1
+                        repo.delete_auto_annotation(anno)
+                return self.force_response(
+                    "There are no more automatic building recognition tags for image {}. Deleted {}".format(
+                        image_id, deleted),
+                    code=hcodes.HTTP_OK_BASIC)
+            # DO NOT re-import building recognition twice for the same image!
+            if repo.check_automatic_br(item.uuid):
+                raise RestApiException(
+                    "Building recognition CANNOT be import twice for the same image.",
+                    status_code=hcodes.HTTP_BAD_CONFLICT)
+        else:
+            # should never be reached
             raise RestApiException(
-                "Object detection CANNOT be run twice for the same video.",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Specified tool '{}' NOT implemented".format(tool),
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
 
         task = CeleryExt.launch_tool.apply_async(
             args=[tool, item.uuid],
             countdown=10
         )
 
-        return self.force_response(task.id, code=hcodes.HTTP_OK_CREATED)
+        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)

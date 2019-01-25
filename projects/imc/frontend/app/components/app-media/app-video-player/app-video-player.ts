@@ -1,21 +1,19 @@
-import {Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import {rangePlayer} from "../../../decorators/app-range";
-
-
+import { Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { rangePlayer } from "../../../decorators/app-range";
+import { ShotRevisionService } from '../../../services/shot-revision.service';
 
 @Component({
     selector: 'app-video-player',
     templateUrl: 'app-video-player.html'
 })
-
-
 export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
     @Input() data: any;
     @Input() shots: any;
-    @Input() layout: any;
+    @Input() layout: any = 'main';
+    @Input() revision: boolean = false;
 
-    @Output() video_player_ready: EventEmitter<any> = new EventEmitter();
+    @Output() video_player_ready: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild('videoPlayer') videoPlayer: ElementRef;
 
@@ -41,7 +39,11 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
      */
     restart_time = null;
 
-    constructor(private cdRef: ChangeDetectorRef, private elRef: ElementRef ) {}
+    constructor(
+        private cdRef: ChangeDetectorRef,
+        private elRef: ElementRef,
+        private shotRevisionService: ShotRevisionService)
+    { }
 
     @rangePlayer() range;
 
@@ -149,7 +151,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
                 let current_frame = Math.ceil(this.fps * this.video.currentTime);
                 let shot_corrente = 0;
                 this.shots.forEach((s,idx) => {
-                    if (current_frame >= s.attributes.start_frame_idx && current_frame < s.attributes.end_frame_idx) {
+                    if (current_frame >= s.attributes.start_frame_idx && current_frame <= s.attributes.end_frame_idx) {
                         s.attivo = true;
                         shot_corrente = idx;
                     } else {
@@ -196,11 +198,11 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.video.currentTime = time_or_frames;
     }
 
-    public shot_play (shot_number) {
-        this.jump_to(1/ this.fps * this.shots[shot_number].attributes.start_frame_idx);
+    public shot_play(shot_number) {
+        this.jump_to(1 / this.fps * this.shots[shot_number].attributes.start_frame_idx);
     }
 
-    public segement_play (segment) {
+    public segment_play (segment) {
 
     }
 
@@ -216,16 +218,81 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         this.video.remove();
     }
 
+    /**
+     * Returns the current SMPTE Time code in the video.
+     * - Can be used as a conversion utility.
+     *
+     * @param  {Number} frame - Frame number for conversion to it's equivalent SMPTE Time code.
+     * @return {String} Returns a SMPTE Time code in HH:MM:SS:FF format
+     */
+    toSMPTE = function(frame) {
+        // if (!frame) { return this.toTime(this.video.currentTime); }
+        var frameNumber = Number(frame);
+        var fps = this.fps;
+        function wrap(n) { return ((n < 10) ? '0' + n : n); }
+        var _hour = ((fps * 60) * 60), _minute = (fps * 60);
+        var _hours = (frameNumber / _hour).toFixed(0);
+        var _minutes = (Number((frameNumber / _minute).toString().split('.')[0]) % 60);
+        var _seconds = (Number((frameNumber / fps).toString().split('.')[0]) % 60);
+        var SMPTE = (wrap(_hours) + ':' + wrap(_minutes) + ':' + wrap(_seconds) + ':' + wrap(frameNumber % fps));
+        return SMPTE;
+    };
+
+    /**
+     * Returns the time in the video for a given frame number
+     *
+     * @param  {Number} frame - The frame number in the video to seek to.
+     * @return {Number} - Time in seconds
+     */
     frame_to_time (frame) {
-        return frame * this.frame_length;
+        /* To seek forward in the video, we must add 0.001 to the video runtime for proper interactivity */
+        //return (frame * this.frame_length) + 0.001;
+
+        // this seems to work better
+        return (frame+.6) * this.frame_length;
     }
 
+    /**
+     * Converts a SMPTE Time code to Seconds
+     *
+     * @param  {String} SMPTE - a SMPTE time code in HH:MM:SS:FF format
+     * @return {Number} Returns the Second count of a SMPTE Time code
+     */
+    toSeconds (SMPTE) {
+        if (!SMPTE) { return Math.floor(this.video.currentTime); }
+        var time = SMPTE.split(':');
+        return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
+    };
+
+    /**
+     * Converts a SMPTE Time code, or standard time code to Milliseconds
+     *
+     * @param  {String} SMPTE a SMPTE time code in HH:MM:SS:FF format,
+     * or standard time code in HH:MM:SS format.
+     * @return {Number} Returns the Millisecond count of a SMPTE Time code
+     */
+    toMilliseconds (SMPTE) {
+        var frames = Number(SMPTE.split(':')[3]);
+        var milliseconds = (1000 / this.fps) * (isNaN(frames) ? 0 : frames);
+        return Math.floor(((this.toSeconds(SMPTE) * 1000) + milliseconds));
+    };
+
+    /**
+     * Returns the frame number for a given time
+     *
+     * @param  {Number} time - The time in the video in seconds
+     * @return {Number} - Frame number in video
+     */
     time_to_frame (time) {
-        return Math.ceil(time / this.frame_length);
+        return Math.floor(time.toFixed(5) / this.frame_length);
     }
 
     frame_current () {
         return this.time_to_frame(this.video.currentTime);
+    }
+
+    cut_changed() {
+        this.shotRevisionService.changeCut(this.frame_current());
     }
 
     _floor (number, decimal_places) {
@@ -245,12 +312,14 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     public layout_check (layout) {
-        return this.shots && this.shots.length && this.layout !== layout
+        return this.shots && this.shots.length && this.layout === layout
     }
 
     public advanced_control_show (stato) {
         this.advanced_show = stato;
     }
+
+    disableSaveAs() { return false; }
 
     ngOnInit () {
         this._frame_set(this.data.relationships.item[0].attributes.framerate);
