@@ -219,16 +219,63 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     /**
+     * Returns the current SMPTE Time code in the video.
+     * - Can be used as a conversion utility.
+     *
+     * @param  {Number} frame - Frame number for conversion to it's equivalent SMPTE Time code.
+     * @return {String} Returns a SMPTE Time code in HH:MM:SS:FF format
+     */
+    toSMPTE = function(frame) {
+        // if (!frame) { return this.toTime(this.video.currentTime); }
+        var frameNumber = Number(frame);
+        var fps = this.fps;
+        function wrap(n) { return ((n < 10) ? '0' + n : n); }
+        var _hour = ((fps * 60) * 60), _minute = (fps * 60);
+        var _hours = (frameNumber / _hour).toFixed(0);
+        var _minutes = (Number((frameNumber / _minute).toString().split('.')[0]) % 60);
+        var _seconds = (Number((frameNumber / fps).toString().split('.')[0]) % 60);
+        var SMPTE = (wrap(_hours) + ':' + wrap(_minutes) + ':' + wrap(_seconds) + ':' + wrap(frameNumber % fps));
+        return SMPTE;
+    };
+
+    /**
      * Returns the time in the video for a given frame number
      *
      * @param  {Number} frame - The frame number in the video to seek to.
      * @return {Number} - Time in seconds
      */
     frame_to_time (frame) {
-        /* To seek forward in the video, we must add 0.00001 to the video runtime for proper interactivity */
-        //return (frame+.4) * this.frame_length;
-        return (frame * this.frame_length) + 0.00001;
+        /* To seek forward in the video, we must add 0.001 to the video runtime for proper interactivity */
+        //return (frame * this.frame_length) + 0.001;
+
+        // this seems to work better
+        return (frame+.6) * this.frame_length;
     }
+
+    /**
+     * Converts a SMPTE Time code to Seconds
+     *
+     * @param  {String} SMPTE - a SMPTE time code in HH:MM:SS:FF format
+     * @return {Number} Returns the Second count of a SMPTE Time code
+     */
+    toSeconds (SMPTE) {
+        if (!SMPTE) { return Math.floor(this.video.currentTime); }
+        var time = SMPTE.split(':');
+        return (((Number(time[0]) * 60) * 60) + (Number(time[1]) * 60) + Number(time[2]));
+    };
+
+    /**
+     * Converts a SMPTE Time code, or standard time code to Milliseconds
+     *
+     * @param  {String} SMPTE a SMPTE time code in HH:MM:SS:FF format,
+     * or standard time code in HH:MM:SS format.
+     * @return {Number} Returns the Millisecond count of a SMPTE Time code
+     */
+    toMilliseconds (SMPTE) {
+        var frames = Number(SMPTE.split(':')[3]);
+        var milliseconds = (1000 / this.fps) * (isNaN(frames) ? 0 : frames);
+        return Math.floor(((this.toSeconds(SMPTE) * 1000) + milliseconds));
+    };
 
     /**
      * Returns the frame number for a given time

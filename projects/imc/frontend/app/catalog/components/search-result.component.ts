@@ -35,6 +35,8 @@ export class SearchResultComponent implements OnInit, OnChanges {
 		return (this.media.relationships.item[0].relationships.revision) ? true : false;
 	}
 
+	disableSaveAs() { return false; }
+
 	route(mediaId, mediaType) {
 		if (mediaType === 'nonaventity') {
 			this.router.navigate(['/app/catalog/images', mediaId]);

@@ -14,5 +14,5 @@
         <rect width="100%" height="100%" mask="url(#mask-image)"/>
     </svg>
     -->
-    <img #picture [src]="data.links.content" class="img-fluid">
+    <img (contextmenu)="disableSaveAs($event)" #picture [src]="data.links.content" class="img-fluid">
 </div>

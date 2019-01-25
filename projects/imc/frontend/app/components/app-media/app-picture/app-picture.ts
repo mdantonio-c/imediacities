@@ -67,6 +67,8 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
         })
     }
 
+    disableSaveAs() { return false; }
+
     getMousePos(evento) {
         const rect = this._picture.getBoundingClientRect();
         return {

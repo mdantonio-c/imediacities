@@ -33,6 +33,7 @@ try:
                                           transcode,
                                           transcoded_tech_info,
                                           transcoded_num_frames,
+                                          get_framerate,
                                           v2_image_transcode,
                                           image_transcoded_tech_info,
                                           update_storyboard)
@@ -371,7 +372,7 @@ def launch_tool(self, tool_name, item_id):
 
 @celery_app.task(bind=True)
 @send_errors_by_email
-def load_v2(self, other_version, item_id):
+def load_v2(self, other_version, item_id, retry=False):
     with celery_app.app.app_context():
         log.debug('load v2 {0} for item {1}'.format(other_version, item_id))
 
@@ -404,11 +405,17 @@ def load_v2(self, other_version, item_id):
                 # run transcoding for v2
                 v2_movie = os.path.join(analyze_path, 'v2_transcoded.mp4')
 
-                if os.path.exists(v2_movie):
+                if not retry and os.path.exists(v2_movie):
                     log.info('transcode v2 ------------ skipped')
                 else:
                     log.info('transcode v2 ------------ begin')
-                    if not transcode(other_version, analyze_path, 'v2_'):
+                    # we need to get the origin fps
+                    fps = get_framerate(os.path.join(analyze_path, 'origin_info.json'))
+                    if fps is None:
+                        raise Exception('Cannot get origin fps')
+                    log.debug("origin fps: {}".format(fps))
+                    if not transcode(other_version, analyze_path,
+                                     fps=str(fps), prefix='v2_'):
                         raise Exception('transcoding for v2 failed!')
                     log.info('transcode v2 ------------ ok')
 
@@ -440,7 +447,7 @@ def load_v2(self, other_version, item_id):
 
                 log.info('v2_image_transcoded_info - begin')
                 if not image_transcoded_tech_info(v2_image, analyze_path, 'v2_'):
-                    return False
+                    raise Exception('tech info for v2 failed!')
                 log.info('v2_image_transcoded_info - end')
 
             else:

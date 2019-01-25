@@ -628,7 +628,7 @@ class Bulk(GraphBaseOperations):
                     # launch here async task
                     path = os.path.join(upload_dir, f)
                     task = CeleryExt.load_v2.apply_async(
-                        args=[path, item.uuid],
+                        args=[path, item.uuid, retry],
                         countdown=10
                     )
                     imported += 1

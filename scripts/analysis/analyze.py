@@ -254,17 +254,17 @@ def lookup_v2(filename):
 
 
 # -----------------------------------------------------
-def transcode(filename, out_folder, v2=''):
+def transcode(filename, out_folder, fps, prefix=''):
 
-    out_filename = os.path.join(out_folder, v2 + 'transcoded.mp4')
+    out_filename = os.path.join(out_folder, prefix + 'transcoded.mp4')
 
     cmd_list = []
     cmd_list.append('/usr/bin/ffmpeg -hide_banner -nostdin -y')
     # cmd_list.append('-threads 4')
     cmd_list.append('-i ' + filename)
     cmd_list.append('-vf yadif=0:-1:0')                                                                       # deinterlacing
-    cmd_list.append('-vcodec libx264 -crf 15.0 -pix_fmt yuv420p -coder 1 -rc_lookahead 60 -r ' + str(TRANSCODED_FRAMERATE) + ' -strict -2')  # video codec
-    cmd_list.append('-g ' + str(TRANSCODED_FRAMERATE) + ' -forced-idr 1 -sc_threshold 40 -bf 16 -refs 6 ')                                   # keyframes
+    cmd_list.append('-vcodec libx264 -crf 15.0 -pix_fmt yuv420p -coder 1 -rc_lookahead 60 -r ' + fps + ' -strict -2')  # video codec
+    cmd_list.append('-g ' + fps + ' -forced-idr 1 -sc_threshold 40 -bf 16 -refs 6 ')                                   # keyframes
     cmd_list.append('-acodec aac -b:a 128k')                                                                  # audio codec
     cmd_list.append(out_filename)
 
@@ -276,7 +276,7 @@ def transcode(filename, out_folder, v2=''):
     if os.path.exists(out_filename):
         os.rename(out_filename, bk_filename)
 
-    if not run(cmd, out_folder, v2 + 'transcode.log', v2 + 'transcode.err', v2 + 'transcode.sh'):
+    if not run(cmd, out_folder, prefix + 'transcode.log', prefix + 'transcode.err', prefix + 'transcode.sh'):
         return False
     return os.path.exists(out_filename)
 
@@ -575,7 +575,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         if i != len(lst) - 1:
             nextframe = filename_to_frame(lst[i + 1]) - 1
         else:
-            nextframe = num_frames
+            nextframe = num_frames - 1
 
         shot_len = (nextframe - frame + 1) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
@@ -688,7 +688,7 @@ def analize_movie(filename, out_folder, muuid, fast=False):
         log('transcode --------------- skipped')
     else:
         log('transcode --------------- begin ')
-        if not transcode(filename, out_folder):
+        if not transcode(filename, out_folder, fps=str(TRANSCODED_FRAMERATE)):
             return False
         log('transcode --------------- ok')
 
@@ -721,7 +721,8 @@ def analize_movie(filename, out_folder, muuid, fast=False):
 
             # transcode v2 movie
             log('transcode v2 ------------ begin')
-            if not transcode(other_version, out_folder, 'v2_'):
+            if not transcode(other_version, out_folder,
+                             fps=str(TRANSCODED_FRAMERATE), prefix='v2_'):
                 return False
             log('transcode v2 ------------ ok')
 
@@ -930,7 +931,7 @@ def update_storyboard(revised_cuts, out_folder):
 
     # prepend 0 and append last_frame to revised_cuts -- ( side-effect: revised_cuts can't be empty )
     revised_cuts.insert(0, 0)          # -- to generate frame 0 thumbnail
-    revised_cuts.append(last_frame + 1)  # -- needed later ( next_frame is cuts[i+1]-1 )
+    revised_cuts.append(last_frame)  # -- needed later ( next_frame is cuts[i+1]-1 )
     # check for duplicated cuts, (prevent 0-sized shots)
     revised_cuts = list(set(revised_cuts))
     revised_cuts.sort()
