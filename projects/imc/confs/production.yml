@@ -53,3 +53,7 @@ services:
   celeryui:
     environment:
       ACTIVATE: 0
+
+  rabbit:
+    environment:
+      ACTIVATE: 0
