@@ -751,23 +751,26 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         # get the thumbnail assigned to a given AV digital object
         thumbnails_uri = os.path.join(analyze_dir_path, 'thumbs/')
         item.thumbnail = get_thumbnail(thumbnails_uri)
-        # duration
-        item.duration = data["streams"][0]["duration"]
-        # framerate
-        item.framerate = data["streams"][0]["avg_frame_rate"]
         # dimension
         item.dimension = data["format"]["size"]
         # format
         # container: e.g."AVI", "MP4", "3GP"
         item.digital_format[0] = data["format"]["format_name"]
-        # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
-        item.digital_format[1] = data["streams"][0]["codec_long_name"]
         # format: RFC 2049 MIME types, e.g. "image/jpg", etc.
         item.digital_format[2] = data["format"]["format_long_name"]
-        # resolution: The degree of sharpness of the digital object expressed
-        # in pixel
-        item.digital_format[3] = str(data["streams"][0]['width']) \
-            + 'x' + str(data['streams'][0]['height'])
+
+        # be sure to use video stream
+        for s in data['streams']:
+            if s['codec_type'] == 'video':
+                # duration
+                item.duration = s["duration"]
+                # framerate
+                item.framerate = s["avg_frame_rate"]
+                # coding: e.g. "WMA","WMV", "MPEG-4", "RealVideo"
+                item.digital_format[1] = s["codec_long_name"]
+                # resolution: The degree of sharpness of the digital object
+                # expressed in pixel
+                item.digital_format[3] = str(s['width']) + 'x' + str(s['height'])
 
         item.uri = data["format"]["filename"]
 

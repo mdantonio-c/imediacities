@@ -239,7 +239,9 @@ def transcoded_num_frames(out_folder, v2=''):
     out_filename = os.path.join(out_folder, v2 + 'transcoded_info.json')
     out_file = open(out_filename, 'r')
     data = json.load(out_file)
-    return int(data['streams'][0]['nb_frames'])
+    for s in data['streams']:
+        if s['codec_type'] == 'video':
+            return int(s['nb_frames'])
 
 
 # -----------------------------------------------------
