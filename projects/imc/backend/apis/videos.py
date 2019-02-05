@@ -499,7 +499,7 @@ class VideoContent(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    # @authz.pre_authorize
+    @authz.pre_authorize
     def get(self, video_id):
         """
         Gets video content such as video strem and thumbnail

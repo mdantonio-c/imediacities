@@ -199,7 +199,7 @@ class ImageContent(GraphBaseOperations):
     """
     @decorate.catch_error()
     @catch_graph_exceptions
-    # @authz.pre_authorize
+    @authz.pre_authorize
     def get(self, image_id):
         logger.info("get image content for id %s" % image_id)
         if image_id is None:

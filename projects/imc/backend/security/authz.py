@@ -33,6 +33,27 @@ def pre_authorize(func):
         return True if (user is None or
                         user.roles.search(name='normal_user')) else False
 
+    def _has_rights(self, user, entity_id):
+        """
+        Look at right status
+        """
+        self.graph = self.get_service_instance('neo4j')
+        repo = CreationRepository(self.graph)
+        rs = repo.get_right_status(entity_id)
+        logger.debug('right status = {}'.format(rs))
+        return (False if _is_general_public(user) and not _is_public_domain(rs)
+                else True)
+
+    def _has_public_access(self, user, entity_id):
+        """
+        Look at public access flag
+        """
+        if not _is_general_public(user):
+            return True
+        self.graph = self.get_service_instance('neo4j')
+        repo = CreationRepository(self.graph)
+        return repo.publicly_accessible(entity_id)
+
     def has_permission(self, **kwargs):
         """verify if user has permission to access the specified content id"""
         entity_id = kwargs.get('video_id') or kwargs.get('image_id')
@@ -44,31 +65,14 @@ def pre_authorize(func):
         if ct is None or (ct != 'image' and ct != 'video'):
             # do not yet raise the exception but ignore it
             return func(self, entity_id)
-        # FIXME: it does not seem to always work for logged in users
         user = self.get_user_if_logged()
         logger.debug('Logged in user: {}'.format(user))
         logger.debug("Has permission to access entity[{}]?".format(entity_id))
-        self.graph = self.get_service_instance('neo4j')
-        repo = CreationRepository(self.graph)
-        rs = repo.get_right_status(entity_id)
-        logger.debug('right status = {}'.format(rs))
-        """
-        ('01', 'In copyright'),
-        ('02', 'EU Orphan Work'),
-        ('03', 'In copyright - Educational use permitted'),
-        ('04', 'In copyright - Non-commercial use permitted'),
-        ('05', 'Public Domain'),
-        ('06', 'No Copyright - Contractual Restrictions'),
-        ('07', 'No Copyright - Non-Commercial Use Only'),
-        ('08', 'No Copyright - Other Known Legal Restrictions'),
-        ('09', 'No Copyright - United States'),
-        ('10', 'Copyright Undetermined')
-        """
-        # logger.debug('Is public domain? {}'.format(_is_public_domain(rs)))
-        if _is_general_public(user) and not _is_public_domain(rs):
+        if not _has_public_access(self, user, entity_id):
             raise RestApiException(
                 "User is not authorized to access content",
                 status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
         return func(self, entity_id)
 
     return has_permission
