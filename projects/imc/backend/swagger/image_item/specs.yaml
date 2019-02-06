@@ -1,0 +1,6 @@
+file: images
+class: ImageItem
+schema:
+  expose: true
+mapping:
+  image_item: "/images/<image_id>/item"
