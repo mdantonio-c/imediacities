@@ -1,5 +1,6 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
+import { NotificationService } from '/rapydo/src/app/services/notification';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/forkJoin';
 import { AppShotsService } from "./app-shots";
@@ -17,7 +18,11 @@ export class AppAnnotationsService {
 
     @Output() update: EventEmitter<any> = new EventEmitter();
 
-    constructor(private api: ApiService, private ShotsService: AppShotsService) { }
+    constructor(
+        private api: ApiService,
+        private ShotsService: AppShotsService,
+        private notify: NotificationService
+        ) { }
 
     create_tag(shots_ids, sources, media_type, cb) {
         let observables: Observable<any>[] = [];
@@ -47,7 +52,6 @@ export class AppAnnotationsService {
     }
 
     create_note(shots_ids, note, media_type, cb) {
-
         let observables: Observable<any>[] = [];
         shots_ids.forEach(shot_id => observables.push(
             this.api.post(
@@ -66,7 +70,6 @@ export class AppAnnotationsService {
             observables
         ).subscribe(res => cb(res));
     }
-
     create_link(shots_ids, link, media_type, cb) {
 
         let observables: Observable<any>[] = [];
@@ -119,9 +122,7 @@ export class AppAnnotationsService {
     }
 
     delete_tag(annotation, media_type) {
-
         const bodyRef = annotation.iri ? `resource:${annotation.iri}` : `textual:${annotation.name}`;
-
         this.api.delete(
             'annotations',
             `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
@@ -137,7 +138,25 @@ export class AppAnnotationsService {
             err => { }
         );
     }
-
+    update_note_private(note, new_private) {
+        this.api.put(
+            'annotations',
+            `${note.id}`,
+                {
+                    body: AppAnnotationsService.textual_body_2(note),
+                    private: new_private
+                }
+        ).subscribe(
+            response => {
+                //console.log("Updated note: ", response.data);
+                note.private = response.data.attributes.private;
+            },
+            err => {
+                console.error("Error updating note: err=", err);
+                this.notify.showError('The update of the note is failed');
+            }
+        );
+    }
     delete_anno(annotation, media_type) {
         this.api.delete(
             'annotations',
@@ -211,6 +230,55 @@ export class AppAnnotationsService {
         }
     }
 
+    static _encode_language (lang): string {
+        let language;
+        switch (lang){
+            case 'Català':
+                language='ca';
+                break;
+            case 'Dansk':
+                language='da';
+                break;
+            case 'Deutsche':
+                language='de';
+                break;
+            case 'English':
+                language='en';
+                break;
+            case 'Español':
+                language='es';
+                break;
+            case 'Français':
+                language='fr';
+                break;
+            case 'Italiano':
+                language='it';
+                break;
+            case 'Nederlands':
+                language='nl';
+                break;
+            case 'Svenska':
+                language='sv';
+                break;
+            case 'Ελληνικά':
+                language='el';
+                break;
+            default:
+                language='';
+                break;
+        }
+
+        return language;
+    }
+    // I had to create the textual_body_2
+    //  because I need it to update notes
+    static textual_body_2(note) {
+        return {
+            type: 'TextualBody',
+            value: note.name,
+            language: this._encode_language(note.language)
+        }
+    }
     static textual_body(note) {
         return {
             type: 'TextualBody',
@@ -218,7 +286,6 @@ export class AppAnnotationsService {
             language: note.language
         }
     }
-
     static textual_body_term(term) {
         return {
             type: 'TextualBody',
