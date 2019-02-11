@@ -124,6 +124,52 @@ class Images(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
 
+class ImageItem(GraphBaseOperations):
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def put(self, image_id):
+        """
+        Allow user to update item information.
+        """
+        logger.debug("Update Item for NonAVEntity uuid: %s", image_id)
+        if image_id is None:
+            raise RestApiException(
+                "Please specify a image id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
+        except self.graph.NonAVEntity.DoesNotExist:
+            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            raise RestApiException(
+                "Please specify a valid image id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            raise RestApiException(
+                "This NonAVEntity may not have been correctly imported. "
+                "Item info not found",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        data = self.get_input()
+        # ONLY public_access allowed at the moment
+        public_access = data.get('public_access')
+        if public_access is None or type(public_access) != bool:
+            raise RestApiException(
+                "Please specify a valid value for public_access",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        item.public_access = public_access
+        item.save()
+        logger.debug("Item successfully updated for NonAVEntity uuid {}. {}"
+                     .format(image_id, item))
+
+        # 204: Item successfully updated.
+        return self.empty_response()
+
+
 class ImageAnnotations(GraphBaseOperations):
     """
         Get all image annotations for a given image.
@@ -199,7 +245,7 @@ class ImageContent(GraphBaseOperations):
     """
     @decorate.catch_error()
     @catch_graph_exceptions
-    # @authz.pre_authorize
+    @authz.pre_authorize
     def get(self, image_id):
         logger.info("get image content for id %s" % image_id)
         if image_id is None:

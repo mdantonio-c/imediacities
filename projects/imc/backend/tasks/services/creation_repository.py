@@ -212,6 +212,11 @@ class CreationRepository():
         if entity is not None:
             return entity.rights_status
 
+    def publicly_accessible(self, entity_id):
+        entity = self.graph.Creation.nodes.get_or_none(uuid=entity_id)
+        item = entity.item.single()
+        return item.public_access
+
     def get_belonging_city(self, item):
         log.debug('Look for belonging city for item {}'.format(item.uuid))
         query = "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()" \

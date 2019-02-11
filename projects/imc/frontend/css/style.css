@@ -370,7 +370,13 @@ search-thumbnail div .media-image-wrapper {
 
 .note-attribute{
   font-size: smaller;
-  margin: 15px;
+  margin: 30px;
+  color: #53b8e2;
+  background-color: #f8f8f8;
+  padding: 5px;
+}
+.note-attribute-status{
+  font-size: smaller;
   color: #53b8e2;
   background-color: #f8f8f8;
   padding: 5px;

@@ -1,4 +1,5 @@
 import {Component, Input, OnInit, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
+import { AuthService } from '/rapydo/src/app/services/auth';
 
 @Component({
     selector: 'app-picture',
@@ -23,7 +24,7 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
     private _track;
     private _maschera;
 
-    constructor() {
+    constructor(private auth: AuthService) {
     }
 
     mousedown (evento) {
@@ -31,6 +32,7 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
         this._drawing = true;
         this._maschera.setAttribute('visibility', 'hidden');
     }
+
     mousemove (evento) {
         if (this._drawing) {
             const pos = this.getMousePos(evento);
@@ -50,6 +52,7 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
             this.draw (this._track, this.rect.props)
         }
     }
+
     mouseup (evento) {
         const pos = this.getMousePos(evento);
         this._drawing = false;
@@ -77,11 +80,18 @@ export class AppPictureComponent implements OnInit, AfterViewInit {
         };
     }
 
+    _picture_source_add(source_url) {
+        let token = this.auth.getToken();
+        this._picture.src = source_url + '&access_token=' + token;
+    }
+
     ngOnInit() {
     }
 
     ngAfterViewInit () {
         this._picture = this.picture.nativeElement;
+
+        this._picture_source_add(this.data.links.content);
         /*this._track = this.mouse_track.nativeElement;
         this._maschera = this.maschera.nativeElement;*/
     }

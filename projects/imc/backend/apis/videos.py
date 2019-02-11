@@ -126,6 +126,52 @@ class Videos(GraphBaseOperations):
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
 
+class VideoItem(GraphBaseOperations):
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
+    @graph_transactions
+    def put(self, video_id):
+        """
+        Allow user to update item information.
+        """
+        log.debug("Update Item for AVEntity uuid: %s", video_id)
+        if video_id is None:
+            raise RestApiException(
+                "Please specify a video id",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            log.debug("AVEntity with uuid %s does not exist" % video_id)
+            raise RestApiException(
+                "Please specify a valid video id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        item = v.item.single()
+        if item is None:
+            raise RestApiException(
+                "This AVEntity may not have been correctly imported. "
+                "Item info not found",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+
+        data = self.get_input()
+        # ONLY public_access allowed at the moment
+        public_access = data.get('public_access')
+        if public_access is None or type(public_access) != bool:
+            raise RestApiException(
+                "Please specify a valid value for public_access",
+                status_code=hcodes.HTTP_BAD_REQUEST)
+
+        item.public_access = public_access
+        item.save()
+        log.debug("Item successfully updated for AVEntity uuid {}. {}"
+                  .format(video_id, item))
+
+        # 204: Item successfully updated.
+        return self.empty_response()
+
+
 class VideoAnnotations(GraphBaseOperations):
     """
         Get all video annotations for a given video.
@@ -499,7 +545,7 @@ class VideoContent(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    # @authz.pre_authorize
+    @authz.pre_authorize
     def get(self, video_id):
         """
         Gets video content such as video strem and thumbnail
