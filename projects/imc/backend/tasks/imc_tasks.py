@@ -438,7 +438,7 @@ def load_v2(self, other_version, item_id, retry=False):
                 ext = 'jpg'
                 v2_image = os.path.join(analyze_path, 'v2_transcoded.jpg')
                 if os.path.exists(v2_image):
-                    log('image_transcode v2 ------- skipped')
+                    log.info('image_transcode v2 ------- skipped')
                 else:
                     # transcode v2 image
                     log.info('image_transcode v2 ------ begin')
