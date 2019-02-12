@@ -145,6 +145,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         console.log("You should not reach this final return")
         return true;
     }
+    /*
     is_public_domain() {
         let k = this.media.attributes.rights_status.key;
 
@@ -170,6 +171,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         if (k == "09") return true;
 
         return false;
+    }*/
+    is_public_domain() {
+        return this.media.relationships.item[0].public_access;
     }
 
     start_shot_revision() {
