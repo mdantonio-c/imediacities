@@ -743,7 +743,7 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         return
 
     # load info from json
-    with open(tech_info_path) as data_file:
+    with open(tech_info_path, encoding='utf-8', errors='ignore') as data_file:
         data = json.load(data_file)
 
     item.digital_format = [None for _ in range(4)]
