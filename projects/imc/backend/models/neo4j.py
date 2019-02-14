@@ -196,6 +196,8 @@ class Item(TimestampedNode, AnnotationTarget):
         item_type       "Text", "Image" or "Video"
         license         A reference to the license that applies to the digital
                         item.
+        public_access   A flag that indicates whether or not the item is
+                        accessible by a public user.
     """
     thumbnail = StringProperty()
     summary = StringProperty()
@@ -206,6 +208,7 @@ class Item(TimestampedNode, AnnotationTarget):
     uri = StringProperty()
     item_type = StringProperty(
         required=True, choices=codelists.CONTENT_TYPES, show=True)
+    public_access = BooleanProperty(default=False, show=True)
     ownership = RelationshipTo(
         'Group', 'IS_OWNED_BY', cardinality=One, show=True)
     content_source = RelationshipTo(
@@ -291,6 +294,18 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         model=ContributionRel)
     item = RelationshipFrom(
         'Item', 'CREATION', cardinality=One, show=True)
+
+    def get_default_public_access(self):
+        rs = self.rights_status
+        return True if (
+            rs == "02" or  # EU Orphan Work
+            rs == "04" or  # In copyright - Non-commercial use permitted
+            rs == "05" or  # Public Domain
+            rs == "06" or  # No Copyright - Contractual Restrictions
+            rs == "07" or  # No Copyright - Non-Commercial Use Only
+            rs == "08" or  # No Copyright - Other Known Legal Restrictions
+            rs == "09"     # No Copyright - United States
+        ) else False
 
 
 class Title(StructuredNode):

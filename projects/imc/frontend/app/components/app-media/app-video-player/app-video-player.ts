@@ -1,6 +1,7 @@
 import { Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { rangePlayer } from "../../../decorators/app-range";
 import { ShotRevisionService } from '../../../services/shot-revision.service';
+import { AuthService } from '/rapydo/src/app/services/auth';
 
 @Component({
     selector: 'app-video-player',
@@ -42,7 +43,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     constructor(
         private cdRef: ChangeDetectorRef,
         private elRef: ElementRef,
-        private shotRevisionService: ShotRevisionService)
+        private shotRevisionService: ShotRevisionService,
+        private auth: AuthService)
     { }
 
     @rangePlayer() range;
@@ -54,8 +56,9 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
     
     _video_source_add (source_url) {
+        let token = this.auth.getToken();
         let source = document.createElement('source');
-        source.src = source_url;
+        source.src = source_url + '&access_token=' + token;
         this.videoPlayer.nativeElement.appendChild(source);
         this.video.load();
     }

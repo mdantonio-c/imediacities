@@ -9,7 +9,7 @@ import {AppAnnotationsService} from "../../services/app-annotations";
 export class AppNoteComponent implements OnInit {
 
     @HostBinding('class.notes') notes = true;
-    @HostBinding('class.note-expanded') note_expanded = false;
+    @HostBinding('class.note-expanded') note_expanded = true;
 
     @Input() note;
     @Input() can_delete = false;
@@ -30,7 +30,18 @@ export class AppNoteComponent implements OnInit {
         }
 
     }
-
+    lock_note () {
+        if (!this.can_delete) return;
+        if (this.note.id) {
+            this.AnnotationsService.update_note_private(this.note, true);
+        }
+    }
+    unlock_note () {
+        if (!this.can_delete) return;
+        if (this.note.id) {
+            this.AnnotationsService.update_note_private(this.note, false);
+        }
+    }
     toggle () {
         this.icon = (this.icon === 'keyboard_arrow_up') ? 'keyboard_arrow_down' : 'keyboard_arrow_up';
         this.note_expanded = this.icon === 'keyboard_arrow_up';
