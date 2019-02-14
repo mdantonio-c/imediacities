@@ -215,6 +215,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                                   'v2_transcoded_info.json')
                 # same cover as the origin item
                 other_item.thumbnail = item_node.thumbnail
+                # same access policy as the origin item
+                other_item.public_access = item_node.public_access
                 other_item.save()
 
             # - ONLY for videos -
@@ -410,7 +412,8 @@ def load_v2(self, other_version, item_id, retry=False):
                 else:
                     log.info('transcode v2 ------------ begin')
                     # we need to get the origin fps
-                    fps = get_framerate(os.path.join(analyze_path, 'origin_info.json'))
+                    fps = get_framerate(os.path.join(
+                        analyze_path, 'origin_info.json'))
                     if fps is None:
                         raise Exception('Cannot get origin fps')
                     log.debug("origin fps: {}".format(fps))
@@ -471,6 +474,8 @@ def load_v2(self, other_version, item_id, retry=False):
                               'v2_transcoded_info.json')
             # same cover as the origin item
             other_item.thumbnail = item.thumbnail
+            # same access policy as the origin item
+            other_item.public_access = item.public_access
             other_item.save()
 
         except Exception as e:
@@ -662,6 +667,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
             # check for existing creation
             creation = item_node.creation.single()
+            init_public_access = True if creation is None else False
             if creation is not None and not metadata_update:
                 log.info("Skip updating metadata for resource_id=%s" %
                          resource_id)
@@ -675,6 +681,19 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 xml_resource.status = 'COMPLETED'
                 xml_resource.status_message = 'Nothing to declare'
                 xml_resource.save()
+
+            # now creation should be available
+            creation = item_node.creation.single()
+            if init_public_access:
+                # init public_access
+                item_node.public_access = creation.get_default_public_access()
+                log.info("Default public access flag for {type} [{uuid}] "
+                         "rights status '{rs}' = {access}".format(
+                             type=item_node.item_type,
+                             uuid=creation.uuid,
+                             rs=creation.get_rights_status_display(),
+                             access=item_node.public_access))
+                item_node.save()
         else:
             log.warning("Not found MetaStage for resource_id=%s" % resource_id)
 
@@ -770,7 +789,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
                 item.digital_format[1] = s["codec_long_name"]
                 # resolution: The degree of sharpness of the digital object
                 # expressed in pixel
-                item.digital_format[3] = str(s['width']) + 'x' + str(s['height'])
+                item.digital_format[3] = str(
+                    s['width']) + 'x' + str(s['height'])
 
         item.uri = data["format"]["filename"]
 
