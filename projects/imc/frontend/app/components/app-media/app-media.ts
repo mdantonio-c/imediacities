@@ -173,7 +173,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         return false;
     }*/
     is_public_domain() {
-        return this.media.relationships.item[0].public_access;
+        return this.media.relationships.item[0].attributes.public_access;
     }
 
     start_shot_revision() {
