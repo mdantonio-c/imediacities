@@ -348,14 +348,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * @param componente Componente selezionato
      */
     modal_show_multi(evento, componente) {
-
         let data = this.shots_attivi.reduce((acc, value, index) => {
             if (value) {
                 acc.push(this.shots[index])
             }
             return acc;
         }, []);
-
+        //console.log('modal_show_multi: data=',data);
         if (!data.length) return;
 
         let comp = {
@@ -365,7 +364,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             },
             titolo: evento.target.innerText
         };
-
         this.modal_show(comp);
     }
 
@@ -378,7 +376,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     shots_init(shots) {
-        //  Questo tipo di aggiornamento serve per non ridisegnare tutti i componenti collegati agli shots
+        //  Questo tipo di aggiornamento serve per non 
+        //   ridisegnare tutti i componenti collegati agli shots
         if (this.shots.length) {
             this.shots.forEach((s, idx) => {
                 s.annotations = shots[idx].annotations;
@@ -386,7 +385,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         } else {
             this.shots = shots;
         }
-        this.shots_attivi = shots.map(s => false);
+        // se shots_attivi non è vuoto allora non
+        //  lo voglio resettare, potrebbe contenere
+        //  le info sugli shot selezionati per la annotaz multipla
+        if(this.shots_attivi.length==0){
+            this.shots_attivi = shots.map(s => false);
+        }
     }
 
     shots_update(evento) {
@@ -445,7 +449,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
      * Esegue le richieste del video e degli shot
      */
     ngOnInit() {
-
         this.user = this.AuthService.getUser();
         this.media_type_set(this.router.url);
 
