@@ -1,4 +1,6 @@
 import { Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { AuthService } from "/rapydo/src/app/services/auth";
+import { AppMediaService } from "../../../services/app-media";
 
 @Component({
     selector: 'app-media-info',
@@ -27,8 +29,10 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         format: true
     };
     item: any;
+    user: any;
 
-    constructor() {
+    constructor(private AuthService: AuthService,
+                private MediaService: AppMediaService,) {
     }
 
     /**
@@ -178,11 +182,18 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         })
 
     }
+
     expandCard(card) {
         this.isCollapsed[card] = !this.isCollapsed[card];
     }
 
+    togglePublicAccess() {
+        let newVal = !this.info.relationships.item[0].attributes.public_access;
+        this.MediaService.updatePublicAccess(newVal);
+    }
+
     ngOnInit() {
+        this.user = this.AuthService.getUser();
         this.description_languages = new Map();
         this.keyword_languages = new Map();
         if (this.user_language) {
