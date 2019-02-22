@@ -1,82 +1,8 @@
 {
-  "created": "2018-10-10 14:43:35.357894",
+  "created": "2019-02-21 14:22:38.453373",
   "terms": [
     {
       "children": [
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q360418",
-              "label": "(construction) site"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q17781833",
-              "label": "destruction"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1441983",
-              "label": "redevelopment"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q4181026",
-              "label": "roadworks"
-            }
-          ],
-          "label": "State"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1468524",
-              "label": "city center"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q27150222",
-              "label": "exhibition ground"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q721207",
-              "label": "marina"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q676050",
-              "label": "old town"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q7380602",
-              "label": "periphery/edge of city"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q19563580",
-              "label": "rail yard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q691960",
-              "label": "satellite town"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q190928",
-              "label": "shipyard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q201759",
-              "label": "slum / shanty town"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q188509",
-              "label": "suburb"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q863404",
-              "label": "underground"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q532",
-              "label": "village"
-            }
-          ],
-          "label": "Type"
-        },
         {
           "children": [
             {
@@ -190,6 +116,80 @@
             }
           ],
           "label": "Nature"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q360418",
+              "label": "(construction) site"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q17781833",
+              "label": "destruction"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1441983",
+              "label": "redevelopment"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q4181026",
+              "label": "roadworks"
+            }
+          ],
+          "label": "State"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q1468524",
+              "label": "city center"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q27150222",
+              "label": "exhibition ground"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q721207",
+              "label": "marina"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q676050",
+              "label": "old town"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q7380602",
+              "label": "periphery/edge of city"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q19563580",
+              "label": "rail yard"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q691960",
+              "label": "satellite town"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q190928",
+              "label": "shipyard"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q201759",
+              "label": "slum / shanty town"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q188509",
+              "label": "suburb"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q863404",
+              "label": "underground"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q532",
+              "label": "village"
+            }
+          ],
+          "label": "Type"
         }
       ],
       "label": "Spaces"
@@ -199,431 +199,19 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q305418",
-              "label": "abandoned building"
+              "id": "https://www.wikidata.org/wiki/Q543654",
+              "label": "city hall"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q959782",
-              "label": "excavation"
+              "id": "https://www.wikidata.org/wiki/Q16831714",
+              "label": "government building"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q109607",
-              "label": "ruins"
+              "id": "https://www.wikidata.org/wiki/Q7138926",
+              "label": "parliament building"
             }
           ],
-          "label": "Building state"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q22687",
-              "label": "bank"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q83405",
-              "label": "factory"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1021645",
-              "label": "office"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q656720",
-              "label": "workshop"
-            }
-          ],
-          "label": "Work"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q101687",
-              "label": "altar"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q39614",
-              "label": "cemetery"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q16970",
-              "label": "church"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q192619",
-              "label": "crypt"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q173387",
-              "label": "grave"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q44613",
-              "label": "Monastery"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q32815",
-              "label": "mosque"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1370598",
-              "label": "sacral building (others)"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q34627",
-              "label": "synagogue"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q44539",
-              "label": "temple"
-            }
-          ],
-          "label": "Religion"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1248784",
-              "label": "airport"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1777951",
-              "label": "boathouse"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q494829",
-              "label": "bus station"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q953806",
-              "label": "bus stop"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q12284",
-              "label": "canal"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q22733",
-              "label": "garage"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q205495",
-              "label": "gas station"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q105731",
-              "label": "lock"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q928830",
-              "label": "metro station"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q44782",
-              "label": "port"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1395196",
-              "label": "taxi rank"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q55488",
-              "label": "train station"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2175765",
-              "label": "tram stop"
-            }
-          ],
-          "label": "Transport"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1455871",
-              "label": "daycare"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1469420",
-              "label": "institution for adult education"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q126807",
-              "label": "kindergarten"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q62832",
-              "label": "observatory"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q31855",
-              "label": "research institute"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1244442",
-              "label": "school"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q3918",
-              "label": "university/academy/college"
-            }
-          ],
-          "label": "Education & science"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1251403",
-              "label": "alley"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q207934",
-              "label": "avenue"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q221722",
-              "label": "bike lane"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q54114",
-              "label": "boulevard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q12280",
-              "label": "bridge"
-            },
-            {
-              "id": "https://en.wikipedia.org/wiki/Highway",
-              "label": "main road"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q46622",
-              "label": "motorway"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1433633",
-              "label": "parking space"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q13634881",
-              "label": "passage"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q369730",
-              "label": "pedestrian zone"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q633423",
-              "label": "rails"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q674950",
-              "label": "residential street"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q16968135",
-              "label": "ropeway"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q21000333",
-              "label": "shopping street"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q177749",
-              "label": "sidewalk/pavement"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q174782",
-              "label": "square"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q79007",
-              "label": "street"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q628179",
-              "label": "trail"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q44377",
-              "label": "tunnel"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q13634881",
-              "label": "walkway"
-            }
-          ],
-          "label": "Roads and squares"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q389959",
-              "label": "air-raid shelter"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q131263",
-              "label": "barracks"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q81715",
-              "label": "barricade"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q152081",
-              "label": "concentration camp"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q57821",
-              "label": "fortification"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2387974",
-              "label": "military hospital"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q861951",
-              "label": "police station"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q40357",
-              "label": "prison/jail"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1852785",
-              "label": "trench"
-            }
-          ],
-          "label": "Military, police & judiciary"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q8054653",
-              "label": "allotment garden"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q4839857",
-              "label": "backyard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q170552",
-              "label": "balcony"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q129211",
-              "label": "cage"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q170477",
-              "label": "chimney"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q309250",
-              "label": "courtyard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q132911",
-              "label": "elevator"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q15003",
-              "label": "escalator"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q148571",
-              "label": "fence"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q5505899",
-              "label": "front yard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q215194",
-              "label": "gargoyle"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q816741",
-              "label": "porch"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q185600",
-              "label": "portico"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1081213",
-              "label": "rooftop"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q21061279",
-              "label": "stained glass window"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q12511",
-              "label": "stairway"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q9158768",
-              "label": "storage yard"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q641406",
-              "label": "terrace"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q277151",
-              "label": "trellis"
-            }
-          ],
-          "label": "Building sections"
-        },
-        {
-          "children": [
-            {
-              "id": "https://en.wikipedia.org/wiki/Terrace_(building)",
-              "label": "(restaurant) terrace"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q187456",
-              "label": "bar, pub, nightclub"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q866742",
-              "label": "bistro"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q131183",
-              "label": "cabaret"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q30022",
-              "label": "café/espresso bar"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q133215",
-              "label": "casino"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1188223",
-              "label": "dance hall"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1228895",
-              "label": "disco"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q8719053",
-              "label": "music club"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11707",
-              "label": "restaurant/inn"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q3303463",
-              "label": "street food, fast food"
-            }
-          ],
-          "label": "Gastronomy & nightlife"
+          "label": "Administration"
         },
         {
           "children": [
@@ -765,129 +353,272 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q12323",
-              "label": "dam"
+              "id": "https://www.wikidata.org/wiki/Q8054653",
+              "label": "allotment garden"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q181623",
-              "label": "depot/warehouse"
+              "id": "https://www.wikidata.org/wiki/Q4839857",
+              "label": "backyard"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q114768",
-              "label": "granary"
+              "id": "https://www.wikidata.org/wiki/Q170552",
+              "label": "balcony"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q13416228",
-              "label": "incineration plant"
+              "id": "https://www.wikidata.org/wiki/Q129211",
+              "label": "cage"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q152810",
-              "label": "landfill"
+              "id": "https://www.wikidata.org/wiki/Q170477",
+              "label": "chimney"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q159719",
-              "label": "power plant"
+              "id": "https://www.wikidata.org/wiki/Q309250",
+              "label": "courtyard"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q156849",
-              "label": "sewer"
+              "id": "https://www.wikidata.org/wiki/Q132911",
+              "label": "elevator"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q385557",
-              "label": "slaughterhouse"
+              "id": "https://www.wikidata.org/wiki/Q15003",
+              "label": "escalator"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q15242449",
-              "label": "treatment plant"
+              "id": "https://www.wikidata.org/wiki/Q148571",
+              "label": "fence"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q6501028",
-              "label": "water tower"
+              "id": "https://www.wikidata.org/wiki/Q5505899",
+              "label": "front yard"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q215194",
+              "label": "gargoyle"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q816741",
+              "label": "porch"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q185600",
+              "label": "portico"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1081213",
+              "label": "rooftop"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q21061279",
+              "label": "stained glass window"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q12511",
+              "label": "stairway"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q9158768",
+              "label": "storage yard"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q641406",
+              "label": "terrace"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q277151",
+              "label": "trellis"
             }
           ],
-          "label": "Supply/disposal"
+          "label": "Building sections"
         },
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q194195",
-              "label": "amusement park"
+              "id": "https://www.wikidata.org/wiki/Q305418",
+              "label": "abandoned building"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q2290113",
-              "label": "boxing ring"
+              "id": "https://www.wikidata.org/wiki/Q959782",
+              "label": "excavation"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1193438",
-              "label": "bullring"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q47928",
-              "label": "circus"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q13607440",
-              "label": "playground"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q7361066",
-              "label": "roller-skating rink"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q39463060",
-              "label": "soccer field"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1202618",
-              "label": "sports ground / sports venue"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q483110",
-              "label": "stadium"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q13586493",
-              "label": "swimming pool"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q741118",
-              "label": "tennis court"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q830528",
-              "label": "velodrome"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q43501",
-              "label": "zoo"
+              "id": "https://www.wikidata.org/wiki/Q109607",
+              "label": "ruins"
             }
           ],
-          "label": "Sport & leisure"
+          "label": "Building state"
         },
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q190771",
-              "label": "bathroom"
+              "id": "https://www.wikidata.org/wiki/Q961082",
+              "label": "arbour"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q193837",
-              "label": "bedroom"
+              "id": "https://www.wikidata.org/wiki/Q215635",
+              "label": "breakwater"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q661199",
-              "label": "dining room"
+              "id": "https://www.wikidata.org/wiki/Q1198413",
+              "label": "camp"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q43164",
-              "label": "Kitchen"
+              "id": "https://www.wikidata.org/wiki/Q23413",
+              "label": "castle"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q475018",
-              "label": "living room"
+              "id": "https://www.wikidata.org/wiki/Q53060",
+              "label": "gate"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1796966",
+              "label": "grandstand"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q162875",
+              "label": "mausoleum"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q16560",
+              "label": "palace"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11303",
+              "label": "skyscraper"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q12518",
+              "label": "tower"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q143912",
+              "label": "triumphal arch"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q43483 ",
+              "label": "well"
             }
           ],
-          "label": "Interior"
+          "label": "Building type"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q166118",
+              "label": "archive"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q41253",
+              "label": "cinema"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1060829",
+              "label": "concert hall"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1320830",
+              "label": "gallery"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q7075",
+              "label": "library"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q33506",
+              "label": "museum"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q153562",
+              "label": "opera house"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q194428",
+              "label": "stage"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q24354",
+              "label": "theater"
+            }
+          ],
+          "label": "Culture"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q1469420",
+              "label": "institution for adult education"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q126807",
+              "label": "kindergarten"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q62832",
+              "label": "observatory"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q31855",
+              "label": "research institute"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1244442",
+              "label": "school"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q3918",
+              "label": "university/academy/college"
+            }
+          ],
+          "label": "Education & science"
+        },
+        {
+          "children": [
+            {
+              "id": "https://en.wikipedia.org/wiki/Terrace_(building)",
+              "label": "(restaurant) terrace"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q187456",
+              "label": "bar, pub, nightclub"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q866742",
+              "label": "bistro"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q131183",
+              "label": "cabaret"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q30022",
+              "label": "café/espresso bar"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q133215",
+              "label": "casino"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1188223",
+              "label": "dance hall"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1228895",
+              "label": "disco"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q8719053",
+              "label": "music club"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11707",
+              "label": "restaurant/inn"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q3303463",
+              "label": "street food, fast food"
+            }
+          ],
+          "label": "Gastronomy & nightlife"
         },
         {
           "children": [
@@ -949,6 +680,198 @@
         {
           "children": [
             {
+              "id": "https://www.wikidata.org/wiki/Q190771",
+              "label": "bathroom"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q193837",
+              "label": "bedroom"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q661199",
+              "label": "dining room"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q43164",
+              "label": "Kitchen"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q475018",
+              "label": "living room"
+            }
+          ],
+          "label": "Interior"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q389959",
+              "label": "air-raid shelter"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q131263",
+              "label": "barracks"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q81715",
+              "label": "barricade"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q152081",
+              "label": "concentration camp"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q57821",
+              "label": "fortification"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2387974",
+              "label": "military hospital"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q861951",
+              "label": "police station"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q40357",
+              "label": "prison/jail"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1852785",
+              "label": "trench"
+            }
+          ],
+          "label": "Military, police & judiciary"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q101687",
+              "label": "altar"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q39614",
+              "label": "cemetery"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q16970",
+              "label": "church"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q192619",
+              "label": "crypt"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q173387",
+              "label": "grave"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q44613",
+              "label": "Monastery"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q32815",
+              "label": "mosque"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1370598",
+              "label": "sacral building (others)"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q34627",
+              "label": "synagogue"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q44539",
+              "label": "temple"
+            }
+          ],
+          "label": "Religion"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q1251403",
+              "label": "alley"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q207934",
+              "label": "avenue"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q221722",
+              "label": "bike lane"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q54114",
+              "label": "boulevard"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q12280",
+              "label": "bridge"
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki/Highway",
+              "label": "main road"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q46622",
+              "label": "motorway"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1433633",
+              "label": "parking space"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q369730",
+              "label": "pedestrian zone"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q633423",
+              "label": "rails"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q674950",
+              "label": "residential street"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q16968135",
+              "label": "ropeway"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q21000333",
+              "label": "shopping street"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q177749",
+              "label": "sidewalk/pavement"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q174782",
+              "label": "square"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q79007",
+              "label": "street"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q628179",
+              "label": "trail"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q44377",
+              "label": "tunnel"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q13634881",
+              "label": "walkway"
+            }
+          ],
+          "label": "Roads and squares"
+        },
+        {
+          "children": [
+            {
               "id": "https://www.wikidata.org/wiki/Q216107",
               "label": "department store"
             },
@@ -959,10 +882,6 @@
             {
               "id": "https://www.wikidata.org/wiki/Q330284",
               "label": "open air market"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11315",
-              "label": "shopping arcade"
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11315",
@@ -986,43 +905,161 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q166118",
-              "label": "archive"
+              "id": "https://www.wikidata.org/wiki/Q194195",
+              "label": "amusement park"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q41253",
-              "label": "cinema"
+              "id": "https://www.wikidata.org/wiki/Q2290113",
+              "label": "boxing ring"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1060829",
-              "label": "concert hall"
+              "id": "https://www.wikidata.org/wiki/Q1193438",
+              "label": "bullring"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1320830",
-              "label": "gallery"
+              "id": "https://www.wikidata.org/wiki/Q47928",
+              "label": "circus"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q7075",
-              "label": "library"
+              "id": "https://www.wikidata.org/wiki/Q13607440",
+              "label": "playground"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q33506",
-              "label": "museum"
+              "id": "https://www.wikidata.org/wiki/Q7361066",
+              "label": "roller-skating rink"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q153562",
-              "label": "opera house"
+              "id": "https://www.wikidata.org/wiki/Q39463060",
+              "label": "soccer field"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q194428",
-              "label": "stage"
+              "id": "https://www.wikidata.org/wiki/Q1202618",
+              "label": "sports ground / sports venue"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q24354",
-              "label": "theater"
+              "id": "https://www.wikidata.org/wiki/Q483110",
+              "label": "stadium"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q13586493",
+              "label": "swimming pool"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q741118",
+              "label": "tennis court"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q830528",
+              "label": "velodrome"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q43501",
+              "label": "zoo"
             }
           ],
-          "label": "Culture"
+          "label": "Sport & leisure"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q12323",
+              "label": "dam"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q181623",
+              "label": "depot/warehouse"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q114768",
+              "label": "granary"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q13416228",
+              "label": "incineration plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q152810",
+              "label": "landfill"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q159719",
+              "label": "power plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q156849",
+              "label": "sewer"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q385557",
+              "label": "slaughterhouse"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q15242449",
+              "label": "treatment plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q6501028",
+              "label": "water tower"
+            }
+          ],
+          "label": "Supply/disposal"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q1248784",
+              "label": "airport"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1777951",
+              "label": "boathouse"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q494829",
+              "label": "bus station"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q953806",
+              "label": "bus stop"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q12284",
+              "label": "canal"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q22733",
+              "label": "garage"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q205495",
+              "label": "gas station"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q105731",
+              "label": "lock"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q928830",
+              "label": "metro station"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q44782",
+              "label": "port"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1395196",
+              "label": "taxi rank"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q55488",
+              "label": "train station"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2175765",
+              "label": "tram stop"
+            }
+          ],
+          "label": "Transport"
         },
         {
           "children": [
@@ -1060,173 +1097,29 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q961082",
-              "label": "arbour"
+              "id": "https://www.wikidata.org/wiki/Q22687",
+              "label": "bank"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q215635",
-              "label": "breakwater"
+              "id": "https://www.wikidata.org/wiki/Q83405",
+              "label": "factory"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1198413",
-              "label": "camp"
+              "id": "https://www.wikidata.org/wiki/Q1021645",
+              "label": "office"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q23413",
-              "label": "castle"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q53060",
-              "label": "gate"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1796966",
-              "label": "grandstand"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q162875",
-              "label": "mausoleum"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q16560",
-              "label": "palace"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11303",
-              "label": "skyscraper"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q200334",
-              "label": "tower"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q143912",
-              "label": "triumphal arch"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q43483 ",
-              "label": "well"
+              "id": "https://www.wikidata.org/wiki/Q656720",
+              "label": "workshop"
             }
           ],
-          "label": "Building type"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q543654",
-              "label": "city hall"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q16831714",
-              "label": "government building"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q7138926",
-              "label": "parliament building"
-            }
-          ],
-          "label": "Administration"
+          "label": "Work"
         }
       ],
       "label": "Buildings & structures"
     },
     {
       "children": [
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/bike_ride",
-              "label": "bike ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/boat_trip",
-              "label": "boat trip"
-            },
-            {
-              "id": "https://imediacities.eu/resource/bus_ride",
-              "label": "bus ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/car_ride",
-              "label": "car ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/metro_ride",
-              "label": "metro ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/motorcycle_ride",
-              "label": "motorcycle ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/plane_ride",
-              "label": "plane ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/train_ride",
-              "label": "train ride"
-            },
-            {
-              "id": "https://imediacities.eu/resource/tram_ride",
-              "label": "tram ride"
-            }
-          ],
-          "label": "Locomotion"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q35856",
-              "label": "baptism"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1539016",
-              "label": "church service"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1362402",
-              "label": "First communion"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q898830",
-              "label": "Procession"
-            }
-          ],
-          "label": "Religious event"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q200538",
-              "label": "celebration"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q525356",
-              "label": "commemoration"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q201676",
-              "label": "funeral"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1417098",
-              "label": "opening"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q657449",
-              "label": "parade"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1783115",
-              "label": "queue"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q49836",
-              "label": "wedding"
-            }
-          ],
-          "label": "Other"
-        },
         {
           "children": [
             {
@@ -1308,6 +1201,97 @@
         {
           "children": [
             {
+              "id": "https://www.wikidata.org/wiki/Q178651",
+              "label": "interview"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q603773",
+              "label": "lecture"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2761147",
+              "label": "meeting"
+            }
+          ],
+          "label": "Interaction"
+        },
+        {
+          "children": [
+            {
+              "id": "https://imediacities.eu/resource/bike_ride",
+              "label": "bike ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/boat_trip",
+              "label": "boat trip"
+            },
+            {
+              "id": "https://imediacities.eu/resource/bus_ride",
+              "label": "bus ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/car_ride",
+              "label": "car ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/metro_ride",
+              "label": "metro ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/motorcycle_ride",
+              "label": "motorcycle ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/plane_ride",
+              "label": "plane ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/train_ride",
+              "label": "train ride"
+            },
+            {
+              "id": "https://imediacities.eu/resource/tram_ride",
+              "label": "tram ride"
+            }
+          ],
+          "label": "Locomotion"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q200538",
+              "label": "celebration"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q525356",
+              "label": "commemoration"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q201676",
+              "label": "funeral"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1417098",
+              "label": "opening"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q657449",
+              "label": "parade"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1783115",
+              "label": "queue"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q49836",
+              "label": "wedding"
+            }
+          ],
+          "label": "Other"
+        },
+        {
+          "children": [
+            {
               "id": "https://www.wikidata.org/wiki/Q18812548",
               "label": "campaign"
             },
@@ -1341,19 +1325,23 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q178651",
-              "label": "interview"
+              "id": "https://www.wikidata.org/wiki/Q35856",
+              "label": "baptism"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q603773",
-              "label": "lecture"
+              "id": "https://www.wikidata.org/wiki/Q1539016",
+              "label": "church service"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q2761147",
-              "label": "meeting"
+              "id": "https://www.wikidata.org/wiki/Q1362402",
+              "label": "First communion"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q898830",
+              "label": "Procession"
             }
           ],
-          "label": "Interaction"
+          "label": "Religious event"
         },
         {
           "children": [
@@ -1388,15 +1376,31 @@
         {
           "children": [
             {
-              "id": "https://en.wikipedia.org/wiki/Listening",
-              "label": "listening"
+              "id": "https://imediacities.eu/resource/carrying",
+              "label": "carrying"
             },
             {
-              "id": "https://imediacities.eu/resource/watching",
-              "label": "watching"
+              "id": "https://www.wikidata.org/wiki/Q22857",
+              "label": "climbing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1427203",
+              "label": "crawling"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1151752",
+              "label": "jumping"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q105674",
+              "label": "running"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q6537379",
+              "label": "walking"
             }
           ],
-          "label": "Perception"
+          "label": "Body movement"
         },
         {
           "children": [
@@ -1422,86 +1426,6 @@
             }
           ],
           "label": "Care & education"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1403016",
-              "label": "arresting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q3242199",
-              "label": "beating"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q891854",
-              "label": "bombing, bombardment"
-            },
-            {
-              "id": "https://imediacities.eu/resource/food_dispensation",
-              "label": "food dispensation"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2252077",
-              "label": "shooting"
-            }
-          ],
-          "label": "War & conflict"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q7307",
-              "label": "kissing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q814696",
-              "label": "applauding"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q24488",
-              "label": "high five"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q14467155",
-              "label": "gazer (looking straight into the camera)"
-            }
-          ],
-          "label": "Interaction"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q174876",
-              "label": "breastfeeding"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q876776",
-              "label": "drinking"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q213449",
-              "label": "eating"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2836947",
-              "label": "feeding"
-            }
-          ],
-          "label": "Eating & drinking"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q3315513",
-              "label": "resting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q35831",
-              "label": "sleeping"
-            }
-          ],
-          "label": "Relaxation"
         },
         {
           "children": [
@@ -1571,134 +1495,23 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q11451",
-              "label": "agriculture"
+              "id": "https://www.wikidata.org/wiki/Q174876",
+              "label": "breastfeeding"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q17200001",
-              "label": "cleaning"
+              "id": "https://www.wikidata.org/wiki/Q876776",
+              "label": "drinking"
             },
             {
-              "id": "https://en.wikipedia.org/wiki/Commerce",
-              "label": "commerce"
+              "id": "https://www.wikidata.org/wiki/Q213449",
+              "label": "eating"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q329637",
-              "label": "construction work"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q38695",
-              "label": "cooking"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2207288",
-              "label": "craft"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q4232202",
-              "label": "digging"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1458465",
-              "label": "fruit picking"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q124946",
-              "label": "gardening"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q8148",
-              "label": "industry"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11034",
-              "label": "printing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q36633",
-              "label": "prostitution"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q7406919",
-              "label": "service"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1517909",
-              "label": "shoe-shining"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q814214",
-              "label": "unloading"
+              "id": "https://www.wikidata.org/wiki/Q2836947",
+              "label": "feeding"
             }
           ],
-          "label": "Work activity"
-        },
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/all-fours",
-              "label": "all-fours"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q8866546",
-              "label": "kneeling"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2268776",
-              "label": "lying"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1144593",
-              "label": "sitting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2540134",
-              "label": "squatting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1986098",
-              "label": "standing"
-            }
-          ],
-          "label": "Posture / position"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q153271",
-              "label": "fascist greeting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2543966",
-              "label": "raised fist"
-            }
-          ],
-          "label": "Politics"
-        },
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/dressing",
-              "label": "dressing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1542314",
-              "label": "sightseeing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q662860",
-              "label": "smoking"
-            },
-            {
-              "id": "https://imediacities.eu/resource/undressing",
-              "label": "undressing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1362683",
-              "label": "waiting"
-            }
-          ],
-          "label": "Other"
+          "label": "Eating & drinking"
         },
         {
           "children": [
@@ -1732,6 +1545,120 @@
             }
           ],
           "label": "Expression"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q7307",
+              "label": "kissing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q814696",
+              "label": "applauding"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q24488",
+              "label": "high five"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q14467155",
+              "label": "gazer (looking straight into the camera)"
+            }
+          ],
+          "label": "Interaction"
+        },
+        {
+          "children": [
+            {
+              "id": "https://imediacities.eu/resource/dressing",
+              "label": "dressing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1542314",
+              "label": "sightseeing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q662860",
+              "label": "smoking"
+            },
+            {
+              "id": "https://imediacities.eu/resource/undressing",
+              "label": "undressing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1362683",
+              "label": "waiting"
+            }
+          ],
+          "label": "Other"
+        },
+        {
+          "children": [
+            {
+              "id": "https://en.wikipedia.org/wiki/Listening",
+              "label": "listening"
+            },
+            {
+              "id": "https://imediacities.eu/resource/watching",
+              "label": "watching"
+            }
+          ],
+          "label": "Perception"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q153271",
+              "label": "fascist greeting"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2543966",
+              "label": "raised fist"
+            }
+          ],
+          "label": "Politics"
+        },
+        {
+          "children": [
+            {
+              "id": "https://imediacities.eu/resource/all-fours",
+              "label": "all-fours"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q8866546",
+              "label": "kneeling"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2268776",
+              "label": "lying"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1144593",
+              "label": "sitting"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2540134",
+              "label": "squatting"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1986098",
+              "label": "standing"
+            }
+          ],
+          "label": "Posture / position"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q3315513",
+              "label": "resting"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q35831",
+              "label": "sleeping"
+            }
+          ],
+          "label": "Relaxation"
         },
         {
           "children": [
@@ -1849,31 +1776,92 @@
         {
           "children": [
             {
-              "id": "https://imediacities.eu/resource/carrying",
-              "label": "carrying"
+              "id": "https://www.wikidata.org/wiki/Q1403016",
+              "label": "arresting"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q22857",
-              "label": "climbing"
+              "id": "https://www.wikidata.org/wiki/Q3242199",
+              "label": "beating"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1427203",
-              "label": "crawling"
+              "id": "https://www.wikidata.org/wiki/Q891854",
+              "label": "bombing, bombardment"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q1151752",
-              "label": "jumping"
+              "id": "https://imediacities.eu/resource/food_dispensation",
+              "label": "food dispensation"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q105674",
-              "label": "running"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q6537379",
-              "label": "walking"
+              "id": "https://www.wikidata.org/wiki/Q2252077",
+              "label": "shooting"
             }
           ],
-          "label": "Body movement"
+          "label": "War & conflict"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q11451",
+              "label": "agriculture"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q17200001",
+              "label": "cleaning"
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki/Commerce",
+              "label": "commerce"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q329637",
+              "label": "construction work"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q38695",
+              "label": "cooking"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2207288",
+              "label": "craft"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q4232202",
+              "label": "digging"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1458465",
+              "label": "fruit picking"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q124946",
+              "label": "gardening"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q8148",
+              "label": "industry"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11034",
+              "label": "printing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q36633",
+              "label": "prostitution"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q7406919",
+              "label": "service"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1517909",
+              "label": "shoe-shining"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q814214",
+              "label": "unloading"
+            }
+          ],
+          "label": "Work activity"
         }
       ],
       "label": "Activities"
@@ -1883,27 +1871,19 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q10874",
-              "label": "blind"
+              "id": "https://www.wikidata.org/wiki/Q80994",
+              "label": "adult"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q48422",
-              "label": "corpse"
+              "id": "https://www.wikidata.org/wiki/Q7569",
+              "label": "child"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q15978181",
-              "label": "disabled person"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11995",
-              "label": "pregnant"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q184753",
-              "label": "wounded"
+              "id": "https://www.wikidata.org/wiki/Q2191986",
+              "label": "elderly"
             }
           ],
-          "label": "State"
+          "label": "Age"
         },
         {
           "children": [
@@ -2047,256 +2027,30 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q80994",
-              "label": "adult"
+              "id": "https://www.wikidata.org/wiki/Q10874",
+              "label": "blind"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q7569",
-              "label": "child"
+              "id": "https://www.wikidata.org/wiki/Q48422",
+              "label": "corpse"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q2191986",
-              "label": "elderly"
-            }
-          ],
-          "label": "Age"
-        }
-      ],
-      "label": "People"
-    },
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q6008603",
-              "label": "in-camera editing"
+              "id": "https://www.wikidata.org/wiki/Q15978181",
+              "label": "disabled person"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q648877",
-              "label": "post-production editing"
-            }
-          ],
-          "label": "Editing"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q217199",
-              "label": "added instrumental music"
+              "id": "https://www.wikidata.org/wiki/Q11995",
+              "label": "pregnant"
             },
             {
-              "id": "https://www.wikidata.org/wiki/Q217199",
-              "label": "added vocal music"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q52943",
-              "label": "conversation"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q639197",
-              "label": "instrumental music"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q178651",
-              "label": "interview"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q217199",
-              "label": "soundtrack"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q861911",
-              "label": "speech"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q27939",
-              "label": "vocal music"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1146822",
-              "label": "voice over"
-            }
-          ],
-          "label": "Audio"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q455595",
-              "label": "amateur film"
-            },
-            {
-              "id": "https://imediacities.eu/resource/professional_production",
-              "label": "professional production"
-            }
-          ],
-          "label": "Production type"
-        },
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/cross_fade",
-              "label": "cross fade"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q5647097",
-              "label": "hand held camera"
-            },
-            {
-              "id": "https://imediacities.eu/resource/panning_shot",
-              "label": "panning shot"
-            },
-            {
-              "id": "https://imediacities.eu/resource/phantom-ride",
-              "label": "phantom-ride"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2919140",
-              "label": "tilt"
-            },
-            {
-              "id": "https://imediacities.eu/resource/tracking___travelling",
-              "label": "tracking / travelling"
-            },
-            {
-              "id": "http://dbpedia.org/resource/Zooming_(filmmaking)",
-              "label": "zoom"
-            }
-          ],
-          "label": "Camera movement"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q11425",
-              "label": "animation"
-            },
-            {
-              "id": "https://en.wikipedia.org/wiki/Photographic_filter",
-              "label": "effect filter"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q381243",
-              "label": "special effects"
-            }
-          ],
-          "label": "Effects"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q3391185",
-              "label": "american shot"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q296001",
-              "label": "close-up (CU)"
-            },
-            {
-              "id": "https://imediacities.eu/resource/extreme_close-up_(ECU)",
-              "label": "extreme close-up (ECU)"
-            },
-            {
-              "id": "https://imediacities.eu/resource/extreme_long_shot_(ELS)",
-              "label": "extreme long shot (ELS)"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q3294287",
-              "label": "long shot (LS)"
-            },
-            {
-              "id": "https://en.wikipedia.org/wiki/Medium_shot",
-              "label": "medium close shot (MCS)"
-            },
-            {
-              "id": "https://imediacities.eu/resource/medium_full_shot_(MFS)",
-              "label": "medium full shot (MFS)"
-            },
-            {
-              "id": "https://imediacities.eu/resource/medium_long_shot_(MLS)",
-              "label": "medium long shot (MLS)"
-            },
-            {
-              "id": "https://imediacities.eu/resource/medium_shot_(MS)",
-              "label": "medium shot (MS)"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q41363",
-              "label": "panorama"
-            }
-          ],
-          "label": "Shot size"
-        },
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/scratches",
-              "label": "scratches"
-            },
-            {
-              "id": "https://en.wikipedia.org/wiki/Film_splicer",
-              "label": "splice"
+              "id": "https://www.wikidata.org/wiki/Q184753",
+              "label": "wounded"
             }
           ],
           "label": "State"
-        },
-        {
-          "children": [
-            {
-              "id": "https://imediacities.eu/resource/black_frame",
-              "label": "black frame"
-            },
-            {
-              "id": "https://imediacities.eu/resource/dissolve",
-              "label": "dissolve"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q245069",
-              "label": "intertitle"
-            },
-            {
-              "id": "https://imediacities.eu/resource/iris_shot",
-              "label": "iris shot"
-            },
-            {
-              "id": "https://imediacities.eu/resource/stop",
-              "label": "stop"
-            },
-            {
-              "id": "https://imediacities.eu/resource/white_frame",
-              "label": "white frame"
-            },
-            {
-              "id": "https://imediacities.eu/resource/wipe",
-              "label": "wipe"
-            }
-          ],
-          "label": "Transition"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q4688031",
-              "label": "aerial shot"
-            },
-            {
-              "id": "https://imediacities.eu/resource/high_angle",
-              "label": "high angle"
-            },
-            {
-              "id": "https://imediacities.eu/resource/low_angle",
-              "label": "low angle"
-            },
-            {
-              "id": "https://imediacities.eu/resource/straight_on_angle",
-              "label": "straight on angle"
-            }
-          ],
-          "label": "Camera angle"
         }
       ],
-      "label": "Film technique"
+      "label": "People"
     },
     {
       "children": [
@@ -2324,6 +2078,39 @@
             }
           ],
           "label": "Aircrafts"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q35872",
+              "label": "boat"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q39804",
+              "label": "cruiseship"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2529255",
+              "label": "float"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q170483",
+              "label": "sailing ship"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11446",
+              "label": "ship"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q178193",
+              "label": "steamboat"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q191826",
+              "label": "tugboat"
+            }
+          ],
+          "label": "Boats"
         },
         {
           "children": [
@@ -2417,74 +2204,12 @@
             }
           ],
           "label": "Vehicules"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q35872",
-              "label": "boat"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q39804",
-              "label": "cruiseship"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q2529255",
-              "label": "float"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q170483",
-              "label": "sailing ship"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11446",
-              "label": "ship"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q178193",
-              "label": "steamboat"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q191826",
-              "label": "tugboat"
-            }
-          ],
-          "label": "Boats"
         }
       ],
       "label": "Means of transportation"
     },
     {
       "children": [
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q42295",
-              "label": "bush"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q235352",
-              "label": "crop plant"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1369438",
-              "label": "decorative plant"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q8564039",
-              "label": "flowerbed"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q869381",
-              "label": "potted plant"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q10884",
-              "label": "tree"
-            }
-          ],
-          "label": "Plants and trees"
-        },
         {
           "children": [
             {
@@ -2627,6 +2352,35 @@
             }
           ],
           "label": "Fruit & vegetables"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q42295",
+              "label": "bush"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q235352",
+              "label": "crop plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1369438",
+              "label": "decorative plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q8564039",
+              "label": "flowerbed"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q869381",
+              "label": "potted plant"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q10884",
+              "label": "tree"
+            }
+          ],
+          "label": "Plants and trees"
         }
       ],
       "label": "Nature"
@@ -2636,8 +2390,181 @@
         {
           "children": [
             {
+              "id": "https://www.wikidata.org/wiki/Q5843",
+              "label": "backpack"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q467505",
+              "label": "handbag"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q44416",
+              "label": "tie"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q41607",
+              "label": "umbrella"
+            }
+          ],
+          "label": "Accessories"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q1352349",
+              "label": "architectural model"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1485994",
+              "label": "camera"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q93184",
+              "label": "drawing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q161524",
+              "label": "mask"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q133067",
+              "label": "mosaic"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q335095",
+              "label": "movie camera"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q34379",
+              "label": "musical instrument"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q3305213",
+              "label": "painting"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q125191",
+              "label": "photo"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1913135",
+              "label": "puppet"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q23662753",
+              "label": "relief"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q860861",
+              "label": "sculpture / statue"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q471835",
+              "label": "sgraffito"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q184296",
+              "label": "tapestry"
+            }
+          ],
+          "label": "Arts"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q39397",
+              "label": "axe"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q178692",
+              "label": "construction crane"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11019",
+              "label": "construction vehicle"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q25294",
+              "label": "hammer"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q168639",
+              "label": "ladder"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q200822",
+              "label": "rake"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q233320",
+              "label": "scaffold"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q216642",
+              "label": "shovel"
+            }
+          ],
+          "label": "Construction & tools"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q42177",
+              "label": "bed"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q15026",
+              "label": "chair"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q36539",
+              "label": "oven"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q131514",
+              "label": "sofa"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q14748",
+              "label": "table"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q7857",
+              "label": "toilet"
+            }
+          ],
+          "label": "Furniture"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q571",
+              "label": "book"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q41298",
+              "label": "magazine"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q11032",
+              "label": "newspaper"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q273623",
+              "label": "radio"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q289",
+              "label": "television"
+            }
+          ],
+          "label": "Media"
+        },
+        {
+          "children": [
+            {
               "id": "https://www.wikidata.org/wiki/Q190399",
-              "label": "(political) pamphlet"
+              "label": "political pamphlet"
             },
             {
               "id": "https://www.wikidata.org/wiki/Q64418",
@@ -2793,7 +2720,7 @@
             },
             {
               "id": "https://www.wikidata.org/wiki/Q188688",
-              "label": "Swing"
+              "label": "swing"
             },
             {
               "id": "https://www.wikidata.org/wiki/Q213477",
@@ -2837,52 +2764,6 @@
             }
           ],
           "label": "Other"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q571",
-              "label": "book"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q41298",
-              "label": "magazine"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11032",
-              "label": "newspaper"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q273623",
-              "label": "radio"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q289",
-              "label": "television"
-            }
-          ],
-          "label": "Media"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q5843",
-              "label": "backpack"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q467505",
-              "label": "handbag"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q44416",
-              "label": "tie"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q41607",
-              "label": "umbrella"
-            }
-          ],
-          "label": "Accessories"
         },
         {
           "children": [
@@ -2968,96 +2849,6 @@
         {
           "children": [
             {
-              "id": "https://www.wikidata.org/wiki/Q42177",
-              "label": "bed"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q15026",
-              "label": "chair"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q36539",
-              "label": "oven"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q131514",
-              "label": "sofa"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q14748",
-              "label": "table"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q7857",
-              "label": "toilet"
-            }
-          ],
-          "label": "Furniture"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q1352349",
-              "label": "architectural model"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1485994",
-              "label": "camera"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q93184",
-              "label": "drawing"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q161524",
-              "label": "mask"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q133067",
-              "label": "mosaic"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q335095",
-              "label": "movie camera"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q34379",
-              "label": "musical instrument"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q3305213",
-              "label": "painting"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q125191",
-              "label": "photo"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q1913135",
-              "label": "puppet"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q23662753",
-              "label": "relief"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q860861",
-              "label": "sculpture / statue"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q471835",
-              "label": "sgraffito"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q184296",
-              "label": "tapestry"
-            }
-          ],
-          "label": "Arts"
-        },
-        {
-          "children": [
-            {
               "id": "https://www.wikidata.org/wiki/Q153988",
               "label": "bowl"
             },
@@ -3083,43 +2874,6 @@
             }
           ],
           "label": "Tableware"
-        },
-        {
-          "children": [
-            {
-              "id": "https://www.wikidata.org/wiki/Q39397",
-              "label": "axe"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q178692",
-              "label": "construction crane"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q11019",
-              "label": "construction vehicle"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q25294",
-              "label": "hammer"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q168639",
-              "label": "ladder"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q200822",
-              "label": "rake"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q233320",
-              "label": "scaffold"
-            },
-            {
-              "id": "https://www.wikidata.org/wiki/Q216642",
-              "label": "shovel"
-            }
-          ],
-          "label": "Construction & tools"
         }
       ],
       "label": "Objects"
@@ -3213,6 +2967,240 @@
         }
       ],
       "label": "Time of day"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q217199",
+              "label": "added instrumental music"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q217199",
+              "label": "added vocal music"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q52943",
+              "label": "conversation"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q639197",
+              "label": "instrumental music"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q178651",
+              "label": "interview"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q217199",
+              "label": "soundtrack"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q861911",
+              "label": "speech"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q685884",
+              "label": "vocal music"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q1146822",
+              "label": "voice over"
+            }
+          ],
+          "label": "Audio"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q4688031",
+              "label": "aerial shot"
+            },
+            {
+              "id": "https://imediacities.eu/resource/high_angle",
+              "label": "high angle"
+            },
+            {
+              "id": "https://imediacities.eu/resource/low_angle",
+              "label": "low angle"
+            },
+            {
+              "id": "https://imediacities.eu/resource/straight_on_angle",
+              "label": "straight on angle"
+            }
+          ],
+          "label": "Camera angle"
+        },
+        {
+          "children": [
+            {
+              "id": "https://imediacities.eu/resource/cross_fade",
+              "label": "cross fade"
+            },
+            {
+              "id": "https://imediacities.eu/resource/black_frame",
+              "label": "black frame"
+            },
+            {
+              "id": "https://imediacities.eu/resource/dissolve",
+              "label": "dissolve"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q245069",
+              "label": "intertitle"
+            },
+            {
+              "id": "https://imediacities.eu/resource/iris_shot",
+              "label": "iris shot"
+            },
+            {
+              "id": "https://imediacities.eu/resource/stop",
+              "label": "stop"
+            },
+            {
+              "id": "https://imediacities.eu/resource/white_frame",
+              "label": "white frame"
+            },
+            {
+              "id": "https://imediacities.eu/resource/wipe",
+              "label": "wipe"
+            }
+          ],
+          "label": "Transition"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q5647097",
+              "label": "hand held camera"
+            },
+            {
+              "id": "https://imediacities.eu/resource/panning_shot",
+              "label": "panning shot"
+            },
+            {
+              "id": "https://imediacities.eu/resource/phantom-ride",
+              "label": "phantom-ride"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q2919140",
+              "label": "tilt"
+            },
+            {
+              "id": "https://imediacities.eu/resource/tracking___travelling",
+              "label": "tracking / travelling"
+            },
+            {
+              "id": "http://dbpedia.org/resource/Zooming_(filmmaking)",
+              "label": "zoom"
+            }
+          ],
+          "label": "Camera movement"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q6008603",
+              "label": "in-camera editing"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q648877",
+              "label": "post-production editing"
+            }
+          ],
+          "label": "Editing"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q11425",
+              "label": "animation"
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki/Photographic_filter",
+              "label": "effect filter"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q381243",
+              "label": "special effects"
+            }
+          ],
+          "label": "Effects"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q455595",
+              "label": "amateur film"
+            },
+            {
+              "id": "https://imediacities.eu/resource/professional_production",
+              "label": "professional production"
+            }
+          ],
+          "label": "Production type"
+        },
+        {
+          "children": [
+            {
+              "id": "https://www.wikidata.org/wiki/Q3391185",
+              "label": "american shot"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q296001",
+              "label": "close-up (CU)"
+            },
+            {
+              "id": "https://imediacities.eu/resource/extreme_close-up_(ECU)",
+              "label": "extreme close-up (ECU)"
+            },
+            {
+              "id": "https://imediacities.eu/resource/extreme_long_shot_(ELS)",
+              "label": "extreme long shot (ELS)"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q3294287",
+              "label": "long shot (LS)"
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki/Medium_shot",
+              "label": "medium close shot (MCS)"
+            },
+            {
+              "id": "https://imediacities.eu/resource/medium_full_shot_(MFS)",
+              "label": "medium full shot (MFS)"
+            },
+            {
+              "id": "https://imediacities.eu/resource/medium_long_shot_(MLS)",
+              "label": "medium long shot (MLS)"
+            },
+            {
+              "id": "https://imediacities.eu/resource/medium_shot_(MS)",
+              "label": "medium shot (MS)"
+            },
+            {
+              "id": "https://www.wikidata.org/wiki/Q41363",
+              "label": "panorama"
+            }
+          ],
+          "label": "Shot size"
+        },
+        {
+          "children": [
+            {
+              "id": "https://imediacities.eu/resource/scratches",
+              "label": "scratches"
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki/Film_splicer",
+              "label": "splice"
+            }
+          ],
+          "label": "State"
+        }
+      ],
+      "label": "Film technique"
     },
     {
       "children": [
