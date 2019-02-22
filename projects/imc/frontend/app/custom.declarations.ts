@@ -11,6 +11,7 @@ import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
 import { UploadComponent } from './components/upload/upload';
+import { UserWorkspaceComponent } from './components/user-workspace/user-workspace';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
@@ -94,6 +95,7 @@ export const declarations: any[] = [
     ArchivesListComponent, ArchiveComponent,
 	AdminGroupsComponent,
     UploadComponent,
+    UserWorkspaceComponent,
 	CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,

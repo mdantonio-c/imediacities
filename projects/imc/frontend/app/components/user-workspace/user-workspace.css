@@ -1,0 +1,12 @@
+.imc--topbar .material-icons,
+.imc--topbar--title {
+	color: #fff;
+	margin-right: 10px;
+}
+
+.imc--topbar .box-search {
+	background: #fff;
+    padding: 5px;
+    border-radius: 2px;
+    border: 2px solid #707070;
+}

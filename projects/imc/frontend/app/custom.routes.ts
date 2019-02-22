@@ -9,6 +9,7 @@ import { UploadComponent } from './components/upload/upload';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { AppMediaComponent } from './components/app-media/app-media';
+import { UserWorkspaceComponent } from './components/user-workspace/user-workspace';
 
 export const appRoutes: Routes = [
 	{
@@ -31,6 +32,13 @@ export const appRoutes: Routes = [
 		canActivate: [AuthGuard],
 		runGuardsAndResolvers: 'always',
 		data: { roles: ['Archive'] }
+	},
+	{
+		path: 'app/myWorkspace',
+		component: UserWorkspaceComponent,
+		canActivate: [AuthGuard],
+		runGuardsAndResolvers: 'always',
+		data: { roles: ['Researcher'] }
 	},
 	// { path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
 	{ path: 'app/catalog', component: CatalogComponent },
