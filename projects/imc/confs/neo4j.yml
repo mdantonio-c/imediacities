@@ -17,6 +17,10 @@ services:
     environment:
       ACTIVATE: 0
 
+  rabbit:
+    environment:
+      ACTIVATE: 0
+
   backend:
     environment:
       ACTIVATE: 0
