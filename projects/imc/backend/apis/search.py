@@ -224,6 +224,9 @@ class Search(GraphBaseOperations):
                 term = self.graph.sanitize_input(term)
                 term = self.graph.fuzzy_tokenize(term)
 
+            # Create with:
+            # CALL db.index.fulltext.createNodeIndex("titles",["Title", "Description", "Keyword"],["text", "term"])
+
             fulltext = """
                 CALL db.index.fulltext.queryNodes("titles", '{term}')
                 YIELD node, score
