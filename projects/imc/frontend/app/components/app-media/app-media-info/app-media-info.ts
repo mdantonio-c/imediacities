@@ -1,4 +1,7 @@
 import { Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { AuthService } from "/rapydo/src/app/services/auth";
+import { AppMediaService } from "../../../services/app-media";
+import { is_item_owner } from "../../../decorators/app-item-owner";
 
 @Component({
     selector: 'app-media-info',
@@ -11,6 +14,8 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
     @Input() user_language: any;
     @ViewChild('description_languages_selector') description_languages_selector: ElementRef;
     @ViewChild('keyword_languages_selector') keyword_languages_selector: ElementRef;
+
+    @is_item_owner() is_item_owner;
 
     public description_languages: any;
     public description_active = null;
@@ -27,8 +32,10 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         format: true
     };
     item: any;
+    user: any;
 
-    constructor() {
+    constructor(private AuthService: AuthService,
+                private MediaService: AppMediaService,) {
     }
 
     /**
@@ -178,11 +185,18 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         })
 
     }
+
     expandCard(card) {
         this.isCollapsed[card] = !this.isCollapsed[card];
     }
 
+    togglePublicAccess() {
+        let newVal = !this.info.relationships.item[0].attributes.public_access;
+        this.MediaService.updatePublicAccess(newVal);
+    }
+
     ngOnInit() {
+        this.user = this.AuthService.getUser();
         this.description_languages = new Map();
         this.keyword_languages = new Map();
         if (this.user_language) {

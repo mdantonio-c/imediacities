@@ -1,16 +1,8 @@
-common:
-  custom:
-    # publish: true
-    authentication: false
-    authorized:
-      - admin_root
-
 video_content:
   summary: Gets the video content
   # description: -
-  # tags:
-  #   # - logout
-  #   - authentication
+  tags:
+    - video
   custom:
     # publish: true
     authentication: false

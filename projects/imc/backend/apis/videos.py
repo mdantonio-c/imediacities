@@ -155,6 +155,14 @@ class VideoItem(GraphBaseOperations):
                 "Item info not found",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
+        user = self.get_current_user()
+        repo = CreationRepository(self.graph)
+        if not repo.item_belongs_to_user(item, user):
+            raise RestApiException(
+                "User [{0}, {1} {2}] cannot update public access for videos that does not belong to him/her".format(
+                    user.uuid, user.name, user.surname),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+
         data = self.get_input()
         # ONLY public_access allowed at the moment
         public_access = data.get('public_access')

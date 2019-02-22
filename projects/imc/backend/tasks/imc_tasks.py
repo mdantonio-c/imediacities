@@ -201,8 +201,9 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             extract_tech_info(self, item_node, analyze_path,
                               'transcoded_info.json')
 
-            # other version
-            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.mp4')
+            # bind other version
+            v2_ext = '.mp4' if item_type == 'Video' else '.jpg'
+            other_version_uri = os.path.join(analyze_path, 'v2_transcoded' + v2_ext)
             if os.path.exists(other_version_uri):
                 other_item = item_node.other_version.single()
                 if other_item is None:
@@ -222,7 +223,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # - ONLY for videos -
             if item_type == 'Video':
 
-                if old_fps != item_node.framerate:
+                if old_fps is not None and old_fps != item_node.framerate:
                     log.info("Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}"
                              .format(id=item_node.uuid, old_fps=old_fps, new_fps=item_node.framerate))
 

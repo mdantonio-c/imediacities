@@ -173,6 +173,16 @@
                             <strong>Film ID in Archive: </strong>
                             <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
                         </div>
+                        <div class="col-12 space-paragraph-10" *ngIf="user && user.roles['Archive'] && is_item_owner(user, info.relationships.item[0])">
+                            <strong>Public Access: </strong>
+                            <input class="imc--input-checkbox styled-checkbox" id="public-access" type="checkbox" value="on"
+                                (click)="$event.preventDefault()"
+                                [(ngModel)]="info.relationships.item[0].attributes.public_access"
+                                mwlConfirmationPopover
+                                [popoverMessage]="info.relationships.item[0].attributes.public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
+                                (confirm)="togglePublicAccess()">
+                            <label for="public-access"></label>
+                        </div>
                 </app-expansion-panel> 
 
             </div>
