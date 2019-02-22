@@ -58,7 +58,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     _video_source_add (source_url) {
         let token = this.auth.getToken();
         let source = document.createElement('source');
-        source.src = source_url + '&access_token=' + token;
+        let append = (token !== null) ? '&access_token=' + token : '';
+        source.src = source_url + append;
         this.videoPlayer.nativeElement.appendChild(source);
         this.video.load();
     }
