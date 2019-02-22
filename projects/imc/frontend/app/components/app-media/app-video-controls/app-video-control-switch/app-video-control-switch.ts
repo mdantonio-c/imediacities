@@ -55,7 +55,9 @@ export class AppVideoControlSwitchComponent extends AppVideoControlComponent {
      * @returns {string}
      */
     source_create(type) {
-        return `${this.source}?type=${type}`
+        let token = this.parent.auth.getToken();
+        let append = (type === 'video' && token !== null) ? '&access_token=' + token : '';
+        return `${this.source}?type=${type}` + append;
     }
 
     /**
