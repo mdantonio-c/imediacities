@@ -9,6 +9,7 @@ python3 import_automatic_tags.py
     --metadata_set mct
     --domain_name imediacities.hpc.cineca.it
     --token 'Bearer eyJ0eXAiOiJ..'
+    --tool object-detection
 """
 
 from utilities.logs import get_logger
@@ -72,7 +73,7 @@ def import_automatic_tags(metadata_set, domain_name, token, tool):
                 continue
             log.info("Imported automatic tags for item: {item}. STATUS CODE {sc}".format(item=item.uuid, sc=resp.status_code))
             succeed += 1
-        log.info("Imported items: SUCCEED {}, FAILED {}, SKIPPED".format(succeed, failed, skipped))
+        log.info("Imported items: SUCCEED {0}, FAILED {1}, SKIPPED {2}".format(succeed, failed, skipped))
 
 
 if __name__ == '__main__':
