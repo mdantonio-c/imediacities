@@ -54,7 +54,7 @@ def import_xml(metadata_set, domain_name, token):
         for filename in [row[0] for row in results]:
             payload = {'filename': filename, 'mode': 'fast'}
             headers = {'Authorization': token}
-            resp = requests.post("http://{dn}/api/stage".format(dn=domain_name), headers=headers, data=payload)
+            resp = requests.post("https://{dn}/api/stage".format(dn=domain_name), headers=headers, data=payload)
             try:
                 resp.raise_for_status()
             except requests.exceptions.HTTPError as http_error:
