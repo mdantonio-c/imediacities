@@ -187,7 +187,7 @@ class VideoAnnotations(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
-        log.info("get annotations for AVEntity id: %s", video_id)
+        log.debug("get annotations for AVEntity id: %s", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -326,7 +326,7 @@ class VideoShots(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, video_id):
-        log.info("get shots for AVEntity id: %s", video_id)
+        log.debug("get shots for AVEntity id: %s", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
@@ -357,7 +357,7 @@ class VideoShots(GraphBaseOperations):
             RETURN shot.uuid, anno, creator, collect(b)
         """ % video_id
 
-        log.info("Prefetching annotations...")
+        log.debug("Prefetching annotations...")
         result = self.graph.cypher(annotations_query)
         for row in result:
             shot_uuid = row[0]
@@ -402,7 +402,7 @@ class VideoShots(GraphBaseOperations):
                 annotations[shot_uuid] = []
             annotations[shot_uuid].append(res)
 
-        log.info("Prefetching automatic tags from embedded segments...")
+        log.debug("Prefetching automatic tags from embedded segments...")
 
         query_auto_tags = """
             MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)-[:WITHIN_SHOT]-(sgm:VideoSegment)
