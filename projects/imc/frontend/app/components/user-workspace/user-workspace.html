@@ -16,15 +16,25 @@
 			</div>
 		</span>
 	</div>
-	<!-- SEARCH RESULTS -->
-	<!-- <div class="row">
-		<div class="col-12">
-			<!-- title-->
-			<span class="imc--topbar--title imc--flex--vertical-center">
-				<i class="material-icons">dashboard</i>
-				&nbsp;
-				<strong>Cities</strong>
-			</span>
+	<div class="container-workspace">
+		<!-- SEARCH RESULTS -->
+		<div class="row no-gutters">
+			<div class="col-12 my-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">location_city</i>&nbsp;<strong>Cities (9)</strong>
+				</span>
+			</div>
 		</div>
-	</div> -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 col-sm-8 col-md-3">
+				<select [(ngModel)]="city" class="form-control">
+						<option *ngFor="let c of cities" [value]="c">{{c}}</option>
+					</select>
+			</div>
+			<div class="col-12 mt-2">
+				<multi-item-carousel></multi-item-carousel>
+			</div>
+		</div>
+	</div>
+	
 </div>

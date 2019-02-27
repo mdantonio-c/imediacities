@@ -1,5 +1,5 @@
 .imc--topbar .material-icons,
-.imc--topbar--title {
+.imc--topbar .imc--topbar--title {
 	color: #fff;
 	margin-right: 10px;
 }
@@ -9,4 +9,10 @@
     padding: 5px;
     border-radius: 2px;
     border: 2px solid #707070;
+}
+
+.container-workspace {
+	box-sizing: border-box;
+    padding: 35px 25px;
+    width: 100%;
 }
