@@ -203,6 +203,8 @@ class EFG_XMLParser():
                     title['relation'] = code_el[0]
             log.debug('title: {}'.format(title))
             titles.append(title)
+        if not titles:
+            raise ValueError('Title is missing')
         return titles
 
     def parse_keywords(self, record):
@@ -248,8 +250,8 @@ class EFG_XMLParser():
                     keyword['term'] = term.text.strip()
 
                 log.debug('keyword: {}'.format(keyword['term']))
-                
-                #log.debug('term id: %s' % term.get('id'))
+ 
+                # log.debug('term id: %s' % term.get('id'))
                 if term.get('id') is not None:
                     # check keyword term id is integer (keyword term id is optional)
                     try:
@@ -291,7 +293,7 @@ class EFG_XMLParser():
             log.debug('description: {}'.format(description))
             descriptions.append(description)
         # october 2018: change: description is optional 
-        #if len(descriptions) == 0:
+        # if len(descriptions) == 0:
         #    raise ValueError('Description is missing')
         return descriptions
 
@@ -552,7 +554,7 @@ class EFG_XMLParser():
             if code_el is not None:
                 return code_el[0]
             self.warnings.append(
-                'Invalid format colour for: ' + code_el.text.strip())
+                'Invalid format colour for: ' + node.text.strip())
 
     def __parse_creation(self, record, audio_visual=False):
         properties = {}
