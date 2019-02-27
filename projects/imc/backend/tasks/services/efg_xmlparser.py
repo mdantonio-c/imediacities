@@ -552,7 +552,7 @@ class EFG_XMLParser():
             if code_el is not None:
                 return code_el[0]
             self.warnings.append(
-                'Invalid format colour for: ' + code_el.text.strip())
+                'Invalid format colour for: ' + node.text.strip())
 
     def __parse_creation(self, record, audio_visual=False):
         properties = {}
