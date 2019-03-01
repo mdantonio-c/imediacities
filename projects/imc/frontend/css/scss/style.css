@@ -1343,6 +1343,11 @@ input[type="radio"] {
   max-width: 100%;
   min-width: 280px; }
 
+.search-term-results a {
+  font-size: 80% !important;
+  font-weight: 400 !important;
+}
+
 .search-term-close {
   float: right; }
 

@@ -187,14 +187,17 @@
                 </div>
                 <!--risultati dai lods-->
                 <div [ngStyle]="{display: results.show === 'l' ? 'block' : 'none'}">
-                    <div class="search-term-result click-event"
+                    <div class="search-term-result"
                          tabindex="0"
-                         *ngFor="let term of results.lods | slice:results.lods_nav.page_start:results.lods_nav.page_end"
-                         (keydown.enter)="term_selected(term)"
+                         *ngFor="let term of results.lods | slice:results.lods_nav.page_start:results.lods_nav.page_end">
+                         <div class="click-event" (keydown.enter)="term_selected(term)"
                          (click)="term_selected(term)">
-                        <strong [ngClass]="{'lod': term.source !== 'vocabulary'}" [innerHTML]="term.name"></strong>
-                        <br>
+                            <strong [ngClass]="{'lod': term.source !== 'vocabulary'}" [innerHTML]="term.name"></strong>
+                        </div>
                         <small [innerHTML]="term.description"></small>
+                        <a href="{{term.iri}}" target="#" title="open a new window with more info about the this item">{{term.iri}}&nbsp;<i class="fa fa-external-link blue"></i></a>
+
+                        <br>
                     </div>
                     <div *ngIf="!results.lods.length" class="search-term-no-results">
                         no results
