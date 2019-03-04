@@ -1,34 +1,81 @@
-<!-- <mdb-carousel [isControls]="true" class="carousel-multi-item multi-animation" [type]="'carousel-multi-item'"
-[animation]="'slide'">
-<mdb-carousel-item *ngFor="let item of slides; let i = index">
-<div class="col-md-4" [ngClass]="{'d-none d-md-block': cardIndex !== 0}" *ngFor="let card of item; let cardIndex = index">
-		<mdb-card class="my-1">
-		<mdb-card-img [src]="card.img" alt="Card image cap"></mdb-card-img>
-		<mdb-card-body>
-		<mdb-card-title>
-		<h4>{{card.title}}</h4>
-		</mdb-card-title>
-		<p>{{card.description}}</p>
-		<a href="#" mdbBtn color="primary" class="waves-light" mdbWavesEffect>{{card.buttonText}}</a>
-		</mdb-card-body>
-		</mdb-card>
+<div id="#demo" class="carousel slide" data-ride="carousel">
+  
+  <!-- The slideshow -->
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <div class="row">
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-1'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-2'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-3'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-4'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-5'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-6'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+      </div>
+    </div>
+    
+    <div class="carousel-item">
+      <div class="row">
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-7'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-8'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-9'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-10'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-11'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-12'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+      </div>
+    </div>
+    
+    <div class="carousel-item">
+      <div class="row">
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-13'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-14'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-15'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-16'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-17'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+        <div class="col-2">
+          <hjs class="media-object" alt="300x200" [holderId]="'hjs-18'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Left and right controls -->
+  <a class="carousel-control-prev" href="#demo" data-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </a>
+  <a class="carousel-control-next" href="#demo" data-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </a>
 </div>
-</mdb-carousel-item>
-</mdb-carousel> -->
-<ngb-carousel *ngIf="images">
-<ng-template ngbSlide *ngFor="let image of images">
-<!-- <img [src]="image" alt="Random slide">
-<div class="carousel-caption">
-		<h3>No mouse navigation</h3>
-		<p>This carousel hides navigation arrows and indicators.</p>
-</div> -->
-<div class="card" style="width: 18rem;">
-	<img class="card-img-top" [src]="image" alt="Card image cap">
-	<div class="card-body">
-		<h5 class="card-title">Card title</h5>
-		<p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-		<a href="#" class="btn btn-primary">Go somewhere</a>
-	</div>
-</div>
-</ng-template>
-</ngb-carousel>

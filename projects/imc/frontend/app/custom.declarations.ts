@@ -2,8 +2,8 @@ import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
 import { IonRangeSliderModule } from "ng2-ion-range-slider";
-
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { CustomNavbarComponent } from './custom.navbar';
 import { CustomBrandComponent } from './custom.navbar';
@@ -187,5 +187,6 @@ export const imports: any[] = [
   HttpClientJsonpModule,
   NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
   HolderJsModule,
-  IonRangeSliderModule
+  IonRangeSliderModule,
+  SlickCarouselModule
 ];

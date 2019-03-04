@@ -28,13 +28,76 @@
 		<div class="row no-gutters mx-3">
 			<div class="col-12 col-sm-8 col-md-3">
 				<select [(ngModel)]="city" class="form-control">
-						<option *ngFor="let c of cities" [value]="c">{{c}}</option>
+						<option *ngFor="let c of cities; let i = index" [value]="c">{{c}}</option>
 					</select>
 			</div>
 			<div class="col-12 mt-2">
 				<multi-item-carousel></multi-item-carousel>
 			</div>
 		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- VIRTUAL EXHIBITOR -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">collections</i>&nbsp;<strong>My Virtual Exhibitions (5)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- MY LISTS -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists (4)</strong>
+				</span>
+			</div>
+			<div class="colt-12 mt-2">
+				<!-- <ngx-slick-carousel class="carousel" 
+                        #slickModal="slick-carousel" 
+                        [config]="slideConfig" 
+                        (init)="slickInit($event)"
+                        (breakpoint)="breakpoint($event)"
+                        (afterChange)="afterChange($event)"
+                        (beforeChange)="beforeChange($event)">
+	        <div ngxSlickItem *ngFor="let slide of slides" class="slide">
+	              <img src="{{ slide.img }}" alt="" width="100%">
+        	</div>
+    		</ngx-slick-carousel> -->
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- MY EMBARGOES -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">lock</i>&nbsp;<strong>My Embargoes (43)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- ANNOTATED BY ME -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">bookmark</i>&nbsp;<strong>Contents annotated by me (22)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- WITH MY NOTES -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--topbar--title imc--flex--vertical-center">
+					<i class="material-icons">speaker_notes</i>&nbsp;<strong>Content with my personal notes (12)</strong>
+				</span>
+			</div>
+		</div>
+
 	</div>
-	
 </div>
