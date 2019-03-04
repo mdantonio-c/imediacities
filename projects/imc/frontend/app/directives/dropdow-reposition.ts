@@ -87,7 +87,7 @@ export class DropdownPositionDirective implements AfterContentInit, OnDestroy {
 
         this.menuWrapper.addEventListener('keyup', (event: KeyboardEvent) => {
             if (event.keyCode === 27) {
-                this.dropdown.closeFromOutsideEsc();
+                this.dropdown.close();
             }
         });
         this.menuWrapper.appendChild(this.menuRef.nativeElement);
