@@ -13,12 +13,8 @@
     "file-saver": "2.0.1",
     "@types/file-saver": "2.0.0",
     "ng2-ion-range-slider": "2.0.0",
-<<<<<<< HEAD
-    "ion-rangeslider": "2.2.0",
+    "ion-rangeslider": "2.3.0",
     "ngx-slick-carousel": "^0.4.4",
     "slick-carousel": "^1.8.1"
-=======
-    "ion-rangeslider": "2.3.0"
->>>>>>> dd6de5a5295810576441788e70f68fd6cb4d4ac8
   }
 }
