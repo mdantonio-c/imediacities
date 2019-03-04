@@ -4,7 +4,7 @@ import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
 import { SliderRangeComponent } from './slider-range/slider-range.component';
 import { AppVocabularyService } from "../../../services/app-vocabulary";
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import 'rxjs/add/observable/combineLatest';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { IonRangeSliderComponent } from "ng2-ion-range-slider";

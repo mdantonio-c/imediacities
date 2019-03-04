@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MediaEntity, Providers } from './data'
 import { LocalStorageService } from './local-storage.service';
@@ -129,7 +129,7 @@ export class CatalogService {
 	 */
     getRelevantCreations = function(relevantCreations) {
         if (relevantCreations === undefined || relevantCreations.size === 0) {
-        	return Observable.of({'Response': {'data': []}});
+        	return of({'Response': {'data': []}});
         }
         let data = {
             'relevant-list': []
