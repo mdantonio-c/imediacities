@@ -6,10 +6,6 @@ project:
 
 variables:
 
-  submodules:
-    rapydo-angular:
-      branch: 0.6.5-a7
-
   frontend:
     framework: angular
 
