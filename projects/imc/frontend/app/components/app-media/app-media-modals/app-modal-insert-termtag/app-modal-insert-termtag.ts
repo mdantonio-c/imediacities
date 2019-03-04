@@ -2,7 +2,7 @@ import {Component, ChangeDetectorRef, OnInit, OnChanges, Input, AfterViewInit, V
 import {AppVocabularyService} from "../../../../services/app-vocabulary";
 import {AppAnnotationsService} from "../../../../services/app-annotations";
 import {Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, map, switchMap} from 'rxjs/operators';
+import {debounceTime, map } from 'rxjs/operators';
 import {HttpClient} from '@angular/common/http';
 import {AppLodService} from "../../../../services/app-lod";
 import {NgbPopover} from '@ng-bootstrap/ng-bootstrap';
@@ -321,7 +321,7 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
     }
 
     ngOnInit() {
-        this.subject.debounceTime(300).subscribe(searchTextValue => {
+        this.subject.pipe(debounceTime(300)).subscribe(searchTextValue => {
             this.search_vocabulary_and_lods(searchTextValue);
         });
     }

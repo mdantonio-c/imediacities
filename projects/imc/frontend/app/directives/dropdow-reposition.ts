@@ -7,8 +7,8 @@
  *
  */
 import {Directive, ContentChild, AfterContentInit, ElementRef, OnDestroy, Inject, forwardRef} from '@angular/core';
-import {NgbDropdownMenu, NgbDropdown} from '@ng-bootstrap/ng-bootstrap/dropdown/dropdown';
-import {positionElements} from '@ng-bootstrap/ng-bootstrap/util/positioning';
+import {NgbDropdownMenu, NgbDropdown} from '@ng-bootstrap/ng-bootstrap/esm5/dropdown/dropdown';
+import {positionElements} from '@ng-bootstrap/ng-bootstrap/esm5/util/positioning';
 import {Subscription} from 'rxjs/Subscription';
 
 @Directive({

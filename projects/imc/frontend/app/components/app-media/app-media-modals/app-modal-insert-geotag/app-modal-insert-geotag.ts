@@ -2,7 +2,7 @@ import {Component, ChangeDetectorRef, Input, OnInit, OnChanges, ViewChild, Eleme
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {AppAnnotationsService} from "../../../../services/app-annotations";
 import { } from '@types/googlemaps';
-import {} from '@ngui';
+import { } from '@ngui';
 import {AppMediaMapComponent} from "../../app-media-map/app-media-map";
 import {infoResult} from "../../../../decorators/app-info";
 

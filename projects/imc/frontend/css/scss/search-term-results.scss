@@ -1,7 +1,13 @@
 .search-term-results {
   max-width: 100%;
   min-width:280px;
+
+  a {
+    font-size: 80%;
+    font-weight: 400;
+  }
 }
+
 .search-term-close{
   float:right;
 }
