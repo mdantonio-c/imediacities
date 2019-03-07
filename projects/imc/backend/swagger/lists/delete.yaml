@@ -1,0 +1,18 @@
+list:
+  summary: Delete a list
+  description: Delete a list of the researcher.
+  custom:
+    authentication: true
+    authorized:
+      - Researcher
+      - admin_root
+    required_roles: any
+  responses:
+    204:
+      description: List deleted successfully.
+    401:
+      description: This endpoint requires a valid authorization token
+    403:
+      description: The user is not authorized to perform this operation.
+    404:
+      description: List does not exist.

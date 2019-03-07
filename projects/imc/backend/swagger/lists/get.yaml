@@ -1,0 +1,57 @@
+lists:
+  summary: Get the researcher's lists.
+  description: Returns all the list of a researcher. The result supports paging.
+  custom:
+    authentication: true
+    authorized:
+      - Researcher
+      - admin_root
+    required_roles: any
+  parameters:
+    - name: perpage
+      in: query
+      description: Number of lists returned
+      type: integer
+    - name: currentpage
+      in: query
+      description: Page number
+      type: integer
+    - name: researcher
+      in: query
+      description: Researcher uuid
+      type: string
+  responses:
+    '200':
+      description: All the list of the researcher.
+      schema:
+        $ref: "#/definitions/Lists"
+    '401':
+      description: This endpoint requires a valid authorization token
+    '403':
+      description: The user is not authorized to perform this operation.
+    '404'
+      description: The researcher does not exist (only admin).
+list:
+  summary: Get a list of the researcher
+  custom:
+    authentication: true
+    authorized:
+      - Researcher
+      - admin_root
+    required_roles: any
+  parameters:
+    - name: researcher
+      in: query
+      description: Researcher uuid
+      type: string
+  responses:
+    '200':
+      description: The list of the researcher.
+      schema:
+        $ref: "#/definitions/List"
+    '401':
+      description: This endpoint requires a valid authorization token
+    '403':
+      description: The user is not authorized to perform this operation.
+    '404':
+      description: The requested list does not exist.

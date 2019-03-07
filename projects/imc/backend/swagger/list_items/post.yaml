@@ -1,0 +1,15 @@
+list_items:
+  summary: Add an item to a list.
+  custom:
+    authentication: true
+    authorized:
+      - Researcher
+  responses:
+    '201':
+      description: Item added successfully.
+    '401':
+      description: This endpoint requires a valid authorization token.
+    '403':
+      description: The user is not authorized to perform this operation.
+    '404':
+      description: List does not exist.
