@@ -118,6 +118,8 @@ class User(UserBase):
         'Item', 'REVISION_BY', cardinality=ZeroOrMore)
     revised_shots = RelationshipFrom(
         'Shot', 'REVISED_BY', cardinality=ZeroOrMore)
+    lists = RelationshipFrom(
+        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True)
 
 
 class Group(IdentifiedNode):
@@ -161,7 +163,31 @@ class AnnotationTarget(HeritableStructuredNode):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
 
 
-class Item(TimestampedNode, AnnotationTarget):
+class ListItem(HeritableStructuredNode):
+    """Represents an element of a list."""
+    __abstract_node__ = True
+
+    lists = RelationshipFrom(
+        'List', 'LST_ITEM', cardinality=ZeroOrMore, show=True)
+
+
+class List(TimestampedNode):
+    """
+    List of item. Group a collection of items (e.g. Item, Shot).
+
+    Attributes:
+        name            The name of the list.
+        description     It gives a description to the list.
+    """
+    name = StringProperty(required=True, show=True)
+    description = StringProperty(required=True, show=True)
+    items = RelationshipTo(
+        'ListItem', 'LST_ITEM', cardinality=ZeroOrMore, show=True)
+    creator = RelationshipTo(
+        'User', 'LST_BELONGS_TO', cardinality=One)
+
+
+class Item(TimestampedNode, AnnotationTarget, ListItem):
     """
     The Item Entity points to the digital file held in the IMC repository.
     The item functions as a logical wrapper for the digital object displayed in
@@ -785,7 +811,7 @@ class VideoSegment(IdentifiedNode, AnnotationTarget):
     within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
-class Shot(VideoSegment):
+class Shot(VideoSegment, ListItem):
     """Shot class"""
     shot_num = IntegerProperty(required=True, show=True)
     frame_uri = StringProperty()
