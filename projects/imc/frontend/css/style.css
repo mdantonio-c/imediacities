@@ -381,3 +381,18 @@ search-thumbnail div .media-image-wrapper {
   background-color: #f8f8f8;
   padding: 5px;
 }
+
+/* Override some Slick styles */
+.slick-prev:before,
+.slick-next:before {
+  color: #333;
+}
+.slick-slide {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+.slick-slide:hover {
+  border-color: #75A8CE
+}

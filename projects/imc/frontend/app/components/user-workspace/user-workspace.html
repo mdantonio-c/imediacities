@@ -26,13 +26,24 @@
 			</div>
 		</div>
 		<div class="row no-gutters mx-3">
-			<div class="col-12 col-sm-8 col-md-3">
-				<select [(ngModel)]="city" class="form-control">
-						<option *ngFor="let c of cities; let i = index" [value]="c">{{c}}</option>
-					</select>
+			<div class="col-12">
+				<div class="form-row align-items-center">
+			    <div class="col-auto">
+			      <select [(ngModel)]="selectedCity" (ngModelChange)="onCityChange($event)" class="form-control" style="max-width: 160px;">
+							<option *ngFor="let c of cities; let i = index" [value]="c">{{c}}</option>
+					  </select>
+			    </div>
+			    <!-- <div class="col-1" style="max-width: 40px !important;">
+			      <i class="material-icons">star_rate</i>
+			    </div> -->
+			    <div class="col-auto">
+			      <span *ngIf="countCityResults">{{countCityResults}} contents</span>
+			    </div>
+			  </div>
 			</div>
 			<div class="col-12 mt-2">
-				<multi-item-carousel></multi-item-carousel>
+				<multi-item-carousel 
+					[filter]="cityFilter" (onResult)="countChangedHandler($event)"></multi-item-carousel>
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>
@@ -55,17 +66,6 @@
 				</span>
 			</div>
 			<div class="colt-12 mt-2">
-				<!-- <ngx-slick-carousel class="carousel" 
-                        #slickModal="slick-carousel" 
-                        [config]="slideConfig" 
-                        (init)="slickInit($event)"
-                        (breakpoint)="breakpoint($event)"
-                        (afterChange)="afterChange($event)"
-                        (beforeChange)="beforeChange($event)">
-	        <div ngxSlickItem *ngFor="let slide of slides" class="slide">
-	              <img src="{{ slide.img }}" alt="" width="100%">
-        	</div>
-    		</ngx-slick-carousel> -->
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>

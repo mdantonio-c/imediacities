@@ -1,81 +1,23 @@
-<div id="#demo" class="carousel slide" data-ride="carousel">
-  
-  <!-- The slideshow -->
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <div class="row">
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-1'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-2'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-3'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-4'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-5'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-6'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-      </div>
+<div class="loader col" *ngIf="loading" style="text-align: center">
+	<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
+</div>
+<ngx-slick-carousel class="carousel"
+        #slickModal="slick-carousel"
+        [config]="slideConfig"
+        (init)="slickInit($event)"
+        (breakpoint)="breakpoint($event)"
+        (afterChange)="afterChange($event)"
+        (beforeChange)="beforeChange($event)">
+    <div ngxSlickItem *ngFor="let mediaEntity of results" class="slide">
+        <item-detail [media]="mediaEntity"></item-detail>
     </div>
-    
-    <div class="carousel-item">
-      <div class="row">
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-7'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-8'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-9'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-10'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-11'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-12'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-      </div>
-    </div>
-    
-    <div class="carousel-item">
-      <div class="row">
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-13'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-14'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-15'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-16'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-17'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-        <div class="col-2">
-          <hjs class="media-object" alt="300x200" [holderId]="'hjs-18'" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"></hjs>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Left and right controls -->
-  <a class="carousel-control-prev" href="#demo" data-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </a>
-  <a class="carousel-control-next" href="#demo" data-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </a>
+</ngx-slick-carousel>
+
+<!-- no results -->
+<div class="row" *ngIf="!loading && results.length == 0">
+	<div class="col">
+		<div class="no-results">
+			<p>Your search returned no results</p>
+		</div>
+	</div>
 </div>

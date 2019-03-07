@@ -13,6 +13,7 @@ import { AdminGroupsComponent } from './components/admin/groups';
 import { UploadComponent } from './components/upload/upload';
 import { UserWorkspaceComponent } from './components/user-workspace/user-workspace';
 import { MultiItemCarouselComponent } from './components/user-workspace/multi-item-carousel/multi-item-carousel.component';
+import { ItemDetailComponent } from './components/user-workspace/item-detail/item-detail.component';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
@@ -98,6 +99,7 @@ export const declarations: any[] = [
     UploadComponent,
     UserWorkspaceComponent,
     MultiItemCarouselComponent,
+    ItemDetailComponent,
 	CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,
