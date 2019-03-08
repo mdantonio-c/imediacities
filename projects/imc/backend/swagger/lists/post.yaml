@@ -13,9 +13,13 @@ lists:
   responses:
     201:
       description: List created successfully.
+      schema:
+        $ref: "#/definitions/List"
     400:
       description: There is no content present in the request body or the content is not valid for list.
     401:
       description: This endpoint requires a valid authorization token.
     403:
       description: The user is not authorized to perform this operation.
+    409:
+      description: There is already a list with that name.

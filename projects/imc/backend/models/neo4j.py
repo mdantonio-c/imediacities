@@ -165,8 +165,6 @@ class AnnotationTarget(HeritableStructuredNode):
 
 class ListItem(HeritableStructuredNode):
     """Represents an element of a list."""
-    __abstract_node__ = True
-
     lists = RelationshipFrom(
         'List', 'LST_ITEM', cardinality=ZeroOrMore, show=True)
 
