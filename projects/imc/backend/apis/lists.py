@@ -32,7 +32,7 @@ class Lists(GraphBaseOperations):
         params = self.get_input()
         researcher = self.get_current_user() if not iamadmin else None
         r_uuid = params.get('researcher', None)
-        if iamadmin and list_id is not None and r_uuid is not None:
+        if iamadmin and list_id is None and r_uuid is not None:
             try:
                 researcher = self.graph.User.nodes.get(uuid=r_uuid)
             except self.graph.User.DoesNotExist:
@@ -47,6 +47,29 @@ class Lists(GraphBaseOperations):
             logger.debug("researcher: {name} {surname}".format(
                 name=researcher.name, surname=researcher.surname))
 
+        if list_id is not None:
+            try:
+                res = self.graph.List.nodes.get(uuid=list_id)
+            except self.graph.List.DoesNotExist:
+                logger.debug("List with uuid %s does not exist" % list_id)
+                raise RestApiException(
+                    "Please specify a valid list id",
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            creator = res.creator.single()
+            if not iamadmin and researcher.uuid != creator.uuid:
+                raise RestApiException(
+                    'You are not allowed to get a list that does not belong to you',
+                    status_code=hcodes.HTTP_BAD_FORBIDDEN)
+            user_list = self.getJsonResponse(res)
+            if iamadmin and researcher is None:
+                user_list['creator'] = {
+                    'uuid': creator.uuid,
+                    'name': creator.name,
+                    'surname': creator.surname
+                }
+            return self.force_response(user_list)
+
+        # request for multiple lists
         offset, limit = self.get_paging()
         offset -= 1
         logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
@@ -56,20 +79,15 @@ class Lists(GraphBaseOperations):
         if limit < 0:
             raise RestApiException('Page size cannot be a negative value',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
-        single_match = ('' if list_id is None
-                        else " {{uuid:'{0}'}}".format(
-                            self.graph.sanitize_input(list_id)))
-        count = "MATCH (n:List{single})" \
+        count = "MATCH (n:List)" \
                 " {match} " \
                 "RETURN COUNT(DISTINCT(n))".format(
-                    match=user_match,
-                    single=single_match)
+                    match=user_match)
         # logger.debug("count query: %s" % count)
-        query = "MATCH (n:List{single})" \
+        query = "MATCH (n:List)" \
                 " {match} " \
                 "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
                     match=user_match,
-                    single=single_match,
                     offset=offset * limit,
                     limit=limit)
         # logger.debug("query: %s" % query)
@@ -90,13 +108,6 @@ class Lists(GraphBaseOperations):
                     'surname': creator.surname
                 }
             data.append(user_list)
-        if list_id is not None:
-            if not data:
-                raise RestApiException(
-                    "List not found for id {}".format(list_id),
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
-            # return single result as an object
-            data = data[0]
         return self.force_response(data)
 
     @decorate.catch_error()
@@ -191,7 +202,8 @@ class Lists(GraphBaseOperations):
         duplicate = [self.graph.List.inflate(row[0]) for row in results]
         if duplicate:
             raise RestApiException(
-                'There is already another list with the same name [{}] among your lists'.format(data['name']),
+                'There is already another list with the same name [{}] among your lists'.format(
+                    data['name']),
                 status_code=hcodes.HTTP_BAD_CONFLICT)
         # update the list
         user_list.name = data['name'].strip()
@@ -249,8 +261,56 @@ class ListItems(GraphBaseOperations):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
         self.graph = self.get_service_instance('neo4j')
+        try:
+            user_list = self.graph.List.nodes.get(uuid=list_id)
+        except self.graph.List.DoesNotExist:
+            logger.debug("List with uuid %s does not exist" % list_id)
+            raise RestApiException(
+                "Please specify a valid list id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        # am I the owner of the list? (allowed also to admin)
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        creator = user_list.creator.single()
+        if user.uuid != creator.uuid and not iamadmin:
+            raise RestApiException(
+                'You are not allowed to get a list that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+        if item_id is not None:
+            logger.debug("Get item <{0}> of the list <{1}, {2}>".format(
+                         item_id, user_list.uuid, user_list.name))
+            # Find item with uuid <item_id> in the user_list
+            # res = user_list.items.search(uuid=item_id)
+            results = self.graph.cypher("MATCH (l:List {{uuid:'{uuid}'}})"
+                                        " MATCH (l)-[:LST_ITEM]->(i:ListItem {{uuid:'{item}'}})"
+                                        " RETURN i"
+                                        "".format(uuid=list_id, item=item_id))
+            res = [self.graph.ListItem.inflate(row[0]) for row in results]
+            if not res:
+                raise RestApiException(
+                    "Item <{0}> is not connected to the list <{1}, {2}>".format(
+                        item_id, user_list.uuid, user_list.name),
+                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+            return self.force_response(self.getJsonResponse(res[0].downcast()))
+
+        logger.debug("Get all the items of the list <{0}, {1}>".format(
+                     user_list.uuid, user_list.name))
+        # do we need pagination here?
+        offset, limit = self.get_paging()
+        offset -= 1
+        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        if offset < 0:
+            raise RestApiException('Page number cannot be a negative value',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
+        if limit < 0:
+            raise RestApiException('Page size cannot be a negative value',
+                                   status_code=hcodes.HTTP_BAD_REQUEST)
         data = []
-        # TODO
+        for list_item in user_list.items.all():
+            # look at the most derivative class
+            # TODO understand the model to be retrieved
+            # expected item of type :Item or :Shot
+            data.append(self.getJsonResponse(list_item.downcast()))
         return self.force_response(data)
 
     @decorate.catch_error()
@@ -270,15 +330,14 @@ class ListItems(GraphBaseOperations):
                 'Target is mandatory',
                 status_code=hcodes.HTTP_BAD_REQUEST)
         target = data['target']
-        logger.debug('Add item with target: {}'.format(target))
         # check if the target is valid
         if not TARGET_PATTERN.match(target):
             raise RestApiException(
                 'Invalid Target format',
                 status_code=hcodes.HTTP_BAD_REQUEST)
+        logger.debug('Add item with target: {}'.format(target))
 
         self.graph = self.get_service_instance('neo4j')
-
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
@@ -311,11 +370,17 @@ class ListItems(GraphBaseOperations):
             raise RestApiException(
                 'Target [' + target_type + ':' + tid + '] does not exist',
                 status_code=hcodes.HTTP_BAD_REQUEST)
-        # TODO
+        # check if the incoming target is already connected to the list
+        if targetNode.lists.is_connected(user_list):
+            raise RestApiException(
+                'The item is already connected to the list <{0}, {1}>.'.format(
+                    list_id, user_list.name),
+                status_code=hcodes.HTTP_BAD_CONFLICT)
+        # connect the target to the list
         user_list.items.connect(targetNode)
-        logger.debug("Item {} added successfully to list {}"
-                     .format(target, list_id))
-        # 204: Item added successfully.
+        logger.debug("Item {0} added successfully to list <{1}, {2}>"
+                     .format(target, list_id, user_list.name))
+        # 204: return empty response (?)
         self.empty_response()
 
     @decorate.catch_error()
@@ -323,4 +388,37 @@ class ListItems(GraphBaseOperations):
     @graph_transactions
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
-        pass
+        self.graph = self.get_service_instance('neo4j')
+        try:
+            user_list = self.graph.List.nodes.get(uuid=list_id)
+        except self.graph.List.DoesNotExist:
+            logger.debug("List with uuid %s does not exist" % list_id)
+            raise RestApiException(
+                "Please specify a valid list id",
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        logger.debug("delete item <{0}> from the list <{1}, {2}>".format(
+            item_id, user_list.uuid, user_list.name))
+        # am I the creator of the list? (allowed also to admin)
+        user = self.get_current_user()
+        iamadmin = self.auth.verify_admin()
+        creator = user_list.creator.single()
+        if user.uuid != creator.uuid and not iamadmin:
+            raise RestApiException(
+                'You are not allowed to delete an item from a list that does not belong to you',
+                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+        matched_item = None
+        for list_item in user_list.items.all():
+            item = list_item.downcast()
+            if item.uuid == item_id:
+                matched_item = item
+                break
+        if matched_item is None:
+            raise RestApiException(
+                "Item <{uuid}> does not belong the the list <{list_id}, {list_name}>".format(
+                    uuid=item_id, list_id=user_list.uuid, list_name=user_list.name),
+                status_code=hcodes.HTTP_BAD_NOTFOUND)
+        # disconnect the item
+        user_list.items.disconnect(matched_item)
+        logger.debug("Item <{0}> remeved from the list <{1}, {2}>successfully."
+                     .format(item_id, user_list.uuid, user_list.name))
+        return self.empty_response()

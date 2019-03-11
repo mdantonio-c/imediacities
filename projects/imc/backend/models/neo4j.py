@@ -23,10 +23,6 @@ from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
 
-import logging
-
-log = logging.getLogger(__name__)
-
 
 class HeritableStructuredNode(StructuredNode):
 
@@ -46,7 +42,8 @@ class HeritableStructuredNode(StructuredNode):
         Re-instantiate this node as an instance its most derived derived class.
         """
         # TODO: there is probably a far more robust way to do this.
-        def _get_class(cname): return getattr(sys.modules[__name__], cname)
+        def _get_class(cname):
+            return getattr(sys.modules[__name__], cname)
 
         # inherited_labels() only returns the labels for the current class and
         #  any super-classes, whereas labels() will return all labels on the
@@ -65,10 +62,11 @@ class HeritableStructuredNode(StructuredNode):
                 # Infer the most derivative class by looking for the one
                 # with the longest method resolution order.
                 class_objs = map(_get_class, classes)
+                ordered_class_objs = list(class_objs)
                 _, cls = sorted(
                     zip(
-                        map(lambda cls: len(cls.mro()), class_objs),
-                        class_objs),
+                        map(lambda cls: len(cls.mro()), ordered_class_objs),
+                        ordered_class_objs),
                     key=lambda size_cls: size_cls[0])[-1]
         else:    # Caller has specified a target class.
             if not isinstance(target_class, str):
@@ -166,7 +164,7 @@ class AnnotationTarget(HeritableStructuredNode):
 class ListItem(HeritableStructuredNode):
     """Represents an element of a list."""
     lists = RelationshipFrom(
-        'List', 'LST_ITEM', cardinality=ZeroOrMore, show=True)
+        'List', 'LST_ITEM', cardinality=ZeroOrMore)
 
 
 class List(TimestampedNode):
@@ -180,7 +178,7 @@ class List(TimestampedNode):
     name = StringProperty(required=True, show=True)
     description = StringProperty(required=True, show=True)
     items = RelationshipTo(
-        'ListItem', 'LST_ITEM', cardinality=ZeroOrMore, show=True)
+        'ListItem', 'LST_ITEM', cardinality=ZeroOrMore)
     creator = RelationshipTo(
         'User', 'LST_BELONGS_TO', cardinality=One)
 
