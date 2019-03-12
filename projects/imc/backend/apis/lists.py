@@ -3,12 +3,17 @@
 """
 Manage the lists of the researcher
 """
-
+from flask import request
+from utilities.helpers import get_api_url
+from restapi.confs import PRODUCTION
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import (GraphBaseOperations,
                                                     graph_transactions,
                                                     catch_graph_exceptions)
+from imc.models.neo4j import (
+    Item, Shot, TextualBody
+)
 from utilities.logs import get_logger
 from utilities import htmlcodes as hcodes
 
@@ -291,7 +296,7 @@ class ListItems(GraphBaseOperations):
                     "Item <{0}> is not connected to the list <{1}, {2}>".format(
                         item_id, user_list.uuid, user_list.name),
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
-            return self.force_response(self.getJsonResponse(res[0].downcast()))
+            return self.force_response(self.get_list_item_response(res[0]))
 
         logger.debug("Get all the items of the list <{0}, {1}>".format(
                      user_list.uuid, user_list.name))
@@ -307,10 +312,7 @@ class ListItems(GraphBaseOperations):
                                    status_code=hcodes.HTTP_BAD_REQUEST)
         data = []
         for list_item in user_list.items.all():
-            # look at the most derivative class
-            # TODO understand the model to be retrieved
-            # expected item of type :Item or :Shot
-            data.append(self.getJsonResponse(list_item.downcast()))
+            data.append(self.get_list_item_response(list_item))
         return self.force_response(data)
 
     @decorate.catch_error()
@@ -422,3 +424,113 @@ class ListItems(GraphBaseOperations):
         logger.debug("Item <{0}> remeved from the list <{1}, {2}>successfully."
                      .format(item_id, user_list.uuid, user_list.name))
         return self.empty_response()
+
+    def get_list_item_response(self, list_item):
+        # look at the most derivative class
+        # expected list_item of type :Item or :Shot
+        mdo = list_item.downcast()
+        item = None
+        if isinstance(mdo, Item):
+            item = mdo
+        elif isinstance(mdo, Shot):
+            item = mdo.item.single()
+        else:
+            raise ValueError("Invalid ListItem instance.")
+        creation = item.creation.single()
+        if creation is None:
+            raise ValueError(
+                "Very strange. Item <%s> with no metadata" % item.uuid)
+        creation = creation.downcast()
+
+        res = self.getJsonResponse(mdo)
+        if 'relationships' in res:
+            del(res['relationships'])
+
+        api_url = get_api_url(request, PRODUCTION)
+        if isinstance(mdo, Item):
+            # always consider v2 properties if exists
+            v2 = item.other_version.single()
+            # if v2 is not None:
+            #     # should I consider v2 attibutes instead?
+            #     logger.debug('get v2 for item <%s>' % mdo.uuid)
+            #     # FIXME the following doesn't work
+            #     # v2_res = self.getJsonResponse(v2)
+            #     # res["attributes"] = v2_res["attributes"]
+            content_type = 'videos' if item.item_type == 'Video' else 'images'
+            res['links']['content'] = api_url + \
+                'api/' + content_type + '/' + creation.uuid + \
+                '/content?type=' + content_type[:-1]
+            res['links']['thumbnail'] = (api_url + 'api/' + content_type + '/' +
+                                         creation.uuid + '/content?type=thumbnail&size=large' if item.item_type == 'Video' or v2 is None
+                                         else
+                                         api_url + 'api/' + content_type + '/' + creation.uuid + '/content?type=' + content_type[:-1])
+            res['links']['webpage'] = api_url + \
+                'app/catalog/' + content_type + '/' + creation.uuid
+        else:
+            # SHOT
+            res['links']['content'] = api_url + \
+                'api/videos/' + creation.uuid + '/content?type=video'
+            res['links']['webpage'] = api_url + \
+                'app/catalog/videos/' + creation.uuid
+            res['links']['thumbnail'] = api_url + \
+                'api/shots/' + mdo.uuid + '?content=thumbnail'
+
+        res["rights_status"] = creation.get_rights_status_display()
+        # add title
+        for idx, t in enumerate(creation.titles.all()):
+            # get default
+            if not idx:
+                res["title"] = t.text
+            # override with english text
+            if t.language and t.language == 'en':
+                res["title"] = t.text
+        # add description
+        for idx, desc in enumerate(creation.descriptions.all()):
+            # get default
+            if not idx:
+                res["description"] = desc.text
+            # override with english text
+            if desc.language and desc.language == 'en':
+                res["title"] = desc.text
+        # add contributor
+        for agent in creation.contributors.all():
+            rel = creation.contributors.relationship(agent)
+            if item.item_type == 'Video' and agent.names and 'Director' in rel.activities:
+                # expected one in the list
+                res["director"] = agent.names[0]
+                break
+            if item.item_type == 'Image' and agent.names and 'Creator' in rel.activities:
+                # expected one in the list
+                res["creator"] = agent.names[0]
+                break
+        # add production year
+        if item.item_type == 'Image' and creation.date_created:
+            res["production_year"] = creation.date_created[0]
+        if item.item_type == 'Video' and creation.production_years:
+            res["production_year"] = creation.production_years[0]
+        # add notes and links
+        res["annotations"] = {}
+        notes = mdo.annotation.search(annotation_type='DSC', private=False)
+        if notes:
+            res["annotations"]["notes"] = []
+            for n in notes:
+                # expected single body here
+                note_text = n.bodies.single().downcast()
+                res["annotations"]["notes"].append({
+                    "text": note_text.value,
+                    "language": note_text.language
+                })
+        links = mdo.annotation.search(annotation_type='LNK', private=False)
+        if links:
+            res["annotations"]["links"] = []
+            for l in links:
+                link_text = l.bodies.single().downcast()
+                # a link can have a ReferenceBody
+                if not isinstance(link_text, TextualBody):
+                    continue
+                res["annotations"]["links"].append(link_text.value)
+            if not res["annotations"]["links"]:
+                del(res["annotations"]["links"])
+        if not res["annotations"]:
+            del(res["annotations"])
+        return res
