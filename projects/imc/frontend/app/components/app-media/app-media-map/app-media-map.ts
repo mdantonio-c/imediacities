@@ -5,7 +5,7 @@ import { AppAnnotationsService } from "../../../services/app-annotations";
 import { AppShotsService } from "../../../services/app-shots";
 import { AuthService } from "/rapydo/src/app/services/auth";
 import { AppVideoService } from "../../../services/app-video";
-import { AuthzService, Permission } from "../../../services/authz";
+import { AuthzService, Permission } from "../../../services/authz.service";
 import { ApiService } from '/rapydo/src/app/services/api';
 import { ProviderToCityPipe } from "../../../pipes/ProviderToCity";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";

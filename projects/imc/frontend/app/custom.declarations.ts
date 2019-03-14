@@ -91,6 +91,7 @@ import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fas
 import {AppVideoService} from "./services/app-video";
 import {AppLodService} from "./services/app-lod";
 import {ShotRevisionService} from "./services/shot-revision.service";
+import {ListsService} from "./services/lists.service";
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent,
@@ -176,6 +177,7 @@ export const providers: any[] = [
     AppAnnotationsService,
     AppLodService,
     ShotRevisionService,
+    ListsService,
     AppMediaService,
     AppModaleService,
     AppShotsService,
