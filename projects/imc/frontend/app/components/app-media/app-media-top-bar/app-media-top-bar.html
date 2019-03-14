@@ -10,7 +10,7 @@
     </span>
     <span class="imc--flex--item-end box-icons-share">
         <div ngbDropdown class="d-inline-block" placement="bottom-right" autoClose="outside"
-            (openChange)="loadMyLists($event)"
+            (openChange)="openAddListPanel($event)"
             *ngIf="user && user.roles['Researcher']">
             <a class="dropdown-toggle" id="dropdownAddToList" ngbDropdownToggle>
                 <i class="material-icons click-event">playlist_add</i>
@@ -28,18 +28,30 @@
                     </div>
                 </form>
                 <div class="dropdown-divider"></div>
-                <form class="px-3 py-1">
-                    <!-- <a href="#" class="btn disabled" role="button" aria-disabled="true">
-                        <i class="material-icons click-event" style="color: #333;">add_box</i>
-                    </a>
-                    <h6 class="dropdown-header px-3">Create new list</h6> -->
-                    <div class="input-group">
+                <form class="px-3 py-1" [formGroup]="listForm" (ngSubmit)="createList()">
+                    <div class="input-group" *ngIf="!listCreation">
                         <div class="input-group-prepend">
-                            <button class="btn-reset" type="button" disabled="">
+                            <button class="btn-reset" type="button" (click)="listCreationToggle()">
                                 <i class="material-icons" style="color: #333; width: 1.2rem; height: 1rem; cursor: pointer; margin-left: -3px;">add_box</i>
                             </button>
                         </div>
                         <h6 class="dropdown-header py-0 px-2">Create new list</h6>
+                    </div>
+                    <div class="input-group" *ngIf="listCreation">
+                        <div class="form-header">
+                            <button type="button" class="close" aria-label="Close" (click)="listCreationToggle()">
+                                <span aria-hidden="true" class="material-icons mr-0" style="color: #707070;">close</span>
+                            </button>
+                        </div>
+                        <input type="text" class="imc--input" placeholder="Enter name"
+                            formControlName="name">
+                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('name').touched && listForm.get('name').invalid">Name is required</div>
+                        <textarea class="imc--input mt-3" placeholder="Enter notes"
+                            formControlName="description"></textarea>
+                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('description').touched && listForm.get('description').invalid">Description is required</div>
+                        <div class="form-footer mt-2">
+                            <button type="submit" class="btn btn-accent" [disabled]="listForm.invalid">Create</button>
+                        </div>
                     </div>
                 </form>
             </div>

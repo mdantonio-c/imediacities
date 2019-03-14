@@ -1,5 +1,5 @@
 export interface UserList {
-	uuid: string,
+	uuid?: string,
 	name: string,
 	description: string,
 	items?: ListItem[]

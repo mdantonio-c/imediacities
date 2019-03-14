@@ -13,3 +13,9 @@
   overflow: hidden;
   max-width: 100%;
 }
+.form-header,
+.form-footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}

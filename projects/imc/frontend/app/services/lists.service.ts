@@ -20,12 +20,16 @@ export class ListsService {
 				"description": lst.attributes.description
 			});
 		});
-		return parsed_lists;
+		return parsed_lists.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	addItemToList(target: string, listId: string) {
 		return this.api.post(`lists/${listId}/items`, {
 			'target': `${target}`
 		});
+	}
+
+	create(list: UserList) {
+		return this.api.post('lists', list);
 	}
 }
