@@ -558,7 +558,8 @@ def shot_revision(self, revision, item_id):
         failure = traceback.format_exc()
         send_notification(self, reviser.email, 'Error in shot revision',
                           'shot_revision_failure.html', replaces,
-                          self.request.id, failure)
+                          self.request.id)
+        raise
     finally:
         if exitRevision:
             item.revision.disconnect_all()
