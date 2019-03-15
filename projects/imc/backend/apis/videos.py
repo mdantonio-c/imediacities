@@ -558,7 +558,7 @@ class VideoContent(GraphBaseOperations):
         """
         Gets video content such as video strem and thumbnail
         """
-        log.info("get video content for id %s" % video_id)
+        log.debug("get video content for id %s" % video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id",
