@@ -14,7 +14,7 @@ import 'ion-rangeslider/css/ion.rangeSlider.skinFlat.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 
-import 'material-icons/iconfont/material-icons.css'
+//import 'material-icons/iconfont/material-icons.css'
 
 import '/app/frontend/css/style.css'
 import '/app/frontend/css/scss/style.css'
