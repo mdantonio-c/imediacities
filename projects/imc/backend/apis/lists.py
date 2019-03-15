@@ -52,6 +52,7 @@ class Lists(GraphBaseOperations):
             logger.debug("researcher: {name} {surname}".format(
                 name=researcher.name, surname=researcher.surname))
 
+        belong_item = params.get('item', None)
         if list_id is not None:
             try:
                 res = self.graph.List.nodes.get(uuid=list_id)
@@ -72,6 +73,11 @@ class Lists(GraphBaseOperations):
                     'name': creator.name,
                     'surname': creator.surname
                 }
+            if belong_item is not None:
+                for i in res.items.all():
+                    if i.downcast().uuid == belong_item:
+                        user_list['belong'] = True
+                        break
             return self.force_response(user_list)
 
         # request for multiple lists
@@ -112,6 +118,11 @@ class Lists(GraphBaseOperations):
                     'name': creator.name,
                     'surname': creator.surname
                 }
+            if belong_item is not None:
+                for i in res.items.all():
+                    if i.downcast().uuid == belong_item:
+                        user_list['belong'] = True
+                        break
             data.append(user_list)
         return self.force_response(data)
 

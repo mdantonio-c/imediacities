@@ -20,6 +20,10 @@ lists:
       in: query
       description: Researcher uuid
       type: string
+    - name: item
+      in: query
+      description: Item uuid (used to check whether the item belongs to the list or not)
+      type: string
   responses:
     '200':
       description: All the list of the researcher.
