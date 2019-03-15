@@ -18,7 +18,7 @@ from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from imc.models import codelists
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
 
 #####################################
@@ -36,7 +36,7 @@ class Search(GraphBaseOperations):
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1
-        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        log.debug("paging: offset {0}, limit {1}".format(offset, limit))
         if offset < 0:
             raise RestApiException('Page number cannot be a negative value',
                                    status_code=hcodes.HTTP_BAD_REQUEST)
@@ -141,7 +141,7 @@ class Search(GraphBaseOperations):
                     status_code=hcodes.HTTP_SERVER_ERROR)
             # PROVIDER
             provider = filtering.get('provider')
-            logger.debug("provider {0}".format(provider))
+            log.debug("provider {0}".format(provider))
             # if provider is not None:
             #    filters.append(
             #        "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
@@ -152,7 +152,7 @@ class Search(GraphBaseOperations):
                 filters.append(
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
                     " WHERE p.city='{city}'".format(city=city.strip()))
-            logger.debug("city {0}".format(city))
+            log.debug("city {0}".format(city))
             # COUNTRY
             country = filtering.get('country')
             if country is not None:
@@ -175,7 +175,7 @@ class Search(GraphBaseOperations):
                         iprstatus=iprstatus))
             # PRODUCTION YEAR RANGE
             missingDate = filtering.get('missingDate')
-            # logger.debug("missingDate: {0}".format(missingDate))
+            # log.debug("missingDate: {0}".format(missingDate))
             if not missingDate:
                 year_from = filtering.get('yearfrom')
                 year_to = filtering.get('yearto')
@@ -266,15 +266,32 @@ class Search(GraphBaseOperations):
                     offset=offset * limit,
                     limit=limit)
 
-        # logger.debug("QUERY to get number of elements: {0}".format(countv))
-
-        # get total number of elements
-        numels = [row[0] for row in self.graph.cypher(countv)][0]
-        logger.debug("Number of elements retrieved: {0}".format(numels))
-
-        # logger.debug(query)
+        # log.debug("QUERY to get number of elements: {0}".format(countv))
 
         data = []
+        meta_response = {
+            "totalItems": 0,
+            "countByProviders": 0,
+            "countByYears": 0,
+        }
+        # get total number of elements
+        try:
+            numels = [row[0] for row in self.graph.cypher(countv)][0]
+        except BaseException as e:
+            log.error(e)
+            return self.force_response(
+                data,
+                meta=meta_response,
+                errors=['Invalid query parameters']
+            )
+            raise RestApiException('Invalid query parameters')
+
+        log.debug("Number of elements retrieved: {0}".format(numels))
+
+        # return also the total number of elements
+        meta_response["totalItems"] = numels
+        # log.debug(query)
+
         result = self.graph.cypher(query)
         api_url = get_api_url(request, PRODUCTION)
         for row in result:
@@ -301,7 +318,7 @@ class Search(GraphBaseOperations):
                         'item.revision'
                     ]
                 )
-                logger.debug("video links %s" % video['links'])
+                log.debug("video links %s" % video['links'])
                 video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
                 if item.thumbnail is not None:
@@ -322,7 +339,7 @@ class Search(GraphBaseOperations):
                         # 'descriptions.creation',
                     ]
                 )
-                logger.debug("image links %s" % image['links'])
+                log.debug("image links %s" % image['links'])
                 image['links']['self'] = image_url
                 image['links']['content'] = image_url + '/content?type=image'
                 if item.thumbnail is not None:
@@ -330,9 +347,6 @@ class Search(GraphBaseOperations):
                         '/content?type=thumbnail'
                 image['links']['summary'] = image_url + '/content?type=summary'
                 data.append(image)
-
-        # return also the total number of elements
-        meta_response = {"totalItems": numels}
 
         # count result by provider if provider == null
         if provider is None:
@@ -345,12 +359,12 @@ class Search(GraphBaseOperations):
                     entity=entity,
                     filters=' '.join(filters),
                     match=multi_match_query)
-            # logger.debug(count_by_provider_query)
+            # log.debug(count_by_provider_query)
             result_p_count = self.graph.cypher(count_by_provider_query)
             group_by_providers = {}
             for row in result_p_count:
                 group_by_providers[row[0]] = row[1]
-            # logger.debug(group_by_providers)
+            # log.debug(group_by_providers)
             meta_response["countByProviders"] = group_by_providers
 
         # count result by year
@@ -363,7 +377,7 @@ class Search(GraphBaseOperations):
                 entity=entity,
                 filters=' '.join(filters),
                 match=multi_match_query)
-        # logger.debug(count_by_year_query)
+        # log.debug(count_by_year_query)
         result_y_count = self.graph.cypher(count_by_year_query)
         group_by_years = {}
         for row in result_y_count:
