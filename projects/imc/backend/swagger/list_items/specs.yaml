@@ -1,0 +1,9 @@
+file: lists
+class: ListItems
+schema:
+  expose: true
+mapping:
+  list_items: "/lists/<list_id>/items"
+  list_item: "/lists/<list_id>/items/<item_id>"
+labels:
+  - list_items

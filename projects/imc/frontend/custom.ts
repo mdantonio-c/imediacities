@@ -1,9 +1,7 @@
 
 import 'js-marker-clusterer/src/markerclusterer.js'
 
-//$ = jQuery = require('jquery');
 import 'ion-rangeslider/js/ion.rangeSlider.min.js'
-
 import 'slick-carousel/slick/slick.min.js'
 
 // add the ion-range-slider style and skin css

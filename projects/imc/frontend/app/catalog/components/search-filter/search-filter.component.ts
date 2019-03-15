@@ -85,6 +85,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   private toForm(filter: SearchFilter) {
+    console.log('filter', filter);
     let res = {
       searchTerm: filter.searchTerm,
       videoType: (filter.itemType === 'all' || filter.itemType === 'video') ? true : false,
@@ -96,7 +97,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       iprstatus: filter.iprstatus
     }
     this.terms = [];
-    for (let t of filter.terms) {
+    for (let t of filter.terms || []) {
       let entry = (!t.iri) ? t.label : { iri: t.iri, name: t.label };
       this.addTerm(entry);
     }
