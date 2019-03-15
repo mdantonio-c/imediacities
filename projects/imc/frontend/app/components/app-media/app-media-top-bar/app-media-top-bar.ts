@@ -67,23 +67,38 @@ export class AppMediaTopBarComponent implements OnInit, OnChanges {
     }
 
     private loadMyLists() {
-        this.listsService.getLists().subscribe(resp => {
+        this.listsService.getLists(this.item_id).subscribe(resp => {
             this.my_lists = this.listsService.parseLists(resp.data);
+            console.log(this.my_lists);
         }, error => {
-            console.error(`There was an error loading lists: $()`);
+            console.error('There was an error loading lists', error.errors);
             this.notify.showError('Error in loading lists');
         });
     }
 
-    addToList(event, listId) {
+    toggleItem(event, listId, isMember) {
         event.preventDefault();
+        isMember ? this.removeFromList(listId) : this.addToList(listId);
+    }
+
+    private removeFromList(listId) {
+        this.listsService.removeItemfromList(this.item_id, listId).subscribe(resp => {
+            // item removed from the list
+            this.my_lists.filter(l => l.uuid == listId)[0].belong = false;
+        }, error => {
+            console.error('There was an error removing item from the list', error.errors);
+            this.notify.showError('Error in removing this item from the list');
+        });
+    }
+
+    private addToList(listId) {
         let target = 'item:' + this.item_id;
         console.log('add this <' + target + '> to the list <' + listId + '>');
         this.listsService.addItemToList(target, listId).subscribe(resp => {
             // item added to the list
-            // 
+            this.my_lists.filter(l => l.uuid == listId)[0].belong = true; 
         }, error => {
-            console.error(`There was an error adding item to the list: $(error.erros)`);
+            console.error('There was an error adding item to the list', error.errors);
             this.notify.showError('Error in adding this item to the list');
         });
     }

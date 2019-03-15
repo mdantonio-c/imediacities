@@ -17,16 +17,19 @@
             </a>
             <div ngbDropdownMenu aria-labelledby="dropdownAddToList" class="dropdown-menu-right">
                 <h6 class="dropdown-header px-3">Add to...</h6>
-                <form class="px-3 py-1">
+                <div class="px-3 py-1">
                     <div style="max-height: 120px; overflow-y: auto;">
                     <div class="form-check px-0" *ngFor="let l of my_lists">
-                        <input class="form-check-input imc--input-checkbox styled-checkbox" type="checkbox" value="" id="lst-{{l.uuid}}" (click)="addToList($event, l.uuid)">
+                        <input class="imc--input-checkbox styled-checkbox" type="checkbox" value=""
+                            [(ngModel)]="l.belong"
+                            id="lst-{{l.uuid}}"
+                            (click)="toggleItem($event, l.uuid, l.belong)">
                         <label class="form-check-label m-0 text-truncate" for="lst-{{l.uuid}}">
                             {{l.name}}
                         </label>
                     </div>
                     </div>
-                </form>
+                </div>
                 <div class="dropdown-divider"></div>
                 <form class="px-3 py-1" [formGroup]="listForm" (ngSubmit)="createList()">
                     <div class="input-group" *ngIf="!listCreation">
