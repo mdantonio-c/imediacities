@@ -49,36 +49,38 @@
 		<div class="row"><div class="col-12"><hr></div></div>
 
 		<!-- VIRTUAL EXHIBITOR -->
-		<div class="row no-gutters mx-3">
+		<!-- <div class="row no-gutters mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--topbar--title imc--flex--vertical-center">
 					<i class="material-icons">collections</i>&nbsp;<strong>My Virtual Exhibitions (5)</strong>
 				</span>
 			</div>
 		</div>
-		<div class="row"><div class="col-12"><hr></div></div>
+		<div class="row"><div class="col-12"><hr></div></div> -->
 
 		<!-- MY LISTS -->
 		<div class="row no-gutters mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--topbar--title imc--flex--vertical-center">
-					<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists (4)</strong>
+					<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists ({{countListResults}})</strong>
 				</span>
 			</div>
 			<div class="colt-12 mt-2">
+				<multi-item-carousel 
+					[endpoint]="'lists'" (onResult)="countListHandler($event)"></multi-item-carousel>
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>
 
 		<!-- MY EMBARGOES -->
-		<div class="row no-gutters mx-3">
+		<!-- <div class="row no-gutters mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--topbar--title imc--flex--vertical-center">
 					<i class="material-icons">lock</i>&nbsp;<strong>My Embargoes (43)</strong>
 				</span>
 			</div>
 		</div>
-		<div class="row"><div class="col-12"><hr></div></div>
+		<div class="row"><div class="col-12"><hr></div></div> -->
 
 		<!-- ANNOTATED BY ME -->
 		<div class="row no-gutters mx-3">

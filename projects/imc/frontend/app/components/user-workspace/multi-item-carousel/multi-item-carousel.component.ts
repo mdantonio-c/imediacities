@@ -3,6 +3,7 @@ import { NotificationService } from '/rapydo/src/app/services/notification';
 import { Providers } from '../../../catalog/services/data';
 import { MediaUtilsService } from '../../../catalog/services/media-utils.service'
 import { CatalogService, SearchFilter } from '../../../catalog/services/catalog.service';
+import { ListsService } from '../../../services/lists.service'
 import { ItemDetail } from '../item-detail/item-detail.component';
 
 @Component({
@@ -12,7 +13,8 @@ import { ItemDetail } from '../item-detail/item-detail.component';
 })
 export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
-  @Input() filter: SearchFilter;
+  @Input() filter: SearchFilter = {};
+  @Input() endpoint: string = 'search';
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
 
   @ViewChild('slickModal') slickModal;
@@ -33,6 +35,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   constructor(
     private catalogService: CatalogService,
+    private listsService: ListsService,
     private notify: NotificationService) { }
 
   slickInit(e) {
@@ -62,29 +65,52 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   load() {
     this.loading = true;
-    this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
-      response => {
-        this.slickModal.unslick();
-        this.results = response["Response"].data.map(media => {
-          let r = {
-            'id': media.id,
-            'title': MediaUtilsService.getIdentifyingTitle(media),
-            'description': MediaUtilsService.getDescription(media),
-            'type': media.type,
-            'thumbnail': media.links['thumbnail']
-          }
-          if (media.type === 'aventity') r['duration'] = media.relationships.item[0].attributes.duration;
-          return r;
-        });
+    switch (this.endpoint) {
+      case "lists":
+        this.listsService.getLists().subscribe(
+          response => {
+            this.slickModal.unslick();
+            this.results = response.data.map(lst => {
+              return {
+                'id': lst.id,
+                'title': lst.attributes.name,
+                'description': lst.attributes.description
+              }
+            });
+            this.onResult.emit(this.results.length);
+            this.loading = false;
+          },
+          error => {
+            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.loading = false;
+          });
+        break;
+      default:
+        this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
+          response => {
+            this.slickModal.unslick();
+            this.results = response["Response"].data.map(media => {
+              let r = {
+                'id': media.id,
+                'title': MediaUtilsService.getIdentifyingTitle(media),
+                'description': MediaUtilsService.getDescription(media),
+                'type': media.type,
+                'thumbnail': media.links['thumbnail']
+              }
+              if (media.type === 'aventity') r['duration'] = media.relationships.item[0].attributes.duration;
+              return r;
+            });
 
-        console.log(this.results);
-        this.onResult.emit(response["Meta"].totalItems);
-        this.loading = false;
-      },
-      error => {
-        this.notify.extractErrors(error.error.Response, this.notify.ERROR);
-        this.loading = false;
-      });
+            console.log(this.results);
+            this.onResult.emit(response["Meta"].totalItems);
+            this.loading = false;
+          },
+          error => {
+            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.loading = false;
+          });
+        break;
+    }
   }
 
 }

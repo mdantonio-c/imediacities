@@ -7,7 +7,7 @@
 			<span class="fa-stack">
 				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.links['thumbnail']"></i>
 				<i class="fa fa-circle fa-stack-2x" *ngIf="media.links['thumbnail']"></i>
-				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
+				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
 			</span>
 		</span>
 		<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.id" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.links['thumbnail']"></hjs>

@@ -25,7 +25,7 @@ export class ItemDetailComponent implements OnInit {
 	route(mediaId, mediaType) {
 		if (mediaType === 'nonaventity') {
 			this.router.navigate(['/app/catalog/images', mediaId]);
-		} else {
+		} else if (mediaType === 'aventity') {
 			this.router.navigate(['/app/catalog/videos', mediaId]);
 		}
 	}

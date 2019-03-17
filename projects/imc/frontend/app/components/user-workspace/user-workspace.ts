@@ -14,6 +14,7 @@ export class UserWorkspaceComponent implements OnInit {
 	selectedCity: string = "Bologna";
 	cityFilter: SearchFilter = { city: this.selectedCity };
 	countCityResults: number = 0;
+	countListResults: number = 0;
 
 	onCityChange(newValue) {
 		this.selectedCity = newValue;
@@ -22,6 +23,10 @@ export class UserWorkspaceComponent implements OnInit {
 
 	countChangedHandler(newCount) {
 		this.countCityResults = newCount;
+	}
+
+	countListHandler(newCount) {
+		this.countListResults = newCount;
 	}
 
 	constructor(
