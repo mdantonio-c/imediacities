@@ -30,7 +30,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     "slidesToScroll": 1,
     "swipeToSlide": true,
     "variableWidth": true,
-    "lazyLoad": "progressive"
+    "lazyLoad": "progressive",
   };
 
   constructor(
@@ -47,7 +47,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   afterChange(e) {
-    /*console.log('afterChange');*/
+    console.log('afterChange', e);
   }
 
   beforeChange(e) {
@@ -85,6 +85,11 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
             this.loading = false;
           });
         break;
+      case "listItems":
+        /*this.listsService.getListItems()*/
+        console.log('load list items...');
+        this.loading = false;
+        break;
       default:
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
@@ -101,7 +106,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
               return r;
             });
 
-            console.log(this.results);
+            /*console.log(this.results);*/
             this.onResult.emit(response["Meta"].totalItems);
             this.loading = false;
           },

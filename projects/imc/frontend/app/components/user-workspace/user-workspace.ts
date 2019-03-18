@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from '/rapydo/src/app/services/notification';
 import { Providers } from '../../catalog/services/data';
 import { CatalogService, SearchFilter } from '../../catalog/services/catalog.service'
+import { ListsService } from '../../services/lists.service';
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
+import { MultiItemCarouselComponent } from './multi-item-carousel/multi-item-carousel.component';
 
 @Component({
 	selector: 'user-workspace',
@@ -15,6 +19,26 @@ export class UserWorkspaceComponent implements OnInit {
 	cityFilter: SearchFilter = { city: this.selectedCity };
 	countCityResults: number = 0;
 	countListResults: number = 0;
+	listForm: FormGroup;
+	/**
+     * Reference to NgbDropdown component
+     */
+	@ViewChild('newListDrop') listDropdown: NgbDropdown;
+	/**
+     * Reference to MyLists component
+     */
+	@ViewChild('mylists') myListsComp: MultiItemCarouselComponent;
+
+	constructor(
+		private catalogService: CatalogService,
+		private listsService: ListsService,
+		private formBuilder: FormBuilder,
+		private notify: NotificationService) {
+		this.listForm = this.formBuilder.group({
+            name: ['', Validators.required],
+            description: ['', Validators.required]
+        });
+	}
 
 	onCityChange(newValue) {
 		this.selectedCity = newValue;
@@ -29,12 +53,33 @@ export class UserWorkspaceComponent implements OnInit {
 		this.countListResults = newCount;
 	}
 
-	constructor(
-		private catalogService: CatalogService,
-		private notify: NotificationService) { }
-
 	ngOnInit() {
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
     	this.cities = this.cities.sort();
 	}
+
+	createList() {
+        console.log('create list', this.listForm.value);
+        this.listsService.create(this.listForm.value).subscribe(response => {
+            console.log('list created successfully', response);
+            this.notify.showSuccess("List created successfully");
+            this.listDropdown.close();
+            this.refreshMyLists();
+        }, error => {
+            console.error('There was an error creating list', error.errors);
+            this.notify.extractErrors(error, this.notify.ERROR);
+        });
+    }
+
+    openListCreation() {
+    	this.resetForm();
+    }
+
+    private refreshMyLists() {
+    	this.myListsComp.load();
+    }
+
+    private resetForm() {
+        this.listForm.reset({ 'name': '', 'description': '' });
+    }
 }

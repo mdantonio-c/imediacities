@@ -27,6 +27,10 @@ export class ListsService {
 		return parsed_lists.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
+	getListItems(listId: string) {
+		return this.api.get(`lists/${listId}/items`);
+	}
+
 	addItemToList(target: string, listId: string) {
 		return this.api.post(`lists/${listId}/items`, {
 			'target': `${target}`
