@@ -22,6 +22,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   results: ItemDetail[] = [];
   loading = false;
   private currentPage: number = 1;
+  private currentSlide: number = 0;
   private pageSize: number = 12;
 
   slideConfig = {
@@ -50,14 +51,15 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   afterChange(e) {
     /*console.log('afterChange', e);*/
 
-    let slidesToShow = this.slideConfig["slidesToShow"];
-    let end = e.currentSlide + slidesToShow - 1;
+    //preventing concurrent loading
+    if (!this.loading) {
+      let slidesToShow = this.slideConfig["slidesToShow"];
+      let end = e.currentSlide + slidesToShow - 1;
 
-    /*console.log("You want to display from " + start + " to " + end);*/
+      /*console.log("You want to display from " + start + " to " + end);*/
 
-    if (this.results.length <= end + slidesToShow) {
-      //preventing concurrent loading
-      if (!this.loading) {
+      if (this.results.length <= end + slidesToShow) {
+
         this.currentPage = Math.ceil((end + 1) / slidesToShow);
         this.load(true);
       }
@@ -129,7 +131,9 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
       default:
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
-            this.slickModal.unslick();
+            if (!append) {
+              this.slickModal.unslick();
+            }
             this.results = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
               let r = {
                 'id': media.id,
