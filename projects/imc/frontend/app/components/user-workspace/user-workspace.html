@@ -1,0 +1,137 @@
+<div id="pageWorkspace">
+	<!-- TOPBAR -->
+	<!-- <workspace-top-bar></workspace-top-bar> -->
+	<div class="nav imc--topbar">
+		<span class="imc--flex--vertical-center">
+			<i class="material-icons">dashboard</i>
+			&nbsp;
+			<strong>My Workspace</strong>
+		</span>
+		<span class="imc--flex--item-end">
+			<div class="input-group box-search">
+				<input type="text" class="imc--input imc--input-search"
+				name="searchTerm"
+				placeholder="search catalogue"
+				>
+			</div>
+		</span>
+	</div>
+	<div class="container-workspace">
+		<!-- SEARCH RESULTS -->
+		<div class="row no-gutters">
+			<div class="col-12 my-2">
+				<span class="imc--flex--vertical-center">
+					<i class="material-icons">location_city</i>&nbsp;<strong>Cities (9)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row no-gutters mx-3">
+			<div class="col-12">
+				<div class="form-row align-items-center">
+			    <div class="col-auto">
+			      <select [(ngModel)]="selectedCity" (ngModelChange)="onCityChange($event)" class="form-control" style="max-width: 160px;">
+							<option *ngFor="let c of cities; let i = index" [value]="c">{{c}}</option>
+					  </select>
+			    </div>
+			    <!-- <div class="col-1" style="max-width: 40px !important;">
+			      <i class="material-icons">star_rate</i>
+			    </div> -->
+			    <div class="col-auto">
+			      <span *ngIf="countCityResults">{{countCityResults}} contents</span>
+			    </div>
+			  </div>
+			</div>
+			<div class="col-12 mt-2">
+				<multi-item-carousel 
+					[filter]="cityFilter" (onResult)="countChangedHandler($event)"></multi-item-carousel>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- VIRTUAL EXHIBITOR -->
+		<!-- <div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--flex--vertical-center">
+					<i class="material-icons">collections</i>&nbsp;<strong>My Virtual Exhibitions (5)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div> -->
+
+		<!-- MY LISTS -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<div style="display: flex; flex-wrap: wrap;">
+					<span class="imc--flex--vertical-center">
+						<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists ({{countListResults}})</strong>
+					</span>
+					<span class="imc--flex--vertical-center">
+		        <div ngbDropdown class="d-inline-block ml-5" placement="bottom-left" autoClose="outside" #newListDrop="ngbDropdown">
+		            <button class="btn" id="dropdownCreateAList" ngbDropdownToggle (click)="openListCreation()">
+		            	<i class="fa fa-plus-square"></i> Create a new list</button>
+		            <div ngbDropdownMenu aria-labelledby="dropdownCreateAList" class="dropdown-menu-right" style="width: 300px;">
+		            	<form class="px-3 py-1" [formGroup]="listForm" (ngSubmit)="createList()">
+	                    <div class="input-group">
+	                        <div class="form-header">
+	                            <button type="button" class="close" aria-label="Close" (click)="newListDrop.close()">
+	                                <span aria-hidden="true" class="material-icons mr-0" style="color: #707070;">close</span>
+	                            </button>
+	                        </div>
+	                        <input type="text" class="imc--input" placeholder="Enter name"
+	                            formControlName="name">
+	                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('name').touched && listForm.get('name').invalid">Name is required</div>
+	                        <textarea class="imc--input mt-3" placeholder="Enter notes"
+	                            formControlName="description"></textarea>
+	                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('description').touched && listForm.get('description').invalid">Description is required</div>
+	                        <div class="form-footer mt-2">
+	                            <button type="submit" class="btn btn-border-classic" [disabled]="listForm.invalid">Create</button>
+	                        </div>
+	                    </div>
+	                </form>
+		            </div>
+		        </div>
+		      </span>
+		     </div>
+			</div>
+			<div class="colt-12 mt-2">
+				<multi-item-carousel 
+					[endpoint]="'lists'" (onResult)="countListHandler($event)" #mylists></multi-item-carousel>
+			</div>
+			<!-- <div class="colt-12 mt-2">
+				<multi-item-carousel 
+					[endpoint]="'listItems'"></multi-item-carousel>
+			</div> -->
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- MY EMBARGOES -->
+		<!-- <div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--flex--vertical-center">
+					<i class="material-icons">lock</i>&nbsp;<strong>My Embargoes (43)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div> -->
+
+		<!-- ANNOTATED BY ME -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--flex--vertical-center">
+					<i class="material-icons">bookmark</i>&nbsp;<strong>Contents annotated by me (22)</strong>
+				</span>
+			</div>
+		</div>
+		<div class="row"><div class="col-12"><hr></div></div>
+
+		<!-- WITH MY NOTES -->
+		<div class="row no-gutters mx-3">
+			<div class="col-12 mt-2">
+				<span class="imc--flex--vertical-center">
+					<i class="material-icons">speaker_notes</i>&nbsp;<strong>Content with my personal notes (12)</strong>
+				</span>
+			</div>
+		</div>
+
+	</div>
+</div>

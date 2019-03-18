@@ -7,8 +7,8 @@
  *
  */
 import {Directive, ContentChild, AfterContentInit, ElementRef, OnDestroy, Inject, forwardRef} from '@angular/core';
-import {NgbDropdownMenu, NgbDropdown} from '@ng-bootstrap/ng-bootstrap/dropdown/dropdown';
-import {positionElements} from '@ng-bootstrap/ng-bootstrap/util/positioning';
+import {NgbDropdownMenu, NgbDropdown} from '@ng-bootstrap/ng-bootstrap';
+import {positionElements} from '@ng-bootstrap/ng-bootstrap/esm5/util/positioning';
 import {Subscription} from 'rxjs/Subscription';
 
 @Directive({
@@ -87,7 +87,7 @@ export class DropdownPositionDirective implements AfterContentInit, OnDestroy {
 
         this.menuWrapper.addEventListener('keyup', (event: KeyboardEvent) => {
             if (event.keyCode === 27) {
-                this.dropdown.closeFromOutsideEsc();
+                this.dropdown.close();
             }
         });
         this.menuWrapper.appendChild(this.menuRef.nativeElement);

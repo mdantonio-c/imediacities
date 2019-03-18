@@ -34,6 +34,21 @@ definitions:
     items:
       $ref: "#/definitions/Annotation"
 
+  List:
+    required:
+      - name
+      - description
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+
+  Lists:
+    type: array
+    items:
+      $ref: "#/definitions/List"
+
   Body:
     discriminator: type
     required:

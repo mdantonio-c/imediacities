@@ -1,8 +1,9 @@
+// /// <reference types="@types/googlemaps" />
 import {Component, ChangeDetectorRef, Input, OnInit, OnChanges, ViewChild, ElementRef, Output, EventEmitter} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {AppAnnotationsService} from "../../../../services/app-annotations";
-import { } from '@types/googlemaps';
-import {} from '@ngui';
+// import { } from '@types/googlemaps';
+// import { } from '@ngui';
 import {AppMediaMapComponent} from "../../app-media-map/app-media-map";
 import {infoResult} from "../../../../decorators/app-info";
 

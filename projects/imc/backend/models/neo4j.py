@@ -23,10 +23,6 @@ from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
 
-import logging
-
-log = logging.getLogger(__name__)
-
 
 class HeritableStructuredNode(StructuredNode):
 
@@ -46,7 +42,8 @@ class HeritableStructuredNode(StructuredNode):
         Re-instantiate this node as an instance its most derived derived class.
         """
         # TODO: there is probably a far more robust way to do this.
-        def _get_class(cname): return getattr(sys.modules[__name__], cname)
+        def _get_class(cname):
+            return getattr(sys.modules[__name__], cname)
 
         # inherited_labels() only returns the labels for the current class and
         #  any super-classes, whereas labels() will return all labels on the
@@ -65,10 +62,11 @@ class HeritableStructuredNode(StructuredNode):
                 # Infer the most derivative class by looking for the one
                 # with the longest method resolution order.
                 class_objs = map(_get_class, classes)
+                ordered_class_objs = list(class_objs)
                 _, cls = sorted(
                     zip(
-                        map(lambda cls: len(cls.mro()), class_objs),
-                        class_objs),
+                        map(lambda cls: len(cls.mro()), ordered_class_objs),
+                        ordered_class_objs),
                     key=lambda size_cls: size_cls[0])[-1]
         else:    # Caller has specified a target class.
             if not isinstance(target_class, str):
@@ -118,6 +116,8 @@ class User(UserBase):
         'Item', 'REVISION_BY', cardinality=ZeroOrMore)
     revised_shots = RelationshipFrom(
         'Shot', 'REVISED_BY', cardinality=ZeroOrMore)
+    lists = RelationshipFrom(
+        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True)
 
 
 class Group(IdentifiedNode):
@@ -161,7 +161,29 @@ class AnnotationTarget(HeritableStructuredNode):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
 
 
-class Item(TimestampedNode, AnnotationTarget):
+class ListItem(HeritableStructuredNode):
+    """Represents an element of a list."""
+    lists = RelationshipFrom(
+        'List', 'LST_ITEM', cardinality=ZeroOrMore)
+
+
+class List(TimestampedNode):
+    """
+    List of item. Group a collection of items (e.g. Item, Shot).
+
+    Attributes:
+        name            The name of the list.
+        description     It gives a description to the list.
+    """
+    name = StringProperty(required=True, show=True)
+    description = StringProperty(required=True, show=True)
+    items = RelationshipTo(
+        'ListItem', 'LST_ITEM', cardinality=ZeroOrMore)
+    creator = RelationshipTo(
+        'User', 'LST_BELONGS_TO', cardinality=One)
+
+
+class Item(TimestampedNode, AnnotationTarget, ListItem):
     """
     The Item Entity points to the digital file held in the IMC repository.
     The item functions as a logical wrapper for the digital object displayed in
@@ -785,7 +807,7 @@ class VideoSegment(IdentifiedNode, AnnotationTarget):
     within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
-class Shot(VideoSegment):
+class Shot(VideoSegment, ListItem):
     """Shot class"""
     shot_num = IntegerProperty(required=True, show=True)
     frame_uri = StringProperty()

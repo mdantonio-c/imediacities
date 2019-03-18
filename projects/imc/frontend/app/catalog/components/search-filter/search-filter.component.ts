@@ -4,7 +4,7 @@ import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
 import { SliderRangeComponent } from './slider-range/slider-range.component';
 import { AppVocabularyService } from "../../../services/app-vocabulary";
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import 'rxjs/add/observable/combineLatest';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { IonRangeSliderComponent } from "ng2-ion-range-slider";
@@ -85,6 +85,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   private toForm(filter: SearchFilter) {
+    console.log('filter', filter);
     let res = {
       searchTerm: filter.searchTerm,
       videoType: (filter.itemType === 'all' || filter.itemType === 'video') ? true : false,
@@ -96,7 +97,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       iprstatus: filter.iprstatus
     }
     this.terms = [];
-    for (let t of filter.terms) {
+    for (let t of filter.terms || []) {
       let entry = (!t.iri) ? t.label : { iri: t.iri, name: t.label };
       this.addTerm(entry);
     }

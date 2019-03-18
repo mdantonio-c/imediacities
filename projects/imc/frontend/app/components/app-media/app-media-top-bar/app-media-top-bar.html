@@ -8,16 +8,76 @@
         &nbsp;
         <strong [innerHTML]="label"></strong>
     </span>
-    <!-- <span class="imc--flex--item-end box-icons-share">
-        <i class="material-icons click-event">playlist_add</i>
-
-        <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+    <span class="imc--flex--item-end box-icons-share">
+        <div ngbDropdown class="d-inline-block" placement="bottom-right" autoClose="outside"
+            (openChange)="openAddListPanel($event)"
+            *ngIf="user && user.roles['Researcher']">
+            <a class="dropdown-toggle" id="dropdownAddToList" ngbDropdownToggle>
+                <i class="material-icons click-event">playlist_add</i>
+            </a>
+            <div ngbDropdownMenu aria-labelledby="dropdownAddToList" class="dropdown-menu-right">
+                <h6 class="dropdown-header px-3">Add to...</h6>
+                <div class="px-3 py-1">
+                    <div style="max-height: 120px; overflow-y: auto;">
+                    <div class="form-check px-0" *ngFor="let l of my_lists">
+                        <input class="imc--input-checkbox styled-checkbox" type="checkbox" value=""
+                            [(ngModel)]="l.belong"
+                            id="lst-{{l.uuid}}"
+                            (click)="toggleItem($event, l.uuid, l.belong)">
+                        <label class="form-check-label m-0 text-truncate" for="lst-{{l.uuid}}">
+                            {{l.name}}
+                        </label>
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <form class="px-3 py-1" [formGroup]="listForm" (ngSubmit)="createList()">
+                    <div class="input-group" *ngIf="!listCreation">
+                        <div class="input-group-prepend">
+                            <button class="btn-reset" type="button" (click)="listCreationToggle()">
+                                <i class="material-icons" style="color: #333; width: 1.2rem; height: 1rem; cursor: pointer; margin-left: -3px;">add_box</i>
+                            </button>
+                        </div>
+                        <h6 class="dropdown-header py-0 px-2">Create new list</h6>
+                    </div>
+                    <div class="input-group" *ngIf="listCreation">
+                        <div class="form-header">
+                            <button type="button" class="close" aria-label="Close" (click)="listCreationToggle()">
+                                <span aria-hidden="true" class="material-icons mr-0" style="color: #707070;">close</span>
+                            </button>
+                        </div>
+                        <input type="text" class="imc--input" placeholder="Enter name"
+                            formControlName="name">
+                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('name').touched && listForm.get('name').invalid">Name is required</div>
+                        <textarea class="imc--input mt-3" placeholder="Enter notes"
+                            formControlName="description"></textarea>
+                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('description').touched && listForm.get('description').invalid">Description is required</div>
+                        <div class="form-footer mt-2">
+                            <button type="submit" class="btn btn-accent" [disabled]="listForm.invalid">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- <div>
+            <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <i class="material-icons click-event">playlist_add</i>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <span>Add to list...</span>
+                <a class="dropdown-item" href="#">Share the video</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Share your segment list</a>
+            </div>
+        </div> -->
+        
+        <!-- <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
             <i class="material-icons">share</i>
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-          <a class="dropdown-item" href="#">Share the video</a>
+            <a class="dropdown-item" href="#">Share the video</a>
             <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Share your segment list</a>
-        </div>
-    </span> -->
+            <a class="dropdown-item" href="#">Share your segment list</a>
+        </div> -->
+    </span>
 </div>

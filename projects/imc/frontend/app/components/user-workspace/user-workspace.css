@@ -1,0 +1,31 @@
+.imc--topbar .material-icons,
+.imc--topbar .imc--topbar--title {
+	color: #fff;
+	margin-right: 10px;
+}
+
+.imc--topbar .box-search {
+	background: #fff;
+    padding: 5px;
+    border-radius: 2px;
+    border: 2px solid #707070;
+}
+
+.container-workspace {
+	box-sizing: border-box;
+    padding: 35px 25px;
+    width: 100%;
+}
+
+.dropdown-toggle::after {
+  content:initial;
+}
+
+.form-header,
+.form-footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+

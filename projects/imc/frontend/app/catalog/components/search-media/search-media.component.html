@@ -7,7 +7,7 @@
 		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
 		<div class="cn">
 			<div class="card inner bg-secondary small">
-				<i class="fa small" [ngClass]="{'fa-video-camera': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+				<i class="fa small" [ngClass]="{'fa-video': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
 			</div>
 		</div>
 	</div>

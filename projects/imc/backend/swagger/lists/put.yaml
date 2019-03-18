@@ -1,0 +1,26 @@
+list:
+  summary: Update a list
+  description: Update a list of the researcher
+  custom:
+    authentication: true
+    authorized:
+      - Researcher
+  parameters:
+    - name: updatedList
+      in: body
+      description: The updated list.
+      schema:
+        $ref: "#/definitions/List"
+  responses:
+    200:
+      description: List updated successfully.
+    400:
+      description: There is no content present in the request body or the content is not valid for list.
+    401:
+      description: This endpoint requires a valid authorization token.
+    403:
+      description: The user is not authorized to perform this operation.
+    404:
+      description: List does not exist.
+    409:
+      description: There is already another list with the same name among your lists.

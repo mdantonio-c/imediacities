@@ -2,8 +2,8 @@ import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
 import { IonRangeSliderModule } from "ng2-ion-range-slider";
-
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { CustomNavbarComponent } from './custom.navbar';
 import { CustomBrandComponent } from './custom.navbar';
@@ -11,6 +11,9 @@ import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
 import { UploadComponent } from './components/upload/upload';
+import { UserWorkspaceComponent } from './components/user-workspace/user-workspace';
+import { MultiItemCarouselComponent } from './components/user-workspace/multi-item-carousel/multi-item-carousel.component';
+import { ItemDetailComponent } from './components/user-workspace/item-detail/item-detail.component';
 
 import { CatalogComponent } from './catalog/catalog.component';
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
@@ -88,12 +91,16 @@ import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fas
 import {AppVideoService} from "./services/app-video";
 import {AppLodService} from "./services/app-lod";
 import {ShotRevisionService} from "./services/shot-revision.service";
+import {ListsService} from "./services/lists.service";
 
 export const declarations: any[] = [
 	CustomNavbarComponent, CustomBrandComponent,
     ArchivesListComponent, ArchiveComponent,
 	AdminGroupsComponent,
     UploadComponent,
+    UserWorkspaceComponent,
+    MultiItemCarouselComponent,
+    ItemDetailComponent,
 	CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,
@@ -170,6 +177,7 @@ export const providers: any[] = [
     AppAnnotationsService,
     AppLodService,
     ShotRevisionService,
+    ListsService,
     AppMediaService,
     AppModaleService,
     AppShotsService,
@@ -183,5 +191,6 @@ export const imports: any[] = [
   HttpClientJsonpModule,
   NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
   HolderJsModule,
-  IonRangeSliderModule
+  IonRangeSliderModule,
+  SlickCarouselModule
 ];

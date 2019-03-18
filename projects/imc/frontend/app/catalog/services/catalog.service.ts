@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
-import { Observable } from 'rxjs/Observable';
+import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { MediaEntity, Providers } from './data'
 import { LocalStorageService } from './local-storage.service';
 
 export interface SearchFilter {
-	searchTerm: string,
-	itemType: string,
-	terms: SearchTerm[],
-	provider: string,
-	city: string,
-	country: string,
-	productionYearFrom: number,
-	productionYearTo: number,
-	iprstatus: string,
-	missingDate: boolean
+	searchTerm?: string,
+	itemType?: string,
+	terms?: SearchTerm[],
+	provider?: string,
+	city?: string,
+	country?: string,
+	productionYearFrom?: number,
+	productionYearTo?: number,
+	iprstatus?: string,
+	missingDate?: boolean
 }
 
 export interface SearchTerm {
@@ -57,7 +57,7 @@ export class CatalogService {
      * @param pageIdx
      * @param pageSize
      */
-	search(filter: SearchFilter, pageIdx: number, pageSize: number) {
+	search(filter: SearchFilter, pageIdx: number, pageSize: number, cached: boolean = true) {
 		let endpoint = 'search?currentpage=' + pageIdx + '&perpage=' + pageSize;
 		this._filter = filter;
 		let data = {
@@ -76,7 +76,7 @@ export class CatalogService {
 		if (filter.searchTerm) {
 			data.match = { term: filter.searchTerm, fields: matchFields }
 		}
-		this.cacheValues();
+		if (cached) this.cacheValues();
 		return this.api.post(endpoint, data, { "rawResponse": true });
 	}
 
@@ -129,7 +129,7 @@ export class CatalogService {
 	 */
     getRelevantCreations = function(relevantCreations) {
         if (relevantCreations === undefined || relevantCreations.size === 0) {
-        	return Observable.of({'Response': {'data': []}});
+        	return of({'Response': {'data': []}});
         }
         let data = {
             'relevant-list': []

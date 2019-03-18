@@ -64,6 +64,7 @@ export class CatalogComponent implements OnInit {
 				this.countByYears = response["Meta"].countByYears;
 				this.calculateCountMissingDate();
 				this.countByProviders = response["Meta"].countByProviders;
+				this.notify.extractErrors(response.Response, this.notify.WARNING);
 				this.loading = false;
 			},
 			error => {
