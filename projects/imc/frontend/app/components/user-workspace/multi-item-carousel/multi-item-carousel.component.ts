@@ -27,7 +27,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   slideConfig = {
     "infinite": false,
     "slidesToShow": 8,
-    "slidesToScroll": 1,
+    "slidesToScroll": 8,
     "swipeToSlide": true,
     "variableWidth": true,
     "lazyLoad": "progressive",
@@ -43,11 +43,25 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   breakpoint(e) {
+    console.log(e);
     /*console.log('breakpoint');*/
   }
 
   afterChange(e) {
-    console.log('afterChange', e);
+    /*console.log('afterChange', e);*/
+
+    let slidesToShow = this.slideConfig["slidesToShow"];
+    let end = e.currentSlide + slidesToShow - 1;
+
+    /*console.log("You want to display from " + start + " to " + end);*/
+
+    if (this.results.length <= end + slidesToShow) {
+      //preventing concurrent loading
+      if (!this.loading) {
+        this.currentPage = Math.ceil((end + 1) / slidesToShow);
+        this.load(true);
+      }
+    }
   }
 
   beforeChange(e) {
@@ -60,10 +74,32 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     console.log('Input changed', this.filter);
+    this.currentPage = 1;
     this.load();
   }
 
-  load() {
+  update_results(append, page, new_results) {
+
+    if (append) {
+      let start = (this.currentPage -1) * this.pageSize;
+      let end = start + this.pageSize - 1;
+
+      if (this.results.length > end) {
+        console.log("Results already loaded?");
+      } else {
+        /*console.log("Loading from " + start + " to " + end);*/
+
+        this.results.push(...new_results);
+      }
+    } else {
+      this.results = new_results;
+    }
+    return this.results
+
+
+  }
+
+  load(append=false) {
     this.loading = true;
     switch (this.endpoint) {
       case "lists":
@@ -94,7 +130,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
             this.slickModal.unslick();
-            this.results = response["Response"].data.map(media => {
+            this.results = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
               let r = {
                 'id': media.id,
                 'title': MediaUtilsService.getIdentifyingTitle(media),
@@ -104,7 +140,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
               }
               if (media.type === 'aventity') r['duration'] = media.relationships.item[0].attributes.duration;
               return r;
-            });
+            }));
 
             /*console.log(this.results);*/
             this.onResult.emit(response["Meta"].totalItems);
