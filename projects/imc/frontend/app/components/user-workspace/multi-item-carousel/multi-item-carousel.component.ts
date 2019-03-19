@@ -27,6 +27,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   slideConfig = {
     "infinite": false,
     "slidesToShow": 8,
+    /*"focusOnSelect": true,*/
     "slidesToScroll": 1,
     "swipeToSlide": true,
     "variableWidth": true,
