@@ -11,7 +11,7 @@
     <div ngxSlickItem *ngFor="let item of results" class="slide" 
         (focus)="item.focus = true"
         (blur)="item.focus = false">
-        <item-detail [media]="item"></item-detail>
+        <item-detail [media]="item" (onDelete)="removeItem(item)"></item-detail>
     </div>
 </ngx-slick-carousel>
 

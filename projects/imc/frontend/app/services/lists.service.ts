@@ -27,6 +27,10 @@ export class ListsService {
 		return parsed_lists.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
+	removeList(listId: string) {
+		return this.api.delete('lists', listId);
+	}
+
 	getListItems(listId: string) {
 		return this.api.get(`lists/${listId}/items`);
 	}

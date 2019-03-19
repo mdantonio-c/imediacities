@@ -31,7 +31,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     "slidesToScroll": 8,
     "swipeToSlide": true,
     "variableWidth": true,
-    "lazyLoad": "progressive",
+    "lazyLoad": "progressive"
   };
 
   constructor(
@@ -81,7 +81,6 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   update_results(append, page, new_results) {
-
     if (append) {
       let start = (this.currentPage -1) * this.pageSize;
       let end = start + this.pageSize - 1;
@@ -97,8 +96,6 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
       this.results = new_results;
     }
     return this.results
-
-
   }
 
   load(append=false) {
@@ -109,10 +106,12 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           response => {
             this.slickModal.unslick();
             this.results = response.data.map(lst => {
+              console.log(lst);
               return {
                 'id': lst.id,
                 'title': lst.attributes.name,
-                'description': lst.attributes.description
+                'description': lst.attributes.description,
+                'type': lst.type
               }
             });
             this.onResult.emit(this.results.length);
@@ -156,6 +155,27 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           });
         break;
     }
+  }
+
+  removeItem(item) {
+    let itemTitle = item.title;
+    switch (item.type) {
+      case "list":
+        this.listsService.removeList(item.id).subscribe(
+          response => {
+            this.notify.showSuccess('List <'+itemTitle+'> removed successfully');
+            this.load();
+          },
+          error => {
+            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+          });
+        break;
+      
+      default:
+        console.warn('Remove function not allowed for type', item.type);
+        break;
+    }
+    
   }
 
 }
