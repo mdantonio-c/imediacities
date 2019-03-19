@@ -15,10 +15,11 @@ export interface ItemDetail {
 	templateUrl: './item-detail.component.html',
 	styleUrls: ['./item-detail.component.css'],
 })
-export class ItemDetailComponent  {
+export class ItemDetailComponent {
 
 	@Input() media: ItemDetail;
 	@Output() onDelete: EventEmitter<null> = new EventEmitter<null>();
+	selected = false;
 
 	constructor(
 		private router: Router,
@@ -36,6 +37,11 @@ export class ItemDetailComponent  {
 
 	delete() {
 		this.onDelete.emit();
+	}
+
+	select() {
+		this.selected = true;
+    	this.listsService.selectList(this.media);
 	}
 
 }

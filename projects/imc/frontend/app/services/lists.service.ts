@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
 import { UserList } from './lists.model';
+import { Subject }    from 'rxjs';
 
 @Injectable()
 export class ListsService {
+
+	private listSelectedSource = new Subject<any>();
+	listSelected$ = this.listSelectedSource.asObservable();
 
 	constructor(private api: ApiService) { }
 
@@ -47,5 +51,9 @@ export class ListsService {
 
 	create(list: UserList) {
 		return this.api.post('lists', list);
+	}
+
+	selectList(list) {
+		this.listSelectedSource.next(list);
 	}
 }

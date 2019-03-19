@@ -15,11 +15,12 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   @Input() filter: SearchFilter = {};
   @Input() endpoint: string = 'search';
+  @Input() listId: string;
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
 
   @ViewChild('slickModal') slickModal;
 
-  results: ItemDetail[] = [];
+  slides: ItemDetail[] = [];
   loading = false;
   private currentPage: number = 1;
   private currentSlide: number = 0;
@@ -33,6 +34,10 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     "variableWidth": true,
     "lazyLoad": "progressive"
   };
+
+  _trackBy(slide) {
+    return slide.id;
+  }
 
   constructor(
     private catalogService: CatalogService,
@@ -58,7 +63,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
       /*console.log("You want to display from " + start + " to " + end);*/
 
-      if (this.results.length <= end + slidesToShow) {
+      if (this.slides.length <= end + slidesToShow) {
 
         this.currentPage = Math.ceil((end + 1) / slidesToShow);
         this.load(true);
@@ -82,30 +87,30 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   update_results(append, page, new_results) {
     if (append) {
-      let start = (this.currentPage -1) * this.pageSize;
+      let start = (this.currentPage - 1) * this.pageSize;
       let end = start + this.pageSize - 1;
 
-      if (this.results.length > end) {
+      if (this.slides.length > end) {
         console.log("Results already loaded?");
       } else {
         /*console.log("Loading from " + start + " to " + end);*/
 
-        this.results.push(...new_results);
+        this.slides.push(...new_results);
       }
     } else {
-      this.results = new_results;
+      this.slides = new_results;
     }
-    return this.results
+    return this.slides
   }
 
-  load(append=false) {
+  load(append = false) {
     this.loading = true;
     switch (this.endpoint) {
       case "lists":
         this.listsService.getLists().subscribe(
           response => {
             this.slickModal.unslick();
-            this.results = response.data.map(lst => {
+            this.slides = response.data.map(lst => {
               console.log(lst);
               return {
                 'id': lst.id,
@@ -114,7 +119,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
                 'type': lst.type
               }
             });
-            this.onResult.emit(this.results.length);
+            this.onResult.emit(this.slides.length);
             this.loading = false;
           },
           error => {
@@ -123,9 +128,35 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           });
         break;
       case "listItems":
-        /*this.listsService.getListItems()*/
-        console.log('load list items...');
-        this.loading = false;
+        this.listsService.getListItems(this.listId).subscribe(
+          response => {
+            this.slickModal.unslick();
+            console.log(response);
+            this.slides = response.data.map(media => {
+              console.log(media);
+              let mediaType = '';
+              if(media.type === 'shot') {
+                mediaType = 'aventity';
+              } else {
+                mediaType = (media.attributes.item_type.key === 'Video') ? 'aventity' : 'nonaventity';
+              }
+              let r = {
+                'id': media.id,
+                'title': media.title,
+                'description': media.description,
+                'type': mediaType,
+                'thumbnail': media.links['thumbnail']
+              }
+              if (mediaType === 'aventity') r['duration'] = media.attributes.duration;
+              return r;
+            });
+            /*this.onResult.emit(response["Meta"].elements);*/
+            this.loading = false;
+          },
+          error => {
+            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.loading = false;
+          });
         break;
       default:
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
@@ -133,7 +164,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
             if (!append) {
               this.slickModal.unslick();
             }
-            this.results = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
+            this.slides = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
               let r = {
                 'id': media.id,
                 'title': MediaUtilsService.getIdentifyingTitle(media),
@@ -163,19 +194,19 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
       case "list":
         this.listsService.removeList(item.id).subscribe(
           response => {
-            this.notify.showSuccess('List <'+itemTitle+'> removed successfully');
+            this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
             this.load();
           },
           error => {
             this.notify.extractErrors(error.error.Response, this.notify.ERROR);
           });
         break;
-      
+
       default:
         console.warn('Remove function not allowed for type', item.type);
         break;
     }
-    
+
   }
 
 }

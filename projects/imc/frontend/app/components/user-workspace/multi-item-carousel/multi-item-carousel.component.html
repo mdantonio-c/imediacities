@@ -8,7 +8,7 @@
         (breakpoint)="breakpoint($event)"
         (afterChange)="afterChange($event)"
         (beforeChange)="beforeChange($event)">
-    <div ngxSlickItem *ngFor="let item of results" class="slide" 
+    <div ngxSlickItem *ngFor="let item of slides; trackBy: _trackBy" class="slide" 
         (focus)="item.focus = true"
         (blur)="item.focus = false">
         <item-detail [media]="item" (onDelete)="removeItem(item)"></item-detail>
@@ -16,7 +16,7 @@
 </ngx-slick-carousel>
 
 <!-- no results -->
-<div class="row" *ngIf="!loading && results.length == 0">
+<div class="row" *ngIf="!loading && slides.length == 0">
 	<div class="col">
 		<div class="no-results">
 			<p>This list has no items</p>
