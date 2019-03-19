@@ -208,8 +208,9 @@ search-thumbnail div .media-image-wrapper {
 
 .media-thumbnail .text .imc-icon:first-child,
 .media .text .imc-icon:first-child,
-.media .search-actions .imc-icon:first-child {
-	color: #bbb; margin-right: 4px
+.media .search-actions .imc-icon:first-child,
+.item-detail .card-text .imc-icon:first-child {
+	color: #bbb; margin-right: 4px;
 }
 
 .media-thumbnail {
@@ -339,12 +340,13 @@ search-thumbnail div .media-image-wrapper {
   cursor: pointer;
 }
 
-.badge.revision {
+.badge.revision,
+.badge.item-del {
   position: absolute !important;
   top: 5px;
   right: 5px;
   font-weight: bold;
-  padding: 2px 6px;
+  padding: 2px 2px;
   z-index: 1;
 }
 
@@ -383,6 +385,9 @@ search-thumbnail div .media-image-wrapper {
 }
 
 /* Override some Slick styles */
+.slick-list {
+  padding: 0 3px;
+}
 .slick-prev:before,
 .slick-next:before {
   color: #333;
@@ -391,8 +396,11 @@ search-thumbnail div .media-image-wrapper {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-right: 5px;
+  margin: 5px;
 }
 .slick-slide:hover {
   border-color: #75A8CE
+}
+.slick-slide:focus {
+  margin: 3px;
 }

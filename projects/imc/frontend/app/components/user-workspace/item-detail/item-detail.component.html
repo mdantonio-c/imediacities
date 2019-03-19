@@ -1,5 +1,14 @@
 <div class="card item-detail">
   <div class="media-image-wrapper" style="outline: none;">
+  	<span class="badge item-del" *ngIf="!media.type && media.focus">
+			<i class="material-icons click-event"
+        mwlConfirmationPopover
+        [popoverTitle]="'Remove list'"
+        [popoverMessage]="'This operation cannot be undone. References to all items will be lost. Do you wish to continue?'"
+        placement="bottom"
+        (confirm)="removeList()"
+        style="color: #707070; font-size: 16px !important;">cancel_presentation</i>
+		</span>
 		<span class="search-item label bigger-110">
 			<span class="fa-stack">
 				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.thumbnail"></i>
@@ -13,6 +22,6 @@
 	</div>
   <div class="card-body">
     <h5 class="card-title blue click-event" (click)="route(media.id, media.type)">{{media.title}}</h5>
-    <p class="card-text">{{media.description}}</p>
+    <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
   </div>
 </div>

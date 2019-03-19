@@ -512,6 +512,7 @@ input[type="radio"] {
   - .focus ├¿ la classe che gli viene applicata per invertire i colori e avere il gb bianco
 */
 .badge {
+  margin: 2px;
   border-radius: 5px;
   right: -5px;
   padding: 3px 3px;

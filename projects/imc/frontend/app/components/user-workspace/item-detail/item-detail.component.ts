@@ -33,4 +33,9 @@ export class ItemDetailComponent implements OnInit {
 	ngOnInit() {
 
 	}
+
+	removeList() {
+		console.log('remove list', this.media.title);
+	}
+
 }
