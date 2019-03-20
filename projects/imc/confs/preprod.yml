@@ -38,6 +38,7 @@ services:
   frontend:
     environment:
       APP_MODE: production
+      BACKEND_PORT: ${PROXY_PROD_PORT}
     networks:
       proxy_net:
         aliases:
