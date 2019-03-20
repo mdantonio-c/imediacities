@@ -4,6 +4,9 @@
 }
 
 .item-detail .card-body {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
 	margin-top: 8px;
     padding: .25rem;
     height: 110px;
@@ -16,9 +19,13 @@
 }
 
 .item-detail .card-text {
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
     line-height: 1.2;
-    margin-left: 5px;
-    margin-right: 5px;
+    font-size: .7vw;
+    max-height: 100px;
 }
 
 .item-detail .search-item.label {
@@ -47,4 +54,3 @@
     font-weight: bold;
     color: #fff;
 }
-

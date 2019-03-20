@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '/rapydo/src/app/services/api';
 import { UserList } from './lists.model';
+import { Subject }    from 'rxjs';
 
 @Injectable()
 export class ListsService {
+
+	private listSelectedSource = new Subject<any>();
+	listSelected$ = this.listSelectedSource.asObservable();
 
 	constructor(private api: ApiService) { }
 
@@ -27,6 +31,10 @@ export class ListsService {
 		return parsed_lists.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
+	removeList(listId: string) {
+		return this.api.delete('lists', listId);
+	}
+
 	getListItems(listId: string) {
 		return this.api.get(`lists/${listId}/items`);
 	}
@@ -43,5 +51,9 @@ export class ListsService {
 
 	create(list: UserList) {
 		return this.api.post('lists', list);
+	}
+
+	selectList(list) {
+		this.listSelectedSource.next(list);
 	}
 }

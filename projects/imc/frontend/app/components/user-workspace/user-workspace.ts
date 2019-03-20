@@ -20,6 +20,7 @@ export class UserWorkspaceComponent implements OnInit {
 	countCityResults: number = 0;
 	countListResults: number = 0;
 	listForm: FormGroup;
+	selectedList;
 	/**
      * Reference to NgbDropdown component
      */
@@ -38,6 +39,11 @@ export class UserWorkspaceComponent implements OnInit {
             name: ['', Validators.required],
             description: ['', Validators.required]
         });
+        listsService.listSelected$.subscribe(
+        	list => {
+        		console.log('Selected list', list);
+        		this.selectedList = list;
+        	})
 	}
 
 	onCityChange(newValue) {
@@ -73,6 +79,10 @@ export class UserWorkspaceComponent implements OnInit {
 
     openListCreation() {
     	this.resetForm();
+    }
+
+    openListItems() {
+
     }
 
     private refreshMyLists() {

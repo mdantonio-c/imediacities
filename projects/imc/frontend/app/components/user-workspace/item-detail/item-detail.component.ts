@@ -1,5 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
+import { ListsService } from '../../../services/lists.service'
 
 export interface ItemDetail {
 	id: string,
@@ -14,11 +15,15 @@ export interface ItemDetail {
 	templateUrl: './item-detail.component.html',
 	styleUrls: ['./item-detail.component.css'],
 })
-export class ItemDetailComponent implements OnInit {
+export class ItemDetailComponent {
 
 	@Input() media: ItemDetail;
+	@Output() onDelete: EventEmitter<null> = new EventEmitter<null>();
+	selected = false;
 
-	constructor(private router: Router) { }
+	constructor(
+		private router: Router,
+		private listsService: ListsService) { }
 
 	disableSaveAs() { return false; }
 
@@ -30,7 +35,13 @@ export class ItemDetailComponent implements OnInit {
 		}
 	}
 
-	ngOnInit() {
-
+	delete() {
+		this.onDelete.emit();
 	}
+
+	select() {
+		this.selected = true;
+    	this.listsService.selectList(this.media);
+	}
+
 }
