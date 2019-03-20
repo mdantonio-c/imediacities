@@ -24,12 +24,13 @@
 		<span *ngIf="media.type === 'aventity'" class="anteprima-duration" [innerHTML]="media.duration | secondsToTime"></span>
 	</div>
   <div class="card-body">
-    <h5 class="card-title blue click-event" (click)="route(media.id, media.type)">{{media.title}}</h5>
+    <h5 class="card-title blue">{{media.title}}</h5>
     <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
   </div>
-  <div class="card-footer p-0" *ngIf="media.type === 'list' && media.focus">
+  <div class="card-footer p-0" *ngIf="media.focus" style="margin-top: -25px;">
      <span class="imc--flex--vertical-center imc--flex--horizontal-center">
-      <i class="material-icons click-event" (click)="select()">keyboard_arrow_down</i>
+      <i class="material-icons click-event" (click)="select()" *ngIf="media.type === 'list'">expand_more</i>
+      <i class="material-icons click-event" (click)="route(media.id, media.type)" *ngIf="media.type !== 'list'">launch</i>
     </span>
   </div>
 </div>

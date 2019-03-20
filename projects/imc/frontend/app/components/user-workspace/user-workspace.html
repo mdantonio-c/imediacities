@@ -93,13 +93,12 @@
 		      </span>
 		     </div>
 			</div>
-			<div class="colt-12 mt-2">
-				<multi-item-carousel [endpoint]="'lists'" #mylists
-					(onResult)="countListHandler($event)"></multi-item-carousel>
+			<div class="col-12 mt-2">
+				<multi-item-carousel [endpoint]="'lists'" (onResult)="countListHandler($event)" #mylists></multi-item-carousel>
 			</div>
-			<div class="colt-12 mt-2">
+			<div class="col-12 mt-2" *ngIf="selectedList">
 				<hr>
-				<multi-item-carousel *ngIf="selectedList"
+				<multi-item-carousel
 					[endpoint]="'listItems'" [listId]="selectedList.id"></multi-item-carousel>
 			</div>
 		</div>

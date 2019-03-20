@@ -7,7 +7,9 @@ import { Subject }    from 'rxjs';
 export class ListsService {
 
 	private listSelectedSource = new Subject<any>();
+	private listDeletedSource = new Subject<string>();
 	listSelected$ = this.listSelectedSource.asObservable();
+	listDeleted$ = this.listDeletedSource.asObservable();
 
 	constructor(private api: ApiService) { }
 
@@ -33,6 +35,7 @@ export class ListsService {
 
 	removeList(listId: string) {
 		return this.api.delete('lists', listId);
+		this.listDeletedSource.next(listId);
 	}
 
 	getListItems(listId: string) {

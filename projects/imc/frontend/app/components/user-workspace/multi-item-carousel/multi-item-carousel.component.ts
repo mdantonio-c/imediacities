@@ -80,7 +80,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    console.log('Input changed', this.filter);
+    /*console.log('Input changed', this.filter);*/
     this.currentPage = 1;
     this.load();
   }
@@ -109,9 +109,8 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
       case "lists":
         this.listsService.getLists().subscribe(
           response => {
-            this.slickModal.unslick();
+            /*this.slickModal.unslick();*/
             this.slides = response.data.map(lst => {
-              console.log(lst);
               return {
                 'id': lst.id,
                 'title': lst.attributes.name,
@@ -119,7 +118,10 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
                 'type': lst.type
               }
             });
-            this.onResult.emit(this.slides.length);
+            console.log('lists', this.slides);
+            // FIXME with pagination
+            this.total = this.slides.length;
+            this.onResult.emit(this.total);
             this.loading = false;
           },
           error => {
@@ -150,6 +152,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
               if (mediaType === 'aventity') r['duration'] = media.attributes.duration;
               return r;
             });
+            this.total = this.slides.length;
             /*this.onResult.emit(response["Meta"].elements);*/
             this.loading = false;
           },

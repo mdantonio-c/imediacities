@@ -9,13 +9,18 @@
     flex-direction: column;
 	margin-top: 8px;
     padding: .25rem;
-    height: 110px;
+    height: 135px;
 }
 
 .item-detail .card-title,
 .item-detail .card-text {
-	font-size: small;
-	margin-bottom: .5rem;
+	font-size: small;	
+}
+.item-detail .card-title {
+    margin-bottom: .4rem;
+}
+.item-detail .card-text {
+    margin-bottom: 1.2rem;
 }
 
 .item-detail .card-text {
@@ -24,7 +29,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.2;
-    font-size: .7vw;
+    font-size: .65em;
     max-height: 100px;
 }
 
