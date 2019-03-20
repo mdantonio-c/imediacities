@@ -24,12 +24,13 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   loading = false;
   private currentPage: number = 1;
   private currentSlide: number = 0;
-  private pageSize: number = 12;
+  private pageSize: number = 10; // pageSize MUST be greater than slidesToShow
+  private total: number;
 
   slideConfig = {
     "infinite": false,
     "slidesToShow": 8,
-    "slidesToScroll": 8,
+    "slidesToScroll": 1,
     "swipeToSlide": true,
     "variableWidth": true,
     "lazyLoad": "progressive"
@@ -58,14 +59,13 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
     //preventing concurrent loading
     if (!this.loading) {
+      console.log(`slides size: ${this.slides.length} (in ${this.total})`);
       let slidesToShow = this.slideConfig["slidesToShow"];
       let end = e.currentSlide + slidesToShow - 1;
-
-      /*console.log("You want to display from " + start + " to " + end);*/
-
-      if (this.slides.length <= end + slidesToShow) {
-
-        this.currentPage = Math.ceil((end + 1) / slidesToShow);
+      console.log(`Active slides [${e.currentSlide}-${end}]`);
+      let offset = 1; // load next page one step before the end
+      if (this.slides.length < this.total && (end + offset) == this.slides.length) {
+        this.currentPage += 1;
         this.load(true);
       }
     }
@@ -175,9 +175,8 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
               if (media.type === 'aventity') r['duration'] = media.relationships.item[0].attributes.duration;
               return r;
             }));
-
-            /*console.log(this.results);*/
-            this.onResult.emit(response["Meta"].totalItems);
+            this.total = response["Meta"].totalItems;
+            this.onResult.emit(this.total);
             this.loading = false;
           },
           error => {
