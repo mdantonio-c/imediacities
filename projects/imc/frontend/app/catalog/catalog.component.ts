@@ -48,16 +48,22 @@ export class CatalogComponent implements OnInit {
 				this.catalogService.init();
 			}
 			this.changeFilter(this.catalogService.filter);
+			if ('page' in this.catalogService.filter) {
+				this.currentPage = this.catalogService.filter['page'];
+			}
 		});
 	}
 
 	load() {
-		/*console.log(this.filter);*/
 		this.loading = true;
 		// clean current results
 		this.results = [];
 		this.mediaTags = [];
-		this.catalogService.search(this.filter, this.currentPage, this.pageSize).subscribe(
+
+		let page = this.currentPage;
+		if ('page' in this.filter) page = this.filter['page'];
+
+		this.catalogService.search(this.filter, page, this.pageSize).subscribe(
 			response => {
 				this.results = response["Response"].data;
 				this.totalItems = response["Meta"].totalItems;
@@ -96,6 +102,7 @@ export class CatalogComponent implements OnInit {
 
 	changePage(page: number) {
 		this.currentPage = page;
+		this.filter['page'] = page;
 		this.load()
 	}
 
