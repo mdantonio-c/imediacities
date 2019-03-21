@@ -1,4 +1,5 @@
 import { Component, Input, ViewChild, OnInit, OnChanges, AfterViewInit, OnDestroy, ViewContainerRef } from '@angular/core';
+import { AuthService } from "/rapydo/src/app/services/auth";
 import { AppShotsService } from "../../../services/app-shots";
 import { AppModaleService } from "../../../services/app-modale";
 import { AppMediaService } from "../../../services/app-media";
@@ -21,6 +22,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     public shot_corrente = null;
 
     constructor(
+        private auth: AuthService,
         private VideoService: AppMediaService,
         private ShotsService: AppShotsService,
         private ModalService: AppModaleService,
@@ -65,7 +67,12 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
 
     ngOnChanges() {
         this.mediaData = this.VideoService.media();
-        console.log(this.mediaData);
+
+        let token = this.auth.getToken();
+        let append = (token !== null) ? '&access_token=' + token : '';
+        let content = this.mediaData["links"]["content"];
+        this.mediaData["links"]["content"] = content + append";
+
         this.shots = this.ShotsService.shots();
         this.shot_cambia(0);
     }
