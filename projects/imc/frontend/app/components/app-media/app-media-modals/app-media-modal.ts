@@ -68,7 +68,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     ngOnChanges() {
         this.mediaData = this.VideoService.media();
 
-        let token = this.parent.auth.getToken();
+        let token = this.auth.getToken();
         let append = (token !== null) ? '&access_token=' + token : '';
         let content = this.mediaData["links"]["content"];
         this.mediaData["links"]["content"] = content + append;
