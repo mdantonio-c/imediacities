@@ -65,6 +65,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
 
     ngOnChanges() {
         this.mediaData = this.VideoService.media();
+        console.log(this.mediaData);
         this.shots = this.ShotsService.shots();
         this.shot_cambia(0);
     }
