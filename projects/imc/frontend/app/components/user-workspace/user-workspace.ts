@@ -44,6 +44,10 @@ export class UserWorkspaceComponent implements OnInit {
         		console.log('Selected list', list);
         		this.selectedList = list;
         	})
+       	listsService.listDeleted$.subscribe(
+        	listId => {
+        		console.log('Deleted list', listId);
+        	})
 	}
 
 	onCityChange(newValue) {
@@ -79,10 +83,6 @@ export class UserWorkspaceComponent implements OnInit {
 
     openListCreation() {
     	this.resetForm();
-    }
-
-    openListItems() {
-
     }
 
     private refreshMyLists() {
