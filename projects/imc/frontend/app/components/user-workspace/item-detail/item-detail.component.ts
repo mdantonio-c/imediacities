@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ListsService } from '../../../services/lists.service'
 
@@ -7,17 +7,20 @@ export interface ItemDetail {
 	title: string,
 	type?: string,
 	description?: string,
-	thumbnail?: string
+	thumbnail?: string,
+	focus?: boolean
 }
 
 @Component({
 	selector: 'item-detail',
 	templateUrl: './item-detail.component.html',
 	styleUrls: ['./item-detail.component.css'],
+	/*changeDetection: ChangeDetectionStrategy.OnPush*/
 })
 export class ItemDetailComponent {
 
 	@Input() media: ItemDetail;
+	@Input() focus: boolean;
 	@Output() onDelete: EventEmitter<null> = new EventEmitter<null>();
 	selected = false;
 
@@ -40,7 +43,7 @@ export class ItemDetailComponent {
 	}
 
 	select() {
-		this.selected = true;
+		/*this.selected = true;*/
     	this.listsService.selectList(this.media);
 	}
 

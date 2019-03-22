@@ -1,5 +1,6 @@
-import { Component, OnInit, Input, Output, OnChanges, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, OnChanges, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Providers } from '../../../catalog/services/data';
 import { MediaUtilsService } from '../../../catalog/services/media-utils.service'
 import { CatalogService, SearchFilter } from '../../../catalog/services/catalog.service';
@@ -19,6 +20,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
 
   @ViewChild('slickModal') slickModal;
+  @ViewChild('confirmModal') confirmModal;
 
   slides: ItemDetail[] = [];
   loading = false;
@@ -43,6 +45,8 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   constructor(
     private catalogService: CatalogService,
     private listsService: ListsService,
+    private modalService: NgbModal,
+    private cdRef : ChangeDetectorRef,
     private notify: NotificationService) { }
 
   slickInit(e) {
@@ -118,7 +122,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
                 'type': lst.type
               }
             });
-            console.log('lists', this.slides);
+            /*console.log('lists', this.slides);*/
             // FIXME with pagination
             this.total = this.slides.length;
             this.onResult.emit(this.total);
@@ -135,9 +139,9 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
             this.slickModal.unslick();
             console.log(response);
             this.slides = response.data.map(media => {
-              console.log(media);
+              /*console.log(media);*/
               let mediaType = '';
-              if(media.type === 'shot') {
+              if (media.type === 'shot') {
                 mediaType = 'aventity';
               } else {
                 mediaType = (media.attributes.item_type.key === 'Video') ? 'aventity' : 'nonaventity';
@@ -192,23 +196,29 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   removeItem(item) {
     let itemTitle = item.title;
-    switch (item.type) {
-      case "list":
-        this.listsService.removeList(item.id).subscribe(
-          response => {
-            this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
-            this.load();
-          },
-          error => {
-            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
-          });
-        break;
+    item.focus = false;
+    console.log(`delete item <${itemTitle}>`);
+    const modalRef = this.modalService.open(this.confirmModal);
+    modalRef.result.then((result) => {
+      switch (item.type) {
+        case "list":
+          this.listsService.removeList(item.id).subscribe(
+            response => {
+              this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
+              this.load();
+            },
+            error => {
+              this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            });
+          break;
 
-      default:
-        console.warn('Remove function not allowed for type', item.type);
-        break;
-    }
-
+        default:
+          console.warn('Remove function not allowed for type', item.type);
+          break;
+      }
+    }, (reason) => {
+      // keep focus on item
+      item.focus = true;
+    });
   }
-
 }

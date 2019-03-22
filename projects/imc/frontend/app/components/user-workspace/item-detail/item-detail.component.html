@@ -1,13 +1,6 @@
 <div class="card item-detail">
   <div class="media-image-wrapper" style="outline: none;">
   	<span class="badge item-del" *ngIf="media.type === 'list' && media.focus">
-			<!-- <i class="material-icons click-event"
-        mwlConfirmationPopover
-        [popoverTitle]="'Remove list'"
-        [popoverMessage]="'This operation cannot be undone. References to all items will be lost. Do you wish to continue?'"
-        placement="bottom"
-        (confirm)="removeList()"
-        style="color: #707070; font-size: 16px !important;">cancel_presentation</i> -->
       <i class="material-icons click-event" 
       	(click)="delete()"
       	style="color: #707070; font-size: 16px !important;">cancel_presentation</i>

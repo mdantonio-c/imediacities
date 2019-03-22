@@ -23,3 +23,20 @@
 		</div>
 	</div>
 </div>
+
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Confirm deletion</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete this list?</strong></p>
+    <p>All information associated to this user list will be permanently deleted and items disconnected. This operation can not be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-border-classic" (click)="modal.close()">OK</button>
+  </div>
+</ng-template>
