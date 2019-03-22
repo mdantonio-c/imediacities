@@ -205,6 +205,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           this.listsService.removeList(item.id).subscribe(
             response => {
               this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
+              this.slickModal.unslick();
               this.load();
             },
             error => {

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
 import { Router } from '@angular/router';
 import { ListsService } from '../../../services/lists.service'
 
@@ -15,7 +15,6 @@ export interface ItemDetail {
 	selector: 'item-detail',
 	templateUrl: './item-detail.component.html',
 	styleUrls: ['./item-detail.component.css'],
-	/*changeDetection: ChangeDetectionStrategy.OnPush*/
 })
 export class ItemDetailComponent {
 
