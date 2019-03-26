@@ -3,6 +3,9 @@
   	<span class="badge item-del" *ngIf="media.type === 'list' && media.focus">
       <i class="material-icons click-event" 
       	(click)="delete()"
+        ngbTooltip="Delete the list"
+        placement="bottom"
+        container="body"
       	style="color: #707070; font-size: 16px !important;">cancel_presentation</i>
 		</span>
 		<span class="search-item label bigger-110">
@@ -22,8 +25,14 @@
   </div>
   <div class="card-footer p-0" *ngIf="media.focus" style="margin-top: -25px;">
      <span class="imc--flex--vertical-center imc--flex--horizontal-center">
-      <i class="material-icons click-event" (click)="select()" *ngIf="media.type === 'list'">expand_more</i>
-      <i class="material-icons click-event" (click)="route(media.id, media.type)" *ngIf="media.type !== 'list'">launch</i>
+      <i class="material-icons click-event" (click)="select()" *ngIf="media.type === 'list'"
+        ngbTooltip="Open the contents of my list"
+        placement="top"
+        container="body">expand_more</i>
+      <i class="material-icons click-event" (click)="route(media.id, media.type)" *ngIf="media.type !== 'list'"
+        ngbTooltip="Open the content page"
+        placement="top"
+        container="body">launch</i>
     </span>
   </div>
 </div>
