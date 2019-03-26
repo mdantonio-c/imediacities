@@ -8,7 +8,9 @@ export interface ItemDetail {
 	type?: string,
 	description?: string,
 	thumbnail?: string,
-	focus?: boolean
+	focus?: boolean,
+	listItem?: boolean,
+	listId?: string
 }
 
 @Component({
@@ -37,7 +39,9 @@ export class ItemDetailComponent {
 
 	delete() {
 		this.onDelete.emit();
-		this.listsService.selectList(null);
+		if (this.media.type === 'list') {
+			this.listsService.selectList(null);
+		}
 	}
 
 	select() {

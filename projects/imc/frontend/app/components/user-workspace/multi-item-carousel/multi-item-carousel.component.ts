@@ -21,6 +21,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
   @ViewChild('slickModal') slickModal;
   @ViewChild('confirmModal') confirmModal;
+  @ViewChild('itemConfirmModal') itemConfirmModal;
 
   slides: ItemDetail[] = [];
   loading = false;
@@ -113,7 +114,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
       case "lists":
         this.listsService.getLists().subscribe(
           response => {
-            /*this.slickModal.unslick();*/
+            this.slickModal.unslick();
             this.slides = response.data.map(lst => {
               return {
                 'id': lst.id,
@@ -151,7 +152,9 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
                 'title': media.title,
                 'description': media.description,
                 'type': mediaType,
-                'thumbnail': media.links['thumbnail']
+                'thumbnail': media.links['thumbnail'],
+                'listItem': true,
+                'listId': this.listId
               }
               if (mediaType === 'aventity') r['duration'] = media.attributes.duration;
               return r;
@@ -197,6 +200,26 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   removeItem(item) {
     let itemTitle = item.title;
     item.focus = false;
+    if (item.listItem) {
+      console.log(`Remove item <${itemTitle}> from list <${item.listId}>`);
+      this.modalService.open(this.itemConfirmModal).result.then(
+        (result) => {
+          this.listsService.removeItemfromList(item.id, item.listId).subscribe(
+            response => {
+              this.notify.showSuccess('Item <' + itemTitle + '> removed successfully');
+              /*this.slickModal.unslick();*/
+              this.load();
+            },
+            error => {
+              this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            });
+        }, (reason) => {
+          // keep focus on item
+          item.focus = true;
+        });
+      return;
+    }
+    
     console.log(`delete item <${itemTitle}>`);
     const modalRef = this.modalService.open(this.confirmModal);
     modalRef.result.then((result) => {
@@ -205,7 +228,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           this.listsService.removeList(item.id).subscribe(
             response => {
               this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
-              this.slickModal.unslick();
+              /*this.slickModal.unslick();*/
               this.load();
             },
             error => {
