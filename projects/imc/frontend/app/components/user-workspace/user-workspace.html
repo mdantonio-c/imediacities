@@ -98,7 +98,7 @@
 			</div>
 			<div class="col-12 mt-2" *ngIf="selectedList">
 				<hr>
-				<multi-item-carousel
+				<multi-item-carousel #listItems
 					[endpoint]="'listItems'" [listId]="selectedList.id"></multi-item-carousel>
 			</div>
 		</div>

@@ -19,9 +19,7 @@ export interface ItemDetail {
 export class ItemDetailComponent {
 
 	@Input() media: ItemDetail;
-	@Input() focus: boolean;
 	@Output() onDelete: EventEmitter<null> = new EventEmitter<null>();
-	selected = false;
 
 	constructor(
 		private router: Router,
@@ -39,10 +37,10 @@ export class ItemDetailComponent {
 
 	delete() {
 		this.onDelete.emit();
+		this.listsService.selectList(null);
 	}
 
 	select() {
-		/*this.selected = true;*/
     	this.listsService.selectList(this.media);
 	}
 

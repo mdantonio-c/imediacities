@@ -29,6 +29,10 @@ export class UserWorkspaceComponent implements OnInit {
      * Reference to MyLists component
      */
 	@ViewChild('mylists') myListsComp: MultiItemCarouselComponent;
+    /**
+     * Reference to the list of items
+     */
+    @ViewChild('listItems') listItemsComp: MultiItemCarouselComponent;
 
 	constructor(
 		private catalogService: CatalogService,
@@ -43,6 +47,9 @@ export class UserWorkspaceComponent implements OnInit {
         	list => {
         		console.log('Selected list', list);
         		this.selectedList = list;
+                if (list === null) {
+                    this.listItemsComp.slickModal.unslick();
+                }
         	})
        	listsService.listDeleted$.subscribe(
         	listId => {
