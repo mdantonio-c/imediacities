@@ -68,8 +68,10 @@ def parse_date(date_string):
               help='Downloading content starting from this date')
 @click.option('--until', 'until_date',
               help='Downloading content only until this date')
+@click.option('--no-keyword-filter', is_flag=True,
+              help="Exclute filter on keyword IMediaCities")
 def harvest(metadata_set, dest_folder, log_file, content_type,
-            from_date, until_date):
+            from_date, until_date, no_keyword_filter):
 
     #############################
     # ### FILESYSTEM CHECKS ### #
@@ -217,15 +219,18 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                 continue
 
             filter_keyword = "IMediaCities"
-            is_good = False
-            for keyword in keywords:
-                term = keyword.find(tag("term"))
-                if term.text == filter_keyword:
-                    is_good = True
-                    break
+            if no_keyword_filter:
+                log.warning("Skipping filtering for keyword '%s'", filter_keyword)
+            else:
+                is_good = False
+                for keyword in keywords:
+                    term = keyword.find(tag("term"))
+                    if term.text == filter_keyword:
+                        is_good = True
+                        break
 
-            if not is_good:
-                continue
+                if not is_good:
+                    continue
 
             report_data['filtered'] += 1
 
