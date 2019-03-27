@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, OnChanges, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, OnChanges, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NotificationService } from '/rapydo/src/app/services/notification';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Providers } from '../../../catalog/services/data';
@@ -12,12 +12,13 @@ import { ItemDetail } from '../item-detail/item-detail.component';
   templateUrl: './multi-item-carousel.component.html',
   styleUrls: ['./multi-item-carousel.component.css'],
 })
-export class MultiItemCarouselComponent implements OnInit, OnChanges {
+export class MultiItemCarouselComponent implements OnChanges {
 
   @Input() filter: SearchFilter = {};
   @Input() endpoint: string = 'search';
   @Input() listId: string;
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
+  @Output() onDelete: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('slickModal') slickModal;
   @ViewChild('confirmModal') confirmModal;
@@ -47,7 +48,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     private catalogService: CatalogService,
     private listsService: ListsService,
     private modalService: NgbModal,
-    private cdRef : ChangeDetectorRef,
+    private cdRef: ChangeDetectorRef,
     private notify: NotificationService) { }
 
   slickInit(e) {
@@ -55,8 +56,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   breakpoint(e) {
-    console.log(e);
-    /*console.log('breakpoint');*/
+    /*console.log('breakpoint', e);*/
   }
 
   afterChange(e) {
@@ -64,10 +64,10 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
 
     //preventing concurrent loading
     if (!this.loading) {
-      console.log(`slides size: ${this.slides.length} (in ${this.total})`);
+      /*console.log(`slides size: ${this.slides.length} (in ${this.total})`);*/
       let slidesToShow = this.slideConfig["slidesToShow"];
       let end = e.currentSlide + slidesToShow - 1;
-      console.log(`Active slides [${e.currentSlide}-${end}]`);
+      /*console.log(`Active slides [${e.currentSlide}-${end}]`);*/
       let offset = 1; // load next page one step before the end
       if (this.slides.length < this.total && (end + offset) == this.slides.length) {
         this.currentPage += 1;
@@ -77,11 +77,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
   }
 
   beforeChange(e) {
-    /*console.log('beforeChange');*/
-  }
-
-  ngOnInit() {
-    /*this.load();*/
+    /*console.log('beforeChange', e);*/
   }
 
   ngOnChanges() {
@@ -99,7 +95,6 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
         console.log("Results already loaded?");
       } else {
         /*console.log("Loading from " + start + " to " + end);*/
-
         this.slides.push(...new_results);
       }
     } else {
@@ -108,10 +103,17 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     return this.slides
   }
 
+  close() {
+    this.slides = [];
+    this.slickModal.unslick();
+  }
+
   load(append = false) {
     this.loading = true;
     switch (this.endpoint) {
       case "lists":
+        /*console.log('load my list...');*/
+        this.close();
         this.listsService.getLists().subscribe(
           response => {
             this.slickModal.unslick();
@@ -132,15 +134,16 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           error => {
             this.notify.extractErrors(error.error.Response, this.notify.ERROR);
             this.loading = false;
+            this.slickModal.initSlick();
           });
         break;
       case "listItems":
+        console.log(`load items for list <${this.listId}>`);
+        this.slides = [];
+        this.slickModal.unslick();
         this.listsService.getListItems(this.listId).subscribe(
           response => {
-            this.slickModal.unslick();
-            console.log(response);
             this.slides = response.data.map(media => {
-              /*console.log(media);*/
               let mediaType = '';
               if (media.type === 'shot') {
                 mediaType = 'aventity';
@@ -162,6 +165,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
             this.total = this.slides.length;
             /*this.onResult.emit(response["Meta"].elements);*/
             this.loading = false;
+            /*this.slickModal.initSlick();*/
           },
           error => {
             this.notify.extractErrors(error.error.Response, this.notify.ERROR);
@@ -169,11 +173,12 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           });
         break;
       default:
+        if (!append) {
+          this.slides = [];
+          this.slickModal.unslick();
+        }
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
-            if (!append) {
-              this.slickModal.unslick();
-            }
             this.slides = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
               let r = {
                 'id': media.id,
@@ -188,6 +193,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
             this.total = response["Meta"].totalItems;
             this.onResult.emit(this.total);
             this.loading = false;
+            /*this.slickModal.initSlick();*/
           },
           error => {
             this.notify.extractErrors(error.error.Response, this.notify.ERROR);
@@ -201,13 +207,12 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
     let itemTitle = item.title;
     item.focus = false;
     if (item.listItem) {
-      console.log(`Remove item <${itemTitle}> from list <${item.listId}>`);
+      console.log(`remove item <${itemTitle}> from list <${item.listId}>`);
       this.modalService.open(this.itemConfirmModal).result.then(
         (result) => {
           this.listsService.removeItemfromList(item.id, item.listId).subscribe(
             response => {
-              this.notify.showSuccess('Item <' + itemTitle + '> removed successfully');
-              /*this.slickModal.unslick();*/
+              this.notify.showSuccess(`Item <${itemTitle}> removed successfully`);
               this.load();
             },
             error => {
@@ -219,17 +224,23 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
         });
       return;
     }
-    
-    console.log(`delete item <${itemTitle}>`);
+
     const modalRef = this.modalService.open(this.confirmModal);
     modalRef.result.then((result) => {
       switch (item.type) {
         case "list":
+          console.log(`delete list <${itemTitle}>`);
           this.listsService.removeList(item.id).subscribe(
             response => {
-              this.notify.showSuccess('List <' + itemTitle + '> removed successfully');
+              this.notify.showSuccess(`List <${itemTitle}> removed successfully`);
+              // update the list in the view
               /*this.slickModal.unslick();*/
-              this.load();
+              /*this.load();*/
+              //this.slickModal.removeSlide(???);
+              this.slides = this.slides.filter(s =>  s.id !== item.id);
+
+              // close the related item list if open
+              this.onDelete.emit(item.id);
             },
             error => {
               this.notify.extractErrors(error.error.Response, this.notify.ERROR);
@@ -237,7 +248,7 @@ export class MultiItemCarouselComponent implements OnInit, OnChanges {
           break;
 
         default:
-          console.warn('Remove function not allowed for type', item.type);
+          console.warn(`Delete operation not allowed for type ${item.type}`);
           break;
       }
     }, (reason) => {

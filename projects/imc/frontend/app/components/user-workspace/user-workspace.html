@@ -7,14 +7,14 @@
 			&nbsp;
 			<strong>My Workspace</strong>
 		</span>
-		<span class="imc--flex--item-end">
+		<!-- <span class="imc--flex--item-end">
 			<div class="input-group box-search">
 				<input type="text" class="imc--input imc--input-search"
 				name="searchTerm"
 				placeholder="search catalogue"
 				>
 			</div>
-		</span>
+		</span> -->
 	</div>
 	<div class="container-workspace">
 		<!-- SEARCH RESULTS -->
@@ -30,6 +30,7 @@
 				<div class="form-row align-items-center">
 			    <div class="col-auto">
 			      <select [(ngModel)]="selectedCity" (ngModelChange)="onCityChange($event)" class="form-control" style="max-width: 160px;">
+			      	<option value=""></option>
 							<option *ngFor="let c of cities; let i = index" [value]="c">{{c}}</option>
 					  </select>
 			    </div>
@@ -41,7 +42,7 @@
 			    </div>
 			  </div>
 			</div>
-			<div class="col-12 mt-2">
+			<div class="col-12 mt-2" style="min-height: 268px;">
 				<multi-item-carousel 
 					[filter]="cityFilter" (onResult)="countChangedHandler($event)"></multi-item-carousel>
 			</div>
@@ -78,7 +79,7 @@
 	                            </button>
 	                        </div>
 	                        <input type="text" class="imc--input" placeholder="Enter name"
-	                            formControlName="name">
+	                            formControlName="name" autoFocus>
 	                        <div class="invalid-feedback d-block mt-0" *ngIf="listForm.get('name').touched && listForm.get('name').invalid">Name is required</div>
 	                        <textarea class="imc--input mt-3" placeholder="Enter notes"
 	                            formControlName="description"></textarea>
@@ -94,10 +95,13 @@
 		     </div>
 			</div>
 			<div class="col-12 mt-2">
-				<multi-item-carousel [endpoint]="'lists'" (onResult)="countListHandler($event)" #mylists></multi-item-carousel>
+				<multi-item-carousel [endpoint]="'lists'" 
+					(onResult)="countListHandler($event)"
+					(onDelete)="closeItemList($event)" #mylists></multi-item-carousel>
 			</div>
-			<div class="col-12 mt-2" *ngIf="selectedList">
+			<div class="col-12 mt-2" *ngIf="selectedList" style="min-height: 300px;">
 				<hr>
+				<span><strong>{{selectedList.title}}</strong></span>
 				<multi-item-carousel #listItems
 					[endpoint]="'listItems'" [listId]="selectedList.id"></multi-item-carousel>
 			</div>

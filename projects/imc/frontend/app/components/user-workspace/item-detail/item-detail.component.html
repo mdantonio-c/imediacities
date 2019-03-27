@@ -29,7 +29,7 @@
   </div>
   <div class="card-footer p-0" *ngIf="media.focus" style="margin-top: -25px;">
      <span class="imc--flex--vertical-center imc--flex--horizontal-center">
-      <i class="material-icons click-event" (click)="select()" *ngIf="media.type === 'list'"
+      <i class="material-icons click-event" (click)="loadListItems()" *ngIf="media.type === 'list'"
         ngbTooltip="Open the contents of my list"
         placement="top"
         container="body">expand_more</i>

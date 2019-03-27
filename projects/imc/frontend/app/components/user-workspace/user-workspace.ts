@@ -6,6 +6,7 @@ import { CatalogService, SearchFilter } from '../../catalog/services/catalog.ser
 import { ListsService } from '../../services/lists.service';
 import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { MultiItemCarouselComponent } from './multi-item-carousel/multi-item-carousel.component';
+import { ItemDetail } from './item-detail/item-detail.component';
 
 @Component({
 	selector: 'user-workspace',
@@ -15,18 +16,18 @@ import { MultiItemCarouselComponent } from './multi-item-carousel/multi-item-car
 export class UserWorkspaceComponent implements OnInit {
 
 	cities: string[] = [];
-	selectedCity: string = "Bologna";
-	cityFilter: SearchFilter = { city: this.selectedCity };
+	selectedCity: string = "";
+	cityFilter: SearchFilter = {};
 	countCityResults: number = 0;
 	countListResults: number = 0;
 	listForm: FormGroup;
-	selectedList;
+	private selectedList: ItemDetail;
 	/**
-     * Reference to NgbDropdown component
+     * Reference to NgbDropdown component for creating a new user list
      */
 	@ViewChild('newListDrop') listDropdown: NgbDropdown;
 	/**
-     * Reference to MyLists component
+     * Reference to my list
      */
 	@ViewChild('mylists') myListsComp: MultiItemCarouselComponent;
     /**
@@ -45,21 +46,13 @@ export class UserWorkspaceComponent implements OnInit {
         });
         listsService.listSelected$.subscribe(
         	list => {
-        		console.log('Selected list', list);
         		this.selectedList = list;
-                if (list === null) {
-                    this.listItemsComp.slickModal.unslick();
-                }
-        	})
-       	listsService.listDeleted$.subscribe(
-        	listId => {
-        		console.log('Deleted list', listId);
         	})
 	}
 
 	onCityChange(newValue) {
 		this.selectedCity = newValue;
-		this.cityFilter = { city: newValue };
+		this.cityFilter = (newValue !== '') ? { city: newValue } : {};
 	}
 
 	countChangedHandler(newCount) {
@@ -90,6 +83,14 @@ export class UserWorkspaceComponent implements OnInit {
 
     openListCreation() {
     	this.resetForm();
+    }
+
+    closeItemList(listId: string) {
+        if (this.selectedList && listId === this.selectedList.id) {
+            console.log(`close item list for <${listId}>`);
+            this.listItemsComp.close();
+            this.selectedList = undefined;
+        }
     }
 
     private refreshMyLists() {

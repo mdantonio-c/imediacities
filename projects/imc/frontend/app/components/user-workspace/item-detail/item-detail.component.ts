@@ -39,12 +39,9 @@ export class ItemDetailComponent {
 
 	delete() {
 		this.onDelete.emit();
-		if (this.media.type === 'list') {
-			this.listsService.selectList(null);
-		}
 	}
 
-	select() {
+	loadListItems() {
     	this.listsService.selectList(this.media);
 	}
 
