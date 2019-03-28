@@ -40,8 +40,11 @@ export class UploadComponent extends BasePaginationComponent {
 
 		super("group", api, auth, notify, modalService, formly);
 
-		this.list();
+		this.server_side_pagination = true;
+		this.endpoint = 'stage';
+		this.counter_endpoint = 'stage';
 		this.initPaging(20);
+		this.list();
 
 /*
 		$scope.flowOptions = {
@@ -126,7 +129,7 @@ export class UploadComponent extends BasePaginationComponent {
     };
 */
 	list() {
-		return this.get('stage')
+		return this.get(this.endpoint);
 	}
 
 	remove(filename: string) {

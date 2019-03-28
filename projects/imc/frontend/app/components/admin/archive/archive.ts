@@ -43,7 +43,11 @@ export class ArchiveComponent implements OnInit {
 	list() {
 
 		this.loading = true;
-		this.api.get('stage', this.group.id).subscribe(
+		let data = {
+			"currentpage": 1,
+			"perpage": 100000
+		}
+		this.api.get('stage', this.group.id, data).subscribe(
       		response => {
 
 				this.data = this.api.parseResponse(response.data);

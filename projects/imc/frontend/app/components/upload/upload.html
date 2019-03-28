@@ -191,7 +191,7 @@
 
 <loading *ngIf="loading"></loading>
 
-<div class="table-responsive" *ngIf="!loading">
+<div class="table-responsive" *ngIf="rows?.length">
 
 	<ngx-datatable
 		[rows]="rows"
