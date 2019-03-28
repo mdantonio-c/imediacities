@@ -3,6 +3,20 @@ stage:
   custom:
     # publish: true
     authentication: true
+  parameters:
+    - name: perpage
+      in: query
+      description: Number of annotations returned
+      type: integer
+    - name: currentpage
+      in: query
+      description: Page number
+      type: integer
+    - name: get_total 
+      in: query
+      description: Retrieve total number of items
+      type: boolean 
+
   responses:
     '200':
       description: List of files and directories successfully retrieved
@@ -14,6 +28,22 @@ archive:
   custom:
     # publish: true
     authentication: true
+
+  parameters:
+    - name: perpage
+      in: query
+      description: Number of annotations returned
+      type: integer
+    - name: currentpage
+      in: query
+      description: Page number
+      type: integer
+    - name: get_total 
+      in: query
+      description: Retrieve total number of items
+      type: boolean 
+
+
   responses:
     '200':
       description: List of files and directories successfully retrieved
