@@ -161,7 +161,7 @@ class Stage(GraphBaseOperations):
             if get_total:
                 continue
 
-            if offset > counter:
+            if offset >= counter:
                 continue
 
             if offset + limit < counter:
