@@ -46,6 +46,7 @@ class Lists(GraphBaseOperations):
                     "Please specify a valid researcher id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND)
         user_match = ''
+        optional_match = ''
         if researcher:
             user_match = "MATCH (n)-[:LST_BELONGS_TO]->(:User {{uuid:'{user}'}})".format(
                          user=researcher.uuid)
@@ -53,6 +54,16 @@ class Lists(GraphBaseOperations):
                 name=researcher.name, surname=researcher.surname))
 
         belong_item = params.get('item', None)
+        nb_items = params.get('includeNumberOfItems')
+        if isinstance(nb_items, str) and (nb_items == '' or nb_items.lower() == 'true'):
+            nb_items = True
+        elif type(nb_items) == bool:
+            # do nothing
+            pass
+        else:
+            nb_items = False
+        if nb_items:
+            optional_match = 'OPTIONAL MATCH (n)-[r:LST_ITEM]->(:ListItem)'
         if list_id is not None:
             try:
                 res = self.graph.List.nodes.get(uuid=list_id)
@@ -74,42 +85,59 @@ class Lists(GraphBaseOperations):
                     'surname': creator.surname
                 }
             if belong_item is not None:
+                found = False
                 for i in res.items.all():
                     if i.downcast().uuid == belong_item:
-                        user_list['belong'] = True
+                        found = True
                         break
+                user_list['belong'] = found
+            if nb_items:
+                user_list['nb_frames'] = len(res.items)
             return self.force_response(user_list)
 
         # request for multiple lists
-        offset, limit = self.get_paging()
-        offset -= 1
-        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
-        if offset < 0:
-            raise RestApiException('Page number cannot be a negative value',
-                                   status_code=hcodes.HTTP_BAD_REQUEST)
-        if limit < 0:
-            raise RestApiException('Page size cannot be a negative value',
-                                   status_code=hcodes.HTTP_BAD_REQUEST)
+        # offset, limit = self.get_paging()
+        # offset -= 1
+        # logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        # if offset < 0:
+        #     raise RestApiException('Page number cannot be a negative value',
+        #                            status_code=hcodes.HTTP_BAD_REQUEST)
+        # if limit < 0:
+        #     raise RestApiException('Page size cannot be a negative value',
+        #                            status_code=hcodes.HTTP_BAD_REQUEST)
         count = "MATCH (n:List)" \
                 " {match} " \
                 "RETURN COUNT(DISTINCT(n))".format(
                     match=user_match)
         # logger.debug("count query: %s" % count)
-        query = "MATCH (n:List)" \
-                " {match} " \
-                "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
+        # query = "MATCH (n:List)" \
+        #         " {match} " \
+        #         "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
+        #             match=user_match,
+        #             offset=offset * limit,
+        #             limit=limit)
+        count_items = ', count(r)' if nb_items else ''
+        query = "MATCH (n:List) " \
+                "{match} " \
+                "{optional} " \
+                "RETURN DISTINCT(n){counter}".format(
                     match=user_match,
-                    offset=offset * limit,
-                    limit=limit)
-        # logger.debug("query: %s" % query)
+                    optional=optional_match,
+                    counter=count_items)
+        logger.debug("query: %s" % query)
 
         # get total number of lists
         numels = [row[0] for row in self.graph.cypher(count)][0]
         logger.debug("Total number of lists: {0}".format(numels))
 
         data = []
+        meta_response = {
+            "totalItems": numels
+        }
         results = self.graph.cypher(query)
-        for res in [self.graph.List.inflate(row[0]) for row in results]:
+        # for res in [self.graph.List.inflate(row[0]) for row in results]:
+        for row in results:
+            res = self.graph.List.inflate(row[0])
             user_list = self.getJsonResponse(res)
             if iamadmin and researcher is None:
                 creator = res.creator.single()
@@ -123,8 +151,10 @@ class Lists(GraphBaseOperations):
                     if i.downcast().uuid == belong_item:
                         user_list['belong'] = True
                         break
+            if nb_items:
+                user_list['nb_items'] = row[1]
             data.append(user_list)
-        return self.force_response(data)
+        return self.force_response(data, meta=meta_response)
 
     @decorate.catch_error()
     @catch_graph_exceptions

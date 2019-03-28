@@ -1,6 +1,6 @@
 lists:
   summary: Get the researcher's lists.
-  description: Returns all the list of a researcher. The result supports paging.
+  description: Returns all the list of a researcher.
   custom:
     authentication: true
     authorized:
@@ -8,14 +8,6 @@ lists:
       - admin_root
     required_roles: any
   parameters:
-    - name: perpage
-      in: query
-      description: Number of lists returned
-      type: integer
-    - name: currentpage
-      in: query
-      description: Page number
-      type: integer
     - name: researcher
       in: query
       description: Researcher uuid
@@ -24,6 +16,11 @@ lists:
       in: query
       description: Item uuid (used to check whether the item belongs to the list or not)
       type: string
+    - name: includeNumberOfItems
+      in: query
+      type: boolean
+      default: false
+      allowEmptyValue: true
   responses:
     '200':
       description: All the list of the researcher.
@@ -48,6 +45,15 @@ list:
       in: query
       description: Researcher uuid
       type: string
+    - name: item
+      in: query
+      description: Item uuid (used to check whether the item belongs to the list or not)
+      type: string
+    - name: includeNumberOfItems
+      in: query
+      type: boolean
+      default: false
+      allowEmptyValue: true
   responses:
     '200':
       description: The list of the researcher.
