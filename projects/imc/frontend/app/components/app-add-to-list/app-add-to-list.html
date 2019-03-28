@@ -1,10 +1,20 @@
-<div ngbDropdown class="d-inline-block" placement="bottom-right" autoClose="outside"
+<div ngbDropdown #myDrop="ngbDropdown" class="d-inline-block" placement="bottom-right" autoClose="outside"
 	(openChange)="openAddListPanel($event)">
 	<a class="dropdown-toggle" id="dropdownAddToList" ngbDropdownToggle>
 		<i class="material-icons click-event">playlist_add</i>
 	</a>
 	<div ngbDropdownMenu aria-labelledby="dropdownAddToList" class="dropdown-menu-right">
-		<h6 class="dropdown-header px-3">Add to...</h6>
+		<div class="row no-gutters">
+        <div class="mr-auto">
+        	<h6 class="dropdown-header px-3">Add to...</h6>
+        </div>
+        <div class="ml-auto" >
+        	<button type="button" class="close" aria-label="Close" (click)="$event.stopPropagation(); myDrop.close();">
+						<span aria-hidden="true" class="material-icons" style="color: #707070;">close</span>
+					</button>
+        </div>
+    </div>
+		<!-- <h6 class="dropdown-header px-3">Add to...</h6> -->
 		<div class="px-3 py-1">
 			<div style="max-height: 120px; overflow-y: auto;">
 				<div class="form-check px-0" *ngFor="let l of my_lists">
