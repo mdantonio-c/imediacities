@@ -11,8 +11,11 @@ export class ListsService {
 
 	constructor(private api: ApiService) { }
 
-	getLists(itemId?: string) {
+	getLists(itemId?: string, includeNumberOfItems?: boolean) {
 		let params = itemId ? {'item':itemId} : {};
+		if (includeNumberOfItems) {
+			params['includeNumberOfItems'] = true;
+		}
 		return this.api.get('lists', '', params);
 	}
 

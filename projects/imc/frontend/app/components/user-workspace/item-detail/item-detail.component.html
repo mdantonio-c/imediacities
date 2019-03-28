@@ -25,6 +25,7 @@
 	</div>
   <div class="card-body">
     <h5 class="card-title blue">{{media.title}}</h5>
+    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} items</h5>
     <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
   </div>
   <div class="card-footer p-0" *ngIf="media.focus" style="margin-top: -25px;">

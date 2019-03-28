@@ -114,7 +114,7 @@ export class MultiItemCarouselComponent implements OnChanges {
       case "lists":
         /*console.log('load my list...');*/
         this.close();
-        this.listsService.getLists().subscribe(
+        this.listsService.getLists(undefined, true).subscribe(
           response => {
             this.slickModal.unslick();
             this.slides = response.data.map(lst => {
@@ -122,11 +122,11 @@ export class MultiItemCarouselComponent implements OnChanges {
                 'id': lst.id,
                 'title': lst.attributes.name,
                 'description': lst.attributes.description,
-                'type': lst.type
+                'type': lst.type,
+                'nb_items': lst.nb_items
               }
             });
-            /*console.log('lists', this.slides);*/
-            // FIXME with pagination
+            /*this.total = response["Meta"].totalItems;*/
             this.total = this.slides.length;
             this.onResult.emit(this.total);
             this.loading = false;
