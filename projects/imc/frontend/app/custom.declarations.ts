@@ -31,6 +31,7 @@ import {SecondsToTimePipe} from "./pipes/secondsToTime.pipe";
 
 import {AppMediaComponent} from "./components/app-media/app-media";
 import {AppMediaTopBarComponent} from "./components/app-media/app-media-top-bar/app-media-top-bar";
+import {AppAddToListComponent} from "./components/app-add-to-list/app-add-to-list";
 
 import {AppPictureComponent} from "./components/app-media/app-picture/app-picture";
 import {AppVideoTagComponent} from "./components/app-media/app-video-tag/app-video-tag";
@@ -120,6 +121,7 @@ export const declarations: any[] = [
 	AppModaleComponent,
 	AppMediaComponent,
     AppMediaTopBarComponent,
+    AppAddToListComponent,
 	AppPictureComponent,
 	AppShotReferenceComponent,
 	AppVideoTagComponent,
