@@ -78,6 +78,41 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    def head(self, group=None):
+        self.graph = self.get_service_instance('neo4j')
+
+        if not self.auth.verify_admin():
+            # Only admins can specify a different group to be inspected
+            group = None
+
+        if group is None:
+            group = self.getSingleLinkedNode(
+                self.get_current_user().belongs_to)
+        else:
+            group = self.graph.Group.nodes.get_or_none(uuid=group)
+
+        if group is None:
+            return 0
+
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            return 0
+
+        counter = 0
+        for f in os.listdir(upload_dir):
+
+            path = os.path.join(upload_dir, f)
+            if not os.path.isfile(path):
+                continue
+            if f[0] == '.':
+                continue
+
+            counter += 1
+
+        return counter
+
+    @decorate.catch_error()
+    @catch_graph_exceptions
     def get(self, group=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -91,7 +126,6 @@ class Stage(GraphBaseOperations):
                 self.get_current_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
-            # group = self.getNode(self.graph.Group, group, field='uuid')
 
         if group is None:
             raise RestApiException(
@@ -105,9 +139,15 @@ class Stage(GraphBaseOperations):
                 return self.force_response(
                     [], errors=["Upload dir not found"])
 
-        # resources = group.stage_files.all()
-
         data = []
+
+        params = self.get_input()
+        get_total = params.get('get_total', False)
+        if not get_total:
+            current_page, limit = self.get_paging()
+            offset = (current_page - 1) * limit
+
+        counter = 0
         for f in os.listdir(upload_dir):
 
             path = os.path.join(upload_dir, f)
@@ -115,6 +155,18 @@ class Stage(GraphBaseOperations):
                 continue
             if f[0] == '.':
                 continue
+
+            counter += 1
+
+            if get_total:
+                continue
+
+            if offset > counter:
+                continue
+
+            if offset + limit <= counter:
+                break
+
             stat = os.stat(path)
 
             row = {}
@@ -153,13 +205,10 @@ class Stage(GraphBaseOperations):
                             binding['status'] = 'PENDING'
                         row['binding'] = binding
 
-            # for res in resources:
-            #     if res.path != path:
-            #         continue
-            #     row['status'] = res.status
-            #     row['status_message'] = res.status_message
-            #     row['task_id'] = res.task_id
             data.append(row)
+
+        if get_total:
+            return {"total": counter}
 
         return self.force_response(data)
 
