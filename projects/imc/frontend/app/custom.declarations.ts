@@ -78,6 +78,7 @@ import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
 import {AppReferenceComponent} from "./components/app-reference/app-reference";
 import {AppLinkComponent} from "./components/app-link/app-link";
+import {AutoFocusDirective} from "./directives/auto-focus"
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
@@ -148,6 +149,7 @@ export const declarations: any[] = [
     DropdownPositionDirective,
 	InputNumericDirective,
 	InputSelectDirective,
+    AutoFocusDirective,
 
     FileSelectDirective, FileDropDirective
 

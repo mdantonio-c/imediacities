@@ -8,7 +8,9 @@ export interface ItemDetail {
 	type?: string,
 	description?: string,
 	thumbnail?: string,
-	focus?: boolean
+	focus?: boolean,
+	listItem?: boolean,
+	listId?: string
 }
 
 @Component({
@@ -19,9 +21,7 @@ export interface ItemDetail {
 export class ItemDetailComponent {
 
 	@Input() media: ItemDetail;
-	@Input() focus: boolean;
 	@Output() onDelete: EventEmitter<null> = new EventEmitter<null>();
-	selected = false;
 
 	constructor(
 		private router: Router,
@@ -41,8 +41,7 @@ export class ItemDetailComponent {
 		this.onDelete.emit();
 	}
 
-	select() {
-		/*this.selected = true;*/
+	loadListItems() {
     	this.listsService.selectList(this.media);
 	}
 
