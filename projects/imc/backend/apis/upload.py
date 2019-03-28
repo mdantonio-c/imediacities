@@ -5,7 +5,6 @@ Upload a file
 """
 
 import os
-from flask_restful import request
 from flask import send_file, make_response
 from mimetypes import MimeTypes
 
@@ -17,13 +16,11 @@ from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
-# from restapi.services.download import Downloader
 
 log = get_logger(__name__)
 mime = MimeTypes()
 
 
-#####################################
 class Upload(Uploader, GraphBaseOperations):
 
     @decorate.catch_error()
@@ -44,25 +41,8 @@ class Upload(Uploader, GraphBaseOperations):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
 
-        # chunk_number = int(self.get_input(
-        #     single_parameter='flowChunkNumber'))
-        # chunk_total = int(self.get_input(
-        #     single_parameter='flowTotalChunks'))
-        # chunk_size = int(self.get_input(
-        #     single_parameter='flowChunkSize'))
-        # filename = self.get_input(single_parameter='flowFilename')
-
-        # abs_fname, secure_name = self.ngflow_upload(
-        #     filename, upload_dir, request.files['file'],
-        #     chunk_number, chunk_size, chunk_total,
-        #     overwrite=True
-        # )
-
         upload_response = self.upload_data(
             filename, subfolder=upload_dir, force=False)
-
-        # return self.force_response("", code=hcodes.HTTP_OK_ACCEPTED)
-        # return self.force_response("")
 
         return upload_response
 
