@@ -164,7 +164,7 @@ class Stage(GraphBaseOperations):
             if offset > counter:
                 continue
 
-            if offset + limit <= counter:
+            if offset + limit < counter:
                 break
 
             stat = os.stat(path)
