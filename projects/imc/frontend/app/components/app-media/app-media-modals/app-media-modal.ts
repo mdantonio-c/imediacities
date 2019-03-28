@@ -17,9 +17,9 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     @ViewChild('videoPlayer') videoPlayer: AppVideoPlayerComponent;
 
     public mediaData = null;
-
     public shots = null;
     public shot_corrente = null;
+    user: any;
 
     constructor(
         private auth: AuthService,
@@ -63,6 +63,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
         if (this.data.shots && this.data.shots.length) {
             this.shot_cambia(0);
         }
+        this.user = this.auth.getUser();
     }
 
     ngOnChanges() {

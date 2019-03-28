@@ -1,8 +1,18 @@
 <div class="modal-body">
-    
-    <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.attributes.shot_num+1}}
-        <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.attributes.shot_num+2}}</ng-container>
-    </h4>
+
+    <div class="row no-gutters">
+        <div class="mr-auto">
+            <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.attributes.shot_num+1}}
+            <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.attributes.shot_num+2}}</ng-container>
+            </h4>
+        </div>
+        <div class="ml-auto" >
+            <app-add-to-list
+                [item_id]="data.shots[0].id"
+                [item_type]="(media_type === 'video') ? 'shot' : 'item'"
+                *ngIf="user && user.roles['Researcher']"></app-add-to-list>
+        </div>
+    </div>
 
     <div class="row modal-body-content">
 
