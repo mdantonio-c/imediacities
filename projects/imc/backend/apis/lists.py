@@ -486,6 +486,7 @@ class ListItems(GraphBaseOperations):
             res['links']['thumbnail'] = api_url + \
                 'api/shots/' + mdo.uuid + '?content=thumbnail'
 
+        res['creation_id'] = creation.uuid
         res["rights_status"] = creation.get_rights_status_display()
         # add title
         for idx, t in enumerate(creation.titles.all()):

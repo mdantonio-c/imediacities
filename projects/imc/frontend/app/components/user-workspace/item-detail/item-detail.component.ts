@@ -10,7 +10,8 @@ export interface ItemDetail {
 	thumbnail?: string,
 	focus?: boolean,
 	listItem?: boolean,
-	listId?: string
+	listId?: string,
+	ref?: any
 }
 
 @Component({
@@ -29,11 +30,26 @@ export class ItemDetailComponent {
 
 	disableSaveAs() { return false; }
 
-	route(mediaId, mediaType) {
-		if (mediaType === 'nonaventity') {
-			this.router.navigate(['/app/catalog/images', mediaId]);
-		} else if (mediaType === 'aventity') {
-			this.router.navigate(['/app/catalog/videos', mediaId]);
+	route() {
+		if (this.media.listItem) {
+			// here media.id is item UUID
+			// list item conveys with creation model in ref
+			let media = this.media.ref;
+			if (media.type === 'shot' || media.attributes.item_type['key'] === 'Video') {
+				this.router.navigate(['/app/catalog/videos',  media.creation_id]);
+			} else {
+				this.router.navigate(['/app/catalog/images', media.creation_id]);
+			}
+		} else {
+			// here media.id is aventity/nonaventity UUID
+			switch (this.media.type) {
+				case "nonaventity":
+					this.router.navigate(['/app/catalog/images', this.media.id]);
+					break;
+				case "aventity":
+					this.router.navigate(['/app/catalog/videos', this.media.id]);
+					break;
+			}
 		}
 	}
 

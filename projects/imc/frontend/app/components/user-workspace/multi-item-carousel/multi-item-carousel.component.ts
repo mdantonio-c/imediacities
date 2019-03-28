@@ -157,7 +157,8 @@ export class MultiItemCarouselComponent implements OnChanges {
                 'type': mediaType,
                 'thumbnail': media.links['thumbnail'],
                 'listItem': true,
-                'listId': this.listId
+                'listId': this.listId,
+                'ref': media
               }
               if (mediaType === 'aventity') r['duration'] = media.attributes.duration;
               return r;
