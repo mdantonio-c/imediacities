@@ -96,23 +96,14 @@ class Upload(Uploader, GraphBaseOperations):
             if not os.path.exists(upload_dir):
                 return self.force_response(
                     [], errors=["Upload dir not found"])
-        found = False
-        for f in os.listdir(upload_dir):
 
-            staged_file = os.path.join(upload_dir, f)
-            if not os.path.isfile(staged_file):
-                continue
-            if f[0] == '.':
-                continue
-            if f == filename:
-                found = True
-                break
-        if not found:
+        staged_file = os.path.join(upload_dir, filename)
+        if not os.path.isfile(staged_file):
             raise RestApiException(
                 "File not found. Please specify a valid staged file",
                 status_code=hcodes.HTTP_BAD_NOTFOUND)
 
-        mime_type = mime.guess_type(f)
+        mime_type = mime.guess_type(filename)
         log.debug('mime type: {}'.format(mime_type))
 
         response = make_response(send_file(staged_file))
