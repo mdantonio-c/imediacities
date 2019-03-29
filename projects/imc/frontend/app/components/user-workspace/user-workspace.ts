@@ -47,8 +47,8 @@ export class UserWorkspaceComponent implements OnInit {
         });
         listsService.listSelected$.subscribe(
         	list => {
-                this.countListItemsResults = undefined;
         		this.selectedList = list;
+                this.countListItemsResults = undefined;
         	})
 	}
 
