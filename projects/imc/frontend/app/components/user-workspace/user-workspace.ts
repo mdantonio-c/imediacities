@@ -20,6 +20,7 @@ export class UserWorkspaceComponent implements OnInit {
 	cityFilter: SearchFilter = {};
 	countCityResults: number = 0;
 	countListResults: number = 0;
+    countListItemsResults: number;
 	listForm: FormGroup;
 	private selectedList: ItemDetail;
 	/**
@@ -46,6 +47,7 @@ export class UserWorkspaceComponent implements OnInit {
         });
         listsService.listSelected$.subscribe(
         	list => {
+                this.countListItemsResults = undefined;
         		this.selectedList = list;
         	})
 	}
@@ -62,6 +64,10 @@ export class UserWorkspaceComponent implements OnInit {
 	countListHandler(newCount) {
 		this.countListResults = newCount;
 	}
+
+    countListItemsHandler(newCount) {
+        this.countListItemsResults = newCount;
+    }
 
 	ngOnInit() {
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);

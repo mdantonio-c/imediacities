@@ -164,9 +164,8 @@ export class MultiItemCarouselComponent implements OnChanges {
               return r;
             });
             this.total = this.slides.length;
-            /*this.onResult.emit(response["Meta"].elements);*/
+            this.onResult.emit(this.total);
             this.loading = false;
-            /*this.slickModal.initSlick();*/
           },
           error => {
             this.notify.extractErrors(error.error.Response, this.notify.ERROR);
