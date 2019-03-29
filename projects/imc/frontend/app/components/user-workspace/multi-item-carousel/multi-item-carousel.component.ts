@@ -239,6 +239,8 @@ export class MultiItemCarouselComponent implements OnChanges {
               /*this.load();*/
               //this.slickModal.removeSlide(???);
               this.slides = this.slides.filter(s =>  s.id !== item.id);
+              this.total = this.slides.length;
+              this.onResult.emit(this.total);
 
               // close the related item list if open
               this.onDelete.emit(item.id);
