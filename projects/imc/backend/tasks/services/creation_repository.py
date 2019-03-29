@@ -93,7 +93,7 @@ class CreationRepository():
                             code=country_reference[0]).save()
                     entity.production_countries.connect(
                         country, {'reference': country_reference[1]})
-            elif av and r == 'video_format':
+            elif av and r == 'video_format' and relationships[r] is not None:
                 video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
             elif r == 'agents':
