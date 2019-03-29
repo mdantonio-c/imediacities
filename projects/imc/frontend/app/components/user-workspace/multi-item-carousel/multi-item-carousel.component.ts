@@ -213,7 +213,10 @@ export class MultiItemCarouselComponent implements OnChanges {
           this.listsService.removeItemfromList(item.id, item.listId).subscribe(
             response => {
               this.notify.showSuccess(`Item <${itemTitle}> removed successfully`);
-              this.load();
+              /*this.load();*/
+              this.slides = this.slides.filter(s =>  s.id !== item.id);
+              this.total = this.slides.length;
+              this.onResult.emit(this.total);
             },
             error => {
               this.notify.extractErrors(error.error.Response, this.notify.ERROR);
