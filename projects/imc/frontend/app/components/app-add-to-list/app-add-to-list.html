@@ -19,9 +19,9 @@
 				<div class="form-check px-0" *ngFor="let l of my_lists">
 					<input class="imc--input-checkbox styled-checkbox" type="checkbox" value=""
 					[(ngModel)]="l.belong"
-					id="lst-{{l.uuid}}-{{item_id}}"
+					[attr.id]="'lst-'+l.uuid+'-'+item_id+flag"
 					(click)="toggleItem($event, l.uuid, l.belong)">
-					<label class="form-check-label m-0 text-truncate" for="lst-{{l.uuid}}-{{item_id}}">
+					<label class="form-check-label m-0 text-truncate" [attr.for]="'lst-'+l.uuid+'-'+item_id+flag">
 						{{l.name}}
 					</label>
 				</div>

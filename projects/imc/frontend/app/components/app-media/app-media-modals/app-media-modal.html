@@ -10,6 +10,7 @@
             <app-add-to-list
                 [item_id]="data.shots[0].id"
                 [item_type]="(media_type === 'video') ? 'shot' : 'item'"
+                [flag]="'inner'"
                 *ngIf="user && user.roles['Researcher']"></app-add-to-list>
         </div>
     </div>

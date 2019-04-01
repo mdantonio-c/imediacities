@@ -13,6 +13,7 @@ export class AppAddToListComponent {
 
 	@Input() item_id: string;
     @Input() item_type: string = 'item';    // 'item' or 'shot'
+    @Input() flag: string;
 
 	my_lists: UserList[] = [];
     listCreation: boolean = false;

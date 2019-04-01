@@ -9,7 +9,7 @@
         <strong [innerHTML]="label"></strong>
     </span>
     <span class="imc--flex--item-end box-icons-share">
-        <app-add-to-list [item_id]="item_id"
+        <app-add-to-list [item_id]="item_id" [flag]="'root'"
             *ngIf="user && user.roles['Researcher']"></app-add-to-list>
         <!-- <div>
             <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
