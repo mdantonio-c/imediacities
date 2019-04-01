@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Output, EventEmitter, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
@@ -12,7 +12,8 @@ import { IonRangeSliderComponent } from "ng2-ion-range-slider";
 @Component({
   selector: 'search-filter',
   templateUrl: './search-filter.component.html',
-  styleUrls: ['./search-filter.component.css']
+  styleUrls: ['./search-filter.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SearchFilterComponent implements OnInit, AfterViewInit {
   searchForm: FormGroup;

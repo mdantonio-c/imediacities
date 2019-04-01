@@ -14,12 +14,18 @@
 						<input type="text" class="imc--input imc--input-search"
 						name="searchTerm"
 						formControlName="searchTerm"
-						placeholder="Look within results"
+						placeholder="Search in title, keyword, description"
 						style="width: 80%;">
 						<div class="input-group-append">
+								<ng-template #tipContent>
+									By default, the terms in box search are linked by OR. AND  digited(in capital letters)  between  two terms  limites the results to the text that contains the two terms together.<br/><br/>
+									By default, the engine extracts all the results that contain your search terms or similar terms. Similar term  is equal to a term different for a single letter from the original one.<br/><br/>
+									Use double quotes for exact match to a term or to a phrase
+									</ng-template>
 								<button class="btn-reset" type="button"
-								ngbTooltip="Search within titles, keywords or descriptions"
-								placement="bottom">
+								 	[ngbTooltip]="tipContent"
+								 	tooltipClass="info-fulltext"
+									placement="bottom">
 								<i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">info</i>
 								</button>
 						</div>
