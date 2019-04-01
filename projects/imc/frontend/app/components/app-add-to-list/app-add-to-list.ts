@@ -70,6 +70,7 @@ export class AppAddToListComponent {
     }
 
     private removeFromList(listId) {
+        console.log(`remove <${this.item_type}:${this.item_id}> to the list <${listId}>`);
         this.listsService.removeItemfromList(this.item_id, listId).subscribe(resp => {
             // item removed from the list
             this.my_lists.filter(l => l.uuid == listId)[0].belong = false;

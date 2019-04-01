@@ -1,9 +1,9 @@
 <div ngbDropdown #myDrop="ngbDropdown" class="d-inline-block" placement="bottom-right" autoClose="outside"
 	(openChange)="openAddListPanel($event)">
-	<a class="dropdown-toggle" id="dropdownAddToList" ngbDropdownToggle>
+	<a class="dropdown-toggle" id="dropdownAddToList-{{item_id}}" ngbDropdownToggle>
 		<i class="material-icons click-event">playlist_add</i>
 	</a>
-	<div ngbDropdownMenu aria-labelledby="dropdownAddToList" class="dropdown-menu-right">
+	<div ngbDropdownMenu attr.aria-labelledby="dropdownAddToList-{{item_id}}" class="dropdown-menu-right">
 		<div class="row no-gutters">
         <div class="mr-auto">
         	<h6 class="dropdown-header px-3">Add to...</h6>
@@ -14,15 +14,14 @@
 					</button>
         </div>
     </div>
-		<!-- <h6 class="dropdown-header px-3">Add to...</h6> -->
 		<div class="px-3 py-1">
 			<div style="max-height: 120px; overflow-y: auto;">
 				<div class="form-check px-0" *ngFor="let l of my_lists">
 					<input class="imc--input-checkbox styled-checkbox" type="checkbox" value=""
 					[(ngModel)]="l.belong"
-					id="lst-{{l.uuid}}"
+					id="lst-{{l.uuid}}-{{item_id}}"
 					(click)="toggleItem($event, l.uuid, l.belong)">
-					<label class="form-check-label m-0 text-truncate" for="lst-{{l.uuid}}">
+					<label class="form-check-label m-0 text-truncate" for="lst-{{l.uuid}}-{{item_id}}">
 						{{l.name}}
 					</label>
 				</div>
