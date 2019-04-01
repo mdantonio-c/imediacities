@@ -33,6 +33,7 @@ class Search(GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
+        user = self.get_current_user()
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1
@@ -214,6 +215,24 @@ class Search(GraphBaseOperations):
                         "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) "
                         "WHERE {clauses}".format(
                             clauses=' or '.join(term_clauses)))
+            # ANNOTATED BY
+            annotated_by = filtering.get('annotated_by')
+            log.debug('------------------------------------------------- {}'.format(user))
+            if annotated_by:
+                log.debug("apply filter annotated by user <{}>".format(annotated_by))
+                # if no user ignore this filter
+                # only annotated *BY ME* is autorized (except for the admin)
+                # iamadmin = self.auth.verify_admin()
+                # if user.uuid != annotated_by and not iamadmin:
+                #     raise RestApiException(
+                #         'You are not allowed to search for item that are not annotated by you',
+                #         status_code=hcodes.HTTP_BAD_FORBIDDEN)
+                # should I check if 'annotated_by' (i.e. user) exists?
+                # TODO
+                filters.append(
+                    "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})"
+                    "-[IS_ANNOTATED_BY]->(:User {{uuid:'{user}'}})".format(
+                        user=annotated_by))
 
         match = input_parameters.get('match')
         fulltext = None
