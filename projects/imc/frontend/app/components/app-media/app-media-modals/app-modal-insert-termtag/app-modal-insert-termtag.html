@@ -195,10 +195,8 @@
                          (click)="term_selected(term)">
                             <strong [ngClass]="{'lod': term.source !== 'vocabulary'}" [innerHTML]="term.name"></strong>
                         </div>
-                        <small [innerHTML]="term.description"></small>
+                        <small class="d-block">{{term.description}}</small>
                         <a href="{{term.iri}}" target="#" title="open a new window with more info about the this item">{{term.iri}}&nbsp;<i class="fa fa-external-link blue"></i></a>
-
-                        <br>
                     </div>
                     <div *ngIf="!results.lods.length" class="search-term-no-results">
                         no results
