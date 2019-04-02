@@ -50,8 +50,15 @@ def log(msg):
     print(msg)
     sys.stdout.flush()
     time = datetime.datetime.now().strftime("[%d%b%y %H:%M:%S] ")
-    logfile.write(time + msg + '\n')
-    logfile.flush()
+    if logfile is None:
+        print("warning -- log file not initialized")
+        sys.stdout.flush()
+    try:
+        logfile.write(time + msg + '\n')
+        logfile.flush()
+    except BaseException:
+        print("warning -- write to log file failed -- logfile closed ?")
+        sys.stdout.flush()
 
 
 # -----------------------------------------------------
@@ -903,11 +910,6 @@ def update_storyboard(revised_cuts, out_folder):
         print('bad_out_folder:', out_folder)
         return False
 
-    global TRANSCODED_FRAMERATE
-    TRANSCODED_FRAMERATE = get_framerate(os.path.join(out_folder, 'origin_info.json'))
-    if TRANSCODED_FRAMERATE == 0:
-        return False  # (errors already logged)
-
     # check storyboard folder
     sb_folder = os.path.join(out_folder, 'storyboard')
     if(not os.path.exists(sb_folder)):
@@ -918,6 +920,11 @@ def update_storyboard(revised_cuts, out_folder):
     global logfile
     logfile = open(os.path.join(sb_folder, "log.txt"), "w")
     log("update_storyboard_begin")
+
+    global TRANSCODED_FRAMERATE
+    TRANSCODED_FRAMERATE = get_framerate(os.path.join(out_folder, 'origin_info.json'))
+    if TRANSCODED_FRAMERATE == 0:
+        return False  # (errors already logged)
 
     # check movie
     movie = os.path.join(out_folder, 'transcoded.mp4')
