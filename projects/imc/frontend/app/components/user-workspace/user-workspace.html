@@ -38,7 +38,7 @@
 			      <i class="material-icons">star_rate</i>
 			    </div> -->
 			    <div class="col-auto">
-			      <span *ngIf="countCityResults">{{countCityResults}} contents</span>
+			      <span *ngIf="counters.BY_CITIES !== undefined">{{counters.BY_CITIES}} contents</span>
 			    </div>
 			  </div>
 			</div>
@@ -64,7 +64,7 @@
 			<div class="col-12 mt-2">
 				<div style="display: flex; flex-wrap: wrap;">
 					<span class="imc--flex--vertical-center">
-						<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists ({{countListResults}})</strong>
+						<i class="material-icons">format_list_bulleted</i>&nbsp;<strong>My Lists ({{counters.MY_LISTS}})</strong>
 					</span>
 					<span class="imc--flex--vertical-center">
 		        <div ngbDropdown class="d-inline-block ml-5" placement="bottom-left" autoClose="outside" #newListDrop="ngbDropdown">
@@ -96,7 +96,7 @@
 			</div>
 			<div class="col-12 mt-2">
 				<multi-item-carousel [endpoint]="'lists'" 
-					(onResult)="countListHandler($event)"
+					(onResult)="countChangedHandler($event, 'MY_LISTS')"
 					(onDelete)="closeItemList($event)" #mylists></multi-item-carousel>
 			</div>
 			<div class="col-12 mt-2" *ngIf="selectedList" style="min-height: 330px;">
@@ -104,7 +104,7 @@
 				<span><strong>{{selectedList.title}} <ng-container *ngIf="countListItemsResults !== undefined">({{countListItemsResults}})</ng-container></strong></span>
 				<multi-item-carousel #listItems
 					[endpoint]="'listItems'" [listId]="selectedList.id"
-					(onResult)="countListItemsHandler($event)"></multi-item-carousel>
+					(onResult)="countChangedHandler($event, 'LIST_ITEM')"></multi-item-carousel>
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>
@@ -123,8 +123,11 @@
 		<div class="row no-gutters mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--flex--vertical-center">
-					<i class="material-icons">bookmark</i>&nbsp;<strong>Contents annotated by me (22)</strong>
+					<i class="material-icons">bookmark</i>&nbsp;<strong>Contents annotated by me ({{counters.TAGGED_BY_ME}})</strong>
 				</span>
+				<multi-item-carousel 
+					[filter]="taggedByMeFilter" 
+					(onResult)="countChangedHandler($event, 'TAGGED_BY_ME')"></multi-item-carousel>
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>
@@ -133,8 +136,11 @@
 		<div class="row no-gutters mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--flex--vertical-center">
-					<i class="material-icons">speaker_notes</i>&nbsp;<strong>Content with my personal notes (12)</strong>
+					<i class="material-icons">speaker_notes</i>&nbsp;<strong>Content with my personal notes ({{counters.NOTED_BY_ME}})</strong>
 				</span>
+				<multi-item-carousel 
+					[filter]="notedByMeFilter" 
+					(onResult)="countChangedHandler($event, 'NOTED_BY_ME')"></multi-item-carousel>
 			</div>
 		</div>
 

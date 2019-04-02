@@ -174,9 +174,9 @@ export class MultiItemCarouselComponent implements OnChanges {
         break;
       default:
         if (!append) {
-          this.slides = [];
-          this.slickModal.unslick();
+          this.close();
         }
+        /*console.log(this.filter);*/
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
             this.slides = this.update_results(append, this.currentPage, response["Response"].data.map(media => {

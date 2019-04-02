@@ -15,7 +15,13 @@ export interface SearchFilter {
 	productionYearFrom?: number,
 	productionYearTo?: number,
 	iprstatus?: string,
-	missingDate?: boolean
+	missingDate?: boolean,
+	annotated_by?: AnnotatedByFilter
+}
+
+export interface AnnotatedByFilter {
+	user: string,
+	type: string
 }
 
 export interface SearchTerm {
@@ -72,6 +78,10 @@ export class CatalogService {
 				terms: filter.terms,
 				missingDate: filter.missingDate
 			}
+		}
+		// FIXME: the following filter has no effect without an authentication token
+		if (filter.annotated_by) {
+			data.filter['annotated_by'] = filter.annotated_by;
 		}
 		if (filter.searchTerm) {
 			data.match = { term: filter.searchTerm, fields: matchFields }

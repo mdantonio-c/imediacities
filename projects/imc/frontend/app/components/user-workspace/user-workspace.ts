@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '/rapydo/src/app/services/auth';
 import { NotificationService } from '/rapydo/src/app/services/notification';
 import { Providers } from '../../catalog/services/data';
 import { CatalogService, SearchFilter } from '../../catalog/services/catalog.service'
@@ -18,11 +19,22 @@ export class UserWorkspaceComponent implements OnInit {
 	cities: string[] = [];
 	selectedCity: string = "";
 	cityFilter: SearchFilter = {};
-	countCityResults: number = 0;
-	countListResults: number = 0;
-    countListItemsResults: number;
+    taggedByMeFilter: SearchFilter = {
+        annotated_by: {user:null, type:'TAG'}
+    };
+    notedByMeFilter: SearchFilter = {
+        annotated_by: {user:null, type:'DSC'}
+    };
+    counters = {
+        'BY_CITIES': undefined,
+        'MY_LISTS': undefined,
+        'LIST_ITEMS': undefined,
+        'TAGGED_BY_ME': undefined,
+        'NOTED_BY_ME': undefined
+    }
 	listForm: FormGroup;
 	private selectedList: ItemDetail;
+    private user: any;
 	/**
      * Reference to NgbDropdown component for creating a new user list
      */
@@ -37,6 +49,7 @@ export class UserWorkspaceComponent implements OnInit {
     @ViewChild('listItems') listItemsComp: MultiItemCarouselComponent;
 
 	constructor(
+        private authService: AuthService,
 		private catalogService: CatalogService,
 		private listsService: ListsService,
 		private formBuilder: FormBuilder,
@@ -48,7 +61,7 @@ export class UserWorkspaceComponent implements OnInit {
         listsService.listSelected$.subscribe(
         	list => {
         		this.selectedList = list;
-                this.countListItemsResults = undefined;
+                this.counters.LIST_ITEMS = undefined;
         	})
 	}
 
@@ -57,19 +70,14 @@ export class UserWorkspaceComponent implements OnInit {
 		this.cityFilter = (newValue !== '') ? { city: newValue } : {};
 	}
 
-	countChangedHandler(newCount) {
-		this.countCityResults = newCount;
-	}
-
-	countListHandler(newCount) {
-		this.countListResults = newCount;
-	}
-
-    countListItemsHandler(newCount) {
-        this.countListItemsResults = newCount;
+    countChangedHandler(newCount, counter='BY_CITIES') {
+        this.counters[counter] = newCount;
     }
 
 	ngOnInit() {
+        this.user = this.authService.getUser();
+        this.taggedByMeFilter.annotated_by.user = this.user.uuid;
+        this.notedByMeFilter.annotated_by.user = this.user.uuid;
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
     	this.cities = this.cities.sort();
 	}
