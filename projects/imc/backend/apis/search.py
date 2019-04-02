@@ -26,6 +26,7 @@ class Search(GraphBaseOperations):
 
     allowed_item_types = ('all', 'video', 'image')  # , 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
+    allowed_anno_types = ('TAG', 'DSC', 'LNK')
 
     @decorate.catch_error()
     @catch_graph_exceptions
@@ -33,7 +34,7 @@ class Search(GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
-        user = self.get_current_user()
+        user = self.get_user_if_logged()
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1
@@ -217,22 +218,38 @@ class Search(GraphBaseOperations):
                             clauses=' or '.join(term_clauses)))
             # ANNOTATED BY
             annotated_by = filtering.get('annotated_by')
-            log.debug('------------------------------------------------- {}'.format(user))
-            if annotated_by:
-                log.debug("apply filter annotated by user <{}>".format(annotated_by))
-                # if no user ignore this filter
+            # if no user ignore this filter
+            if user and annotated_by:
                 # only annotated *BY ME* is autorized (except for the admin)
-                # iamadmin = self.auth.verify_admin()
-                # if user.uuid != annotated_by and not iamadmin:
-                #     raise RestApiException(
-                #         'You are not allowed to search for item that are not annotated by you',
-                #         status_code=hcodes.HTTP_BAD_FORBIDDEN)
-                # should I check if 'annotated_by' (i.e. user) exists?
-                # TODO
+                anno_user_id = annotated_by.get('user', None)
+                if anno_user_id is None:
+                    raise RestApiException(
+                        'Missing user in annotated_by filter',
+                        status_code=hcodes.HTTP_BAD_REQUEST)
+                iamadmin = self.auth.verify_admin()
+                if user.uuid != anno_user_id and not iamadmin:
+                    raise RestApiException(
+                        'You are not allowed to search for item that are not annotated by you',
+                        status_code=hcodes.HTTP_BAD_FORBIDDEN)
+                if iamadmin:
+                    # check if 'user' in annotated_by filter exists
+                    try:
+                        v = self.graph.User.nodes.get(uuid=anno_user_id)
+                    except self.graph.User.DoesNotExist:
+                        log.debug("User with uuid %s does not exist" % anno_user_id)
+                        raise RestApiException(
+                            "Please specify a valid user id in annotated_by filter",
+                            status_code=hcodes.HTTP_BAD_NOTFOUND)
+                anno_type = annotated_by.get('type', 'TAG')
+                if anno_type not in self.__class__.allowed_anno_types:
+                    raise RestApiException(
+                        "Bad annotation type in annotated_by filter: expected one of %s" %
+                        (self.__class__.allowed_anno_types, ),
+                        status_code=hcodes.HTTP_BAD_REQUEST)
                 filters.append(
-                    "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})"
+                    "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'{type}'}})"
                     "-[IS_ANNOTATED_BY]->(:User {{uuid:'{user}'}})".format(
-                        user=annotated_by))
+                        user=anno_user_id, type=anno_type))
 
         match = input_parameters.get('match')
         fulltext = None
