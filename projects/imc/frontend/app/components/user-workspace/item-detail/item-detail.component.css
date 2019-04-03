@@ -49,13 +49,19 @@
     padding: 0px 2px;
 }
 
-.media-image-wrapper .anteprima-duration {
+.media-image-wrapper .anteprima-duration,
+.media-image-wrapper .anteprima-shot--badge {
 	position: absolute;
-    right: 5px;
     bottom: 5px;
-    padding: 0 4px;
+    padding: 0 2px;
     background: #000;
     font-size: 12px;
     font-weight: bold;
     color: #fff;
+}
+.media-image-wrapper .anteprima-duration {
+    right: 5px;
+}
+.media-image-wrapper .anteprima-shot--badge {
+    left: 5px;
 }
