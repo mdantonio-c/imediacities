@@ -223,15 +223,20 @@
                         <div class="col-12">
                             <ul class="list-space">
                                 <li *ngIf="item && item.attributes.digital_format.length >= 1">
-                                    <strong>Container: </strong> <span [innerHTML]="item.attributes.digital_format[0]"></span>
+                                    <strong>Container: </strong>
+                                    <span [innerHTML]="printContainerInfo()"></span>
                                 </li>
 
                                 <li *ngIf="item && item.attributes.digital_format.length >= 2">
-                                    <strong>Encoding: </strong> <span [innerHTML]="item.attributes.digital_format[1]"></span>
+                                    <strong>Encoding: </strong>
+                                    <span [innerHTML]="printEncodingInfo()"></span>
                                 </li>
 
                                 <li *ngIf="item && item.attributes.digital_format.length >= 3">
-                                    <strong>Format: </strong> <span [innerHTML]="item.attributes.digital_format[2]"></span>
+                                    <strong>Format: </strong>
+                                    <!-- <span [innerHTML]="item.attributes.digital_format[2]"></span> -->
+                                    <!-- ALWAYS MPEG-4-->
+                                    <span>MPEG-4</span>
                                 </li>
 
                                 <li *ngIf="item && item.attributes.digital_format.length >= 4">
@@ -243,11 +248,13 @@
                                 </li>
 
                                 <li *ngIf="item && item.attributes.duration">
-                                    <strong>Duration: </strong><span [innerHTML]="item.attributes.duration | secondsToTime"></span> s
+                                    <strong>Duration: </strong>
+                                    <span [innerHTML]="item.attributes.duration | secondsToTime"></span>
                                 </li>
 
                                 <li *ngIf="item && item.attributes.dimension">
-                                    <strong>Size: </strong> <span [innerHTML]="item.attributes.dimension"></span> bytes
+                                    <strong>Size: </strong>
+                                    <span [innerHTML]="item.attributes.dimension | bytes:2"></span>
                                 </li>
 
                             </ul>

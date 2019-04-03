@@ -195,6 +195,20 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         this.MediaService.updatePublicAccess(newVal);
     }
 
+    printContainerInfo() {
+        // from ffprobe in the following form: mov,mp4,m4a,3gp,3g2,mj2
+        // as the item is always transcoded as mp4 look for mp4 in the list
+        // or provide the first
+        let containers = this.item.attributes.digital_format[0].split(',');
+        return (containers.includes('mp4')) ? 'mp4' : containers[0].trim();
+    }
+
+    printEncodingInfo() {
+       // from ffprobe in the following long name form: H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
+       // always print the first value
+       return this.item.attributes.digital_format[1].split('/')[0].trim();
+    }
+
     ngOnInit() {
         this.user = this.AuthService.getUser();
         this.description_languages = new Map();
