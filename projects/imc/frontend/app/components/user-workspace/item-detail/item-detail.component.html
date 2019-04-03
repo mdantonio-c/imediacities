@@ -1,5 +1,5 @@
 <div class="card item-detail">
-  <div class="media-image-wrapper" style="outline: none;">
+  <div class="media-image-wrapper">
     <ng-template #tipContent>
       <ng-container *ngIf="media.listItem">Remove item from list</ng-container >
       <ng-container *ngIf="media.type === 'list'">Delete the list</ng-container >
@@ -9,9 +9,26 @@
       	(click)="delete()"
         [ngbTooltip]="tipContent"
         placement="bottom"
-        container="body"
-      	style="color: #707070; font-size: 16px !important;">cancel_presentation</i>
+        container="body">cancel_presentation</i>
 		</span>
+    <ng-template #optionsContent>
+      <ul id="item-menu-options" class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link click-event p-0" [routerLink]=""
+            (click)="toggleEdit()"><i class="fa fa-edit"></i> Edit</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link click-event p-0" [routerLink]="['/404']" target="_blank">
+            <i class="fa fa-cube" aria-hidden="true"></i> Virtual Gallery</a>
+        </li>
+      </ul>
+    </ng-template>
+    <span class="badge item-options" *ngIf="media.type === 'list'">
+      <i class="material-icons click-event"
+        [ngbPopover]="optionsContent"
+        placement="right"
+        container="body">more_vert</i>
+    </span>
 		<span class="search-item label bigger-110">
 			<span class="fa-stack">
 				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.thumbnail"></i>
@@ -25,12 +42,22 @@
     <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge">shot {{media.ref.attributes.shot_num + 1}}</span>
 	</div>
   <div class="card-body">
-    <h5 class="card-title blue">{{media.title}}</h5>
+    <ng-container *ngIf="editable">
     <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} items</h5>
+    <form class="item-edit">
+      <input name="title" [(ngModel)]="mediaForm.name" class="mb-1">
+      <textarea name="description" [(ngModel)]="mediaForm.description"></textarea>
+    </form>
+    </ng-container>
+    <ng-container *ngIf="!editable">
+    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} items</h5>
+    <h5 class="card-title blue">{{media.title}}</h5>
     <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
+    </ng-container>
   </div>
-  <div class="card-footer p-0" *ngIf="media.focus" style="margin-top: -25px;">
-     <span class="imc--flex--vertical-center imc--flex--horizontal-center">
+  <div class="card-footer p-0" *ngIf="media.focus || editable">
+    <ng-container *ngIf="!editable">
+    <span class="imc--flex--vertical-center imc--flex--horizontal-center">
       <i class="material-icons click-event" (click)="loadListItems()" *ngIf="media.type === 'list'"
         ngbTooltip="Open the contents of my list"
         placement="top"
@@ -40,5 +67,12 @@
         placement="top"
         container="body">launch</i>
     </span>
+    </ng-container>
+    <ng-container *ngIf="editable">
+      <span class="imc--flex--vertical-center" style="justify-content: flex-end;">
+        <i class="material-icons click-event" (click)="cancel()">cancel</i>
+        <i class="material-icons click-event mr-1" (click)="save()">save</i>
+      </span>
+    </ng-container>
   </div>
 </div>

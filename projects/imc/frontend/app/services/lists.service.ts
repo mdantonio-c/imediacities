@@ -34,6 +34,10 @@ export class ListsService {
 		return parsed_lists.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
+	updateList(listId: string, data: any) {
+		return this.api.put('lists', listId, data);
+	}
+
 	removeList(listId: string) {
 		return this.api.delete('lists', listId);
 	}

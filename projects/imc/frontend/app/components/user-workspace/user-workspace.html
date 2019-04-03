@@ -101,10 +101,10 @@
 			</div>
 			<div class="col-12 mt-2" *ngIf="selectedList" style="min-height: 330px;">
 				<hr>
-				<span><strong>{{selectedList.title}} <ng-container *ngIf="countListItemsResults !== undefined">({{countListItemsResults}})</ng-container></strong></span>
+				<span><strong>{{selectedList.title}} <ng-container *ngIf="counters.LIST_ITEMS !== undefined">({{counters.LIST_ITEMS}})</ng-container></strong></span>
 				<multi-item-carousel #listItems
 					[endpoint]="'listItems'" [listId]="selectedList.id"
-					(onResult)="countChangedHandler($event, 'LIST_ITEM')"></multi-item-carousel>
+					(onResult)="countChangedHandler($event, 'LIST_ITEMS')"></multi-item-carousel>
 			</div>
 		</div>
 		<div class="row"><div class="col-12"><hr></div></div>

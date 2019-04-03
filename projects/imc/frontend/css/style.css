@@ -341,13 +341,19 @@ search-thumbnail div .media-image-wrapper {
 }
 
 .badge.revision,
-.badge.item-del {
+.badge.item-del,
+.badge.item-options {
   position: absolute !important;
   top: 5px;
   right: 5px;
   font-weight: bold;
   padding: 2px 2px;
   z-index: 1;
+}
+
+.badge.item-options {
+  left: -3px;
+  right: auto !important;
 }
 
 /* CINZIA */

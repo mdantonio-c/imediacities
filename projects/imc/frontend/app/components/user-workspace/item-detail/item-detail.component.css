@@ -41,12 +41,23 @@
     padding-top: 2px;
 	justify-content: center;
     display: flex;
+    outline: none;
 }
 
 .item-detail .media-image-wrapper img {
 	height: 110px;
     display: block;
     padding: 0px 2px;
+}
+
+.item-detail .card-footer {
+    margin-top: -25px;
+}
+
+.item-detail .item-del .material-icons,
+.item-detail .item-options .material-icons {
+    color: #707070;
+    font-size: 16px !important;
 }
 
 .media-image-wrapper .anteprima-duration,
@@ -64,4 +75,14 @@
 }
 .media-image-wrapper .anteprima-shot--badge {
     left: 5px;
+}
+
+.item-detail .item-edit input,
+.item-detail .item-edit textarea {
+    width: 142px;
+    font-size: small;
+}
+.item-detail .item-edit textarea {
+    resize: none;
+    height: 48px;
 }
