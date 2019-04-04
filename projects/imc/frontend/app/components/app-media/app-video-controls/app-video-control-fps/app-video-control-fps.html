@@ -3,10 +3,12 @@
 </div>
 <div *ngIf="video" class="controls__status">
     <select name="fps" #fps (change)="fps_change($event)">
-        <option value="6">slower</option>
-        <option value="12">slow</option>
-        <option value="24" selected="selected">normal</option>
-        <option value="36">fast</option>
-        <option value="48">faster</option>
+        <option value="0.10">iper slow</option>
+        <option value="0.25">slower</option>
+        <option value="0.5">slow</option>
+        <option value="1" selected="selected">normal</option>
+        <option value="2">fast</option>
+        <option value="4">faster</option>
+        <option value="10">iper fast</option>
     </select>
 </div>

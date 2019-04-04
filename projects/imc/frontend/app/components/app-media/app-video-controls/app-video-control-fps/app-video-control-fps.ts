@@ -15,7 +15,8 @@ export class AppVideoControlFpsComponent extends AppVideoControlComponent implem
     }
 
     fps_change (evento) {
-       this.video.playbackRate = AppVideoControlFpsComponent.Round(evento.target.value / this.parent.fps, 2);
+       // this.video.playbackRate = AppVideoControlFpsComponent.Round(evento.target.value / this.parent.fps, 2);
+       this.video.playbackRate = AppVideoControlFpsComponent.Round(evento.target.value, 2);
     }
 
     static Round (Number, DecimalPlaces) {
