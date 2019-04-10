@@ -188,8 +188,9 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             else:
                 raise Exception('Analize terminated with errors')
 
-            analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + content_filename.split('.')[0] + '/'
+            # analyze_path = '/uploads/Analize/' + \
+            #     group.uuid + '/' + content_filename.split('.')[0] + '/'
+            analyze_path = out_folder
             log.debug('analyze path: {0}'.format(analyze_path))
 
             # SAVE AUTOMATIC ANNOTATIONS
