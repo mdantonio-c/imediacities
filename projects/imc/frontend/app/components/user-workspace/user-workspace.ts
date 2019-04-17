@@ -72,6 +72,10 @@ export class UserWorkspaceComponent implements OnInit {
 
     countChangedHandler(newCount, counter='BY_CITIES') {
         this.counters[counter] = newCount;
+        if (counter === 'LIST_ITEMS') {
+            // update nb_items for the current selected list
+            this.selectedList.nb_items = newCount;
+        }
     }
 
 	ngOnInit() {

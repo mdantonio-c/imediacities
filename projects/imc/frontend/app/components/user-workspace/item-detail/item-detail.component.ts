@@ -13,6 +13,7 @@ export interface ItemDetail {
 	focus?: boolean,
 	listItem?: boolean,
 	listId?: string,
+	nb_items?: number,
 	ref?: any
 }
 
