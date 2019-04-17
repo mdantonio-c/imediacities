@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NotificationService } from '/rapydo/src/app/services/notification';
+import { AuthService } from '/rapydo/src/app/services/auth';
 import { ListsService } from '../../../services/lists.service'
 
 export interface ItemDetail {
@@ -14,6 +15,9 @@ export interface ItemDetail {
 	listId?: string,
 	ref?: any
 }
+
+// expected https://{url}?list={listID}&access_token={token}
+const VIRTUAL_GALLERY_URL: string = "http://130.186.13.31:8000/imc_vg/start_gallery"
 
 @Component({
 	selector: 'item-detail',
@@ -30,7 +34,8 @@ export class ItemDetailComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private listsService: ListsService,
-		private notify: NotificationService) { }
+		private notify: NotificationService,
+		private auth: AuthService) { }
 
 	ngOnInit() {
 		this.mediaForm['name'] = this.media.title;
@@ -72,6 +77,10 @@ export class ItemDetailComponent implements OnInit {
 
 	toggleEdit() {
 		this.editable = !this.editable;
+	}
+
+	getVGalleryURL() {
+		return `${VIRTUAL_GALLERY_URL}?list=${this.media.id}&access_token=${this.auth.getToken()}`;
 	}
 
 	save() {
