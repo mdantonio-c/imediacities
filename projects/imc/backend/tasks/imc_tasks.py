@@ -188,9 +188,10 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             else:
                 raise Exception('Analize terminated with errors')
 
-            analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + content_filename.split('.')[0] + '/'
-            log.debug('analyze path: {0}'.format(analyze_path))
+            # analyze_path = '/uploads/Analize/' + \
+            #     group.uuid + '/' + content_filename.split('.')[0] + '/'
+            analyze_path = out_folder
+            log.info('analyze path: {0}'.format(analyze_path))
 
             # SAVE AUTOMATIC ANNOTATIONS
 
@@ -350,8 +351,9 @@ def launch_tool(self, tool_name, item_id):
             group = GraphBaseOperations.getSingleLinkedNode(
                 item.ownership)
             movie = content_source.filename
+            m_name = os.path.splitext(os.path.basename(movie))[0]
             analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + movie.split('.')[0] + '/'
+                group.uuid + '/' + m_name + '/'
             log.debug('analyze path: {0}'.format(analyze_path))
             # call analyze for object detection ONLY
             # if detect_objects(movie, analyze_path):
@@ -387,8 +389,9 @@ def load_v2(self, other_version, item_id, retry=False):
             group = GraphBaseOperations.getSingleLinkedNode(
                 item.ownership)
             source_filename = content_source.filename
+            m_name = os.path.splitext(os.path.basename(source_filename))[0]
             analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + source_filename.split('.')[0] + '/'
+                group.uuid + '/' + m_name + '/'
             log.debug('analyze path: {0}'.format(analyze_path))
 
             # create symbolic link
@@ -501,8 +504,9 @@ def shot_revision(self, revision, item_id):
         group = GraphBaseOperations.getSingleLinkedNode(
             item.ownership)
         movie = content_source.filename
+        m_name = os.path.splitext(os.path.basename(movie))[0]
         analyze_path = '/uploads/Analize/' + \
-            group.uuid + '/' + movie.split('.')[0] + '/'
+            group.uuid + '/' + m_name + '/'
         log.debug('analyze path: {0}'.format(analyze_path))
 
         revised_cuts = []
@@ -756,8 +760,7 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
             "Analyze results does not exist in the path %s", analyze_dir_path)
 
     # check for info result
-    tech_info_path = os.path.join(
-        os.path.dirname(analyze_dir_path), tech_info_filename)
+    tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
     if not os.path.exists(tech_info_path):
         log.warning("Technical info CANNOT be extracted: [%s] does not exist",
                     tech_info_path)
@@ -910,8 +913,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
     ingest valueable annotations as 'automatic' TAGs.
     '''
     brf_results_filename = 'brf.xml'
-    brf_results_path = os.path.join(
-        os.path.dirname(analyze_dir_path), brf_results_filename)
+    brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
     if not os.path.exists(brf_results_path):
         raise IOError(
             "Analyze results does not exist in the path %s", brf_results_path)
@@ -1075,8 +1077,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
     ingest valueable annotations as 'automatic' TAGs.
     '''
     orf_results_filename = 'orf.xml'
-    orf_results_path = os.path.join(
-        os.path.dirname(analyze_dir_path), orf_results_filename)
+    orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
     if not os.path.exists(orf_results_path):
         raise IOError(
             "Analyze results does not exist in the path %s", orf_results_path)

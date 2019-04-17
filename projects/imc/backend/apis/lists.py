@@ -515,9 +515,20 @@ class ListItems(GraphBaseOperations):
                 'app/catalog/videos/' + creation.uuid
             res['links']['thumbnail'] = api_url + \
                 'api/shots/' + mdo.uuid + '?content=thumbnail'
+            # add some video item attributes
+            res['item'] = {
+                "digital_format": item.digital_format,
+                "dimension": item.dimension,
+                "duration": item.duration,
+                "framerate": item.framerate
+            }
 
         res['creation_id'] = creation.uuid
-        res["rights_status"] = creation.get_rights_status_display()
+        res['rights_status'] = creation.get_rights_status_display()
+        for record_source in creation.record_sources.all():
+            provider = record_source.provider.single()
+            res['city'] = provider.city
+            break
         # add title
         for idx, t in enumerate(creation.titles.all()):
             # get default
@@ -550,6 +561,11 @@ class ListItems(GraphBaseOperations):
             res["production_year"] = creation.date_created[0]
         if item.item_type == 'Video' and creation.production_years:
             res["production_year"] = creation.production_years[0]
+        # add video format
+        if item.item_type == 'Video':
+            video_format = creation.video_format.single()
+            if video_format is not None:
+                res['video_format'] = self.getJsonResponse(video_format, max_relationship_depth=0)['attributes']
         # add notes and links
         res["annotations"] = {}
         notes = mdo.annotation.search(annotation_type='DSC', private=False)

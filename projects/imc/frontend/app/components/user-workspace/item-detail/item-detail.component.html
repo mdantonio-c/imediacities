@@ -18,7 +18,9 @@
             (click)="toggleEdit()"><i class="fa fa-edit"></i> Edit</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link click-event p-0" [routerLink]="['/404']" target="_blank">
+          <a class="nav-link click-event p-0 disabled"
+            [attr.href]="getVGalleryURL()"
+            target="_blank">
             <i class="fa fa-cube" aria-hidden="true"></i> Virtual Gallery</a>
         </li>
       </ul>
