@@ -88,9 +88,9 @@ building_mapping['Barcelona_Monument_a_Colom']       = {         # 13
     'city': 'Barcelona'
 }
 building_mapping['Barcelona_Palau_de']               = {         # 14
-    'iri': None,
-    'name': '',
-    'coord': [],
+    'iri': 'ChIJDQeJ-PiipBIRsCvbkn506Ws',
+    'name': 'Palau de la Generalitat de Catalunya',
+    'coord': [41.3828639, 2.1767069],
     'city': 'Barcelona'
 }
 building_mapping['Barcelona_Palau_de_Musica']        = {         # 15
@@ -137,9 +137,9 @@ building_mapping['Brussels_Cathedral_St_Goedele']    = {         # 21
     'city': 'Brussels'
 }
 building_mapping['Brussels_City_Hall']               = {         # 22
-    'iri': '',
-    'name': '',
-    'coord': [],
+    'iri': 'ChIJdaRasnjEw0cRbdRY5kkK554',
+    'name': 'City Hall',
+    'coord': [50.8471734, 4.3519977],
     'city': 'Brussels'
 }
 building_mapping['Brussels_Heizel']                  = {         # 23
