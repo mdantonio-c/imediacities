@@ -13,11 +13,12 @@ export interface ItemDetail {
 	focus?: boolean,
 	listItem?: boolean,
 	listId?: string,
+	nb_items?: number,
 	ref?: any
 }
 
 // expected https://{url}?list={listID}&access_token={token}
-const VIRTUAL_GALLERY_URL: string = "http://130.186.13.31:8000/imc_vg/start_gallery"
+const VIRTUAL_GALLERY_URL: string = "https://imc-vg.hpc.cineca.it/imc_vg/start_gallery"
 
 @Component({
 	selector: 'item-detail',

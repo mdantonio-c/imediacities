@@ -45,14 +45,14 @@
 	</div>
   <div class="card-body">
     <ng-container *ngIf="editable">
-    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} items</h5>
+    <h5 class="card-title" *ngIf="media.nb_items !== undefined">{{media.nb_items}} item(s)</h5>
     <form class="item-edit">
       <input name="title" [(ngModel)]="mediaForm.name" class="mb-1">
       <textarea name="description" [(ngModel)]="mediaForm.description"></textarea>
     </form>
     </ng-container>
     <ng-container *ngIf="!editable">
-    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} items</h5>
+    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} item(s)</h5>
     <h5 class="card-title blue">{{media.title}}</h5>
     <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
     </ng-container>

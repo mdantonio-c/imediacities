@@ -1330,7 +1330,7 @@ input[type="radio"] {
   display: inline-block; }
   .imc--picture img {
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
   }
   .imc--picture svg {
     position: absolute;

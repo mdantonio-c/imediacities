@@ -213,10 +213,12 @@ export class MultiItemCarouselComponent implements OnChanges {
           this.listsService.removeItemfromList(item.id, item.listId).subscribe(
             response => {
               this.notify.showSuccess(`Item <${itemTitle}> removed successfully`);
-              /*this.load();*/
               this.slides = this.slides.filter(s =>  s.id !== item.id);
               this.total = this.slides.length;
               this.onResult.emit(this.total);
+              if (this.total === 0) {
+                this.slickModal.unslick();
+              }
             },
             error => {
               this.notify.extractErrors(error.error.Response, this.notify.ERROR);
@@ -237,13 +239,12 @@ export class MultiItemCarouselComponent implements OnChanges {
             response => {
               this.notify.showSuccess(`List <${itemTitle}> removed successfully`);
               // update the list in the view
-              /*this.slickModal.unslick();*/
-              /*this.load();*/
-              //this.slickModal.removeSlide(???);
               this.slides = this.slides.filter(s =>  s.id !== item.id);
               this.total = this.slides.length;
               this.onResult.emit(this.total);
-
+              if (this.total === 0) {
+                this.slickModal.unslick();
+              }
               // close the related item list if open
               this.onDelete.emit(item.id);
             },
