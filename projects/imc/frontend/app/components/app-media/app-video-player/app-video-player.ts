@@ -190,7 +190,6 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     public jump_to (time_or_frames, um_is_frame = false, pause = false) {
-
         if (pause) {
             this.video.pause();
         }
@@ -203,7 +202,10 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     }
 
     public shot_play(shot_number) {
-        this.jump_to(1 / this.fps * this.shots[shot_number].attributes.start_frame_idx);
+        // jump by time (?) 
+        //this.jump_to(1 / this.fps * this.shots[shot_number].attributes.start_frame_idx);
+        // always jump by frame
+        this.jump_to(this.shots[shot_number].attributes.start_frame_idx, true);
     }
 
     public segment_play (segment) {
