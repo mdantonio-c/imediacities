@@ -197,7 +197,6 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         if (um_is_frame) {
             time_or_frames =  this.frame_to_time(time_or_frames);
         }
-
         this.video.currentTime = time_or_frames;
     }
 
@@ -255,7 +254,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
         //return (frame * this.frame_length) + 0.001;
 
         // this seems to work better
-        return (frame+.6) * this.frame_length;
+        return (Number(frame)+.6) * this.frame_length;
     }
 
     /**
