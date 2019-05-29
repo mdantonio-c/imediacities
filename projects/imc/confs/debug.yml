@@ -38,7 +38,3 @@ services:
   ftp:
     environment:
       PUBLICHOST: localhost
-
-  swaggerui:
-    ports:
-      - 7777:80
