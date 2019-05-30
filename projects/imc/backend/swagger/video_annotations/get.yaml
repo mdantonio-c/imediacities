@@ -9,6 +9,7 @@ video_annotations:
       enum:
         - TAG
         - DSC
+        - TVS
     - name: onlyManual
       in: query
       type: boolean
