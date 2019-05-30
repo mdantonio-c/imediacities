@@ -544,7 +544,7 @@ class ListItems(GraphBaseOperations):
                 res["description"] = desc.text
             # override with english text
             if desc.language and desc.language == 'en':
-                res["title"] = desc.text
+                res["description"] = desc.text
         # add contributor
         for agent in creation.contributors.all():
             rel = creation.contributors.relationship(agent)
