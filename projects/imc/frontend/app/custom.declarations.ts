@@ -193,7 +193,7 @@ export const providers: any[] = [
 
 export const imports: any[] = [
   HttpClientJsonpModule,
-  NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
+  NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
   HolderJsModule,
   IonRangeSliderModule,
   SlickCarouselModule

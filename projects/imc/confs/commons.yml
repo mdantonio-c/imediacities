@@ -3,8 +3,8 @@ version: '3'
 
 services:
   backend:
-    # build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
-    # image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
+    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
@@ -129,3 +129,5 @@ services:
     environment:
       ALLOW_PASSWORD_RESET: "true"
       ALLOW_REGISTRATION: "true"
+      INJECT_GMAP_KEY: ${GMAP_KEY}
+      INJECT_VIRTUAL_GALLERY_URL: ${VIRTUAL_GALLERY_URL}

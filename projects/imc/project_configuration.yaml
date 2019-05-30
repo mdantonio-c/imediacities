@@ -10,6 +10,10 @@ variables:
     framework: angular
 
   env:
+
+    GMAP_KEY: "AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI"
+    VIRTUAL_GALLERY_URL: "https://imc-vg.hpc.cineca.it/imc_vg/start_gallery"
+
     LETSENCRYPT_MODE: 
   
     ACTIVATE_FTP: 1
