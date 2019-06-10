@@ -38,7 +38,8 @@ export class UploadComponent extends BasePaginationComponent {
 		protected formly: FormlyService,
 		) {
 
-		super("group", api, auth, notify, modalService, formly);
+		super(api, auth, notify, modalService, formly);
+		this.init("group");
 
 		this.server_side_pagination = true;
 		this.endpoint = 'stage';

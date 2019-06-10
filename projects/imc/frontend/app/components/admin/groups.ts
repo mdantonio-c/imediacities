@@ -31,7 +31,8 @@ export class AdminGroupsComponent extends BasePaginationComponent {
 		protected formly: FormlyService,
 		) {
 
-		super("group", api, auth, notify, modalService, formly);
+		super(api, auth, notify, modalService, formly);
+		this.init("group");
 
 		this.list();
 		this.initPaging(20);
