@@ -211,10 +211,23 @@ const routes: Routes = [
     AutoFocusDirective,
 
     FileSelectDirective, FileDropDirective
-
   ],
 
   providers: [
+    CatalogService,
+    MediaUtilsService,
+    LocalStorageService,
+    AppAnnotationsService,
+    AppLodService,
+    ShotRevisionService,
+    ListsService,
+    AppMediaService,
+    AppModaleService,
+    AppShotsService,
+    AppVocabularyService,
+    AppVideoService,
+    AppVideoControlsFastPlayService,
+    ProviderToCityPipe
   ],
 
   entryComponents: [
