@@ -55,7 +55,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	@Input() filter: SearchFilter;
 	@Output() onMapChange: EventEmitter<any> = new EventEmitter<string>();
 
-	map;
+	public map;
 	private zoom;
 	private center;
 	private reloading: boolean = false;
