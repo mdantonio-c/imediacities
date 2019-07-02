@@ -1,3 +1,9 @@
+import { NgModule, ModuleWithProviders } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { RapydoModule } from '/rapydo/src/app/rapydo.module';
+import { AuthGuard } from '/rapydo/src/app/app.auth.guard';
+
 import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
@@ -5,8 +11,6 @@ import { IonRangeSliderModule } from "ng2-ion-range-slider";
 import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 
-import { CustomNavbarComponent } from './custom.navbar';
-import { CustomBrandComponent } from './custom.navbar';
 import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
 import { AdminGroupsComponent } from './components/admin/groups';
@@ -41,9 +45,9 @@ import {AppMediaInfoComponent} from "./components/app-media/app-media-info/app-m
 import {AppMediaTagsComponent} from "./components/app-media/app-media-tags/app-media-tags";
 
 import {AppVideoPlayerComponent} from "./components/app-media/app-video-player/app-video-player";
-import {AppVideoControlPlayComponent} from 		"./components/app-media/app-video-controls/app-video-control-play/app-video-control-play";
+import {AppVideoControlPlayComponent} from     "./components/app-media/app-video-controls/app-video-control-play/app-video-control-play";
 import {AppVideoControlGotoStartComponent} from "./components/app-media/app-video-controls/app-video-control-goto-start/app-video-control-goto-start";
-import {AppVideoControlGotoEndComponent} from 	"./components/app-media/app-video-controls/app-video-control-goto-end/app-video-control-goto-end";
+import {AppVideoControlGotoEndComponent} from   "./components/app-media/app-video-controls/app-video-control-goto-end/app-video-control-goto-end";
 import {AppVideoControlProgressBarComponent} from "./components/app-media/app-video-controls/app-video-control-progress-bar/app-video-control-progress-bar";
 import {AppVideoControlFforwardComponent} from "./components/app-media/app-video-controls/app-video-control-fforward/app-video-control-fforward";
 import {AppVideoControlFrewindComponent} from "./components/app-media/app-video-controls/app-video-control-frewind/app-video-control-frewind";
@@ -95,15 +99,68 @@ import {AppLodService} from "./services/app-lod";
 import {ShotRevisionService} from "./services/shot-revision.service";
 import {ListsService} from "./services/lists.service";
 
-export const declarations: any[] = [
-	CustomNavbarComponent, CustomBrandComponent,
+
+const routes: Routes = [
+  {
+    path: 'app/admin/archives',
+    component: ArchivesListComponent,
+    canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always',
+    data: { roles: ['admin_root'] }
+  },
+  {
+    path: 'app/admin/groups',
+    component: AdminGroupsComponent,
+    canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always',
+    data: { roles: ['admin_root'] }
+  },
+  {
+    path: 'app/upload',
+    component: UploadComponent,
+    canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always',
+    data: { roles: ['Archive'] }
+  },
+  {
+    path: 'app/myWorkspace',
+    component: UserWorkspaceComponent,
+    canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always',
+    data: { roles: ['Researcher'] }
+  },
+  // { path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+  { path: 'app/catalog', component: CatalogComponent },
+
+  // { path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+  { path: 'app/catalog/images/:uuid', component: AppMediaComponent },
+
+  // { path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
+  { path: 'app/catalog/videos/:uuid', component: AppMediaComponent },
+
+  { path: 'app', redirectTo: '/app/catalog', pathMatch: 'full' },
+  { path: '', redirectTo: '/app/catalog', pathMatch: 'full' }
+
+];
+
+@NgModule({
+  imports: [
+    RapydoModule,
+    RouterModule.forChild(routes),
+    HttpClientJsonpModule,
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
+    HolderJsModule,
+    IonRangeSliderModule,
+    SlickCarouselModule
+  ],
+  declarations: [
     ArchivesListComponent, ArchiveComponent,
-	AdminGroupsComponent,
+    AdminGroupsComponent,
     UploadComponent,
     UserWorkspaceComponent,
     MultiItemCarouselComponent,
     ItemDetailComponent,
-	CatalogComponent,
+    CatalogComponent,
     SearchFilterComponent,
     SliderRangeComponent,
     SearchNavbarComponent,
@@ -112,53 +169,56 @@ export const declarations: any[] = [
     SearchMapComponent,
     SearchTimelineComponent,
     SearchMediaTagComponent,
-	ProviderToCityPipe,
-	NoCommaPipe,
-	DurationPipe,
+    ProviderToCityPipe,
+    NoCommaPipe,
+    DurationPipe,
     SecondsToTimePipe,
-	AppExpansionPanelComponent,
-	AppInfoComponent,
-	AppModaleComponent,
-	AppMediaComponent,
+    AppExpansionPanelComponent,
+    AppInfoComponent,
+    AppModaleComponent,
+    AppMediaComponent,
     AppMediaTopBarComponent,
     AppAddToListComponent,
-	AppPictureComponent,
-	AppShotReferenceComponent,
-	AppVideoTagComponent,
-	AppVideoShotComponent,
+    AppPictureComponent,
+    AppShotReferenceComponent,
+    AppVideoTagComponent,
+    AppVideoShotComponent,
     AppMediaModal,
-	AppMediaAnnotationComponent,
-	AppMediaCommentiComponent,
-	AppMediaMapComponent,
-	AppMediaMapWrapperComponent,
-	AppMediaRelatedItemsComponent,
-	AppModalAllAnnotationsComponent,
-	AppModalInsertGeotagComponent,
-	AppModalInsertLinkComponent,
-	AppModalInsertNoteComponent,
-	AppModalInsertReferenceComponent,
+    AppMediaAnnotationComponent,
+    AppMediaCommentiComponent,
+    AppMediaMapComponent,
+    AppMediaMapWrapperComponent,
+    AppMediaRelatedItemsComponent,
+    AppModalAllAnnotationsComponent,
+    AppModalInsertGeotagComponent,
+    AppModalInsertLinkComponent,
+    AppModalInsertNoteComponent,
+    AppModalInsertReferenceComponent,
     AppModalMoveCutComponent,
     AppModalInsertTermtagComponent,
-	AppModalListaShotsComponent,
-	AppMediaInfoComponent,
-	AppMediaTagsComponent,
-	AppNoteComponent,
+    AppModalListaShotsComponent,
+    AppMediaInfoComponent,
+    AppMediaTagsComponent,
+    AppNoteComponent,
     AppReferenceComponent,
     AppLinkComponent,
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,
     DropdownPositionDirective,
-	InputNumericDirective,
-	InputSelectDirective,
+    InputNumericDirective,
+    InputSelectDirective,
     AutoFocusDirective,
 
     FileSelectDirective, FileDropDirective
 
-];
+  ],
 
-export const entryComponents: any[] = [
-	CatalogComponent,
+  providers: [
+  ],
+
+  entryComponents: [
+    CatalogComponent,
     SearchFilterComponent,
     SearchNavbarComponent,
     SearchThumbnailComponent,
@@ -172,29 +232,33 @@ export const entryComponents: any[] = [
     AppModalInsertLinkComponent,
     AppModalInsertReferenceComponent,
     AppModalMoveCutComponent,
-];
+  ],
+  exports: [
+    RouterModule
+  ]
 
-export const providers: any[] = [
-    CatalogService,
-    MediaUtilsService,
-    LocalStorageService,
-    AppAnnotationsService,
-    AppLodService,
-    ShotRevisionService,
-    ListsService,
-    AppMediaService,
-    AppModaleService,
-    AppShotsService,
-    AppVocabularyService,
-    AppVideoService,
-    AppVideoControlsFastPlayService,
-    ProviderToCityPipe
-];
+})
+export class CustomModule {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: CustomModule,
+      providers: [
+        CatalogService,
+        MediaUtilsService,
+        LocalStorageService,
+        AppAnnotationsService,
+        AppLodService,
+        ShotRevisionService,
+        ListsService,
+        AppMediaService,
+        AppModaleService,
+        AppShotsService,
+        AppVocabularyService,
+        AppVideoService,
+        AppVideoControlsFastPlayService,
+        ProviderToCityPipe
+      ],
+    };
+  }
+} 
 
-export const imports: any[] = [
-  HttpClientJsonpModule,
-  NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
-  HolderJsModule,
-  IonRangeSliderModule,
-  SlickCarouselModule
-];
