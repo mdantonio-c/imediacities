@@ -67,7 +67,7 @@ import {AppModaleComponent} from "./components/app-modale/app-modale";
 import {AppMediaModal} from "./components/app-media/app-media-modals/app-media-modal";
 import {NoCommaPipe} from "./pipes/NoComma";
 import {AppModalListaShotsComponent} from "./components/app-media/app-media-modals/app-modal-lista-shots/app-modal-lista-shots";
-import {DropdownPositionDirective} from "./directives/dropdow-reposition";
+// import {DropdownPositionDirective} from "./directives/dropdow-reposition";
 import {AppVideoControlFpsComponent} from "./components/app-media/app-video-controls/app-video-control-fps/app-video-control-fps";
 import {AppVideoControlSwitchComponent} from "./components/app-media/app-video-controls/app-video-control-switch/app-video-control-switch";
 import {appVideoControlsDeclarations as VideoControlsDeclarations} from "./components/app-media/app-video-controls/app-video-controls-declarations";
@@ -205,7 +205,7 @@ const routes: Routes = [
     AppVideoPlayerComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,
-    DropdownPositionDirective,
+//    DropdownPositionDirective,
     InputNumericDirective,
     InputSelectDirective,
     AutoFocusDirective,
