@@ -12,7 +12,7 @@ export class AppModalTagCloudComponent implements OnInit, OnChanges, OnDestroy {
     @Input() data;
     @Input() media_type: string;
 
-    @ViewChild('p') p;
+    @ViewChild('p', { static: false }) p;
 
     constructor(private ShotsService: AppShotsService) {}
 

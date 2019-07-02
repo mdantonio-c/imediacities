@@ -16,7 +16,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
     @Output() video_player_ready: EventEmitter<any> = new EventEmitter<any>();
 
-    @ViewChild('videoPlayer') videoPlayer: ElementRef;
+    @ViewChild('videoPlayer', { static: false }) videoPlayer: ElementRef;
 
     advanced_show = false;
 

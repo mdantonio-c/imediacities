@@ -8,7 +8,7 @@ import {AppVideoControlComponent} from "../app-video-control";
 
 export class AppVideoControlTimerangeComponent extends AppVideoControlComponent {
 
-    @ViewChild('timeranges') timeranges: ElementRef;
+    @ViewChild('timeranges', { static: false }) timeranges: ElementRef;
 
     constructor() {
         super();

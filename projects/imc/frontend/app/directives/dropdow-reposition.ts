@@ -16,8 +16,8 @@ import {Subscription} from 'rxjs/Subscription';
 })
 export class DropdownPositionDirective implements AfterContentInit, OnDestroy {
 
-    @ContentChild(NgbDropdownMenu) private menu: NgbDropdownMenu;
-    @ContentChild(NgbDropdownMenu, {read: ElementRef}) private menuRef: ElementRef;
+    @ContentChild(NgbDropdownMenu, { static: false }) private menu: NgbDropdownMenu;
+    @ContentChild(NgbDropdownMenu, {read: ElementRef, static: false }) private menuRef: ElementRef;
 
 
     private oldParent: HTMLElement | null;

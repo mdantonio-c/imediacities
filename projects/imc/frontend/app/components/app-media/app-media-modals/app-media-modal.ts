@@ -14,7 +14,7 @@ export class AppMediaModal implements OnInit, OnChanges, AfterViewInit, OnDestro
     @Input() data: any;
     @Input() media_type: string;
     @Input() revision: boolean = false;
-    @ViewChild('videoPlayer') videoPlayer: AppVideoPlayerComponent;
+    @ViewChild('videoPlayer', { static: false }) videoPlayer: AppVideoPlayerComponent;
 
     public mediaData = null;
     public shots = null;

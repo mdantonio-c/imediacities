@@ -8,7 +8,7 @@ import {AppVideoControlComponent} from "../app-video-control";
 
 export class AppVideoControlFpsComponent extends AppVideoControlComponent implements AfterViewInit {
 
-    @ViewChild('fps') fps: ElementRef;
+    @ViewChild('fps', { static: false }) fps: ElementRef;
 
     constructor() {
         super();

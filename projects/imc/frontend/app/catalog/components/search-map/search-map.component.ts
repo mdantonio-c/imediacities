@@ -68,9 +68,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
 	counters = [];
 	autocomplete: any;
 
-	@ViewChild(NguiMapComponent) private ngMap: NguiMapComponent;
-	@ViewChild('customControl') private customControl: ElementRef;
-	@ViewChild('placeControl') private placeControl: ElementRef;
+	@ViewChild(NguiMapComponent, { static: false }) private ngMap: NguiMapComponent;
+	@ViewChild('customControl', { static: false }) private customControl: ElementRef;
+	@ViewChild('placeControl', { static: false }) private placeControl: ElementRef;
 
 	/*marker: GeoMarker = {
 		iri: null,

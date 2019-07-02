@@ -16,10 +16,10 @@ import { BasePaginationComponent } from '/rapydo/src/app/components/base.paginat
 })
 export class AdminGroupsComponent extends BasePaginationComponent {
 
-	@ViewChild('dataCoordinator') public dataCoordinator: TemplateRef<any>;
-	@ViewChild('controlsCell') public controlsCell: TemplateRef<any>;
-	@ViewChild('emptyHeader') public emptyHeader: TemplateRef<any>;
-	@ViewChild('formModal') public formModal: TemplateRef<any>;
+	@ViewChild('dataCoordinator', { static: false }) public dataCoordinator: TemplateRef<any>;
+	@ViewChild('controlsCell', { static: false }) public controlsCell: TemplateRef<any>;
+	@ViewChild('emptyHeader', { static: false }) public emptyHeader: TemplateRef<any>;
+	@ViewChild('formModal', { static: false }) public formModal: TemplateRef<any>;
 
 	protected endpoint = 'admin/groups'
 
@@ -38,7 +38,8 @@ export class AdminGroupsComponent extends BasePaginationComponent {
 		this.initPaging(20);
 	}
 
-	public ngOnInit(): void {
+	public ngOnInit(): void { }
+	public ngAfterViewInit(): void {
 
 		this.columns = [
 	        {name: 'Shortname', prop: "shortname", flexGrow: 0.5},

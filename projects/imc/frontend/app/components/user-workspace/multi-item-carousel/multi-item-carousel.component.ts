@@ -20,9 +20,9 @@ export class MultiItemCarouselComponent implements OnChanges {
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
   @Output() onDelete: EventEmitter<string> = new EventEmitter<string>();
 
-  @ViewChild('slickModal') slickModal;
-  @ViewChild('confirmModal') confirmModal;
-  @ViewChild('itemConfirmModal') itemConfirmModal;
+  @ViewChild('slickModal', { static: false }) slickModal;
+  @ViewChild('confirmModal', { static: false }) confirmModal;
+  @ViewChild('itemConfirmModal', { static: false }) itemConfirmModal;
 
   slides: ItemDetail[] = [];
   loading = false;

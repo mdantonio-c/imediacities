@@ -36,7 +36,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
     links_all: IMC_Annotation[] = [];
     private _current_user;
 
-    @ViewChild(AppMediaModal) modal: AppMediaModal;
+    @ViewChild(AppMediaModal, { static: false }) modal: AppMediaModal;
 
     constructor(
         private AnnotationsService: AppAnnotationsService,

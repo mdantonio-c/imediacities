@@ -22,11 +22,11 @@ import { BasePaginationComponent } from '/rapydo/src/app/components/base.paginat
 })
 export class UploadComponent extends BasePaginationComponent {
 
-	@ViewChild('dataSize') public dataSize: TemplateRef<any>;
-	@ViewChild('dataUploadData') public dataUploadData: TemplateRef<any>;
-	@ViewChild('dataStatus') public dataStatus: TemplateRef<any>;
-	@ViewChild('controlsCell') public controlsCell: TemplateRef<any>;
-	@ViewChild('emptyHeader') public emptyHeader: TemplateRef<any>;
+	@ViewChild('dataSize', { static: false }) public dataSize: TemplateRef<any>;
+	@ViewChild('dataUploadData', { static: false }) public dataUploadData: TemplateRef<any>;
+	@ViewChild('dataStatus', { static: false }) public dataStatus: TemplateRef<any>;
+	@ViewChild('controlsCell', { static: false }) public controlsCell: TemplateRef<any>;
+	@ViewChild('emptyHeader', { static: false }) public emptyHeader: TemplateRef<any>;
 	public uploader:FileUploader;
 	public hasDropZoneOver:boolean = false;
  
@@ -87,7 +87,8 @@ export class UploadComponent extends BasePaginationComponent {
 		}
 	}
 
-	public ngOnInit(): void {
+	public ngOnInit(): void { }
+	public ngAfterViewInit(): void {
 
 		this.columns = [
 	        {name: 'Filename', prop: "name", flexGrow: 2},

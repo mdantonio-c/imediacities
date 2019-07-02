@@ -9,9 +9,9 @@ import { AuthService } from '/rapydo/src/app/services/auth';
 export class AppPictureComponent implements OnInit, AfterViewInit {
 
     @Input() data;
-    @ViewChild ('picture') picture: ElementRef;
-    @ViewChild ('maschera') maschera: ElementRef;
-    @ViewChild ('mouse_track') mouse_track: ElementRef;
+    @ViewChild('picture', { static: false }) picture: ElementRef;
+    @ViewChild('maschera', { static: false }) maschera: ElementRef;
+    @ViewChild('mouse_track', { static: false }) mouse_track: ElementRef;
 
     private rect = {
         origin: null,

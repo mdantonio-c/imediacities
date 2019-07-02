@@ -8,7 +8,7 @@ import {AppVideoControlComponent} from "../app-video-control";
 
 export class AppVideoControlProgressBarComponent extends AppVideoControlComponent {
 
-    @ViewChild('progress') progress: ElementRef;
+    @ViewChild('progress', { static: false }) progress: ElementRef;
 
     constructor() {
         super();

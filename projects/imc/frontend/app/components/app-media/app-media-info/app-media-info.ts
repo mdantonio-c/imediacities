@@ -12,8 +12,8 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
 
     @Input() info: any;
     @Input() user_language: any;
-    @ViewChild('description_languages_selector') description_languages_selector: ElementRef;
-    @ViewChild('keyword_languages_selector') keyword_languages_selector: ElementRef;
+    @ViewChild('description_languages_selector', { static: false }) description_languages_selector: ElementRef;
+    @ViewChild('keyword_languages_selector', { static: false }) keyword_languages_selector: ElementRef;
 
     @is_item_owner() is_item_owner;
 

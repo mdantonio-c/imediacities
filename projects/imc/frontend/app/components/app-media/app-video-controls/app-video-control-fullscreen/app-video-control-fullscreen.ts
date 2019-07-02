@@ -9,8 +9,8 @@ import {AppVideoPlayerComponent} from "../../app-video-player/app-video-player";
 
 export class AppVideoControlFullscreenComponent extends AppVideoControlComponent implements AfterViewInit {
 
-    @ViewChild('fullscreen_on') fullscreen_on: ElementRef;
-    @ViewChild('fullscreen_off') fullscreen_off: ElementRef;
+    @ViewChild('fullscreen_on', { static: false }) fullscreen_on: ElementRef;
+    @ViewChild('fullscreen_off', { static: false }) fullscreen_off: ElementRef;
     @Output() fullscreen: EventEmitter<any> = new EventEmitter();
 
     fullscreen_stato = 'off';

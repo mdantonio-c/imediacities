@@ -19,16 +19,14 @@ import { NotificationService } from '/rapydo/src/app/services/notification';
 })
 export class AppMediaComponent implements OnInit, OnDestroy {
 
-    //Riferimento alla pagina contenente il media
-    // @ViewChild('pageMedia') pageMedia: ElementRef;
     /**
      * Riferimento al componente AppModale
      */
-    @ViewChild('appModale') appModale: AppModaleComponent;
+    @ViewChild('appModale', { static: false }) appModale: AppModaleComponent;
     /**
      * Riferimento al componente AppVideoPlayer
      */
-    @ViewChild('appVideo') appVideo: AppVideoPlayerComponent;
+    @ViewChild('appVideo', { static: false }) appVideo: AppVideoPlayerComponent;
     /**
      * Conteggio annotazioni
      * @type {number}

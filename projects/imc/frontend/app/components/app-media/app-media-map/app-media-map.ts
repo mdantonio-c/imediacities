@@ -24,7 +24,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     @Input() clickable_markers;
     @Input() media_type;
 
-    @ViewChild(NguiMapComponent) ngMap: NguiMapComponent;
+    @ViewChild(NguiMapComponent, { static: false }) ngMap: NguiMapComponent;
 
     @is_annotation_owner() is_annotation_owner;
 

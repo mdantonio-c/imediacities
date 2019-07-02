@@ -17,7 +17,7 @@ export class AppModalInsertGeotagComponent implements  OnInit, OnChanges{
     @Input() data;
     @Input() media_type: string;
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
-    @ViewChild('map') mappa: AppMediaMapComponent;
+    @ViewChild('map', { static: false }) mappa: AppMediaMapComponent;
     @infoResult() save_result;
     @infoResult() add_geotag;
 

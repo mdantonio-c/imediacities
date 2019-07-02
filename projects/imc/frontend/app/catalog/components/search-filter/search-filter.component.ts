@@ -30,7 +30,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
-  @ViewChild('rangeSlider') rangeSliderEl: IonRangeSliderComponent;
+  @ViewChild('rangeSlider', { static: false }) rangeSliderEl: IonRangeSliderComponent;
 
   constructor(
     private formBuilder: FormBuilder,

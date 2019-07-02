@@ -8,7 +8,7 @@ import { AppModaleService } from "../../services/app-modale";
 
 export class AppModaleComponent implements OnInit {
 
-    @ViewChild('content') content;
+    @ViewChild('content', { static: false }) content;
 
     public titolo = '';
 

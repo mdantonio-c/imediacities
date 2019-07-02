@@ -8,13 +8,13 @@ import {AppVideoControlComponent} from "../app-video-control";
 
 export class AppVideoControlVolumeComponent extends AppVideoControlComponent implements AfterViewInit{
 
-    @ViewChild('ico_off') ico_off: ElementRef;
-    @ViewChild('ico_mute') ico_mute: ElementRef;
-    @ViewChild('ico_down') ico_down: ElementRef;
-    @ViewChild('ico_up') ico_up: ElementRef;
-    @ViewChild('volume') volume: ElementRef;
-    @ViewChild('volume_slider') volume_slider: ElementRef;
-    @ViewChild('volume_gutter') volume_gutter: ElementRef;
+    @ViewChild('ico_off', { static: false }) ico_off: ElementRef;
+    @ViewChild('ico_mute', { static: false }) ico_mute: ElementRef;
+    @ViewChild('ico_down', { static: false }) ico_down: ElementRef;
+    @ViewChild('ico_up', { static: false }) ico_up: ElementRef;
+    @ViewChild('volume', { static: false }) volume: ElementRef;
+    @ViewChild('volume_slider', { static: false }) volume_slider: ElementRef;
+    @ViewChild('volume_gutter', { static: false }) volume_gutter: ElementRef;
 
     private volume_level = 'off';
     private volume_last_value = 0;

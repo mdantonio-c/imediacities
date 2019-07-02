@@ -12,9 +12,9 @@ import { NotificationService} from '/rapydo/src/app/services/notification';
 export class ArchiveComponent implements OnInit { 
 
 	@Input() private group: any;
-	@ViewChild('dataSize') public dataSize: TemplateRef<any>;
-	@ViewChild('dataModification') public dataModification: TemplateRef<any>;
-	@ViewChild('dataStatus') public dataStatus: TemplateRef<any>;
+	@ViewChild('dataSize', { static: false }) public dataSize: TemplateRef<any>;
+	@ViewChild('dataModification', { static: false }) public dataModification: TemplateRef<any>;
+	@ViewChild('dataStatus', { static: false }) public dataStatus: TemplateRef<any>;
 
 	private loading:boolean = false;
 	private data: Array<any> = [];
@@ -30,6 +30,8 @@ export class ArchiveComponent implements OnInit {
 	public ngOnInit(): void {
 
 		this.list();
+	}
+	public ngAfterViewInit(): void {
 
 		this.columns = [
 	        {name: 'Filename', prop: "name"},

@@ -9,8 +9,8 @@ import {AppVideoControlFieldComponent} from "../app-video-control-field/app-vide
 
 export class AppVideoControlRangeComponent extends AppVideoControlComponent{
 
-    @ViewChild('from') from: AppVideoControlFieldComponent;
-    @ViewChild('to') to: AppVideoControlFieldComponent;
+    @ViewChild('from', { static: false }) from: AppVideoControlFieldComponent;
+    @ViewChild('to', { static: false }) to: AppVideoControlFieldComponent;
 
     constructor() {
         super()

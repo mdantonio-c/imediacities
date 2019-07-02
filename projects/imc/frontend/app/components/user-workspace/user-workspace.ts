@@ -38,15 +38,15 @@ export class UserWorkspaceComponent implements OnInit {
 	/**
      * Reference to NgbDropdown component for creating a new user list
      */
-	@ViewChild('newListDrop') listDropdown: NgbDropdown;
+	@ViewChild('newListDrop', { static: false }) listDropdown: NgbDropdown;
 	/**
      * Reference to my list
      */
-	@ViewChild('mylists') myListsComp: MultiItemCarouselComponent;
+	@ViewChild('mylists', { static: false }) myListsComp: MultiItemCarouselComponent;
     /**
      * Reference to the list of items
      */
-    @ViewChild('listItems') listItemsComp: MultiItemCarouselComponent;
+    @ViewChild('listItems', { static: false }) listItemsComp: MultiItemCarouselComponent;
 
 	constructor(
         private authService: AuthService,

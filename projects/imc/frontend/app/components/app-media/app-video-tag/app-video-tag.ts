@@ -10,8 +10,8 @@ import { AppShotsService } from "../../../services/app-shots";
 export class AppVideoTagComponent extends AppVideoControlComponent implements AfterViewInit, DoCheck {
 
     @Input() data;
-    @ViewChild('termtag_slider') termtag_slider: ElementRef;
-    @ViewChild('geotag_slider') geotag_slider: ElementRef;
+    @ViewChild('termtag_slider', { static: false }) termtag_slider: ElementRef;
+    @ViewChild('geotag_slider', { static: false }) geotag_slider: ElementRef;
     @Output() scena_visualizza: EventEmitter<any> = new EventEmitter();
     @Output() modale_richiedi: EventEmitter<any> = new EventEmitter();
 

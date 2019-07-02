@@ -20,7 +20,7 @@ export class AppModalMoveCutComponent implements AfterViewInit, OnChanges, OnDes
 	private fps;
 	private split = false;
 
-	@ViewChild(AppMediaModal) modal: AppMediaModal;
+	@ViewChild(AppMediaModal, { static: false }) modal: AppMediaModal;
 
 	constructor(
 		private shotRevisionService: ShotRevisionService,

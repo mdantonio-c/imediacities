@@ -17,7 +17,7 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
 
     @Input() data: any;
     @Input() media_type: string;
-    @ViewChild('p') p;
+    @ViewChild('p', { static: false }) p;
 
     @infoResult() save_result;
     @infoResult() add_tag;
@@ -46,7 +46,7 @@ export class AppModalInsertTermtagComponent implements OnInit, OnChanges, AfterV
 
     private subject: Subject<string> = new Subject();
 
-    @ViewChild('search_field') search_field: ElementRef;
+    @ViewChild('search_field', { static: false }) search_field: ElementRef;
 
     @Output() shots_update: EventEmitter<any> = new EventEmitter();
 
