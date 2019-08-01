@@ -13,9 +13,7 @@
 						[loading]=loading
 						[totalItems]=totalItems
 						(onViewChange)="changeView($event)"></search-navbar>
-						<div class="loader col" *ngIf="loading" style="text-align: center">
-							<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
-						</div>
+						<div class="loader col" *ngIf="loading"></div>
 						<!-- no results -->
 						<div class="row" *ngIf="!loading && totalItems == 0">
 							<div class="col">
@@ -71,9 +69,7 @@
 									</div>
 								</div>
 								<div class="row" *ngIf="currentView == 'Map'">
-									<div class="col-12 loader" *ngIf="loadingMapResults" style="text-align: center">
-										<i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
-									</div>
+									<div class="col-12 loader" *ngIf="loadingMapResults"></div>
 									<div class="col" *ngIf="!loadingMapResults">
 										<!-- PUT HERE results from map filter -->
 										<div class="row">
