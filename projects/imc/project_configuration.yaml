@@ -11,9 +11,6 @@ variables:
 
   env:
 
-    GMAP_KEY: "AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI"
-    VIRTUAL_GALLERY_URL: "https://imc-vg.hpc.cineca.it/imc_vg/start_gallery"
-
     LETSENCRYPT_MODE: 
   
     ACTIVATE_FTP: 1
@@ -24,18 +21,19 @@ variables:
 
     ALLOW_ACCESS_TOKEN_PARAMETER: True
 
-    GRAPHDB_PASSWORD: chooseapassword
+    GRAPHDB_PASSWORD: "**PLACEHOLDER**"
+    GMAP_KEY: "**PLACEHOLDER**"
+    VIRTUAL_GALLERY_URL: "**PLACEHOLDER**"
+    SMTP_ADMIN: "**PLACEHOLDER**"
+    SMTP_NOREPLY: "**PLACEHOLDER**"
+    SMTP_HOST: "**PLACEHOLDER**"
+    SMTP_PORT: "**PLACEHOLDER**"
+    SMTP_USERNAME: "**PLACEHOLDER**"
+    SMTP_PASSWORD: "**PLACEHOLDER**"
 
     CELERY_BACKEND: MONGODB
     CELERY_BACKEND_HOST: mongo.dockerized.io
     CELERY_BACKEND_PORT: 27017
-
-    SMTP_ADMIN: m.dantonio@cineca.it
-    SMTP_NOREPLY: I-Media-Cities@cinematek.be
-    SMTP_HOST: mail.cineca.it
-    SMTP_PORT: 587
-    SMTP_USERNAME: hpc-service-noreply@cineca.it
-    SMTP_PASSWORD: dnt%01u
 
   backend:
     credentials:
