@@ -63,7 +63,7 @@ class Initializer(object):
             log.warning("Admin role does not exist")
 
         if (len(Group.nodes) > 0):
-            log.info("Found one ore more groups already defined")
+            log.info("Found one or more already defined groups")
         else:
             log.warning("No group defined")
             group = Group()
