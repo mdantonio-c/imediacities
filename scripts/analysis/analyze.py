@@ -15,15 +15,8 @@ os.umask(int('007', 8))
 
 TRANSCODED_FRAMERATE = 24  # now used as a default
 
-if getpass.getuser() == 'simboden':
-    host = 'sil_pc'
-else:
-    host = 'imc_vm'
-
-if host == 'sil_pc':
-    root_dir = '/home/simboden/Desktop/IMC/sb_update/'
-else:
-    root_dir = '/'
+host = 'imc_vm'
+root_dir = '/'
 
 stage_area     = root_dir + 'uploads'
 analize_area   = root_dir + 'uploads/Analize'
@@ -32,11 +25,7 @@ idmt_bin       = root_dir + 'imedia-pipeline/tools'
 idmt_scripts   = root_dir + 'imedia-pipeline/scripts'
 idmt_py        = root_dir + 'imedia-pipeline/scripts/idmt'
 
-# default_media   = '15b54855-49c8-437c-9ad3-9226695d2fb4/Grande_Manifestazione_Patriottica.mp4'
-# default_media   = '774688ec-dc09-4b38-90b6-9991e375d710/vivere_a_bologna.mov'
 default_media     = '00000000-0000-0000-00000000000000000/test_00.avi'
-# default_media   = '00000000-0000-0000-00000000000000000/test_01.jpg'
-# default_media   = 'ac8/DFI_BOLIG_SANERINGSFILM_DFI86299.mp4'
 default_filename  = os.path.join(stage_area, default_media)
 default_mediatype = 'Video'  # 'Image'
 default_uuid      = '000'

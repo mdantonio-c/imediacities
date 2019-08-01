@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import http.client
+import os
+# import http.client
 from urllib.parse import urlencode
 import requests
 # import json
@@ -12,7 +13,8 @@ graph = get_debug_instance(NeoModel)
 
 log = get_logger(__name__)
 
-GOOGLE_API_KEY = 'AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'
+
+GOOGLE_API_KEY = os.environ.get('GMAP_KEY')
 GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com/maps/api/place/details/json'
 
 results = graph.cypher("MATCH (n:ResourceBody) WHERE n.spatial IS NOT NULL RETURN n")
