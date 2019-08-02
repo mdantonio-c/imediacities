@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, OnChanges, Injector } from '@angular/core';
+import {  } from '@angular/core';
 import { Router } from '@angular/router';
 import { MediaUtilsService } from '../services/media-utils.service'
 import { AuthService } from "/rapydo/src/app/services/auth";
@@ -10,25 +11,19 @@ import { AuthService } from "/rapydo/src/app/services/auth";
 export class SearchResultComponent implements OnInit, OnChanges {
 	@Input() media;
 
-	private authService: AuthService;
-
 	identifyingTitle: string;
 	description: string;
 	private user: any;
 
-	constructor(private router: Router, private injector: Injector) {
+	constructor(private authService: AuthService, private router: Router) {
 		console.log("SearchResultComponent.constructor")
-		console.log(this.injector);
-		this.authService = this.injector.get(AuthService);
+		console.log(authService);
 		console.log(this.authService);
 	}
 
-	ngOnInit() {}
-    ngAfterViewInit() {
-		console.log("SearchResultComponent.ngAfterViewInit")
-    	console.log(this.authService);
-        this.user = this.authService.getUser();
-    }
+	ngOnInit() {
+		this.user = this.authService.getUser();
+	}
 
 	ngOnChanges() {
 		this.identifyingTitle = MediaUtilsService.getIdentifyingTitle(this.media);
