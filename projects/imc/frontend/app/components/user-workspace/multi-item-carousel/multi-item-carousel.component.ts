@@ -105,7 +105,12 @@ export class MultiItemCarouselComponent implements OnChanges {
 
   close() {
     this.slides = [];
-    this.slickModal.unslick();
+
+    if (this.slickModal === undefined) {
+      console.log("Warning, slick modal undefined, cannot unslick")
+    } else {
+      this.slickModal.unslick();
+    }
   }
 
   load(append = false) {
