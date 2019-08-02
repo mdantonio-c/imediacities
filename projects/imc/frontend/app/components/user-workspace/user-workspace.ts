@@ -79,6 +79,7 @@ export class UserWorkspaceComponent implements OnInit {
     }
 
     ngAfterViewInit() {
+        console.log("UserWorkspaceComponent.ngAfterViewInit")
         console.log(this.authService);
         this.user = this.authService.getUser();
         this.taggedByMeFilter.annotated_by.user = this.user.uuid;

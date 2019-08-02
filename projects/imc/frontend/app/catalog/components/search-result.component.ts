@@ -14,10 +14,14 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	description: string;
 	private user: any;
 
-	constructor(private authService: AuthService, private router: Router) { }
+	constructor(private authService: AuthService, private router: Router) {
+		console.log("SearchResultComponent.constructor")
+		console.log(authService);
+	}
 
 	ngOnInit() {}
     ngAfterViewInit() {
+		console.log("SearchResultComponent.ngAfterViewInit")
     	console.log(this.authService);
         this.user = this.authService.getUser();
     }
