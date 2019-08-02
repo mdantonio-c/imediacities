@@ -14,13 +14,14 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	description: string;
 	private user: any;
 
-	constructor(private authService: AuthService, private router: Router) {
-		this.user = authService.getUser();
-	}
+	constructor(private authService: AuthService, private router: Router) { }
 
 	ngOnInit() {
-		// this.user = this.authService.getUser();
 	}
+    ngAfterViewInit() {
+    	console.log(this.authService);
+        this.user = this.authService.getUser();
+    }
 
 	ngOnChanges() {
 		this.identifyingTitle = MediaUtilsService.getIdentifyingTitle(this.media);

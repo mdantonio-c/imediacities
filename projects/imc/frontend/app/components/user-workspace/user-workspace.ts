@@ -54,9 +54,6 @@ export class UserWorkspaceComponent implements OnInit {
 		private listsService: ListsService,
 		private formBuilder: FormBuilder,
 		private notify: NotificationService) {
-
-        this.user = authService.getUser();
-
 		this.listForm = this.formBuilder.group({
             name: ['', Validators.required],
             description: ['', Validators.required]
@@ -81,8 +78,12 @@ export class UserWorkspaceComponent implements OnInit {
         }
     }
 
-	ngOnInit() {
+    ngAfterViewInit() {
+        console.log(this.authService);
         this.user = this.authService.getUser();
+    }
+
+	ngOnInit() {
         this.taggedByMeFilter.annotated_by.user = this.user.uuid;
         this.notedByMeFilter.annotated_by.user = this.user.uuid;
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
