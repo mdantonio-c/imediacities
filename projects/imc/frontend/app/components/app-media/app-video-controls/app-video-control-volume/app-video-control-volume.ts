@@ -29,6 +29,8 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
 
     ngOnInit () {
         super.ngOnInit();
+    }
+    ngAfterViewInit () {
         this.volume_last_value = this.video.volume;
         this._interfaccia();
     }
