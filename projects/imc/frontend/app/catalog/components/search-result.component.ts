@@ -14,10 +14,12 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	description: string;
 	private user: any;
 
-	constructor(private authService: AuthService, private router: Router) { }
+	constructor(private authService: AuthService, private router: Router) {
+		this.user = authService.getUser();
+	}
 
 	ngOnInit() {
-		this.user = this.authService.getUser();
+		// this.user = this.authService.getUser();
 	}
 
 	ngOnChanges() {

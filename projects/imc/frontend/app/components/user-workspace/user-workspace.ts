@@ -82,6 +82,7 @@ export class UserWorkspaceComponent implements OnInit {
     }
 
 	ngOnInit() {
+        this.user = this.authService.getUser();
         this.taggedByMeFilter.annotated_by.user = this.user.uuid;
         this.notedByMeFilter.annotated_by.user = this.user.uuid;
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
