@@ -30,9 +30,17 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
     ngOnInit () {
         super.ngOnInit();
     }
+
     ngAfterViewInit () {
         this.volume_last_value = this.video.volume;
         this._interfaccia();
+        this._ico_events();
+        this.volume_set(this.video.volume);
+        this._volume_events();
+        this.volume.nativeElement.value = this.video.volume;
+        this._volume_slider_events();
+        this._interfaccia();
+
     }
 
     private _interfaccia () {
@@ -151,17 +159,6 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
 
     public volume_unmute () {
         this.volume_set(this.volume_last_value);
-    }
-
-    ngAfterViewInit () {
-
-        this._ico_events();
-        this.volume_set(this.video.volume);
-        this._volume_events();
-        this.volume.nativeElement.value = this.video.volume;
-        this._volume_slider_events();
-        this._interfaccia();
-
     }
 
     onvolumechange () {
