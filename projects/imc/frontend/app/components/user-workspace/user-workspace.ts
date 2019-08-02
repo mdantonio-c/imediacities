@@ -81,11 +81,11 @@ export class UserWorkspaceComponent implements OnInit {
     ngAfterViewInit() {
         console.log(this.authService);
         this.user = this.authService.getUser();
+        this.taggedByMeFilter.annotated_by.user = this.user.uuid;
+        this.notedByMeFilter.annotated_by.user = this.user.uuid;
     }
 
 	ngOnInit() {
-        this.taggedByMeFilter.annotated_by.user = this.user.uuid;
-        this.notedByMeFilter.annotated_by.user = this.user.uuid;
 		for (let i = 0; i < Providers.length; i++) this.cities.push(Providers[i].city.name);
     	this.cities = this.cities.sort();
 	}
