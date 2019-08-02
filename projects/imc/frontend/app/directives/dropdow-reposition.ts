@@ -6,6 +6,8 @@
  * Rif: https://github.com/ng-bootstrap/ng-bootstrap/issues/1012
  *
  */
+
+/*
 import {Directive, ContentChild, AfterContentInit, ElementRef, OnDestroy, Inject, forwardRef} from '@angular/core';
 import {NgbDropdownMenu, NgbDropdown} from '@ng-bootstrap/ng-bootstrap';
 import {positionElements} from '@ng-bootstrap/ng-bootstrap/esm5/util/positioning';
@@ -98,3 +100,5 @@ export class DropdownPositionDirective implements AfterContentInit, OnDestroy {
         this.menuWrapper.style.width = parentEl.clientWidth + 'px';
     }
 }
+
+*/
