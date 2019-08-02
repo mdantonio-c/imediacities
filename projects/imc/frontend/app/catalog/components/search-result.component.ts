@@ -17,6 +17,7 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	constructor(private authService: AuthService, private router: Router) {
 		console.log("SearchResultComponent.constructor")
 		console.log(authService);
+		console.log(this.authService);
 	}
 
 	ngOnInit() {}
