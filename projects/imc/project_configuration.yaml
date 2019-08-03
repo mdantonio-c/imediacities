@@ -11,8 +11,8 @@ variables:
 
   env:
 
-    LETSENCRYPT_MODE: 
-  
+    AUTH_SERVICE: neo4j 
+
     ACTIVATE_FTP: 1
     ACTIVATE_CELERY: 1
     ACTIVATE_CELERYUI: 1
