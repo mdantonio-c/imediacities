@@ -22,7 +22,6 @@ mime = MimeTypes()
 
 
 class Upload(Uploader, GraphBaseOperations):
-
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
@@ -34,15 +33,14 @@ class Upload(Uploader, GraphBaseOperations):
 
         if group is None:
             raise RestApiException(
-                "No group defined for this user",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
 
-        upload_response = self.upload_data(
-            filename, subfolder=upload_dir, force=False)
+        upload_response = self.upload_data(filename, subfolder=upload_dir, force=False)
 
         return upload_response
 
@@ -53,8 +51,8 @@ class Upload(Uploader, GraphBaseOperations):
         log.info("get stage content for filename %s" % filename)
         if filename is None:
             raise RestApiException(
-                "Please specify a stage filename",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a stage filename", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -62,26 +60,26 @@ class Upload(Uploader, GraphBaseOperations):
 
         if group is None:
             raise RestApiException(
-                "No group defined for this user",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         if group is None:
             raise RestApiException(
-                "No group defined for this user",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.force_response(
-                    [], errors=["Upload dir not found"])
+                return self.force_response([], errors=["Upload dir not found"])
 
         staged_file = os.path.join(upload_dir, filename)
         if not os.path.isfile(staged_file):
             raise RestApiException(
                 "File not found. Please specify a valid staged file",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                status_code=hcodes.HTTP_BAD_NOTFOUND,
+            )
 
         mime_type = mime.guess_type(filename)
         log.debug('mime type: {}'.format(mime_type))

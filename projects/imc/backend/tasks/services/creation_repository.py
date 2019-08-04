@@ -10,7 +10,7 @@ from neomodel.cardinality import CardinalityViolation
 log = get_logger(__name__)
 
 
-class CreationRepository():
+class CreationRepository:
     """ """
 
     def __init__(self, graph):
@@ -31,14 +31,15 @@ class CreationRepository():
                 self.delete_av_entity(existing_creation)
             else:
                 self.delete_non_av_entity(existing_creation)
-            log.info(
-                "Existing creation [UUID:{0}] deleted".format(creation_id))
+            log.info("Existing creation [UUID:{0}] deleted".format(creation_id))
             # use the same uuid for the new replacing creation
             properties['uuid'] = creation_id
 
-        entity = (self.graph.AVEntity(**properties).save()
-                  if av
-                  else self.graph.NonAVEntity(**properties).save())
+        entity = (
+            self.graph.AVEntity(**properties).save()
+            if av
+            else self.graph.NonAVEntity(**properties).save()
+        )
         # connect to item
         item.creation.connect(entity)
 
@@ -51,7 +52,8 @@ class CreationRepository():
                     entity.record_sources.connect(record_source)
                     # look for existing content provider
                     provider = self.find_provider_by_identifier(
-                        item[1]['identifier'], item[1]['scheme'])
+                        item[1]['identifier'], item[1]['scheme']
+                    )
                     if provider is None:
                         provider = self.graph.Provider(**item[1]).save()
                     record_source.provider.connect(provider)
@@ -74,8 +76,7 @@ class CreationRepository():
             elif r == 'languages':
                 # connect to languages
                 for lang_usage in relationships[r]:
-                    lang = self.graph.Language.nodes.get_or_none(
-                        code=lang_usage[0])
+                    lang = self.graph.Language.nodes.get_or_none(code=lang_usage[0])
                     if lang is None:
                         lang = self.graph.Language(code=lang_usage[0]).save()
                     entity.languages.connect(lang, {'usage': lang_usage[1]})
@@ -87,12 +88,13 @@ class CreationRepository():
             elif av and r == 'production_countries':
                 for country_reference in relationships[r]:
                     country = self.graph.Country.nodes.get_or_none(
-                        code=country_reference[0])
+                        code=country_reference[0]
+                    )
                     if country is None:
-                        country = self.graph.Country(
-                            code=country_reference[0]).save()
+                        country = self.graph.Country(code=country_reference[0]).save()
                     entity.production_countries.connect(
-                        country, {'reference': country_reference[1]})
+                        country, {'reference': country_reference[1]}
+                    )
             elif av and r == 'video_format' and relationships[r] is not None:
                 video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
@@ -107,7 +109,8 @@ class CreationRepository():
                     else:
                         agent = self.graph.Agent(**props).save()
                     entity.contributors.connect(
-                        agent, {'activities': agent_activities[1]})
+                        agent, {'activities': agent_activities[1]}
+                    )
             elif r == 'rightholders':
                 for props in relationships[r]:
                     # look for existing rightholder
@@ -116,8 +119,8 @@ class CreationRepository():
                         rightholder = self.graph.Rightholder(**props).save()
                     else:
                         log.debug(
-                            'Found existing rightholder: {}'.format(
-                                rightholder.name))
+                            'Found existing rightholder: {}'.format(rightholder.name)
+                        )
                     entity.rightholders.connect(rightholder)
 
         return entity
@@ -182,8 +185,7 @@ class CreationRepository():
         # results = self.graph.Provider.cypher(
         #     query, {'pid': pid, 'scheme': scheme})
         # return [self.graph.Provider.inflate(row[0]) for row in results]
-        return self.graph.Provider.nodes.get_or_none(
-            identifier=pid, scheme=scheme)
+        return self.graph.Provider.nodes.get_or_none(identifier=pid, scheme=scheme)
 
     def find_rightholder_by_name(self, name):
         log.debug('Find rightholder by name: {}'.format(name))
@@ -219,8 +221,10 @@ class CreationRepository():
 
     def get_belonging_city(self, item):
         log.debug('Look for belonging city for item {}'.format(item.uuid))
-        query = "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()" \
-                "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) " \
-                "RETURN p.city"
+        query = (
+            "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()"
+            "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) "
+            "RETURN p.city"
+        )
         results = self.graph.cypher(query.format(item_id=item.uuid))
         return [row[0] for row in results][0] if results else None

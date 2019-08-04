@@ -12,8 +12,8 @@ from restapi import decorators as decorate
 
 log = get_logger(__name__)
 
-class Vocabulary(EndpointResource):
 
+class Vocabulary(EndpointResource):
     @decorate.catch_error()
     def get(self, lang=None):
         """Get the controlled vocabulary."""
@@ -23,5 +23,6 @@ class Vocabulary(EndpointResource):
         except FileNotFoundError as err:
             log.warning('Vocabulary file not found')
             raise RestApiException(
-                    "Warining: vocabulary not available",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Warining: vocabulary not available",
+                status_code=hcodes.HTTP_BAD_NOTFOUND,
+            )

@@ -9,13 +9,13 @@ from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from utilities import htmlcodes as hcodes
 
 from utilities.logs import get_logger
+
 log = get_logger(__name__)
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 
 class AdminGroups(GraphBaseOperations):
-
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, id=None):
@@ -39,9 +39,7 @@ class AdminGroups(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            raise RestApiException(
-                'Empty input',
-                status_code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
 
         schema = self.get_endpoint_custom_definition()
 
@@ -61,17 +59,9 @@ class AdminGroups(GraphBaseOperations):
 
                         if can_coordinate:
 
-                            label = "%s %s (%s)" % (
-                                n.name,
-                                n.surname,
-                                n.email
-                            )
+                            label = "%s %s (%s)" % (n.name, n.surname, n.email)
 
-                            schema[idx]["enum"].append(
-                                {
-                                    n.uuid: label
-                                }
-                            )
+                            schema[idx]["enum"].append({n.uuid: label})
 
             return self.force_response(schema)
 
@@ -80,7 +70,8 @@ class AdminGroups(GraphBaseOperations):
 
         if 'coordinator' not in v:
             raise RestApiException(
-                'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST)
+                'Coordinator not found', status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
         # coordinator = self.getNode(
@@ -88,7 +79,8 @@ class AdminGroups(GraphBaseOperations):
 
         if coordinator is None:
             raise RestApiException(
-                'User not found', status_code=hcodes.HTTP_BAD_REQUEST)
+                'User not found', status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         # GRAPH #
         group = self.graph.Group(**properties).save()
@@ -104,8 +96,8 @@ class AdminGroups(GraphBaseOperations):
         if group_id is None:
 
             raise RestApiException(
-                "Please specify a group id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a group id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         schema = self.get_endpoint_custom_definition()
         self.graph = self.get_service_instance('neo4j')
@@ -122,8 +114,7 @@ class AdminGroups(GraphBaseOperations):
 
         if 'coordinator' in v:
 
-            coordinator = self.graph.User.nodes.get_or_none(
-                uuid=v['coordinator'])
+            coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
             # coordinator = self.getNode(
             #     self.graph.User, v['coordinator'], field='uuid')
 
@@ -147,8 +138,8 @@ class AdminGroups(GraphBaseOperations):
         if group_id is None:
 
             raise RestApiException(
-                "Please specify a group id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a group id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -163,7 +154,6 @@ class AdminGroups(GraphBaseOperations):
 
 
 class UserGroup(GraphBaseOperations):
-
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, query=None):

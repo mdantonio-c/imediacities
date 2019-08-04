@@ -5,7 +5,6 @@ log = get_logger(__name__)
 
 
 class Initializer(object):
-
     def __init__(self, services):
 
         self.neo4j = services['neo4j']
@@ -62,7 +61,7 @@ class Initializer(object):
         except Role.DoesNotExist:
             log.warning("Admin role does not exist")
 
-        if (len(Group.nodes) > 0):
+        if len(Group.nodes) > 0:
             log.info("Found one or more already defined groups")
         else:
             log.warning("No group defined")
@@ -246,7 +245,6 @@ class Initializer(object):
 
 
 class Customizer(object):
-
     def custom_user_properties(self, properties):
         return properties
 

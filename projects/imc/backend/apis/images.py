@@ -31,6 +31,7 @@ class Images(GraphBaseOperations):
     Get an NonAVEntity if its id is passed as an argument.
     Else return all NonAVEntities in the repository.
     """
+
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id=None):
@@ -43,11 +44,11 @@ class Images(GraphBaseOperations):
             try:
                 v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             except self.graph.NonAVEntity.DoesNotExist:
-                logger.debug(
-                    "NonAVEntity with uuid %s does not exist" % image_id)
+                logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
                 raise RestApiException(
                     "Please specify a valid image id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                )
             images = [v]
         else:
             images = self.graph.NonAVEntity.nodes.all()
@@ -55,22 +56,23 @@ class Images(GraphBaseOperations):
         api_url = get_api_url(request, PRODUCTION)
         for v in images:
             image = self.getJsonResponse(
-                v, max_relationship_depth=1,
-                relationships_expansion=[
-                    'record_sources.provider',
-                    'item.ownership'
-                ]
+                v,
+                max_relationship_depth=1,
+                relationships_expansion=['record_sources.provider', 'item.ownership'],
             )
             item = v.item.single()
             # image['links']['self'] = api_url + \
             #     'api/images/' + v.uuid
-            image['links']['content'] = api_url + \
-                'api/images/' + v.uuid + '/content?type=image'
+            image['links']['content'] = (
+                api_url + 'api/images/' + v.uuid + '/content?type=image'
+            )
             if item.thumbnail is not None:
-                image['links']['thumbnail'] = api_url + \
-                    'api/images/' + v.uuid + '/content?type=thumbnail'
-            image['links']['summary'] = api_url + \
-                'api/images/' + v.uuid + '/content?type=summary'
+                image['links']['thumbnail'] = (
+                    api_url + 'api/images/' + v.uuid + '/content?type=thumbnail'
+                )
+            image['links']['summary'] = (
+                api_url + 'api/images/' + v.uuid + '/content?type=summary'
+            )
             data.append(image)
 
         return self.force_response(data)
@@ -78,6 +80,7 @@ class Images(GraphBaseOperations):
     """
     Create a new image description.
     """
+
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
@@ -86,9 +89,7 @@ class Images(GraphBaseOperations):
 
         v = self.get_input()
         if len(v) == 0:
-            raise RestApiException(
-                'Empty input',
-                status_code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
 
         # schema = self.get_endpoint_custom_definition()
 
@@ -110,8 +111,8 @@ class Images(GraphBaseOperations):
 
         if image_id is None:
             raise RestApiException(
-                "Please specify a valid image id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
         try:
             v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             repo = CreationRepository(self.graph)
@@ -120,12 +121,11 @@ class Images(GraphBaseOperations):
         except self.graph.NonAVEntity.DoesNotExist:
             logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
-                "Please specify a valid image id",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )
 
 
 class ImageItem(GraphBaseOperations):
-
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
@@ -136,30 +136,33 @@ class ImageItem(GraphBaseOperations):
         logger.debug("Update Item for NonAVEntity uuid: %s", image_id)
         if image_id is None:
             raise RestApiException(
-                "Please specify a image id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
         self.graph = self.get_service_instance('neo4j')
         try:
             v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
             logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
-                "Please specify a valid image id",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )
         item = v.item.single()
         if item is None:
             raise RestApiException(
                 "This NonAVEntity may not have been correctly imported. "
                 "Item info not found",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                status_code=hcodes.HTTP_BAD_NOTFOUND,
+            )
 
         user = self.get_current_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
                 "User [{0}, {1} {2}] cannot update public access for videos that does not belong to him/her".format(
-                    user.uuid, user.name, user.surname),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+                    user.uuid, user.name, user.surname
+                ),
+                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            )
 
         data = self.get_input()
         # ONLY public_access allowed at the moment
@@ -167,12 +170,16 @@ class ImageItem(GraphBaseOperations):
         if public_access is None or type(public_access) != bool:
             raise RestApiException(
                 "Please specify a valid value for public_access",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
 
         item.public_access = public_access
         item.save()
-        logger.debug("Item successfully updated for NonAVEntity uuid {}. {}"
-                     .format(image_id, item))
+        logger.debug(
+            "Item successfully updated for NonAVEntity uuid {}. {}".format(
+                image_id, item
+            )
+        )
 
         # 204: Item successfully updated.
         return self.empty_response()
@@ -182,14 +189,15 @@ class ImageAnnotations(GraphBaseOperations):
     """
         Get all image annotations for a given image.
     """
+
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id):
         logger.debug("get annotations for NonAVEntity id: %s", image_id)
         if image_id is None:
             raise RestApiException(
-                "Please specify a image id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         params = self.get_input()
         anno_type = params.get('type')
@@ -205,8 +213,8 @@ class ImageAnnotations(GraphBaseOperations):
         except self.graph.NonAVEntity.DoesNotExist:
             logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
-                "Please specify a valid image id",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )
 
         user = self.get_current_user()
 
@@ -217,17 +225,23 @@ class ImageAnnotations(GraphBaseOperations):
             if anno.private:
                 if anno.creator is None:
                     # expected ALWAYS a creator for private annotation
-                    logger.warn('Invalid state: missing creator for private '
-                                'anno [UUID:{}]'.format(anno.uuid))
+                    logger.warn(
+                        'Invalid state: missing creator for private '
+                        'anno [UUID:{}]'.format(anno.uuid)
+                    )
                     continue
                 creator = anno.creator.single()
                 if user is None or creator.uuid != user.uuid:
-                        continue
+                    continue
             res = self.getJsonResponse(anno, max_relationship_depth=0)
-            del(res['links'])
-            if anno.annotation_type in ('TAG', 'DSC', 'LNK') and anno.creator is not None:
+            del res['links']
+            if (
+                anno.annotation_type in ('TAG', 'DSC', 'LNK')
+                and anno.creator is not None
+            ):
                 res['creator'] = self.getJsonResponse(
-                    anno.creator.single(), max_relationship_depth=0)
+                    anno.creator.single(), max_relationship_depth=0
+                )
             # attach bodies
             res['bodies'] = []
             for b in anno.bodies.all():
@@ -235,12 +249,12 @@ class ImageAnnotations(GraphBaseOperations):
                 if anno.annotation_type == 'TAG' and 'ODBody' in mdb.labels():
                     # object detection body
                     body = self.getJsonResponse(
-                        mdb.object_type.single(), max_relationship_depth=0)
+                        mdb.object_type.single(), max_relationship_depth=0
+                    )
                 else:
-                    body = self.getJsonResponse(
-                        mdb, max_relationship_depth=0)
+                    body = self.getJsonResponse(mdb, max_relationship_depth=0)
                 if 'links' in body:
-                    del(body['links'])
+                    del body['links']
                 res['bodies'].append(body)
             data.append(res)
 
@@ -251,6 +265,7 @@ class ImageContent(GraphBaseOperations):
     """
     Gets image content or thumbnail
     """
+
     @decorate.catch_error()
     @catch_graph_exceptions
     @authz.pre_authorize
@@ -258,16 +273,18 @@ class ImageContent(GraphBaseOperations):
         logger.info("get image content for id %s" % image_id)
         if image_id is None:
             raise RestApiException(
-                "Please specify a image id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         input_parameters = self.get_input()
         content_type = input_parameters['type']
-        if content_type is None or (content_type != 'image' and
-                                    content_type != 'thumbnail'):
+        if content_type is None or (
+            content_type != 'image' and content_type != 'thumbnail'
+        ):
             raise RestApiException(
                 "Bad type parameter: expected 'image' or 'thumbnail'",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
 
         self.graph = self.get_service_instance('neo4j')
         image = None
@@ -276,8 +293,8 @@ class ImageContent(GraphBaseOperations):
         except self.graph.NonAVEntity.DoesNotExist:
             logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
-                "Please specify a valid image id",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )
 
         item = image.item.single()
         logger.debug("item data: " + format(item))
@@ -291,8 +308,8 @@ class ImageContent(GraphBaseOperations):
             logger.debug("image content uri: %s" % image_uri)
             if image_uri is None:
                 raise RestApiException(
-                    "Image not found",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+                    "Image not found", status_code=hcodes.HTTP_BAD_NOTFOUND
+                )
             # image is always jpeg
             mime = "image/jpeg"
             download = Downloader()
@@ -304,18 +321,18 @@ class ImageContent(GraphBaseOperations):
             if thumbnail_size is not None and thumbnail_size.lower() == 'large':
                 # load large image file as the original (i.e. transcoded.jpg)
                 thumbnail_uri = item.uri
-                logger.debug(
-                    'request for large thumbnail: {}'.format(thumbnail_uri))
+                logger.debug('request for large thumbnail: {}'.format(thumbnail_uri))
             if thumbnail_uri is None:
                 raise RestApiException(
-                    "Thumbnail not found",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+                    "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
+                )
             return send_file(thumbnail_uri, mimetype='image/jpeg')
         else:
             # it should never be reached
             raise RestApiException(
                 "Invalid content type: {0}".format(content_type),
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+            )
 
 
 class ImageTools(GraphBaseOperations):
@@ -330,8 +347,8 @@ class ImageTools(GraphBaseOperations):
 
         if image_id is None:
             raise RestApiException(
-                "Please specify a image id",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
+            )
 
         self.graph = self.get_service_instance('neo4j')
         image = None
@@ -340,36 +357,42 @@ class ImageTools(GraphBaseOperations):
         except self.graph.NonAVEntity.DoesNotExist:
             logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
             raise RestApiException(
-                "Please specify a valid image id.",
-                status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Please specify a valid image id.", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )
         item = image.item.single()
         if item is None:
             raise RestApiException(
                 "Item not available. Execute the pipeline first!",
-                status_code=hcodes.HTTP_BAD_CONFLICT)
+                status_code=hcodes.HTTP_BAD_CONFLICT,
+            )
         if item.item_type != 'Image':
             raise RestApiException(
                 "Content item is not a image. Use a valid image id.",
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
 
         params = self.get_input()
         if 'tool' not in params:
             raise RestApiException(
                 'Please specify the tool to be launched.',
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
         tool = params['tool']
         if tool not in self.__available_tools__:
             raise RestApiException(
-                "Please specify a valid tool. Expected one of %s." %
-                (self.__available_tools__, ),
-                status_code=hcodes.HTTP_BAD_REQUEST)
+                "Please specify a valid tool. Expected one of %s."
+                % (self.__available_tools__,),
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
 
         repo = AnnotationRepository(self.graph)
         if tool == self.__available_tools__[0]:  # object-detection
-            if ('operation' in params and params['operation'] == 'delete'):
+            if 'operation' in params and params['operation'] == 'delete':
                 # get all automatic object detection tags
                 deleted = 0
-                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                for anno in item.sourcing_annotations.search(
+                    annotation_type='TAG', generator='FHG'
+                ):
                     # expected always single body for automatic tags
                     body = anno.bodies.single()
                     if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
@@ -377,18 +400,23 @@ class ImageTools(GraphBaseOperations):
                         repo.delete_auto_annotation(anno)
                 return self.force_response(
                     "There are no more automatic object detection tags for image {}. Deleted {}".format(
-                        image_id, deleted),
-                    code=hcodes.HTTP_OK_BASIC)
+                        image_id, deleted
+                    ),
+                    code=hcodes.HTTP_OK_BASIC,
+                )
             # DO NOT re-import object detection twice for the same image!
             if repo.check_automatic_od(item.uuid):
                 raise RestApiException(
                     "Object detection CANNOT be import twice for the same image.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT)
+                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                )
         elif tool == self.__available_tools__[1]:  # building-recognition
-            if ('operation' in params and params['operation'] == 'delete'):
+            if 'operation' in params and params['operation'] == 'delete':
                 # get all automatic building recognition tags
                 deleted = 0
-                for anno in item.sourcing_annotations.search(annotation_type='TAG', generator='FHG'):
+                for anno in item.sourcing_annotations.search(
+                    annotation_type='TAG', generator='FHG'
+                ):
                     # expected always single body for automatic tags
                     body = anno.bodies.single()
                     if 'BRBody' in body.labels():
@@ -396,22 +424,23 @@ class ImageTools(GraphBaseOperations):
                         repo.delete_auto_annotation(anno)
                 return self.force_response(
                     "There are no more automatic building recognition tags for image {}. Deleted {}".format(
-                        image_id, deleted),
-                    code=hcodes.HTTP_OK_BASIC)
+                        image_id, deleted
+                    ),
+                    code=hcodes.HTTP_OK_BASIC,
+                )
             # DO NOT re-import building recognition twice for the same image!
             if repo.check_automatic_br(item.uuid):
                 raise RestApiException(
                     "Building recognition CANNOT be import twice for the same image.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT)
+                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                )
         else:
             # should never be reached
             raise RestApiException(
                 "Specified tool '{}' NOT implemented".format(tool),
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED)
+                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+            )
 
-        task = CeleryExt.launch_tool.apply_async(
-            args=[tool, item.uuid],
-            countdown=10
-        )
+        task = CeleryExt.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
         return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)

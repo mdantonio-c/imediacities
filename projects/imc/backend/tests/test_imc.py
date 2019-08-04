@@ -8,7 +8,6 @@ log = get_logger(__name__)
 
 
 class TestApp(BaseTests):
-
     def test_status(self, client):
 
         res = client.get('/api/stage')

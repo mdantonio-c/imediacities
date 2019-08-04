@@ -9,7 +9,6 @@ log = get_logger(__name__)
 
 
 class TestApp(BaseTests):
-
     def test_get(self, client):  # client e' una fixture di pytest-flask
         """
             Test GET method of /api/shots
@@ -49,28 +48,28 @@ class TestApp(BaseTests):
                     if shots_list is not None:
                         # log.debug("*** number of shots: " + str(len(shots_list)))
                         if shots_list[0] is not None:
-                            #log.debug("*** shots[0]: " + json.dumps(shots_list[0]))
+                            # log.debug("*** shots[0]: " + json.dumps(shots_list[0]))
                             shot_id = shots_list[0].get("id")
                             # deve esistere lo shot_id
                             assert shot_id is not None
-                            #log.debug("*** shot id: " + shot_id)
+                            # log.debug("*** shot id: " + shot_id)
         if shot_id is not None:
             log.info("*** Testing GET shot by id")
             # GET a shot with a specific id
-            # at the moment authorization token not required for GET shot 
-            res = client.get('/api/shots/' + shot_id) 
+            # at the moment authorization token not required for GET shot
+            res = client.get('/api/shots/' + shot_id)
             assert res.status_code == hcodes.HTTP_OK_BASIC
             shot_content = json.loads(res.data.decode('utf-8'))
-            #log.debug("*** Response of GET shots with id: "+json.dumps(shot_content))
+            # log.debug("*** Response of GET shots with id: "+json.dumps(shot_content))
             if shot_content is not None:
                 shot_data = shot_content.get('Response', {}).get('data', {})
                 if shot_data is not None:
                     shot_attributes = shot_data.get('attributes')
                     if shot_attributes is not None:
                         shot_number = shot_attributes.get('shot_num')
-                        #log.debug("*** shot number: " + str(shot_number))
+                        # log.debug("*** shot number: " + str(shot_number))
             log.info("*** Testing GET shot thumbnail")
             # GET shot thumbnail
             res = client.get('/api/shots/' + shot_id + '?content=thumbnail')
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            #log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
+            # log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))

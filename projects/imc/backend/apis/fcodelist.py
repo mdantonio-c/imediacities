@@ -12,24 +12,24 @@ from restapi import decorators as decorate
 
 log = get_logger(__name__)
 
-class Fcodelist(EndpointResource):
 
+class Fcodelist(EndpointResource):
     @decorate.catch_error()
     def get(self, codelist=None):
         """Get the codelists."""
-        log.debug('load the codelist: '+codelist)
+        log.debug('load the codelist: ' + codelist)
         input_parameters = self.get_input()
         lang = input_parameters['lang']
         if lang is None:
-            lang='en'
+            lang = 'en'
         filename = codelist + '.json'
         filepath = 'imc/fcodelist/' + lang + '/' + filename
-        log.debug('filepath: '+filepath)
+        log.debug('filepath: ' + filepath)
         try:
             data = json.load(open(filepath))
-            return self.force_response(data)            
+            return self.force_response(data)
         except FileNotFoundError as err:
-            log.warning('Codelist file not found: '+filepath)
+            log.warning('Codelist file not found: ' + filepath)
             raise RestApiException(
-                    "Warning: codelist not available",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND)
+                "Warning: codelist not available", status_code=hcodes.HTTP_BAD_NOTFOUND
+            )

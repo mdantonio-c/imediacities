@@ -9,7 +9,6 @@ log = get_logger(__name__)
 
 
 class TestApp(BaseTests):
-
     def test_POST(self, client):  # client e' una fixture di pytest-flask
         """
             Test POST method of /api/search
@@ -25,7 +24,7 @@ class TestApp(BaseTests):
         res = client.post('/api/search')
         # This endpoint requires a valid authorization token
         assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-        #log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
 
         # log in
         log.debug("*** Do login")
@@ -33,7 +32,11 @@ class TestApp(BaseTests):
 
         # search all item of type video with pagination parameters
         post_data = {'type': 'video', 'term': '*'}
-        res = client.post('/api/search?perpage=10&currentpage=1', headers=headers, data=json.dumps(post_data))
+        res = client.post(
+            '/api/search?perpage=10&currentpage=1',
+            headers=headers,
+            data=json.dumps(post_data),
+        )
 
         assert res.status_code == hcodes.HTTP_OK_BASIC
         response = json.loads(res.data.decode('utf-8'))

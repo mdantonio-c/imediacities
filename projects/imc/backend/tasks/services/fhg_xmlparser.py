@@ -1,16 +1,14 @@
 import os
 import xml.etree.ElementTree as ET
+
 # from xml.dom import minidom
-from imc.models.neo4j import (
-    Shot
-)
+from imc.models.neo4j import Shot
 from utilities.logs import get_logger
 
 log = get_logger(__name__)
 
 
-class FHG_XMLParser():
-
+class FHG_XMLParser:
     def get_root(self, filepath):
         tree = ET.parse(filepath)
         root = tree.getroot()
@@ -35,8 +33,7 @@ class FHG_XMLParser():
             shot = Shot(start_frame_idx=start_idx)
             frame_filename = 'tvs_s_' + str(start_idx).zfill(5) + '.jpg'
             shot.frame_uri = os.path.join(tvs_dirname, frame_filename)
-            shot.thumbnail_uri = os.path.join(
-                tvs_dirname, 'thumbs/' + frame_filename)
+            shot.thumbnail_uri = os.path.join(tvs_dirname, 'thumbs/' + frame_filename)
             shots.append(shot)
         return shots
 

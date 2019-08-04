@@ -27,22 +27,25 @@ celery_app = CeleryExt.celery_app
 log = get_logger(__name__)
 
 try:
-    from scripts.analysis.analyze import (make_movie_analize_folder,
-                                          analize,
-                                          stage_area,
-                                          transcode,
-                                          transcoded_tech_info,
-                                          transcoded_num_frames,
-                                          get_framerate,
-                                          v2_image_transcode,
-                                          image_transcoded_tech_info,
-                                          update_storyboard)
+    from scripts.analysis.analyze import (
+        make_movie_analize_folder,
+        analize,
+        stage_area,
+        transcode,
+        transcoded_tech_info,
+        transcoded_num_frames,
+        get_framerate,
+        v2_image_transcode,
+        image_transcoded_tech_info,
+        update_storyboard,
+    )
 except BaseException:
     log.warning("Unable to import analyze script, not required in backend")
 
 
 ####################
 # Define your celery tasks
+
 
 def progress(self, state, info):
     if info is not None:
@@ -55,17 +58,16 @@ def progress(self, state, info):
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
-        log.debug("Starting task update_metadata for resource_id %s" %
-                  resource_id)
+        log.debug("Starting task update_metadata for resource_id %s" % resource_id)
         progress(self, 'Starting update metadata', path)
         self.graph = celery_app.get_service('neo4j')
         xml_resource = None
         try:
             metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
-                self, resource_id, path, metadata_update)
-            log.debug(
-                "Completed task update_metadata for resource_id %s" % resource_id)
+                self, resource_id, path, metadata_update
+            )
+            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
 
             progress(self, 'Completed', path)
 
@@ -89,9 +91,9 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         try:
             metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
-                self, resource_id, path, metadata_update)
-            log.debug(
-                "Completed task update_metadata for resource_id %s" % resource_id)
+                self, resource_id, path, metadata_update
+            )
+            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
             progress(self, 'Updated metadata', path)
         except Exception as e:
             progress(self, 'Failed updating metadata', path)
@@ -111,12 +113,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             filename, file_extension = os.path.splitext(path)
             if file_extension.startswith("."):
                 file_extension = file_extension[1:]
-            log.debug('filename [{0}], extension [{1}]'.format(
-                filename, file_extension))
+            log.debug(
+                'filename [{0}], extension [{1}]'.format(filename, file_extension)
+            )
             basedir = os.path.dirname(os.path.abspath(path))
             log.debug("Content basedir {0}".format(basedir))
-            content_path, content_filename = lookup_content(
-                self, basedir, source_id)
+            content_path, content_filename = lookup_content(self, basedir, source_id)
 
             if content_path is not None:
                 # Create content resource
@@ -126,10 +128,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
                 try:
                     # This is a task restart? What to do in this case?
-                    content_node = self.graph.ContentStage.nodes.get(
-                        **properties)
-                    log.debug("Content resource already exist for %s" %
-                              content_path)
+                    content_node = self.graph.ContentStage.nodes.get(**properties)
+                    log.debug("Content resource already exist for %s" % content_path)
                 except self.graph.ContentStage.DoesNotExist:
                     content_node = self.graph.ContentStage(**properties).save()
                     content_node.ownership.connect(group)
@@ -144,13 +144,15 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 if mode == 'skip':
                     log.info('Analyze skipped for source id: ' + source_id)
                     return 1
-                fast = (mode == 'fast')
+                fast = mode == 'fast'
 
             if content_node is None:
                 raise Exception(
-                    "Pipeline cannot be started: " +
-                    "content does not exist in the path {0} for source ID {1}"
-                    .format(basedir, source_id))
+                    "Pipeline cannot be started: "
+                    + "content does not exist in the path {0} for source ID {1}".format(
+                        basedir, source_id
+                    )
+                )
 
             content_node.status = "IMPORTING"
             content_node.save()
@@ -162,8 +164,9 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             repo = AnnotationRepository(self.graph)
             if repo.check_automatic_tagging(item_node.uuid):
                 log.warn(
-                    "Pipeline cannot be started: " +
-                    "delete automatic tags before re-processing!")
+                    "Pipeline cannot be started: "
+                    + "delete automatic tags before re-processing!"
+                )
                 content_node.status = "COMPLETED"
                 content_node.save()
                 return 1
@@ -174,11 +177,14 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             creation = item_node.creation.single()
             if not creation:
-                raise ValueError('Unexpected missing creation '
-                                 'importing resource {}'.format(resource_id))
+                raise ValueError(
+                    'Unexpected missing creation '
+                    'importing resource {}'.format(resource_id)
+                )
 
-            out_folder = make_movie_analize_folder(content_item,
-                                                   (mode is not None and mode == 'clean'))
+            out_folder = make_movie_analize_folder(
+                content_item, (mode is not None and mode == 'clean')
+            )
             if out_folder == "":
                 raise Exception('Failed to create out_folder')
 
@@ -199,8 +205,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
             # take the previous fps apart
             old_fps = item_node.framerate
-            extract_tech_info(self, item_node, analyze_path,
-                              'transcoded_info.json')
+            extract_tech_info(self, item_node, analyze_path, 'transcoded_info.json')
 
             # bind other version
             v2_ext = '.mp4' if item_type == 'Video' else '.jpg'
@@ -210,11 +215,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 if other_item is None:
                     other_item_properties = {}
                     other_item_properties['item_type'] = item_type
-                    other_item = self.graph.Item(
-                        **other_item_properties).save()
+                    other_item = self.graph.Item(**other_item_properties).save()
                     item_node.other_version.connect(other_item)
-                extract_tech_info(self, other_item, analyze_path,
-                                  'v2_transcoded_info.json')
+                extract_tech_info(
+                    self, other_item, analyze_path, 'v2_transcoded_info.json'
+                )
                 # same cover as the origin item
                 other_item.thumbnail = item_node.thumbnail
                 # same access policy as the origin item
@@ -225,16 +230,23 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             if item_type == 'Video':
 
                 if old_fps is not None and old_fps != item_node.framerate:
-                    log.info("Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}"
-                             .format(id=item_node.uuid, old_fps=old_fps, new_fps=item_node.framerate))
+                    log.info(
+                        "Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}".format(
+                            id=item_node.uuid,
+                            old_fps=old_fps,
+                            new_fps=item_node.framerate,
+                        )
+                    )
 
                 # extract TVS and VIM results
                 shots, vim_estimations = extract_tvs_vim_results(
-                    self, item_node, analyze_path)
+                    self, item_node, analyze_path
+                )
 
                 # first remove existing automatic VIM annotations if any
                 vim_annotations = item_node.sourcing_annotations.search(
-                    annotation_type='VIM', generator='FHG')
+                    annotation_type='VIM', generator='FHG'
+                )
                 for anno in vim_annotations:
                     anno_id = anno.id
                     repo.delete_vim_annotation(anno)
@@ -249,8 +261,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                     # reposition accordingly them all in case of different a
                     # fps.
                     arrange_manual_annotations(self, item_node, shots, old_fps)
-                    repo.update_automatic_tvs(
-                        item_node, shots, vim_estimations)
+                    repo.update_automatic_tvs(item_node, shots, vim_estimations)
 
                 # save VIM annotations
                 repo.create_vim_annotation(item_node, vim_estimations)
@@ -300,8 +311,11 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
     item : <node>
     new_shot_list : <dict>
     '''
-    log.info("Set the new shot list with the current annotations for video [{}]"
-             .format(item.uuid))
+    log.info(
+        "Set the new shot list with the current annotations for video [{}]".format(
+            item.uuid
+        )
+    )
     for shot in item.shots.all():
         log.debug('-----------------------------------------------------')
         # key frame
@@ -316,18 +330,20 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
         for anno in shot.annotation.search(generator__isnull=True):
             log.debug(anno)
             annotations.append(anno.uuid)
-        log.debug('shot[{}] - manual annotations:{}'
-                  .format(shot.shot_num, annotations))
+        log.debug('shot[{}] - manual annotations:{}'.format(shot.shot_num, annotations))
 
         # get target shot in the new shot list
         for shot_num, properties in new_shot_list.items():
             if properties['start_frame_idx'] <= ft <= properties['end_frame_idx']:
-                log.info('Append annotation list {list} to the new shot '
-                         '{shot_num} [{shot_start}-{shot_end}]'.format(
-                             list=annotations,
-                             shot_num=shot_num,
-                             shot_start=properties['start_frame_idx'],
-                             shot_end=properties['end_frame_idx']))
+                log.info(
+                    'Append annotation list {list} to the new shot '
+                    '{shot_num} [{shot_start}-{shot_end}]'.format(
+                        list=annotations,
+                        shot_num=shot_num,
+                        shot_start=properties['start_frame_idx'],
+                        shot_end=properties['end_frame_idx'],
+                    )
+                )
                 if 'annotations' not in properties:
                     properties['annotations'] = []
                 properties['annotations'].extend(annotations)
@@ -347,13 +363,12 @@ def launch_tool(self, tool_name, item_id):
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
             content_source = GraphBaseOperations.getSingleLinkedNode(
-                item.content_source)
-            group = GraphBaseOperations.getSingleLinkedNode(
-                item.ownership)
+                item.content_source
+            )
+            group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
             movie = content_source.filename
             m_name = os.path.splitext(os.path.basename(movie))[0]
-            analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + m_name + '/'
+            analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
             log.debug('analyze path: {0}'.format(analyze_path))
             # call analyze for object detection ONLY
             # if detect_objects(movie, analyze_path):
@@ -367,8 +382,7 @@ def launch_tool(self, tool_name, item_id):
                 # here we expect building recognition results in brf.xml
                 extract_br_annotations(self, item, analyze_path)
             else:
-                raise NotImplementedError(
-                    'Invalid tool name: '.format(tool_name))
+                raise NotImplementedError('Invalid tool name: '.format(tool_name))
         except Exception as e:
             log.error("Task error, %s" % e)
             raise e
@@ -385,13 +399,12 @@ def load_v2(self, other_version, item_id, retry=False):
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
             content_source = GraphBaseOperations.getSingleLinkedNode(
-                item.content_source)
-            group = GraphBaseOperations.getSingleLinkedNode(
-                item.ownership)
+                item.content_source
+            )
+            group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
             source_filename = content_source.filename
             m_name = os.path.splitext(os.path.basename(source_filename))[0]
-            analyze_path = '/uploads/Analize/' + \
-                group.uuid + '/' + m_name + '/'
+            analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
             log.debug('analyze path: {0}'.format(analyze_path))
 
             # create symbolic link
@@ -416,13 +429,13 @@ def load_v2(self, other_version, item_id, retry=False):
                 else:
                     log.info('transcode v2 ------------ begin')
                     # we need to get the origin fps
-                    fps = get_framerate(os.path.join(
-                        analyze_path, 'origin_info.json'))
+                    fps = get_framerate(os.path.join(analyze_path, 'origin_info.json'))
                     if fps is None:
                         raise Exception('Cannot get origin fps')
                     log.debug("origin fps: {}".format(fps))
-                    if not transcode(other_version, analyze_path,
-                                     fps=str(fps), prefix='v2_'):
+                    if not transcode(
+                        other_version, analyze_path, fps=str(fps), prefix='v2_'
+                    ):
                         raise Exception('transcoding for v2 failed!')
                     log.info('transcode v2 ------------ ok')
 
@@ -439,7 +452,8 @@ def load_v2(self, other_version, item_id, retry=False):
                 log.info('v1_transcoded_nb_frames - ' + str(v1_nf))
                 if v1_nf != v2_nf:
                     raise ValueError(
-                        'v2 transcoded version does NOT match the number of frames')
+                        'v2 transcoded version does NOT match the number of frames'
+                    )
 
             elif item.item_type == "Image":
                 ext = 'jpg'
@@ -463,19 +477,18 @@ def load_v2(self, other_version, item_id, retry=False):
             # ######################################################
             # bind v2 to origin item as other version
 
-            other_version_uri = os.path.join(
-                analyze_path, 'v2_transcoded.' + ext)
+            other_version_uri = os.path.join(analyze_path, 'v2_transcoded.' + ext)
             if not os.path.exists(other_version_uri):
                 raise Exception(
-                    'Unable to find transcoded v2 at {}'.format(other_version_uri))
+                    'Unable to find transcoded v2 at {}'.format(other_version_uri)
+                )
             other_item = item.other_version.single()
             if other_item is None:
                 other_item_properties = {}
                 other_item_properties['item_type'] = item.item_type
                 other_item = self.graph.Item(**other_item_properties).save()
                 item.other_version.connect(other_item)
-            extract_tech_info(self, other_item, analyze_path,
-                              'v2_transcoded_info.json')
+            extract_tech_info(self, other_item, analyze_path, 'v2_transcoded_info.json')
             # same cover as the origin item
             other_item.thumbnail = item.thumbnail
             # same access policy as the origin item
@@ -495,18 +508,17 @@ def shot_revision(self, revision, item_id):
     self.graph = celery_app.get_service('neo4j')
     # get reviser
     reviser = self.graph.User.nodes.get_or_none(uuid=revision['reviser'])
-    exitRevision = True if 'exitRevision' in revision and revision['exitRevision'] else False
+    exitRevision = (
+        True if 'exitRevision' in revision and revision['exitRevision'] else False
+    )
     item = None
     try:
         item = self.graph.Item.nodes.get(uuid=item_id)
-        content_source = GraphBaseOperations.getSingleLinkedNode(
-            item.content_source)
-        group = GraphBaseOperations.getSingleLinkedNode(
-            item.ownership)
+        content_source = GraphBaseOperations.getSingleLinkedNode(item.content_source)
+        group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
         movie = content_source.filename
         m_name = os.path.splitext(os.path.basename(movie))[0]
-        analyze_path = '/uploads/Analize/' + \
-            group.uuid + '/' + m_name + '/'
+        analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
         log.debug('analyze path: {0}'.format(analyze_path))
 
         revised_cuts = []
@@ -516,8 +528,7 @@ def shot_revision(self, revision, item_id):
         update_storyboard(revised_cuts, analyze_path)
 
         # extract new TVS and VIM results
-        shots, vim_estimations = extract_tvs_vim_results(
-            self, item, analyze_path)
+        shots, vim_estimations = extract_tvs_vim_results(self, item, analyze_path)
 
         # extract 'confirmed' and 'double_check' flags
         for s in revision['shots']:
@@ -536,7 +547,8 @@ def shot_revision(self, revision, item_id):
         repo = AnnotationRepository(self.graph)
         # first remove existing automatic VIM annotations if any
         vim_annotations = item.sourcing_annotations.search(
-            annotation_type='VIM', generator='FHG')
+            annotation_type='VIM', generator='FHG'
+        )
         for anno in vim_annotations:
             anno_id = anno.id
             repo.delete_vim_annotation(anno)
@@ -550,19 +562,23 @@ def shot_revision(self, revision, item_id):
 
     except Exception as e:
         log.error("Shot revision task has encountered some problems. %s" % e)
-        aventity = GraphBaseOperations.getSingleLinkedNode(
-            item.creation).downcast()
+        aventity = GraphBaseOperations.getSingleLinkedNode(item.creation).downcast()
         replaces = {
             "title": aventity.identifying_title,
             "vid": aventity.uuid,
             "task_id": "",
-            "failure": ""
+            "failure": "",
         }
         # send an email to the reviser (and to the administrator)
         failure = traceback.format_exc()
-        send_notification(self, reviser.email, 'Error in shot revision',
-                          'shot_revision_failure.html', replaces,
-                          self.request.id)
+        send_notification(
+            self,
+            reviser.email,
+            'Error in shot revision',
+            'shot_revision_failure.html',
+            replaces,
+            self.request.id,
+        )
         raise
     finally:
         if exitRevision:
@@ -573,8 +589,11 @@ def shot_revision(self, revision, item_id):
             rel.state = 'W'
             rel.save()
 
-    log.info('Shot revision task completed successfully (exit: {exit})'.format(
-        exit=exitRevision))
+    log.info(
+        'Shot revision task completed successfully (exit: {exit})'.format(
+            exit=exitRevision
+        )
+    )
     return 1
 
 
@@ -645,19 +664,16 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
         if xml_resource is not None:
 
-            group = GraphBaseOperations.getSingleLinkedNode(
-                xml_resource.ownership)
+            group = GraphBaseOperations.getSingleLinkedNode(xml_resource.ownership)
 
             source_id = extract_creation_ref(self, path)
             if source_id is None:
-                raise Exception(
-                    "No source ID found importing metadata file %s" % path)
+                raise Exception("No source ID found importing metadata file %s" % path)
 
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
                 raise Exception("Invalid content type for: " + item_type)
-            log.info("Content source ID: {0}; TYPE: {1}".format(
-                source_id, item_type))
+            log.info("Content source ID: {0}; TYPE: {1}".format(source_id, item_type))
 
             # check for existing item
             item_node = xml_resource.item.single()
@@ -668,20 +684,19 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 item_node.ownership.connect(group)
                 item_node.meta_source.connect(xml_resource)
                 item_node.save()
-                log.debug("Item resource created for resource_id=%s" %
-                          resource_id)
+                log.debug("Item resource created for resource_id=%s" % resource_id)
 
             # check for existing creation
             creation = item_node.creation.single()
             init_public_access = True if creation is None else False
             if creation is not None and not metadata_update:
-                log.info("Skip updating metadata for resource_id=%s" %
-                         resource_id)
+                log.info("Skip updating metadata for resource_id=%s" % resource_id)
             else:
                 # update metadata
                 log.debug("Updating metadata for resource_id=%s" % resource_id)
                 xml_resource.warnings = extract_descriptive_metadata(
-                    self, path, item_type, item_node)
+                    self, path, item_type, item_node
+                )
                 log.info("Metadata updated for resource_id=%s" % resource_id)
 
                 xml_resource.status = 'COMPLETED'
@@ -693,19 +708,21 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             if init_public_access:
                 # init public_access
                 item_node.public_access = creation.get_default_public_access()
-                log.info("Default public access flag for {type} [{uuid}] "
-                         "rights status '{rs}' = {access}".format(
-                             type=item_node.item_type,
-                             uuid=creation.uuid,
-                             rs=creation.get_rights_status_display(),
-                             access=item_node.public_access))
+                log.info(
+                    "Default public access flag for {type} [{uuid}] "
+                    "rights status '{rs}' = {access}".format(
+                        type=item_node.item_type,
+                        uuid=creation.uuid,
+                        rs=creation.get_rights_status_display(),
+                        access=item_node.public_access,
+                    )
+                )
                 item_node.save()
         else:
             log.warning("Not found MetaStage for resource_id=%s" % resource_id)
 
     except Exception as e:
-        log.error("Failed update of resource_id %s, Error: %s" %
-                  (resource_id, e))
+        log.error("Failed update of resource_id %s, Error: %s" % (resource_id, e))
         if xml_resource is not None:
             xml_resource.status = 'ERROR'
             xml_resource.status_message = str(e)
@@ -731,7 +748,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     record = parser.get_creation_by_type(path, item_type)
     # log.debug(EFG_XMLParser.prettify(record))
     repo = CreationRepository(self.graph)
-    av = (item_type == 'Video')
+    av = item_type == 'Video'
     creation = None
     if item_type == 'Video':
         # parse AV_Entity
@@ -742,11 +759,10 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     else:
         # should never be reached
         raise Exception(
-            "Extracting metadata for type {} not yet implemented".format(
-                item_type))
+            "Extracting metadata for type {} not yet implemented".format(item_type)
+        )
     # log.debug(creation['properties'])
-    repo.create_entity(
-        creation['properties'], item_node, creation['relationships'], av)
+    repo.create_entity(creation['properties'], item_node, creation['relationships'], av)
     return parser.warnings
 
 
@@ -756,14 +772,14 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     file tech_info_filename and save them as Item properties in the database.
     """
     if not os.path.exists(analyze_dir_path):
-        raise IOError(
-            "Analyze results does not exist in the path %s", analyze_dir_path)
+        raise IOError("Analyze results does not exist in the path %s", analyze_dir_path)
 
     # check for info result
     tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
     if not os.path.exists(tech_info_path):
-        log.warning("Technical info CANNOT be extracted: [%s] does not exist",
-                    tech_info_path)
+        log.warning(
+            "Technical info CANNOT be extracted: [%s] does not exist", tech_info_path
+        )
         return
 
     # load info from json
@@ -794,18 +810,19 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
                 item.digital_format[1] = s["codec_long_name"]
                 # resolution: The degree of sharpness of the digital object
                 # expressed in pixel
-                item.digital_format[3] = str(
-                    s['width']) + 'x' + str(s['height'])
+                item.digital_format[3] = str(s['width']) + 'x' + str(s['height'])
 
         item.uri = data["format"]["filename"]
 
         # summary
         summary_filename = 'summary.jpg'
-        summary_path = os.path.join(
-            os.path.dirname(analyze_dir_path), summary_filename)
+        summary_path = os.path.join(os.path.dirname(analyze_dir_path), summary_filename)
         if not os.path.exists(summary_path):
-            log.warning("{0} CANNOT be found in the path: [{1}]".format(
-                        summary_filename, analyze_dir_path))
+            log.warning(
+                "{0} CANNOT be found in the path: [{1}]".format(
+                    summary_filename, analyze_dir_path
+                )
+            )
         else:
             item.summary = summary_path
 
@@ -813,10 +830,11 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         item.uri = data['image']['name']
         thumbnail_filename = 'transcoded_small.jpg'
         thumbnail_uri = os.path.join(
-            os.path.dirname(analyze_dir_path), thumbnail_filename)
-        item.thumbnail = (thumbnail_uri
-                          if os.path.exists(thumbnail_uri)
-                          else data['image']['name'])
+            os.path.dirname(analyze_dir_path), thumbnail_filename
+        )
+        item.thumbnail = (
+            thumbnail_uri if os.path.exists(thumbnail_uri) else data['image']['name']
+        )
 
         # filesize MUST be an Iteger of bytes (not e.g. 4.1KB)
         item.dimension = os.path.getsize(item.uri)
@@ -830,18 +848,21 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         item.digital_format[2] = data['image']['mimeType']
         # resolution: The degree of sharpness of the digital object expressed in
         # lines or pixel
-        item.digital_format[3] = str(data['image']['geometry']['width']) \
-            + 'x' + str(data['image']['geometry']['height'])
+        item.digital_format[3] = (
+            str(data['image']['geometry']['width'])
+            + 'x'
+            + str(data['image']['geometry']['height'])
+        )
 
     else:
-        log.warning('Invalid type. Technical info CANNOT be extracted for '
-                    'Item[{uuid}] with type {type}'.format(
-                        uuid=item.uuid, type=item.item_type))
+        log.warning(
+            'Invalid type. Technical info CANNOT be extracted for '
+            'Item[{uuid}] with type {type}'.format(uuid=item.uuid, type=item.item_type)
+        )
         return
 
     item.save()
-    log.info('Extraction of techincal info completed [{}]'
-             .format(tech_info_filename))
+    log.info('Extraction of techincal info completed [{}]'.format(tech_info_filename))
 
 
 def get_thumbnail(path):
@@ -850,8 +871,7 @@ def get_thumbnail(path):
     """
     jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
     index = random.randrange(0, len(jpg_files))
-    return os.path.join(
-        os.path.dirname(path), jpg_files[index])
+    return os.path.join(os.path.dirname(path), jpg_files[index])
 
 
 def extract_tvs_vim_results(self, item, analyze_dir_path):
@@ -866,14 +886,13 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
         raise IOError(
-            "Storyboard directory does not exist in the path %s", tvs_dir_path)
+            "Storyboard directory does not exist in the path %s", tvs_dir_path
+        )
     # check for info result
     tvs_filename = 'storyboard.json'
-    tvs_path = os.path.join(
-        os.path.dirname(tvs_dir_path), tvs_filename)
+    tvs_path = os.path.join(os.path.dirname(tvs_dir_path), tvs_filename)
     if not os.path.exists(tvs_path):
-        raise IOError(
-            "Shots CANNOT be extracted: [%s] does not exist", tvs_path)
+        raise IOError("Shots CANNOT be extracted: [%s] does not exist", tvs_path)
 
     log.debug('Get shots and vimotion from file [%s]' % tvs_path)
 
@@ -887,15 +906,19 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
         try:
             duration = s['len_seconds']
         except ValueError:
-            log.warning("Invalid duration in the shot {0} \
-                for value '{1}'".format(s['shot_num'], s['len_seconds']))
+            log.warning(
+                "Invalid duration in the shot {0} \
+                for value '{1}'".format(
+                    s['shot_num'], s['len_seconds']
+                )
+            )
             duration = None
         shots[s['shot_num']] = {
             'start_frame_idx': s['first_frame'],
             'end_frame_idx': s['last_frame'],
             'timestamp': s['timecode'],
             'duration': duration,
-            'thumbnail_uri': os.path.join(tvs_dir_path, s['img'])
+            'thumbnail_uri': os.path.join(tvs_dir_path, s['img']),
         }
         vim_estimations.append((s['shot_num'], s['motions_dict']))
 
@@ -915,10 +938,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
     brf_results_filename = 'brf.xml'
     brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
     if not os.path.exists(brf_results_path):
-        raise IOError(
-            "Analyze results does not exist in the path %s", brf_results_path)
-    log.info(
-        'get automatic building recognition from file [%s]' % brf_results_path)
+        raise IOError("Analyze results does not exist in the path %s", brf_results_path)
+    log.info('get automatic building recognition from file [%s]' % brf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(brf_results_path)
 
@@ -941,13 +962,13 @@ def extract_br_annotations(self, item, analyze_dir_path):
         (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
         '''
         if bf_list:
-            log.debug("timestamp: {0}, element: {1}".format(
-                timestamp, bf_list))
+            log.debug("timestamp: {0}, element: {1}".format(timestamp, bf_list))
         for recognized_building in bf_list:
             concepts.add(recognized_building[1])
             if recognized_building[0] not in object_ids:
-                report[recognized_building[1]] = report.get(
-                    recognized_building[1], 0) + 1
+                report[recognized_building[1]] = (
+                    report.get(recognized_building[1], 0) + 1
+                )
             object_ids.add(recognized_building[0])
             if item.item_type == 'Video':
                 shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
@@ -957,10 +978,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
                 shot_list[shot_num].add(recognized_building[1])
             # collect timestamp for keys:
             # (cat,shot) --> [(id1, t1, confidence1), (id2, t2, confidence2), ...]
-            tmp = obj_cat_report.get(
-                (recognized_building[1], shot_num), [])
-            tmp.append(
-                (recognized_building[0], timestamp, recognized_building[2]))
+            tmp = obj_cat_report.get((recognized_building[1], shot_num), [])
+            tmp.append((recognized_building[0], timestamp, recognized_building[2]))
             obj_cat_report[(recognized_building[1], shot_num)] = tmp
 
     log.info('-----------------------------------------------------')
@@ -969,7 +988,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
     print_out = 'Report of detected concepts per shot:\n'
     for k in sorted(shot_list.keys()):
         v = '{ }' if len(shot_list[k]) == 0 else shot_list[k]
-        print_out += ("{}:\t{}\n".format(k, v))
+        print_out += "{}:\t{}\n".format(k, v)
     log.info(print_out)
 
     # get item "city" code
@@ -985,8 +1004,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
         concept_name = key[0]
         building_resource = building_mapping.get(concept_name)
         if building_resource is None:
-            log.warn('Cannot find building <{0}> in the mapping'
-                     .format(concept_name))
+            log.warn('Cannot find building <{0}> in the mapping'.format(concept_name))
             # DO NOT create this annotation
             continue
         # filter by belonging city
@@ -998,7 +1016,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
         concept = {
             'iri': building_resource.get('iri'),
             'name': building_resource.get('name'),
-            'spatial': building_resource.get('coord')
+            'spatial': building_resource.get('coord'),
         }
         log.debug(concept)
 
@@ -1011,7 +1029,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
         end_frame = timestamps[-1][1]
         selector = {
             'type': 'FragmentSelector',
-            'value': 't=' + str(start_frame) + ',' + str(end_frame)
+            'value': 't=' + str(start_frame) + ',' + str(end_frame),
         }
         log.debug(selector)
 
@@ -1030,8 +1048,11 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
         od_confidences = [e for e in confidence if e is not None]
         avg_confidence = sum(od_confidences) / float(len(od_confidences))
-        log.debug('AVG confidence for building {0} in shot {1}: {2}'
-                  .format(key[0], key[1], avg_confidence))
+        log.debug(
+            'AVG confidence for building {0} in shot {1}: {2}'.format(
+                key[0], key[1], avg_confidence
+            )
+        )
         if avg_confidence < 0.5:
             # discard detections with low confidence
             continue
@@ -1039,35 +1060,34 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
         # save annotation
         bodies = []
-        br_body = {
-            'type': 'BRBody',
-            'object_id': br_id,
-            'confidence': avg_confidence
-        }
+        br_body = {'type': 'BRBody', 'object_id': br_id, 'confidence': avg_confidence}
         br_body['concept'] = {'type': 'ResourceBody', 'source': concept}
         bodies.append(br_body)
         try:
             from neomodel import db as transaction
+
             transaction.begin()
             # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
             #     bodies, selector))
-            repo.create_tag_annotation(
-                None, bodies, item, selector, False, None, True)
+            repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
             log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
-                log.warning(
-                    "Exception raised during rollback: %s" % rollback_exp)
+                log.warning("Exception raised during rollback: %s" % rollback_exp)
             raise e
         saved_counter += 1
 
-    log.info('Number of discarded recognized buildings with wrong city: {counter}'
-             .format(counter=wrong_city_counter))
-    log.info('Number of saved automatic annotations: {counter}'
-             .format(counter=saved_counter))
+    log.info(
+        'Number of discarded recognized buildings with wrong city: {counter}'.format(
+            counter=wrong_city_counter
+        )
+    )
+    log.info(
+        'Number of saved automatic annotations: {counter}'.format(counter=saved_counter)
+    )
     log.info('-----------------------------------------------------')
 
 
@@ -1079,10 +1099,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
     orf_results_filename = 'orf.xml'
     orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
     if not os.path.exists(orf_results_path):
-        raise IOError(
-            "Analyze results does not exist in the path %s", orf_results_path)
-    log.info(
-        'get automatic object detection from file [%s]' % orf_results_path)
+        raise IOError("Analyze results does not exist in the path %s", orf_results_path)
+    log.info('get automatic object detection from file [%s]' % orf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(orf_results_path)
 
@@ -1109,8 +1127,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
         for detected_object in od_list:
             concepts.add(detected_object[1])
             if detected_object[0] not in object_ids:
-                report[detected_object[1]] = report.get(
-                    detected_object[1], 0) + 1
+                report[detected_object[1]] = report.get(detected_object[1], 0) + 1
             object_ids.add(detected_object[0])
             if item.item_type == 'Video':
                 shot_uuid, shot_num = shot_lookup(self, shots, timestamp)
@@ -1120,8 +1137,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
                 shot_list[shot_num].add(detected_object[1])
             # collect timestamp for keys:
             # (obj,cat) --> [(t1, confidence1, region1), (t2, confidence2, region2), ...]
-            tmp = obj_cat_report.get(
-                (detected_object[0], detected_object[1]), [])
+            tmp = obj_cat_report.get((detected_object[0], detected_object[1]), [])
             tmp.append((timestamp, detected_object[2], detected_object[3]))
             obj_cat_report[(detected_object[0], detected_object[1])] = tmp
 
@@ -1140,21 +1156,17 @@ def extract_od_annotations(self, item, analyze_dir_path):
         concept_name = key[1]
         concept_iri = concept_mapping.get(concept_name)
         if concept_iri is None:
-            log.warn('Cannot find concept <{0}> in the mapping'
-                     .format(concept_name))
+            log.warn('Cannot find concept <{0}> in the mapping'.format(concept_name))
             # DO NOT create this annotation
             continue
-        concept = {
-            'iri': concept_iri,
-            'name': concept_name
-        }
+        concept = {'iri': concept_iri, 'name': concept_name}
 
         # detect target segment ONLY for videos
         start_frame = timestamps[0][0]
         end_frame = timestamps[-1][0]
         selector = {
             'type': 'FragmentSelector',
-            'value': 't=' + str(start_frame) + ',' + str(end_frame)
+            'value': 't=' + str(start_frame) + ',' + str(end_frame),
         }
 
         # detection confidence
@@ -1185,35 +1197,36 @@ def extract_od_annotations(self, item, analyze_dir_path):
         if len(region_sequence) > 1000:
             huge_size = len(region_sequence)
             region_sequence = []
-            log.warn('Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.
-                     format(objID=key[0], concept=concept['name'], size=huge_size))
+            log.warn(
+                'Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.format(
+                    objID=key[0], concept=concept['name'], size=huge_size
+                )
+            )
         od_body = {
             'type': 'ODBody',
             'object_id': key[0],
             'confidence': avg_confidence,
-            'region_sequence': region_sequence
+            'region_sequence': region_sequence,
         }
         od_body['concept'] = {'type': 'ResourceBody', 'source': concept}
         bodies.append(od_body)
         try:
             from neomodel import db as transaction
+
             transaction.begin()
             # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
             #     bodies, selector))
-            repo.create_tag_annotation(
-                None, bodies, item, selector, False, None, True)
+            repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
             log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
-                log.warning(
-                    "Exception raised during rollback: %s" % rollback_exp)
+                log.warning("Exception raised during rollback: %s" % rollback_exp)
             raise e
         counter += 1
-    log.info('Number of saved automatic annotations: {counter}'
-             .format(counter=counter))
+    log.info('Number of saved automatic annotations: {counter}'.format(counter=counter))
     log.info('-----------------------------------------------------')
 
 
@@ -1223,8 +1236,9 @@ def shot_lookup(self, shots, timestamp):
             return s.uuid, s.shot_num
 
 
-def send_notification(self, recipient, subject, template, replaces, task_id,
-                      failure=None):
+def send_notification(
+    self, recipient, subject, template, replaces, task_id, failure=None
+):
     """
     Send a notification email to a given recipient. If the failure is passed,
     an email is also sent to the system administrator with some more details

@@ -6,7 +6,7 @@ from utilities.logs import get_logger
 log = get_logger(__name__)
 
 
-class EFG_XMLParser():
+class EFG_XMLParser:
 
     ns = {'efg': 'http://www.europeanfilmgateway.eu/efg'}
 
@@ -21,15 +21,13 @@ class EFG_XMLParser():
         root = ET.parse(filepath)
         record = root.find('efg:avcreation', self.ns)
         if record is not None:
-            nodes = record.findall(
-                './efg:recordSource/efg:sourceID', self.ns)
+            nodes = record.findall('./efg:recordSource/efg:sourceID', self.ns)
             if len(nodes) <= 0:
                 return None
             return nodes[0].text.strip()
         record = root.find('efg:nonavcreation', self.ns)
         if record is not None:
-            nodes = record.findall(
-                './efg:recordSource/efg:sourceID', self.ns)
+            nodes = record.findall('./efg:recordSource/efg:sourceID', self.ns)
             if len(nodes) <= 0:
                 return None
             return nodes[0].text.strip()
@@ -51,8 +49,9 @@ class EFG_XMLParser():
     def get_av_creation_by_ref(self, filepath, ref_id):
         root = ET.parse(filepath)
         nodes = root.findall(
-            "./efg:avcreation/efg:recordSource/[efg:sourceID='" +
-            ref_id + "']/..", self.ns)
+            "./efg:avcreation/efg:recordSource/[efg:sourceID='" + ref_id + "']/..",
+            self.ns,
+        )
         if len(nodes) <= 0:
             return None
         return nodes[0]
@@ -78,8 +77,7 @@ class EFG_XMLParser():
         if title_el is not None:
             return title_el.text.strip(), title_el.get('origin')
 
-        log.debug(
-            'Identifying Title not found... look at the first Title composite')
+        log.debug('Identifying Title not found... look at the first Title composite')
         nodes = record.findall("./efg:title[1]/efg:text", self.ns)
         if len(nodes) <= 0:
             raise ValueError("Identifying title is missing")
@@ -102,7 +100,8 @@ class EFG_XMLParser():
         code_el = codelists.fromDescription(node.text.strip(), codelists.RIGHTS_STATUS)
         if code_el is None:
             raise ValueError(
-                'Invalid rights status description for: ' + node.text.strip())
+                'Invalid rights status description for: ' + node.text.strip()
+            )
         return code_el[0]
 
     def get_view_filmography(self, record):
@@ -132,11 +131,9 @@ class EFG_XMLParser():
             provider['name'] = provider_el.text.strip()
             provider['identifier'] = provider_el.get('id').upper()
             p_scheme = provider_el.get('schemeID')
-            scheme = codelists.fromDescription(
-                p_scheme, codelists.PROVIDER_SCHEMES)
+            scheme = codelists.fromDescription(p_scheme, codelists.PROVIDER_SCHEMES)
             if scheme is None:
-                raise ValueError(
-                    'Invalid provider scheme value for [%s]' % p_scheme)
+                raise ValueError('Invalid provider scheme value for [%s]' % p_scheme)
             provider['scheme'] = scheme[0]
             log.debug('Record Provider: {}'.format(provider))
 
@@ -144,8 +141,7 @@ class EFG_XMLParser():
             # this is a naive solution but enough because we expect here ONLY
             # one record_source (that of the archive)
             if not bind_url:
-                rs['is_shown_at'] = self.get_record_source_url(
-                    record, audio_visual)
+                rs['is_shown_at'] = self.get_record_source_url(record, audio_visual)
                 bind_url = True
             record_sources.append([rs, provider])
         return record_sources
@@ -175,30 +171,34 @@ class EFG_XMLParser():
                 lang_val = lang.lower()
                 lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                 if lang_code is None:
-                    self.warnings.append(
-                        'Invalid title language for: ' + lang.text)
+                    self.warnings.append('Invalid title language for: ' + lang.text)
                 else:
                     title['language'] = lang_code[0]
             if avcreation:
                 parts = []
                 for part in node.findall('efg:partDesignation', self.ns):
                     part_unit = part.find('efg:unit', self.ns).text.strip()
-                    code_el = codelists.fromCode(
-                        part_unit, codelists.AV_TITLE_UNIT)
+                    code_el = codelists.fromCode(part_unit, codelists.AV_TITLE_UNIT)
                     if code_el is None:
                         raise ValueError(
-                            'Invalid part designation unit for: ' + part_unit)
-                    parts.append("{} {}".format(
-                        code_el[0], part.find('efg:value', self.ns).text.strip()))
+                            'Invalid part designation unit for: ' + part_unit
+                        )
+                    parts.append(
+                        "{} {}".format(
+                            code_el[0], part.find('efg:value', self.ns).text.strip()
+                        )
+                    )
                 title['part_designations'] = parts
             title['text'] = node.find('efg:text', self.ns).text.strip()
             title_rel = node.find('efg:relation', self.ns)
             if title_rel is not None and title_rel.text.lower() != 'n/a':
                 code_el = codelists.fromCode(
-                    title_rel.text.strip(), codelists.AV_TITLE_TYPES)
+                    title_rel.text.strip(), codelists.AV_TITLE_TYPES
+                )
                 if code_el is None:
                     self.warnings.append(
-                        'Invalid title type for: ' + title_rel.text.strip())
+                        'Invalid title type for: ' + title_rel.text.strip()
+                    )
                 else:
                     title['relation'] = code_el[0]
             log.debug('title: {}'.format(title))
@@ -217,11 +217,9 @@ class EFG_XMLParser():
                     # filter ktype with value 'Project'
                     if ktype == 'Project':
                         continue
-                    code_el = codelists.fromDescription(
-                        ktype, codelists.KEYWORD_TYPES)
+                    code_el = codelists.fromDescription(ktype, codelists.KEYWORD_TYPES)
                     if code_el is None:
-                        self.warnings.append(
-                            'Invalid keyword type for: ' + ktype)
+                        self.warnings.append('Invalid keyword type for: ' + ktype)
                     else:
                         keyword['keyword_type'] = code_el[0]
                         log.debug('keyword [type]: %s' % keyword['keyword_type'])
@@ -231,7 +229,8 @@ class EFG_XMLParser():
                     lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                     if lang_code is None:
                         self.warnings.append(
-                            'Invalid keyword language for: ' + lang.text)
+                            'Invalid keyword language for: ' + lang.text
+                        )
                     else:
                         keyword['language'] = lang_code[0]
                         log.debug('language: {}'.format(keyword['language']))
@@ -239,10 +238,11 @@ class EFG_XMLParser():
                     # check term from a controlled IMC list
                     if term.text.lower() == 'n/a':
                         continue
-                    code_el = codelists.fromCode(
-                        term.text.strip(), codelists.FORM)
+                    code_el = codelists.fromCode(term.text.strip(), codelists.FORM)
                     if code_el is None:
-                        self.warnings.append('Invalid form type for: ' + term.text.strip())
+                        self.warnings.append(
+                            'Invalid form type for: ' + term.text.strip()
+                        )
                         continue
                     else:
                         keyword['term'] = code_el[0]
@@ -250,7 +250,7 @@ class EFG_XMLParser():
                     keyword['term'] = term.text.strip()
 
                 log.debug('keyword: {}'.format(keyword['term']))
- 
+
                 # log.debug('term id: %s' % term.get('id'))
                 if term.get('id') is not None:
                     # check keyword term id is integer (keyword term id is optional)
@@ -259,7 +259,10 @@ class EFG_XMLParser():
                         keyword['termID'] = term.get('id')
                     except Exception:
                         self.warnings.append(
-                            'Invalid keyword term id for: ' + term.get('id') + '. Expected integer.')
+                            'Invalid keyword term id for: '
+                            + term.get('id')
+                            + '. Expected integer.'
+                        )
                 else:
                     keyword['termID'] = None
                 keyword['schemeID'] = node.get('scheme')
@@ -272,11 +275,9 @@ class EFG_XMLParser():
             description = {}
             dtype = node.get('type')
             if dtype is not None and dtype.lower() != 'n/a':
-                code_el = codelists.fromDescription(
-                    dtype, codelists.DESCRIPTION_TYPES)
+                code_el = codelists.fromDescription(dtype, codelists.DESCRIPTION_TYPES)
                 if code_el is None:
-                    self.warnings.append(
-                        'Invalid description type for: ' + dtype)
+                    self.warnings.append('Invalid description type for: ' + dtype)
                 else:
                     description['description_type'] = code_el[0]
             lang = node.get('lang')
@@ -284,15 +285,14 @@ class EFG_XMLParser():
                 lang_val = lang.lower()
                 lang_code = codelists.fromCode(lang_val, codelists.LANGUAGE)
                 if lang_code is None:
-                    self.warnings.append(
-                        'Invalid description language for: ' + lang)
+                    self.warnings.append('Invalid description language for: ' + lang)
                 else:
                     description['language'] = lang_code[0]
             description['source_ref'] = node.get('source')
             description['text'] = node.text.strip()
             log.debug('description: {}'.format(description))
             descriptions.append(description)
-        # october 2018: change: description is optional 
+        # october 2018: change: description is optional
         # if len(descriptions) == 0:
         #    raise ValueError('Description is missing')
         return descriptions
@@ -340,16 +340,17 @@ class EFG_XMLParser():
                     usage = None
                 else:
                     code_el = codelists.fromDescription(
-                        usage, codelists.LANGUAGE_USAGES)
+                        usage, codelists.LANGUAGE_USAGES
+                    )
                     if code_el is None:
-                        self.warnings.append(
-                            'Invalid language usage for: ' + usage)
+                        self.warnings.append('Invalid language usage for: ' + usage)
                         usage = None
                     else:
                         usage = code_el[0]
             lang_usage = [lang, usage]
-            log.debug("lang code: {}, usage code: {}"
-                      .format(lang_usage[0], lang_usage[1]))
+            log.debug(
+                "lang code: {}, usage code: {}".format(lang_usage[0], lang_usage[1])
+            )
             languages.append(lang_usage)
         return languages
 
@@ -361,13 +362,15 @@ class EFG_XMLParser():
         for node in record.findall("./efg:countryOfReference", self.ns):
             country = node.text.strip().upper()
             if codelists.fromCode(country, codelists.COUNTRY) is None:
-                self.warnings.append(
-                    'Invalid country code for: ' + node.text.strip())
+                self.warnings.append('Invalid country code for: ' + node.text.strip())
                 continue
             reference = node.get('reference')
             country_reference = [country, reference]
-            log.debug("country: {}, reference: {}"
-                      .format(country_reference[0], country_reference[1]))
+            log.debug(
+                "country: {}, reference: {}".format(
+                    country_reference[0], country_reference[1]
+                )
+            )
             countries.append(country_reference)
         return countries
 
@@ -380,42 +383,62 @@ class EFG_XMLParser():
             video_format = {}
             # gauge (0..1) enum
             gauge_el = node.find('efg:gauge', self.ns)
-            if gauge_el is not None and gauge_el.text is not None and gauge_el.text.lower() != 'n/a':
-                code_el = codelists.fromCode(
-                    gauge_el.text.strip(), codelists.GAUGE)
+            if (
+                gauge_el is not None
+                and gauge_el.text is not None
+                and gauge_el.text.lower() != 'n/a'
+            ):
+                code_el = codelists.fromCode(gauge_el.text.strip(), codelists.GAUGE)
                 if code_el is None:
-                    self.warnings.append(
-                        'Invalid gauge for: ' + gauge_el.text.strip())
+                    self.warnings.append('Invalid gauge for: ' + gauge_el.text.strip())
                 else:
                     video_format['gauge'] = code_el[0]
             # aspectRation (0..1) enum
             aspect_ratio_el = node.find('efg:aspectRatio', self.ns)
-            if aspect_ratio_el is not None and aspect_ratio_el.text is not None and aspect_ratio_el.text.lower() != 'n/a':
+            if (
+                aspect_ratio_el is not None
+                and aspect_ratio_el.text is not None
+                and aspect_ratio_el.text.lower() != 'n/a'
+            ):
                 code_el = codelists.fromCode(
-                    aspect_ratio_el.text.strip(), codelists.ASPECT_RATIO)
+                    aspect_ratio_el.text.strip(), codelists.ASPECT_RATIO
+                )
                 if code_el is None:
                     self.warnings.append(
-                        'Invalid aspect ratio for: ' + aspect_ratio_el.text.strip())
+                        'Invalid aspect ratio for: ' + aspect_ratio_el.text.strip()
+                    )
                 else:
                     video_format['aspect_ratio'] = code_el[0]
             # sound (0..1) enum
             sound_el = node.find('efg:sound', self.ns)
-            if sound_el is not None and sound_el.text is not None and sound_el.text.lower() != 'n/a':
+            if (
+                sound_el is not None
+                and sound_el.text is not None
+                and sound_el.text.lower() != 'n/a'
+            ):
                 code_el = codelists.fromDescription(
-                    sound_el.text.strip(), codelists.VIDEO_SOUND)
+                    sound_el.text.strip(), codelists.VIDEO_SOUND
+                )
                 if code_el is None:
                     self.warnings.append(
-                        'Invalid format sound for: ' + sound_el.text.strip())
+                        'Invalid format sound for: ' + sound_el.text.strip()
+                    )
                 else:
                     video_format['sound'] = code_el[0]
             # colour (0..1)
             colour_el = node.find('efg:colour', self.ns)
-            if colour_el is not None and colour_el.text is not None and colour_el.text.lower() != 'n/a':
+            if (
+                colour_el is not None
+                and colour_el.text is not None
+                and colour_el.text.lower() != 'n/a'
+            ):
                 code_el = codelists.fromDescription(
-                    colour_el.text.strip(), codelists.COLOUR)
+                    colour_el.text.strip(), codelists.COLOUR
+                )
                 if code_el is None:
                     self.warnings.append(
-                        'Invalid format colour for: ' + colour_el.text.strip())
+                        'Invalid format colour for: ' + colour_el.text.strip()
+                    )
                 else:
                     video_format['colour'] = code_el[0]
             log.debug(video_format)
@@ -451,10 +474,12 @@ class EFG_XMLParser():
             rel_agent_type = agent_node.find('efg:type', self.ns)
             if rel_agent_type is not None and rel_agent_type.text.lower() != 'n/a':
                 code_el = codelists.fromDescription(
-                    rel_agent_type.text.strip(), codelists.TYPE_OF_ACTIVITY)
+                    rel_agent_type.text.strip(), codelists.TYPE_OF_ACTIVITY
+                )
                 if code_el is None:
                     self.warnings.append(
-                        'Invalid agent activity for: ' + rel_agent_type.text.strip())
+                        'Invalid agent activity for: ' + rel_agent_type.text.strip()
+                    )
                 else:
                     activities.append(rel_agent_type.text.strip())
 
@@ -464,8 +489,7 @@ class EFG_XMLParser():
                 props['agent_type'] = 'C'
             else:
                 # should never be reached
-                raise ValueError(
-                    'Invalid tag name for: {}'.format(agent_node.tag))
+                raise ValueError('Invalid tag name for: {}'.format(agent_node.tag))
 
             agent = None
             # de-duplicate agents
@@ -513,8 +537,7 @@ class EFG_XMLParser():
         if node is None:
             raise ValueError('Non AV type is missing')
         value = node.text.strip()
-        code_el = codelists.fromCode(
-            value, codelists.NON_AV_TYPES)
+        code_el = codelists.fromCode(value, codelists.NON_AV_TYPES)
         if code_el is None:
             raise ValueError('Invalid Non-AV type for: ' + value)
         return code_el[0]
@@ -524,7 +547,8 @@ class EFG_XMLParser():
         if node is None:
             raise ValueError('Non-AV specific type is missing')
         code_el = codelists.fromDescription(
-            node.text.strip(), codelists.NON_AV_SPECIFIC_TYPES)
+            node.text.strip(), codelists.NON_AV_SPECIFIC_TYPES
+        )
         if code_el is None:
             raise ValueError('Invalid Non-AV spefic type for: ' + node.text.strip())
         return code_el[0]
@@ -534,8 +558,7 @@ class EFG_XMLParser():
         Return an array with 2 element as follow:
         ["5x5", "pixel"]
         """
-        node = record.find(
-            './efg:nonAVManifestation/efg:physicalFormat', self.ns)
+        node = record.find('./efg:nonAVManifestation/efg:physicalFormat', self.ns)
         if node is not None:
             value = node.text.strip()
             unit = node.get('size')
@@ -553,14 +576,12 @@ class EFG_XMLParser():
             code_el = codelists.fromDescription(node.text.strip(), codelists.COLOUR)
             if code_el is not None:
                 return code_el[0]
-            self.warnings.append(
-                'Invalid format colour for: ' + node.text.strip())
+            self.warnings.append('Invalid format colour for: ' + node.text.strip())
 
     def __parse_creation(self, record, audio_visual=False):
         properties = {}
         properties['external_ids'] = self.parse_identifiers(record)
-        properties['rights_status'] = self.get_rights_status(
-            record, audio_visual)
+        properties['rights_status'] = self.get_rights_status(record, audio_visual)
         properties['collection_title'] = self.get_collection_title(record)
         # provenance is determined by the group from IS_OWNED_BY relationship,
         # ignore it!
@@ -568,15 +589,14 @@ class EFG_XMLParser():
 
         relationships = {}
         relationships['record_sources'] = self.parse_record_sources(
-            record, audio_visual)
-        relationships['titles'] = self.parse_titles(
-            record, avcreation=audio_visual)
+            record, audio_visual
+        )
+        relationships['titles'] = self.parse_titles(record, avcreation=audio_visual)
         relationships['keywords'] = self.parse_keywords(record)
         relationships['descriptions'] = self.parse_descriptions(record)
         relationships['languages'] = self.parse_languages(record, audio_visual)
         relationships['coverages'] = self.parse_coverages(record, audio_visual)
-        relationships['rightholders'] = self.parse_rightholders(
-            record, audio_visual)
+        relationships['rightholders'] = self.parse_rightholders(record, audio_visual)
 
         # agents
         relationships['agents'] = self.parse_related_agents(record)
@@ -587,25 +607,22 @@ class EFG_XMLParser():
         log.debug("--- parsing AV Entity ---")
         av_creation = {}
 
-        properties, relationships = self.__parse_creation(
-            record, audio_visual=True)
+        properties, relationships = self.__parse_creation(record, audio_visual=True)
 
         # manage av properties
-        properties['identifying_title'], \
-            properties['identifying_title_origin'] = self.get_identifying_title(
-                record)
+        properties['identifying_title'], properties[
+            'identifying_title_origin'
+        ] = self.get_identifying_title(record)
         properties['production_years'] = self.get_production_years(record)
         properties['view_filmography'] = self.get_view_filmography(record)
         av_creation['properties'] = properties
 
         # manage av relationships
-        relationships['production_countries'] = self.parse_production_contries(
-            record)
+        relationships['production_countries'] = self.parse_production_contries(record)
         relationships['video_format'] = self.parse_video_format(record)
         av_creation['relationships'] = relationships
         if len(self.warnings) > 0:
-            log.warning(
-                "Creation parsed with {} warning(s)".format(len(self.warnings)))
+            log.warning("Creation parsed with {} warning(s)".format(len(self.warnings)))
         return av_creation
 
     def parse_non_av_creation(self, record):
@@ -617,8 +634,7 @@ class EFG_XMLParser():
         # manage non_av properties
         properties['non_av_type'] = self.get_non_av_type(record)
         properties['specific_type'] = self.get_non_av_specific_type(record)
-        properties['phisical_format_size'] = self.get_physical_format_size(
-            record)
+        properties['phisical_format_size'] = self.get_physical_format_size(record)
         properties['date_created'] = self.get_date_created(record)
         properties['colour'] = self.get_colour(record)
         non_av_creation['properties'] = properties
@@ -626,8 +642,7 @@ class EFG_XMLParser():
         # manage non_av relationships
         non_av_creation['relationships'] = relationships
         if len(self.warnings) > 0:
-            log.warning(
-                "Creation parsed with {} warning(s)".format(len(self.warnings)))
+            log.warning("Creation parsed with {} warning(s)".format(len(self.warnings)))
         return non_av_creation
 
     def prettify(elem):

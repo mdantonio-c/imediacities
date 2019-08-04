@@ -1,6 +1,4 @@
-
-class CreationModelFactory():
-
+class CreationModelFactory:
     def __init__(self, graph):
         self.graph = graph
 

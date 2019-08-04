@@ -4,5 +4,5 @@
 import xml.etree.ElementTree as ET
 
 
-class XMLResultParser():
+class XMLResultParser:
     pass

@@ -14,24 +14,29 @@ logger = get_logger(__name__)
 
 
 def pre_authorize(func):
-
     def _is_public_domain(rs):
-        return True if (
-            rs == "02" or  # EU Orphan Work
-            rs == "04" or  # In copyright - Non-commercial use permitted
-            rs == "05" or  # Public Domain
-            rs == "06" or  # No Copyright - Contractual Restrictions
-            rs == "07" or  # No Copyright - Non-Commercial Use Only
-            rs == "08" or  # No Copyright - Other Known Legal Restrictions
-            rs == "09"     # No Copyright - United States
-        ) else False
+        return (
+            True
+            if (
+                rs == "02"
+                or rs == "04"  # EU Orphan Work
+                or rs == "05"  # In copyright - Non-commercial use permitted
+                or rs == "06"  # Public Domain
+                or rs == "07"  # No Copyright - Contractual Restrictions
+                or rs == "08"  # No Copyright - Non-Commercial Use Only
+                or rs  # No Copyright - Other Known Legal Restrictions
+                == "09"  # No Copyright - United States
+            )
+            else False
+        )
 
     def _is_general_public(user):
         """User is general public if anonymous (not logged in) or is a 'normal
         user'.
         """
-        return True if (user is None or
-                        user.roles.search(name='normal_user')) else False
+        return (
+            True if (user is None or user.roles.search(name='normal_user')) else False
+        )
 
     def _has_rights(self, user, entity_id):
         """
@@ -41,8 +46,7 @@ def pre_authorize(func):
         repo = CreationRepository(self.graph)
         rs = repo.get_right_status(entity_id)
         logger.debug('right status = {}'.format(rs))
-        return (False if _is_general_public(user) and not _is_public_domain(rs)
-                else True)
+        return False if _is_general_public(user) and not _is_public_domain(rs) else True
 
     def _has_public_access(self, user, entity_id):
         """
@@ -71,7 +75,8 @@ def pre_authorize(func):
         if not _has_public_access(self, user, entity_id):
             raise RestApiException(
                 "User is not authorized to access content",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN)
+                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            )
 
         return func(self, entity_id)
 

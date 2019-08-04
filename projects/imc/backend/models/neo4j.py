@@ -13,12 +13,24 @@ from datetime import datetime
 import pytz
 
 from restapi.services.neo4j.models import (
-    StringProperty, ArrayProperty, IntegerProperty, BooleanProperty,
-    FloatProperty, DateTimeProperty, DateProperty, JSONProperty, EmailProperty,
-    StructuredNode, StructuredRel, IdentifiedNode,
-    TimestampedNode, RelationshipTo, RelationshipFrom,
+    StringProperty,
+    ArrayProperty,
+    IntegerProperty,
+    BooleanProperty,
+    FloatProperty,
+    DateTimeProperty,
+    DateProperty,
+    JSONProperty,
+    EmailProperty,
+    StructuredNode,
+    StructuredRel,
+    IdentifiedNode,
+    TimestampedNode,
+    RelationshipTo,
+    RelationshipFrom,
 )
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
+
 # from neomodel.util import NodeClassRegistry
 
 from restapi.models.neo4j import User as UserBase
@@ -64,8 +76,8 @@ class HeritableStructuredNode(StructuredNode):
             return self
         cls = None
 
-        if target_class is None:    # Caller has not specified the target.
-            if len(classes) == 1:    # Only one option, so this must be it.
+        if target_class is None:  # Caller has not specified the target.
+            if len(classes) == 1:  # Only one option, so this must be it.
                 target_class = classes[0]
             else:
                 # Infer the most derivative class by looking for the one
@@ -75,17 +87,21 @@ class HeritableStructuredNode(StructuredNode):
                 _, cls = sorted(
                     zip(
                         map(lambda cls: len(cls.mro()), ordered_class_objs),
-                        ordered_class_objs),
-                    key=lambda size_cls: size_cls[0])[-1]
-        else:    # Caller has specified a target class.
+                        ordered_class_objs,
+                    ),
+                    key=lambda size_cls: size_cls[0],
+                )[-1]
+        else:  # Caller has specified a target class.
             if not isinstance(target_class, str):
                 # In the spirit of neomodel, we might as well support both
                 #  class (type) objects and class names as targets.
                 target_class = target_class.__name__
 
             if target_class not in classes:
-                raise ValueError('%s is not a sub-class of %s'
-                                 % (target_class, self.__class__.__name__))
+                raise ValueError(
+                    '%s is not a sub-class of %s'
+                    % (target_class, self.__class__.__name__)
+                )
         if cls is None:
             cls = getattr(sys.modules[__name__], target_class)
         instance = cls.inflate(self.id)
@@ -93,6 +109,7 @@ class HeritableStructuredNode(StructuredNode):
         # TODO: Can we re-instatiate without hitting the database again?
         instance.refresh()
         return instance
+
 
 ##############################################################################
 # MODELS
@@ -107,38 +124,38 @@ class RevisionRel(StructuredRel):
         when  Date of start or approval of a revision.
         state Revision status: Waiting or Running
     """
+
     when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
     state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
 
 class User(UserBase):
 
-    declared_institution = StringProperty(
-        required=False, show=True, default="none")
+    declared_institution = StringProperty(required=False, show=True, default="none")
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     annotations = RelationshipFrom(
-        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore)
+        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
+    )
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
-    coordinator = RelationshipTo(
-        'Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    coordinator = RelationshipTo('Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
     items_under_revision = RelationshipFrom(
-        'Item', 'REVISION_BY', cardinality=ZeroOrMore)
-    revised_shots = RelationshipFrom(
-        'Shot', 'REVISED_BY', cardinality=ZeroOrMore)
+        'Item', 'REVISION_BY', cardinality=ZeroOrMore
+    )
+    revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
     lists = RelationshipFrom(
-        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True)
+        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
+    )
 
 
 class Group(IdentifiedNode):
     fullname = StringProperty(required=True, unique_index=True, show=True)
     shortname = StringProperty(required=True, unique_index=True, show=True)
 
-    members = RelationshipFrom(
-        'User', 'BELONGS_TO', cardinality=ZeroOrMore, show=True)
-    coordinator = RelationshipFrom(
-        'User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    members = RelationshipFrom('User', 'BELONGS_TO', cardinality=ZeroOrMore, show=True)
+    coordinator = RelationshipFrom('User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
     stage_files = RelationshipFrom(
-        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=False)
+        'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=False
+    )
 
 
 class Stage(TimestampedNode, HeritableStructuredNode):
@@ -150,7 +167,8 @@ class Stage(TimestampedNode, HeritableStructuredNode):
     warnings = ArrayProperty(StringProperty(), show=True)
     task_id = StringProperty(show=True)
     ownership = RelationshipTo(
-        'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True)
+        'Group', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=True
+    )
 
 
 class MetaStage(Stage):
@@ -166,14 +184,13 @@ class ContentStage(Stage):
 
 
 class AnnotationTarget(HeritableStructuredNode):
-    annotation = RelationshipFrom(
-        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
+    annotation = RelationshipFrom('Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
 
 
 class ListItem(HeritableStructuredNode):
     """Represents an element of a list."""
-    lists = RelationshipFrom(
-        'List', 'LST_ITEM', cardinality=ZeroOrMore)
+
+    lists = RelationshipFrom('List', 'LST_ITEM', cardinality=ZeroOrMore)
 
 
 class List(TimestampedNode):
@@ -184,12 +201,11 @@ class List(TimestampedNode):
         name            The name of the list.
         description     It gives a description to the list.
     """
+
     name = StringProperty(required=True, show=True)
     description = StringProperty(required=True, show=True)
-    items = RelationshipTo(
-        'ListItem', 'LST_ITEM', cardinality=ZeroOrMore)
-    creator = RelationshipTo(
-        'User', 'LST_BELONGS_TO', cardinality=One)
+    items = RelationshipTo('ListItem', 'LST_ITEM', cardinality=ZeroOrMore)
+    creator = RelationshipTo('User', 'LST_BELONGS_TO', cardinality=One)
 
 
 class Item(TimestampedNode, AnnotationTarget, ListItem):
@@ -230,6 +246,7 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
         public_access   A flag that indicates whether or not the item is
                         accessible by a public user.
     """
+
     thumbnail = StringProperty()
     summary = StringProperty()
     duration = FloatProperty(show=True)
@@ -238,26 +255,28 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
     digital_format = ArrayProperty(StringProperty(), required=False, show=True)
     uri = StringProperty()
     item_type = StringProperty(
-        required=True, choices=codelists.CONTENT_TYPES, show=True)
+        required=True, choices=codelists.CONTENT_TYPES, show=True
+    )
     public_access = BooleanProperty(default=False, show=True)
-    ownership = RelationshipTo(
-        'Group', 'IS_OWNED_BY', cardinality=One, show=True)
+    ownership = RelationshipTo('Group', 'IS_OWNED_BY', cardinality=One, show=True)
     content_source = RelationshipTo(
-        'ContentStage', 'CONTENT_SOURCE', cardinality=ZeroOrOne)
-    meta_source = RelationshipTo(
-        'MetaStage', 'META_SOURCE', cardinality=One)
-    creation = RelationshipTo(
-        'Creation', 'CREATION', cardinality=ZeroOrOne)
+        'ContentStage', 'CONTENT_SOURCE', cardinality=ZeroOrOne
+    )
+    meta_source = RelationshipTo('MetaStage', 'META_SOURCE', cardinality=One)
+    creation = RelationshipTo('Creation', 'CREATION', cardinality=ZeroOrOne)
     sourcing_annotations = RelationshipFrom(
-        'Annotation', 'SOURCE', cardinality=ZeroOrMore)
+        'Annotation', 'SOURCE', cardinality=ZeroOrMore
+    )
     targeting_annotations = RelationshipFrom(
-        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore)
-    shots = RelationshipTo(
-        'Shot', 'SHOT', cardinality=ZeroOrMore)
+        'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore
+    )
+    shots = RelationshipTo('Shot', 'SHOT', cardinality=ZeroOrMore)
     revision = RelationshipTo(
-        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True)
+        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True
+    )
     other_version = RelationshipTo(
-        'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True)
+        'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True
+    )
 
 
 class ContributionRel(StructuredRel):
@@ -266,12 +285,14 @@ class ContributionRel(StructuredRel):
         activities  One or more film-related activities of the person taken
                     from relationship records or from secondary sources.
     """
+
     activities = ArrayProperty(StringProperty(), show=True)
 
 
 class LanguageRel(StructuredRel):
     """This indicates the usage relationship between the language and the
        creation."""
+
     usage = StringProperty(choices=codelists.LANGUAGE_USAGES, show=True)
 
 
@@ -301,42 +322,56 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         contributors        Agents which are involved in the creation of the
                             objects.
     """
+
     external_ids = ArrayProperty(StringProperty(), show=True)
     record_sources = RelationshipTo(
-        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
-    titles = RelationshipTo(
-        'Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
+        'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True
+    )
+    titles = RelationshipTo('Title', 'HAS_TITLE', cardinality=OneOrMore, show=True)
     keywords = RelationshipTo(
-        'Keyword', 'HAS_KEYWORD', cardinality=ZeroOrMore, show=True)
+        'Keyword', 'HAS_KEYWORD', cardinality=ZeroOrMore, show=True
+    )
     descriptions = RelationshipTo(
-        'Description', 'HAS_DESCRIPTION', cardinality=ZeroOrMore, show=True)
+        'Description', 'HAS_DESCRIPTION', cardinality=ZeroOrMore, show=True
+    )
     languages = RelationshipTo(
-        'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel,
-        show=True)
+        'Language', 'HAS_LANGUAGE', cardinality=ZeroOrMore, model=LanguageRel, show=True
+    )
     coverages = RelationshipTo(
-        'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True)
+        'Coverage', 'HAS_COVERAGE', cardinality=ZeroOrMore, show=True
+    )
     rights_status = StringProperty(
-        choices=codelists.RIGHTS_STATUS, required=True, show=True)
+        choices=codelists.RIGHTS_STATUS, required=True, show=True
+    )
     rightholders = RelationshipTo(
-        'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True)
+        'Rightholder', 'COPYRIGHTED_BY', cardinality=ZeroOrMore, show=True
+    )
     collection_title = StringProperty(show=True)
     contributors = RelationshipTo(
-        'Agent', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True,
-        model=ContributionRel)
-    item = RelationshipFrom(
-        'Item', 'CREATION', cardinality=One, show=True)
+        'Agent',
+        'CONTRIBUTED_BY',
+        cardinality=ZeroOrMore,
+        show=True,
+        model=ContributionRel,
+    )
+    item = RelationshipFrom('Item', 'CREATION', cardinality=One, show=True)
 
     def get_default_public_access(self):
         rs = self.rights_status
-        return True if (
-            rs == "02" or  # EU Orphan Work
-            rs == "04" or  # In copyright - Non-commercial use permitted
-            rs == "05" or  # Public Domain
-            rs == "06" or  # No Copyright - Contractual Restrictions
-            rs == "07" or  # No Copyright - Non-Commercial Use Only
-            rs == "08" or  # No Copyright - Other Known Legal Restrictions
-            rs == "09"     # No Copyright - United States
-        ) else False
+        return (
+            True
+            if (
+                rs == "02"
+                or rs == "04"  # EU Orphan Work
+                or rs == "05"  # In copyright - Non-commercial use permitted
+                or rs == "06"  # Public Domain
+                or rs == "07"  # No Copyright - Contractual Restrictions
+                or rs == "08"  # No Copyright - Non-Commercial Use Only
+                or rs  # No Copyright - Other Known Legal Restrictions
+                == "09"  # No Copyright - United States
+            )
+            else False
+        )
 
 
 class Title(StructuredNode):
@@ -353,12 +388,12 @@ class Title(StructuredNode):
                             title", "Distribution title", "Translated title"
                             etc).
     """
+
     text = StringProperty(required=True, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     part_designations = ArrayProperty(StringProperty(), show=True)
     relation = StringProperty(choices=codelists.AV_TITLE_TYPES, show=True)
-    creation = RelationshipFrom(
-        'Creation', 'HAS_TITLE', cardinality=One, show=True)
+    creation = RelationshipFrom('Creation', 'HAS_TITLE', cardinality=One, show=True)
 
 
 class Keyword(StructuredNode):
@@ -386,13 +421,13 @@ class Keyword(StructuredNode):
                         controlled vocabulary, the value of this element should
                         be set to "uncontrolled".
     """
+
     term = StringProperty(index=True, required=True, show=True)
     termID = IntegerProperty(show=True)
     keyword_type = StringProperty(choices=codelists.KEYWORD_TYPES, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
     schemeID = StringProperty(show=True)
-    creation = RelationshipFrom(
-        'Creation', 'HAS_KEYWORD', cardinality=One, show=True)
+    creation = RelationshipFrom('Creation', 'HAS_KEYWORD', cardinality=One, show=True)
 
 
 class Description(StructuredNode):
@@ -411,13 +446,14 @@ class Description(StructuredNode):
                           identifying the source directly or via a reference
                           system such as an on-line catalogue.
     """
+
     text = StringProperty(index=True, required=True, show=True)
     language = StringProperty(choices=codelists.LANGUAGE, show=True)
-    description_type = StringProperty(
-        choices=codelists.DESCRIPTION_TYPES, show=True)
+    description_type = StringProperty(choices=codelists.DESCRIPTION_TYPES, show=True)
     source_ref = StringProperty(show=True)
     creation = RelationshipFrom(
-        'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True)
+        'Creation', 'HAS_DESCRIPTION', cardinality=One, show=True
+    )
 
 
 class Language(StructuredNode):
@@ -428,10 +464,9 @@ class Language(StructuredNode):
         code   The language code.
         labels The translation into different languages.
     """
-    code = StringProperty(
-        choices=codelists.LANGUAGE, show=True, required=True)
-    creation = RelationshipFrom(
-        'Creation', 'HAS_LANGUAGE', cardinality=ZeroOrMore)
+
+    code = StringProperty(choices=codelists.LANGUAGE, show=True, required=True)
+    creation = RelationshipFrom('Creation', 'HAS_LANGUAGE', cardinality=ZeroOrMore)
 
 
 class Coverage(StructuredNode):
@@ -444,10 +479,10 @@ class Coverage(StructuredNode):
                     LOD-service.
         temporal    This may be a period, date or range date.
     """
+
     spatial = ArrayProperty(StringProperty(), required=True, show=True)
     temporal = ArrayProperty(StringProperty(), show=True)
-    creation = RelationshipFrom(
-        'Creation', 'HAS_COVERAGE', cardinality=One, show=True)
+    creation = RelationshipFrom('Creation', 'HAS_COVERAGE', cardinality=One, show=True)
 
 
 class Rightholder(IdentifiedNode):
@@ -457,10 +492,10 @@ class Rightholder(IdentifiedNode):
         name    Name of the copyright holder.
         url     If available, URL to the homepage of the copyright holder.
     """
+
     name = StringProperty(required=True, show=True)
     url = StringProperty(show=True)
-    creation = RelationshipFrom(
-        'Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore)
+    creation = RelationshipFrom('Creation', 'COPYRIGHTED_BY', cardinality=ZeroOrMore)
 
 
 class Agent(IdentifiedNode):
@@ -483,11 +518,11 @@ class Agent(IdentifiedNode):
                             entry in an external database or on content
                             provider's website.
     """
+
     # record_sources = RelationshipTo(
     #     'RecordSource', 'RECORD_SOURCE', cardinality=OneOrMore, show=True)
     external_ids = ArrayProperty(StringProperty(), show=True)
-    agent_type = StringProperty(
-        required=True, choices=codelists.AGENT_TYPES, show=True)
+    agent_type = StringProperty(required=True, choices=codelists.AGENT_TYPES, show=True)
     names = ArrayProperty(StringProperty(), required=True, show=True)
     birth_date = DateProperty(show=True)
     death_date = DateProperty(default=None, show=True)
@@ -495,7 +530,8 @@ class Agent(IdentifiedNode):
     sex = StringProperty(choices=codelists.SEXES, show=True)
     biography_views = ArrayProperty(StringProperty())
     creation = RelationshipFrom(
-        'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True)
+        'Creation', 'CONTRIBUTED_BY', cardinality=ZeroOrMore, show=True
+    )
 
 
 class RecordSource(StructuredNode):
@@ -510,12 +546,11 @@ class RecordSource(StructuredNode):
                         content provider's web site in its full information
                         context.
     """
+
     source_id = StringProperty(required=True, show=True)
     is_shown_at = StringProperty(show=True)
-    provider = RelationshipTo(
-        'Provider', 'PROVIDED_BY', cardinality=One, show=True)
-    creation = RelationshipFrom(
-        'Creation', 'RECORD_SOURCE', cardinality=One)
+    provider = RelationshipTo('Provider', 'PROVIDED_BY', cardinality=One, show=True)
+    creation = RelationshipFrom('Creation', 'RECORD_SOURCE', cardinality=One)
 
 
 class Provider(IdentifiedNode):
@@ -531,10 +566,12 @@ class Provider(IdentifiedNode):
     email        The email of the archive
     city         The city which the items refer to
     """
+
     name = StringProperty(index=True, required=True, show=True)
     identifier = StringProperty(required=True, show=True)
     scheme = StringProperty(
-        choices=codelists.PROVIDER_SCHEMES, required=True, show=True)
+        choices=codelists.PROVIDER_SCHEMES, required=True, show=True
+    )
     address = StringProperty(required=False, show=True)
     phone = StringProperty(required=False, show=True)
     fax = StringProperty(required=False, show=True)
@@ -542,7 +579,8 @@ class Provider(IdentifiedNode):
     email = EmailProperty(required=False, show=True)
     city = StringProperty(required=False, show=True)
     record_source = RelationshipFrom(
-        'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore)
+        'RecordSource', 'RECORD_SOURCE', cardinality=ZeroOrMore
+    )
 
 
 class CountryOfReferenceRel(StructuredRel):
@@ -550,6 +588,7 @@ class CountryOfReferenceRel(StructuredRel):
     The relationship between a geographic area and the audiovisual creation.
     Defaults to "production".
     """
+
     reference = StringProperty(default="Country of Production", show=True)
 
 
@@ -580,15 +619,20 @@ class AVEntity(Creation):
                                     filmographic entry of a film on the content
                                     provider web site.
     """
+
     identifying_title = StringProperty(index=True, required=True, show=True)
     identifying_title_origin = StringProperty(index=True, show=True)
-    production_years = ArrayProperty(
-        StringProperty(), required=True, show=True)
+    production_years = ArrayProperty(StringProperty(), required=True, show=True)
     production_countries = RelationshipTo(
-        'Country', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore,
-        model=CountryOfReferenceRel, show=True)
+        'Country',
+        'COUNTRY_OF_REFERENCE',
+        cardinality=ZeroOrMore,
+        model=CountryOfReferenceRel,
+        show=True,
+    )
     video_format = RelationshipTo(
-        'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True)
+        'VideoFormat', 'VIDEO_FORMAT', cardinality=ZeroOrOne, show=True
+    )
     view_filmography = ArrayProperty(StringProperty(), show=True)
 
 
@@ -603,9 +647,11 @@ class Country(StructuredNode):
         code   The country code.
         labels The translation into different languages.
     """
+
     code = StringProperty(choices=codelists.COUNTRY, show=True, required=True)
     creation = RelationshipFrom(
-        'AVEntity', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore)
+        'AVEntity', 'COUNTRY_OF_REFERENCE', cardinality=ZeroOrMore
+    )
 
 
 class VideoFormat(StructuredNode):
@@ -621,16 +667,17 @@ class VideoFormat(StructuredNode):
         sound           Element from values list.
         colour          Element from values list.
     """
+
     gauge = StringProperty(choices=codelists.GAUGE, show=True)
     aspect_ratio = StringProperty(choices=codelists.ASPECT_RATIO, show=True)
     sound = StringProperty(choices=codelists.VIDEO_SOUND, show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
-    creation = RelationshipFrom(
-        'AVEntity', 'VIDEO_FORMAT', cardinality=One, show=True)
+    creation = RelationshipFrom('AVEntity', 'VIDEO_FORMAT', cardinality=One, show=True)
 
     def __str__(self):
         return "VideoFormat: [gauge: {}, aspect_ratio: {}, sound: {}; colour {}]".format(
-            self.gauge, self.aspect_ratio, self.sound, self.colour)
+            self.gauge, self.aspect_ratio, self.sound, self.colour
+        )
 
 
 class NonAVEntity(Creation):
@@ -655,15 +702,17 @@ class NonAVEntity(Creation):
                                 of a non-audiovisual object (e.g. "black and
                                 white", "colour", "mixed").
     """
+
     date_created = ArrayProperty(StringProperty(), show=True)
-    non_av_type = StringProperty(required=True,
-                                 choices=codelists.NON_AV_TYPES,
-                                 show=True)
+    non_av_type = StringProperty(
+        required=True, choices=codelists.NON_AV_TYPES, show=True
+    )
     specific_type = StringProperty(
-        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES,
-        show=True)
+        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES, show=True
+    )
     phisical_format_size = ArrayProperty(StringProperty(), show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
+
 
 # ANNOTATION
 ##############################################################################
@@ -675,6 +724,7 @@ class AnnotationCreatorRel(StructuredRel):
 
 class Annotation(IdentifiedNode, AnnotationTarget):
     """Annotation class"""
+
     ANNOTATION_TYPES = (
         ('VQ', 'video quality'),
         ('VIM', 'video image motion'),
@@ -686,30 +736,37 @@ class Annotation(IdentifiedNode, AnnotationTarget):
         ('REP', 'reporting'),
         ('ASS', 'assessing'),
         ('DSC', 'describing'),
-        ('BMK', 'bookmarking')
+        ('BMK', 'bookmarking'),
     )
     AUTOMATIC_GENERATOR_TOOLS = (
         ('FHG', 'Fraunhofer tool'),
         ('VIS', 'Google Vision API'),
-        ('AWS', 'Amazon Rekognition API')
+        ('AWS', 'Amazon Rekognition API'),
     )
-    annotation_type = StringProperty(
-        required=True, choices=ANNOTATION_TYPES, show=True)
+    annotation_type = StringProperty(required=True, choices=ANNOTATION_TYPES, show=True)
     creation_datetime = DateTimeProperty(
-        default=lambda: datetime.now(pytz.utc), show=True)
+        default=lambda: datetime.now(pytz.utc), show=True
+    )
     private = BooleanProperty(default=False, show=True)
     embargo = DateProperty(show=True)
     source_item = RelationshipTo('Item', 'SOURCE', cardinality=One, show=True)
     creator = RelationshipTo(
-        'User', 'IS_ANNOTATED_BY', cardinality=ZeroOrOne,
-        model=AnnotationCreatorRel, show=True)
+        'User',
+        'IS_ANNOTATED_BY',
+        cardinality=ZeroOrOne,
+        model=AnnotationCreatorRel,
+        show=True,
+    )
     generator = StringProperty(choices=AUTOMATIC_GENERATOR_TOOLS, show=True)
     bodies = RelationshipTo(
-        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True)
+        'AnnotationBody', 'HAS_BODY', cardinality=ZeroOrMore, show=True
+    )
     targets = RelationshipTo(
-        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True)
+        'AnnotationTarget', 'HAS_TARGET', cardinality=OneOrMore, show=True
+    )
     refined_selection = RelationshipTo(
-        'FragmentSelector', 'REFINED_SELECTION', cardinality=ZeroOrOne)
+        'FragmentSelector', 'REFINED_SELECTION', cardinality=ZeroOrOne
+    )
 
 
 class AnnotationBody(HeritableStructuredNode):
@@ -725,12 +782,12 @@ class ResourceBody(AnnotationBody):
     iri = StringProperty(required=True, index=True, show=True)
     name = StringProperty(index=True, show=True)
     spatial = ArrayProperty(FloatProperty(), show=True)  # [lat, long]
-    detected_objects = RelationshipFrom(
-        'ODBody', 'CONCEPT', cardinality=ZeroOrMore)
+    detected_objects = RelationshipFrom('ODBody', 'CONCEPT', cardinality=ZeroOrMore)
 
 
 class ODBody(AnnotationBody):
     """Detected Object"""
+
     object_id = StringProperty(required=True, show=True)
     confidence = FloatProperty(required=True, show=True)
     object_type = RelationshipTo('ResourceBody', 'CONCEPT', cardinality=One)
@@ -738,6 +795,7 @@ class ODBody(AnnotationBody):
 
 class BRBody(ODBody):
     """Building Recognition"""
+
     pass
 
 
@@ -779,6 +837,7 @@ class VIMBody(AnnotationBody):
 
     [avg value, max value]
     """
+
     no_motion = ArrayProperty(FloatProperty(), show=True)
     left_motion = ArrayProperty(FloatProperty(), show=True)
     right_motion = ArrayProperty(FloatProperty(), show=True)
@@ -804,20 +863,22 @@ class VIMBody(AnnotationBody):
 
 class TVSBody(AnnotationBody):
     segments = RelationshipTo(
-        'VideoSegment', 'SEGMENT', cardinality=OneOrMore, show=True)
+        'VideoSegment', 'SEGMENT', cardinality=OneOrMore, show=True
+    )
 
 
 class VideoSegment(IdentifiedNode, AnnotationTarget):
     """Video Segment"""
+
     start_frame_idx = IntegerProperty(required=True, show=True)
     end_frame_idx = IntegerProperty(required=True, show=True)
-    annotation_body = RelationshipFrom(
-        'TVSBody', 'SEGMENT', cardinality=ZeroOrMore)
+    annotation_body = RelationshipFrom('TVSBody', 'SEGMENT', cardinality=ZeroOrMore)
     within_shots = RelationshipTo('Shot', 'WITHIN_SHOT', cardinality=OneOrMore)
 
 
 class Shot(VideoSegment, ListItem):
     """Shot class"""
+
     shot_num = IntegerProperty(required=True, show=True)
     frame_uri = StringProperty()
     thumbnail_uri = StringProperty()
@@ -827,14 +888,15 @@ class Shot(VideoSegment, ListItem):
     revision_check = BooleanProperty(default=False, show=True)
     item = RelationshipFrom('Item', 'SHOT', cardinality=One)
     embedded_segments = RelationshipFrom(
-        'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore)
-    revised_by = RelationshipTo('User', 'REVISED_BY', cardinality=ZeroOrMore,
-                                model=RevisionRel)
+        'VideoSegment', 'WITHIN_SHOT', cardinality=ZeroOrMore
+    )
+    revised_by = RelationshipTo(
+        'User', 'REVISED_BY', cardinality=ZeroOrMore, model=RevisionRel
+    )
 
 
 class FragmentSelector(HeritableStructuredNode):
-    annotation = RelationshipFrom(
-        'Annotation', 'REFINED_SELECTION', cardinality=One)
+    annotation = RelationshipFrom('Annotation', 'REFINED_SELECTION', cardinality=One)
 
 
 class AreaSequenceSelector(FragmentSelector):
@@ -844,4 +906,5 @@ class AreaSequenceSelector(FragmentSelector):
     e.g.
     [[x1,y1,w1,z1], [x2,y2,w2,z2], ...]
     """
+
     sequence = JSONProperty(required=True, show=True)

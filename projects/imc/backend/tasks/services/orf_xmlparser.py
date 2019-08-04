@@ -9,15 +9,14 @@ logger = get_logger(__name__)
 __author__ = "Silvano Imboden(s.imboden@cineca.it)"
 
 
-class ORF_XMLParser():
-
+class ORF_XMLParser:
     def parse(self, xmlfile):
         xml_tree = ET.ElementTree(file=xmlfile)
         xml_root = xml_tree.getroot()
         xml_labels = xml_root.find('labels')
         labels = {}
         for label in xml_labels:
-            lid  = int(label.get('uid'))
+            lid = int(label.get('uid'))
             name = label.get('name')
             # logger.debug("label id: {0}, name: {1}".format(lid, name))
             labels[int(lid)] = name
@@ -31,14 +30,14 @@ class ORF_XMLParser():
             xml_mappings = n.find('mappings')
             mappings = {}
             for m in xml_mappings:
-                oref  = m.attrib['object_ref']
-                lref  = int(m.attrib['label_ref'])
-                conf  = float(m.attrib['confidence'])
+                oref = m.attrib['object_ref']
+                lref = int(m.attrib['label_ref'])
+                conf = float(m.attrib['confidence'])
                 # always take the object with the highest confidence
                 if (oref not in mappings) or (mappings[oref][1] < conf):
                     mappings[oref] = (labels[lref], conf)
 
-            xml_objects  = n.find('objects')
+            xml_objects = n.find('objects')
             for o in xml_objects.findall('object'):
 
                 xml_region = o.find('region')
