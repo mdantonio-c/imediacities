@@ -11,9 +11,7 @@
         <item-detail [media]="item" (onDelete)="removeItem(item)"></item-detail>
     </div>
 </ngx-slick-carousel>
-<div class="loader col" *ngIf="loading" style="text-align: center">
-  <i class="fa fa-spinner fa-spin blue" style="font-size:36px;" aria-hidden="true"></i>
-</div>
+<div class="loader col" *ngIf="loading" style="text-align: center"></div>
 
 <!-- no results -->
 <div class="row" *ngIf="!loading && slides.length == 0">
