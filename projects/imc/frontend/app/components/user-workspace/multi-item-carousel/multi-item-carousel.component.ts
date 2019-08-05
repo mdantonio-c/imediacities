@@ -106,9 +106,7 @@ export class MultiItemCarouselComponent implements OnChanges {
   close() {
     this.slides = [];
 
-    if (this.slickModal === undefined) {
-      console.log("Warning, slick modal undefined, cannot unslick")
-    } else {
+    if (this.slickModal !== undefined) {
       this.slickModal.unslick();
     }
   }
@@ -144,8 +142,9 @@ export class MultiItemCarouselComponent implements OnChanges {
         break;
       case "listItems":
         console.log(`load items for list <${this.listId}>`);
-        this.slides = [];
-        this.slickModal.unslick();
+        /*this.slides = [];
+        this.slickModal.unslick();*/
+        this.close();
         this.listsService.getListItems(this.listId).subscribe(
           response => {
             this.slides = response.data.map(media => {
