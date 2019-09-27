@@ -209,8 +209,6 @@ const routes: Routes = [
     InputNumericDirective,
     InputSelectDirective,
     AutoFocusDirective,
-
-    FileSelectDirective, FileDropDirective
   ],
 
   providers: [
