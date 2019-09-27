@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { Component, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { saveAs as importedSaveAs } from "file-saver";
 import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -36,9 +36,10 @@ export class UploadComponent extends BasePaginationComponent {
 		protected notify: NotificationService,
 		protected modalService: NgbModal,
 		protected formly: FormlyService,
+	    protected changeDetectorRef: ChangeDetectorRef
 		) {
 
-		super(api, auth, notify, modalService, formly);
+		super(api, auth, notify, modalService, formly, changeDetectorRef);
 		this.init("group");
 
 		this.server_side_pagination = true;
