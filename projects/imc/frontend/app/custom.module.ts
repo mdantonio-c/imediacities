@@ -24,6 +24,7 @@ import { MultiItemCarouselComponent } from './components/user-workspace/multi-it
 import { ItemDetailComponent } from './components/user-workspace/item-detail/item-detail.component';
 
 import { CatalogComponent } from './catalog/catalog.component';
+import { SearchResultComponent } from "@app/catalog/components/search-result.component"
 import { SearchFilterComponent } from './catalog/components/search-filter/search-filter.component';
 import { SearchNavbarComponent } from './catalog/components/search-navbar/search-navbar.component';
 import { SearchThumbnailComponent } from './catalog/components/search-thumbnail/search-thumbnail.component';
@@ -49,6 +50,7 @@ import {AppMediaInfoComponent} from "./components/app-media/app-media-info/app-m
 import {AppMediaTagsComponent} from "./components/app-media/app-media-tags/app-media-tags";
 
 import {AppVideoPlayerComponent} from "./components/app-media/app-video-player/app-video-player";
+import {AppVideoControlComponent} from "@app/components/app-media/app-video-controls/app-video-control";
 import {AppVideoControlPlayComponent} from     "./components/app-media/app-video-controls/app-video-control-play/app-video-control-play";
 import {AppVideoControlGotoStartComponent} from "./components/app-media/app-video-controls/app-video-control-goto-start/app-video-control-goto-start";
 import {AppVideoControlGotoEndComponent} from   "./components/app-media/app-video-controls/app-video-control-goto-end/app-video-control-goto-end";
@@ -165,6 +167,7 @@ const routes: Routes = [
     MultiItemCarouselComponent,
     ItemDetailComponent,
     CatalogComponent,
+    SearchResultComponent,
     SearchFilterComponent,
     SliderRangeComponent,
     SearchNavbarComponent,
@@ -207,6 +210,7 @@ const routes: Routes = [
     AppReferenceComponent,
     AppLinkComponent,
     AppVideoPlayerComponent,
+    AppVideoControlComponent,
     AppModalTagCloudComponent,
     VideoControlsDeclarations,
 //    DropdownPositionDirective,

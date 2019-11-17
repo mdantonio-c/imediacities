@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class AppLodService {
@@ -11,10 +12,10 @@ export class AppLodService {
         const url = `https://www.wikidata.org/w/api.php`;
         const query_string = `?action=wbsearchentities&format=json&search=${search_key}&type=${type}&limit=${limit}&language=${language}`;
 
-        return this.http.jsonp(url + query_string, 'callback')
-            .map(
+        return this.http.jsonp(url + query_string, 'callback').pipe(
+            map(
                 res => AppLodService.jsonp_unwrap(res)
-            )
+            ))
             .toPromise()
     }
 

@@ -71,8 +71,8 @@ export class AdminGroupsComponent extends BasePaginationComponent {
 		return this.put(row, this.endpoint, data, this.formModal, false);
 	}
 
-	submit(data) {
-		this.send(data, this.endpoint);
+	submit() {
+		this.send(this.endpoint);
 	}
 
 }
