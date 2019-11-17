@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, OnInit, OnChanges, AfterViewInit, OnDestroy, ViewContainerRef } from '@angular/core';
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 import { AppShotsService } from "../../../services/app-shots";
 import { AppModaleService } from "../../../services/app-modale";
 import { AppMediaService } from "../../../services/app-media";

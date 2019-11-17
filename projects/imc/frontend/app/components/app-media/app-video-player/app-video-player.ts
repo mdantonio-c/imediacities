@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, ViewChildren, OnInit, AfterViewInit, Output, ElementRef, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { rangePlayer } from "../../../decorators/app-range";
 import { ShotRevisionService } from '../../../services/shot-revision.service';
-import { AuthService } from '/rapydo/src/app/services/auth';
+import { AuthService } from '@rapydo/services/auth';
 
 @Component({
     selector: 'app-video-player',

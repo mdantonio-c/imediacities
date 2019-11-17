@@ -5,8 +5,8 @@ import 'slick-carousel/slick/slick.min.js'
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { RapydoModule } from '/rapydo/src/app/rapydo.module';
-import { AuthGuard } from '/rapydo/src/app/app.auth.guard';
+import { RapydoModule } from '@rapydo/rapydo.module';
+import { AuthGuard } from '@rapydo/app.auth.guard';
 
 import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';

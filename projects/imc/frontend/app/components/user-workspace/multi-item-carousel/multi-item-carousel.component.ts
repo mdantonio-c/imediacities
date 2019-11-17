@@ -1,5 +1,5 @@
 import { Component, Input, Output, OnChanges, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NotificationService } from '@rapydo/services/notification';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Providers } from '../../../catalog/services/data';
 import { MediaUtilsService } from '../../../catalog/services/media-utils.service'

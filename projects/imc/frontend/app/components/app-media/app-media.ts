@@ -4,11 +4,11 @@ import { AppShotsService } from "../../services/app-shots";
 import { AppMediaService } from "../../services/app-media";
 import { AppModaleComponent } from "../app-modale/app-modale";
 import { AppVideoPlayerComponent } from "./app-video-player/app-video-player";
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 import { AppVideoService } from "../../services/app-video";
 import { AppAnnotationsService } from "../../services/app-annotations";
 import { ShotRevisionService, SceneCut } from "../../services/shot-revision.service";
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NotificationService } from '@rapydo/services/notification';
 /**
  * Componente per la visualizzazione del media
  */

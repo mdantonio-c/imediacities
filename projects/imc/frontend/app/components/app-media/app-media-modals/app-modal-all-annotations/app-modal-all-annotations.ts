@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges, Input } from '@angular/core';
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 import { is_annotation_owner } from "../../../../decorators/app-annotation-owner";
 
 @Component({

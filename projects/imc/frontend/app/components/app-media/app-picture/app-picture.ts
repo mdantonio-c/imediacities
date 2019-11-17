@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, AfterViewInit, ViewChild, ElementRef} from '@angular/core';
-import { AuthService } from '/rapydo/src/app/services/auth';
+import { AuthService } from '@rapydo/services/auth';
 
 @Component({
     selector: 'app-picture',

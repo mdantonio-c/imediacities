@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NotificationService } from '@rapydo/services/notification';
 import { ListsService } from '../../services/lists.service';
 import { UserList } from '../../services/lists.model';
 

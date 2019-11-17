@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '/rapydo/src/app/services/api';
+import { ApiService } from '@rapydo/services/api';
 import { Subject } from 'rxjs';
 import * as moment from 'moment';
 

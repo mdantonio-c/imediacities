@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '/rapydo/src/app/services/auth';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { AuthService } from '@rapydo/services/auth';
+import { NotificationService } from '@rapydo/services/notification';
 import { Providers } from '../../catalog/services/data';
 import { CatalogService, SearchFilter } from '../../catalog/services/catalog.service'
 import { ListsService } from '../../services/lists.service';

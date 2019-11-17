@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 import { AppMediaService } from "../../../services/app-media";
 import { is_item_owner } from "../../../decorators/app-item-owner";
 

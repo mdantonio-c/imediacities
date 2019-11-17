@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { CatalogService, SearchFilter } from "../../services/catalog.service";
 import { GeoCoder, NguiMapComponent } from '@ngui/map';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NotificationService } from '@rapydo/services/notification';
 
 const europeCenter = { lat: 45, lng: 14 };
 const mapStyles = {

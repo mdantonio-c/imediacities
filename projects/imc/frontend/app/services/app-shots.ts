@@ -1,5 +1,5 @@
 import {Injectable, Output, EventEmitter} from '@angular/core';
-import {ApiService} from '/rapydo/src/app/services/api';
+import {ApiService} from '@rapydo/services/api';
 
 @Injectable()
 export class AppShotsService {

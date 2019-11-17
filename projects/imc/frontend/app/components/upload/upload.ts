@@ -4,12 +4,12 @@ import { saveAs as importedSaveAs } from "file-saver";
 import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { ApiService } from '/rapydo/src/app/services/api';
-import { AuthService } from '/rapydo/src/app/services/auth';
-import { NotificationService} from '/rapydo/src/app/services/notification';
-import { FormlyService } from '/rapydo/src/app/services/formly'
+import { ApiService } from '@rapydo/services/api';
+import { AuthService } from '@rapydo/services/auth';
+import { NotificationService} from '@rapydo/services/notification';
+import { FormlyService } from '@rapydo/services/formly'
 
-import { BasePaginationComponent } from '/rapydo/src/app/components/base.pagination.component'
+import { BasePaginationComponent } from '@rapydo/components/base.pagination.component'
 
 @Component({
   selector: 'upload',

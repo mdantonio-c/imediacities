@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NotificationService } from '/rapydo/src/app/services/notification';
-import { AuthService } from '/rapydo/src/app/services/auth';
+import { NotificationService } from '@rapydo/services/notification';
+import { AuthService } from '@rapydo/services/auth';
 import { ListsService } from '../../../services/lists.service'
 
 export interface ItemDetail {

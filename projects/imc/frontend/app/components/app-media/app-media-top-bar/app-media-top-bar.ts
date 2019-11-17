@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { Location } from '@angular/common';
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 
 @Component({
     selector: 'app-media-top-bar',

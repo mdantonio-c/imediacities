@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '/rapydo/src/app/services/api';
+import { ApiService } from '@rapydo/services/api';
 import { Router } from '@angular/router';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { NotificationService } from '@rapydo/services/notification';
 
 @Injectable()
 export class AppMediaService {

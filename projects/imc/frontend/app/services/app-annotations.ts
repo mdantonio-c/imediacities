@@ -1,6 +1,6 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
-import { ApiService } from '/rapydo/src/app/services/api';
-import { NotificationService } from '/rapydo/src/app/services/notification';
+import { ApiService } from '@rapydo/services/api';
+import { NotificationService } from '@rapydo/services/notification';
 import { Observable } from 'rxjs/';
 import 'rxjs/add/observable/forkJoin';
 import { AppShotsService } from "./app-shots";

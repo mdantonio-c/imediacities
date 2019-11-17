@@ -3,7 +3,7 @@ import { AppMediaModal } from "../app-media-modal";
 import { AppAnnotationsService } from "../../../../services/app-annotations";
 import { IMC_Annotation } from "../../../../services/app-shots";
 import { infoResult } from "../../../../decorators/app-info";
-import { AuthService } from "/rapydo/src/app/services/auth";
+import { AuthService } from "@rapydo/services/auth";
 import { is_annotation_owner } from "../../../../decorators/app-annotation-owner";
 
 const url_protocol = /^https?:\/\//i;
