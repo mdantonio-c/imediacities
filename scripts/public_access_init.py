@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 from imc.models.neo4j import Item
 from restapi.flask_ext import get_debug_instance
 from restapi.flask_ext.flask_neo4j import NeoModel

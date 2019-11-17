@@ -16,7 +16,7 @@ from imc.models import codelists
 from operator import itemgetter
 
 
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.flask_ext.flask_celery import CeleryExt
 from restapi.flask_ext.flask_celery import send_errors_by_email

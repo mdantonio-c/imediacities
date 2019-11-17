@@ -13,17 +13,14 @@ POST api/bulk
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-# from flask import request
-# from utilities.helpers import get_api_url
-# from restapi.confs import PRODUCTION
 import os
 import re
 from shutil import copyfile
 from datetime import datetime
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
-from utilities import htmlcodes as hcodes
+from restapi.utilities.htmlcodes import hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from imc.tasks.services.creation_repository import CreationRepository

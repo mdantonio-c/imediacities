@@ -17,7 +17,7 @@ from oaipmh.error import NoRecordsMatchError
 from lxml import etree
 import time
 from datetime import datetime
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 
 log = get_logger(__name__)
 

@@ -9,8 +9,8 @@ from flask import send_file, make_response
 from mimetypes import MimeTypes
 
 from restapi import decorators as decorate
-from utilities.logs import get_logger
-from utilities import htmlcodes as hcodes
+from restapi.utilities.logs import get_logger
+from restapi.utilities.htmlcodes import hcodes
 from restapi.services.uploader import Uploader
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException

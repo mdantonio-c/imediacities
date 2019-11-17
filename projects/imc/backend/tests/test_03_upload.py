@@ -1,6 +1,6 @@
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 from restapi.tests import BaseTests
-from utilities import htmlcodes as hcodes
+from restapi.utilities.htmlcodes import hcodes
 from restapi.tests.utilities import AUTH_URI
 import json
 

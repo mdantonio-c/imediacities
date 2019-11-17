@@ -3,11 +3,11 @@
 """
 Expose the codelists
 """
-import os, json
-from utilities.logs import get_logger
+import json
+from restapi.utilities.logs import get_logger
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from utilities import htmlcodes as hcodes
+from restapi.utilities.htmlcodes import hcodes
 from restapi import decorators as decorate
 
 log = get_logger(__name__)

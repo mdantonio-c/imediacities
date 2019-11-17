@@ -10,8 +10,8 @@ from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
-from utilities.logs import get_logger
-from utilities import htmlcodes as hcodes
+from restapi.utilities.logs import get_logger
+from restapi.utilities.htmlcodes import hcodes
 
 # from imc.tasks.services.xml_result_parser import XMLResultParser
 from imc.tasks.services.annotation_repository import AnnotationRepository

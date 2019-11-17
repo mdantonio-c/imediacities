@@ -4,12 +4,12 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
-from utilities import htmlcodes as hcodes
+from restapi.utilities.htmlcodes import hcodes
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 

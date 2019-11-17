@@ -2,7 +2,7 @@
 
 import xml.etree.ElementTree as ET
 
-from utilities.logs import get_logger
+from restapi.utilities.logs import get_logger
 
 logger = get_logger(__name__)
 

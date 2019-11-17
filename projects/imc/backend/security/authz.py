@@ -7,8 +7,8 @@
 """
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi.exceptions import RestApiException
-from utilities import htmlcodes as hcodes
-from utilities.logs import get_logger
+from restapi.utilities.htmlcodes import hcodes
+from restapi.utilities.logs import get_logger
 
 logger = get_logger(__name__)
 

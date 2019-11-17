@@ -4,7 +4,7 @@
 Manage the lists of the researcher
 """
 from flask import request
-from utilities.helpers import get_api_url
+from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
@@ -14,8 +14,8 @@ from restapi.services.neo4j.graph_endpoints import (
     catch_graph_exceptions,
 )
 from imc.models.neo4j import Item, Shot, TextualBody
-from utilities.logs import get_logger
-from utilities import htmlcodes as hcodes
+from restapi.utilities.logs import get_logger
+from restapi.utilities.htmlcodes import hcodes
 
 import re
 
