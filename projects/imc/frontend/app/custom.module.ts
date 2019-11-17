@@ -1,3 +1,7 @@
+import 'js-marker-clusterer/src/markerclusterer.js'
+import 'ion-rangeslider/js/ion.rangeSlider.min.js'
+import 'slick-carousel/slick/slick.min.js'
+
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 

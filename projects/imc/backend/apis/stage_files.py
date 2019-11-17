@@ -365,7 +365,7 @@ class Stage(GraphBaseOperations):
                         # cambio il nome al file dell'utente
                         # TODO come faccio ad avvisarlo????
                         os.replace(path, standard_path)
-                    except OSError as ose:
+                    except OSError:
                         log.debug(
                             "Error in renaming file %s to %s: " % (path, standard_path)
                         )

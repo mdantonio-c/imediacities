@@ -1,3 +1,14 @@
+/* add the ion-range-slider style and skin css */
+@import url('ion-rangeslider/css/ion.rangeSlider.css');
+@import url('ion-rangeslider/css/ion.rangeSlider.skinFlat.css');
+
+/* Include slick css */
+@import url('slick-carousel/slick/slick.css');
+@import url('slick-carousel/slick/slick-theme.css');
+
+@import url('/app/app/custom/css/scss/style.css');
+@import url('/app/app/custom/css/app-video-player.css');
+
 .no-padding { padding: 0 !important }
 .no-padding-bottom { padding-bottom: 0 !important }
 .no-padding-top { padding-top: 0 !important }

@@ -12,7 +12,6 @@ services:
       ftp_net:
 
   neo4j:
-    restart: on-failure:5
     volumes:
       - ${VANILLA_DIR}/data/graphdata:/data
     ports:

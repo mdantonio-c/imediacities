@@ -4,13 +4,8 @@ version: '3'
 
 services:
   backend:
-    environment:
-      APP_MODE: debug
-      DEBUG_LEVEL: VERBOSE
     ports:
-      - 8080:5000
-    networks:
-      worker_net:
+      - ${BACKEND_PORT}:${FLASK_DEFAULT_PORT}
 
   neo4j:
     ports:
@@ -19,21 +14,6 @@ services:
   frontend:
     ports:
       - 80:80
-
-  celery:
-    environment:
-      APP_MODE: debug
-      DEBUG_LEVEL: VERBOSE
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
-
-  celeryui:
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
 
   ftp:
     environment:
