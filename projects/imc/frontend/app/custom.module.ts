@@ -12,7 +12,7 @@ import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule} from '@ngui/map';
 import { HolderJsModule } from 'angular2-holderjs/component';
 import { IonRangeSliderModule } from "ng2-ion-range-slider";
-import { FileSelectDirective, FileDropDirective } from 'ng2-file-upload';
+import { FileUploadModule } from 'ng2-file-upload';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { ArchiveComponent } from './components/admin/archive/archive'
@@ -157,7 +157,8 @@ const routes: Routes = [
     NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
     HolderJsModule,
     IonRangeSliderModule,
-    SlickCarouselModule
+    SlickCarouselModule,
+    FileUploadModule
   ],
   declarations: [
     ArchivesListComponent, ArchiveComponent,
@@ -216,7 +217,8 @@ const routes: Routes = [
 //    DropdownPositionDirective,
     InputNumericDirective,
     InputSelectDirective,
-    AutoFocusDirective,
+    AutoFocusDirective
+
   ],
 
   providers: [
