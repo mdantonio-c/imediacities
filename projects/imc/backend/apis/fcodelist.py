@@ -7,6 +7,7 @@ import json
 from restapi.utilities.logs import get_logger
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
+from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
 from restapi import decorators as decorate
 
@@ -14,7 +15,13 @@ log = get_logger(__name__)
 
 
 class Fcodelist(EndpointResource):
+
+    # schema_expose = True
+    labels = ['fcodelist']
+    GET = {'/fcodelist/<codelist>': {'summary': 'GET codelists', 'description': 'Returns a codelist', 'parameters': [{'name': 'lang', 'in': 'query', 'description': 'Language of the codelist', 'type': 'string'}], 'responses': {'200': {'description': 'A codelist.'}, '404': {'description': 'Codelist does not exist.'}}}}
+
     @decorate.catch_error()
+    @authentication.required()
     def get(self, codelist=None):
         """Get the codelists."""
         log.debug('load the codelist: ' + codelist)

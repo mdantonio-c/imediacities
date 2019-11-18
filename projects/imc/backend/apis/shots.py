@@ -7,9 +7,9 @@ from flask import send_file
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-
 from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
+from restapi.protocols.bearer import authentication
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 
@@ -22,6 +22,11 @@ logger = get_logger(__name__)
 
 #####################################
 class Shots(GraphBaseOperations):
+
+    # schema_expose = True
+    labels = ['shot']
+    GET = {'/shots/<shot_id>': {'summary': 'Gets information about a shot', 'description': 'Returns a single shot for its id', 'parameters': [{'name': 'content', 'in': 'query', 'description': 'content type (ONLY thumbnail at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Shot information successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video does not exists.'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, shot_id=None):
@@ -77,8 +82,13 @@ class ShotAnnotations(GraphBaseOperations):
         Get all shot annotations for a given shot.
     """
 
+    # schema_expose = True
+    labels = ['shot_annotations']
+    GET = {'/shots/<shot_id>/annotations': {'summary': 'Gets shot annotations.', 'description': 'Returns all the annotations targeting the given shot.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'List of annotations.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Shot does not exist.'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def get(self, shot_id):
         logger.info("get annotations for Shot id: %s", shot_id)
         if shot_id is None:

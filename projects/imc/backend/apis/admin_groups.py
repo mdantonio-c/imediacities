@@ -4,6 +4,7 @@ from restapi import decorators as decorate
 
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
+from restapi.protocols.bearer import authentication
 from restapi.services.neo4j.graph_endpoints import graph_transactions
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
@@ -16,8 +17,17 @@ __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 
 class AdminGroups(GraphBaseOperations):
+
+    # schema_expose = True
+    labels = ['admin']
+    GET = {'/admin/groups/<group_id>': {'summary': 'List of groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/admin/groups': {'summary': 'List of groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    POST = {'/admin/groups': {'parameters': [{'name': 'shortname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Short name', 'custom': {'label': 'Short name'}}, {'name': 'fullname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Full name', 'custom': {'label': 'Full name'}}, {'name': 'coordinator', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Select a coordinator', 'custom': {'htmltype': 'select', 'label': 'Group coordinator', 'model_key': '_coordinator', 'select_id': 'id', 'islink': True}}], 'summary': 'Create a new group', 'responses': {'200': {'description': 'The uuid of the new group is returned'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    PUT = {'/admin/groups/<group_id>': {'parameters': [{'name': 'shortname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Short name', 'custom': {'label': 'Short name'}}, {'name': 'fullname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Full name', 'custom': {'label': 'Full name'}}, {'name': 'coordinator', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Select a coordinator', 'custom': {'htmltype': 'select', 'label': 'Group coordinator', 'model_key': '_coordinator', 'select_id': 'id', 'islink': True}}], 'summary': 'Modify a group', 'responses': {'200': {'description': 'Group successfully modified'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    DELETE = {'/admin/groups/<group_id>': {'summary': 'Delete a group', 'responses': {'200': {'description': 'Group successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required(roles=['admin_root'])
     def get(self, id=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -33,6 +43,7 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
+    @authentication.required(roles=['admin_root'])
     def post(self):
 
         self.graph = self.get_service_instance('neo4j')
@@ -91,6 +102,7 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
+    @authentication.required(roles=['admin_root'])
     def put(self, group_id=None):
 
         if group_id is None:
@@ -133,6 +145,7 @@ class AdminGroups(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
+    @authentication.required(roles=['admin_root'])
     def delete(self, group_id=None):
 
         if group_id is None:
@@ -154,8 +167,13 @@ class AdminGroups(GraphBaseOperations):
 
 
 class UserGroup(GraphBaseOperations):
+
+    labels = ['miscellaneous']
+    GET = {'/group/<query>': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/group': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def get(self, query=None):
 
         self.graph = self.get_service_instance('neo4j')

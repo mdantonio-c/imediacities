@@ -1,6 +1,0 @@
-file: videos
-class: VideoItem
-schema:
-  expose: true
-mapping:
-  video_item: "/videos/<video_id>/item"

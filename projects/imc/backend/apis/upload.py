@@ -9,6 +9,7 @@ from flask import send_file, make_response
 from mimetypes import MimeTypes
 
 from restapi import decorators as decorate
+from restapi.protocols.bearer import authentication
 from restapi.utilities.logs import get_logger
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.uploader import Uploader
@@ -22,9 +23,15 @@ mime = MimeTypes()
 
 
 class Upload(Uploader, GraphBaseOperations):
+
+    labels = ['file']
+    GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
+    POST = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
+    @authentication.required(roles=['Archive'])
     def post(self, filename):
 
         self.graph = self.get_service_instance('neo4j')
@@ -47,6 +54,7 @@ class Upload(Uploader, GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     @graph_transactions
+    @authentication.required(roles=['Archive'])
     def get(self, filename):
         log.info("get stage content for filename %s" % filename)
         if filename is None:

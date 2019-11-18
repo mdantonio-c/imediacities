@@ -1,8 +1,0 @@
-file: images
-class: ImageTools
-schema:
-  expose: true
-mapping:
-  image_tools: "/images/<image_id>/tools"
-labels:
-  - image_tools

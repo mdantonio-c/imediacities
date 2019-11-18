@@ -1,8 +1,0 @@
-file: shots
-class: ShotAnnotations
-schema:
-  expose: true
-mapping:
-  shot_annotations: "/shots/<shot_id>/annotations"
-labels:
-  - shot_annotations

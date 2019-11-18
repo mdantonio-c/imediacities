@@ -1,6 +1,0 @@
-file: bulk 
-class: Bulk 
-mapping:
-  bulk: "/bulk"
-labels:
-  - bulk

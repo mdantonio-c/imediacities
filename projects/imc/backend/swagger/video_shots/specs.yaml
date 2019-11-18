@@ -1,8 +1,0 @@
-file: videos
-class: VideoShots
-schema:
-  expose: true
-mapping:
-  video_shots: "/videos/<video_id>/shots"
-labels:
-  - video_shots

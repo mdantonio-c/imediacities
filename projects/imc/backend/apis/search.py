@@ -24,6 +24,9 @@ log = get_logger(__name__)
 #####################################
 class Search(GraphBaseOperations):
 
+    labels = ['file']
+    POST = {'/search': {'summary': 'Search some videos', 'description': 'Search videos previously staged in the area.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/SearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of videos matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+
     allowed_item_types = ('all', 'video', 'image')  # , 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
     allowed_anno_types = ('TAG', 'DSC', 'LNK')

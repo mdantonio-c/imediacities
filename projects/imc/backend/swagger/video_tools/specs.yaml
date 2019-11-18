@@ -1,8 +1,0 @@
-file: videos
-class: VideoTools
-schema:
-  expose: true
-mapping:
-  video_tools: "/videos/<video_id>/tools"
-labels:
-  - video_tools

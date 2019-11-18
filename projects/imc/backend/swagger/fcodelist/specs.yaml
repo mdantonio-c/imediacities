@@ -1,9 +1,0 @@
-file: fcodelist 
-class: Fcodelist 
-# baseuri: "/api"
-schema:
-  expose: true
-mapping:
-  fcodelist: "/fcodelist/<codelist>"
-labels:
-  - fcodelist

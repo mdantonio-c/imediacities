@@ -19,6 +19,7 @@ from shutil import copyfile
 from datetime import datetime
 from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
+from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
@@ -36,6 +37,9 @@ logger = get_logger(__name__)
 class Bulk(GraphBaseOperations):
 
     allowed_actions = ('update', 'import', 'delete', 'v2')
+
+    labels = ['bulk']
+    POST = {'/bulk': {'summary': 'Perform many operations such as import, update, delete etc.', 'description': 'The bulk API makes it possible to perform many operations in a single API call.', 'responses': {'202': {'description': 'Bulk action successfully accepted'}, '400': {'description': 'Bad request.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     def check_item_type_coherence(self, resource, standard_path):
         """
@@ -127,6 +131,7 @@ class Bulk(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required(roles=['admin_root'])
     def post(self):
         logger.debug("Start bulk procedure...")
 

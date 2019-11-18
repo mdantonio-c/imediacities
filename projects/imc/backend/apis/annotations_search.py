@@ -7,6 +7,7 @@ Search endpoint for annotations
 from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
+from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
@@ -21,8 +22,11 @@ class SearchAnnotations(GraphBaseOperations):
     allowed_item_types = ('all', 'video', 'image', 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
+    POST = {'/annotations/search': {'summary': 'Search for annotations', 'description': 'Search for annotations', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of annotation matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def post(self):
 
         self.initGraph()

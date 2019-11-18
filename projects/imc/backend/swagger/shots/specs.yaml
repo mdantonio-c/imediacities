@@ -1,9 +1,0 @@
-file: shots 
-class: Shots 
-# baseuri: "/api"
-schema:
-  expose: true
-mapping:
-  video: "/shots/<shot_id>"
-labels:
-  - shot

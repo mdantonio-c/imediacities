@@ -1,9 +1,0 @@
-file: admin_groups
-class: AdminGroups
-schema:
-  expose: true
-mapping:
-  groups: "/admin/groups"
-  group: "/admin/groups/<group_id>"
-labels:
-  - admin 

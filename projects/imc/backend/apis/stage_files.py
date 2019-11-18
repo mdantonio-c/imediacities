@@ -8,6 +8,7 @@ from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
+from restapi.protocols.bearer import authentication
 from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 
@@ -22,6 +23,11 @@ log = get_logger(__name__)
 class Stage(GraphBaseOperations):
 
     allowed_import_mode = ('clean', 'fast', 'skip')
+
+    labels = ['file']
+    GET = {'/stage': {'summary': 'List of files contained in the stage area of the specified group', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}], 'responses': {'200': {'description': 'List of files and directories successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/stage/<group>': {'summary': 'List of files contained in the stage area of the specified group', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}], 'responses': {'200': {'description': 'List of files and directories successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    POST = {'/stage': {'summary': 'Import a file from the stage area', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the import.', 'schema': {'required': ['filename'], 'properties': {'filename': {'type': 'string', 'description': 'The metadata file to be imported'}, 'mode': {'type': 'string', 'description': 'Different modes for pipeline execution', 'default': 'fast', 'enum': ['fast', 'clean', 'skip']}, 'update': {'type': 'boolean', 'description': 'only for metadata update', 'default': True}, 'force_reprocessing': {'type': 'boolean', 'description': 'Allow to force re-processing of COMPLETED contents', 'default': False}}}}], 'responses': {'200': {'description': 'File successfully imported'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '409': {'description': 'No source ID found in metadata file.'}}}}
+    DELETE = {'/stage/<filename>': {'summary': 'Delete a file from the stage area', 'responses': {'200': {'description': 'File successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     def getType(self, filename):
         name, file_extension = os.path.splitext(filename)
@@ -78,6 +84,7 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def head(self, group=None):
         self.graph = self.get_service_instance('neo4j')
 
@@ -112,6 +119,7 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def get(self, group=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -212,6 +220,7 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def post(self):
         """
         Start IMPORT
@@ -418,6 +427,7 @@ class Stage(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
+    @authentication.required()
     def delete(self, filename):
 
         self.graph = self.get_service_instance('neo4j')

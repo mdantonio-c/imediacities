@@ -1,9 +1,0 @@
-file: stage_files 
-class: Stage 
-# baseuri: "/api"
-mapping:
-  stage: "/stage"
-  archive: "/stage/<group>"
-  deletion: "/stage/<filename>"
-labels:
-  - file

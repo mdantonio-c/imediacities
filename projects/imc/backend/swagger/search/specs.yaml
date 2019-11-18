@@ -1,7 +1,0 @@
-file: search 
-class: Search 
-# baseuri: "/api"
-mapping:
-  search: "/search"
-labels:
-  - file
