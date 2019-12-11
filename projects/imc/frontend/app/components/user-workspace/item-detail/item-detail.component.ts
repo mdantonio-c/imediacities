@@ -14,7 +14,8 @@ export interface ItemDetail {
 	listItem?: boolean,
 	listId?: string,
 	nb_items?: number,
-	ref?: any
+	ref?: any,
+	duration?: string
 }
 
 // expected https://{url}?list={listID}&access_token={token}
@@ -43,7 +44,7 @@ export class ItemDetailComponent implements OnInit {
 		this.mediaForm['description'] = this.media.description;
 	}
 
-	disableSaveAs() { return false; }
+	disableSaveAs(event) { return false; }
 
 	route() {
 		if (this.media.listItem) {

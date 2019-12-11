@@ -18,7 +18,6 @@ import { NotificationService } from '@rapydo/services/notification';
     providers: [ShotRevisionService]
 })
 export class AppMediaComponent implements OnInit, OnDestroy {
-
     /**
      * Riferimento al componente AppModale
      */
@@ -82,9 +81,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     public media_class = '';
     public media_type = '';
     public media_id = '';
-
     public tab_title = '';
-
     private _subscription;
 
     constructor(
@@ -185,8 +182,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 attributes: {
                     state: {key: 'W'}
                 }
-            }
-            this.media.relationships.item[0].relationships.revision = [revision]
+            };
+            this.media.relationships.item[0].relationships.revision = [revision];
             this.under_revision();
         });
     }
@@ -335,7 +332,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             componente.data.shots.unshift(this.shots[previous_shot_num]);
         }
         this.modale.data = componente.data;
-
         this.appModale.open(componente.titolo, this.MediaService.type(), componente.classe);
     }
 
@@ -420,19 +416,15 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
         //  Normalizzo i dati delle immagini
         if (this.media_type === 'image') {
-
             // anno di produzione
             if (mediaEntity.attributes.date_created) {
                 mediaEntity.attributes.production_years = mediaEntity.attributes.date_created;
             }
-
             // titolo principale
             if (mediaEntity.relationships.titles.length) {
                 mediaEntity.attributes.identifying_title = mediaEntity.relationships.titles[0].attributes.text;
             }
-
             this.locations = [];
-
         }
 
         //  elimino i titoli aggiuntivi se sono identici a quello identificativo

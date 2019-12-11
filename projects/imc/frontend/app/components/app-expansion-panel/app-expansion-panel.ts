@@ -20,7 +20,6 @@ export class AppExpansionPanelComponent implements OnInit {
     }
 
     panel_expand(){
-        console.log('expand panel: ' + this.title);
         this.panel_is_expanded = !this.panel_is_expanded;
     }
 

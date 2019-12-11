@@ -78,10 +78,10 @@
     <!-- Barre sotto al player degli shot -->
     <div class="video_tag-container col-12">
         <app-video-tag *ngIf="layout_check('main')"
-                   [data]="shots"
-                   (modale_richiedi)="modal_show($event)"
-                   (scena_visualizza)="jump_to($event)"
-                   (current_component)="registra($event)"
-                   [parent]="this"></app-video-tag>
+            [data]="shots"
+            [parent]="this"
+            (scena_visualizza)="jump_to($event)"
+            (current_component)="registra($event)">
+        </app-video-tag>
     </div>
 </div>

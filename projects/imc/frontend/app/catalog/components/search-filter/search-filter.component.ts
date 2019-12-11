@@ -2,7 +2,6 @@ import { Component, OnInit, AfterViewInit, Output, EventEmitter, ViewChild, View
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SearchFilter, CatalogService } from '../../services/catalog.service'
 import { IPRStatuses, Providers } from '../../services/data';
-import { SliderRangeComponent } from './slider-range/slider-range.component';
 import { AppVocabularyService } from "../../../services/app-vocabulary";
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/combineLatest';

@@ -1,32 +1,33 @@
 <div class="search-nav row card mb-4 py-2 px-3" style="height: 58px;">
-	<div class="mr-auto">
-		<b style="position: absolute;top: 50%;height: 38px;margin-top: -11px;">
-		<span *ngIf="!loading">{{totalItems}}</span>
-		<span *ngIf="loading">
+    <div class="mr-auto">
+        <b style="position: absolute;top: 50%;height: 38px;margin-top: -11px;">
+            <span *ngIf="!loading">{{ totalItems }}</span>
+            <span *ngIf="loading">
 			<i class="fa fa-spinner fa-spin blue" aria-hidden="true" style="font-size:12px"></i>
 		</span>
-		results</b>
-	</div>
-	<div class="ml-auto" *ngIf="totalItems > 0">
-			<b>Display</b>
-			&nbsp;
-			<div id="toggle-result-format" class="btn-group btn-overlap" role="group" aria-label="Basic example">
-				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('Grid')"
-				[ngClass]="{'active btn-success': displayMode==='Grid'}" placement="top" ngbTooltip="Thumbnail view">
-				<i class="material-icons">view_module</i>
-				</button>
-				<button type="button" class="btn btn-icon-border-classic" (click)="changeView('List')"
-				[ngClass]="{'active btn-primary': displayMode==='List'}" placement="top" ngbTooltip="List view">
-				<i class="material-icons">view_list</i>
-				</button>
-				<button *ngIf="user && !user.roles['normal_user']" 
-					type="button" class="btn btn-icon-border-classic" 
-					(click)="changeView('Map')"				
-					[ngClass]="{'active btn-warning': displayMode==='Map'}" 
-					placement="top" 
-					ngbTooltip="Map&nbsp;view">
-				<i class="material-icons">location_searching</i>
-				</button>
-			</div>
-	</div>
+            results</b>
+    </div>
+    <div class="ml-auto" *ngIf="totalItems > 0">
+        <b>Display</b>
+        &nbsp;
+        <div id="toggle-result-format" class="btn-group btn-overlap" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-icon-border-classic" (click)="changeView('Grid')"
+                    [ngClass]="{'active btn-success': displayMode==='Grid'}" placement="top"
+                    ngbTooltip="Thumbnail view">
+                <i class="material-icons">view_module</i>
+            </button>
+            <button type="button" class="btn btn-icon-border-classic" (click)="changeView('List')"
+                    [ngClass]="{'active btn-primary': displayMode==='List'}" placement="top" ngbTooltip="List view">
+                <i class="material-icons">view_list</i>
+            </button>
+            <button *ngIf="user && !user.roles['normal_user']"
+                    type="button" class="btn btn-icon-border-classic"
+                    (click)="changeView('Map')"
+                    [ngClass]="{'active btn-warning': displayMode==='Map'}"
+                    placement="top"
+                    ngbTooltip="Map&nbsp;view">
+                <i class="material-icons">location_searching</i>
+            </button>
+        </div>
+    </div>
 </div>

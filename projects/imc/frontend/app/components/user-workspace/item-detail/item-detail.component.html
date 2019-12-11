@@ -38,7 +38,9 @@
 				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video': media.type === 'aventity', 'fa-camera': media.type === 'nonaventity'}"></i>
 			</span>
 		</span>
+    <!-- FIXME
 		<hjs class="media-object" alt="146x110" [holderId]="'hjs-'+media.id" [imgSrc]="'holder.js/146x110?text=NO THUMBNAIL'" *ngIf="!media.thumbnail" (contextmenu)="disableSaveAs($event)"></hjs>
+    -->
 		<img (contextmenu)="disableSaveAs($event)" src="{{media.thumbnail}}" *ngIf="media.thumbnail" class="img-fluid"/>
 		<span *ngIf="media.type === 'aventity'" class="anteprima-duration" [innerHTML]="media.duration | secondsToTime"></span>
     <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge">shot {{media.ref.attributes.shot_num + 1}}</span>

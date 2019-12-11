@@ -10,7 +10,9 @@
 				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-camera': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}"></i>
 			</span>
 		</span>
+		<!-- FIXME
 		<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.id" [imgSrc]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.links['thumbnail']"></hjs>
+		-->
 		<img (contextmenu)="disableSaveAs($event)" src="{{media.links['thumbnail']+'&size=large'}}" *ngIf="media.links['thumbnail']"
 		style="height: 200px; /*width: 100%;*/ display: block;" class="img-fluid"/>
 		<span *ngIf="media.type == 'aventity'" class="anteprima-duration" [innerHTML]="media.relationships.item[0].attributes.duration | secondsToTime"></span>

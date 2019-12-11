@@ -16,7 +16,7 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
     @ViewChild('volume_slider', { static: false }) volume_slider: ElementRef;
     @ViewChild('volume_gutter', { static: false }) volume_gutter: ElementRef;
 
-    private volume_level = 'off';
+    public volume_level = 'off';
     private volume_last_value = 0;
 
     private volume_slider_timer = 500;

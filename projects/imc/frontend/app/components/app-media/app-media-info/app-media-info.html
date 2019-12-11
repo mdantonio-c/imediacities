@@ -55,7 +55,7 @@
                                     let-descrizione
                                     [ngForOf]="this.info.relationships.descriptions">
                                 <p class="col-12"
-                                   *ngIf="descrizione.attributes.language && descrizione.attributes.language.key === description_active else missingLanguage"
+                                   *ngIf="descrizione.attributes.language && descrizione.attributes.language.key === description_active; else missingLanguage"
                                    [attr.data-languagekey]="descrizione.attributes.language.key"
                                    [innerHTML]="descrizione.attributes.text"></p>
                                 <p class="col-12"
@@ -100,16 +100,17 @@
                                     let-pchiave
                                     [ngForOf]="this.info.relationships.keywords">
                                 <div class="d-inline keyword-div"
-                                   *ngIf="pchiave.attributes.language && pchiave.attributes.language.key === keyword_active else missingLanguage"
-                                   [attr.data-languagekey]="pchiave.attributes.language.key"
-                                   [innerHTML]="pchiave.attributes.term"></div>
+                                     *ngIf="pchiave.attributes.language && pchiave.attributes.language.key === keyword_active; else missingLanguage"
+                                     [attr.data-languagekey]="pchiave.attributes.language.key"
+                                     [innerHTML]="pchiave.attributes.term"></div>
                                 <div class="d-inline keyword-div"
-                                   *ngIf="keyword_active === 'n/a' && !pchiave.attributes.language"
-                                   [innerHTML]="pchiave.attributes.term"></div>
+                                     *ngIf="keyword_active === 'n/a' && !pchiave.attributes.language"
+                                     [innerHTML]="pchiave.attributes.term"></div>
                             </ng-template>
                         </div>
                     </div>
                 </div>
+                <ng-template #missingLanguage></ng-template>
 
                 <app-expansion-panel title="Production information">
 

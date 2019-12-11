@@ -199,7 +199,7 @@
 		[columnMode]="'flex'"
 		[loadingIndicator]='true'
 		[footerHeight]="50"
-		[limit]="itemsPerPage">
+		[limit]="paging.itemsPerPage">
 		<ngx-datatable-footer>
 			<ng-template 
 				ngx-datatable-footer-template
@@ -282,8 +282,7 @@
 	        [popoverTitle]="deleteConfirmation.title"
 	        [popoverMessage]="deleteConfirmation.message"
 	        placement="left"
-	        (confirm)="remove(row.name)"
-	        (cancel)="cancelRequest()"></i>
+	        (confirm)="remove(row.name)"></i>
 
         <ng-template #disableDelete>
 			<i class='fa fa-trash fa-large'

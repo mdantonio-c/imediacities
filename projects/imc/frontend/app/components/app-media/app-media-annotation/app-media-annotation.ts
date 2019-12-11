@@ -1,11 +1,10 @@
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {AppAnnotationsService} from "../../../services/app-annotations";
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { AppAnnotationsService } from "../../../services/app-annotations";
 
 @Component({
     selector: 'app-media-annotation',
     templateUrl: 'app-media-annotation.html'
 })
-
 export class AppMediaAnnotationComponent implements OnInit {
 
     @Input() annotation;
@@ -17,28 +16,28 @@ export class AppMediaAnnotationComponent implements OnInit {
 
     public popover;
 
-    constructor(private element: ElementRef, private AnnotationsService: AppAnnotationsService) {
+    constructor(
+        private element: ElementRef,
+        private AnnotationsService: AppAnnotationsService) {
     }
 
-    delete () {
+    delete() {
         if (this.tag) return;
         if (!this.can_delete) return;
         if (this.annotation.id) {
             this.AnnotationsService.delete_tag(this.annotation, this.annotation.source);
         } else if (this.delete_fn) {
-                this.delete_fn(this.annotation)
+            this.delete_fn(this.annotation)
         }
-
     }
 
-    cancella_senza_popover () {
+    cancella_senza_popover() {
         if (this.disable_confirmation === true) {
             this.delete();
         }
     }
 
-    ngOnInit () {
-
+    ngOnInit() {
         let classe = 'badge-termtag';
         if (this.annotation.group === 'location') {
             classe = 'badge-geotag'
@@ -53,8 +52,6 @@ export class AppMediaAnnotationComponent implements OnInit {
         }*/
 
         this.element.nativeElement.querySelector('span').classList.add(classe);
-
         this.popover = this.AnnotationsService.popover();
-
     }
 }

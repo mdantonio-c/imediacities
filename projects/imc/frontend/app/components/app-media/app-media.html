@@ -190,7 +190,7 @@ picture-->
                                         *ngFor="let shot of shots"
                                         [shot]="shot"
                                         [user]="user"
-                                        [media_type]="image"
+                                        [media_type]="'image'"
                                         [multiSelection]="multi_annotations_is_active"
                                         (modale_richiedi)="modal_show($event)"
                                         (is_selezionato)="shot_selezionato($event)"

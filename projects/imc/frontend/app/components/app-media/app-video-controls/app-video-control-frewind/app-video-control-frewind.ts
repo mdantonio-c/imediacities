@@ -11,7 +11,7 @@ export class AppVideoControlFrewindComponent extends AppVideoControlComponent {
 
     stato = 0;
 
-    constructor(private AppVideoControlsFastPlay: AppVideoControlsFastPlayService) {
+    constructor(public AppVideoControlsFastPlay: AppVideoControlsFastPlayService) {
         super()
     }
 

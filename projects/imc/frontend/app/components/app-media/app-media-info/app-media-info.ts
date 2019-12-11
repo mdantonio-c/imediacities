@@ -7,7 +7,6 @@ import { is_item_owner } from "../../../decorators/app-item-owner";
     selector: 'app-media-info',
     templateUrl: 'app-media-info.html'
 })
-
 export class AppMediaInfoComponent implements AfterViewInit, OnInit {
 
     @Input() info: any;
@@ -46,6 +45,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
     _description_language_set(new_description_language) {
         this.description_active = new_description_language;
     }
+
     /**
      * Imposta la lingua della keyword
      * @param new_keyword_language
@@ -134,6 +134,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         };
 
     }
+
     /**
      * Eventi per la gestione del cambio della lingua delle keyword
      * @private
@@ -151,6 +152,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         };
 
     }
+
     /**
      * Crea le opzioni per la gestione della lignua delle descrizioni
      * @private
@@ -168,6 +170,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         })
 
     }
+
     /**
      * Crea le opzioni per la gestione della lignua delle keyword
      * @private

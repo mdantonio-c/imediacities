@@ -62,7 +62,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         this.parent.shot_play(this.shot.attributes.shot_num);
     }
 
-    shot_goto(frame, pause: true) {
+    shot_goto(frame, pause = true) {
         this.parent.jump_to(frame, true, pause)
     }
 

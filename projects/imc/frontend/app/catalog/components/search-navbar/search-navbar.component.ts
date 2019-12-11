@@ -16,7 +16,6 @@ export class SearchNavbarComponent extends SearchResultComponent {
 	ngOnChanges() {}
 
 	changeView(choice) {
-		console.log("changeView: user=" + JSON.stringify(this.getUser()));
 		this.displayMode = choice;
 		this.onViewChange.emit(choice);
 	}

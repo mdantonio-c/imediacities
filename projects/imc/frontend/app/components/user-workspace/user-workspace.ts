@@ -33,7 +33,7 @@ export class UserWorkspaceComponent implements OnInit {
         'NOTED_BY_ME': undefined
     }
 	listForm: FormGroup;
-	private selectedList: ItemDetail;
+	selectedList: ItemDetail;
     private user: any;
 	/**
      * Reference to NgbDropdown component for creating a new user list

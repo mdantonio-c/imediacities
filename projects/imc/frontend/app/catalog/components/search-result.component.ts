@@ -13,7 +13,7 @@ export class SearchResultComponent implements OnInit, OnChanges {
 
 	identifyingTitle: string;
 	description: string;
-	private user: any;
+	user: any;
 
 	constructor(private authService: AuthService, private router: Router) {
 		console.log("SearchResultComponent.constructor")
@@ -40,7 +40,7 @@ export class SearchResultComponent implements OnInit, OnChanges {
 		return (this.media.relationships.item[0].relationships.revision) ? true : false;
 	}
 
-	disableSaveAs() { return false; }
+	disableSaveAs(event) { return false; }
 
 	route(mediaId, mediaType) {
 		if (mediaType === 'nonaventity') {

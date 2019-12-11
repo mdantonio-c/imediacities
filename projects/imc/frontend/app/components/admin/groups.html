@@ -1,111 +1,101 @@
-
 <div class='container-fluid'>
-<div class="row justify-content-md-center">
-<div class='col-12'>
-
-<div class='card'>
-<div class='card-header'>
-	<h4 class='panel-title'>
-		<i class='fa fa-users'></i> Groups list
-	</h4>
-</div>
-
-<div class='card-block'>
-
-<loading *ngIf="loading"></loading>
-
-<div class="table-responsive" *ngIf="!loading">
-
-	<ngx-datatable
-		[rows]="rows"
-		[columns]="columns"
-		[columnMode]="'flex'"
-		[loadingIndicator]='true'
-		[footerHeight]="50"
-		[limit]="itemsPerPage">
-		<ngx-datatable-footer>
-			<ng-template 
-				ngx-datatable-footer-template
-				let-pageSize="pageSize"
-				let-selectedCount="selectedCount"
-				let-curPage="curPage"
-				let-offset="offset">
-				<div class='col-3'>
-					<button class="btn btn-success" (click)="create()">
-						Add new {{resource_name}}
-					</button>
-					{{paging.dataLength}} total
+	<div class="row justify-content-md-center">
+		<div class='col-12'>
+			<div class='card'>
+				<div class='card-header'>
+					<h4 class='panel-title'>
+					<i class='fa fa-users'></i> Groups list
+					</h4>
 				</div>
-				<div class='col-9'>
-				<div class='float-right'>
-				<ngb-pagination
-					boundaryLinks="true"
-					directionLinks="true"
-					[page]="paging.page"
-					[pageSize]="paging.itemsPerPage"
-					[collectionSize]="paging.dataLength"
-					[maxSize]="5"
-					[rotate]="true"
-					size="sm"
-					(pageChange)="setPage($event)"
-				>
-				</ngb-pagination>
+				<div class='card-block'>
+					<loading *ngIf="loading"></loading>
+					<div class="table-responsive" *ngIf="!loading">
+						<!--
+						<ngx-datatable
+							[rows]="rows"
+							[columns]="columns"
+							[columnMode]="'flex'"
+							[loadingIndicator]='true'
+							[footerHeight]="50"
+							[limit]="paging.itemsPerPage">
+							<ngx-datatable-footer>
+								<ng-template
+									ngx-datatable-footer-template
+									let-pageSize="pageSize"
+									let-selectedCount="selectedCount"
+									let-curPage="curPage"
+									let-offset="offset">
+									<div class='col-3'>
+											<button class="btn btn-success" (click)="create()">
+												Add new {{resource_name}}
+											</button>
+											{{paging.dataLength}} total
+									</div>
+									<div class='col-9'>
+										<div class='float-right'>
+											<ngb-pagination
+												boundaryLinks="true"
+												directionLinks="true"
+												[page]="paging.page"
+												[pageSize]="paging.itemsPerPage"
+												[collectionSize]="paging.dataLength"
+												[maxSize]="5"
+												[rotate]="true"
+												size="sm"
+												(pageChange)="setPage($event)"
+											>
+											</ngb-pagination>
+										</div>
+									</div>
+								</ng-template>
+							</ngx-datatable-footer>
+						</ngx-datatable>
+						-->
+						<ngx-datatable
+							class="bootstrap"
+							[rows]="data"
+							[columns]="columns"
+							[columnMode]="ColumnMode.flex"
+							[headerHeight]="40"
+							[footerHeight]="40"
+							[limit]="paging.itemsPerPage"
+							[rowHeight]="'auto'">
+						</ngx-datatable>
+					</div>
+					<ng-template #dataCoordinator let-row="row" let-value="value" let-i="index">
+						<span ngbTooltip='{{value[0].name}} {{value[0].surname}}' *ngIf="value[0]">
+							{{value[0].email}}
+						</span>
+					</ng-template>
+					<ng-template #emptyHeader let-column="column">&nbsp;</ng-template>
+					<ng-template #controlsCell let-row="row" let-value="value" let-i="index">
+						<i class='fa fa-edit fa-large' (click)='update(row)'></i>
+						<i class='fa fa-trash fa-large' style='color:red;'
+							mwlConfirmationPopover
+							[popoverTitle]="deleteConfirmation.title"
+							[popoverMessage]="deleteConfirmation.message"
+							placement="left"
+							(confirm)="remove(row.id)"></i>
+					</ng-template>
+					<ng-template #formModal let-c="close" let-d="dismiss">
+						<div class="modal-header bg-default">
+							<h4 class="modal-title">{{modalTitle}}</h4>
+							<button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<form [formGroup]="form" (ngSubmit)="submit()">
+								<formly-form [form]="form" [fields]="fields" [model]="model">
+									<button type="submit" class="btn btn-default">
+									<h4>Submit</h4>
+									</button>
+								</formly-form>
+							</form>
+						</div>
+					</ng-template>
 				</div>
-				</div>
-			</ng-template>
-		</ngx-datatable-footer>
-	</ngx-datatable>
-
-</div>
-	<ng-template #dataCoordinator let-row="row" let-value="value" let-i="index">
-
-		<span ngbTooltip='{{value[0].name}} {{value[0].surname}}' *ngIf="value[0]">
-	        {{value[0].email}}
-        </span>
-
-	</ng-template>
-
-
-	<ng-template #emptyHeader let-column="column">
-		&nbsp;
-	</ng-template>
-
-	<ng-template #controlsCell let-row="row" let-value="value" let-i="index">
-		<i class='fa fa-edit fa-large' (click)='update(row)'></i>
-		<i 
-			class='fa fa-trash fa-large' style='color:red;'
-	        mwlConfirmationPopover
-	        [popoverTitle]="deleteConfirmation.title"
-	        [popoverMessage]="deleteConfirmation.message"
-	        placement="left"
-	        (confirm)="remove(row.id)"
-	        (cancel)="cancelRequest()"></i>
-	</ng-template>
-
-	<ng-template #formModal let-c="close" let-d="dismiss">
-
-	  <div class="modal-header bg-default">
-	    <h4 class="modal-title">{{modalTitle}}</h4>
-	    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-	      <span aria-hidden="true">&times;</span>
-	    </button>
-	  </div>
-	  <div class="modal-body">
-	  	<form [formGroup]="form" (ngSubmit)="submit()">
-	  		<formly-form [form]="form" [fields]="fields" [model]="model">
-		    <button type="submit" class="btn btn-default">
-			    <h4>Submit</h4>
-		    </button>
-	  		</formly-form>
-  		</form>
-	  </div>
-
-	</ng-template>
-
-
-</div>
-</div>
-
-</div>
-</div>
+			</div>
+		</div>
+	</div>
 </div>
