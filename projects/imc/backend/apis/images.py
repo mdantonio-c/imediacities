@@ -42,6 +42,13 @@ class Images(GraphBaseOperations):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id=None):
+
+        if image_id is None and not self.auth.verify_admin():
+            raise RestApiException(
+                "You are not authorized",
+                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            )
+
         logger.debug("getting NonAVEntity id: %s", image_id)
         self.graph = self.get_service_instance('neo4j')
         data = []

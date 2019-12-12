@@ -42,8 +42,14 @@ class Videos(GraphBaseOperations):
 
     @decorate.catch_error()
     @catch_graph_exceptions
-    @authentication.required(roles=['admin_root'])
     def get(self, video_id=None):
+
+        if video_id is None and not self.auth.verify_admin():
+            raise RestApiException(
+                "You are not authorized",
+                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            )
+
         log.debug("getting AVEntity id: %s", video_id)
         self.graph = self.get_service_instance('neo4j')
         data = []
