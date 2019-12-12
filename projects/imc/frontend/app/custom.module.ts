@@ -5,6 +5,8 @@ import 'slick-carousel/slick/slick.min.js'
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { environment } from '@rapydo/../environments/environment';
+
 import { RapydoModule } from '@rapydo/rapydo.module';
 import { AuthGuard } from '@rapydo/app.auth.guard';
 
@@ -140,7 +142,8 @@ const routes: Routes = [
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
+    // NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+process.env.GMAP_KEY}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key=AIzaSyCkSQ5V_EWELQ6UCvVGBwr3LCriTAfXypI'}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,

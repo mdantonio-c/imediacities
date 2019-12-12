@@ -19,7 +19,8 @@ export interface ItemDetail {
 }
 
 // expected https://{url}?list={listID}&access_token={token}
-const VIRTUAL_GALLERY_URL: string = process.env.VIRTUAL_GALLERY_URL;
+// const VIRTUAL_GALLERY_URL: string = process.env.VIRTUAL_GALLERY_URL;
+const VIRTUAL_GALLERY_URL: string = "https://imc-vg.hpc.cineca.it/imc_vg/start_gallery";
 
 @Component({
 	selector: 'item-detail',

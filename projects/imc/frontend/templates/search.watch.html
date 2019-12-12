@@ -303,7 +303,7 @@
 				<div class="media search-media" ng-repeat="shot in watchCtrl.storyshots" style="height: 94px; padding-top: 6px;">
 					<div class="media-left">
 						<img ng-src="{{shot.thumb}}" ng-if="shot.thumb"/>
-						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
+						<img alt="no thumbnail" ng-src="/app/custom/assets/images/no_thumbnail_80x80.png" ng-if="shot.thumb == null"/>
 					</div>
 					<div class="media-content">
 						<div class="row">
@@ -366,7 +366,7 @@
 				<div class="media search-media" ng-repeat="seg in watchCtrl.manualSegmentations[0].segments | orderBy:'start'" style="height: 94px; padding-top: 6px;" ng-if="watchCtrl.manualSegmentations.length > 0 && watchCtrl.manualSegmentations[0].segments.length > 0">
 					<div class="media-left">
 						<img ng-src="{{seg.thumb}}" ng-if="seg.thumb"/>
-						<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="seg.thumb == null"/>
+						<img alt="no thumbnail" ng-src="/app/custom/assets/images/no_thumbnail_80x80.png" ng-if="seg.thumb == null"/>
 					</div>
 					<div class="media-content">
 						<div class="row">

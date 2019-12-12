@@ -11,6 +11,8 @@ import { FormlyService } from '@rapydo/services/formly'
 
 import { BasePaginationComponent } from '@rapydo/components/base.pagination.component'
 
+import { environment } from '@rapydo/../environments/environment';
+
 @Component({
   selector: 'upload',
   styles: [
@@ -48,21 +50,10 @@ export class UploadComponent extends BasePaginationComponent {
 		this.initPaging(20);
 		this.list();
 
-/*
-		$scope.flowOptions = {
-	        target: process.env.apiUrl + '/upload',
-	        chunkSize: 10*1024*1024,
-	        simultaneousUploads: 1,
-	        testChunks: false,
-	        permanentErrors: [ 401, 405, 500, 501 ],
-	        headers: {Authorization : 'Bearer ' + AuthService2.getToken()}
-	    };
-*/
-
 		let token = this.auth.getToken();
 		this.uploader = new FileUploader(
 			{
-				url: process.env.apiUrl + '/upload',
+				url: environment.apiUrl + '/upload',
 				authToken: `Bearer ${token}`,
 				disableMultipart: true,
 				// authToken: this.auth.getToken()

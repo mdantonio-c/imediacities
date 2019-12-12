@@ -16,7 +16,7 @@
 			}
 			else {
 				// console.log('load vocabulary from server');
-				$http.get('static/assets/vocabulary/vocabulary.json')
+				$http.get('/app/custom/assets/vocabulary/vocabulary.json')
 				.success(function(data) {
 					vocabulary.terms = data.terms;
 					d.resolve(data.terms);

@@ -29,7 +29,7 @@ export class AppVocabularyService {
 
         }else {
 
-            this.http.get('/static/assets/vocabulary/vocabulary.json')
+            this.http.get('/app/custom/assets/vocabulary/vocabulary.json')
                 .subscribe(
                     response => {
 

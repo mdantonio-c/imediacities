@@ -6,7 +6,7 @@
 	<div class="row">
 		<div id="search-box">
 			<div id="search-logo" ng-show="ctrl.viewlogo">
-				<img class="imc-logo" ng-src="static/assets/images/IMC-Logo-big-transp.png">
+				<img class="imc-logo" ng-src="/app/custom/assets/images/IMC-Logo-big-transp.png">
 			</div>
 			<span ng-if="ctrl.loadResults && ctrl.creations.length == 0"><i>No item found</i></span>
 			<div uib-alert 
@@ -125,7 +125,7 @@
 						<div class="itemdiv" ng-repeat="v in ctrl.creations">
 							<div class="imc-thumbnail">
 								<img ng-src="{{v.links['thumbnail']}}" ng-if="v.links['thumbnail']"/>
-								<img alt="no thumbnail" ng-src="static/assets/images/no_thumbnail_80x80.png" ng-if="v.links['thumbnail'] == null"/>
+								<img alt="no thumbnail" ng-src="/app/custom/assets/images/no_thumbnail_80x80.png" ng-if="v.links['thumbnail'] == null"/>
 								<div class="cn">
 									<div class="inner">
 										<i class="fa small" ng-class="{'fa-video-camera': v.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': v.relationships.item[0].attributes.item_type.key === 'Image'}">&nbsp;&nbsp;{{v.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
