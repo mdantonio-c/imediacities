@@ -83,40 +83,40 @@ class Stage(EndpointResource):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
-    def head(self, group=None):
-        self.graph = self.get_service_instance('neo4j')
+    # @decorate.catch_error()
+    # @catch_graph_exceptions
+    # @authentication.required()
+    # def head(self, group=None):
+    #     self.graph = self.get_service_instance('neo4j')
 
-        if not self.auth.verify_admin():
-            # Only admins can specify a different group to be inspected
-            group = None
+    #     if not self.auth.verify_admin():
+    #         # Only admins can specify a different group to be inspected
+    #         group = None
 
-        if group is None:
-            group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
-        else:
-            group = self.graph.Group.nodes.get_or_none(uuid=group)
+    #     if group is None:
+    #         group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+    #     else:
+    #         group = self.graph.Group.nodes.get_or_none(uuid=group)
 
-        if group is None:
-            return 0
+    #     if group is None:
+    #         return 0
 
-        upload_dir = os.path.join("/uploads", group.uuid)
-        if not os.path.exists(upload_dir):
-            return 0
+    #     upload_dir = os.path.join("/uploads", group.uuid)
+    #     if not os.path.exists(upload_dir):
+    #         return 0
 
-        counter = 0
-        for f in os.listdir(upload_dir):
+    #     counter = 0
+    #     for f in os.listdir(upload_dir):
 
-            path = os.path.join(upload_dir, f)
-            if not os.path.isfile(path):
-                continue
-            if f[0] == '.':
-                continue
+    #         path = os.path.join(upload_dir, f)
+    #         if not os.path.isfile(path):
+    #             continue
+    #         if f[0] == '.':
+    #             continue
 
-            counter += 1
+    #         counter += 1
 
-        return counter
+    #     return counter
 
     @decorate.catch_error()
     @catch_graph_exceptions
