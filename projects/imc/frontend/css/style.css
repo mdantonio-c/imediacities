@@ -93,7 +93,7 @@ button:focus {outline:0 !important;}
 .label.label-app {
     position: relative;
 }
-
+/*
 .badge {
 	position: absolute !important;
   top: -4px;
@@ -105,7 +105,7 @@ button:focus {outline:0 !important;}
   border-radius: 4px;
   white-space: normal;
   margin-bottom: 2px;
-}
+}*/
 .badge-warning, .badge.badge-warning { background-color: #f89406; }
 .label-location, .badge-location { background-color: #603913; }
 .label-term, .badge-term { background-color: #cbb69d; }
