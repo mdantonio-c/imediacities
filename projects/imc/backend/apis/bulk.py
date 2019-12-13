@@ -23,7 +23,7 @@ from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
-from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi.decorators import catch_graph_exceptions
 from imc.tasks.services.creation_repository import CreationRepository
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
@@ -99,7 +99,7 @@ class Bulk(GraphBaseOperations):
                 try:
                     parsed_date = datetime.strptime(d, format)
                     break
-                except Exception as e:
+                except Exception:
                     # il nome della dir non e' nel formato
                     pass
             if parsed_date is not None:

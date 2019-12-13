@@ -15,8 +15,8 @@ from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
-from restapi.services.neo4j.graph_endpoints import graph_transactions
-from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi.flask_ext.flask_neo4j import graph_transactions
+from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository

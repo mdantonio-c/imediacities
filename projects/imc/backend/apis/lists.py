@@ -9,11 +9,9 @@ from restapi.confs import PRODUCTION
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
-from restapi.services.neo4j.graph_endpoints import (
-    GraphBaseOperations,
-    graph_transactions,
-    catch_graph_exceptions,
-)
+from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.flask_ext.flask_neo4j import graph_transactions
+from restapi.decorators import catch_graph_exceptions
 from imc.models.neo4j import Item, Shot, TextualBody
 from restapi.utilities.logs import get_logger
 from restapi.utilities.htmlcodes import hcodes

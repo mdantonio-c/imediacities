@@ -9,7 +9,7 @@ from restapi import decorators as decorate
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
-from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser

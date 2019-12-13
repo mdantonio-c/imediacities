@@ -4,7 +4,7 @@ from datetime import datetime
 import pytz
 import json
 from restapi.utilities.logs import get_logger
-from restapi.services.neo4j.graph_endpoints import graph_transactions
+from restapi.flask_ext.flask_neo4j import graph_transactions
 from neomodel.cardinality import CardinalityViolation
 
 from imc.models.neo4j import (

@@ -15,7 +15,7 @@ from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
-from restapi.services.neo4j.graph_endpoints import catch_graph_exceptions
+from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
 
 log = get_logger(__name__)
