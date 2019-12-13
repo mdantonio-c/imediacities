@@ -13,7 +13,7 @@ from restapi.protocols.bearer import authentication
 from restapi.utilities.logs import get_logger
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.uploader import Uploader
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
@@ -22,7 +22,7 @@ log = get_logger(__name__)
 mime = MimeTypes()
 
 
-class Upload(Uploader, GraphBaseOperations):
+class Upload(Uploader, EndpointResource):
 
     labels = ['file']
     GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}

@@ -10,7 +10,7 @@ from restapi.confs import PRODUCTION
 from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 
 
 #####################################
-class Shots(GraphBaseOperations):
+class Shots(EndpointResource):
 
     # schema_expose = True
     labels = ['shot']
@@ -75,7 +75,7 @@ class Shots(GraphBaseOperations):
         return self.force_response(shot)
 
 
-class ShotAnnotations(GraphBaseOperations):
+class ShotAnnotations(EndpointResource):
     """
         Get all shot annotations for a given shot.
     """

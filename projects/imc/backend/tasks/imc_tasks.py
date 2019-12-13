@@ -17,7 +17,6 @@ from operator import itemgetter
 
 
 from restapi.utilities.logs import get_logger
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
 from restapi.flask_ext.flask_celery import CeleryExt
 from restapi.flask_ext.flask_celery import send_errors_by_email
 from restapi.services.mail import send_mail
@@ -363,10 +362,10 @@ def launch_tool(self, tool_name, item_id):
         self.graph = celery_app.get_service('neo4j')
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
-            content_source = GraphBaseOperations.getSingleLinkedNode(
+            content_source = self.graph.getSingleLinkedNode(
                 item.content_source
             )
-            group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
+            group = self.graph.getSingleLinkedNode(item.ownership)
             movie = content_source.filename
             m_name = os.path.splitext(os.path.basename(movie))[0]
             analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
@@ -399,10 +398,10 @@ def load_v2(self, other_version, item_id, retry=False):
         self.graph = celery_app.get_service('neo4j')
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
-            content_source = GraphBaseOperations.getSingleLinkedNode(
+            content_source = self.graph.getSingleLinkedNode(
                 item.content_source
             )
-            group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
+            group = self.graph.getSingleLinkedNode(item.ownership)
             source_filename = content_source.filename
             m_name = os.path.splitext(os.path.basename(source_filename))[0]
             analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
@@ -515,8 +514,8 @@ def shot_revision(self, revision, item_id):
     item = None
     try:
         item = self.graph.Item.nodes.get(uuid=item_id)
-        content_source = GraphBaseOperations.getSingleLinkedNode(item.content_source)
-        group = GraphBaseOperations.getSingleLinkedNode(item.ownership)
+        content_source = self.graph.getSingleLinkedNode(item.content_source)
+        group = self.graph.getSingleLinkedNode(item.ownership)
         movie = content_source.filename
         m_name = os.path.splitext(os.path.basename(movie))[0]
         analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
@@ -563,7 +562,7 @@ def shot_revision(self, revision, item_id):
 
     except Exception as e:
         log.error("Shot revision task has encountered some problems. %s" % e)
-        aventity = GraphBaseOperations.getSingleLinkedNode(item.creation).downcast()
+        aventity = self.graph.getSingleLinkedNode(item.creation).downcast()
         replaces = {
             "title": aventity.identifying_title,
             "vid": aventity.uuid,
@@ -665,7 +664,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
         if xml_resource is not None:
 
-            group = GraphBaseOperations.getSingleLinkedNode(xml_resource.ownership)
+            group = self.graph.getSingleLinkedNode(xml_resource.ownership)
 
             source_id = extract_creation_ref(self, path)
             if source_id is None:

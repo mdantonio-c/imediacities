@@ -2,7 +2,7 @@
 
 from restapi import decorators as decorate
 
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.flask_ext.flask_neo4j import graph_transactions
@@ -16,7 +16,7 @@ log = get_logger(__name__)
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 
-class AdminGroups(GraphBaseOperations):
+class AdminGroups(EndpointResource):
 
     # schema_expose = True
     labels = ['admin']
@@ -160,7 +160,7 @@ class AdminGroups(GraphBaseOperations):
         return self.empty_response()
 
 
-class UserGroup(GraphBaseOperations):
+class UserGroup(EndpointResource):
 
     labels = ['miscellaneous']
     GET = {'/group/<query>': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/group': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}

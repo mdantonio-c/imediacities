@@ -22,7 +22,7 @@ from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.decorators import catch_graph_exceptions
 from imc.tasks.services.creation_repository import CreationRepository
 
@@ -34,7 +34,7 @@ logger = get_logger(__name__)
 
 
 #####################################
-class Bulk(GraphBaseOperations):
+class Bulk(EndpointResource):
 
     allowed_actions = ('update', 'import', 'delete', 'v2')
 

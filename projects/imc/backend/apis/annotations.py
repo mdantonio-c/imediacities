@@ -6,7 +6,7 @@ Handle annotations
 
 from flask import request
 from restapi import decorators as decorate
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.flask_ext.flask_neo4j import graph_transactions
@@ -31,7 +31,7 @@ __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
 #####################################
-class Annotations(GraphBaseOperations):
+class Annotations(EndpointResource):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module

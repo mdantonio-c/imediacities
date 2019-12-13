@@ -6,7 +6,7 @@ List content from upload dir and import of data and metadata
 import os
 from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.decorators import catch_graph_exceptions
@@ -20,7 +20,7 @@ log = get_logger(__name__)
 
 
 #####################################
-class Stage(GraphBaseOperations):
+class Stage(EndpointResource):
 
     allowed_import_mode = ('clean', 'fast', 'skip')
 

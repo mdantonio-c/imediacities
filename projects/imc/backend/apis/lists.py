@@ -9,7 +9,7 @@ from restapi.confs import PRODUCTION
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
 from imc.models.neo4j import Item, Shot, TextualBody
@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
-class Lists(GraphBaseOperations):
+class Lists(EndpointResource):
 
     # schema_expose = True
     labels = ['list']
@@ -323,7 +323,7 @@ class Lists(GraphBaseOperations):
         return self.empty_response()
 
 
-class ListItems(GraphBaseOperations):
+class ListItems(EndpointResource):
     """ List of items in a list. """
 
     # schema_expose = True

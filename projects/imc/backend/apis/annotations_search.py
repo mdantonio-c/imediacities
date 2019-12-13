@@ -9,14 +9,14 @@ from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
 
 logger = get_logger(__name__)
 
 
-class SearchAnnotations(GraphBaseOperations):
+class SearchAnnotations(EndpointResource):
 
     allowed_anno_types = ('TAG', 'VIM', 'TVS')
     allowed_item_types = ('all', 'video', 'image', 'text')

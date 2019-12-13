@@ -11,7 +11,7 @@ from restapi.confs import PRODUCTION
 from restapi.utilities.logs import get_logger
 from imc.security import authz
 from restapi import decorators as decorate
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
@@ -27,7 +27,7 @@ log = get_logger(__name__)
 
 
 #####################################
-class Videos(GraphBaseOperations):
+class Videos(EndpointResource):
 
     """
     Get an AVEntity if its id is passed as an argument.
@@ -147,7 +147,7 @@ class Videos(GraphBaseOperations):
             )
 
 
-class VideoItem(GraphBaseOperations):
+class VideoItem(EndpointResource):
 
     # schema_expose = True
     PUT = {'/videos/<video_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Video does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
@@ -210,7 +210,7 @@ class VideoItem(GraphBaseOperations):
         return self.empty_response()
 
 
-class VideoAnnotations(GraphBaseOperations):
+class VideoAnnotations(EndpointResource):
     """
         Get all video annotations for a given video.
     """
@@ -366,7 +366,7 @@ class VideoAnnotations(GraphBaseOperations):
         return self.force_response(data)
 
 
-class VideoShots(GraphBaseOperations):
+class VideoShots(EndpointResource):
     """
         Get the list of shots for a given video.
     """
@@ -545,7 +545,7 @@ class VideoShots(GraphBaseOperations):
         return self.force_response(data)
 
 
-class VideoSegments(GraphBaseOperations):
+class VideoSegments(EndpointResource):
     """
         Get the list of manual segments for a given video.
     """
@@ -623,7 +623,7 @@ class VideoSegments(GraphBaseOperations):
         )
 
 
-class VideoContent(GraphBaseOperations):
+class VideoContent(EndpointResource):
 
     __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
     # schema_expose = True
@@ -801,7 +801,7 @@ class VideoContent(GraphBaseOperations):
         return self.force_response([], headers=headers)
 
 
-class VideoTools(GraphBaseOperations):
+class VideoTools(EndpointResource):
 
     __available_tools__ = ('object-detection', 'building-recognition')
 
@@ -917,7 +917,7 @@ class VideoTools(GraphBaseOperations):
         return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
 
 
-class VideoShotRevision(GraphBaseOperations):
+class VideoShotRevision(EndpointResource):
     """Shot revision endpoint"""
 
     # schema_expose = True

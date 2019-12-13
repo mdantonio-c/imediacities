@@ -14,7 +14,7 @@ from restapi.utilities.logs import get_logger
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
 
@@ -22,7 +22,7 @@ log = get_logger(__name__)
 
 
 #####################################
-class Search(GraphBaseOperations):
+class Search(EndpointResource):
 
     labels = ['file']
     POST = {'/search': {'summary': 'Search some videos', 'description': 'Search videos previously staged in the area.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/SearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of videos matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}

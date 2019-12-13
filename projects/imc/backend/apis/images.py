@@ -11,7 +11,7 @@ from restapi.utilities.logs import get_logger
 from imc.security import authz
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
-from restapi.services.neo4j.graph_endpoints import GraphBaseOperations
+from restapi.rest.definition import EndpointResource
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
 from restapi.flask_ext.flask_neo4j import graph_transactions
@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 
 
 #####################################
-class Images(GraphBaseOperations):
+class Images(EndpointResource):
 
     """
     Get an NonAVEntity if its id is passed as an argument.
@@ -141,7 +141,7 @@ class Images(GraphBaseOperations):
             )
 
 
-class ImageItem(GraphBaseOperations):
+class ImageItem(EndpointResource):
 
     # schema_expose = True
     PUT = {'/images/<image_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Image does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
@@ -206,7 +206,7 @@ class ImageItem(GraphBaseOperations):
         return self.empty_response()
 
 
-class ImageAnnotations(GraphBaseOperations):
+class ImageAnnotations(EndpointResource):
     """
         Get all image annotations for a given image.
     """
@@ -285,7 +285,7 @@ class ImageAnnotations(GraphBaseOperations):
         return self.force_response(data)
 
 
-class ImageContent(GraphBaseOperations):
+class ImageContent(EndpointResource):
     """
     Gets image content or thumbnail
     """
@@ -363,7 +363,7 @@ class ImageContent(GraphBaseOperations):
             )
 
 
-class ImageTools(GraphBaseOperations):
+class ImageTools(EndpointResource):
 
     __available_tools__ = ('object-detection', 'building-recognition')
     # schema_expose = True
