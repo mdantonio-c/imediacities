@@ -6,10 +6,9 @@ project:
 
 variables:
 
-  frontend:
-    framework: angular
-
   env:
+
+    FRONTEND_FRAMEWORK: angular
 
     AUTH_SERVICE: neo4j 
 
