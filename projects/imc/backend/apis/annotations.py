@@ -320,7 +320,6 @@ class Annotations(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
-        # anno = self.getNode(self.graph.Annotation, anno_id, field='uuid')
         if anno is None:
             raise RestApiException(
                 'Annotation not found', status_code=hcodes.HTTP_BAD_NOTFOUND

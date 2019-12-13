@@ -85,8 +85,6 @@ class AdminGroups(GraphBaseOperations):
             )
 
         coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
-        # coordinator = self.getNode(
-        #     self.graph.User, v['coordinator'], field='uuid')
 
         if coordinator is None:
             raise RestApiException(
@@ -117,7 +115,6 @@ class AdminGroups(GraphBaseOperations):
         v = self.get_input()
 
         group = self.graph.Group.nodes.get_or_none(uuid=group_id)
-        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
@@ -127,8 +124,6 @@ class AdminGroups(GraphBaseOperations):
         if 'coordinator' in v:
 
             coordinator = self.graph.User.nodes.get_or_none(uuid=v['coordinator'])
-            # coordinator = self.getNode(
-            #     self.graph.User, v['coordinator'], field='uuid')
 
             p = None
             for p in group.coordinator.all():
@@ -157,7 +152,6 @@ class AdminGroups(GraphBaseOperations):
         self.graph = self.get_service_instance('neo4j')
 
         group = self.graph.Group.nodes.get_or_none(uuid=group_id)
-        # group = self.getNode(self.graph.Group, group_id, field='uuid')
         if group is None:
             raise RestApiException("Group not found")
 
