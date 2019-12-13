@@ -9,6 +9,11 @@
 @import url('/app/app/custom/css/scss/style.css');
 @import url('/app/app/custom/css/app-video-player.css');
 
+/* top navbar: force bg-white */
+.navbar {
+    background-color: #FFF !important;
+}
+
 .no-padding { padding: 0 !important }
 .no-padding-bottom { padding-bottom: 0 !important }
 .no-padding-top { padding-top: 0 !important }
