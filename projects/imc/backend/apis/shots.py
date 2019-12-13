@@ -7,15 +7,13 @@ from flask import send_file
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-from restapi.utilities.logs import get_logger
+# from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
-
-logger = get_logger(__name__)
 
 
 #####################################

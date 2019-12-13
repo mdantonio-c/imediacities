@@ -1,10 +1,7 @@
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
-from restapi.tests.utilities import AUTH_URI
 import json
-
-log = get_logger(__name__)
 
 
 class TestApp(BaseTests):
@@ -98,8 +95,7 @@ class TestApp(BaseTests):
             data=post_md_data,
         )
         assert res.status_code == hcodes.HTTP_OK_ACCEPTED
-        contents = json.loads(res.data.decode('utf-8'))
-        # log.debug("*** Response of post md file: "+json.dumps(contents))
+        json.loads(res.data.decode('utf-8'))
 
         post_video_data = {
             'file': (
@@ -118,8 +114,7 @@ class TestApp(BaseTests):
             data=post_video_data,
         )
         assert res2.status_code == hcodes.HTTP_OK_ACCEPTED
-        contents2 = json.loads(res2.data.decode('utf-8'))
-        # log.debug("*** Response of post video file: "+json.dumps(contents2))
+        json.loads(res2.data.decode('utf-8'))
 
         post_filetodel_data = {
             'file': ('tests/custom/testdata/to_del.txt', 'to_del.txt'),
@@ -135,5 +130,4 @@ class TestApp(BaseTests):
             data=post_filetodel_data,
         )
         assert res3.status_code == hcodes.HTTP_OK_ACCEPTED
-        contents3 = json.loads(res3.data.decode('utf-8'))
-        # log.debug("*** Response of post todel file: "+json.dumps(contents3))
+        json.loads(res3.data.decode('utf-8'))

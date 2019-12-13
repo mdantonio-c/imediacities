@@ -2,9 +2,7 @@
 
 import xml.etree.ElementTree as ET
 
-from restapi.utilities.logs import get_logger
-
-logger = get_logger(__name__)
+# from restapi.utilities.logs import log
 
 __author__ = "Silvano Imboden(s.imboden@cineca.it)"
 

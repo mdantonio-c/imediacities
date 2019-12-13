@@ -3,7 +3,7 @@
 from datetime import datetime
 import pytz
 import json
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from neomodel.cardinality import CardinalityViolation
 
@@ -18,8 +18,6 @@ from imc.models.neo4j import (
     TextualBody,
     Item,
 )
-
-log = get_logger(__name__)
 
 
 class AnnotationRepository:

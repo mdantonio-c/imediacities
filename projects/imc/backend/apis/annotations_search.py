@@ -4,7 +4,7 @@
 Search endpoint for annotations
 """
 
-from restapi.utilities.logs import get_logger
+# from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
@@ -12,8 +12,6 @@ from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
 from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
-
-logger = get_logger(__name__)
 
 
 class SearchAnnotations(EndpointResource):

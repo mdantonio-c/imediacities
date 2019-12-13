@@ -3,9 +3,7 @@ import xml.etree.ElementTree as ET
 
 # from xml.dom import minidom
 from imc.models.neo4j import Shot
-from restapi.utilities.logs import get_logger
-
-log = get_logger(__name__)
+# from restapi.utilities.logs import log
 
 
 class FHG_XMLParser:

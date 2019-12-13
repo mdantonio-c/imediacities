@@ -11,7 +11,7 @@ from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
-from restapi.utilities.logs import get_logger
+# from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
 # from imc.tasks.services.xml_result_parser import XMLResultParser
@@ -24,8 +24,6 @@ import re
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
 BODY_PATTERN = re.compile("(resource|textual):.+")
 SELECTOR_PATTERN = re.compile("t=\d+,\d+")
-
-logger = get_logger(__name__)
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 

@@ -4,7 +4,7 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
@@ -15,8 +15,6 @@ from restapi.utilities.htmlcodes import hcodes
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 
 from restapi.flask_ext.flask_celery import CeleryExt
-
-log = get_logger(__name__)
 
 
 #####################################

@@ -8,7 +8,7 @@ from flask import request, send_file
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
 
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from imc.security import authz
 from restapi import decorators as decorate
 from restapi.rest.definition import EndpointResource
@@ -22,8 +22,6 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 
 from restapi.flask_ext.flask_celery import CeleryExt
-
-log = get_logger(__name__)
 
 
 #####################################

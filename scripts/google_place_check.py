@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-# import http.client
 from urllib.parse import urlencode
 import requests
-# import json
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from imc.models.neo4j import ResourceBody
 from restapi.flask_ext import get_debug_instance
 from restapi.flask_ext.flask_neo4j import NeoModel
 graph = get_debug_instance(NeoModel)
-
-log = get_logger(__name__)
 
 
 GOOGLE_API_KEY = os.environ.get('GMAP_KEY')

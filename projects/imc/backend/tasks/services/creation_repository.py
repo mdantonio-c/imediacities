@@ -3,11 +3,9 @@
 from datetime import datetime
 import pytz
 
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from neomodel.cardinality import CardinalityViolation
-
-log = get_logger(__name__)
 
 
 class CreationRepository:

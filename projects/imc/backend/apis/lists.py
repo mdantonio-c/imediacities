@@ -13,14 +13,12 @@ from restapi.rest.definition import EndpointResource
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
 from imc.models.neo4j import Item, Shot, TextualBody
-from restapi.utilities.logs import get_logger
+# from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
 import re
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
-
-logger = get_logger(__name__)
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 

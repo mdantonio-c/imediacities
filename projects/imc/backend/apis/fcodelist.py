@@ -4,14 +4,12 @@
 Expose the codelists
 """
 import json
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
 from restapi import decorators as decorate
-
-log = get_logger(__name__)
 
 
 class Fcodelist(EndpointResource):

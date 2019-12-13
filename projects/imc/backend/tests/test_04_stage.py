@@ -3,11 +3,9 @@
 import json
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
-from restapi.utilities.logs import get_logger
+from restapi.utilities.logs import log
 
 import time
-
-log = get_logger(__name__)
 
 
 class TestApp(BaseTests):
@@ -90,9 +88,6 @@ class TestApp(BaseTests):
             # log.debug("*** Response of post stage: "+json.dumps(contents))
             if contents is not None:
                 datas = contents.get('Response', {}).get('data', {})
-                if datas is not None:
-                    task_id = datas
-                    # log.debug("*** Import task id: "+json.dumps(task_id))
         log.debug(
             "*** Start a pause of 20 sec to give time to the import task to finish..."
         )

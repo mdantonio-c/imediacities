@@ -9,9 +9,7 @@ from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 
-from restapi.utilities.logs import get_logger
-
-log = get_logger(__name__)
+# from restapi.utilities.logs import log
 
 __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 

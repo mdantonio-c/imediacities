@@ -8,9 +8,7 @@
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.utilities.logs import get_logger
-
-logger = get_logger(__name__)
+# from restapi.utilities.logs import log
 
 
 def pre_authorize(func):

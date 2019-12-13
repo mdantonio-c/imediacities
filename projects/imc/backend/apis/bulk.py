@@ -17,7 +17,7 @@ import os
 import re
 from shutil import copyfile
 from datetime import datetime
-from restapi.utilities.logs import get_logger
+# from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
@@ -29,8 +29,6 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 
 from restapi.flask_ext.flask_celery import CeleryExt
-
-logger = get_logger(__name__)
 
 
 #####################################

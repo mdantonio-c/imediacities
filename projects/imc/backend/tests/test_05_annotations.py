@@ -3,9 +3,7 @@
 import json
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
-from restapi.utilities.logs import get_logger
-
-log = get_logger(__name__)
+from restapi.utilities.logs import log
 
 
 class TestApp(BaseTests):
@@ -94,7 +92,6 @@ class TestApp(BaseTests):
             'value': 'testo della annotazione',
             'language': 'it',
         }
-        selector_data = ''
         post_data = {'target': target_data, 'body': body_data}
         # POST: try without log in
         res = client.post('/api/annotations', headers=None, data=json.dumps(post_data))

@@ -3,9 +3,7 @@
 import json
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
-from restapi.utilities.logs import get_logger
-
-log = get_logger(__name__)
+from restapi.utilities.logs import log
 
 
 class TestApp(BaseTests):
@@ -67,7 +65,7 @@ class TestApp(BaseTests):
                     shot_attributes = shot_data.get('attributes')
                     if shot_attributes is not None:
                         shot_number = shot_attributes.get('shot_num')
-                        # log.debug("*** shot number: " + str(shot_number))
+                        log.debug("*** shot number: " + str(shot_number))
             log.info("*** Testing GET shot thumbnail")
             # GET shot thumbnail
             res = client.get('/api/shots/' + shot_id + '?content=thumbnail')
