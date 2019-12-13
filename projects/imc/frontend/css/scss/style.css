@@ -330,7 +330,7 @@ input[type="radio"] {
   /*min-height: 480px;*/
   align-self: stretch; }
 
-.imc--tab,
+.imc--tab .nav-tabs,
 .imc--card {
   background: #fff;
   box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.16); }

@@ -8,6 +8,7 @@ scripts/analysis/shot-output.xml
 # data
 uploads
 data
+node_modules
 
 ########################
 ##  Host configuration  ##

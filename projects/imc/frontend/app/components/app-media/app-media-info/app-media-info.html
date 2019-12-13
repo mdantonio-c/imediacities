@@ -1,23 +1,14 @@
-<div class="imc--tab">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
-               aria-selected="true">General Info</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
-               aria-selected="false">Technical Info</a>
-        </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
+<ngb-tabset class="imc--tab">
+    <ngb-tab title="General Info">
+        <ng-template ngbTabContent>
             <div id="general-info_accordion" class="imc--accordion">
 
-                <app-expansion-panel title="Titles" [subtitle]="info.attributes.identifying_title" [allow_expansion]="info.relationships.titles.length">
+                <app-expansion-panel title="Titles" [subtitle]="info.attributes.identifying_title"
+                                     [allow_expansion]="info.relationships.titles.length">
                     <div *ngIf="info.relationships.titles.length">
                         <h5 class="col-12">Other Titles</h5>
-                        <p class="col-12" *ngFor="let title of info.relationships.titles" [innerHTML]="title.attributes.text"></p>
+                        <p class="col-12" *ngFor="let title of info.relationships.titles"
+                           [innerHTML]="title.attributes.text"></p>
                     </div>
                 </app-expansion-panel>
 
@@ -41,7 +32,8 @@
                                       </select>
                                     </div>
                                     <div class="col-4 col-sm-2 imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.description" class="material-icons">keyboard_arrow_down</i>
+                                        <i *ngIf="isCollapsed.description"
+                                           class="material-icons">keyboard_arrow_down</i>
                                         <i *ngIf="!isCollapsed.description" class="material-icons">keyboard_arrow_up</i>
                                     </div>
                                 </div>
@@ -115,8 +107,9 @@
                 <app-expansion-panel title="Production information">
 
                     <!--Anno di produzione-->
-                    <div class="col-3"><strong>Year:</strong> 
-                        <span *ngIf="info.attributes.production_years" [innerHTML]="info.attributes.production_years[0]"></span>
+                    <div class="col-3"><strong>Year:</strong>
+                        <span *ngIf="info.attributes.production_years"
+                              [innerHTML]="info.attributes.production_years[0]"></span>
                     </div>
                     <!--Paesi di produzione-->
                     <!-- @NSI non esiste production_countries per le immagini-->
@@ -126,7 +119,7 @@
                             <strong>Country:</strong>
                             <span
                                     *ngFor="let production_country of info.relationships.production_countries; last as last">
-                                    {{production_country.attributes.code.description}}{{last ? '' : '/'}}
+                                    {{ production_country.attributes.code.description }}{{ last ? '' : '/'}}
                             </span>
                         </div>
                     </ng-template>
@@ -138,7 +131,7 @@
                                 <ng-template ngFor let-contributor [ngForOf]="info.relationships.contributors">
                                     <li
                                             *ngFor="let role of contributor.attributes.activities">
-                                        {{role}}:
+                                        {{ role }}:
                                         <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
                                     </li>
 
@@ -156,46 +149,56 @@
                 </app-expansion-panel>
 
                 <app-expansion-panel title="More information on film">
-                        <h5 class="col-12" [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
-                        <div class="col-12"><strong>Contacts:</strong></div>
-                        <div class="col-12">
-                            <ul>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.address">
-                                    {{info.relationships.record_sources[0].relationships.provider[0].attributes.address}}
-                                </li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">tel: {{info.relationships.record_sources[0].relationships.provider[0].attributes.phone}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">fax: {{info.relationships.record_sources[0].relationships.provider[0].attributes.fax}}</li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email"><a [href]="'mailto:' + info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{info.relationships.record_sources[0].relationships.provider[0].attributes.email}}</a></li>
-                                <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website"><a href="//{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}" target="_blank">{{info.relationships.record_sources[0].relationships.provider[0].attributes.website}}</a></li>
-                                <li></li>
-                            </ul>
-                        </div>
-                        <div class="col-12 space-paragraph-10">
-                            <strong>Film ID in Archive: </strong>
-                            <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
-                        </div>
-                        <div class="col-12 space-paragraph-10" *ngIf="user && user.roles['Archive'] && is_item_owner(user, info.relationships.item[0])">
-                            <strong>Public Access: </strong>
-                            <input class="imc--input-checkbox styled-checkbox" id="public-access" type="checkbox" value="on"
-                                (click)="$event.preventDefault()"
-                                [(ngModel)]="info.relationships.item[0].attributes.public_access"
-                                mwlConfirmationPopover
-                                [popoverMessage]="info.relationships.item[0].attributes.public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
-                                (confirm)="togglePublicAccess()">
-                            <label for="public-access"></label>
-                        </div>
-                </app-expansion-panel> 
+                    <h5 class="col-12"
+                        [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
+                    <div class="col-12"><strong>Contacts:</strong></div>
+                    <div class="col-12">
+                        <ul>
+                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.address">
+                                {{ info.relationships.record_sources[0].relationships.provider[0].attributes.address }}
+                            </li>
+                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">
+                                tel: {{ info.relationships.record_sources[0].relationships.provider[0].attributes.phone }}</li>
+                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">
+                                fax: {{ info.relationships.record_sources[0].relationships.provider[0].attributes.fax }}</li>
+                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">
+                                <a [href]="'mailto:' + info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{ info.relationships.record_sources[0].relationships.provider[0].attributes.email }}</a>
+                            </li>
+                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">
+                                <a href="//{{ info.relationships.record_sources[0].relationships.provider[0].attributes.website }}"
+                                   target="_blank">{{ info.relationships.record_sources[0].relationships.provider[0].attributes.website }}</a>
+                            </li>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class="col-12 space-paragraph-10">
+                        <strong>Film ID in Archive: </strong>
+                        <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
+                    </div>
+                    <div class="col-12 space-paragraph-10"
+                         *ngIf="user && user.roles['Archive'] && is_item_owner(user, info.relationships.item[0])">
+                        <strong>Public Access: </strong>
+                        <input class="imc--input-checkbox styled-checkbox" id="public-access" type="checkbox" value="on"
+                               (click)="$event.preventDefault()"
+                               [(ngModel)]="info.relationships.item[0].attributes.public_access"
+                               mwlConfirmationPopover
+                               [popoverMessage]="info.relationships.item[0].attributes.public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
+                               (confirm)="togglePublicAccess()">
+                        <label for="public-access"></label>
+                    </div>
+                </app-expansion-panel>
 
             </div>
 
-        </div>
-        <!-- tab TECHNICAL INFO -->
-        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        </ng-template>
+    </ngb-tab>
+    <ngb-tab title="Technical Info">
+        <ng-template ngbTabContent>
             <div id="tech-info_accordion" class="imc--accordion">
 
                 <ng-template [ngIf]="info.type === 'aventity'">
 
-                    <app-expansion-panel title="Analogue film format" >
+                    <app-expansion-panel title="Analogue film format">
                         <div class="col-12">
                             <ul class="list-space">
 
@@ -241,7 +244,8 @@
                                 </li>
 
                                 <li *ngIf="item && item.attributes.digital_format.length >= 4">
-                                    <strong>Resolution: </strong> <span [innerHTML]="item.attributes.digital_format[3]"></span>
+                                    <strong>Resolution: </strong> <span
+                                        [innerHTML]="item.attributes.digital_format[3]"></span>
                                 </li>
 
                                 <li *ngIf="item && item.attributes.framerate">
@@ -286,7 +290,8 @@
                         </ul>
                     </app-expansion-panel>
 
-                    <app-expansion-panel title="Digital format" *ngIf="info.relationships.item[0] && info.relationships.item[0].attributes">
+                    <app-expansion-panel title="Digital format"
+                                         *ngIf="info.relationships.item[0] && info.relationships.item[0].attributes">
                         <ul class="list-space">
 
                             <li *ngIf="info.relationships.item[0].attributes.item_type">
@@ -305,6 +310,6 @@
                 </ng-template>
 
             </div>
-        </div>
-    </div>
-</div>
+        </ng-template>
+    </ngb-tab>
+</ngb-tabset>
