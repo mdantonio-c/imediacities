@@ -51,6 +51,7 @@
 							</ngx-datatable-footer>
 						</ngx-datatable>
 						-->
+						<div class="table-wrapper" #tableWrapper>
 						<ngx-datatable
 							class="bootstrap"
 							[rows]="data"
@@ -61,6 +62,7 @@
 							[limit]="paging.itemsPerPage"
 							[rowHeight]="'auto'">
 						</ngx-datatable>
+						</div>
 					</div>
 					<ng-template #dataCoordinator let-row="row" let-value="value" let-i="index">
 						<span ngbTooltip='{{value[0].name}} {{value[0].surname}}' *ngIf="value[0]">
