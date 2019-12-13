@@ -400,9 +400,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     /* Seleziona il titolo per le tabs degli shot */
-    tab_title_set(evento) {
+    tab_title_set($event) {
 
-        let target = evento.target;
+        let target = $event.target;
 
         if (target.nodeName.toUpperCase() === 'LI') {
             target = target.querySelector('a > i');
@@ -410,6 +410,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             target = target.querySelector('i');
         }
         this.tab_title = target.attributes.getNamedItem('data-title').value;
+        // cancel navigation action on tab click
+        $event.preventDefault();
     }
 
     media_entity_normalize(mediaEntity) {
