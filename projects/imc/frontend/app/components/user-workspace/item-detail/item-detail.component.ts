@@ -4,6 +4,8 @@ import { NotificationService } from '@rapydo/services/notification';
 import { AuthService } from '@rapydo/services/auth';
 import { ListsService } from '../../../services/lists.service'
 
+import { environment } from '@rapydo/../environments/environment';
+
 export interface ItemDetail {
 	id: string,
 	title: string,
@@ -19,8 +21,7 @@ export interface ItemDetail {
 }
 
 // expected https://{url}?list={listID}&access_token={token}
-// const VIRTUAL_GALLERY_URL: string = process.env.VIRTUAL_GALLERY_URL;
-const VIRTUAL_GALLERY_URL: string = "https://imc-vg.hpc.cineca.it/imc_vg/start_gallery";
+const VIRTUAL_GALLERY_URL: string = environment.ALL['VIRTUAL_GALLERY_URL'];
 
 @Component({
 	selector: 'item-detail',
