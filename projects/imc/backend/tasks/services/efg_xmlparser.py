@@ -121,7 +121,7 @@ class EFG_XMLParser:
         for node in record.findall("./efg:recordSource", self.ns):
             rs = {}
             rs['source_id'] = node.find('efg:sourceID', self.ns).text.strip()
-            log.debug('record source [ID]: %s' % rs['source_id'])
+            log.debug('record source [ID]: {}', rs['source_id'])
 
             # record provider
             provider = {}
@@ -131,9 +131,10 @@ class EFG_XMLParser:
             p_scheme = provider_el.get('schemeID')
             scheme = codelists.fromDescription(p_scheme, codelists.PROVIDER_SCHEMES)
             if scheme is None:
-                raise ValueError('Invalid provider scheme value for [%s]' % p_scheme)
+                raise ValueError(
+                    'Invalid provider scheme value for [{}]'.format(p_scheme))
             provider['scheme'] = scheme[0]
-            log.debug('Record Provider: {}'.format(provider))
+            log.debug('Record Provider: {}', provider)
 
             # bind here the url only to the first element
             # this is a naive solution but enough because we expect here ONLY
@@ -199,7 +200,7 @@ class EFG_XMLParser:
                     )
                 else:
                     title['relation'] = code_el[0]
-            log.debug('title: {}'.format(title))
+            log.debug('title: {}', title)
             titles.append(title)
         if not titles:
             raise ValueError('Title is missing')
@@ -220,7 +221,7 @@ class EFG_XMLParser:
                         self.warnings.append('Invalid keyword type for: ' + ktype)
                     else:
                         keyword['keyword_type'] = code_el[0]
-                        log.debug('keyword [type]: %s' % keyword['keyword_type'])
+                        log.debug('keyword [type]: {}', keyword['keyword_type'])
                 lang = node.get('lang')
                 if lang is not None and lang.lower() != 'n/a':
                     lang_val = lang.lower()
@@ -231,7 +232,7 @@ class EFG_XMLParser:
                         )
                     else:
                         keyword['language'] = lang_code[0]
-                        log.debug('language: {}'.format(keyword['language']))
+                        log.debug('language: {}', keyword['language'])
                 if ktype == 'Form':
                     # check term from a controlled IMC list
                     if term.text.lower() == 'n/a':
@@ -247,9 +248,9 @@ class EFG_XMLParser:
                 else:
                     keyword['term'] = term.text.strip()
 
-                log.debug('keyword: {}'.format(keyword['term']))
+                log.debug('keyword: {}', keyword['term'])
 
-                # log.debug('term id: %s' % term.get('id'))
+                # log.debug('term id: {}', term.get('id'))
                 if term.get('id') is not None:
                     # check keyword term id is integer (keyword term id is optional)
                     try:
@@ -288,7 +289,7 @@ class EFG_XMLParser:
                     description['language'] = lang_code[0]
             description['source_ref'] = node.get('source')
             description['text'] = node.text.strip()
-            log.debug('description: {}'.format(description))
+            log.debug('description: {}', description)
             descriptions.append(description)
         # october 2018: change: description is optional
         # if len(descriptions) == 0:
@@ -303,10 +304,10 @@ class EFG_XMLParser:
             c['spatial'] = []
             c['temporal'] = []
             for s in node.findall('efg:spatial', self.ns):
-                log.debug('spatial: %s' % s.text.strip())
+                log.debug('spatial: {}', s.text.strip())
                 c['spatial'].append(s.text.strip())
             for t in node.findall('efg:temporal', self.ns):
-                log.debug('temporal: %s' % t.text.strip())
+                log.debug('temporal: {}', t.text.strip())
                 c['temporal'].append(t.text.strip())
             coverages.append(c)
         return coverages
@@ -496,7 +497,7 @@ class EFG_XMLParser:
                     log.debug('FOUND agent: ' + props['names'][0])
                     agent = item[0]
                     item[1].extend(activities)
-                    log.debug('added activities: {}'.format(activities))
+                    log.debug('added activities: {}', activities)
                     break
             if agent is None:
                 agents.append([props, activities])
@@ -620,7 +621,7 @@ class EFG_XMLParser:
         relationships['video_format'] = self.parse_video_format(record)
         av_creation['relationships'] = relationships
         if len(self.warnings) > 0:
-            log.warning("Creation parsed with {} warning(s)".format(len(self.warnings)))
+            log.warning("Creation parsed with {} warning(s)", len(self.warnings))
         return av_creation
 
     def parse_non_av_creation(self, record):
@@ -640,7 +641,7 @@ class EFG_XMLParser:
         # manage non_av relationships
         non_av_creation['relationships'] = relationships
         if len(self.warnings) > 0:
-            log.warning("Creation parsed with {} warning(s)".format(len(self.warnings)))
+            log.warning("Creation parsed with {} warning(s)", len(self.warnings))
         return non_av_creation
 
     def prettify(elem):

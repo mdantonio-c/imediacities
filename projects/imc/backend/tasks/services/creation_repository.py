@@ -29,7 +29,7 @@ class CreationRepository:
                 self.delete_av_entity(existing_creation)
             else:
                 self.delete_non_av_entity(existing_creation)
-            log.info("Existing creation [UUID:{0}] deleted".format(creation_id))
+            log.info("Existing creation [UUID:{0}] deleted", creation_id)
             # use the same uuid for the new replacing creation
             properties['uuid'] = creation_id
 
@@ -102,7 +102,7 @@ class CreationRepository:
                     props = agent_activities[0]
                     res = self.find_agents_by_name(props['names'][0])
                     if len(res) > 0:
-                        log.debug('Found existing agent: {}'.format(res[0].names))
+                        log.debug('Found existing agent: {}', res[0].names)
                         agent = res[0]
                     else:
                         agent = self.graph.Agent(**props).save()
@@ -117,7 +117,7 @@ class CreationRepository:
                         rightholder = self.graph.Rightholder(**props).save()
                     else:
                         log.debug(
-                            'Found existing rightholder: {}'.format(rightholder.name)
+                            'Found existing rightholder: {}', rightholder.name
                         )
                     entity.rightholders.connect(rightholder)
 
@@ -152,32 +152,32 @@ class CreationRepository:
         if video_format is not None:
             video_format.delete()
         av_entity.delete()
-        log.debug('Delete AVEntity with uuid {}'.format(uuid))
+        log.debug('Delete AVEntity with uuid {}', uuid)
 
     def delete_non_av_entity(self, node):
         self.__delete_entity(node)
         non_av_entity = node.downcast()
         uuid = non_av_entity.uuid
         non_av_entity.delete()
-        log.debug('Delete NonAVEntity with uuid {}'.format(uuid))
+        log.debug('Delete NonAVEntity with uuid {}', uuid)
 
     def search_item_by_term(self, term, item_type):
         """
         Search all types of items and see whether some attributes matches the
         value provided by the user.
         """
-        log.debug("Searching for Items with term = " % term)
+        log.debug("Searching for Items with term = ", term)
         pass
 
     def find_agents_by_name(self, name):
-        log.debug('Find all agents with name: {}'.format(name))
+        log.debug('Find all agents with name: {}', name)
         name = self.graph.sanitize_input(name)
         query = "MATCH (a:Agent) WHERE '{name}' in a.names RETURN a"
         results = self.graph.cypher(query.format(name=name))
         return [self.graph.Agent.inflate(row[0]) for row in results]
 
     def find_provider_by_identifier(self, pid, scheme):
-        log.debug('Find provider by identifier [{}, {}]'.format(pid, scheme))
+        log.debug('Find provider by identifier [{}, {}]', pid, scheme)
         # query = "MATCH (p:Provider {identifier: '{pid}', \
         # scheme:'{scheme}'}) RETURN p"
         # results = self.graph.Provider.cypher(
@@ -186,7 +186,7 @@ class CreationRepository:
         return self.graph.Provider.nodes.get_or_none(identifier=pid, scheme=scheme)
 
     def find_rightholder_by_name(self, name):
-        log.debug('Find rightholder by name: {}'.format(name))
+        log.debug('Find rightholder by name: {}', name)
         return self.graph.Rightholder.nodes.get_or_none(name=name)
 
     def item_belongs_to_user(self, item, user):
@@ -218,7 +218,7 @@ class CreationRepository:
         return item.public_access
 
     def get_belonging_city(self, item):
-        log.debug('Look for belonging city for item {}'.format(item.uuid))
+        log.debug('Look for belonging city for item {}', item.uuid)
         query = (
             "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()"
             "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) "

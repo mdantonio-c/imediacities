@@ -68,7 +68,7 @@ class AdminGroups(EndpointResource):
 
                         if can_coordinate:
 
-                            label = "%s %s (%s)" % (n.name, n.surname, n.email)
+                            label = "{} {} ({})".format(n.name, n.surname, n.email)
 
                             schema[idx]["enum"].append({n.uuid: label})
 
@@ -182,7 +182,7 @@ class UserGroup(EndpointResource):
         cypher = "MATCH (g:Group)"
 
         if query is not None:
-            cypher += " WHERE g.shortname =~ '(?i).*%s.*'" % query
+            cypher += " WHERE g.shortname =~ '(?i).*{}.*'".format(query)
 
         cypher += " RETURN g ORDER BY g.shortname ASC"
 

@@ -257,7 +257,7 @@ class Customizer(object):
             group.shortname = "default"
             group.save()
 
-        log.info("Link %s to group %s", user_node.email, group.shortname)
+        log.info("Link {} to group {}", user_node.email, group.shortname)
         user_node.belongs_to.connect(group)
 
         return True

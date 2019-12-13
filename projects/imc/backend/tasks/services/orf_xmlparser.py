@@ -2,7 +2,7 @@
 
 import xml.etree.ElementTree as ET
 
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 
 __author__ = "Silvano Imboden(s.imboden@cineca.it)"
 
@@ -16,7 +16,6 @@ class ORF_XMLParser:
         for label in xml_labels:
             lid = int(label.get('uid'))
             name = label.get('name')
-            # logger.debug("label id: {0}, name: {1}".format(lid, name))
             labels[int(lid)] = name
 
         frames = {}
@@ -50,5 +49,5 @@ class ORF_XMLParser:
                 lab, conf = mappings[oid]
                 frames[timestamp].append((oid, lab, conf, rect))
 
-        logger.debug('done reading orf')
+        log.debug('done reading orf')
         return frames

@@ -55,7 +55,7 @@ class Upload(Uploader, EndpointResource):
     @graph_transactions
     @authentication.required(roles=['Archive'])
     def get(self, filename):
-        log.info("get stage content for filename %s" % filename)
+        log.info("get stage content for filename {}", filename)
         if filename is None:
             raise RestApiException(
                 "Please specify a stage filename", status_code=hcodes.HTTP_BAD_REQUEST
@@ -89,7 +89,7 @@ class Upload(Uploader, EndpointResource):
             )
 
         mime_type = mime.guess_type(filename)
-        log.debug('mime type: {}'.format(mime_type))
+        log.debug('mime type: {}', mime_type)
 
         response = make_response(send_file(staged_file))
         response.headers['Content-Type'] = mime_type[0]

@@ -8,7 +8,7 @@
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 
 
 def pre_authorize(func):
@@ -43,7 +43,7 @@ def pre_authorize(func):
         self.graph = self.get_service_instance('neo4j')
         repo = CreationRepository(self.graph)
         rs = repo.get_right_status(entity_id)
-        logger.debug('right status = {}'.format(rs))
+        log.debug('right status = {}', rs)
         return False if _is_general_public(user) and not _is_public_domain(rs) else True
 
     def _has_public_access(self, user, entity_id):
@@ -68,8 +68,8 @@ def pre_authorize(func):
             # do not yet raise the exception but ignore it
             return func(self, entity_id)
         user = self.get_user_if_logged()
-        logger.debug('Logged in user: {}'.format(user))
-        logger.debug("Has permission to access entity[{}]?".format(entity_id))
+        log.debug('Logged in user: {}', user)
+        log.debug("Has permission to access entity[{}]?", entity_id)
         if not _has_public_access(self, user, entity_id):
             raise RestApiException(
                 "User is not authorized to access content",

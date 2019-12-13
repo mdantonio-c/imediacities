@@ -11,7 +11,7 @@ from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
 # from imc.tasks.services.xml_result_parser import XMLResultParser
@@ -74,7 +74,7 @@ class Annotations(EndpointResource):
             try:
                 anno = self.graph.Annotation.nodes.get(uuid=anno_id)
             except self.graph.Annotation.DoesNotExist:
-                logger.debug("Annotation with uuid %s does not exist" % anno_id)
+                log.debug("Annotation with uuid {} does not exist", anno_id)
                 raise RestApiException(
                     "Please specify a valid annotation id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
@@ -100,7 +100,6 @@ class Annotations(EndpointResource):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
         data = self.get_input()
-        # logger.debug(data)
         if len(data) == 0:
             raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
         if 'target' not in data:
@@ -118,8 +117,8 @@ class Annotations(EndpointResource):
         motivation = data['motivation']
         if motivation not in self.__class__.allowed_motivations:
             raise RestApiException(
-                "Bad motivation parameter: expected one of %s"
-                % (self.__class__.allowed_motivations,),
+                "Bad motivation parameter: expected one of {}".format(
+                    self.__class__.allowed_motivations),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # check for private and embargo date
@@ -143,13 +142,13 @@ class Annotations(EndpointResource):
             )
         # check the target
         target = data['target']
-        logger.debug('Annotate target: {}'.format(target))
+        log.debug('Annotate target: {}', target)
         if not TARGET_PATTERN.match(target):
             raise RestApiException(
                 'Invalid Target format', status_code=hcodes.HTTP_BAD_REQUEST
             )
         target_type, tid = target.split(':')
-        logger.debug('target type: {}, target id: {}'.format(target_type, tid))
+        log.debug('target type: {}, target id: {}', target_type, tid)
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -179,7 +178,7 @@ class Annotations(EndpointResource):
 
         # check the selector
         selector = data.get('selector', None)
-        logger.debug('selector: {}'.format(selector))
+        log.debug('selector: {}', selector)
         if selector is not None:
             if selector['type'] != 'FragmentSelector':
                 raise RestApiException(
@@ -325,19 +324,17 @@ class Annotations(EndpointResource):
 
         user = self.get_current_user()
 
-        logger.debug(
-            'current user: {email} - {uuid}'.format(email=user.email, uuid=user.uuid)
-        )
+        log.debug('current user: {email} - {uuid}', email=user.email, uuid=user.uuid)
         iamadmin = self.auth.verify_admin()
-        logger.debug('current user is admin? {0}'.format(iamadmin))
+        log.debug('current user is admin? {0}', iamadmin)
 
         creator = anno.creator.single()
         is_manual = True if creator is not None else False
         if anno.generator is None and creator is None:
             # manual annotation without creator!
-            logger.warn(
-                'Invalid state: manual annotation [{id}] '
-                'MUST have a creator'.format(id=anno.uuid)
+            log.warning(
+                'Invalid state: manual annotation [{id}] MUST have a creator',
+                id=anno.uuid
             )
             raise RestApiException(
                 'Annotation with no creator', status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -352,7 +349,6 @@ class Annotations(EndpointResource):
         bid = None
         # body_ref = self.get_input(single_parameter='body_ref')
         body_ref = request.args.get('body_ref')
-        # logger.debug(body_ref)
         if body_ref is not None:
             if not BODY_PATTERN.match(body_ref):
                 raise RestApiException(
@@ -360,7 +356,7 @@ class Annotations(EndpointResource):
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             body_type, bid = body_ref.split(':', 1)
-            logger.debug('[body type]: {0}, [body id]: {1}'.format(body_type, bid))
+            log.debug('[body type]: {0}, [body id]: {1}', body_type, bid)
 
         repo = AnnotationRepository(self.graph)
         try:
@@ -527,8 +523,8 @@ class Annotations(EndpointResource):
             patch_op = data['op']
             if patch_op not in self.__class__.allowed_patch_operations:
                 raise RestApiException(
-                    "Bad patch operation: allowed one of %s"
-                    % (self.__class__.allowed_patch_operations,),
+                    "Bad patch operation: allowed one of {}".format(
+                        self.__class__.allowed_patch_operations),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if 'path' not in data:
@@ -556,7 +552,7 @@ class Annotations(EndpointResource):
             repo = AnnotationRepository(self.graph)
             for value in values:
                 if patch_op == 'remove':
-                    logger.debug('remove a segment with uuid:{uuid}'.format(uuid=value))
+                    log.debug('remove a segment with uuid:{uuid}', uuid=value)
                     segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
                     if segment is None:
                         raise RestApiException(
@@ -575,7 +571,7 @@ class Annotations(EndpointResource):
                         )
                     return self.empty_response()
                 elif patch_op == 'add':
-                    logger.debug('add a segment with value:{val}'.format(val=value))
+                    log.debug('add a segment with value:{val}', val=value)
                     if not SELECTOR_PATTERN.match(value):
                         raise RestApiException(
                             'Invalid value for: ' + value,

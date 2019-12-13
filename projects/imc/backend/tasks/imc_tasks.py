@@ -47,7 +47,7 @@ except BaseException:
 
 def progress(self, state, info):
     if info is not None:
-        log.info("%s [%s]" % (state, info))
+        log.info("{} [{}]", state, info)
     self.update_state(state=state)
 
 
@@ -56,7 +56,7 @@ def progress(self, state, info):
 def update_metadata(self, path, resource_id):
     with celery_app.app.app_context():
 
-        log.debug("Starting task update_metadata for resource_id %s" % resource_id)
+        log.debug("Starting task update_metadata for resource_id {}", resource_id)
         progress(self, 'Starting update metadata', path)
         self.graph = celery_app.get_service('neo4j')
         xml_resource = None
@@ -65,7 +65,7 @@ def update_metadata(self, path, resource_id):
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
                 self, resource_id, path, metadata_update
             )
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            log.debug("Completed task update_metadata for resource_id {}", resource_id)
 
             progress(self, 'Completed', path)
 
@@ -91,11 +91,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             xml_resource, group, source_id, item_type, item_node = update_meta_stage(
                 self, resource_id, path, metadata_update
             )
-            log.debug("Completed task update_metadata for resource_id %s" % resource_id)
+            log.debug("Completed task update_metadata for resource_id {}", resource_id)
             progress(self, 'Updated metadata', path)
         except Exception as e:
             progress(self, 'Failed updating metadata', path)
-            log.error("Task error, %s" % e)
+            log.error("Task error, {}", e)
             raise e
 
         try:
@@ -115,7 +115,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 'filename [{0}], extension [{1}]'.format(filename, file_extension)
             )
             basedir = os.path.dirname(os.path.abspath(path))
-            log.debug("Content basedir {0}".format(basedir))
+            log.debug("Content basedir {0}", basedir)
             content_path, content_filename = lookup_content(self, basedir, source_id)
 
             if content_path is not None:
@@ -127,13 +127,13 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 try:
                     # This is a task restart? What to do in this case?
                     content_node = self.graph.ContentStage.nodes.get(**properties)
-                    log.debug("Content resource already exist for %s" % content_path)
+                    log.debug("Content resource already exist for {}", content_path)
                 except self.graph.ContentStage.DoesNotExist:
                     content_node = self.graph.ContentStage(**properties).save()
                     content_node.ownership.connect(group)
                     # connect the item to the content source
                     item_node.content_source.connect(content_node)
-                    log.debug("Content resource created for %s" % content_path)
+                    log.debug("Content resource created for {}", content_path)
 
             fast = False
             if mode is not None:
@@ -161,7 +161,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # exist. It is dangerous re-processing in case of different fps.
             repo = AnnotationRepository(self.graph)
             if repo.check_automatic_tagging(item_node.uuid):
-                log.warn(
+                log.warning(
                     "Pipeline cannot be started: "
                     + "delete automatic tags before re-processing!"
                 )
@@ -195,7 +195,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # analyze_path = '/uploads/Analize/' + \
             #     group.uuid + '/' + content_filename.split('.')[0] + '/'
             analyze_path = out_folder
-            log.info('analyze path: {0}'.format(analyze_path))
+            log.info('analyze path: {0}', analyze_path)
 
             # SAVE AUTOMATIC ANNOTATIONS
 
@@ -248,7 +248,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
                 for anno in vim_annotations:
                     anno_id = anno.id
                     repo.delete_vim_annotation(anno)
-                    log.debug("Deleted existing VIM annotation [%s]" % anno_id)
+                    log.debug("Deleted existing VIM annotation [{}]", anno_id)
                 # save or update TVS annotations
                 existing_shots = item_node.shots.all()
                 if not existing_shots:
@@ -268,13 +268,13 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             try:
                 extract_od_annotations(self, item_node, analyze_path)
             except IOError:
-                log.warn('Could not find OD results file.')
+                log.warning('Could not find OD results file.')
 
             # extract automatic building recognition results
             try:
                 extract_br_annotations(self, item_node, analyze_path)
             except IOError:
-                log.warn('Could not find BR results file.')
+                log.warning('Could not find BR results file.')
 
             content_node.status = 'COMPLETED'
             content_node.status_message = 'Nothing to declare'
@@ -318,17 +318,17 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
         log.debug('-----------------------------------------------------')
         # key frame
         fk = (shot.end_frame_idx + shot.start_frame_idx) / 2
-        log.debug('shot[{}] - key frame: {}'.format(shot.shot_num, fk))
+        log.debug('shot[{}] - key frame: {}', shot.shot_num, fk)
         # target frame
         ft = round(fk * eval(item.framerate) / eval(old_fps))
-        log.debug('target frame: {}'.format(ft))
+        log.debug('target frame: {}', ft)
 
         # get current manual annotations for this shot
         annotations = []
         for anno in shot.annotation.search(generator__isnull=True):
             log.debug(anno)
             annotations.append(anno.uuid)
-        log.debug('shot[{}] - manual annotations:{}'.format(shot.shot_num, annotations))
+        log.debug('shot[{}] - manual annotations:{}', shot.shot_num, annotations)
 
         # get target shot in the new shot list
         for shot_num, properties in new_shot_list.items():
@@ -353,7 +353,7 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
 @send_errors_by_email
 def launch_tool(self, tool_name, item_id):
     with celery_app.app.app_context():
-        log.debug('launch tool {0} for item {1}'.format(tool_name, item_id))
+        log.debug('launch tool {0} for item {1}', tool_name, item_id)
         if tool_name not in ['object-detection', 'building-recognition']:
             raise ValueError('Unexpected tool for: {}'.format(tool_name))
 
@@ -367,7 +367,7 @@ def launch_tool(self, tool_name, item_id):
             movie = content_source.filename
             m_name = os.path.splitext(os.path.basename(movie))[0]
             analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
-            log.debug('analyze path: {0}'.format(analyze_path))
+            log.debug('analyze path: {0}', analyze_path)
             # call analyze for object detection ONLY
             # if detect_objects(movie, analyze_path):
             #     log.info('Object detection executed')
@@ -382,7 +382,7 @@ def launch_tool(self, tool_name, item_id):
             else:
                 raise NotImplementedError('Invalid tool name: '.format(tool_name))
         except Exception as e:
-            log.error("Task error, %s" % e)
+            log.error("Task error, {}", e)
             raise e
         return 1
 
@@ -391,7 +391,7 @@ def launch_tool(self, tool_name, item_id):
 @send_errors_by_email
 def load_v2(self, other_version, item_id, retry=False):
     with celery_app.app.app_context():
-        log.debug('load v2 {0} for item {1}'.format(other_version, item_id))
+        log.debug('load v2 {0} for item {1}', other_version, item_id)
 
         self.graph = celery_app.get_service('neo4j')
         try:
@@ -403,7 +403,7 @@ def load_v2(self, other_version, item_id, retry=False):
             source_filename = content_source.filename
             m_name = os.path.splitext(os.path.basename(source_filename))[0]
             analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
-            log.debug('analyze path: {0}'.format(analyze_path))
+            log.debug('analyze path: {0}', analyze_path)
 
             # create symbolic link
             v2_link_name = os.path.join(analyze_path, 'v2')
@@ -430,7 +430,7 @@ def load_v2(self, other_version, item_id, retry=False):
                     fps = get_framerate(os.path.join(analyze_path, 'origin_info.json'))
                     if fps is None:
                         raise Exception('Cannot get origin fps')
-                    log.debug("origin fps: {}".format(fps))
+                    log.debug("origin fps: {}", fps)
                     if not transcode(
                         other_version, analyze_path, fps=str(fps), prefix='v2_'
                     ):
@@ -494,7 +494,7 @@ def load_v2(self, other_version, item_id, retry=False):
             other_item.save()
 
         except Exception as e:
-            log.error("Task error, %s" % e)
+            log.error("Task error, {}", e)
             raise e
         return 1
 
@@ -502,7 +502,7 @@ def load_v2(self, other_version, item_id, retry=False):
 @celery_app.task(bind=True)
 @send_errors_by_email
 def shot_revision(self, revision, item_id):
-    log.info('Start shot revision task for video item [{0}]'.format(item_id))
+    log.info('Start shot revision task for video item [{0}]', item_id)
     self.graph = celery_app.get_service('neo4j')
     # get reviser
     reviser = self.graph.User.nodes.get_or_none(uuid=revision['reviser'])
@@ -517,12 +517,12 @@ def shot_revision(self, revision, item_id):
         movie = content_source.filename
         m_name = os.path.splitext(os.path.basename(movie))[0]
         analyze_path = '/uploads/Analize/' + group.uuid + '/' + m_name + '/'
-        log.debug('analyze path: {0}'.format(analyze_path))
+        log.debug('analyze path: {0}', analyze_path)
 
         revised_cuts = []
         for s in sorted(revision['shots'], key=itemgetter('shot_num'))[1:]:
             revised_cuts.append(s['cut'])
-        log.info('new list of cuts: {}'.format(revised_cuts))
+        log.info('new list of cuts: {}', revised_cuts)
         update_storyboard(revised_cuts, analyze_path)
 
         # extract new TVS and VIM results
@@ -536,7 +536,7 @@ def shot_revision(self, revision, item_id):
             shot = shots.get(shot_num)
             if shot is None:
                 # should never be reached
-                log.warn('Shot {} cannot be found'.format(shot_num))
+                log.warning('Shot {} cannot be found', shot_num)
                 continue
             shot['revision_confirmed'] = s.get('confirmed', False)
             shot['revision_check'] = s.get('double_check', False)
@@ -550,7 +550,7 @@ def shot_revision(self, revision, item_id):
         for anno in vim_annotations:
             anno_id = anno.id
             repo.delete_vim_annotation(anno)
-            log.debug("Deleted existing VIM annotation [%s]" % anno_id)
+            log.debug("Deleted existing VIM annotation [{}]", anno_id)
 
         # update TVS annotations
         repo.update_automatic_tvs(item, shots, vim_estimations, True, reviser)
@@ -559,7 +559,7 @@ def shot_revision(self, revision, item_id):
         repo.create_vim_annotation(item, vim_estimations)
 
     except Exception as e:
-        log.error("Shot revision task has encountered some problems. %s" % e)
+        log.error("Shot revision task has encountered some problems. {}", e)
         aventity = self.graph.getSingleLinkedNode(item.creation).downcast()
         replaces = {
             "title": aventity.identifying_title,
@@ -643,7 +643,7 @@ def lookup_content(self, path, source_id):
     else:
         content_filename = content_filename[0]
         content_path = os.path.join(path, content_filename)
-        log.info('Content file FOUND: {}'.format(content_filename))
+        log.info('Content file FOUND: {}', content_filename)
     return content_path, content_filename
 
 
@@ -666,12 +666,13 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
             source_id = extract_creation_ref(self, path)
             if source_id is None:
-                raise Exception("No source ID found importing metadata file %s" % path)
+                raise Exception(
+                    "No source ID found importing metadata file {}".format(path))
 
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
                 raise Exception("Invalid content type for: " + item_type)
-            log.info("Content source ID: {0}; TYPE: {1}".format(source_id, item_type))
+            log.info("Content source ID: {0}; TYPE: {1}", source_id, item_type)
 
             # check for existing item
             item_node = xml_resource.item.single()
@@ -682,20 +683,20 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 item_node.ownership.connect(group)
                 item_node.meta_source.connect(xml_resource)
                 item_node.save()
-                log.debug("Item resource created for resource_id=%s" % resource_id)
+                log.debug("Item resource created for resource_id={}", resource_id)
 
             # check for existing creation
             creation = item_node.creation.single()
             init_public_access = True if creation is None else False
             if creation is not None and not metadata_update:
-                log.info("Skip updating metadata for resource_id=%s" % resource_id)
+                log.info("Skip updating metadata for resource_id={}", resource_id)
             else:
                 # update metadata
-                log.debug("Updating metadata for resource_id=%s" % resource_id)
+                log.debug("Updating metadata for resource_id={}", resource_id)
                 xml_resource.warnings = extract_descriptive_metadata(
                     self, path, item_type, item_node
                 )
-                log.info("Metadata updated for resource_id=%s" % resource_id)
+                log.info("Metadata updated for resource_id={}", resource_id)
 
                 xml_resource.status = 'COMPLETED'
                 xml_resource.status_message = 'Nothing to declare'
@@ -717,10 +718,10 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 )
                 item_node.save()
         else:
-            log.warning("Not found MetaStage for resource_id=%s" % resource_id)
+            log.warning("Not found MetaStage for resource_id={}", resource_id)
 
     except Exception as e:
-        log.error("Failed update of resource_id %s, Error: %s" % (resource_id, e))
+        log.error("Failed update of resource_id {}, Error: {}", (resource_id, e))
         if xml_resource is not None:
             xml_resource.status = 'ERROR'
             xml_resource.status_message = str(e)
@@ -770,13 +771,14 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     file tech_info_filename and save them as Item properties in the database.
     """
     if not os.path.exists(analyze_dir_path):
-        raise IOError("Analyze results does not exist in the path %s", analyze_dir_path)
+        raise IOError(
+            "Analyze results does not exist in the path {}".format(analyze_dir_path))
 
     # check for info result
     tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
     if not os.path.exists(tech_info_path):
         log.warning(
-            "Technical info CANNOT be extracted: [%s] does not exist", tech_info_path
+            "Technical info CANNOT be extracted: [{}] does not exist", tech_info_path
         )
         return
 
@@ -860,7 +862,7 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         return
 
     item.save()
-    log.info('Extraction of techincal info completed [{}]'.format(tech_info_filename))
+    log.info('Extraction of techincal info completed [{}]', tech_info_filename)
 
 
 def get_thumbnail(path):
@@ -884,15 +886,15 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
         raise IOError(
-            "Storyboard directory does not exist in the path %s", tvs_dir_path
+            "Storyboard directory does not exist in the path {}".format(tvs_dir_path)
         )
     # check for info result
     tvs_filename = 'storyboard.json'
     tvs_path = os.path.join(os.path.dirname(tvs_dir_path), tvs_filename)
     if not os.path.exists(tvs_path):
-        raise IOError("Shots CANNOT be extracted: [%s] does not exist", tvs_path)
+        raise IOError("Shots CANNOT be extracted: [{}] does not exist".format(tvs_path))
 
-    log.debug('Get shots and vimotion from file [%s]' % tvs_path)
+    log.debug('Get shots and vimotion from file [{}]', tvs_path)
 
     # load info from json
     with open(tvs_path) as data_file:
@@ -921,7 +923,7 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
         vim_estimations.append((s['shot_num'], s['motions_dict']))
 
     if len(shots) == 0:
-        log.warning("Shots CANNOT be found in the file [%s]" % tvs_path)
+        log.warning("Shots CANNOT be found in the file [{}]", tvs_path)
         return
 
     log.info('Extraction of TVS and VIM info completed')
@@ -936,8 +938,9 @@ def extract_br_annotations(self, item, analyze_dir_path):
     brf_results_filename = 'brf.xml'
     brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
     if not os.path.exists(brf_results_path):
-        raise IOError("Analyze results does not exist in the path %s", brf_results_path)
-    log.info('get automatic building recognition from file [%s]' % brf_results_path)
+        raise IOError(
+            "Analyze results does not exist in the path {}".format(brf_results_path))
+    log.info('get automatic building recognition from file [{}]', brf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(brf_results_path)
 
@@ -960,7 +963,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
         (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
         '''
         if bf_list:
-            log.debug("timestamp: {0}, element: {1}".format(timestamp, bf_list))
+            log.debug("timestamp: {0}, element: {1}", timestamp, bf_list)
         for recognized_building in bf_list:
             concepts.add(recognized_building[1])
             if recognized_building[0] not in object_ids:
@@ -981,8 +984,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
             obj_cat_report[(recognized_building[1], shot_num)] = tmp
 
     log.info('-----------------------------------------------------')
-    log.info('Number of distinct recognized buildings: {}'.format(len(object_ids)))
-    log.info('Number of distinct concepts: {}'.format(len(concepts)))
+    log.info('Number of distinct recognized buildings: {}', len(object_ids))
+    log.info('Number of distinct concepts: {}', len(concepts))
     print_out = 'Report of detected concepts per shot:\n'
     for k in sorted(shot_list.keys()):
         v = '{ }' if len(shot_list[k]) == 0 else shot_list[k]
@@ -992,7 +995,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
     # get item "city" code
     crepo = CreationRepository(self.graph)
     city = crepo.get_belonging_city(item)
-    log.debug('This item belong to city: {0}'.format(city))
+    log.debug('This item belong to city: {0}', city)
 
     repo = AnnotationRepository(self.graph)
     saved_counter = 0  # keep count of saved annotation
@@ -1002,7 +1005,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
         concept_name = key[0]
         building_resource = building_mapping.get(concept_name)
         if building_resource is None:
-            log.warn('Cannot find building <{0}> in the mapping'.format(concept_name))
+            log.warning('Cannot find building <{0}> in the mapping', concept_name)
             # DO NOT create this annotation
             continue
         # filter by belonging city
@@ -1020,7 +1023,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
         # use first id as building recognition id
         br_id = timestamps[0][0]
-        log.debug("Building Recognition ID: {}".format(br_id))
+        log.debug("Building Recognition ID: {}", br_id)
 
         # detect target segment ONLY for videos
         start_frame = timestamps[0][1]
@@ -1065,8 +1068,6 @@ def extract_br_annotations(self, item, analyze_dir_path):
             from neomodel import db as transaction
 
             transaction.begin()
-            # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
-            #     bodies, selector))
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
@@ -1074,7 +1075,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
-                log.warning("Exception raised during rollback: %s" % rollback_exp)
+                log.warning("Exception raised during rollback: {}", rollback_exp)
             raise e
         saved_counter += 1
 
@@ -1097,8 +1098,9 @@ def extract_od_annotations(self, item, analyze_dir_path):
     orf_results_filename = 'orf.xml'
     orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
     if not os.path.exists(orf_results_path):
-        raise IOError("Analyze results does not exist in the path %s", orf_results_path)
-    log.info('get automatic object detection from file [%s]' % orf_results_path)
+        raise IOError(
+            "Analyze results does not exist in the path {}".format(orf_results_path))
+    log.info('get automatic object detection from file [{}]', orf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(orf_results_path)
 
@@ -1121,7 +1123,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
         (obj_id<str>, concept_label<str>, confidence<float>, region<list>).
 
         '''
-        log.debug("timestamp: {0}, element: {1}".format(timestamp, od_list))
+        log.debug("timestamp: {0}, element: {1}", timestamp, od_list)
         for detected_object in od_list:
             concepts.add(detected_object[1])
             if detected_object[0] not in object_ids:
@@ -1140,9 +1142,9 @@ def extract_od_annotations(self, item, analyze_dir_path):
             obj_cat_report[(detected_object[0], detected_object[1])] = tmp
 
     log.info('-----------------------------------------------------')
-    log.info('Number of distinct detected objects: {}'.format(len(object_ids)))
-    log.info('Number of distinct concepts: {}'.format(len(concepts)))
-    log.info('Report of detected concepts per shot: {}'.format(shot_list))
+    log.info('Number of distinct detected objects: {}', len(object_ids))
+    log.info('Number of distinct concepts: {}', len(concepts))
+    log.info('Report of detected concepts per shot: {}', shot_list)
 
     repo = AnnotationRepository(self.graph)
     counter = 0  # keep count of saved annotation
@@ -1154,7 +1156,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
         concept_name = key[1]
         concept_iri = concept_mapping.get(concept_name)
         if concept_iri is None:
-            log.warn('Cannot find concept <{0}> in the mapping'.format(concept_name))
+            log.warning('Cannot find concept <{0}> in the mapping', concept_name)
             # DO NOT create this annotation
             continue
         concept = {'iri': concept_iri, 'name': concept_name}
@@ -1195,7 +1197,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
         if len(region_sequence) > 1000:
             huge_size = len(region_sequence)
             region_sequence = []
-            log.warn(
+            log.warning(
                 'Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.format(
                     objID=key[0], concept=concept['name'], size=huge_size
                 )
@@ -1212,8 +1214,6 @@ def extract_od_annotations(self, item, analyze_dir_path):
             from neomodel import db as transaction
 
             transaction.begin()
-            # log.debug("Automatic TAG. Body {0}, Selector {1}".format(
-            #     bodies, selector))
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
@@ -1221,10 +1221,10 @@ def extract_od_annotations(self, item, analyze_dir_path):
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
-                log.warning("Exception raised during rollback: %s" % rollback_exp)
+                log.warning("Exception raised during rollback: {}", rollback_exp)
             raise e
         counter += 1
-    log.info('Number of saved automatic annotations: {counter}'.format(counter=counter))
+    log.info('Number of saved automatic annotations: {counter}', counter=counter)
     log.info('-----------------------------------------------------')
 
 

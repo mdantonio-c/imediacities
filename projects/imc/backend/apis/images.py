@@ -7,7 +7,7 @@ from flask import request, send_file
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
 
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from imc.security import authz
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
@@ -47,7 +47,7 @@ class Images(EndpointResource):
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )
 
-        logger.debug("getting NonAVEntity id: %s", image_id)
+        log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = self.get_service_instance('neo4j')
         data = []
 
@@ -56,7 +56,7 @@ class Images(EndpointResource):
             try:
                 v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             except self.graph.NonAVEntity.DoesNotExist:
-                logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+                log.debug("NonAVEntity with uuid {} does not exist", image_id)
                 raise RestApiException(
                     "Please specify a valid image id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
@@ -108,7 +108,7 @@ class Images(EndpointResource):
 
         data = self.get_input()
 
-        logger.critical(data)
+        log.critical(data)
 
         return self.empty_response()
 
@@ -120,7 +120,7 @@ class Images(EndpointResource):
         """
         Delete existing image description.
         """
-        logger.debug("deliting NonAVEntity id: %s", image_id)
+        log.debug("deliting NonAVEntity id: {}", image_id)
         self.graph = self.get_service_instance('neo4j')
 
         if image_id is None:
@@ -133,7 +133,7 @@ class Images(EndpointResource):
             repo.delete_non_av_entity(v)
             return self.empty_response()
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -152,7 +152,7 @@ class ImageItem(EndpointResource):
         """
         Allow user to update item information.
         """
-        logger.debug("Update Item for NonAVEntity uuid: %s", image_id)
+        log.debug("Update Item for NonAVEntity uuid: {}", image_id)
         if image_id is None:
             raise RestApiException(
                 "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
@@ -161,7 +161,7 @@ class ImageItem(EndpointResource):
         try:
             v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -194,7 +194,7 @@ class ImageItem(EndpointResource):
 
         item.public_access = public_access
         item.save()
-        logger.debug(
+        log.debug(
             "Item successfully updated for NonAVEntity uuid {}. {}".format(
                 image_id, item
             )
@@ -215,7 +215,7 @@ class ImageAnnotations(EndpointResource):
     @decorate.catch_error()
     @catch_graph_exceptions
     def get(self, image_id):
-        logger.debug("get annotations for NonAVEntity id: %s", image_id)
+        log.debug("get annotations for NonAVEntity id: {}", image_id)
         if image_id is None:
             raise RestApiException(
                 "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
@@ -233,7 +233,7 @@ class ImageAnnotations(EndpointResource):
         try:
             image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -247,7 +247,7 @@ class ImageAnnotations(EndpointResource):
             if anno.private:
                 if anno.creator is None:
                     # expected ALWAYS a creator for private annotation
-                    logger.warn(
+                    log.warning(
                         'Invalid state: missing creator for private '
                         'anno [UUID:{}]'.format(anno.uuid)
                     )
@@ -296,7 +296,7 @@ class ImageContent(EndpointResource):
     @catch_graph_exceptions
     @authz.pre_authorize
     def get(self, image_id):
-        logger.info("get image content for id %s" % image_id)
+        log.info("get image content for id {}", image_id)
         if image_id is None:
             raise RestApiException(
                 "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
@@ -317,13 +317,13 @@ class ImageContent(EndpointResource):
         try:
             image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
         item = image.item.single()
-        logger.debug("item data: " + format(item))
+        log.debug("item data: " + format(item))
         if content_type == 'image':
             # TODO manage here content access (see issue 190)
             # always return the other version if available
@@ -331,7 +331,7 @@ class ImageContent(EndpointResource):
             other_version = item.other_version.single()
             if other_version is not None:
                 image_uri = other_version.uri
-            logger.debug("image content uri: %s" % image_uri)
+            log.debug("image content uri: {}", image_uri)
             if image_uri is None:
                 raise RestApiException(
                     "Image not found", status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -342,12 +342,12 @@ class ImageContent(EndpointResource):
             return download.send_file_partial(image_uri, mime)
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
-            logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            log.debug("thumbnail content uri: {}", thumbnail_uri)
             thumbnail_size = input_parameters.get('size')
             if thumbnail_size is not None and thumbnail_size.lower() == 'large':
                 # load large image file as the original (i.e. transcoded.jpg)
                 thumbnail_uri = item.uri
-                logger.debug('request for large thumbnail: {}'.format(thumbnail_uri))
+                log.debug('request for large thumbnail: {}', thumbnail_uri)
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -373,7 +373,7 @@ class ImageTools(EndpointResource):
     @authentication.required(roles=['admin_root'])
     def post(self, image_id):
 
-        logger.debug('launch automatic tool for image id: %s' % image_id)
+        log.debug('launch automatic tool for image id: {}', image_id)
 
         if image_id is None:
             raise RestApiException(
@@ -385,7 +385,7 @@ class ImageTools(EndpointResource):
         try:
             image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
-            logger.debug("NonAVEntity with uuid %s does not exist" % image_id)
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id.", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -410,8 +410,8 @@ class ImageTools(EndpointResource):
         tool = params['tool']
         if tool not in self.__available_tools__:
             raise RestApiException(
-                "Please specify a valid tool. Expected one of %s."
-                % (self.__available_tools__,),
+                "Please specify a valid tool. Expected one of {}".format(
+                    self.__available_tools__),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 

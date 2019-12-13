@@ -4,10 +4,5 @@
 
 from restapi.models.sql import db, User
 
-import logging
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
 # Add (inject) attributes to User
 setattr(User, 'my_custom_field', db.Column(db.String(255)))

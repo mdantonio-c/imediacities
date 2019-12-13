@@ -7,7 +7,7 @@ from flask import send_file
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.rest.definition import EndpointResource
@@ -29,7 +29,7 @@ class Shots(EndpointResource):
         """
         Get shot by id.
         """
-        logger.debug("getting Shot id: %s", shot_id)
+        log.debug("getting Shot id: {}", shot_id)
         if shot_id is None:
             raise RestApiException(
                 "Please specify a valid shot uuid", status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -49,14 +49,14 @@ class Shots(EndpointResource):
         try:
             node = self.graph.Shot.nodes.get(uuid=shot_id)
         except self.graph.Shot.DoesNotExist:
-            logger.debug("Shot with id %s does not exist" % shot_id)
+            log.debug("Shot with id {} does not exist", shot_id)
             raise RestApiException(
                 "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
         if content_type is not None:
             thumbnail_uri = node.thumbnail_uri
-            logger.debug("thumbnail content uri: %s" % thumbnail_uri)
+            log.debug("thumbnail content uri: {}", thumbnail_uri)
             if thumbnail_uri is None:
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -86,14 +86,14 @@ class ShotAnnotations(EndpointResource):
     @catch_graph_exceptions
     @authentication.required()
     def get(self, shot_id):
-        logger.info("get annotations for Shot id: %s", shot_id)
+        log.info("get annotations for Shot id: {}", shot_id)
         if shot_id is None:
             raise RestApiException(
                 "Please specify a shot id", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
         params = self.get_input()
-        logger.debug("inputs %s" % params)
+        log.debug("inputs {}", params)
         anno_type = params.get('type')
         if anno_type is not None:
             anno_type = anno_type.upper()
@@ -105,7 +105,7 @@ class ShotAnnotations(EndpointResource):
         try:
             shot = self.graph.Shot.nodes.get(uuid=shot_id)
         except self.graph.AVEntity.DoesNotExist:
-            logger.debug("Shot with uuid %s does not exist" % shot_id)
+            log.debug("Shot with uuid {} does not exist", shot_id)
             raise RestApiException(
                 "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -117,7 +117,7 @@ class ShotAnnotations(EndpointResource):
                 continue
             if a.private:
                 if a.creator is None:
-                    logger.warn(
+                    log.warning(
                         'Invalid state: missing creator for private '
                         'note [UUID:{}]'.format(a.uuid)
                     )

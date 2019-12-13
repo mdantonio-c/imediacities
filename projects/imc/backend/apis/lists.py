@@ -13,7 +13,7 @@ from restapi.rest.definition import EndpointResource
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
 from imc.models.neo4j import Item, Shot, TextualBody
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
 import re
@@ -47,7 +47,7 @@ class Lists(EndpointResource):
             try:
                 researcher = self.graph.User.nodes.get(uuid=r_uuid)
             except self.graph.User.DoesNotExist:
-                logger.debug("Researcher with uuid %s does not exist" % r_uuid)
+                log.debug("Researcher with uuid {} does not exist", r_uuid)
                 raise RestApiException(
                     "Please specify a valid researcher id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
@@ -58,7 +58,7 @@ class Lists(EndpointResource):
             user_match = "MATCH (n)-[:LST_BELONGS_TO]->(:User {{uuid:'{user}'}})".format(
                 user=researcher.uuid
             )
-            logger.debug(
+            log.debug(
                 "researcher: {name} {surname}".format(
                     name=researcher.name, surname=researcher.surname
                 )
@@ -79,7 +79,7 @@ class Lists(EndpointResource):
             try:
                 res = self.graph.List.nodes.get(uuid=list_id)
             except self.graph.List.DoesNotExist:
-                logger.debug("List with uuid %s does not exist" % list_id)
+                log.debug("List with uuid {} does not exist", list_id)
                 raise RestApiException(
                     "Please specify a valid list id",
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
@@ -111,7 +111,6 @@ class Lists(EndpointResource):
         # request for multiple lists
         # offset, limit = self.get_paging()
         # offset -= 1
-        # logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
         # if offset < 0:
         #     raise RestApiException('Page number cannot be a negative value',
         #                            status_code=hcodes.HTTP_BAD_REQUEST)
@@ -123,7 +122,6 @@ class Lists(EndpointResource):
             " {match} "
             "RETURN COUNT(DISTINCT(n))".format(match=user_match)
         )
-        # logger.debug("count query: %s" % count)
         # query = "MATCH (n:List)" \
         #         " {match} " \
         #         "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
@@ -139,11 +137,11 @@ class Lists(EndpointResource):
                 match=user_match, optional=optional_match, counter=count_items
             )
         )
-        logger.debug("query: %s" % query)
+        log.debug("query: {}", query)
 
         # get total number of lists
         numels = [row[0] for row in self.graph.cypher(count)][0]
-        logger.debug("Total number of lists: {0}".format(numels))
+        log.debug("Total number of lists: {0}", numels)
 
         data = []
         meta_response = {"totalItems": numels}
@@ -180,7 +178,7 @@ class Lists(EndpointResource):
         Only a researcher can create a list. Both name and description are
         mandatory. There can not be lists with the same name.
         """
-        logger.debug("create a new list")
+        log.debug("create a new list")
         data = self.get_input()
         if len(data) == 0:
             raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
@@ -212,7 +210,7 @@ class Lists(EndpointResource):
         created_list = self.graph.List(**data).save()
         # connect the creator
         created_list.creator.connect(user)
-        logger.debug("List created successfully. UUID {}".format(created_list.uuid))
+        log.debug("List created successfully. UUID {}", created_list.uuid)
         return self.force_response(
             self.getJsonResponse(created_list), code=hcodes.HTTP_OK_CREATED
         )
@@ -223,12 +221,12 @@ class Lists(EndpointResource):
     @authentication.required(roles=['Researcher'])
     def put(self, list_id):
         """ Update a list. """
-        logger.debug("Update list with uuid: %s", list_id)
+        log.debug("Update list with uuid: {}", list_id)
         self.graph = self.get_service_instance('neo4j')
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
-            logger.debug("List with uuid %s does not exist" % list_id)
+            log.debug("List with uuid {} does not exist", list_id)
             raise RestApiException(
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -276,7 +274,7 @@ class Lists(EndpointResource):
         user_list.name = data['name'].strip()
         user_list.description = data['description'].strip()
         updated_list = user_list.save()
-        logger.debug("List updated successfully. UUID {}".format(updated_list.uuid))
+        log.debug("List updated successfully. UUID {}", updated_list.uuid)
         return self.force_response(
             self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
         )
@@ -287,7 +285,7 @@ class Lists(EndpointResource):
     @authentication.required(roles=['Researcher', 'admin_root'], required_roles='any')
     def delete(self, list_id):
         """ Delete a list. """
-        logger.debug("delete list %s" % list_id)
+        log.debug("delete list {}", list_id)
         if list_id is None:
             raise RestApiException(
                 "Please specify a list id", status_code=hcodes.HTTP_BAD_REQUEST
@@ -296,17 +294,17 @@ class Lists(EndpointResource):
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
-            logger.debug("List with uuid %s does not exist" % list_id)
+            log.debug("List with uuid {} does not exist", list_id)
             raise RestApiException(
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
         user = self.get_current_user()
-        logger.debug(
+        log.debug(
             'current user: {email} - {uuid}'.format(email=user.email, uuid=user.uuid)
         )
         iamadmin = self.auth.verify_admin()
-        logger.debug('current user is admin? {0}'.format(iamadmin))
+        log.debug('current user is admin? {0}', iamadmin)
 
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
@@ -317,7 +315,7 @@ class Lists(EndpointResource):
 
         # delete the list
         user_list.delete()
-        logger.debug("List delete successfully. UUID {}".format(list_id))
+        log.debug("List delete successfully. UUID {}", list_id)
         return self.empty_response()
 
 
@@ -343,7 +341,7 @@ class ListItems(EndpointResource):
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
-            logger.debug("List with uuid %s does not exist" % list_id)
+            log.debug("List with uuid {} does not exist", list_id)
             raise RestApiException(
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -357,7 +355,7 @@ class ListItems(EndpointResource):
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )
         if item_id is not None:
-            logger.debug(
+            log.debug(
                 "Get item <{0}> of the list <{1}, {2}>".format(
                     item_id, user_list.uuid, user_list.name
                 )
@@ -380,7 +378,7 @@ class ListItems(EndpointResource):
                 )
             return self.force_response(self.get_list_item_response(res[0]))
 
-        logger.debug(
+        log.debug(
             "Get all the items of the list <{0}, {1}>".format(
                 user_list.uuid, user_list.name
             )
@@ -388,7 +386,7 @@ class ListItems(EndpointResource):
         # do we need pagination here?
         offset, limit = self.get_paging()
         offset -= 1
-        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        log.debug("paging: offset {0}, limit {1}", offset, limit)
         if offset < 0:
             raise RestApiException(
                 'Page number cannot be a negative value',
@@ -410,7 +408,7 @@ class ListItems(EndpointResource):
     @authentication.required(roles=['Researcher'])
     def post(self, list_id):
         """ Add an item to a list. """
-        logger.debug("Add an item to list %s" % list_id)
+        log.debug("Add an item to list {}", list_id)
         data = self.get_input()
         # validate data input
         if len(data) == 0:
@@ -425,13 +423,13 @@ class ListItems(EndpointResource):
             raise RestApiException(
                 'Invalid Target format', status_code=hcodes.HTTP_BAD_REQUEST
             )
-        logger.debug('Add item with target: {}'.format(target))
+        log.debug('Add item with target: {}', target)
 
         self.graph = self.get_service_instance('neo4j')
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
-            logger.debug("List with uuid %s does not exist" % list_id)
+            log.debug("List with uuid {} does not exist", list_id)
             raise RestApiException(
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
@@ -446,7 +444,7 @@ class ListItems(EndpointResource):
             )
 
         target_type, tid = target.split(':')
-        logger.debug('target type: {}, target id: {}'.format(target_type, tid))
+        log.debug('target type: {}, target id: {}', target_type, tid)
         targetNode = None
         if target_type == 'item':
             targetNode = self.graph.Item.nodes.get_or_none(uuid=tid)
@@ -472,7 +470,7 @@ class ListItems(EndpointResource):
             )
         # connect the target to the list
         user_list.items.connect(targetNode)
-        logger.debug(
+        log.debug(
             "Item {0} added successfully to list <{1}, {2}>".format(
                 target, list_id, user_list.name
             )
@@ -490,11 +488,11 @@ class ListItems(EndpointResource):
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
-            logger.debug("List with uuid %s does not exist" % list_id)
+            log.debug("List with uuid {} does not exist", list_id)
             raise RestApiException(
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
-        logger.debug(
+        log.debug(
             "delete item <{0}> from the list <{1}, {2}>".format(
                 item_id, user_list.uuid, user_list.name
             )
@@ -523,7 +521,7 @@ class ListItems(EndpointResource):
             )
         # disconnect the item
         user_list.items.disconnect(matched_item)
-        logger.debug(
+        log.debug(
             "Item <{0}> remeved from the list <{1}, {2}>successfully.".format(
                 item_id, user_list.uuid, user_list.name
             )
@@ -543,7 +541,8 @@ class ListItems(EndpointResource):
             raise ValueError("Invalid ListItem instance.")
         creation = item.creation.single()
         if creation is None:
-            raise ValueError("Very strange. Item <%s> with no metadata" % item.uuid)
+            raise ValueError(
+                "Very strange. Item <{}}> with no metadata".format(item.uuid))
         creation = creation.downcast()
 
         res = self.getJsonResponse(mdo)
@@ -556,7 +555,7 @@ class ListItems(EndpointResource):
             v2 = item.other_version.single()
             # if v2 is not None:
             #     # should I consider v2 attibutes instead?
-            #     logger.debug('get v2 for item <%s>' % mdo.uuid)
+            #     log.debug('get v2 for item <{}>', mdo.uuid)
             #     # FIXME the following doesn't work
             #     # v2_res = self.getJsonResponse(v2)
             #     # res["attributes"] = v2_res["attributes"]

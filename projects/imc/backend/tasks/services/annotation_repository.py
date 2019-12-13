@@ -79,10 +79,10 @@ class AnnotationRepository:
             if not isinstance(target, Item):
                 raise ValueError('Selector allowed only for Item target.')
             s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
-            log.debug('start:{}, end:{}'.format(s_start, s_end))
+            log.debug('start:{}, end:{}', s_start, s_end)
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
-            log.debug('Segment does exist? {}'.format(True if segment else False))
+            log.debug('Segment does exist? {}', True if segment else False)
             if segment is None:
                 segment = VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
@@ -104,18 +104,18 @@ class AnnotationRepository:
             if body['type'] == 'ResourceBody':
                 source = body['source']
                 iri = source if isinstance(source, str) else source.get('iri')
-                log.debug('ResourceBody with IRI:{}'.format(iri))
+                log.debug('ResourceBody with IRI:{}', iri)
                 # look for existing Resource
                 # do not update the existing resource
                 bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
                 if bodyNode is None:
-                    log.debug('new ResourceBody for concept: {}'.format(source))
+                    log.debug('new ResourceBody for concept: {}', source)
                     bodyNode = ResourceBody(iri=iri)
                     if not isinstance(source, str):
                         bodyNode.name = source.get('name')
                     if 'spatial' in body:
                         coord = [body['spatial']['lat'], body['spatial']['long']]
-                        log.debug('lat: {}, long:{}'.format(coord[0], coord[1]))
+                        log.debug('lat: {}, long:{}', coord[0], coord[1])
                         bodyNode.spatial = coord
                     bodyNode.save()
             elif body['type'] == 'TextualBody':
@@ -140,7 +140,7 @@ class AnnotationRepository:
                     iri=concept['iri']
                 )
                 if conceptNode is None:
-                    log.debug('new ResourceBody for concept: {}'.format(concept))
+                    log.debug('new ResourceBody for concept: {}', concept)
                     conceptNode = ResourceBody(
                         iri=concept['iri'], name=concept['name']
                     ).save()
@@ -157,7 +157,7 @@ class AnnotationRepository:
                     iri=concept['iri']
                 )
                 if conceptNode is None:
-                    log.debug('new ResourceBody for concept: {}'.format(concept))
+                    log.debug('new ResourceBody for concept: {}', concept)
                     conceptNode = ResourceBody(
                         iri=concept['iri'],
                         name=concept['name'],
@@ -177,7 +177,7 @@ class AnnotationRepository:
         Create a "description" annotation used for private and public notes.
         '''
         visibility = 'private' if is_private else 'public'
-        log.debug("Create a new {} description annotation".format(visibility))
+        log.debug("Create a new {} description annotation", visibility)
         # create annotation node
         anno = Annotation(annotation_type='DSC', private=is_private).save()
         if embargo_date is not None:
@@ -215,7 +215,7 @@ class AnnotationRepository:
         Create a link annotation.
         '''
         visibility = 'private' if is_private else 'public'
-        log.debug("Create a new {} description annotation".format(visibility))
+        log.debug("Create a new {} description annotation", visibility)
         # create annotation node
         anno = Annotation(annotation_type='LNK', private=is_private).save()
         if embargo_date is not None:
@@ -234,7 +234,7 @@ class AnnotationRepository:
 
         # ignore at the moment segment selector
         if selector is not None:
-            log.warn('Selector not yet applicable for the target {0}'.format(target))
+            log.warning('Selector not yet applicable for the target {0}', target)
         anno.targets.connect(target)
 
         # ONLY textual and reference body allowed at the moment
@@ -258,19 +258,18 @@ class AnnotationRepository:
         annotation if multiple bodies exist.
         '''
         log.debug(
-            'Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]'.format(
-                anno_id=anno.uuid, btype=btype, bid=bid
-            )
+            'Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]',
+            anno_id=anno.uuid, btype=btype, bid=bid
         )
         bodies = anno.bodies.all()
         body_list_size_before = len(bodies)
-        log.debug('body list size before deletion: {}'.format(body_list_size_before))
+        log.debug('body list size before deletion: {}', body_list_size_before)
         single_body = True if btype is not None and bid is not None else False
-        log.debug('Deleting single body?: {}'.format(single_body))
+        log.debug('Deleting single body?: {}', single_body)
         body_found = False
         for body in bodies:
             original_body = body.downcast()
-            log.debug('body instance of {}'.format(original_body.__class__))
+            log.debug('body instance of {}', original_body.__class__)
             if single_body:
                 # ONLY the referenced body
                 if isinstance(original_body, ResourceBody) and btype == 'resource':
@@ -294,20 +293,19 @@ class AnnotationRepository:
         # refresh the list of bodies
         bodies = anno.bodies.all()
         body_list_size_after = len(bodies)
-        log.debug('body list size after deletion: {}'.format(body_list_size_after))
+        log.debug('body list size after deletion: {}', body_list_size_after)
         if single_body and not body_found:
             raise ReferenceError(
                 "Annotation ID:{anno_id} cannot be deleted."
-                " No body found for {btype}:{bid}".format(
-                    anno_id=anno.uuid, btype=btype, bid=bid
-                )
+                " No body found for {btype}:{bid}",
+                anno_id=anno.uuid, btype=btype, bid=bid
             )
         if body_list_size_after == 0:
             # delete any orphan video segments (NOT SHOT!)
             targets = anno.targets.all()
             for t in targets:
                 target_labels = t.labels()
-                log.debug("Target label(s): {}".format(target_labels))
+                log.debug("Target label(s): {}", target_labels)
                 if (
                     'VideoSegment' in target_labels
                     and 'Shot' not in target_labels
@@ -399,9 +397,9 @@ class AnnotationRepository:
 
         existing_shots = item.shots.all()
         old_size = len(existing_shots)
-        log.debug('Existing shot list size: {}'.format(old_size))
+        log.debug('Existing shot list size: {}', old_size)
         new_size = len(shots)
-        log.debug('Incoming shot list size: {}'.format(new_size))
+        log.debug('Incoming shot list size: {}', new_size)
 
         # for each existing shot we gather and disconnect from them all the
         # manual annotations
@@ -410,7 +408,7 @@ class AnnotationRepository:
             for a in old_shot.annotation.search(generator__isnull=True):
                 existing_annotations.append(a)
                 old_shot.annotation.disconnect(a)
-        log.info('total existing annotations: %s' % len(existing_annotations))
+        log.info('total existing annotations: {}', len(existing_annotations))
 
         # foreach incoming shot
         log.debug('----------')
@@ -421,7 +419,7 @@ class AnnotationRepository:
             if not res:
                 # new incoming shot:
                 # rarely expected (especially for framerate fix)
-                log.info('New incoming shot number: {}'.format(shot_num))
+                log.info('New incoming shot number: {}', shot_num)
                 shot_node = self.graph.Shot(shot_num=shot_num, **properties)
                 if rev and 'revision_confirmed' in properties:
                     shot_node.revision_confirmed = properties['revision_confirmed']
@@ -455,7 +453,7 @@ class AnnotationRepository:
             if 'annotations' in properties:
                 for anno_id in properties['annotations']:
                     # look up ID from existing_annotations
-                    log.debug('look up for annotation ID %s' % anno_id)
+                    log.debug('look up for annotation ID {}', anno_id)
                     found = [x for x in existing_annotations if x.uuid == anno_id]
                     if len(found) == 0:
                         continue
@@ -465,7 +463,7 @@ class AnnotationRepository:
         if old_size > new_size:
             # delete exceeding shots
             # NOTE: we can do this because no annotation targets the shot
-            log.warn(
+            log.warning(
                 'The shot list [size={new_size}] is shorter than the '
                 'previous one [size={old_size}]'.format(
                     new_size=new_size, old_size=old_size
@@ -473,7 +471,7 @@ class AnnotationRepository:
             )
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
-                log.warn('Exceeding shot to delete: {}'.format(shot_to_delete))
+                log.warning('Exceeding shot to delete: {}', shot_to_delete)
                 shot_to_delete[0].delete()
 
         # clean-up "orphan" manual annotations
@@ -481,7 +479,7 @@ class AnnotationRepository:
             try:
                 anno.targets.all()
             except CardinalityViolation:
-                log.warn('orphan annotation to delete: {}'.format(anno))
+                log.warning('orphan annotation to delete: {}', anno)
                 # delete anno
                 # NOTE: this could occur if an exisitng manual anno is not
                 # passed in the shot revision request.
@@ -545,7 +543,7 @@ class AnnotationRepository:
                 )
             )
         visibility = 'private' if is_private else 'public'
-        log.debug("Create a new {} segmentation annotation".format(visibility))
+        log.debug("Create a new {} segmentation annotation", visibility)
         # create annotation node
         anno = Annotation(annotation_type='TVS', private=is_private).save()
         if embargo_date is not None:
@@ -568,14 +566,14 @@ class AnnotationRepository:
             raise ValueError('Invalid segments')
         for s in segments:
             s_start, s_end = map(int, s.lstrip('t=').split(','))
-            log.debug('start:{}, end:{}'.format(s_start, s_end))
+            log.debug('start:{}, end:{}', s_start, s_end)
             if s_start > s_end:
                 raise ValueError(
                     'Invalid segment range. The start is greater than the end.'
                 )
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
-            log.debug('Segment does exist? {}'.format(True if segment else False))
+            log.debug('Segment does exist? {}', True if segment else False)
             if segment is None:
                 segment = VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
@@ -711,7 +709,7 @@ class AnnotationRepository:
         targets = annotation.targets.all()
         for t in targets:
             target_labels = t.labels()
-            log.debug("Target label(s): {}".format(target_labels))
+            log.debug("Target label(s): {}", target_labels)
             if (
                 'VideoSegment' in target_labels
                 and 'Shot' not in target_labels
@@ -753,7 +751,7 @@ class AnnotationRepository:
                 query.format(target_uuid=target.uuid, body_iri=iri)
             )
             count = [row[0] for row in results][0]
-            log.debug("Duplicated found: {0}".format(count))
+            log.debug("Duplicated found: {0}", count)
             if count > 0:
                 warnings.append(
                     "Duplicated tag: '{name}' - '{iri}'".format(
@@ -762,7 +760,6 @@ class AnnotationRepository:
                 )
                 continue
             filtered_bodies.append(body)
-        # log.debug("Filtered bodies: {0}".format(filtered_bodies))
         return warnings, filtered_bodies
 
     def get_enclosing_shots(self, segment, item):
@@ -827,7 +824,7 @@ class AnnotationRepository:
         )
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]
-        log.debug("Number of automatic annotations found: {0}".format(count))
+        log.debug("Number of automatic annotations found: {0}", count)
         return True if count > 0 else False
 
     def check_automatic_od(self, item_id):
@@ -843,7 +840,7 @@ class AnnotationRepository:
         )
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]
-        log.debug("Number of automatic object detections found: {0}".format(count))
+        log.debug("Number of automatic object detections found: {0}", count)
         return True if count > 0 else False
 
     def check_automatic_br(self, item_id):
@@ -859,7 +856,7 @@ class AnnotationRepository:
         )
         results = self.graph.cypher(query.format(item_id=item_id))
         count = [row[0] for row in results][0]
-        log.debug("Number of automatic building recognitions found: {0}".format(count))
+        log.debug("Number of automatic building recognitions found: {0}", count)
         return True if count > 0 else False
 
     def remove_segment(self, anno, segment):
@@ -886,7 +883,7 @@ class AnnotationRepository:
             )
 
         # check if the segment is the last
-        log.debug('actual segmentation list size: {size}'.format(size=len(segments)))
+        log.debug('actual segmentation list size: {size}', size=len(segments))
         if len(segments) == 1:
             raise DuplicatedAnnotationError(
                 "Cannot remove the last segment. "
@@ -926,7 +923,7 @@ class AnnotationRepository:
         # search for existing segment for the given item
         item = anno.source_item.single()
         segment = self.lookup_existing_segment(s_start, s_end, item)
-        log.debug('Segment does exist? {}'.format(True if segment else False))
+        log.debug('Segment does exist? {}', True if segment else False)
         if segment is None:
             segment = VideoSegment(start_frame_idx=s_start, end_frame_idx=s_end).save()
             # look up the shot where the segment is enclosed

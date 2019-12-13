@@ -4,7 +4,7 @@
 Search endpoint for annotations
 """
 
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.exceptions import RestApiException
 from restapi.protocols.bearer import authentication
@@ -32,7 +32,7 @@ class SearchAnnotations(EndpointResource):
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1
-        logger.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        log.debug("paging: offset {0}, limit {1}", offset, limit)
         if offset < 0:
             raise RestApiException(
                 'Page number cannot be a negative value',
@@ -58,8 +58,8 @@ class SearchAnnotations(EndpointResource):
                 )
             if anno_type not in self.__class__.allowed_anno_types:
                 raise RestApiException(
-                    "Bad annotation type parameter: expected one of %s"
-                    % (self.__class__.allowed_anno_types,),
+                    "Bad annotation type parameter: expected one of {}".format(
+                        self.__class__.allowed_anno_types),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             filters.append(
@@ -121,8 +121,8 @@ class SearchAnnotations(EndpointResource):
                     for f in fields:
                         if f not in self.__class__.allowed_term_fields:
                             raise RestApiException(
-                                "Bad field: expected one of %s"
-                                % (self.__class__.allowed_term_fields,),
+                                "Bad field: expected one of {}".format(
+                                    self.__class__.allowed_term_fields),
                                 status_code=hcodes.HTTP_BAD_REQUEST,
                             )
                         if not term:
@@ -178,7 +178,6 @@ class SearchAnnotations(EndpointResource):
                             + " WHERE "
                             + ' OR '.join(multi_match_where)
                         )
-                        # logger.debug(multi_match_query)
                         filters.append(multi_match_query)
 
                 c_filter = creation.get('filter')
@@ -187,8 +186,8 @@ class SearchAnnotations(EndpointResource):
                 c_type = c_type.strip().lower()
                 if c_type not in self.__class__.allowed_item_types:
                     raise RestApiException(
-                        "Bad item type parameter: expected one of %s"
-                        % (self.__class__.allowed_item_types,),
+                        "Bad item type parameter: expected one of {}".format(
+                            self.__class__.allowed_item_types),
                         status_code=hcodes.HTTP_BAD_REQUEST,
                     )
                 if c_type != 'all':
@@ -280,7 +279,7 @@ class SearchAnnotations(EndpointResource):
 
         # get total number of elements
         numels = [row[0] for row in self.graph.cypher(countv)][0]
-        logger.debug("Number of elements retrieved: {0}".format(numels))
+        log.debug("Number of elements retrieved: {0}", numels)
 
         query = (
             "{starters} MATCH (anno:Annotation)"
@@ -293,8 +292,6 @@ class SearchAnnotations(EndpointResource):
                 orderBy=order_by,
             )
         )
-        # logger.debug(query)
-
         data = []
         result = self.graph.cypher(query)
         for row in result:

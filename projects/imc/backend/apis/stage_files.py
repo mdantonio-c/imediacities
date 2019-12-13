@@ -70,7 +70,7 @@ class Stage(EndpointResource):
             if len(tokens) == 0:
                 continue
             if tokens[-1] == source_id:
-                log.info('Content file FOUND: {0}'.format(f))
+                log.info('Content file FOUND: {0}', f)
                 # content_path = os.path.join(path, f)
                 content_filename = f
                 break
@@ -268,27 +268,28 @@ class Stage(EndpointResource):
         mode = input_parameters.get('mode', 'clean').strip().lower()
         if mode not in self.__class__.allowed_import_mode:
             raise RestApiException(
-                "Bad mode parameter: expected one of %s"
-                % (self.__class__.allowed_import_mode,),
+                "Bad mode parameter: expected one of {}".format(
+                    self.__class__.allowed_import_mode),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                "File not found: %s" % filename, status_code=hcodes.HTTP_BAD_REQUEST
+                "File not found: {}".format(filename),
+                status_code=hcodes.HTTP_BAD_REQUEST
             )
 
         # 1) estraggo il source id dal file dei metadati
-        log.debug("Extracting source id from metadata file %s", filename)
+        log.debug("Extracting source id from metadata file {}", filename)
         source_id = self.extract_creation_ref(path)
         if source_id is None:
-            log.debug("No source ID found in metadata file %s", path)
+            log.debug("No source ID found in metadata file {}", path)
             raise RestApiException(
-                "No source ID found in metadata file: %s" % filename,
+                "No source ID found in metadata file: {}", filename,
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
-        log.debug("Source id %s found in metadata file", source_id)
+        log.debug("Source id {} found in metadata file", source_id)
 
         # 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
         #     e appartenente al gruppo
@@ -308,8 +309,7 @@ class Stage(EndpointResource):
             if len(c) > 1:
                 # there are more than one MetaStage related to the same source id: Database incoherence!
                 log.errors(
-                    "Database incoherence: there are more than one MetaStage related to the same source id %s"
-                    % source_id
+                    "Database incoherence: there are more than one MetaStage related to the same source id {}", source_id
                 )
                 raise RestApiException(
                     "System incoherent state: it is not possible to perform the import",
@@ -317,15 +317,14 @@ class Stage(EndpointResource):
                 )
             if len(c) == 1:
                 # Source id already exists in database: updating metadata
-                log.debug("Source id %s already exists in database" % source_id)
+                log.debug("Source id {} already exists in database", source_id)
                 meta_stage = c[0]
                 if meta_stage is not None:
                     dbFilename = meta_stage.filename
-                    log.debug("dbFilename=%s" % dbFilename)
+                    log.debug("dbFilename={}", dbFilename)
                     if filename != dbFilename:
                         raise RestApiException(
-                            "Source id %s already esists in database but with different filename %s: cannot proceed with import!"
-                            % (source_id, dbFilename),
+                            "Source id {} already esists in database but with different filename {}: cannot proceed with import!".format(source_id, dbFilename),
                             status_code=hcodes.HTTP_BAD_CONFLICT,
                         )
 
@@ -345,7 +344,7 @@ class Stage(EndpointResource):
                             and content_stage.status == 'COMPLETED'
                             and not force_reprocessing
                         ):
-                            log.warn(
+                            log.warning(
                                 "This content item has already been "
                                 "successfully processed. Force SKIP mode."
                             )
@@ -359,15 +358,14 @@ class Stage(EndpointResource):
             if len(c) == 0:
                 # Source id does not exist in database: creating new element
                 log.debug(
-                    "Source id %s does not exist in database: creating new element"
-                    % source_id
+                    "Source id {} does not exist in database: creating new element", source_id
                 )
                 # forziamo la convenzione del filename '<archive code>_<source id>.xml'
                 standard_filename = group.shortname + '_' + source_id + '.xml'
                 if filename != standard_filename:
                     log.debug(
-                        "File %s has not standard file name: renaming it to standard %s"
-                        % (filename, standard_filename)
+                        "File {} has not standard file name: renaming it to {}",
+                        filename, standard_filename
                     )
                     standard_path = os.path.join(upload_dir, standard_filename)
                     # rinomino il file nel filesystem
@@ -377,10 +375,10 @@ class Stage(EndpointResource):
                         os.replace(path, standard_path)
                     except OSError:
                         log.debug(
-                            "Error in renaming file %s to %s: " % (path, standard_path)
+                            "Error in renaming file {} to {}: ", path, standard_path
                         )
                         raise RestApiException(
-                            "System error: cannot rename file %s" % path,
+                            "System error: cannot rename file {}".format(path),
                             status_code=hcodes.HTTP_BAD_CONFLICT,
                         )
 
@@ -393,27 +391,27 @@ class Stage(EndpointResource):
                 try:
                     meta_stage = self.graph.MetaStage.nodes.get(**properties)
                     log.debug(
-                        "MetaStage already exists for file %s, meta_stage.uuid=%s"
-                        % (path, meta_stage.uuid)
+                        "MetaStage already exists for file {}, meta_stage.uuid={}",
+                        path, meta_stage.uuid
                     )
                 except self.graph.MetaStage.DoesNotExist:
-                    log.debug("MetaStage does not exists for file %s" % path)
+                    log.debug("MetaStage does not exists for file {}", path)
                     meta_stage = self.graph.MetaStage(**properties).save()
                     meta_stage.ownership.connect(group)
                     log.debug(
-                        "MetaStage created for %s, meta_stage.uuid=%s"
-                        % (path, meta_stage.uuid)
+                        "MetaStage created for {}, meta_stage.uuid={}",
+                        path, meta_stage.uuid
                     )
 
             metadata_update = input_parameters.get('update', True)
 
-            log.debug("Starting import of file path=%s" % (path))
-            log.debug("with meta_stage.uuid=%s" % (meta_stage.uuid))
-            log.debug("with mode=%s" % (mode))
-            log.debug("with metadata_update=%s" % (metadata_update))
+            log.debug("Starting import of file path={}", path)
+            log.debug("with meta_stage.uuid={}", meta_stage.uuid)
+            log.debug("with mode={}", mode)
+            log.debug("with metadata_update={}", metadata_update)
 
         except self.graph.MetaStage.DoesNotExist:
-            log.debug("MetaStage not exist for source id %s " % source_id)
+            log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
         task = CeleryExt.import_file.apply_async(
@@ -458,7 +456,8 @@ class Stage(EndpointResource):
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                "File not found: %s" % filename, status_code=hcodes.HTTP_BAD_REQUEST
+                "File not found: {}".format(filename),
+                status_code=hcodes.HTTP_BAD_REQUEST
             )
 
         os.remove(path)

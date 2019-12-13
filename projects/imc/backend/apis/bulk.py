@@ -17,7 +17,7 @@ import os
 import re
 from shutil import copyfile
 from datetime import datetime
-# from restapi.utilities.logs import log
+from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
@@ -47,33 +47,33 @@ class Bulk(EndpointResource):
         - if 'item_node' is None, non ha senso andare a vedere 'coherent'
         - if 'item_node' is not None, allora vado a vedere 'coherent'
         """
-        logger.debug(
-            "check_item_type_coherence: resource id %s and path %s"
-            % (resource.uuid, standard_path)
+        log.debug(
+            "check_item_type_coherence: resource id {} and path {}",
+            resource.uuid, standard_path
         )
         coherent = False
         # check for existing item
         item_node = resource.item.single()
         if item_node is not None:
-            logger.info("There is an Item associated to MetaStage %s" % resource.uuid)
+            log.info("There is an Item associated to MetaStage {}", resource.uuid)
             # checking for item_type coherence
             existent_item_type = item_node.item_type
             if existent_item_type is None:
-                logger.warning("No item_type found for item id %s" % item_node.uuid)
+                log.warning("No item_type found for item id {}", item_node.uuid)
             else:
                 incoming_item_type = None
                 try:
                     incoming_item_type = self.extract_item_type(standard_path)
                     if incoming_item_type is None:
-                        logger.warning(
-                            "No item type found for filename %s" % standard_path
+                        log.warning(
+                            "No item type found for filename {}", standard_path
                         )
                     elif existent_item_type == incoming_item_type:
                         coherent = True
                 except Exception as e:
-                    logger.error("Exception %s" % e)
-                    logger.error(
-                        "Cannot extract item type from filename %s" % standard_path
+                    log.error("Exception {}", e)
+                    log.error(
+                        "Cannot extract item type from filename {}", standard_path
                     )
         return item_node, coherent
 
@@ -84,7 +84,7 @@ class Bulk(EndpointResource):
         %Y-%m-%dT%H:%M:%S.%fZ (example 2018-04-19T11:22:12.0Z)
         which name is the most recent date
         """
-        logger.debug("lookup_latest_dir: input path" + path)
+        log.debug("lookup_latest_dir.input path = {}", path)
 
         POSSIBLE_FORMATS = ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S.%fZ']
 
@@ -110,7 +110,7 @@ class Bulk(EndpointResource):
                     found_date = parsed_date
                     found_dir = d
             else:
-                logger.warning("cannot parse dir=" + d)
+                log.warning("cannot parse dir = {}", d)
         return os.path.join(path, found_dir)
 
     def extract_creation_ref(self, path):
@@ -131,12 +131,12 @@ class Bulk(EndpointResource):
     @catch_graph_exceptions
     @authentication.required(roles=['admin_root'])
     def post(self):
-        logger.debug("Start bulk procedure...")
+        log.debug("Start bulk procedure...")
 
         self.graph = self.get_service_instance('neo4j')
 
         params = self.get_input()
-        logger.debug('input: {}'.format(params))
+        log.debug('input: {}', params)
         for allowed_action in self.__class__.allowed_actions:
             action = params.get(allowed_action)
             if action is not None:
@@ -144,7 +144,7 @@ class Bulk(EndpointResource):
                 break
         if action is None:
             raise RestApiException(
-                "Bad action: expected one of %s" % (self.__class__.allowed_actions,),
+                "Bad action: expected one of {}".format(self.__class__.allowed_actions),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -166,18 +166,16 @@ class Bulk(EndpointResource):
                     'Group ID {} not found'.format(guid),
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
-            logger.info("Update procedure for Group '{0}' ".format(group.shortname))
+            log.info("Update procedure for Group '{0}'", group.shortname)
             # check if the parameter 'force_reprocessing' has been specified
             force_reprocessing = action.get('force_reprocessing', False)
-            logger.debug('force_reprocessing: {}'.format(force_reprocessing))
+            log.debug('force_reprocessing: {}', force_reprocessing)
 
             # retrieve XML files from delta upload dir
             #  (scaricato con oai-pmh solo delta rispetto all'ultimo harvest
             #    prendere dir= /uploads/<guid>/upload/<date>/ con date la data più recente)
             upload_dir = "/uploads/" + group.uuid
-            # logger.debug("upload_dir %s" % upload_dir)
             upload_delta_dir = os.path.join(upload_dir, "upload")
-            # logger.debug("upload_delta_dir %s" % upload_delta_dir)
             if not os.path.exists(upload_delta_dir):
                 return self.force_response(
                     [], errors=["Upload dir " + upload_delta_dir + " not found"]
@@ -188,10 +186,10 @@ class Bulk(EndpointResource):
             upload_latest_dir = self.lookup_latest_dir(upload_delta_dir)
 
             if upload_latest_dir is None:
-                logger.debug("Upload dir not found")
+                log.debug("Upload dir not found")
                 return self.force_response([], errors=["Upload dir not found"])
 
-            logger.info("Processing files from dir %s" % upload_latest_dir)
+            log.info("Processing files from dir {}", upload_latest_dir)
 
             files = [f for f in os.listdir(upload_latest_dir) if f.endswith('.xml')]
             total_to_be_imported = len(files)
@@ -203,29 +201,29 @@ class Bulk(EndpointResource):
             for f in files:
                 file_path = os.path.join(upload_latest_dir, f)
                 filename = f
-                logger.debug("Processing file %s" % filename)
+                log.debug("Processing file {}", filename)
                 # copio il file nella directory in cui vengono uploadati il file dal Frontend
                 #  come nome del file uso quello nella forma standard "<archive code>_<source id>.xml"
                 #  quindi prima devo estrarre il source id dal file stesso
-                logger.debug("Extracting source id from metadata file %s" % filename)
+                log.debug("Extracting source id from metadata file {}", filename)
                 source_id = None
                 try:
                     source_id = self.extract_creation_ref(file_path)
                     if source_id is None:
-                        logger.warning(
-                            "No source ID found: SKIPPED filename %s" % file_path
+                        log.warning(
+                            "No source ID found: SKIPPED filename {}", file_path
                         )
                         skipped += 1
                         continue
                 except Exception as e:
-                    logger.error("Exception %s" % e)
-                    logger.error(
-                        "Cannot extract source id: SKIPPED filename %s" % file_path
+                    log.error("Exception {}", e)
+                    log.error(
+                        "Cannot extract source id: SKIPPED filename {}", file_path
                     )
                     skipped += 1
                     continue
 
-                logger.info("Found source id %s" % source_id)
+                log.info("Found source id {}", source_id)
 
                 # To use source id in the filename we must
                 # replace non alpha-numeric characters with a dash
@@ -235,11 +233,11 @@ class Bulk(EndpointResource):
                 standard_path = os.path.join(upload_dir, standard_filename)
                 try:
                     copyfile(file_path, standard_path)
-                    logger.info(
-                        "Copied file %s to file %s" % (file_path, standard_path)
+                    log.info(
+                        "Copied file {} to file {}", file_path, standard_path
                     )
                 except BaseException:
-                    logger.warning("Cannot copy file: SKIPPED filename %s" % file_path)
+                    log.warning("Cannot copy file: SKIPPED filename {}", file_path)
                     skipped += 1
                     continue
 
@@ -247,7 +245,7 @@ class Bulk(EndpointResource):
                 properties['filename'] = standard_filename
                 properties['path'] = standard_path
 
-                # cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
+                # cerco nel db se esiste già un META_STAGE collegato a quel SOURCE_ID
                 # e appartenente al gruppo
                 meta_stage = None
                 try:
@@ -257,38 +255,40 @@ class Bulk(EndpointResource):
                             match (c:Creation)-[r1:RECORD_SOURCE]-> (rs:RecordSource) \
                             WHERE rs.source_id = '{source_id}' and g.uuid = '{guuid}' \
                             return ms"
-                    logger.debug("Executing query: %s" % query)
+                    log.debug("Executing query: {}", query)
                     results = self.graph.cypher(
                         query.format(source_id=source_id, guuid=group.uuid)
                     )
                     c = [self.graph.MetaStage.inflate(row[0]) for row in results]
                     if len(c) > 1:
                         # TODO gestire meglio questo caso
-                        # there are more than one MetaStage related to the same source id: Database incoherence!
-                        logger.warning(
+                        # there are more than one MetaStage related to
+                        # the same source id: Database incoherence!
+                        log.warning(
                             "Database incoherence: there is more than one MetaStage \
-                            related to the same source id %s: SKIPPED file %s"
-                            % (source_id, standard_filename)
+                            related to the same source id {}: SKIPPED file {}",
+                            source_id, standard_filename
                         )
                         skipped += 1
                         continue
 
                     if len(c) == 1:
                         # Source id already exists in database
-                        logger.info(
-                            "MetaStage already exists in database for source id %s"
-                            % source_id
+                        log.info(
+                            "MetaStage already exists in database for source id {}",
+                            source_id
                         )
                         meta_stage = c[0]
-                        logger.debug("MetaStage=%s" % meta_stage)
+                        log.debug("MetaStage={}", meta_stage)
 
                 except self.graph.MetaStage.DoesNotExist:
-                    logger.info(
-                        "MetaStage does not exist for source id %s " % source_id
+                    log.info(
+                        "MetaStage does not exist for source id {}", source_id
                     )
 
                 try:
-                    # se il source_id non esiste nel database, allora possono essere due i casi:
+                    # se il source_id non esiste nel database,
+                    # allora possono essere due i casi:
                     #  1) e' l'import di un nuovo contenuto
                     #  2) potrebbe esistere un MetaStage associato allo stesso filename
                     #      ma senza una Creation associata perche' la volta precedente
@@ -312,8 +312,8 @@ class Bulk(EndpointResource):
 
                         try:
                             resource = self.graph.MetaStage.nodes.get(**properties)
-                            logger.info(
-                                "MetaStage already exists for %s" % standard_path
+                            log.info(
+                                "MetaStage already exists for {}", standard_path
                             )
 
                             # check for existing item
@@ -322,31 +322,23 @@ class Bulk(EndpointResource):
                             )
                             if item_node is not None:
                                 if not coherent:
-                                    logger.error(
-                                        "Incoming item_type different from item_type in database for file %s"
-                                        % standard_path
-                                    )
                                     resource.status = 'ERROR'
                                     resource.status_message = (
-                                        "Incoming item_type different from item_type in database for file: "
-                                        + standard_path
+                                        "Incoming item_type different from item_type in database for file: {}".format(standard_path)
                                     )
                                     resource.save()
+                                    log.error(resource.status_message)
                                     failed += 1
                                     continue
                                 # check for existing creation
                                 creation = item_node.creation.single()
                                 if creation is not None:
-                                    logger.error(
-                                        "A creation with a different SOURCE_ID is already associated to file: %s"
-                                        % standard_path
-                                    )
                                     resource.status = 'ERROR'
                                     resource.status_message = (
-                                        "A creation with a different SOURCE_ID is already associated to file: "
-                                        + standard_path
+                                        "A creation with a different SOURCE_ID is already associated to file: {}".format(standard_path)
                                     )
                                     resource.save()
+                                    log.error(resource.status_message)
                                     failed += 1
                                     continue
 
@@ -362,7 +354,7 @@ class Bulk(EndpointResource):
                                     ],
                                     countdown=10,
                                 )
-                                logger.debug("Task id=%s" % task.id)
+                                log.debug("Task id={}", task.id)
                                 resource.status = (
                                     "UPDATING METADATA + FORCE REPROCESSING"
                                 )
@@ -373,7 +365,7 @@ class Bulk(EndpointResource):
                                 task = CeleryExt.update_metadata.apply_async(
                                     args=[standard_path, resource.uuid], countdown=10
                                 )
-                                logger.debug("Task id=%s" % task.id)
+                                log.debug("Task id={}", task.id)
                                 resource.status = "UPDATING METADATA"
                                 resource.task_id = task.id
                                 resource.save()
@@ -381,13 +373,13 @@ class Bulk(EndpointResource):
 
                         except self.graph.MetaStage.DoesNotExist:
                             # import di un nuovo contenuto
-                            logger.debug(
-                                "Creating MetaStage for file %s" % standard_path
+                            log.debug(
+                                "Creating MetaStage for file {}", standard_path
                             )
                             meta_stage = self.graph.MetaStage(**properties).save()
                             meta_stage.ownership.connect(group)
-                            logger.debug(
-                                "MetaStage created for source_id %s" % source_id
+                            log.debug(
+                                "MetaStage created for source_id {}", source_id
                             )
                             mode = "clean"
                             task = CeleryExt.import_file.apply_async(
@@ -400,7 +392,7 @@ class Bulk(EndpointResource):
                             created += 1
 
                     else:
-                        # nel database esiste già un META_STAGE collegato a quel SOURCE_ID
+                        # nel db esiste già un META_STAGE collegato a quel SOURCE_ID
 
                         #  anche qui devo fare il
                         # checking for item_type coherence
@@ -408,17 +400,13 @@ class Bulk(EndpointResource):
                             meta_stage, standard_path
                         )
                         if related_item is not None and not coherent:
-                            logger.error(
-                                "Incoming item_type different from item_type in database for file %s"
-                                % standard_path
-                            )
 
                             meta_stage.status = 'ERROR'
                             meta_stage.status_message = (
-                                "Incoming item_type different from item_type in database for file: "
-                                + standard_path
+                                "Incoming item_type different from item_type in database for file: {}".format(standard_path)
                             )
                             meta_stage.save()
+                            log.error(meta_stage.status_message)
                             failed += 1
                             continue
 
@@ -436,16 +424,16 @@ class Bulk(EndpointResource):
                             metastage_samepath = self.graph.MetaStage.nodes.get(
                                 **props2
                             )
-                            logger.debug(
-                                "metastage_samepath uuid: %s" % metastage_samepath.uuid
+                            log.debug(
+                                "metastage_samepath uuid: {}", metastage_samepath.uuid
                             )
-                            logger.debug("meta_stage uuid: %s" % meta_stage.uuid)
+                            log.debug("meta_stage uuid: {}", meta_stage.uuid)
                             # se è distinto rispetto a quello che avevo trovato per source id
                             #  allora c'è qualcosa che non va
                             if metastage_samepath.uuid != meta_stage.uuid:
-                                logger.error(
-                                    "Another metastage exists for file %s"
-                                    % standard_path
+                                log.error(
+                                    "Another metastage exists for file {}",
+                                    standard_path
                                 )
                                 meta_stage.status = 'ERROR'
                                 meta_stage.status_message = (
@@ -456,8 +444,8 @@ class Bulk(EndpointResource):
                                 continue
 
                         except self.graph.MetaStage.DoesNotExist:
-                            logger.info(
-                                "MetaStage does not exist for %s" % standard_path
+                            log.info(
+                                "MetaStage does not exist for {}", standard_path
                             )
                             # aggiorno nel MetaStage i campi nomefile e path
                             meta_stage.filename = standard_filename
@@ -466,9 +454,9 @@ class Bulk(EndpointResource):
 
                         if force_reprocessing:
                             # update dei metadati e reprocessing
-                            logger.info(
-                                "Starting task import_file for meta_stage.uuid %s"
-                                % meta_stage.uuid
+                            log.info(
+                                "Starting task import_file for meta_stage.uuid {}",
+                                meta_stage.uuid
                             )
                             mode = "clean"
                             metadata_update = True
@@ -481,42 +469,42 @@ class Bulk(EndpointResource):
                                 ],
                                 ountdown=10,
                             )
-                            logger.debug("Task id=%s" % task.id)
+                            log.debug("Task id={}", task.id)
                             meta_stage.status = "UPDATING METADATA + FORCE REPROCESSING"
                             meta_stage.task_id = task.id
                             meta_stage.save()
                             updatedAndReprocessing += 1
                         else:
                             # update dei soli metadati
-                            logger.info(
-                                "Starting task update_metadata for meta_stage.uuid %s"
-                                % meta_stage.uuid
+                            log.info(
+                                "Starting task update_metadata for meta_stage.uuid {}",
+                                meta_stage.uuid
                             )
                             task = CeleryExt.update_metadata.apply_async(
                                 args=[standard_path, meta_stage.uuid], countdown=10
                             )
-                            logger.info("Task id=%s" % task.id)
+                            log.info("Task id={}", task.id)
                             meta_stage.status = "UPDATING METADATA"
                             meta_stage.task_id = task.id
                             meta_stage.save()
                             updated += 1
 
                 except Exception as e:
-                    logger.error(
-                        "Update operation failed for filename %s, error message=%s"
-                        % (file_path, e)
+                    log.error(
+                        "Update operation failed for filename {}, error message={}",
+                        file_path, e
                     )
                     failed += 1
                     continue
 
-            logger.info("------------------------------------")
-            logger.info("Total record: {}".format(total_to_be_imported))
-            logger.info("updating: {}".format(updated))
-            logger.info("updating and reprocessing: {}".format(updatedAndReprocessing))
-            logger.info("creating: {}".format(created))
-            logger.info("skipped {}".format(skipped))
-            logger.info("failed {}".format(failed))
-            logger.info("------------------------------------")
+            log.info("------------------------------------")
+            log.info("Total record: {}", total_to_be_imported)
+            log.info("updating: {}", updated)
+            log.info("updating and reprocessing: {}", updatedAndReprocessing)
+            log.info("creating: {}", created)
+            log.info("skipped {}", skipped)
+            log.info("failed {}", failed)
+            log.info("------------------------------------")
 
             return self.force_response(
                 "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
@@ -539,10 +527,9 @@ class Bulk(EndpointResource):
             update = bool(action.get('update'))
             mode = action.get('mode') or 'skip'
             retry = bool(action.get('retry'))
-            logger.info(
-                "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})".format(
-                    group.shortname, mode, update, retry
-                )
+            log.info(
+                "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})",
+                group.shortname, mode, update, retry
             )
 
             # retrieve XML files from upload dir
@@ -568,10 +555,8 @@ class Bulk(EndpointResource):
                         props = {'status': 'ERROR', 'path': path}
                         self.graph.MetaStage.nodes.get(**props)
                         skipped += 1
-                        logger.debug(
-                            "SKIPPED already imported with ERROR. Filename {}".format(
-                                path
-                            )
+                        log.debug(
+                            "SKIPPED already imported with ERROR. Filename {}", path
                         )
                         continue
                     except self.graph.MetaStage.DoesNotExist:
@@ -586,20 +571,18 @@ class Bulk(EndpointResource):
                     c = [self.graph.Creation.inflate(row[0]) for row in results]
                     if len(c) == 1:
                         skipped += 1
-                        logger.debug(
-                            "SKIPPED filename: {0}. Creation uuid: {1}".format(
-                                path, c[0].uuid
-                            )
+                        log.debug(
+                            "SKIPPED filename: {0}. Creation uuid: {1}", path, c[0].uuid
                         )
                         continue
-                logger.info("Importing metadata file: {}".format(path))
+                log.info("Importing metadata file: {}", path)
                 try:
                     resource = self.graph.MetaStage.nodes.get(**properties)
-                    logger.debug("Resource already exist for %s" % path)
+                    log.debug("Resource already exist for {}", path)
                 except self.graph.MetaStage.DoesNotExist:
                     resource = self.graph.MetaStage(**properties).save()
                     resource.ownership.connect(group)
-                    logger.debug("Metadata Resource created for %s" % path)
+                    log.debug("Metadata Resource created for {}", path)
 
                 task = CeleryExt.import_file.apply_async(
                     args=[path, resource.uuid, mode], countdown=10
@@ -610,11 +593,11 @@ class Bulk(EndpointResource):
                 resource.save()
                 imported += 1
 
-            logger.info("------------------------------------")
-            logger.info("Total record: {}".format(total_to_be_imported))
-            logger.info("importing: {}".format(imported))
-            logger.info("skipped {}".format(skipped))
-            logger.info("------------------------------------")
+            log.info("------------------------------------")
+            log.info("Total record: {}", total_to_be_imported)
+            log.info("importing: {}", imported)
+            log.info("skipped {}", skipped)
+            log.info("------------------------------------")
 
             return self.force_response(
                 "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
@@ -635,7 +618,7 @@ class Bulk(EndpointResource):
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
             retry = bool(action.get('retry'))
-            logger.info("V2 procedure for Group '{}'".format(group.shortname))
+            log.info("V2 procedure for Group '{}'", group.shortname)
 
             # retrieve v2_ XML files from upload dir
             upload_dir = os.path.join("/uploads", group.uuid)
@@ -654,8 +637,8 @@ class Bulk(EndpointResource):
                     'No v2 content for group {}'.format(group.shortname),
                     status_code=hcodes.HTTP_OK_NORESPONSE,
                 )
-            logger.info(
-                "Total v2 files currently available: {}".format(total_available)
+            log.info(
+                "Total v2 files currently available: {}", total_available
             )
             skipped = 0
             imported = 0
@@ -671,9 +654,10 @@ class Bulk(EndpointResource):
                 results = self.graph.cypher(query)
                 c = [self.graph.Item.inflate(row[0]) for row in results]
                 if len(c) == 0:
-                    logger.warn(
+                    log.warning(
                         'Cannot load {v2} because origin content does '
-                        'not exist or its status is NOT completed'.format(v2=f)
+                        'not exist or its status is NOT completed',
+                        v2=f
                     )
                     warnings += 1
                     continue
@@ -690,12 +674,12 @@ class Bulk(EndpointResource):
                     )
                     imported += 1
 
-            logger.info("------------------------------------")
-            logger.info("Total v2 content: {}".format(total_available))
-            logger.info("loading: {}".format(imported))
-            logger.info("skipped: {}".format(skipped))
-            logger.info("warning: {}".format(warnings))
-            logger.info("------------------------------------")
+            log.info("------------------------------------")
+            log.info("Total v2 content: {}", total_available)
+            log.info("loading: {}", imported)
+            log.info("skipped: {}", skipped)
+            log.info("warning: {}", warnings)
+            log.info("------------------------------------")
 
         # ##################################################################
         elif req_action == 'delete':
@@ -746,7 +730,7 @@ class Bulk(EndpointResource):
                     'Entity {} not yet managed for deletion'.format(entity),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-            logger.debug("Deleted: {} in {}".format(deleted, len(uuids)))
+            log.debug("Deleted: {} in {}", deleted, len(uuids))
             return self.empty_response()
 
         # ##################################################################

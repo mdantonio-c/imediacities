@@ -55,8 +55,8 @@ def import_xml(metadata_set, domain_name, token):
             try:
                 resp.raise_for_status()
             except requests.exceptions.HTTPError as http_error:
-                log.warn("Imported record: {f}. STATUS CODE {sc}".format(f=filename, sc=resp.status_code))
-                log.warn(http_error)
+                log.warning("Imported record: {f}. STATUS CODE {sc}".format(f=filename, sc=resp.status_code))
+                log.warning(http_error)
                 failed += 1
                 continue
             log.info("Imported record: {f}. STATUS CODE {sc}".format(f=filename, sc=resp.status_code))

@@ -39,7 +39,7 @@ class Search(EndpointResource):
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1
-        log.debug("paging: offset {0}, limit {1}".format(offset, limit))
+        log.debug("paging: offset {0}, limit {1}", offset, limit)
         if offset < 0:
             raise RestApiException(
                 'Page number cannot be a negative value',
@@ -56,64 +56,6 @@ class Search(EndpointResource):
 
         # TODO: no longer used, to be removed
         multi_match_query = ''
-
-        # multi_match = []
-        # multi_match_where = []
-        # match = input_parameters.get('match')
-
-        # if match is not None:
-        #     term = match.get('term')
-        #     if term is not None:
-        #         term = self.graph.sanitize_input(term)
-
-        #     fields = match.get('fields')
-        #     if term is not None and (fields is None or len(fields) == 0):
-        #         raise RestApiException('Match term fields cannot be empty',
-        #                                status_code=hcodes.HTTP_BAD_REQUEST)
-        #     if fields is None:
-        #         fields = []
-        #     multi_match_fields = []
-        #     multi_optional_match = []
-        #     for f in fields:
-        #         if f not in self.__class__.allowed_term_fields:
-        #             raise RestApiException(
-        #                 "Bad field: expected one of %s" %
-        #                 (self.__class__.allowed_term_fields, ),
-        #                 status_code=hcodes.HTTP_BAD_REQUEST)
-        #         if not term:
-        #             # catch '*'
-        #             break
-        #         if f == 'title':
-        #             multi_match.append("MATCH (n)-[:HAS_TITLE]->(t:Title)")
-        #             multi_match_fields.append('t')
-        #             multi_match_where.append(
-        #                 "t.text =~ '(?i).*{term}.*'".format(term=term))
-        #         elif f == 'description':
-        #             multi_match.append(
-        #                 "OPTIONAL MATCH (n)-[:HAS_DESCRIPTION]->(d:Description)")
-        #             multi_match_fields.append('d')
-        #             multi_match_where.append(
-        #                 "d.text =~ '(?i).*{term}.*'".format(term=term))
-        #         elif f == 'keyword':
-        #             multi_optional_match.append("OPTIONAL MATCH (n)-[:HAS_KEYWORD]->(k:Keyword)")
-        #             multi_match_fields.append('k')
-        #             multi_match_where.append(
-        #                 "k.term =~ '(?i){term}'".format(term=term))
-        #         elif f == 'contributor':
-        #             multi_optional_match.append("OPTIONAL MATCH (n)-[:CONTRIBUTED_BY]->(a:Agent)")
-        #             multi_match_fields.append('a')
-        #             multi_match_where.append(
-        #                 "ANY(item in a.names where item =~ '(?i).*{term}.*')".format(term=term))
-        #         else:
-        #             # should never be reached
-        #             raise RestApiException(
-        #                 'Unexpected field type',
-        #                 status_code=hcodes.HTTP_SERVER_ERROR)
-        #     if len(multi_match) > 0:
-        #         multi_match_query = ' '.join(multi_match) \
-        #             + " " + ' '.join(multi_optional_match) \
-        #             + " WITH n, " + ', '.join(multi_match_fields) \
-        #             + " WHERE " + ' OR '.join(multi_match_where)
 
         # check request for filtering
         filters = []
@@ -133,8 +75,8 @@ class Search(EndpointResource):
                 item_type = item_type.strip().lower()
             if item_type not in self.__class__.allowed_item_types:
                 raise RestApiException(
-                    "Bad item type parameter: expected one of %s"
-                    % (self.__class__.allowed_item_types,),
+                    "Bad item type parameter: expected one of {}".format(
+                        self.__class__.allowed_item_types),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if item_type == 'all':
@@ -150,7 +92,7 @@ class Search(EndpointResource):
                 )
             # PROVIDER
             provider = filtering.get('provider')
-            log.debug("provider {0}".format(provider))
+            log.debug("provider {0}", provider)
             # if provider is not None:
             #    filters.append(
             #        "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)" +
@@ -162,7 +104,7 @@ class Search(EndpointResource):
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)"
                     + " WHERE p.city='{city}'".format(city=city.strip())
                 )
-            log.debug("city {0}".format(city))
+            log.debug("city {0}", city)
             # COUNTRY
             country = filtering.get('country')
             if country is not None:
@@ -187,7 +129,6 @@ class Search(EndpointResource):
                 )
             # PRODUCTION YEAR RANGE
             missingDate = filtering.get('missingDate')
-            # log.debug("missingDate: {0}".format(missingDate))
             if not missingDate:
                 year_from = filtering.get('yearfrom')
                 year_to = filtering.get('yearto')
@@ -263,7 +204,7 @@ class Search(EndpointResource):
                     try:
                         v = self.graph.User.nodes.get(uuid=anno_user_id)
                     except self.graph.User.DoesNotExist:
-                        log.debug("User with uuid %s does not exist" % anno_user_id)
+                        log.debug("User with uuid {} does not exist", anno_user_id)
                         raise RestApiException(
                             "Please specify a valid user id in annotated_by filter",
                             status_code=hcodes.HTTP_BAD_NOTFOUND,
@@ -271,8 +212,8 @@ class Search(EndpointResource):
                 anno_type = annotated_by.get('type', 'TAG')
                 if anno_type not in self.__class__.allowed_anno_types:
                     raise RestApiException(
-                        "Bad annotation type in annotated_by filter: expected one of %s"
-                        % (self.__class__.allowed_anno_types,),
+                        "Bad annotation type in annotated_by filter: expected one of {}".format(
+                            self.__class__.allowed_anno_types),
                         status_code=hcodes.HTTP_BAD_REQUEST,
                     )
                 filters.append(
@@ -341,8 +282,6 @@ class Search(EndpointResource):
                 )
             )
 
-        # log.debug("QUERY to get number of elements: {0}".format(countv))
-
         data = []
         meta_response = {"totalItems": 0, "countByProviders": 0, "countByYears": 0}
         # get total number of elements
@@ -355,7 +294,7 @@ class Search(EndpointResource):
             )
             raise RestApiException('Invalid query parameters')
 
-        log.debug("Number of elements retrieved: {0}".format(numels))
+        log.debug("Number of elements retrieved: {0}", numels)
 
         # return also the total number of elements
         meta_response["totalItems"] = numels
@@ -388,7 +327,7 @@ class Search(EndpointResource):
                         'item.revision',
                     ],
                 )
-                log.debug("video links %s" % video['links'])
+                log.debug("video links {}", video['links'])
                 video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
                 if item.thumbnail is not None:
@@ -409,7 +348,7 @@ class Search(EndpointResource):
                         # 'descriptions.creation',
                     ],
                 )
-                log.debug("image links %s" % image['links'])
+                log.debug("image links {}", image['links'])
                 image['links']['self'] = image_url
                 image['links']['content'] = image_url + '/content?type=image'
                 if item.thumbnail is not None:

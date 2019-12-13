@@ -99,8 +99,8 @@ class HeritableStructuredNode(StructuredNode):
 
             if target_class not in classes:
                 raise ValueError(
-                    '%s is not a sub-class of %s'
-                    % (target_class, self.__class__.__name__)
+                    '{} is not a sub-class of {}'.format(
+                        target_class, self.__class__.__name__)
                 )
         if cls is None:
             cls = getattr(sys.modules[__name__], target_class)

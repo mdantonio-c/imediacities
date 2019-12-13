@@ -56,7 +56,6 @@ class SearchPlace(EndpointResource):
                 raise RestApiException(
                     'Missing place-ids', status_code=hcodes.HTTP_BAD_REQUEST
                 )
-            # logger.debug('creation: {}, places: {}'.format(creation_id, place_ids))
             query = (
                 "MATCH (n:Creation {{uuid:'{uuid}'}}) "
                 "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body:ResourceBody) "
@@ -72,7 +71,7 @@ class SearchPlace(EndpointResource):
                     uuid=creation_id, place_ids=place_ids
                 )
             )
-            logger.debug(query)
+            log.debug(query)
             result = self.graph.cypher(query)
             for row in result:
                 creation_uuid = row[0]['uuid']

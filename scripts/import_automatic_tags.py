@@ -62,8 +62,8 @@ def import_automatic_tags(metadata_set, domain_name, token, tool):
             try:
                 resp.raise_for_status()
             except requests.exceptions.HTTPError as http_error:
-                log.warn("Imported automatic tags for item: {item}. STATUS CODE {sc}".format(item=item.uuid, sc=resp.status_code))
-                log.warn(http_error)
+                log.warning("Imported automatic tags for item: {item}. STATUS CODE {sc}".format(item=item.uuid, sc=resp.status_code))
+                log.warning(http_error)
                 if resp.status_code == 409:
                     skipped += 1
                 else:
