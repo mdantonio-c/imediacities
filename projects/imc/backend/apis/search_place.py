@@ -30,7 +30,7 @@ class SearchPlace(GraphBaseOperations):
     @authentication.required()
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         input_parameters = self.get_input()
         # at moment ONLY search for creations in a place list is available

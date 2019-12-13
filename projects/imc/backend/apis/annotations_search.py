@@ -29,7 +29,7 @@ class SearchAnnotations(GraphBaseOperations):
     @authentication.required()
     def post(self):
 
-        self.initGraph()
+        self.graph = self.get_service_instance('neo4j')
 
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
