@@ -96,7 +96,7 @@ class Stage(GraphBaseOperations):
             group = None
 
         if group is None:
-            group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+            group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
@@ -132,7 +132,7 @@ class Stage(GraphBaseOperations):
             group = None
 
         if group is None:
-            group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+            group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
@@ -245,7 +245,7 @@ class Stage(GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -435,7 +435,7 @@ class Stage(GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -448,7 +448,7 @@ class Stage(GraphBaseOperations):
                 "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        input_parameters = self.get_input()
+        # input_parameters = self.get_input()
 
         # if 'filename' not in input_parameters:
         #     raise RestApiException(

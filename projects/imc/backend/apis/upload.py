@@ -36,7 +36,7 @@ class Upload(Uploader, GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -64,7 +64,7 @@ class Upload(Uploader, GraphBaseOperations):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
 
         if group is None:
             raise RestApiException(
