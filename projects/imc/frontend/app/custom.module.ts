@@ -77,7 +77,8 @@ import {AppInfoComponent} from "./components/app-info/app-info";
 import {AppNoteComponent} from "./components/app-note/app-note";
 import {AppReferenceComponent} from "./components/app-reference/app-reference";
 import {AppLinkComponent} from "./components/app-link/app-link";
-import {AutoFocusDirective} from "./directives/auto-focus"
+import {AutoFocusDirective} from "./directives/auto-focus";
+import {HolderjsDirective} from "./directives/holderjs.directive";
 
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
@@ -92,7 +93,6 @@ import {AppVideoService} from "./services/app-video";
 import {AppLodService} from "./services/app-lod";
 import {ShotRevisionService} from "./services/shot-revision.service";
 import {ListsService} from "./services/lists.service";
-
 
 const routes: Routes = [
   {
@@ -204,8 +204,8 @@ const routes: Routes = [
 //    DropdownPositionDirective,
     InputNumericDirective,
     InputSelectDirective,
-    AutoFocusDirective
-
+    AutoFocusDirective,
+    HolderjsDirective
   ],
 
   providers: [

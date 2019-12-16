@@ -19,9 +19,9 @@
 	<div class="row no-gutters">
 		<div class="col-sm-4 pr-1">
 			<div class="media-image-wrapper">
-				<!-- FIXME
-				<hjs class="media-object" alt="100%x200" [holderId]="'hjs-'+media.source.uuid" [imgSrc]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'" *ngIf="!media.source.links['thumbnail']"></hjs>
-			  -->
+                <img holderjs
+                    [attr.data-src]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'"
+                    *ngIf="!media.source.links['thumbnail']">
 				<img (contextmenu)="disableSaveAs($event)" class="media-object" alt="100%x150" src="{{media.source.links['thumbnail']+'&size=large'}}" *ngIf="media.source.links['thumbnail']">
 			</div>
 			<div class="caption-wrapper">

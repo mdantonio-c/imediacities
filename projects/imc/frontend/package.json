@@ -6,7 +6,6 @@
     "lodash": "4.17.11",
     "js-marker-clusterer": "1.0.0",
     "holderjs": "2.9.6",
-    "angular2-holderjs": "0.0.7",
     "@ngui/map": "^0.30.3",
     "@types/googlemaps": "^3.30.16",
     "ion-rangeslider": "2.1.6",

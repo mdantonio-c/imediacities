@@ -34,7 +34,7 @@ export class CatalogComponent implements OnInit {
 			let preset = false;
 			if (params['city']) {
 				// preset filter with city value if valid
-				let cityCode = params['city'].toUpperCase()
+				let cityCode = params['city'].toUpperCase();
 				let p = Providers.filter(provider => provider.code === cityCode);
 				if (p && p.length) {
 					this.catalogService.reset(cityCode);

@@ -1,5 +1,4 @@
-import { Component, Input, OnInit, OnChanges, Injector } from '@angular/core';
-import {  } from '@angular/core';
+import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { MediaUtilsService } from '../services/media-utils.service'
 import { AuthService } from "@rapydo/services/auth";
@@ -16,7 +15,6 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	user: any;
 
 	constructor(private authService: AuthService, private router: Router) {
-
 	}
 
 	ngOnInit() {
