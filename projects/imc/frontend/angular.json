@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "RAPyDo": {
+      "architect": {
+        "build": {
+          "options": {
+            "scripts": [
+            	"node_modules/holderjs/holder.js"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
