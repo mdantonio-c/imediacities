@@ -50,8 +50,16 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     @rangePlayer() range;
 
     _frame_set (f) {
-        //  sporchissimo :)
-        this.fps = eval(f);
+        let fr = f.split("/");
+        if (fr.length == 1) {
+            console.log("Cannot determine frame rate from " + f);
+            // This is my default in case of problems...
+            this.fps = 25;
+        } else {
+            this.fps = Number(fr[0]);
+        }
+        // sporchissimo :)
+        // this.fps = eval(f);
         this.frame_length = 1/this.fps;
     }
     

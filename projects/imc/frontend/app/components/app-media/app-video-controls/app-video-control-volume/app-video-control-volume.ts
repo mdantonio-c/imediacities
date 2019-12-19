@@ -45,17 +45,23 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent imp
 
     private _interfaccia () {
 
+        let ico;
         if (this.video.volume < .1) {
             this.volume_level = 'off'
+            ico = this.ico_off;
         } else if (this.video.volume < .4) {
             this.volume_level = 'mute';
+            ico = this.ico_mute;
         } else if (this.video.volume < .7) {
             this.volume_level = 'down';
+            ico = this.ico_down;
         } else {
             this.volume_level = 'up';
+            ico = this.ico_up;
         }
 
-        this._volume_gutter_set(eval('this.ico_'+this.volume_level));
+        // this._volume_gutter_set(eval('this.ico_'+this.volume_level));
+        this._volume_gutter_set(ico);
 
     }
 
