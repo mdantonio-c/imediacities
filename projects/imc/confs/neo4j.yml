@@ -8,8 +8,6 @@ services:
       ACTIVATE: 0
 
   neo4j:
-    # ports:
-    #   - 9090:7474
     ports:
       - 9090:7473
     environment:
