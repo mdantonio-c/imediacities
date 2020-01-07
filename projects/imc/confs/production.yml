@@ -4,23 +4,23 @@ version: '3'
 
 services:
 
-  proxy:
-    environment:
-      ACTIVATE: 1
+  # proxy:
+  #   environment:
+  #     ACTIVATE: 1
 
-  backend:
-    environment:
-      APP_MODE: production
-      NGINX_ACTIVE: "True"
+  # backend:
+  #   environment:
+  #     APP_MODE: production
+  #     NGINX_ACTIVE: "True"
 
   neo4j:
     environment:
       ACTIVATE: 0
 
-  frontend:
-    environment:
-      APP_MODE: production
-      BACKEND_PORT: ${PROXY_PROD_PORT}
+  # frontend:
+  #   environment:
+  #     APP_MODE: production
+  #     BACKEND_PORT: ${PROXY_PROD_PORT}
 
   mongodb:
     environment:

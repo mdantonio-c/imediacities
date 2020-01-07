@@ -4,59 +4,59 @@ version: '3'
 
 services:
 
-  proxy:
-    environment:
-      ACTIVATE: 1
-      SMTP_ADMIN: ${SMTP_ADMIN}
-    volumes:
-      # - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production.conf:/etc/nginx/sites-enabled/production
-      - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production-a2.conf:/etc/nginx/sites-enabled/production
-      - ${VANILLA_DIR}/data/${COMPOSE_PROJECT_NAME}/frontend:/modules
-    depends_on:
-      - backend
-      - frontend
+  # proxy:
+  #   environment:
+  #     ACTIVATE: 1
+  #     SMTP_ADMIN: ${SMTP_ADMIN}
+  #   volumes:
+  #     # - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production.conf:/etc/nginx/sites-enabled/production
+  #     - ${SUBMODULE_DIR}/rapydo-confs/confs/nginx/production-a2.conf:/etc/nginx/sites-enabled/production
+  #     - ${VANILLA_DIR}/data/${COMPOSE_PROJECT_NAME}/frontend:/modules
+  #   depends_on:
+  #     - backend
+  #     - frontend
 
-  backend:
-    environment:
-      APP_MODE: production
-      DEBUG_LEVEL: INFO
-      NGINX_ACTIVE: "True"
-    depends_on:
-      - neo4j
-    networks:
-      worker_net:
-      proxy_net:
-        aliases:
-          - ${FLASK_HOST}
+  # backend:
+  #   environment:
+  #     APP_MODE: production
+  #     DEBUG_LEVEL: INFO
+  #     NGINX_ACTIVE: "True"
+  #   depends_on:
+  #     - neo4j
+  #   networks:
+  #     worker_net:
+  #     proxy_net:
+  #       aliases:
+  #         - ${FLASK_HOST}
 
   neo4j:
     ports:
       - 9090:7473
-    volumes:
-      - letsencrypt_certs:/ssl
+    # volumes:
+    #   - letsencrypt_certs:/ssl
 
-  frontend:
-    environment:
-      APP_MODE: production
-      BACKEND_PORT: ${PROXY_PROD_PORT}
-    networks:
-      proxy_net:
-        aliases:
-          - html
+  # frontend:
+  #   environment:
+  #     APP_MODE: production
+  #     BACKEND_PORT: ${PROXY_PROD_PORT}
+  #   networks:
+  #     proxy_net:
+  #       aliases:
+  #         - html
 
-  celery:
-    environment:
-      DEBUG_LEVEL: INFO
-      APP_MODE: production
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
+  # celery:
+  #   environment:
+  #     DEBUG_LEVEL: INFO
+  #     APP_MODE: production
+  #   depends_on:
+  #     - rabbit
+  #     - mongodb
+  #     - neo4j
 
   celeryui:
     # Production command:
     command: flower --basic_auth=${CELERYUI_USER}:${CELERYUI_PASSWORD} --port=${CELERYUI_PORT} --persistent --db=${CELERYUI_DBDIR}/flower --certfile=/ssl/real/fullchain1.pem --keyfile=/ssl/real/privkey1.pem -A restapi.flask_ext.flask_celery.worker.celery_app -n flower_monitor
-    depends_on:
-      - rabbit
-      - mongodb
-      - neo4j
+    # depends_on:
+    #   - rabbit
+    #   - mongodb
+    #   - neo4j
