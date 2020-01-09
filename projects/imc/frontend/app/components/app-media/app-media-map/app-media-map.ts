@@ -41,7 +41,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         private VideoService: AppVideoService,
         private mapApiLoader: CustomNgMapApiLoader
 
-    ) { }
+    ) { 
+
+        mapApiLoader.setUrl();
+
+    }
 
     private _subscription;
 

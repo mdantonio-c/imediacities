@@ -89,7 +89,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		private notify: NotificationService,
 		private renderer: Renderer2,
         private mapApiLoader: CustomNgMapApiLoader
-	) { }
+	) { 
+        mapApiLoader.setUrl();
+	}
 
 	initialized(autocomplete: any) {
 		this.autocomplete = autocomplete;
