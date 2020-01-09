@@ -139,6 +139,7 @@ const routes: Routes = [
 
 // passing through a function avoid aot to replace the variabile at build time with an undefined value
 export function getGMAP_KEY() {
+   console.log(environment.ALL['GMAP_KEY'])
    return environment.ALL['GMAP_KEY'];
 }
 
