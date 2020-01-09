@@ -9,6 +9,7 @@ import { AuthzService, Permission } from "../../../services/authz.service";
 import { ApiService } from '@rapydo/services/api';
 import { ProviderToCityPipe } from "../../../pipes/ProviderToCity";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
+import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
 
 @Component({
     selector: 'app-media-map',

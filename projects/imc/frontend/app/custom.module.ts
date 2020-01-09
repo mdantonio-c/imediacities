@@ -83,17 +83,17 @@ import {HolderjsDirective} from "./directives/holderjs.directive";
 import {CatalogService} from './catalog/services/catalog.service';
 import {MediaUtilsService} from './catalog/services/media-utils.service';
 import {LocalStorageService} from './catalog/services/local-storage.service';
-import {AppAnnotationsService} from "./services/app-annotations";
-import {AppShotsService} from "./services/app-shots";
-import {AppMediaService} from "./services/app-media";
-import {AppVocabularyService} from "./services/app-vocabulary";
-import {AppModaleService} from "./services/app-modale";
-import {AppVideoControlsFastPlayService} from "./services/app-video-controls-fast-play";
-import {AppVideoService} from "./services/app-video";
-import {AppLodService} from "./services/app-lod";
-import {ShotRevisionService} from "./services/shot-revision.service";
-import {ListsService} from "./services/lists.service";
-import {CustomNgMapApiLoader} from "./ngmap-apiloader-service";
+import {AppAnnotationsService} from "@app/services/app-annotations";
+import {AppShotsService} from "@app/services/app-shots";
+import {AppMediaService} from "@app/services/app-media";
+import {AppVocabularyService} from "@app/services/app-vocabulary";
+import {AppModaleService} from "@app/services/app-modale";
+import {AppVideoControlsFastPlayService} from "@app/services/app-video-controls-fast-play";
+import {AppVideoService} from "@app/services/app-video";
+import {AppLodService} from "@app/services/app-lod";
+import {ShotRevisionService} from "@app/services/shot-revision.service";
+import {ListsService} from "@app/services/lists.service";
+import {CustomNgMapApiLoader} from "@app/services/ngmap-apiloader-service";
 
 const routes: Routes = [
   {
