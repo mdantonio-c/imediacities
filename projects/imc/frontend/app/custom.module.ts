@@ -93,6 +93,7 @@ import {AppVideoService} from "./services/app-video";
 import {AppLodService} from "./services/app-lod";
 import {ShotRevisionService} from "./services/shot-revision.service";
 import {ListsService} from "./services/lists.service";
+import {CustomNgMapApiLoader} from "./ngmap-apiloader-service";
 
 const routes: Routes = [
   {
@@ -137,20 +138,12 @@ const routes: Routes = [
 
 ];
 
-// passing through a function prevent aot to replace the variabile at build time with an undefined value
-export function getEnv(key) {
-   console.log(environment.ALL[key]);
-   return environment.ALL[key];
-}
-
-// Beware! the following @dynamic is not a comment, it is required to inject GMAP_KEY
-// @dynamic
 @NgModule({
   imports: [
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getEnv('GMAP_KEY')}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='environment.ALL['GMAP_KEY']}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
@@ -230,7 +223,12 @@ export function getEnv(key) {
     AppVocabularyService,
     AppVideoService,
     AppVideoControlsFastPlayService,
-    ProviderToCityPipe
+    ProviderToCityPipe,
+    CustomNgMapApiLoader,
+    {
+        provide: NgMapApiLoader,
+        useClass: CustomNgMapApiLoader
+    }
   ],
 
   entryComponents: [

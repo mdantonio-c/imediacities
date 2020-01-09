@@ -86,7 +86,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 		private geoCoder: GeoCoder,
 		private ref: ChangeDetectorRef,
 		private notify: NotificationService,
-		private renderer: Renderer2
+		private renderer: Renderer2,
+        private mapApiLoader: CustomNgMapApiLoader
 	) { }
 
 	initialized(autocomplete: any) {

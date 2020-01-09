@@ -37,7 +37,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         private geoCoder: GeoCoder,
         private ProviderToCity: ProviderToCityPipe,
         private MediaService: AppMediaService,
-        private VideoService: AppVideoService
+        private VideoService: AppVideoService,
+        private mapApiLoader: CustomNgMapApiLoader
+
     ) { }
 
     private _subscription;
