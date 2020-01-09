@@ -138,9 +138,8 @@ const routes: Routes = [
 ];
 
 // passing through a function avoid aot to replace the variabile at build time with an undefined value
-export function getGMAP_KEY() {
-   console.log(environment.ALL['GMAP_KEY'])
-   return environment.ALL['GMAP_KEY'];
+export function getEnv(key) {
+   return environment.ALL[key];
 }
 
 // definying a const prevent aot to replace the variabile at build time with an undefined value
@@ -151,7 +150,7 @@ const GMAP_KEY = environment.ALL['GMAP_KEY'];
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getGMAP_KEY()}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getEnv("GMAP_KEY")}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
