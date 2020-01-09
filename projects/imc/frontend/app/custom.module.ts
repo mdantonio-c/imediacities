@@ -137,20 +137,21 @@ const routes: Routes = [
 
 ];
 
-// passing through a function avoid aot to replace the variabile at build time with an undefined value
+// passing through a function prevent aot to replace the variabile at build time with an undefined value
 export function getEnv(key) {
+   console.log(environment.ALL[key]);
    return environment.ALL[key];
 }
 
-// definying a const prevent aot to replace the variabile at build time with an undefined value
-const GMAP_KEY = environment.ALL['GMAP_KEY'];
+// a const here prevents aot to replace the variabile at build time with an undefined value
+const GMAP_KEY = getEnv('GMAP_KEY');
 
 @NgModule({
   imports: [
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getEnv("GMAP_KEY")}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+GMAP_KEY}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
