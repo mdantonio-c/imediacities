@@ -143,9 +143,6 @@ export function getEnv(key) {
    return environment.ALL[key];
 }
 
-// a const here prevents aot to replace the variabile at build time with an undefined value
-const GMAP_KEY = getEnv('GMAP_KEY');
-
 // Beware! the following @dynamic is not a comment, it is required to inject GMAP_KEY
 // @dynamic
 @NgModule({
@@ -153,7 +150,7 @@ const GMAP_KEY = getEnv('GMAP_KEY');
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+GMAP_KEY}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getEnv('GMAP_KEY')}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
