@@ -146,6 +146,8 @@ export function getEnv(key) {
 // a const here prevents aot to replace the variabile at build time with an undefined value
 const GMAP_KEY = getEnv('GMAP_KEY');
 
+// Beware! the following @dynamic is not a comment, it is required to inject GMAP_KEY
+// @dynamic
 @NgModule({
   imports: [
     RapydoModule,
