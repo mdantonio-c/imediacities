@@ -137,12 +137,17 @@ const routes: Routes = [
 
 ];
 
+// passing through a function avoid aot to replace the variabile at build time with an undefined value
+export function getGMAP_KEY() {
+   return environment.ALL['GMAP_KEY'];
+}
+
 @NgModule({
   imports: [
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+environment.ALL['GMAP_KEY']}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getGMAP_KEY}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
