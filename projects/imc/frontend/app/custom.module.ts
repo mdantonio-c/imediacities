@@ -11,7 +11,7 @@ import { RapydoModule } from '@rapydo/rapydo.module';
 import { AuthGuard } from '@rapydo/app.auth.guard';
 
 import { HttpClientJsonpModule } from '@angular/common/http';
-import { NguiMapModule} from '@ngui/map';
+import { NguiMapModule, NgMapApiLoader} from '@ngui/map';
 // import { HolderJsModule } from 'angular2-holderjs/component';
 import { IonRangeSliderModule } from "ng2-ion-range-slider";
 import { FileUploadModule } from 'ng2-file-upload';
