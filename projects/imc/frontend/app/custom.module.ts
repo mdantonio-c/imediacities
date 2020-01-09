@@ -143,12 +143,15 @@ export function getGMAP_KEY() {
    return environment.ALL['GMAP_KEY'];
 }
 
+// definying a const prevent aot to replace the variabile at build time with an undefined value
+const GMAP_KEY = environment.ALL['GMAP_KEY'];
+
 @NgModule({
   imports: [
     RapydoModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getGMAP_KEY}),
+    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+getGMAP_KEY()}),
     //HolderJsModule,
     IonRangeSliderModule,
     SlickCarouselModule,
