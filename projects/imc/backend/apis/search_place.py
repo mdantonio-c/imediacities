@@ -9,13 +9,13 @@ Search endpoint for places
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-# from restapi.utilities.logs import log
 from restapi import decorators as decorate
 from restapi.protocols.bearer import authentication
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
 from restapi.decorators import catch_graph_exceptions
+from restapi.utilities.logs import log
 
 
 #####################################
