@@ -35,14 +35,14 @@ from neomodel.util import NodeClassRegistry
 
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
-from restapi.utilities.logs import log
 
-# registry = NodeClassRegistry()
-# base_user = frozenset({'User'})
-# for c in registry._NODE_CLASS_REGISTRY:
-#     if c == base_user:
-#         registry._NODE_CLASS_REGISTRY.pop(base_user)
-#         break
+
+registry = NodeClassRegistry()
+base_user = frozenset({'User'})
+for c in registry._NODE_CLASS_REGISTRY:
+    if c == base_user:
+        registry._NODE_CLASS_REGISTRY.pop(base_user)
+        break
 
 
 class HeritableStructuredNode(StructuredNode):
@@ -129,22 +129,22 @@ class RevisionRel(StructuredRel):
     state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
 
-# class User(UserBase):
+class User(UserBase):
 
-#     declared_institution = StringProperty(required=False, show=True, default="none")
-#     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
-#     annotations = RelationshipFrom(
-#         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
-#     )
-#     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
-#     coordinator = RelationshipTo('Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
-#     items_under_revision = RelationshipFrom(
-#         'Item', 'REVISION_BY', cardinality=ZeroOrMore
-#     )
-#     revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
-#     lists = RelationshipFrom(
-#         'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
-#     )
+    declared_institution = StringProperty(required=False, show=True, default="none")
+    items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    annotations = RelationshipFrom(
+        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
+    )
+    belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
+    coordinator = RelationshipTo('Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+    items_under_revision = RelationshipFrom(
+        'Item', 'REVISION_BY', cardinality=ZeroOrMore
+    )
+    revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
+    lists = RelationshipFrom(
+        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
+    )
 
 
 class Group(IdentifiedNode):
@@ -271,9 +271,9 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore
     )
     shots = RelationshipTo('Shot', 'SHOT', cardinality=ZeroOrMore)
-    # revision = RelationshipTo(
-    #     'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True
-    # )
+    revision = RelationshipTo(
+        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True
+    )
     other_version = RelationshipTo(
         'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True
     )
