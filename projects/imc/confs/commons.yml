@@ -28,8 +28,8 @@ services:
       -  15672:15672
 
   celery:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
+    # build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    # image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
@@ -42,8 +42,8 @@ services:
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
   celeryui:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
-    image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
+    # build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    # image: ${COMPOSE_PROJECT_NAME}/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts

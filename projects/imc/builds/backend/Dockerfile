@@ -1,3 +1,5 @@
+# THIS BUILD IS DEPRECATED!!
+
 FROM rapydo/backend:0.7.2
 
 MAINTAINER "Mattia D'Antonio <m.dantonio@cineca.it>"
