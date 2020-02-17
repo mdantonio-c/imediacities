@@ -29,8 +29,6 @@ class SearchAnnotations(EndpointResource):
 
         self.graph = self.get_service_instance('neo4j')
 
-        log.critical("TEST")
-
         input_parameters = self.get_input()
         offset, limit = self.get_paging()
         offset -= 1

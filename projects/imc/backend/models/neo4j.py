@@ -273,9 +273,9 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
         'Annotation', 'HAS_TARGET', cardinality=ZeroOrMore
     )
     shots = RelationshipTo('Shot', 'SHOT', cardinality=ZeroOrMore)
-    revision = RelationshipTo(
-        'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True
-    )
+    # revision = RelationshipTo(
+    #     'User', 'REVISION_BY', cardinality=ZeroOrOne, model=RevisionRel, show=True
+    # )
     other_version = RelationshipTo(
         'Item', 'OTHER_VERSION', cardinality=ZeroOrOne, show=True
     )
