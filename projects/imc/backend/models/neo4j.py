@@ -35,7 +35,9 @@ from neomodel.util import NodeClassRegistry
 
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
+from restapi.utilities.logs import log
 
+log.critical("Loading models")
 
 registry = NodeClassRegistry()
 base_user = frozenset({'User'})
