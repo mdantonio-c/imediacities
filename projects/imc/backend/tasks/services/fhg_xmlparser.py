@@ -2,7 +2,6 @@ import os
 import xml.etree.ElementTree as ET
 
 # from xml.dom import minidom
-from imc.models.neo4j import Shot
 # from restapi.utilities.logs import log
 
 
@@ -26,6 +25,7 @@ class FHG_XMLParser:
             return None
         shots = []
         tvs_dirname = os.path.dirname(filepath)
+        from imc.models.neo4j import Shot
         for frame in shot_module_node.iter('frame'):
             start_idx = frame.get('idx')
             shot = Shot(start_frame_idx=start_idx)

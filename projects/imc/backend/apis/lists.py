@@ -12,7 +12,6 @@ from restapi.exceptions import RestApiException
 from restapi.rest.definition import EndpointResource
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from restapi.decorators import catch_graph_exceptions
-from imc.models.neo4j import Item, Shot, TextualBody
 from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
@@ -533,9 +532,9 @@ class ListItems(EndpointResource):
         # expected list_item of type :Item or :Shot
         mdo = list_item.downcast()
         item = None
-        if isinstance(mdo, Item):
+        if isinstance(mdo, self.graph.Item):
             item = mdo
-        elif isinstance(mdo, Shot):
+        elif isinstance(mdo, self.graph.Shot):
             item = mdo.item.single()
         else:
             raise ValueError("Invalid ListItem instance.")
@@ -550,7 +549,7 @@ class ListItems(EndpointResource):
             del res['relationships']
 
         api_url = get_api_url(request, PRODUCTION)
-        if isinstance(mdo, Item):
+        if isinstance(mdo, self.graph.Item):
             # always consider v2 properties if exists
             v2 = item.other_version.single()
             # if v2 is not None:
@@ -675,7 +674,7 @@ class ListItems(EndpointResource):
             for l in links:
                 link_text = l.bodies.single().downcast()
                 # a link can have a ReferenceBody
-                if not isinstance(link_text, TextualBody):
+                if not isinstance(link_text, self.graph.TextualBody):
                     continue
                 res["annotations"]["links"].append(link_text.value)
             if not res["annotations"]["links"]:

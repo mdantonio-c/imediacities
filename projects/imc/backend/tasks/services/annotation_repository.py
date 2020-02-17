@@ -7,18 +7,6 @@ from restapi.utilities.logs import log
 from restapi.flask_ext.flask_neo4j import graph_transactions
 from neomodel.cardinality import CardinalityViolation
 
-from imc.models.neo4j import (
-    Annotation,
-    TVSBody,
-    VIMBody,
-    BibliographicReference,
-    VideoSegment,
-    Shot,
-    ResourceBody,
-    TextualBody,
-    Item,
-)
-
 
 class AnnotationRepository:
     """ """
@@ -52,7 +40,7 @@ class AnnotationRepository:
 
         log.debug("Creating a new tag annotation")
         # create annotation node
-        anno = Annotation(annotation_type='TAG')
+        anno = self.graph.Annotation(annotation_type='TAG')
         if automatic:
             # at the moment ONLY FHG tools allowed
             anno.generator = 'FHG'
@@ -61,22 +49,18 @@ class AnnotationRepository:
             # add creator
             anno.creator.connect(user)
 
-        if isinstance(target, Item):
+        if isinstance(target, self.graph.Item):
             anno.source_item.connect(target)
-        elif isinstance(target, Annotation):
+        elif isinstance(target, self.graph.Annotation):
             anno.source_item.connect(target.source_item.single())
-        elif isinstance(target, Shot):
+        elif isinstance(target, self.graph.Shot):
             anno.source_item.connect(target.item.single())
         else:
             raise ValueError("Invalid Target instance.")
 
         # target to a segment only for videos with a provided selector
-        if (
-            selector is not None
-            and isinstance(target, Item)
-            and target.item_type == 'Video'
-        ):
-            if not isinstance(target, Item):
+        if (selector is not None and isinstance(target, self.graph.Item) and target.item_type == 'Video'):
+            if not isinstance(target, self.graph.Item):
                 raise ValueError('Selector allowed only for Item target.')
             s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
             log.debug('start:{}, end:{}', s_start, s_end)
@@ -84,7 +68,7 @@ class AnnotationRepository:
             segment = self.lookup_existing_segment(s_start, s_end, target)
             log.debug('Segment does exist? {}', True if segment else False)
             if segment is None:
-                segment = VideoSegment(
+                segment = self.graph.VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
                 ).save()
                 # look up the shot where the segment is enclosed
@@ -110,7 +94,7 @@ class AnnotationRepository:
                 bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
                 if bodyNode is None:
                     log.debug('new ResourceBody for concept: {}', source)
-                    bodyNode = ResourceBody(iri=iri)
+                    bodyNode = self.graph.ResourceBody(iri=iri)
                     if not isinstance(source, str):
                         bodyNode.name = source.get('name')
                     if 'spatial' in body:
@@ -120,7 +104,8 @@ class AnnotationRepository:
                     bodyNode.save()
             elif body['type'] == 'TextualBody':
                 text_lang = body.get('language')
-                bodyNode = TextualBody(value=body['value'], language=text_lang).save()
+                bodyNode = self.graph.TextualBody(
+                    value=body['value'], language=text_lang).save()
                 bodyNode.save()
             elif body['type'] == 'ODBody':
                 properties = {
@@ -141,7 +126,7 @@ class AnnotationRepository:
                 )
                 if conceptNode is None:
                     log.debug('new ResourceBody for concept: {}', concept)
-                    conceptNode = ResourceBody(
+                    conceptNode = self.graph.ResourceBody(
                         iri=concept['iri'], name=concept['name']
                     ).save()
                 bodyNode.object_type.connect(conceptNode)
@@ -158,7 +143,7 @@ class AnnotationRepository:
                 )
                 if conceptNode is None:
                     log.debug('new ResourceBody for concept: {}', concept)
-                    conceptNode = ResourceBody(
+                    conceptNode = self.graph.ResourceBody(
                         iri=concept['iri'],
                         name=concept['name'],
                         spatial=concept['spatial'],
@@ -179,7 +164,7 @@ class AnnotationRepository:
         visibility = 'private' if is_private else 'public'
         log.debug("Create a new {} description annotation", visibility)
         # create annotation node
-        anno = Annotation(annotation_type='DSC', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type='DSC', private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -187,11 +172,11 @@ class AnnotationRepository:
         if user is not None:
             anno.creator.connect(user)
 
-        if isinstance(target, Item):
+        if isinstance(target, self.graph.Item):
             anno.source_item.connect(target)
-        elif isinstance(target, Annotation):
+        elif isinstance(target, self.graph.Annotation):
             anno.source_item.connect(target.source_item.single())
-        elif isinstance(target, Shot):
+        elif isinstance(target, self.graph.Shot):
             anno.source_item.connect(target.item.single())
 
         # ignore at the moment segment selector
@@ -203,7 +188,8 @@ class AnnotationRepository:
                     'Invalid body for description annotation: {}'.format(body['type'])
                 )
             text_lang = body.get('language')
-            bodyNode = TextualBody(value=body['value'], language=text_lang).save()
+            bodyNode = self.graph.TextualBody(
+                value=body['value'], language=text_lang).save()
             anno.bodies.connect(bodyNode)
 
         return anno
@@ -217,7 +203,7 @@ class AnnotationRepository:
         visibility = 'private' if is_private else 'public'
         log.debug("Create a new {} description annotation", visibility)
         # create annotation node
-        anno = Annotation(annotation_type='LNK', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type='LNK', private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -225,11 +211,11 @@ class AnnotationRepository:
         if user is not None:
             anno.creator.connect(user)
 
-        if isinstance(target, Item):
+        if isinstance(target, self.graph.Item):
             anno.source_item.connect(target)
-        elif isinstance(target, Annotation):
+        elif isinstance(target, self.graph.Annotation):
             anno.source_item.connect(target.source_item.single())
-        elif isinstance(target, Shot):
+        elif isinstance(target, self.graph.Shot):
             anno.source_item.connect(target.item.single())
 
         # ignore at the moment segment selector
@@ -240,10 +226,10 @@ class AnnotationRepository:
         # ONLY textual and reference body allowed at the moment
         for body in bodies:
             if body['type'] == 'TextualBody':
-                bodyNode = TextualBody(value=body['value']).save()
+                bodyNode = self.graph.TextualBody(value=body['value']).save()
             elif body['type'] == 'BibliographicReference':
                 properties = body['value']
-                bodyNode = BibliographicReference(**properties).save()
+                bodyNode = self.graph.BibliographicReference(**properties).save()
             else:
                 raise ValueError(
                     'Invalid body for link annotation: {}'.format(body['type'])
@@ -272,12 +258,12 @@ class AnnotationRepository:
             log.debug('body instance of {}', original_body.__class__)
             if single_body:
                 # ONLY the referenced body
-                if isinstance(original_body, ResourceBody) and btype == 'resource':
+                if isinstance(original_body, self.graph.ResourceBody) and btype == 'resource':
                     if bid == original_body.iri:
                         # disconnect that node
                         body_found = True
                         anno.bodies.disconnect(body)
-                elif isinstance(original_body, TextualBody) and btype == 'textual':
+                elif isinstance(original_body, self.graph.TextualBody) and btype == 'textual':
                     if bid == original_body.value:
                         # remove the textual node
                         body_found = True
@@ -285,7 +271,7 @@ class AnnotationRepository:
                 if body_found:
                     break
             else:
-                if isinstance(original_body, ResourceBody):
+                if isinstance(original_body, self.graph.ResourceBody):
                     # never remove a ResourceBody
                     anno.bodies.disconnect(body)
                 else:
@@ -344,13 +330,13 @@ class AnnotationRepository:
         if not shots:
             raise ValueError('List of shots cannot be empty')
         # create annotation node
-        annotation = Annotation(generator='FHG', annotation_type='TVS').save()
+        annotation = self.graph.Annotation(generator='FHG', annotation_type='TVS').save()
         # add target
         annotation.targets.connect(item)
         annotation.source_item.connect(item)
 
         # add body
-        tvs_body = TVSBody().save()
+        tvs_body = self.graph.TVSBody().save()
         annotation.bodies.connect(tvs_body)
 
         # foreach shot create a node and connect it properly
@@ -486,7 +472,7 @@ class AnnotationRepository:
                 bodies = anno.bodies.all()
                 for b in bodies:
                     original_body = b.downcast()
-                    if isinstance(original_body, ResourceBody):
+                    if isinstance(original_body, self.graph.ResourceBody):
                         # disconnect this body
                         anno.bodies.disconnect(b)
                     else:
@@ -531,7 +517,7 @@ class AnnotationRepository:
         Create a new user manual segmentation for this video. One segmentation
         per user is allowed at the moment.
         '''
-        if not isinstance(target, Item):
+        if not isinstance(target, self.graph.Item):
             raise ValueError('Segmentation allowed only for Item target.')
         # look for existing segmentation for the given user
         segmentation = self.lookup_existing_user_segmentation(user, target)
@@ -545,7 +531,7 @@ class AnnotationRepository:
         visibility = 'private' if is_private else 'public'
         log.debug("Create a new {} segmentation annotation", visibility)
         # create annotation node
-        anno = Annotation(annotation_type='TVS', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type='TVS', private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -559,7 +545,7 @@ class AnnotationRepository:
             raise ValueError(
                 'Invalid body for segmentation annotation: {}'.format(body['type'])
             )
-        tvs_body = TVSBody().save()
+        tvs_body = self.graph.TVSBody().save()
         anno.bodies.connect(tvs_body)
         segments = body.get('segments')
         if segments is None or type(segments) is not list or len(segments) == 0:
@@ -575,7 +561,7 @@ class AnnotationRepository:
             segment = self.lookup_existing_segment(s_start, s_end, target)
             log.debug('Segment does exist? {}', True if segment else False)
             if segment is None:
-                segment = VideoSegment(
+                segment = self.graph.VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
                 ).save()
                 # look up the shot where the segment is enclosed
@@ -645,12 +631,12 @@ class AnnotationRepository:
                 continue
 
             # create annotation node
-            annotation = Annotation(generator='FHG', annotation_type='VIM').save()
+            annotation = self.graph.Annotation(generator='FHG', annotation_type='VIM').save()
             # add target
             annotation.targets.connect(shot)
             annotation.source_item.connect(item)
             # add body
-            vim_body = VIMBody()
+            vim_body = self.graph.VIMBody()
             motions_dict = q[1]
             log.debug('--------------------------------')
             log.debug(motions_dict)
@@ -766,7 +752,7 @@ class AnnotationRepository:
         '''
         Return the shot list of the item enclosing the given segment.
         '''
-        if item is None or not isinstance(item, Item) or item.item_type != 'Video':
+        if item is None or not isinstance(item, self.graph.Item) or item.item_type != 'Video':
             raise ValueError('Invalid item in getting enclosing shots.')
         s_start = segment.start_frame_idx
         s_end = segment.end_frame_idx
@@ -925,7 +911,7 @@ class AnnotationRepository:
         segment = self.lookup_existing_segment(s_start, s_end, item)
         log.debug('Segment does exist? {}', True if segment else False)
         if segment is None:
-            segment = VideoSegment(start_frame_idx=s_start, end_frame_idx=s_end).save()
+            segment = self.graph.VideoSegment(start_frame_idx=s_start, end_frame_idx=s_end).save()
             # look up the shot where the segment is enclosed
             shots = self.get_enclosing_shots(segment, item)
             if shots is None or len(shots) == 0:

@@ -4,7 +4,6 @@ import os
 from urllib.parse import urlencode
 import requests
 from restapi.utilities.logs import log
-from imc.models.neo4j import ResourceBody
 from restapi.flask_ext import get_debug_instance
 from restapi.flask_ext.flask_neo4j import NeoModel
 graph = get_debug_instance(NeoModel)
@@ -17,7 +16,7 @@ results = graph.cypher("MATCH (n:ResourceBody) WHERE n.spatial IS NOT NULL RETUR
 invalid = 0
 if len(results) > 0:
 
-    for p in [ResourceBody.inflate(row[0]) for row in results]:
+    for p in [graph.ResourceBody.inflate(row[0]) for row in results]:
         # placeid 'ChIJC8RR6ZjUf0cRQZSkWwF84aI'
         params = urlencode({
             'placeid': p.iri,

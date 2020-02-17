@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from restapi.utilities.logs import log
-from imc.models.neo4j import Item
 from restapi.flask_ext import get_debug_instance
 from restapi.flask_ext.flask_neo4j import NeoModel
 graph = get_debug_instance(NeoModel)
@@ -24,7 +23,7 @@ results = graph.cypher(
     "MATCH (i:Item)-[:CREATION]->(c:Creation) RETURN i, c.rights_status")
 if len(results) > 0:
 
-    for item, rs in [(Item.inflate(row[0]), row[1]) for row in results]:
+    for item, rs in [(graph.Item.inflate(row[0]), row[1]) for row in results]:
         is_publicly_accessible = _is_public_domain(rs)
         item.public_access = is_publicly_accessible
         item.save()
