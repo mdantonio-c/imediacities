@@ -132,10 +132,10 @@ for c in registry._NODE_CLASS_REGISTRY:
 class User(UserBase):
 
     declared_institution = StringProperty(required=False, show=True, default="none")
-    items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
-    annotations = RelationshipFrom(
-        'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
-    )
+    # items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
+    # annotations = RelationshipFrom(
+    #     'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
+    # )
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo('Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
     # items_under_revision = RelationshipFrom(
