@@ -138,9 +138,9 @@ class User(UserBase):
     )
     belongs_to = RelationshipTo('Group', 'BELONGS_TO', show=True)
     coordinator = RelationshipTo('Group', 'PI_FOR', cardinality=ZeroOrMore, show=True)
-    items_under_revision = RelationshipFrom(
-        'Item', 'REVISION_BY', cardinality=ZeroOrMore
-    )
+    # items_under_revision = RelationshipFrom(
+    #     'Item', 'REVISION_BY', cardinality=ZeroOrMore
+    # )
     # revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
     # lists = RelationshipFrom(
     #     'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
