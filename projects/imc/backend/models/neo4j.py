@@ -31,18 +31,18 @@ from restapi.services.neo4j.models import (
 )
 from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
-# from neomodel.util import NodeClassRegistry
+from neomodel.util import NodeClassRegistry
 
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
 
 
-# registry = NodeClassRegistry()
-# base_user = frozenset({'User'})
-# for c in registry._NODE_CLASS_REGISTRY:
-#     if c == base_user:
-#         registry._NODE_CLASS_REGISTRY.pop(base_user)
-#         break
+registry = NodeClassRegistry()
+base_user = frozenset({'User'})
+for c in registry._NODE_CLASS_REGISTRY:
+    if c == base_user:
+        registry._NODE_CLASS_REGISTRY.pop(base_user)
+        break
 
 
 class HeritableStructuredNode(StructuredNode):
