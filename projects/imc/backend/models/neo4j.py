@@ -141,10 +141,10 @@ class User(UserBase):
     items_under_revision = RelationshipFrom(
         'Item', 'REVISION_BY', cardinality=ZeroOrMore
     )
-    revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
-    lists = RelationshipFrom(
-        'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
-    )
+    # revised_shots = RelationshipFrom('Shot', 'REVISED_BY', cardinality=ZeroOrMore)
+    # lists = RelationshipFrom(
+    #     'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
+    # )
 
 
 class Group(IdentifiedNode):
