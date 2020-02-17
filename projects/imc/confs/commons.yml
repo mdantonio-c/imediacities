@@ -3,8 +3,8 @@ version: '3'
 
 services:
   backend:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
-    image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
+    # build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/backend
+    # image: ${COMPOSE_PROJECT_NAME}/backend:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts
