@@ -7,7 +7,7 @@ These are custom models!
 VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
-
+import neomodel
 import sys
 from datetime import datetime
 import pytz
@@ -35,7 +35,6 @@ from neomodel.util import NodeClassRegistry
 
 from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
-
 
 registry = NodeClassRegistry()
 base_user = frozenset({'User'})
