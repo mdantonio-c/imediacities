@@ -7,7 +7,6 @@ These are custom models!
 VERY IMPORTANT!
 Imports and models have to be defined/used AFTER normal Graphdb connection.
 """
-import neomodel
 import sys
 from datetime import datetime
 import pytz
@@ -33,7 +32,7 @@ from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
 from neomodel.util import NodeClassRegistry
 
-from restapi.models.neo4j import User as UserBase
+# from restapi.models.neo4j import User as UserBase
 from imc.models import codelists
 
 registry = NodeClassRegistry()
@@ -128,9 +127,22 @@ class RevisionRel(StructuredRel):
     state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
 
-class User(UserBase):
-
+class User(IdentifiedNode):
+    # uuid = StringProperty(required=True, unique_index=True)
+    email = EmailProperty(required=True, unique_index=True, show=True)
+    name = StringProperty(required=True, show=True)
+    surname = StringProperty(required=True, show=True)
+    authmethod = StringProperty(required=True)
+    password = StringProperty()  # Hashed from a custom function
+    first_login = DateTimeProperty(show=True)
+    last_login = DateTimeProperty(show=True)
+    last_password_change = DateTimeProperty(show=True)
+    is_active = BooleanProperty(default=True, show=True)
+    privacy_accepted = BooleanProperty(default=True, show=True)
     declared_institution = StringProperty(required=False, show=True, default="none")
+
+    tokens = RelationshipTo('Token', 'HAS_TOKEN', cardinality=ZeroOrMore)
+    roles = RelationshipTo('Role', 'HAS_ROLE', cardinality=ZeroOrMore, show=True)
     items = RelationshipFrom('Item', 'IS_OWNED_BY', cardinality=ZeroOrMore)
     annotations = RelationshipFrom(
         'Annotation', 'IS_ANNOTATED_BY', cardinality=ZeroOrMore
@@ -144,6 +156,23 @@ class User(UserBase):
     lists = RelationshipFrom(
         'List', 'LST_BELONGS_TO', cardinality=ZeroOrMore, show=True
     )
+
+class Token(StructuredNode):
+    jti = StringProperty(required=True, unique_index=True)
+    token = StringProperty(required=True, unique_index=True)
+    token_type = StringProperty()
+    creation = DateTimeProperty(required=True)
+    expiration = DateTimeProperty()
+    last_access = DateTimeProperty()
+    IP = StringProperty()
+    hostname = StringProperty()
+    emitted_for = RelationshipFrom('User', 'HAS_TOKEN', cardinality=ZeroOrOne)
+
+
+class Role(StructuredNode):
+    name = StringProperty(required=True, unique_index=True, show=True)
+    description = StringProperty(default='No description', show=True)
+    privileged = RelationshipFrom(User, 'HAS_ROLE', cardinality=OneOrMore)
 
 
 class Group(IdentifiedNode):
