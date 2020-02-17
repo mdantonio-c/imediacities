@@ -7,7 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { environment } from '@rapydo/../environments/environment';
 
-import { RapydoModule } from '@rapydo/rapydo.module';
+import { SharedModule } from '@rapydo/shared.module';
 import { AuthGuard } from '@rapydo/app.auth.guard';
 
 import { HttpClientJsonpModule } from '@angular/common/http';
@@ -140,7 +140,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RapydoModule,
+    SharedModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
     // NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+environment.ALL['GMAP_KEY']}),
