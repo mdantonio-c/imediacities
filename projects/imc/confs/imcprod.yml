@@ -1,0 +1,39 @@
+version: '3'
+#######################
+# Link services inside API
+
+services:
+
+  # proxy:
+  #   environment:
+  #     ACTIVATE: 1
+
+  # backend:
+  #   environment:
+  #     APP_MODE: production
+  #     NGINX_ACTIVE: "True"
+
+  neo4j:
+    environment:
+      ACTIVATE: 0
+
+  # frontend:
+  #   environment:
+  #     APP_MODE: production
+  #     BACKEND_PORT: ${PROXY_PROD_PORT}
+
+  mongodb:
+    environment:
+      ACTIVATE: 0
+
+  celery:
+    environment:
+      ACTIVATE: 0
+
+  celeryui:
+    environment:
+      ACTIVATE: 0
+
+  rabbit:
+    environment:
+      ACTIVATE: 0
