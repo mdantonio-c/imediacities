@@ -42,7 +42,7 @@ export class AppAnnotationsService {
                     })
                 }
             ).pipe(map(res => res))
-        );
+        ));
 
         Observable.forkJoin(
             observables
