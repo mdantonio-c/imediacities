@@ -2,6 +2,7 @@ import { Injectable, Output, EventEmitter } from '@angular/core';
 import { ApiService } from '@rapydo/services/api';
 import { NotificationService } from '@rapydo/services/notification';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import 'rxjs/add/observable/forkJoin';
 import { AppShotsService } from "./app-shots";
 
@@ -40,8 +41,8 @@ export class AppAnnotationsService {
                         }
                     })
                 }
-            ).map((res) => res))
-        );
+            ).pipe(map(res => res))
+        ));
 
         Observable.forkJoin(
             observables
