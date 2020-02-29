@@ -177,9 +177,7 @@ class Bulk(EndpointResource):
             upload_dir = "/uploads/" + group.uuid
             upload_delta_dir = os.path.join(upload_dir, "upload")
             if not os.path.exists(upload_delta_dir):
-                return self.force_response(
-                    [], errors=["Upload dir " + upload_delta_dir + " not found"]
-                )
+                return self.force_response(errors=["Upload dir not found"])
 
             # dentro la upload_delta_dir devo cercare la sotto-dir
             # che corrisponde alla data più recente
@@ -187,7 +185,7 @@ class Bulk(EndpointResource):
 
             if upload_latest_dir is None:
                 log.debug("Upload dir not found")
-                return self.force_response([], errors=["Upload dir not found"])
+                return self.force_response(errors=["Upload dir not found"])
 
             log.info("Processing files from dir {}", upload_latest_dir)
 
@@ -535,7 +533,7 @@ class Bulk(EndpointResource):
             # retrieve XML files from upload dir
             upload_dir = os.path.join("/uploads", group.uuid)
             if not os.path.exists(upload_dir):
-                return self.force_response([], errors=["Upload dir not found"])
+                return self.force_response(errors=["Upload dir not found"])
 
             files = [f for f in os.listdir(upload_dir) if f.endswith('.xml')]
             total_to_be_imported = len(files)
@@ -623,7 +621,7 @@ class Bulk(EndpointResource):
             # retrieve v2_ XML files from upload dir
             upload_dir = os.path.join("/uploads", group.uuid)
             if not os.path.exists(upload_dir):
-                return self.force_response([], errors=["Upload dir not found"])
+                return self.force_response(errors=["Upload dir not found"])
 
             # v2_ is used for the 'other version' (exclude .xml)
             files = [

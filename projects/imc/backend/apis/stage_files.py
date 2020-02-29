@@ -143,7 +143,7 @@ class Stage(EndpointResource):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.force_response([], errors=["Upload dir not found"])
+                return self.force_response(errors=["Upload dir not found"])
 
         data = []
 

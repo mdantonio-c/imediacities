@@ -290,7 +290,7 @@ class Search(EndpointResource):
         except BaseException as e:
             log.error(e)
             return self.force_response(
-                data, meta=meta_response, errors=['Invalid query parameters']
+                meta=meta_response, errors=['Invalid query parameters']
             )
             raise RestApiException('Invalid query parameters')
 

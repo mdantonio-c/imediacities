@@ -79,7 +79,7 @@ class Upload(Uploader, EndpointResource):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.force_response([], errors=["Upload dir not found"])
+                return self.force_response(errors=["Upload dir not found"])
 
         staged_file = os.path.join(upload_dir, filename)
         if not os.path.isfile(staged_file):
