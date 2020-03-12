@@ -3,7 +3,7 @@ from restapi.utilities.logs import log
 
 
 class Initializer(object):
-    def __init__(self, services):
+    def __init__(self, services, app=None):
 
         self.neo4j = services['neo4j']
 
