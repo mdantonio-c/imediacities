@@ -11,7 +11,11 @@
 
 /* top navbar: force bg-white */
 .navbar {
-    background-color: #FFF !important;
+    background-color: #f8f8f8 !important;
+    margin-bottom: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    border-bottom: 1px solid rgba(0,0,0,.125);
 }
 
 .no-padding { padding: 0 !important }
