@@ -172,9 +172,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     start_shot_revision() {
-        this.shotRevisionService.putVideoUnderRevision(this.media_id, (err) => {
-            if(err) {
-                this.notify.extractErrors(err, this.notify.ERROR);
+        this.shotRevisionService.putVideoUnderRevision(this.media_id, (error) => {
+            if(error) {
+                this.notify.showError(error);
                 return;
             }
             let revision = {
@@ -207,9 +207,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
 
     exit_shot_revision() {
-        this.shotRevisionService.exitRevision(this.media_id, (err) => {
-            if(err) {
-                this.notify.extractErrors(err, this.notify.ERROR);
+        this.shotRevisionService.exitRevision(this.media_id, (error) => {
+            if(error) {
+                this.notify.showError(error);
                 return;
             }
             delete this.media.relationships.item[0].relationships.revision;

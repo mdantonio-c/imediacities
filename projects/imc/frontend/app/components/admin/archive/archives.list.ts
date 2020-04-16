@@ -6,7 +6,6 @@ import { NotificationService } from '@rapydo/services/notification';
 
 @Component({
 	selector: 'imc-archives-list',
-	providers: [ApiService, NotificationService],
 	templateUrl: './archives.list.html'
 })
 export class ArchivesListComponent {
@@ -24,12 +23,10 @@ export class ArchivesListComponent {
 		this.loading = true;
 		this.api.get('admin/groups').subscribe(
 			response => {
-				this.groups = this.api.parseResponse(response.data);
-				this.notify.extractErrors(response, this.notify.WARNING);
+				this.groups = response;
 				this.loading = false;
 			}, error => {
-				console.log(error);
-				this.notify.extractErrors(error, this.notify.ERROR);
+				this.notify.showError(error);
 				this.loading = false;
 			}
 		);

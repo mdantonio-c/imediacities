@@ -7,19 +7,17 @@ import json
 from restapi.utilities.logs import log
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
-from restapi import decorators as decorate
+from restapi import decorators
 
 
 class Fcodelist(EndpointResource):
 
-    # schema_expose = True
     labels = ['fcodelist']
     GET = {'/fcodelist/<codelist>': {'summary': 'GET codelists', 'description': 'Returns a codelist', 'parameters': [{'name': 'lang', 'in': 'query', 'description': 'Language of the codelist', 'type': 'string'}], 'responses': {'200': {'description': 'A codelist.'}, '404': {'description': 'Codelist does not exist.'}}}}
 
-    @decorate.catch_error()
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.auth.required()
     def get(self, codelist=None):
         """Get the codelists."""
         log.debug('load the codelist: ' + codelist)
@@ -32,7 +30,7 @@ class Fcodelist(EndpointResource):
         log.debug('filepath: ' + filepath)
         try:
             data = json.load(open(filepath))
-            return self.force_response(data)
+            return self.response(data)
         except FileNotFoundError as err:
             log.warning('Codelist file not found: ' + filepath)
             raise RestApiException(

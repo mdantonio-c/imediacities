@@ -8,15 +8,13 @@ import os
 from flask import send_file, make_response
 from mimetypes import MimeTypes
 
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.uploader import Uploader
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 
 mime = MimeTypes()
 
@@ -27,10 +25,10 @@ class Upload(Uploader, EndpointResource):
     GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
     POST = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Archive'])
+    @decorators.auth.required(roles=['Archive'])
     def post(self, filename):
 
         self.graph = self.get_service_instance('neo4j')
@@ -50,10 +48,10 @@ class Upload(Uploader, EndpointResource):
 
         return upload_response
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Archive'])
+    @decorators.auth.required(roles=['Archive'])
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:
@@ -79,7 +77,7 @@ class Upload(Uploader, EndpointResource):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
         staged_file = os.path.join(upload_dir, filename)
         if not os.path.isfile(staged_file):

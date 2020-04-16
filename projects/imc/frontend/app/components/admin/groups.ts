@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, TemplateRef, Injector } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApiService } from '@rapydo/services/api';
@@ -9,12 +9,15 @@ import { FormlyService } from '@rapydo/services/formly'
 
 import { BasePaginationComponent } from '@rapydo/components/base.pagination.component'
 
+export interface Group {
+
+}
+
 @Component({
 	selector: 'admin-groups',
-	providers: [ApiService, AuthService, NotificationService, FormlyService],
 	templateUrl: './groups.html'
 })
-export class AdminGroupsComponent extends BasePaginationComponent {
+export class AdminGroupsComponent extends BasePaginationComponent<Group> {
 
 	@ViewChild('dataCoordinator', { static: false }) public dataCoordinator: TemplateRef<any>;
 	@ViewChild('controlsCell', { static: false }) public controlsCell: TemplateRef<any>;
@@ -23,16 +26,9 @@ export class AdminGroupsComponent extends BasePaginationComponent {
 
 	protected endpoint = 'admin/groups'
 
-	constructor(
-		protected api: ApiService,
-		protected auth: AuthService,
-		protected notify: NotificationService,
-		protected modalService: NgbModal,
-		protected formly: FormlyService,
-		protected changeDetectorRef: ChangeDetectorRef
-	) {
+	constructor(protected injector: Injector) {
 
-		super(api, auth, notify, modalService, formly, changeDetectorRef);
+		super(injector);
 		this.init("group");
 
 		this.list();

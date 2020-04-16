@@ -11,11 +11,10 @@ from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
 
 from restapi.utilities.logs import log
-from restapi import decorators as decorate
+from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
-from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
 
 
@@ -29,8 +28,8 @@ class Search(EndpointResource):
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
     allowed_anno_types = ('TAG', 'DSC', 'LNK')
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def post(self):
 
         self.graph = self.get_service_instance('neo4j')
@@ -289,7 +288,7 @@ class Search(EndpointResource):
             numels = [row[0] for row in self.graph.cypher(countv)][0]
         except BaseException as e:
             log.error(e)
-            return self.force_response(
+            return self.response(
                 meta=meta_response, errors=['Invalid query parameters']
             )
             raise RestApiException('Invalid query parameters')
@@ -394,4 +393,4 @@ class Search(EndpointResource):
             group_by_years[row[0]] = row[1]
         meta_response["countByYears"] = group_by_years
 
-        return self.force_response(data, meta=meta_response)
+        return self.response(data, meta=meta_response)

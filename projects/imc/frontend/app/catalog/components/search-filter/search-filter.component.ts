@@ -309,7 +309,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   setSliderTo(from, to) {
-    this.rangeSliderEl.update({from: from, to:to});
+    console.warn("rangeSlider is temporary disabled");
+    // this.rangeSliderEl.update({from: from, to:to});
   }
 
 }

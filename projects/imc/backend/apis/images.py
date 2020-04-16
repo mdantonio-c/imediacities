@@ -9,18 +9,16 @@ from restapi.confs import PRODUCTION
 
 from restapi.utilities.logs import log
 from imc.security import authz
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.htmlcodes import hcodes
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 
-from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.connectors.celery import CeleryExt
 
 
 #####################################
@@ -31,14 +29,13 @@ class Images(EndpointResource):
     Else return all NonAVEntities in the repository.
     """
 
-    # schema_expose = True
     labels = ['image']
     GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}}
     POST = {'/images': {'summary': 'Create a new image description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).', 'responses': {'200': {'description': 'Image description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     DELETE = {'/images/<image_id>': {'summary': 'Delete a image description', 'responses': {'200': {'description': 'Image successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def get(self, image_id=None):
 
         if image_id is None and not self.auth.verify_admin():
@@ -87,16 +84,16 @@ class Images(EndpointResource):
             )
             data.append(image)
 
-        return self.force_response(data)
+        return self.response(data)
 
     """
     Create a new image description.
     """
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required()
+    @decorators.auth.required()
     def post(self):
         self.graph = self.get_service_instance('neo4j')
 
@@ -112,10 +109,10 @@ class Images(EndpointResource):
 
         return self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['admin_root'])
+    @decorators.auth.required(roles=['admin_root'])
     def delete(self, image_id):
         """
         Delete existing image description.
@@ -141,13 +138,12 @@ class Images(EndpointResource):
 
 class ImageItem(EndpointResource):
 
-    # schema_expose = True
     PUT = {'/images/<image_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Image does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Archive', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=['Archive', 'admin_root'], required_roles='any')
     def put(self, image_id):
         """
         Allow user to update item information.
@@ -208,12 +204,11 @@ class ImageAnnotations(EndpointResource):
     """
         Get all image annotations for a given image.
     """
-    # schema_expose = True
     labels = ['image_annotations']
     GET = {'/images/<image_id>/annotations': {'summary': 'Gets image annotations', 'description': 'Returns all the annotations targeting the given image item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Image does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def get(self, image_id):
         log.debug("get annotations for NonAVEntity id: {}", image_id)
         if image_id is None:
@@ -280,7 +275,7 @@ class ImageAnnotations(EndpointResource):
                 res['bodies'].append(body)
             data.append(res)
 
-        return self.force_response(data)
+        return self.response(data)
 
 
 class ImageContent(EndpointResource):
@@ -288,12 +283,11 @@ class ImageContent(EndpointResource):
     Gets image content or thumbnail
     """
 
-    # schema_expose = True
     labels = ['image']
     GET = {'/images/<image_id>/content': {'summary': 'Gets the image content', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. image, thumbnail)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Image content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image content does not exists.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @authz.pre_authorize
     def get(self, image_id):
         log.info("get image content for id {}", image_id)
@@ -364,13 +358,12 @@ class ImageContent(EndpointResource):
 class ImageTools(EndpointResource):
 
     __available_tools__ = ('object-detection', 'building-recognition')
-    # schema_expose = True
     labels = ['image_tools']
     POST = {'/images/<image_id>/tools': {'summary': 'Allow to launch the execution of some image tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Image not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['admin_root'])
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['admin_root'])
     def post(self, image_id):
 
         log.debug('launch automatic tool for image id: {}', image_id)
@@ -428,7 +421,7 @@ class ImageTools(EndpointResource):
                     if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
-                return self.force_response(
+                return self.response(
                     "There are no more automatic object detection tags for image {}. Deleted {}".format(
                         image_id, deleted
                     ),
@@ -452,7 +445,7 @@ class ImageTools(EndpointResource):
                     if 'BRBody' in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
-                return self.force_response(
+                return self.response(
                     "There are no more automatic building recognition tags for image {}. Deleted {}".format(
                         image_id, deleted
                     ),
@@ -473,4 +466,4 @@ class ImageTools(EndpointResource):
 
         task = CeleryExt.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
-        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)

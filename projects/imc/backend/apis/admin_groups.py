@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from restapi import decorators as decorate
-
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.htmlcodes import hcodes
 
 # from restapi.utilities.logs import log
@@ -16,16 +13,15 @@ __author__ = "Mattia D'Antonio (m.dantonio@cineca.it)"
 
 class AdminGroups(EndpointResource):
 
-    # schema_expose = True
     labels = ['admin']
     GET = {'/admin/groups/<group_id>': {'summary': 'List of groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/admin/groups': {'summary': 'List of groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     POST = {'/admin/groups': {'parameters': [{'name': 'shortname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Short name', 'custom': {'label': 'Short name'}}, {'name': 'fullname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Full name', 'custom': {'label': 'Full name'}}, {'name': 'coordinator', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Select a coordinator', 'custom': {'htmltype': 'select', 'label': 'Group coordinator', 'model_key': '_coordinator', 'select_id': 'id', 'islink': True}}], 'summary': 'Create a new group', 'responses': {'200': {'description': 'The uuid of the new group is returned'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     PUT = {'/admin/groups/<group_id>': {'parameters': [{'name': 'shortname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Short name', 'custom': {'label': 'Short name'}}, {'name': 'fullname', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Full name', 'custom': {'label': 'Full name'}}, {'name': 'coordinator', 'in': 'formData', 'type': 'string', 'required': True, 'description': 'Select a coordinator', 'custom': {'htmltype': 'select', 'label': 'Group coordinator', 'model_key': '_coordinator', 'select_id': 'id', 'islink': True}}], 'summary': 'Modify a group', 'responses': {'200': {'description': 'Group successfully modified'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     DELETE = {'/admin/groups/<group_id>': {'summary': 'Delete a group', 'responses': {'200': {'description': 'Group successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['admin_root'])
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['admin_root'])
     def get(self, id=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -36,12 +32,12 @@ class AdminGroups(EndpointResource):
             for n in nodeset.all():
                 data.append(self.getJsonResponse(n))
 
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['admin_root'])
+    @decorators.auth.required(roles=['admin_root'])
     def post(self):
 
         self.graph = self.get_service_instance('neo4j')
@@ -72,7 +68,7 @@ class AdminGroups(EndpointResource):
 
                             schema[idx]["enum"].append({n.uuid: label})
 
-            return self.force_response(schema)
+            return self.response(schema)
 
         # INIT #
         properties = self.read_properties(schema, v)
@@ -93,12 +89,12 @@ class AdminGroups(EndpointResource):
         group = self.graph.Group(**properties).save()
         # group.coordinator.connect(coordinator)
 
-        return self.force_response(group.uuid)
+        return self.response(group.uuid)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['admin_root'])
+    @decorators.auth.required(roles=['admin_root'])
     def put(self, group_id=None):
 
         if group_id is None:
@@ -135,10 +131,10 @@ class AdminGroups(EndpointResource):
 
         return self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['admin_root'])
+    @decorators.auth.required(roles=['admin_root'])
     def delete(self, group_id=None):
 
         if group_id is None:
@@ -163,9 +159,9 @@ class UserGroup(EndpointResource):
     labels = ['miscellaneous']
     GET = {'/group/<query>': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}, '/group': {'summary': 'List of existing groups', 'responses': {'200': {'description': 'List of groups successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, query=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -177,7 +173,7 @@ class UserGroup(EndpointResource):
             current_user = self.get_current_user()
             for g in current_user.belongs_to.all():
                 data.append({"id": g.uuid, "shortname": g.shortname})
-                return self.force_response(data)
+                return self.response(data)
 
         cypher = "MATCH (g:Group)"
 
@@ -194,4 +190,4 @@ class UserGroup(EndpointResource):
             g = self.graph.Group.inflate(row[0])
             data.append({"id": g.uuid, "shortname": g.shortname})
 
-        return self.force_response(data)
+        return self.response(data)

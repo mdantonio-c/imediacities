@@ -9,12 +9,10 @@ Search endpoint for places
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
-from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.logs import log
 
 
@@ -23,9 +21,9 @@ class SearchPlace(EndpointResource):
 
     POST = {'/search_place': {'summary': 'Search some creations for specific place annotations', 'description': 'Search some creations for specific place annotations.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'required': ['relevant-list'], 'properties': {'relevant-list': {'type': 'array', 'items': {'required': ['creation-id', 'place-ids'], 'properties': {'creation-id': {'type': 'string'}, 'place-ids': {'type': 'array', 'items': {'type': 'string', 'minItems': 1}}}}, 'minItems': 1}}}}], 'responses': {'200': {'description': 'A list of creations for relevant places.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def post(self):
 
         self.graph = self.get_service_instance('neo4j')
@@ -153,4 +151,4 @@ class SearchPlace(EndpointResource):
                 res = {'source': creation, 'annotations': annotations}
                 data.append(res)
 
-        return self.force_response(data)
+        return self.response(data)

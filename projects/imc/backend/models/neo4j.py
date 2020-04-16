@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 import pytz
 
-from restapi.services.neo4j.models import (
+from restapi.connectors.neo4j.types import (
     StringProperty,
     ArrayProperty,
     IntegerProperty,

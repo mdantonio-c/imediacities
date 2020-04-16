@@ -6,12 +6,10 @@ Manage the lists of the researcher
 from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.rest.definition import EndpointResource
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
@@ -24,16 +22,15 @@ __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 class Lists(EndpointResource):
 
-    # schema_expose = True
     labels = ['list']
     GET = {'/lists': {'summary': 'Get a list of the researcher', 'description': 'Returns all the list of a researcher.', 'parameters': [{'name': 'researcher', 'in': 'query', 'description': 'Researcher uuid', 'type': 'string'}, {'name': 'item', 'in': 'query', 'description': 'Item uuid (used to check whether the item belongs to the list or not)', 'type': 'string'}, {'name': 'includeNumberOfItems', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}], 'responses': {'200': {'description': 'The list of the researcher.', 'schema': {'$ref': '#/definitions/List'}}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'The requested list does not exist.'}}}, '/lists/<list_id>': {'summary': 'Get a list of the researcher', 'description': 'Returns all the list of a researcher.', 'parameters': [{'name': 'item', 'in': 'query', 'description': 'Item uuid (used to check whether the item belongs to the list or not)', 'type': 'string'}, {'name': 'includeNumberOfItems', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'researcher', 'in': 'query', 'description': 'Researcher uuid', 'type': 'string'}], 'responses': {'200': {'description': 'The list of the researcher.', 'schema': {'$ref': '#/definitions/List'}}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'The requested list does not exist.'}}}}
     POST = {'/lists': {'summary': 'Create a new list', 'parameters': [{'name': 'list', 'in': 'body', 'description': 'The list to be created.', 'schema': {'$ref': '#/definitions/List'}}], 'responses': {'201': {'description': 'List created successfully.', 'schema': {'$ref': '#/definitions/List'}}, '400': {'description': 'There is no content present in the request body or the content is not valid for list.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '409': {'description': 'There is already a list with that name.'}}}}
     PUT = {'/lists/<list_id>': {'summary': 'Update a list', 'description': 'Update a list of the researcher', 'parameters': [{'name': 'updatedList', 'in': 'body', 'description': 'The updated list.', 'schema': {'$ref': '#/definitions/List'}}], 'responses': {'200': {'description': 'List updated successfully.'}, '400': {'description': 'There is no content present in the request body or the content is not valid for list.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}, '409': {'description': 'There is already another list with the same name among your lists.'}}}}
     DELETE = {'/lists/<list_id>': {'summary': 'Delete a list', 'description': 'Delete a list of the researcher.', 'responses': {'204': {'description': 'List deleted successfully.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['Researcher', 'admin_root'], required_roles='any')
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['Researcher', 'admin_root'], required_roles='any')
     def get(self, list_id=None):
         """ Get all the list of a user or a certain list if an id is provided."""
         self.graph = self.get_service_instance('neo4j')
@@ -105,7 +102,7 @@ class Lists(EndpointResource):
                 user_list['belong'] = found
             if nb_items:
                 user_list['nb_frames'] = len(res.items)
-            return self.force_response(user_list)
+            return self.response(user_list)
 
         # request for multiple lists
         # offset, limit = self.get_paging()
@@ -164,12 +161,12 @@ class Lists(EndpointResource):
             if nb_items:
                 user_list['nb_items'] = row[1]
             data.append(user_list)
-        return self.force_response(data, meta=meta_response)
+        return self.response(data, meta=meta_response)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Researcher'])
+    @decorators.auth.required(roles=['Researcher'])
     def post(self):
         """
         Create a new list.
@@ -210,14 +207,14 @@ class Lists(EndpointResource):
         # connect the creator
         created_list.creator.connect(user)
         log.debug("List created successfully. UUID {}", created_list.uuid)
-        return self.force_response(
+        return self.response(
             self.getJsonResponse(created_list), code=hcodes.HTTP_OK_CREATED
         )
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Researcher'])
+    @decorators.auth.required(roles=['Researcher'])
     def put(self, list_id):
         """ Update a list. """
         log.debug("Update list with uuid: {}", list_id)
@@ -274,14 +271,14 @@ class Lists(EndpointResource):
         user_list.description = data['description'].strip()
         updated_list = user_list.save()
         log.debug("List updated successfully. UUID {}", updated_list.uuid)
-        return self.force_response(
+        return self.response(
             self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
         )
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Researcher', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=['Researcher', 'admin_root'], required_roles='any')
     def delete(self, list_id):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
@@ -321,7 +318,6 @@ class Lists(EndpointResource):
 class ListItems(EndpointResource):
     """ List of items in a list. """
 
-    # schema_expose = True
     labels = ['list_items']
     GET = {
         '/lists/<list_id>/items/<item_id>': {'summary': 'List of items in a list.', 'responses': {'200': {'description': 'An list of items.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}}, 'description': 'Get all the items of a list. The result supports paging.', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of lists returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, 
@@ -330,9 +326,9 @@ class ListItems(EndpointResource):
     POST = {'/lists/<list_id>/items': {'summary': 'Add an item to a list.', 'parameters': [{'name': 'item', 'in': 'body', 'description': "Item to be added. It can be 'item' or 'shot'.", 'schema': {'required': ['target'], 'properties': {'target': {'type': 'string', 'pattern': '(item|shot):[a-z0-9-]+'}}}}], 'responses': {'204': {'description': 'Item added successfully.'}, '400': {'description': 'Bad request body or target node does not exist.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}, '409': {'description': 'The item is already connected to that list.'}}}}
     DELETE = {'/lists/<list_id>/items/<item_id>': {'summary': 'Delete an item from a list.', 'responses': {'204': {'description': 'Item deleted successfully.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List or item does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['Researcher', 'admin_root'], required_roles='any')
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['Researcher', 'admin_root'], required_roles='any')
     def get(self, list_id, item_id=None):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
@@ -375,7 +371,7 @@ class ListItems(EndpointResource):
                     ),
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
-            return self.force_response(self.get_list_item_response(res[0]))
+            return self.response(self.get_list_item_response(res[0]))
 
         log.debug(
             "Get all the items of the list <{0}, {1}>".format(
@@ -399,12 +395,12 @@ class ListItems(EndpointResource):
         data = []
         for list_item in user_list.items.all():
             data.append(self.get_list_item_response(list_item))
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Researcher'])
+    @decorators.auth.required(roles=['Researcher'])
     def post(self, list_id):
         """ Add an item to a list. """
         log.debug("Add an item to list {}", list_id)
@@ -477,10 +473,10 @@ class ListItems(EndpointResource):
         # 204: return empty response (?)
         self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Researcher', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=['Researcher', 'admin_root'], required_roles='any')
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
         self.graph = self.get_service_instance('neo4j')

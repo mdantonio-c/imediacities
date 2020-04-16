@@ -56,7 +56,7 @@ export class AppAddToListComponent {
             this.loadMyLists();
         }, error => {
             console.error('There was an error creating list', error.errors);
-            this.notify.extractErrors(error, this.notify.ERROR);
+            this.notify.showError(error);
         });
     }
 

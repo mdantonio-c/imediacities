@@ -98,7 +98,7 @@ export class ItemDetailComponent implements OnInit {
 					this.editable = false;
 				},
 				error => {
-					this.notify.extractErrors(error, this.notify.ERROR);
+		            this.notify.showError(error);
 				});
 	}
 

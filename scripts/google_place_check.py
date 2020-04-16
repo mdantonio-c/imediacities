@@ -4,8 +4,8 @@ import os
 from urllib.parse import urlencode
 import requests
 from restapi.utilities.logs import log
-from restapi.flask_ext import get_debug_instance
-from restapi.flask_ext.flask_neo4j import NeoModel
+from restapi.connectors import get_debug_instance
+from restapi.connectors.neo4j import NeoModel
 graph = get_debug_instance(NeoModel)
 
 

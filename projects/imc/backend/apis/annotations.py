@@ -5,12 +5,10 @@ Handle annotations
 """
 
 from flask import request
-from restapi import decorators as decorate
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 
@@ -43,7 +41,6 @@ class Annotations(EndpointResource):
     )
     allowed_patch_operations = ('add', 'remove')
 
-    # schema_expose = True
     labels = ['annotation']
     GET = {'/annotations': {'summary': 'Get a single annotation', 'description': 'Returns a single annotation for its uuid', 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of annoations returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'type', 'in': 'query', 'description': 'filter by annotation type', 'type': 'string'}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}], 'responses': {'200': {'description': 'An annotation', 'schema': {'$ref': '#/definitions/Annotation'}}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}, '404': {'description': 'Annotation does not exist.'}}}, '/annotations/<anno_id>': {'summary': 'Get a single annotation', 'description': 'Returns a single annotation for its uuid', 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of annoations returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'type', 'in': 'query', 'description': 'filter by annotation type', 'type': 'string'}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}], 'responses': {'200': {'description': 'An annotation', 'schema': {'$ref': '#/definitions/Annotation'}}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}, '404': {'description': 'Annotation does not exist.'}}}}
     POST = {'/annotations': {'summary': 'Create an annotation', 'description': 'Add a new annotation using WADM-based model to some specified target', 'parameters': [{'name': 'annotation', 'in': 'body', 'description': 'The annotation to create.', 'schema': {'$ref': '#/definitions/Annotation'}}], 'responses': {'201': {'description': 'Annotation successfully created.'}, '400': {'description': "Annotation couldn't have been created."}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
@@ -51,9 +48,9 @@ class Annotations(EndpointResource):
     PATCH = {'/annotations/<anno_id>': {'summary': 'Updates partially an annotation', 'description': 'Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.', 'parameters': [{'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}, {'name': 'JsonPatch', 'in': 'body', 'required': True, 'description': 'The annotation to update.', 'schema': {'$ref': '#/definitions/PatchRequest'}}], 'responses': {'204': {'description': 'Annotation successfully updated.'}, '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Annotation does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
     DELETE = {'/annotations/<anno_id>': {'summary': 'Deletes an annotation', 'description': 'Delete a single annotation identified via its uuid', 'parameters': [{'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}, {'name': 'body_ref', 'in': 'query', 'description': 'optional body reference for annotation with multiple bodies. This reference MUST be in the form "textual:your_term_value" or "resource:your_term_IRI"', 'type': 'string'}], 'responses': {'204': {'description': 'Annotation successfully deleted.'}, '400': {'description': 'Annotation cannot be deleted. No body found for the given reference.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Annotation does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, anno_id=None):
         """ Get an annotation if its id is passed as an argument. """
         self.graph = self.get_service_instance('neo4j')
@@ -90,12 +87,12 @@ class Annotations(EndpointResource):
             anno = self.get_annotation_response(a)
             data.append(anno)
 
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required()
+    @decorators.auth.required()
     def post(self):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
@@ -300,13 +297,13 @@ class Annotations(EndpointResource):
                     status_code=hcodes.HTTP_BAD_CONFLICT,
                 )
 
-        return self.force_response(
+        return self.response(
             self.get_annotation_response(created_anno), code=hcodes.HTTP_OK_CREATED
         )
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def delete(self, anno_id):
         """ Deletes an annotation. """
         if anno_id is None:
@@ -373,10 +370,10 @@ class Annotations(EndpointResource):
 
         return self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required()
+    @decorators.auth.required()
     def put(self, anno_id):
         """
         Update an annotation.
@@ -474,12 +471,12 @@ class Annotations(EndpointResource):
         updated_anno = self.get_annotation_response(anno)
         del updated_anno['links']
 
-        return self.force_response(updated_anno)
+        return self.response(updated_anno)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required()
+    @decorators.auth.required()
     def patch(self, anno_id):
         if anno_id is None:
             raise RestApiException(
@@ -597,7 +594,7 @@ class Annotations(EndpointResource):
         updated_anno = self.get_annotation_response(anno)
         del updated_anno['links']
 
-        return self.force_response(updated_anno)
+        return self.response(updated_anno)
 
     def get_annotation_response(self, anno):
         """

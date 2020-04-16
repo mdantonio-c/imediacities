@@ -19,10 +19,12 @@
 
 		<br>
 
-		<input type="file" ng2FileSelect [uploader]="uploader" multiple/><br/>
+<!-- 		
+        <input type="file" ng2FileSelect [uploader]="uploader" multiple/><br/>
+-->
 
 		<br><br>
-
+<!-- 
 	    <div ng2FileDrop
 	         [ngClass]="{'nv-file-over': hasDropZoneOver}"
 	         (fileOver)="fileOver($event)"
@@ -30,6 +32,7 @@
 	         class="well my-drop-zone">
 	        Drop here your files 
 	    </div>
+    -->
     </div>
 
     <div class="col-md-9" style="margin-bottom: 40px">
@@ -191,43 +194,17 @@
 
 <loading *ngIf="loading"></loading>
 
-<div class="table-responsive" *ngIf="rows?.length">
+<div class="table-responsive" *ngIf="data?.length">
 
 	<ngx-datatable
-		[rows]="rows"
+        class="bootstrap"
+		[rows]="data"
 		[columns]="columns"
-		[columnMode]="'flex'"
-		[loadingIndicator]='true'
-		[footerHeight]="50"
-		[limit]="paging.itemsPerPage">
-		<ngx-datatable-footer>
-			<ng-template 
-				ngx-datatable-footer-template
-				let-pageSize="pageSize"
-				let-selectedCount="selectedCount"
-				let-curPage="curPage"
-				let-offset="offset">
-				<div class='col-3'>
-					{{paging.dataLength}} total
-				</div>
-				<div class='col-9'>
-				<div class='float-right'>
-				<ngb-pagination
-					boundaryLinks="true"
-					directionLinks="true"
-					[page]="paging.page"
-					[pageSize]="paging.itemsPerPage"
-					[collectionSize]="paging.dataLength"
-                    [maxSize]="5"
-                    [rotate]="true"
-					size="sm"
-					(pageChange)="setPage($event)"
-				>
-				</ngb-pagination>
-				</div>
-				</div>
-			</ng-template>
-		</ngx-datatable-footer>
+        [columnMode]="ColumnMode.flex"
+        [headerHeight]="40"
+        [footerHeight]="40"
+		[limit]="paging.itemsPerPage"
+        [rowHeight]="'auto'">
 	</ngx-datatable>
 
 </div>

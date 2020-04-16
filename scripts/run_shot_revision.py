@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from restapi.flask_ext.flask_celery import CeleryExt
-from restapi.flask_ext import get_debug_instance
+from restapi.connectors.celery import CeleryExt
+from restapi.connectors import get_debug_instance
 
 obj = get_debug_instance(CeleryExt)
 

@@ -1,5 +1,5 @@
 
-import { Component, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, TemplateRef, Injector } from '@angular/core';
 import { saveAs as importedSaveAs } from "file-saver";
 import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -13,16 +13,19 @@ import { BasePaginationComponent } from '@rapydo/components/base.pagination.comp
 
 import { environment } from '@rapydo/../environments/environment';
 
+export interface Data {
+
+}
+
 @Component({
   selector: 'upload',
   styles: [
   	'.my-drop-zone { border: dotted 2px lightgray; text-align:center; height: 100px; line-height: 100px;}',
   	'.nv-file-over { border: dotted 2px red; }'
   ],
-  providers: [ApiService, AuthService, NotificationService, FormlyService],
   templateUrl: './upload.html'
 })
-export class UploadComponent extends BasePaginationComponent {
+export class UploadComponent extends BasePaginationComponent<Data> {
 
 	@ViewChild('dataSize', { static: false }) public dataSize: TemplateRef<any>;
 	@ViewChild('dataUploadData', { static: false }) public dataUploadData: TemplateRef<any>;
@@ -32,16 +35,9 @@ export class UploadComponent extends BasePaginationComponent {
 	public uploader:FileUploader;
 	public hasDropZoneOver:boolean = false;
  
-	constructor(
-		protected api: ApiService,
-		protected auth: AuthService,
-		protected notify: NotificationService,
-		protected modalService: NgbModal,
-		protected formly: FormlyService,
-	    protected changeDetectorRef: ChangeDetectorRef
-		) {
+	constructor(protected injector: Injector) {
 
-		super(api, auth, notify, modalService, formly, changeDetectorRef);
+		super(injector);
 		this.init("group");
 
 		this.server_side_pagination = true;
@@ -71,9 +67,6 @@ export class UploadComponent extends BasePaginationComponent {
 
 		this.uploader.onCompleteItem = (item:any, response:any, status:any, headers:any) => {
 
-			response = JSON.parse(response);
-			this.notify.extractErrors(response["Response"], this.notify.ERROR);
-
 			this.list();
 
 		}
@@ -95,33 +88,7 @@ export class UploadComponent extends BasePaginationComponent {
 	public fileOver(e:any):void {
 		this.hasDropZoneOver = e;
 	}
-/*
-    self.importStageFiles = function(file) {
-		DataService.importStageFiles(file).then(
-			function(out_data) {
-		    	// console.log(out_data)
-		    	self.loadFiles();
 
-	            noty.extractErrors(out_data, noty.WARNING);
-			}, function(out_data) {
-		    	console.log("error...");
-
-	            noty.extractErrors(out_data, noty.ERROR);
-			});
-	};
-*/
-/*
-    self.uploadComplete = function (event, $flow, flowFile) {
-    	$rootScope.transitionConfirmationRequested = false;
-    	self.loadFiles();
-    };
-*/
-/*
-    self.uploadStart = function (event, $flow, flowFile) {
-    	$rootScope.transitionConfirmationRequested = true;
-    	$rootScope.transitionConfirmationMessage = "Are you sure want to leave this page? This may interrupt your uploads";
-    };
-*/
 	list() {
 		return this.get(this.endpoint);
 	}
@@ -145,7 +112,6 @@ export class UploadComponent extends BasePaginationComponent {
 				let contentType = response.headers['content-type'] || 'application/octet-stream';
 				const blob = new Blob([response.body], { type: contentType });
 				importedSaveAs(blob, filename);
-				//this.notify.extractErrors(response, this.notify.WARNING);
 			},
 			error => {
 				this.notify.showError('Unable to download file: ' + filename);

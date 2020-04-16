@@ -15,8 +15,8 @@ python3 import_xml_for_new_content.py
 """
 
 from restapi.utilities.logs import log
-from restapi.flask_ext import get_debug_instance
-from restapi.flask_ext.flask_neo4j import NeoModel
+from restapi.connectors import get_debug_instance
+from restapi.connectors.neo4j import NeoModel
 import click
 import requests
 

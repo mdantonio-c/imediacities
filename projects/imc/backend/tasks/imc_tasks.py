@@ -17,8 +17,8 @@ from operator import itemgetter
 
 
 from restapi.utilities.logs import log
-from restapi.flask_ext.flask_celery import CeleryExt
-from restapi.flask_ext.flask_celery import send_errors_by_email
+from restapi.connectors.celery import CeleryExt
+from restapi.connectors.celery import send_errors_by_email
 from restapi.services.mail import send_mail
 from restapi.utilities.templates import get_html_template
 

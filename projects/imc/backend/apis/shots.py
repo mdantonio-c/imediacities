@@ -8,23 +8,20 @@ from flask import request
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
 from restapi.utilities.logs import log
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 
 
 #####################################
 class Shots(EndpointResource):
 
-    # schema_expose = True
     labels = ['shot']
     GET = {'/shots/<shot_id>': {'summary': 'Gets information about a shot', 'description': 'Returns a single shot for its id', 'parameters': [{'name': 'content', 'in': 'query', 'description': 'content type (ONLY thumbnail at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Shot information successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video does not exists.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def get(self, shot_id=None):
         """
         Get shot by id.
@@ -70,7 +67,7 @@ class Shots(EndpointResource):
             api_url + 'api/shots/' + node.uuid + '?content=thumbnail'
         )
 
-        return self.force_response(shot)
+        return self.response(shot)
 
 
 class ShotAnnotations(EndpointResource):
@@ -78,13 +75,12 @@ class ShotAnnotations(EndpointResource):
         Get all shot annotations for a given shot.
     """
 
-    # schema_expose = True
     labels = ['shot_annotations']
     GET = {'/shots/<shot_id>/annotations': {'summary': 'Gets shot annotations.', 'description': 'Returns all the annotations targeting the given shot.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'List of annotations.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Shot does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, shot_id):
         log.info("get annotations for Shot id: {}", shot_id)
         if shot_id is None:
@@ -141,4 +137,4 @@ class ShotAnnotations(EndpointResource):
                 res['bodies'].append(body)
             data.append(res)
 
-        return self.force_response(data)
+        return self.response(data)

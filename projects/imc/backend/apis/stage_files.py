@@ -5,16 +5,14 @@ List content from upload dir and import of data and metadata
 """
 import os
 from restapi.utilities.logs import log
-from restapi import decorators as decorate
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
-from restapi.decorators import catch_graph_exceptions
 from restapi.utilities.htmlcodes import hcodes
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 
-from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.connectors.celery import CeleryExt
 
 
 #####################################
@@ -83,9 +81,9 @@ class Stage(EndpointResource):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
-    # @decorate.catch_error()
-    # @catch_graph_exceptions
-    # @authentication.required()
+    # @decorators.catch_errors()
+    # @decorators.catch_graph_exceptions
+    # @decorators.auth.required()
     # def head(self, group=None):
     #     self.graph = self.get_service_instance('neo4j')
 
@@ -118,9 +116,9 @@ class Stage(EndpointResource):
 
     #     return counter
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, group=None):
 
         self.graph = self.get_service_instance('neo4j')
@@ -143,7 +141,7 @@ class Stage(EndpointResource):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
         data = []
 
@@ -217,11 +215,11 @@ class Stage(EndpointResource):
         if get_total:
             return {"total": counter}
 
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def post(self):
         """
         Start IMPORT
@@ -422,11 +420,11 @@ class Stage(EndpointResource):
         meta_stage.task_id = task.id
         meta_stage.save()
 
-        return self.force_response(task.id)
+        return self.response(task.id)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def delete(self, filename):
 
         self.graph = self.get_service_instance('neo4j')

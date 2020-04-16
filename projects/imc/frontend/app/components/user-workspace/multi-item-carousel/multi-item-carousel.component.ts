@@ -135,7 +135,7 @@ export class MultiItemCarouselComponent implements OnChanges {
             this.loading = false;
           },
           error => {
-            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.notify.showError(error);
             this.loading = false;
             this.slickModal.initSlick();
           });
@@ -172,7 +172,7 @@ export class MultiItemCarouselComponent implements OnChanges {
             this.loading = false;
           },
           error => {
-            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.notify.showError(error);
             this.loading = false;
           });
         break;
@@ -200,7 +200,7 @@ export class MultiItemCarouselComponent implements OnChanges {
             /*this.slickModal.initSlick();*/
           },
           error => {
-            this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+            this.notify.showError(error);
             this.loading = false;
           });
         break;
@@ -225,7 +225,7 @@ export class MultiItemCarouselComponent implements OnChanges {
               }
             },
             error => {
-              this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+              this.notify.showError(error);
             });
         }, (reason) => {
           // keep focus on item
@@ -253,7 +253,7 @@ export class MultiItemCarouselComponent implements OnChanges {
               this.onDelete.emit(item.id);
             },
             error => {
-              this.notify.extractErrors(error.error.Response, this.notify.ERROR);
+              this.notify.showError(error);
             });
           break;
 

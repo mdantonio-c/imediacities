@@ -10,18 +10,16 @@ from restapi.confs import PRODUCTION
 
 from restapi.utilities.logs import log
 from imc.security import authz
-from restapi import decorators as decorate
+from restapi import decorators
 from restapi.rest.definition import EndpointResource
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
-from restapi.flask_ext.flask_neo4j import graph_transactions
-from restapi.decorators import catch_graph_exceptions
+from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.htmlcodes import hcodes
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 
-from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.connectors.celery import CeleryExt
 
 
 #####################################
@@ -32,14 +30,13 @@ class Videos(EndpointResource):
     Else return all AVEntities in the repository.
     """
 
-    # schema_expose = True
     labels = ['video']
     GET = {'/videos/<video_id>': {'summary': 'List of videos', 'description': 'Returns a list containing all videos. The list supports paging.', 'tags': ['videos', 'admin'], 'responses': {'200': {'description': 'List of videos successfully retrieved'}, '404': {'description': 'The video does not exists.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, '/videos': {'summary': 'List of videos', 'description': 'Returns a list containing all videos. The list supports paging.', 'tags': ['videos', 'admin'], 'responses': {'200': {'description': 'List of videos successfully retrieved'}, '404': {'description': 'The video does not exists.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}}
     POST = {'/videos': {'summary': 'Create a new video description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).', 'responses': {'200': {'description': 'Video description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     DELETE = {'/videos/<video_id>': {'summary': 'Delete a video description', 'responses': {'200': {'description': 'Video successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def get(self, video_id=None):
 
         if video_id is None and not self.auth.verify_admin():
@@ -93,16 +90,16 @@ class Videos(EndpointResource):
             )
             data.append(video)
 
-        return self.force_response(data)
+        return self.response(data)
 
     """
     Create a new video description.
     """
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required()
+    @decorators.auth.required()
     def post(self):
         self.graph = self.get_service_instance('neo4j')
 
@@ -118,10 +115,10 @@ class Videos(EndpointResource):
 
         return self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['admin_root'])
+    @decorators.auth.required(roles=['admin_root'])
     def delete(self, video_id):
         """
         Delete existing video description.
@@ -147,13 +144,12 @@ class Videos(EndpointResource):
 
 class VideoItem(EndpointResource):
 
-    # schema_expose = True
     PUT = {'/videos/<video_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Video does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Archive', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=['Archive', 'admin_root'], required_roles='any')
     def put(self, video_id):
         """
         Allow user to update item information.
@@ -213,13 +209,12 @@ class VideoAnnotations(EndpointResource):
         Get all video annotations for a given video.
     """
 
-    # schema_expose = True
     labels = ['video_annotations']
     GET = {'/videos/<video_id>/annotations': {'summary': 'Gets video annotations', 'description': 'Returns all the annotations targeting the given video item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC', 'TVS']}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, video_id):
         log.debug("get annotations for AVEntity id: {}", video_id)
         if video_id is None:
@@ -361,7 +356,7 @@ class VideoAnnotations(EndpointResource):
                 res['bodies'].append(body)
             data.append(res)
 
-        return self.force_response(data)
+        return self.response(data)
 
 
 class VideoShots(EndpointResource):
@@ -369,12 +364,11 @@ class VideoShots(EndpointResource):
         Get the list of shots for a given video.
     """
 
-    # schema_expose = True
     labels = ['video_shots']
     GET = {'/videos/<video_id>/shots': {'summary': 'Gets video shots', 'description': 'Returns a list of shots belonging to the given video item.', 'responses': {'200': {'description': 'An list of shots.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     def get(self, video_id):
         log.debug("get shots for AVEntity id: {}", video_id)
         if video_id is None:
@@ -539,7 +533,7 @@ class VideoShots(EndpointResource):
 
             data.append(shot)
 
-        return self.force_response(data)
+        return self.response(data)
 
 
 class VideoSegments(EndpointResource):
@@ -547,15 +541,14 @@ class VideoSegments(EndpointResource):
         Get the list of manual segments for a given video.
     """
 
-   # schema_expose = True
     labels = ['video_segments', 'video-segment']
     GET = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Gets all manual segments for a video.', 'description': 'Returns a list of the manual segments belonging to the given video item.', 'responses': {'200': {'description': 'An list of manual segments.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}, '/videos/<video_id>/segments': {'summary': 'Gets all manual segments for a video.', 'description': 'Returns a list of the manual segments belonging to the given video item.', 'responses': {'200': {'description': 'An list of manual segments.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
     PUT = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Updates a manual video segment', 'description': 'Update a manual video segment identified by uuid', 'parameters': [{'name': 'updated_segment', 'in': 'body', 'description': 'The manual video segment to update.', 'schema': {'required': ['start_frame_idx', 'end_frame_idx'], 'properties': {'start_frame_idx': {'type': 'integer', 'format': 'int32', 'minimum': 0}, 'end_frame_idx': {'type': 'integer', 'format': 'int32'}}}}], 'responses': {'204': {'description': 'Manual video segment successfully updated.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Manual video segment does not exist.'}}}}
     DELETE = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Delete a video segment.', 'responses': {'200': {'description': 'Video segment successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'Video segment does not exist'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def get(self, video_id, segment_id):
         if segment_id is not None:
             log.debug(
@@ -591,11 +584,11 @@ class VideoSegments(EndpointResource):
 
         # TODO
 
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def delete(self, video_id, segment_id):
         log.debug(
             "delete manual segment [uuid:{sid}] for AVEntity "
@@ -606,9 +599,9 @@ class VideoSegments(EndpointResource):
             status_code=hcodes.HTTP_NOT_IMPLEMENTED,
         )
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def put(self, video_id, segment_id):
         log.debug(
             "update manual segment [uuid:{sid}] for AVEntity "
@@ -623,13 +616,12 @@ class VideoSegments(EndpointResource):
 class VideoContent(EndpointResource):
 
     __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
-    # schema_expose = True
     labels = ['video']
     GET = {'/videos/<video_id>/content': {'summary': 'Gets the video content', 'tags': ['video'], 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Video content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video content does not exists.'}}}}
     HEAD = {'/videos/<video_id>/content': {'summary': 'Check for video existence', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary, orf)', 'type': 'string'}], 'responses': {'200': {'description': 'The video content exists.'}, '404': {'description': 'The video content does not exists.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @authz.pre_authorize
     def get(self, video_id):
         """
@@ -729,8 +721,8 @@ class VideoContent(EndpointResource):
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
     def head(self, video_id):
         """
@@ -795,20 +787,19 @@ class VideoContent(EndpointResource):
                 "Invalid content type: {0}".format(content_type),
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
-        return self.force_response([], headers=headers)
+        return self.response([], headers=headers)
 
 
 class VideoTools(EndpointResource):
 
     __available_tools__ = ('object-detection', 'building-recognition')
 
-    # schema_expose = True
     labels = ['video_tools']
     POST = {'/videos/<video_id>/tools': {'summary': 'Allow to launch the execution of some video tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['admin_root'])
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['admin_root'])
     def post(self, video_id):
 
         log.debug('launch automatic tool for video id: {}', video_id)
@@ -866,7 +857,7 @@ class VideoTools(EndpointResource):
                     if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
-                return self.force_response(
+                return self.response(
                     "There are no more automatic object detection tags for video {}. Deleted {}".format(
                         video_id, deleted
                     ),
@@ -890,7 +881,7 @@ class VideoTools(EndpointResource):
                     if 'BRBody' in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
-                return self.force_response(
+                return self.response(
                     "There are no more automatic building recognition tags for video {}. Deleted {}".format(
                         video_id, deleted
                     ),
@@ -911,22 +902,21 @@ class VideoTools(EndpointResource):
 
         task = CeleryExt.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
-        return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
 
 
 class VideoShotRevision(EndpointResource):
     """Shot revision endpoint"""
 
-    # schema_expose = True
     labels = ['video_shot_revision']
     GET = {'/videos-under-revision': {'summary': 'List of videos under revision.', 'description': 'Returns a list containing all videos under revision together with the assignee. The list supports paging.', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'assignee', 'in': 'query', 'description': "Assignee's uuid of the revision", 'type': 'string'}], 'responses': {'200': {'description': 'List of videos under revision successfully retrieved', 'schema': {'type': 'array', 'items': {'$ref': '#/definitions/VideoInRevision'}}}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     POST = {'/videos/<video_id>/shot-revision': {'summary': 'Launch the execution of the shot revision tool.', 'parameters': [{'name': 'revision', 'in': 'body', 'description': 'The new list of cut.', 'schema': {'$ref': '#/definitions/ShotRevision'}}], 'responses': {'201': {'description': 'Execution launched.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}, '409': {'description': 'Invalid state for the video.'}}}}
     PUT = {'/videos/<video_id>/shot-revision': {'summary': 'Put a video under revision', 'parameters': [{'name': 'revision', 'in': 'body', 'description': 'The revision request.', 'schema': {'properties': {'assignee': {'description': 'The assignee for the revision (user uuid with Reviser role).', 'type': 'string'}}}}], 'responses': {'204': {'description': 'Video under revision successfully.'}, '400': {'description': 'Assignee not valid.'}, '409': {'description': 'Video is already under revision or it is not ready for revision.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Video does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
     DELETE = {'/videos/<video_id>/shot-revision': {'summary': 'Take off revision from a video.', 'responses': {'204': {'description': 'Video revision successfully exited.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
     def get(self):
         """Get all videos under revision"""
         log.debug('Getting videos under revision.')
@@ -974,12 +964,12 @@ class VideoShotRevision(EndpointResource):
             }
             data.append(res)
 
-        return self.force_response(data)
+        return self.response(data)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
     @graph_transactions
-    @authentication.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
     def put(self, video_id):
         """Put a video under revision"""
         log.debug('Put video {0} under revision', video_id)
@@ -1055,9 +1045,9 @@ class VideoShotRevision(EndpointResource):
         # 204: Video under revision successfully.
         return self.empty_response()
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
     def post(self, video_id):
         """Start a shot revision procedure"""
         log.debug('Start shot revision for video {0}', video_id)
@@ -1156,13 +1146,13 @@ class VideoShotRevision(EndpointResource):
             rel.state = 'R'
             rel.save()
             # 202: OK_ACCEPTED
-            return self.force_response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+            return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
         except BaseException as e:
             raise e
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
     def delete(self, video_id):
         """Take off revision from a video"""
         log.debug('Exit revision for video {0}', video_id)

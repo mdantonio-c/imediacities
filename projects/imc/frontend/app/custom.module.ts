@@ -13,8 +13,8 @@ import { AuthGuard } from '@rapydo/app.auth.guard';
 import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule, NgMapApiLoader} from '@ngui/map';
 // import { HolderJsModule } from 'angular2-holderjs/component';
-import { IonRangeSliderModule } from "ng2-ion-range-slider";
-import { FileUploadModule } from 'ng2-file-upload';
+// import { IonRangeSliderModule } from "ng2-ion-range-slider";
+// import { FileUploadModule } from 'ng2-file-upload';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { ArchiveComponent } from './components/admin/archive/archive'
@@ -146,9 +146,9 @@ const routes: Routes = [
     // NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+environment.ALL['GMAP_KEY']}),
     NguiMapModule.forRoot(),
     //HolderJsModule,
-    IonRangeSliderModule,
+    // IonRangeSliderModule,
     SlickCarouselModule,
-    FileUploadModule
+    // FileUploadModule
   ],
   declarations: [
     ArchivesListComponent, ArchiveComponent,
@@ -232,6 +232,7 @@ const routes: Routes = [
     }
   ],
 
+  // TO BE REMOVED!
   entryComponents: [
     CatalogComponent,
     SearchFilterComponent,

@@ -18,17 +18,15 @@ import re
 from shutil import copyfile
 from datetime import datetime
 from restapi.utilities.logs import log
-from restapi import decorators as decorate
-from restapi.protocols.bearer import authentication
+from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
-from restapi.decorators import catch_graph_exceptions
 from imc.tasks.services.creation_repository import CreationRepository
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 
-from restapi.flask_ext.flask_celery import CeleryExt
+from restapi.connectors.celery import CeleryExt
 
 
 #####################################
@@ -127,9 +125,9 @@ class Bulk(EndpointResource):
         parser = EFG_XMLParser()
         return parser.get_creation_type(path)
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required(roles=['admin_root'])
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required(roles=['admin_root'])
     def post(self):
         log.debug("Start bulk procedure...")
 
@@ -177,7 +175,7 @@ class Bulk(EndpointResource):
             upload_dir = "/uploads/" + group.uuid
             upload_delta_dir = os.path.join(upload_dir, "upload")
             if not os.path.exists(upload_delta_dir):
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
             # dentro la upload_delta_dir devo cercare la sotto-dir
             # che corrisponde alla data più recente
@@ -185,7 +183,7 @@ class Bulk(EndpointResource):
 
             if upload_latest_dir is None:
                 log.debug("Upload dir not found")
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
             log.info("Processing files from dir {}", upload_latest_dir)
 
@@ -504,7 +502,7 @@ class Bulk(EndpointResource):
             log.info("failed {}", failed)
             log.info("------------------------------------")
 
-            return self.force_response(
+            return self.response(
                 "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
             )
 
@@ -533,7 +531,7 @@ class Bulk(EndpointResource):
             # retrieve XML files from upload dir
             upload_dir = os.path.join("/uploads", group.uuid)
             if not os.path.exists(upload_dir):
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
             files = [f for f in os.listdir(upload_dir) if f.endswith('.xml')]
             total_to_be_imported = len(files)
@@ -597,7 +595,7 @@ class Bulk(EndpointResource):
             log.info("skipped {}", skipped)
             log.info("------------------------------------")
 
-            return self.force_response(
+            return self.response(
                 "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
             )
 
@@ -621,7 +619,7 @@ class Bulk(EndpointResource):
             # retrieve v2_ XML files from upload dir
             upload_dir = os.path.join("/uploads", group.uuid)
             if not os.path.exists(upload_dir):
-                return self.force_response(errors=["Upload dir not found"])
+                return self.response(errors=["Upload dir not found"])
 
             # v2_ is used for the 'other version' (exclude .xml)
             files = [
@@ -734,6 +732,6 @@ class Bulk(EndpointResource):
         # ##################################################################
         # add here any other bulk request
 
-        return self.force_response(
+        return self.response(
             "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
         )

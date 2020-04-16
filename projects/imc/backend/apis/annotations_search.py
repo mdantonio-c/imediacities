@@ -5,12 +5,10 @@ Search endpoint for annotations
 """
 
 from restapi.utilities.logs import log
-from restapi import decorators as decorate
+from restapi import decorators
 from restapi.exceptions import RestApiException
-from restapi.protocols.bearer import authentication
 from restapi.utilities.htmlcodes import hcodes
 from restapi.rest.definition import EndpointResource
-from restapi.decorators import catch_graph_exceptions
 from imc.models import codelists
 
 
@@ -22,9 +20,9 @@ class SearchAnnotations(EndpointResource):
 
     POST = {'/annotations/search': {'summary': 'Search for annotations', 'description': 'Search for annotations', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of annotation matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
-    @decorate.catch_error()
-    @catch_graph_exceptions
-    @authentication.required()
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @decorators.auth.required()
     def post(self):
 
         self.graph = self.get_service_instance('neo4j')
@@ -329,4 +327,4 @@ class SearchAnnotations(EndpointResource):
             data.append(res)
 
         meta_response = {"totalItems": numels}
-        return self.force_response(data, meta=meta_response)
+        return self.response(data, meta=meta_response)

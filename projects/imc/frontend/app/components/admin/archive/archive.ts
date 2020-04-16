@@ -6,7 +6,6 @@ import { NotificationService } from '@rapydo/services/notification';
 
 @Component({
 	selector: 'imc-archive',
-	providers: [ApiService, NotificationService],
 	templateUrl: './archive.html'
 })
 export class ArchiveComponent implements OnInit {
@@ -49,16 +48,13 @@ export class ArchiveComponent implements OnInit {
 		}
 		this.api.get('stage', this.group.id, data).subscribe(
 			response => {
-
-				this.data = this.api.parseResponse(response.data);
+				this.data = response;
 				this.dataLength = this.data.length;
 				this.numPages = Math.ceil(this.dataLength / this.itemsPerPage);
 				this.rows = this.changePage(this.data);
-				this.notify.extractErrors(response, this.notify.WARNING);
 				this.loading = false;
 			}, error => {
-				console.log(error);
-				this.notify.extractErrors(error, this.notify.ERROR);
+				this.notify.showError(error);
 				this.loading = false;
 			}
 		);
