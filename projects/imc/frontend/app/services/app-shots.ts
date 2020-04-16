@@ -36,9 +36,7 @@ export class AppShotsService {
                 {
                     id: others_data_as_object.item_id,
                     links: others_data_as_object.links,
-                    attributes: {
-                        shot_num:0
-                    },
+                    shot_num:0,
                     annotations: others_data_as_object.annotations
                 }
             ];
@@ -55,7 +53,7 @@ export class AppShotsService {
         ).subscribe(
             response => {
                 this._media_id = media_id;
-                this._shots_parse(response.data, 'video');
+                this._shots_parse(response, 'video');
                 this.update.emit(this._shots);
             },
             err => {
@@ -187,20 +185,20 @@ export class AppShotsService {
 
         annotations.forEach(annotation => {
             //  Term tag e locations
-            if (annotation.attributes.annotation_type.key === 'TAG') {
+            if (annotation.annotation_type.key === 'TAG') {
 
                 annotation.bodies.forEach(body => {
                     let tipo = 'tags';
-                    if (body.attributes.spatial !== null && typeof body.attributes.spatial === 'object') {
+                    if (body.spatial !== null && typeof body.spatial === 'object') {
                         tipo = 'locations';
                     }
                     this._annotation_add(target[tipo], this._annotation_set(annotation, body, media_type), shot_indice);
                 })
             //  Note
-            } else if (annotation.attributes.annotation_type.key === 'DSC') {
+            } else if (annotation.annotation_type.key === 'DSC') {
                 this._annotation_add(target.notes, this._annotation_set(annotation, annotation.bodies[0], media_type), shot_indice);
             // Link
-            } else if (annotation.attributes.annotation_type.key === 'LNK') {
+            } else if (annotation.annotation_type.key === 'LNK') {
                 let body_linked = annotation.bodies[0];
                 if (body_linked.type == 'textualbody') {
                     // external link
@@ -319,32 +317,32 @@ export class AppShotsService {
     private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
         let name, group, language = null;
         if (annotation_body.type === 'textualbody') {
-            name = annotation_body.attributes.value;
+            name = annotation_body.value;
             group = (annotation.type === 'TAG') ? 'term' : null;
-            if(annotation_body.attributes.language){
-                language = this._decode_language(annotation_body.attributes.language);
+            if(annotation_body.language){
+                language = this._decode_language(annotation_body.language);
             }
         } else if (annotation_body.type === 'resourcebody') {
-            name = annotation_body.attributes.name;
-            group = annotation_body.attributes.spatial ? 'location' : 'term';
+            name = annotation_body.name;
+            group = annotation_body.spatial ? 'location' : 'term';
         } else if (annotation_body.type === 'bibliographicreference') {
             name = annotation_body.type;
             group = 'reference';
         }
         return {
-            creation_date: annotation.attributes.creation_datetime,
+            creation_date: annotation.creation_datetime,
             creator: annotation.creator ? annotation.creator.id : null,
             creator_type: annotation.creator ? annotation.creator.type : null,
             embargo: annotation.embargo || null,
             group: group,
             body_id: annotation_body.id,
             id: annotation.id,
-            iri: annotation_body.attributes.iri || null,
+            iri: annotation_body.iri || null,
             name: name,
-            private: annotation.attributes.private || false,
+            private: annotation.private || false,
             language: language || '',
-            spatial: annotation_body.attributes.spatial || null,
-            type: annotation.attributes.annotation_type.key,
+            spatial: annotation_body.spatial || null,
+            type: annotation.annotation_type.key,
             source: media_type,
             source_uuid: this._media_id,
             reference: (annotation_body.type === 'bibliographicreference') ? annotation_body.attributes : null

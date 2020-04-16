@@ -242,7 +242,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 			position[1] + '] within distance: ' + distance + ' (meters)');*/
 		this.clearMarkers();
 		this.catalogService.getGeoDistanceAnnotations(position, distance, this.filter).subscribe(response => {
-			let mapTags = response["Response"].data;
+			let mapTags = response;
 			let relevantCreations = new Map();
 			mapTags.forEach(tag => {
 				let m = new google.maps.Marker({

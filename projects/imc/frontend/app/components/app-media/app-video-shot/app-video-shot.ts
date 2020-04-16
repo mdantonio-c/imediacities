@@ -59,7 +59,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     shot_play() {
         if (this.media_type !== 'video') return;
-        this.parent.shot_play(this.shot.attributes.shot_num);
+        this.parent.shot_play(this.shot.shot_num);
     }
 
     shot_goto(frame, pause = true) {
@@ -68,7 +68,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
 
     shot_seleziona(evento) {
         this.is_selezionato.emit({
-            index: this.shot.attributes.shot_num,
+            index: this.shot.shot_num,
             stato: evento.target.checked
         })
     }
@@ -84,7 +84,7 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         }
 
         if (element.parentElement === undefined) { return; }
-        this.scrollTo(element.parentElement.parentElement, h * this.shot.attributes.shot_num, 400);
+        this.scrollTo(element.parentElement.parentElement, h * this.shot.shot_num, 400);
     }
 
     tag_is_deletable(tag) {
@@ -113,20 +113,20 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
     }
 
     doubleCheck() {
-        this.shot.attributes.revision_check = !this.shot.attributes.revision_check;
+        this.shot.revision_check = !this.shot.revision_check;
     }
 
     remove_cut() {
         console.log('remove (lower) cut for shot', this.shot);
         this.revise_shot.emit({
             op: 'join',
-            index: this.shot.attributes.shot_num,
+            index: this.shot.shot_num,
         });
     }
 
     move_cut() {
         // move to the start frame
-        this.parent.jump_to(this.shot.attributes.start_frame_idx, true, true);
+        this.parent.jump_to(this.shot.start_frame_idx, true, true);
     }
 
     //t = current time
@@ -149,14 +149,14 @@ export class AppVideoShotComponent extends AppVideoControlComponent implements O
         this.scene = Object.assign({}, this.shot);
         // console.log("this.scene",  this.scene);
 
-        this.checkbox_selection_label += this.shot.attributes.shot_num;
-        this.collapse_id += this.shot.attributes.shot_num;
-        this.dropdown_id += this.shot.attributes.shot_num;
+        this.checkbox_selection_label += this.shot.shot_num;
+        this.collapse_id += this.shot.shot_num;
+        this.dropdown_id += this.shot.shot_num;
     }
 
     onshot_start(e) {
 
-        if (e.attributes.shot_num === this.shot.attributes.shot_num) {
+        if (e.shot_num === this.shot.shot_num) {
             setTimeout(() => this.scroll(true), 0);
         } else {
             this.is_attivo = false;

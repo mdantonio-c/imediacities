@@ -70,8 +70,6 @@ class Images(EndpointResource):
                 relationships_expansion=['record_sources.provider', 'item.ownership'],
             )
             item = v.item.single()
-            # image['links']['self'] = api_url + \
-            #     'api/images/' + v.uuid
             image['links']['content'] = (
                 api_url + 'api/images/' + v.uuid + '/content?type=image'
             )
@@ -251,7 +249,6 @@ class ImageAnnotations(EndpointResource):
                 if user is None or creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(anno, max_relationship_depth=0)
-            del res['links']
             if (
                 anno.annotation_type in ('TAG', 'DSC', 'LNK')
                 and anno.creator is not None
@@ -270,8 +267,6 @@ class ImageAnnotations(EndpointResource):
                     )
                 else:
                     body = self.getJsonResponse(mdb, max_relationship_depth=0)
-                if 'links' in body:
-                    del body['links']
                 res['bodies'].append(body)
             data.append(res)
 

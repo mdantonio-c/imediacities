@@ -268,19 +268,15 @@ class VideoAnnotations(EndpointResource):
                 if creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
-            del res['links']
             if a.annotation_type in ('TAG', 'DSC', 'TVS') and a.creator is not None:
                 res['creator'] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0
                 )
-                del res['creator']['links']
             # attach bodies
             res['bodies'] = []
             for b in a.bodies.all():
                 anno_body = b.downcast()
                 body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-                if 'links' in body:
-                    del body['links']
                 if a.annotation_type == 'TVS':
                     segments = []
                     for segment in anno_body.segments:
@@ -288,8 +284,6 @@ class VideoAnnotations(EndpointResource):
                         json_segment = self.getJsonResponse(
                             segment.downcast(), max_relationship_depth=0
                         )
-                        if 'links' in json_segment:
-                            del json_segment['links']
                         # collect annotations and tags
                         # code duplicated for VideoShots.get
                         json_segment['annotations'] = []
@@ -309,7 +303,6 @@ class VideoAnnotations(EndpointResource):
                             s_anno = self.getJsonResponse(
                                 anno, max_relationship_depth=0
                             )
-                            del s_anno['links']
                             if (
                                 anno.annotation_type in ('TAG', 'DSC')
                                 and creator is not None
@@ -317,7 +310,6 @@ class VideoAnnotations(EndpointResource):
                                 s_anno['creator'] = self.getJsonResponse(
                                     anno.creator.single(), max_relationship_depth=0
                                 )
-                                del s_anno['creator']['links']
                             # attach bodies
                             s_anno['bodies'] = []
                             for b in anno.bodies.all():
@@ -427,7 +419,6 @@ class VideoShots(EndpointResource):
                     continue
 
             res = self.getJsonResponse(annotation, max_relationship_depth=0)
-            del res['links']
 
             # attach creator
             if annotation.annotation_type in ('TAG', 'DSC', 'LNK'):
@@ -465,7 +456,6 @@ class VideoShots(EndpointResource):
 
             auto_anno = self.graph.Annotation.inflate(row[1])
             res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
-            del res['links']
             # attach bodies
             res['bodies'] = []
             for concept in row[2]:
@@ -497,7 +487,6 @@ class VideoShots(EndpointResource):
                     if user is None or (creator is not None and creator.uuid != user.uuid):
                         continue
                 res = self.getJsonResponse(anno, max_relationship_depth=0)
-                del(res['links'])
                 if (anno.annotation_type in ('TAG', 'DSC', 'LNK') and
                         creator is not None):
                     res['creator'] = self.getJsonResponse(
@@ -519,7 +508,6 @@ class VideoShots(EndpointResource):
             for row in result:
                 auto_anno = self.graph.Annotation.inflate(row[0])
                 res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
-                del(res['links'])
                 # attach bodies
                 res['bodies'] = []
                 for concept in row[1]:

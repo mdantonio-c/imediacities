@@ -65,25 +65,25 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
 
         let force_user_language = true;
         dati.forEach(d => {
-            if (!d.attributes.language) {
+            if (!d.language) {
                 // for missing language
                 this.description_languages.set('n/a', 'n/a');
                 return;
             }
 
             if (!this.description_active) {
-                this._description_language_set(d.attributes.language.key);
+                this._description_language_set(d.language.key);
             }
 
-            if (force_user_language && d.attributes.language.key === this.description_active) {
+            if (force_user_language && d.language.key === this.description_active) {
                 force_user_language = false;
             }
 
-            this.description_languages.set(d.attributes.language.key, d.attributes.language.description);
+            this.description_languages.set(d.language.key, d.language.description);
         });
 
         if (force_user_language) {
-            let lang = dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
+            let lang = dati[0].language ? dati[0].language.key : 'n/a';
             this._description_language_set(lang);
         }
     }
@@ -97,22 +97,22 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
     _keywords_get_languages(dati) {
         let force_user_language = true;
         dati.forEach(d => {
-            if (!d.attributes.language) {
+            if (!d.language) {
                 // for missing language
                 this.keyword_languages.set('n/a', 'n/a');
                 return;
             }
             if (!this.keyword_active) {
-                this._keyword_language_set(d.attributes.language.key);
+                this._keyword_language_set(d.language.key);
             }
 
-            if (force_user_language && d.attributes.language.key === this.keyword_active) {
+            if (force_user_language && d.language.key === this.keyword_active) {
                 force_user_language = false;
             }
-            this.keyword_languages.set(d.attributes.language.key, d.attributes.language.description);
+            this.keyword_languages.set(d.language.key, d.language.description);
         });
         if (force_user_language) {
-            let lang = dati[0].attributes.language ? dati[0].attributes.language.key : 'n/a';
+            let lang = dati[0].language ? dati[0].language.key : 'n/a';
             this._keyword_language_set(lang);
         }
     }
@@ -194,7 +194,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
     }
 
     togglePublicAccess() {
-        let newVal = !this.info.relationships.item[0].attributes.public_access;
+        let newVal = !this.info._item[0].public_access;
         this.MediaService.updatePublicAccess(newVal);
     }
 
@@ -202,14 +202,14 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
         // from ffprobe in the following form: mov,mp4,m4a,3gp,3g2,mj2
         // as the item is always transcoded as mp4 look for mp4 in the list
         // or provide the first
-        let containers = this.item.attributes.digital_format[0].split(',');
+        let containers = this.item.digital_format[0].split(',');
         return (containers.includes('mp4')) ? 'mp4' : containers[0].trim();
     }
 
     printEncodingInfo() {
        // from ffprobe in the following long name form: H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
        // always print the first value
-       return this.item.attributes.digital_format[1].split('/')[0].trim();
+       return this.item.digital_format[1].split('/')[0].trim();
     }
 
     ngOnInit() {
@@ -220,15 +220,15 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
             this._description_language_set(this.user_language);
             this._keyword_language_set(this.user_language);
         }
-        if (this.info.relationships.descriptions) {
-            this._descriptions_get_languages(this.info.relationships.descriptions);
+        if (this.info._descriptions) {
+            this._descriptions_get_languages(this.info._descriptions);
         }
-        if (this.info.relationships.keywords) {
-            this._keywords_get_languages(this.info.relationships.keywords);
+        if (this.info._keywords) {
+            this._keywords_get_languages(this.info._keywords);
         }
-        if (this.info.relationships.item) {
-            this.item = this.info.relationships.item[0].relationships.other_version ? 
-                this.info.relationships.item[0].relationships.other_version[0] : this.info.relationships.item[0]
+        if (this.info._item) {
+            this.item = this.info._item[0]._other_version ? 
+                this.info._item[0]._other_version[0] : this.info._item[0]
         }
     }
 

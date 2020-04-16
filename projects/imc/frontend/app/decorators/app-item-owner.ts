@@ -8,5 +8,5 @@ export function is_item_owner() {
 }
 
 function owns_item(user, item) {
-	return (user.group['shortname'] === item.relationships.ownership[0].attributes.shortname);
+	return (user.group['shortname'] === item._ownership[0].shortname);
 }

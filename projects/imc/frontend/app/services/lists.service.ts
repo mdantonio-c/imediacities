@@ -24,8 +24,8 @@ export class ListsService {
 		lists.forEach((lst, index) => {
 			let item: UserList = {
 				"uuid": lst.id,
-				"name": lst.attributes.name,
-				"description": lst.attributes.description,
+				"name": lst.name,
+				"description": lst.description,
 				"belong": lst.belong ? true : false
 			};
 			/*if (lst.belong) { item['belong'] = true }*/

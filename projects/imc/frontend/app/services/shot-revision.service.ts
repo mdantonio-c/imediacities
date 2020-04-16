@@ -33,7 +33,7 @@ export class ShotRevisionService {
 	}
 
 	shot_duration(shot: any, fps: number): number {
-		return (shot.attributes.end_frame_idx - shot.attributes.start_frame_idx + 1) / fps;
+		return (shot.end_frame_idx - shot.start_frame_idx + 1) / fps;
 	}
 
 	shot_timestamp(frame: number, fps: number): string {

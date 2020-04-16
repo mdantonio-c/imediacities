@@ -122,7 +122,6 @@ class ShotAnnotations(EndpointResource):
                 if creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
-            del res['links']
             if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
                 res['creator'] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0
@@ -132,8 +131,6 @@ class ShotAnnotations(EndpointResource):
             for b in a.bodies.all():
                 anno_body = b.downcast()
                 body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-                if 'links' in body:
-                    del body['links']
                 res['bodies'].append(body)
             data.append(res)
 

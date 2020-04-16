@@ -149,8 +149,7 @@ export class AppAnnotationsService {
                 }
         ).subscribe(
             response => {
-                //console.log("Updated note: ", response.data);
-                note.private = response.data.attributes.private;
+                note.private = response.private;
             },
             err => {
                 console.error("Error updating note: err=", err);
@@ -184,7 +183,7 @@ export class AppAnnotationsService {
             `${media_id}/annotations`
         ).subscribe(
             response => {
-                this._annotations = response.data;
+                this._annotations = response;
                 this.update.emit(this._annotations);
             },
             err => {

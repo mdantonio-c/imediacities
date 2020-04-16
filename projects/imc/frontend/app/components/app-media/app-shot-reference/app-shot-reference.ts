@@ -14,7 +14,7 @@ export class AppShotReferenceComponent implements OnInit {
     }
 
     shot_play() {
-        this.VideoService.shot_play(this.shot.attributes.shot_num)
+        this.VideoService.shot_play(this.shot.shot_num)
     }
 
     ngOnInit() {

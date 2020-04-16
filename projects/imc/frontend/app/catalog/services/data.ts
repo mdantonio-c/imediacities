@@ -1,10 +1,6 @@
 export interface MediaEntity {
-	attributes: EntityAttributes;
 	id: string;
-	relationships: any;
-}
-
-export interface EntityAttributes {
+	// relationships: any;
 	collection_title: string;
 	external_ids: string[];
 	identifying_title: string;

@@ -2,25 +2,25 @@
 picture-->
 
     <!-- TOPBAR -->
-    <app-media-top-bar [item_type]="media_type" [item_id]="media.relationships.item[0].id"></app-media-top-bar>
+    <app-media-top-bar [item_type]="media_type" [item_id]="media._item[0].id"></app-media-top-bar>
 
     <!-- MEDIA -->
     <div class="container-media row no-gutters justify-content-md-center">
         <!-- TITLE MEDIA -->
         <div class="box-title-media col-12 col-lg-6 row no-gutters">
-            <h2 class="imc--title-bold col-12">{{media.attributes.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision
+            <h2 class="imc--title-bold col-12">{{media.identifying_title}}<span *ngIf="shot_revision_is_active" class="badge badge-geotag">under revision
                 <i class="fa fa-cogs" *ngIf="shot_revision_state == 'R'"></i>
             </span></h2>
             <p class="col-12 col-sm-8 imc--flex--vertical-start" style="margin-bottom: 0;">
                 <a href="#" class="imc--icon-link" onclick="return false;"><i class="material-icons">add_location</i></a>&nbsp;
 
                 <span 
-                    *ngIf="media.relationships.record_sources && media.relationships.record_sources[0].relationships.provider"
-                 [innerHTML]="media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity"></span>
+                    *ngIf="media._record_sources && media._record_sources[0]._provider"
+                 [innerHTML]="media._record_sources[0]._provider[0].identifier | providerToCity"></span>
                 &nbsp;-&nbsp;
                 <span 
-                    *ngIf="media.attributes.production_years"
-                [innerHTML]="media.attributes.production_years[0]"></span>
+                    *ngIf="media.production_years"
+                [innerHTML]="media.production_years[0]"></span>
             </p>
             <!-- <span class="col-6 col-sm-2">1.000 views</span> -->
             <span class="col-12 col-sm-4 text-right" *ngIf="annotations_count">{{annotations_count}} annotations</span>

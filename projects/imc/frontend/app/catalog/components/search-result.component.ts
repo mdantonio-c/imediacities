@@ -29,11 +29,11 @@ export class SearchResultComponent implements OnInit, OnChanges {
 	canRevise() {
 		return this.user.roles.hasOwnProperty('Reviser') &&
 			this.underRevision() &&
-			this.user.uuid === this.media.relationships.item[0].relationships.revision[0].id;
+			this.user.uuid === this.media._item[0]._revision[0].id;
 	}
 
 	underRevision() {
-		return (this.media.relationships.item[0].relationships.revision) ? true : false;
+		return (this.media._item[0]._revision) ? true : false;
 	}
 
 	disableSaveAs(event) { return false; }

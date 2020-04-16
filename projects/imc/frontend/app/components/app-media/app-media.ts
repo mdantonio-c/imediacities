@@ -142,7 +142,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     }
     /*
     is_public_domain() {
-        let k = this.media.attributes.rights_status.key;
+        let k = this.media.rights_status.key;
 
         // EU Orphan Work
         if (k == "02") return true;
@@ -168,7 +168,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         return false;
     }*/
     is_public_domain() {
-        return this.media.relationships.item[0].attributes.public_access;
+        return this.media._item[0].public_access;
     }
 
     start_shot_revision() {
@@ -179,11 +179,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             }
             let revision = {
                 id: this.user.uuid,
-                attributes: {
-                    state: {key: 'W'}
-                }
+                state: {key: 'W'}
             };
-            this.media.relationships.item[0].relationships.revision = [revision];
+            this.media._item[0]._revision = [revision];
             this.under_revision();
         });
     }
@@ -193,8 +191,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         return this.user.roles.hasOwnProperty('Reviser') &&
             this.shot_revision_is_active &&
             this.shot_revision_state != 'R' &&
-            this.media.relationships.item[0].relationships.revision &&
-            this.user.uuid === this.media.relationships.item[0].relationships.revision[0].id;
+            this.media._item[0]._revision &&
+            this.user.uuid === this.media._item[0]._revision[0].id;
     }
 
     private under_revision() {
@@ -212,7 +210,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 this.notify.showError(error);
                 return;
             }
-            delete this.media.relationships.item[0].relationships.revision;
+            delete this.media._item[0]._revision;
             this.shot_revision_is_active = false;
             // shallow clone is enough here!
             this.shots = this.shots_to_restore.slice(0);
@@ -236,8 +234,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     private join_shots(idxA, idxB) {
         let shotA = this.shots[idxA];
         let shotB = this.shots[idxB];
-        shotA.attributes.duration += shotB.attributes.duration;
-        shotA.attributes.end_frame_idx = shotB.attributes.end_frame_idx;
+        shotA.duration += shotB.duration;
+        shotA.end_frame_idx = shotB.end_frame_idx;
         Object.keys(shotA.annotations).forEach(e => {
             // merge annotations
             shotA.annotations[e].push(...shotB.annotations[e]);
@@ -247,7 +245,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         this.shots.splice(idxB, 1);
         // update the subsequent shot numbers
         for (let i = idxA + 1; i < this.shots.length; i++) {
-            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num - 1;
+            this.shots[i].shot_num = this.shots[i].shot_num - 1;
         }
     }
 
@@ -257,12 +255,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
             this.notify.showError('Invalid input in split shot');
             return;
         }
-        let next_idx = shots[0].attributes.shot_num + 1;
+        let next_idx = shots[0].shot_num + 1;
         this.shots.splice(next_idx, 0, shots[1]);
-        this.shots[next_idx].attributes.revision_confirmed = true;
+        this.shots[next_idx].revision_confirmed = true;
         // update the subsequent shot numbers
         for (let i = next_idx + 1; i < this.shots.length; i++) {
-            this.shots[i].attributes.shot_num = this.shots[i].attributes.shot_num + 1;
+            this.shots[i].shot_num = this.shots[i].shot_num + 1;
         }
     }
 
@@ -281,12 +279,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                 shot_anno_ids.push(...Array.from(new Set(
                     s.annotations[key].filter(anno =>  anno.creator != null).map(anno => anno.id))));
             }
-            /*console.log('current annotations for shot_num ' + s.attributes.shot_num, shot_anno_ids);*/
+            /*console.log('current annotations for shot_num ' + s.shot_num, shot_anno_ids);*/
             return {
-                shot_num: s.attributes.shot_num,
-                cut: s.attributes.start_frame_idx,
-                confirmed: s.attributes.revision_confirmed,
-                double_check: s.attributes.revision_check,
+                shot_num: s.shot_num,
+                cut: s.start_frame_idx,
+                confirmed: s.revision_confirmed,
+                double_check: s.revision_check,
                 annotations: shot_anno_ids
             } as SceneCut;
         });
@@ -328,7 +326,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         this.modale.type = componente.modale;
         if (componente.previous) {
             // use the previous flag to add the previous shot to the list
-            let previous_shot_num = componente.data.shots.slice(-1)[0].attributes.shot_num - 1;
+            let previous_shot_num = componente.data.shots.slice(-1)[0].shot_num - 1;
             componente.data.shots.unshift(this.shots[previous_shot_num]);
         }
         this.modale.data = componente.data;
@@ -409,7 +407,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         } else if (target.nodeName.toUpperCase() === 'A') {
             target = target.querySelector('i');
         }
-        this.tab_title = target.attributes.getNamedItem('data-title').value;
+        this.tab_title = target.getNamedItem('data-title').value;
         // cancel navigation action on tab click
         $event.preventDefault();
     }
@@ -419,19 +417,19 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         //  Normalizzo i dati delle immagini
         if (this.media_type === 'image') {
             // anno di produzione
-            if (mediaEntity.attributes.date_created) {
-                mediaEntity.attributes.production_years = mediaEntity.attributes.date_created;
+            if (mediaEntity.date_created) {
+                mediaEntity.production_years = mediaEntity.date_created;
             }
             // titolo principale
-            if (mediaEntity.relationships.titles.length) {
-                mediaEntity.attributes.identifying_title = mediaEntity.relationships.titles[0].attributes.text;
+            if (mediaEntity._titles.length) {
+                mediaEntity.identifying_title = mediaEntity._titles[0].text;
             }
             this.locations = [];
         }
 
         //  elimino i titoli aggiuntivi se sono identici a quello identificativo
-        if (mediaEntity.relationships.titles.length) {
-            mediaEntity.relationships.titles = mediaEntity.relationships.titles.filter(t => t.attributes.text !== mediaEntity.attributes.identifying_title)
+        if (mediaEntity._titles.length) {
+            mediaEntity._titles = mediaEntity._titles.filter(t => t.text !== mediaEntity.identifying_title)
         }
 
         return mediaEntity;
@@ -469,7 +467,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                         this.ShotsService.get(this.media_id, endpoint, {
                             annotations: annotations,
                             links: this.media.links,
-                            item_id: this.media.relationships.item[0].id
+                            item_id: this.media._item[0].id
                         });
                     });
                     this._subscription.add(annotations_subscription);
@@ -482,7 +480,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
                     if (this.user !== null) {
                         this.locations = annotations.filter(a => a.group === 'location');
                     }
-                    if (this.media.relationships.item[0].relationships.revision) {
+                    if (this.media._item[0]._revision) {
                         this.under_revision();
                     }
                 });

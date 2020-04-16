@@ -165,7 +165,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             }
             shots_idx = this._shots_get(this.VideoService.shot_current())
         } else {
-            shots_idx = this._shots_get(this.shots.map(s => s.attributes.shot_num))
+            shots_idx = this._shots_get(this.shots.map(s => s.shot_num))
         }
 
         if (this.media_type === 'video' && !shots_idx.length) {
@@ -448,7 +448,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         elenco_shots.forEach(e => {
 
             this.shots.forEach(s => {
-                if (s.attributes.shot_num === e) {
+                if (s.shot_num === e) {
                     shots_idx.push(s);
                 }
             })
@@ -457,7 +457,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
         shots_idx = shots_idx.map(s => {
             return {
-                indice: s.attributes.shot_num,
+                indice: s.shot_num,
                 id: s.id
             }
         });
@@ -508,18 +508,18 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
         const _media_owner = this.MediaService.owner();
 
-        if (_media_owner && _media_owner.attributes && _media_owner.attributes.shortname) {
+        if (_media_owner && _media_owner.shortname) {
             /*
             //  NSI: aggiunto il codice sottostante perchè l'immagine
             //        di prova aveva "test" come owner
             let location_to_find = null;
-            if (_media_owner.attributes.shortname.length === 3) {
-                location_to_find = _media_owner.attributes.shortname;
+            if (_media_owner.shortname.length === 3) {
+                location_to_find = _media_owner.shortname;
             } else {
                 location_to_find = 'ccb';
             }
             */
-            let location_to_find = _media_owner.attributes.shortname;
+            let location_to_find = _media_owner.shortname;
             if (location_to_find) {
                 //console.log("set_center_from_owner location_to_find: ",  location_to_find);
                 const geocode = this.geoCoder.geocode(

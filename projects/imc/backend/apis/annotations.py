@@ -469,7 +469,6 @@ class Annotations(EndpointResource):
             )
 
         updated_anno = self.get_annotation_response(anno)
-        del updated_anno['links']
 
         return self.response(updated_anno)
 
@@ -592,7 +591,6 @@ class Annotations(EndpointResource):
             )
 
         updated_anno = self.get_annotation_response(anno)
-        del updated_anno['links']
 
         return self.response(updated_anno)
 
@@ -605,15 +603,11 @@ class Annotations(EndpointResource):
             creator = self.getJsonResponse(
                 anno.creator.single(), max_relationship_depth=0
             )
-            if 'links' in creator:
-                del creator['links']
             res['creator'] = creator
         res['bodies'] = []
         for b in anno.bodies.all():
             anno_body = b.downcast()
             body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-            if 'links' in body:
-                del body['links']
             if anno.annotation_type == 'TVS':
                 segments = []
                 for segment in anno_body.segments:
@@ -621,21 +615,15 @@ class Annotations(EndpointResource):
                     json_segment = self.getJsonResponse(
                         segment.downcast(), max_relationship_depth=0
                     )
-                    if 'links' in json_segment:
-                        del json_segment['links']
                     segments.append(json_segment)
                 body['segments'] = segments
             res['bodies'].append(body)
         res['targets'] = []
         for t in anno.targets.all():
             target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
-            if 'links' in target:
-                del target['links']
             res['targets'].append(target)
         source = self.getJsonResponse(
             anno.source_item.single(), max_relationship_depth=0
         )
-        if 'links' in source:
-            del source['links']
         res['source'] = source
         return res

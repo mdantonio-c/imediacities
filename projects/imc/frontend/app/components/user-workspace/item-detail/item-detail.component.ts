@@ -53,7 +53,7 @@ export class ItemDetailComponent implements OnInit {
 			// here media.id is item UUID
 			// list item conveys with creation model in ref
 			let media = this.media.ref;
-			if (media.type === 'shot' || media.attributes.item_type['key'] === 'Video') {
+			if (media.type === 'shot' || media.item_type['key'] === 'Video') {
 				this.router.navigate(['/app/catalog/videos', media.creation_id]);
 			} else {
 				this.router.navigate(['/app/catalog/images', media.creation_id]);

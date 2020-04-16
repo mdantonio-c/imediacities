@@ -8,9 +8,9 @@
         <div #termtag_slider *ngIf="min_detected">
             <span class="box-badge"
                     *ngFor="let shot of data"
-                    [attr.data-shot]="shot.attributes.shot_num"
-                    [style.width.px]="shot.attributes.duration / min_detected * min_width"
-                    (click)="scene_click(shot.attributes.shot_num)">
+                    [attr.data-shot]="shot.shot_num"
+                    [style.width.px]="shot.duration / min_detected * min_width"
+                    (click)="scene_click(shot.shot_num)">
                 <span class="badge badge-termtag click-event" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.tags.length"></span>
             </span>
 
@@ -24,9 +24,9 @@
 
             <span class="box-badge"
                     *ngFor="let shot of data"
-                    [attr.data-shot]="shot.attributes.shot_num"
-                    [style.width.px]="shot.attributes.duration / min_detected * min_width"
-                    (click)="scene_click(shot.attributes.shot_num)">
+                    [attr.data-shot]="shot.shot_num"
+                    [style.width.px]="shot.duration / min_detected * min_width"
+                    (click)="scene_click(shot.shot_num)">
                 <span class="badge badge-geotag click-event" [ngClass]="{active: shot.attivo}" [innerHTML]="shot.annotations.locations.length"></span>
             </span>
 

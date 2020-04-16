@@ -3,16 +3,16 @@
         <ng-template ngbTabContent>
             <div id="general-info_accordion" class="imc--accordion">
 
-                <app-expansion-panel title="Titles" [subtitle]="info.attributes.identifying_title"
-                                     [allow_expansion]="info.relationships.titles.length">
-                    <div *ngIf="info.relationships.titles.length">
+                <app-expansion-panel title="Titles" [subtitle]="info.identifying_title"
+                                     [allow_expansion]="info._titles.length">
+                    <div *ngIf="info._titles.length">
                         <h5 class="col-12">Other Titles</h5>
-                        <p class="col-12" *ngFor="let title of info.relationships.titles"
-                           [innerHTML]="title.attributes.text"></p>
+                        <p class="col-12" *ngFor="let title of info._titles"
+                           [innerHTML]="title.text"></p>
                     </div>
                 </app-expansion-panel>
 
-                <div class="card imc--expansion-panel" *ngIf="this.info.relationships.descriptions">
+                <div class="card imc--expansion-panel" *ngIf="this.info._descriptions">
                     <div class="card-header" id="description_head">
                         <h5 class="mb-0">
                             <span class="btn btn-link collapsed"
@@ -45,20 +45,20 @@
                             <ng-template
                                     ngFor
                                     let-descrizione
-                                    [ngForOf]="this.info.relationships.descriptions">
+                                    [ngForOf]="this.info._descriptions">
                                 <p class="col-12"
-                                   *ngIf="descrizione.attributes.language && descrizione.attributes.language.key === description_active; else missingLanguage"
-                                   [attr.data-languagekey]="descrizione.attributes.language.key"
-                                   [innerHTML]="descrizione.attributes.text"></p>
+                                   *ngIf="descrizione.language && descrizione.language.key === description_active; else missingLanguage"
+                                   [attr.data-languagekey]="descrizione.language.key"
+                                   [innerHTML]="descrizione.text"></p>
                                 <p class="col-12"
-                                   *ngIf="description_active === 'n/a' && !descrizione.attributes.language"
-                                   [innerHTML]="descrizione.attributes.text"></p>
+                                   *ngIf="description_active === 'n/a' && !descrizione.language"
+                                   [innerHTML]="descrizione.text"></p>
                             </ng-template>
                         </div>
                     </div>
                 </div>
 
-                <div class="card imc--expansion-panel" *ngIf="this.info.relationships.keywords">
+                <div class="card imc--expansion-panel" *ngIf="this.info._keywords">
                     <div class="card-header" id="keyword_head">
                         <h5 class="mb-0">
                             <span class="btn btn-link collapsed"
@@ -90,14 +90,14 @@
                             <ng-template
                                     ngFor
                                     let-pchiave
-                                    [ngForOf]="this.info.relationships.keywords">
+                                    [ngForOf]="this.info._keywords">
                                 <div class="d-inline keyword-div"
-                                     *ngIf="pchiave.attributes.language && pchiave.attributes.language.key === keyword_active; else missingLanguage"
-                                     [attr.data-languagekey]="pchiave.attributes.language.key"
-                                     [innerHTML]="pchiave.attributes.term"></div>
+                                     *ngIf="pchiave.language && pchiave.language.key === keyword_active; else missingLanguage"
+                                     [attr.data-languagekey]="pchiave.language.key"
+                                     [innerHTML]="pchiave.term"></div>
                                 <div class="d-inline keyword-div"
-                                     *ngIf="keyword_active === 'n/a' && !pchiave.attributes.language"
-                                     [innerHTML]="pchiave.attributes.term"></div>
+                                     *ngIf="keyword_active === 'n/a' && !pchiave.language"
+                                     [innerHTML]="pchiave.term"></div>
                             </ng-template>
                         </div>
                     </div>
@@ -108,8 +108,8 @@
 
                     <!--Anno di produzione-->
                     <div class="col-3"><strong>Year:</strong>
-                        <span *ngIf="info.attributes.production_years"
-                              [innerHTML]="info.attributes.production_years[0]"></span>
+                        <span *ngIf="info.production_years"
+                              [innerHTML]="info.production_years[0]"></span>
                     </div>
                     <!--Paesi di produzione-->
                     <!-- @NSI non esiste production_countries per le immagini-->
@@ -118,21 +118,21 @@
                         <div class="col-3">
                             <strong>Country:</strong>
                             <span
-                                    *ngFor="let production_country of info.relationships.production_countries; last as last">
-                                    {{ production_country.attributes.code.description }}{{ last ? '' : '/'}}
+                                    *ngFor="let production_country of info._production_countries; last as last">
+                                    {{ production_country.code.description }}{{ last ? '' : '/'}}
                             </span>
                         </div>
                     </ng-template>
                     <!--Crediti-->
-                    <ng-template [ngIf]="info.relationships.contributors && info.relationships.contributors.length">
+                    <ng-template [ngIf]="info._contributors && info._contributors.length">
                         <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
                         <div class="col-12">
                             <ul>
-                                <ng-template ngFor let-contributor [ngForOf]="info.relationships.contributors">
+                                <ng-template ngFor let-contributor [ngForOf]="info._contributors">
                                     <li
-                                            *ngFor="let role of contributor.attributes.activities">
+                                            *ngFor="let role of contributor.activities">
                                         {{ role }}:
-                                        <span [innerHTML]="contributor.attributes.names[0] | nocomma"></span>
+                                        <span [innerHTML]="contributor.names[0] | nocomma"></span>
                                     </li>
 
                                 </ng-template>
@@ -144,45 +144,45 @@
                 <app-expansion-panel title="Copyright">
                     <div class="col-12">
                         <strong>Right Status: </strong>
-                        <span [innerHTML]="info.attributes.rights_status.description"></span>
+                        <span [innerHTML]="info.rights_status.description"></span>
                     </div>
                 </app-expansion-panel>
 
                 <app-expansion-panel title="More information on film">
                     <h5 class="col-12"
-                        [innerHTML]="info.relationships.record_sources[0].relationships.provider[0].attributes.name"></h5>
+                        [innerHTML]="info._record_sources[0]._provider[0].name"></h5>
                     <div class="col-12"><strong>Contacts:</strong></div>
                     <div class="col-12">
                         <ul>
-                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.address">
-                                {{ info.relationships.record_sources[0].relationships.provider[0].attributes.address }}
+                            <li *ngIf="info._record_sources[0]._provider[0].address">
+                                {{ info._record_sources[0]._provider[0].address }}
                             </li>
-                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.phone">
-                                tel: {{ info.relationships.record_sources[0].relationships.provider[0].attributes.phone }}</li>
-                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.fax">
-                                fax: {{ info.relationships.record_sources[0].relationships.provider[0].attributes.fax }}</li>
-                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.email">
-                                <a [href]="'mailto:' + info.relationships.record_sources[0].relationships.provider[0].attributes.email">{{ info.relationships.record_sources[0].relationships.provider[0].attributes.email }}</a>
+                            <li *ngIf="info._record_sources[0]._provider[0].phone">
+                                tel: {{ info._record_sources[0]._provider[0].phone }}</li>
+                            <li *ngIf="info._record_sources[0]._provider[0].fax">
+                                fax: {{ info._record_sources[0]._provider[0].fax }}</li>
+                            <li *ngIf="info._record_sources[0]._provider[0].email">
+                                <a [href]="'mailto:' + info._record_sources[0]._provider[0].email">{{ info._record_sources[0]._provider[0].email }}</a>
                             </li>
-                            <li *ngIf="info.relationships.record_sources[0].relationships.provider[0].attributes.website">
-                                <a href="//{{ info.relationships.record_sources[0].relationships.provider[0].attributes.website }}"
-                                   target="_blank">{{ info.relationships.record_sources[0].relationships.provider[0].attributes.website }}</a>
+                            <li *ngIf="info._record_sources[0]._provider[0].website">
+                                <a href="//{{ info._record_sources[0]._provider[0].website }}"
+                                   target="_blank">{{ info._record_sources[0]._provider[0].website }}</a>
                             </li>
                             <li></li>
                         </ul>
                     </div>
                     <div class="col-12 space-paragraph-10">
                         <strong>Film ID in Archive: </strong>
-                        <span [innerHTML]="info.relationships.record_sources[0].attributes.source_id"></span>
+                        <span [innerHTML]="info._record_sources[0].source_id"></span>
                     </div>
                     <div class="col-12 space-paragraph-10"
-                         *ngIf="user && user.roles['Archive'] && is_item_owner(user, info.relationships.item[0])">
+                         *ngIf="user && user.roles['Archive'] && is_item_owner(user, info._item[0])">
                         <strong>Public Access: </strong>
                         <input class="imc--input-checkbox styled-checkbox" id="public-access" type="checkbox" value="on"
                                (click)="$event.preventDefault()"
-                               [(ngModel)]="info.relationships.item[0].attributes.public_access"
+                               [(ngModel)]="info._item[0].public_access"
                                mwlConfirmationPopover
-                               [popoverMessage]="info.relationships.item[0].attributes.public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
+                               [popoverMessage]="info._item[0].public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
                                (confirm)="togglePublicAccess()">
                         <label for="public-access"></label>
                     </div>
@@ -202,22 +202,22 @@
                         <div class="col-12">
                             <ul class="list-space">
 
-                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.sound">
+                                <li *ngIf="info._video_format && info._video_format[0].sound">
                                     <strong>Sound: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.sound.description"></span>
+                                    <span [innerHTML]="info._video_format[0].sound.description"></span>
 
                                 </li>
-                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.colour">
+                                <li *ngIf="info._video_format && info._video_format[0].colour">
                                     <strong>Colour: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.colour.description"></span>
+                                    <span [innerHTML]="info._video_format[0].colour.description"></span>
                                 </li>
-                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.gauge">
+                                <li *ngIf="info._video_format && info._video_format[0].gauge">
                                     <strong>Gauge: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.gauge.description"></span>
+                                    <span [innerHTML]="info._video_format[0].gauge.description"></span>
                                 </li>
-                                <li *ngIf="info.relationships.video_format && info.relationships.video_format[0].attributes.aspect_ratio">
+                                <li *ngIf="info._video_format && info._video_format[0].aspect_ratio">
                                     <strong>Aspect ratio: </strong>
-                                    <span [innerHTML]="info.relationships.video_format[0].attributes.aspect_ratio.description"></span>
+                                    <span [innerHTML]="info._video_format[0].aspect_ratio.description"></span>
                                 </li>
                             </ul>
                         </div>
@@ -226,40 +226,40 @@
                     <app-expansion-panel title="Digital format">
                         <div class="col-12">
                             <ul class="list-space">
-                                <li *ngIf="item && item.attributes.digital_format.length >= 1">
+                                <li *ngIf="item && item.digital_format.length >= 1">
                                     <strong>Container: </strong>
                                     <span [innerHTML]="printContainerInfo()"></span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.digital_format.length >= 2">
+                                <li *ngIf="item && item.digital_format.length >= 2">
                                     <strong>Encoding: </strong>
                                     <span [innerHTML]="printEncodingInfo()"></span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.digital_format.length >= 3">
+                                <li *ngIf="item && item.digital_format.length >= 3">
                                     <strong>Format: </strong>
-                                    <!-- <span [innerHTML]="item.attributes.digital_format[2]"></span> -->
+                                    <!-- <span [innerHTML]="item.digital_format[2]"></span> -->
                                     <!-- ALWAYS MPEG-4-->
                                     <span>MPEG-4</span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.digital_format.length >= 4">
+                                <li *ngIf="item && item.digital_format.length >= 4">
                                     <strong>Resolution: </strong> <span
-                                        [innerHTML]="item.attributes.digital_format[3]"></span>
+                                        [innerHTML]="item.digital_format[3]"></span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.framerate">
-                                    <strong>Frame rate: </strong> <span [innerHTML]="item.attributes.framerate"></span>
+                                <li *ngIf="item && item.framerate">
+                                    <strong>Frame rate: </strong> <span [innerHTML]="item.framerate"></span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.duration">
+                                <li *ngIf="item && item.duration">
                                     <strong>Duration: </strong>
-                                    <span [innerHTML]="item.attributes.duration | secondsToTime"></span>
+                                    <span [innerHTML]="item.duration | secondsToTime"></span>
                                 </li>
 
-                                <li *ngIf="item && item.attributes.dimension">
+                                <li *ngIf="item && item.dimension">
                                     <strong>Size: </strong>
-                                    <span [innerHTML]="item.attributes.dimension | bytes:2"></span>
+                                    <span [innerHTML]="item.dimension | bytes:2"></span>
                                 </li>
 
                             </ul>
@@ -273,35 +273,35 @@
                     <app-expansion-panel title="Analogue format">
                         <ul class="list-space">
 
-                            <li *ngIf="info.attributes.specific_type">
+                            <li *ngIf="info.specific_type">
                                 <strong>Media type: </strong>
-                                <span [innerHTML]="info.attributes.specific_type.description"></span>
+                                <span [innerHTML]="info.specific_type.description"></span>
                             </li>
 
-                            <li *ngIf="info.attributes.phisical_format_size">
+                            <li *ngIf="info.phisical_format_size">
                                 <strong>Physical format: </strong>
-                                <span [innerHTML]="info.attributes.phisical_format_size.join(' ')"></span>
+                                <span [innerHTML]="info.phisical_format_size.join(' ')"></span>
                             </li>
 
-                            <li *ngIf="info.attributes.colour">
+                            <li *ngIf="info.colour">
                                 <strong>Colour: </strong>
-                                <span [innerHTML]="info.attributes.colour.description"></span>
+                                <span [innerHTML]="info.colour.description"></span>
                             </li>
                         </ul>
                     </app-expansion-panel>
 
                     <app-expansion-panel title="Digital format"
-                                         *ngIf="info.relationships.item[0] && info.relationships.item[0].attributes">
+                                         *ngIf="info._item[0] && info._item[0]">
                         <ul class="list-space">
 
-                            <li *ngIf="info.relationships.item[0].attributes.item_type">
+                            <li *ngIf="info._item[0].item_type">
                                 <strong>Item type:</strong>
-                                <span [innerHTML]="info.relationships.item[0].attributes.item_type.description"></span>
+                                <span [innerHTML]="info._item[0].item_type.description"></span>
                             </li>
 
-                            <li *ngIf="info.relationships.item[0].attributes.digital_format">
+                            <li *ngIf="info._item[0].digital_format">
                                 <strong>Format:</strong>
-                                <span [innerHTML]="info.relationships.item[0].attributes.digital_format.join(' ')"></span>
+                                <span [innerHTML]="info._item[0].digital_format.join(' ')"></span>
                             </li>
 
                         </ul>

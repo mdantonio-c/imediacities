@@ -7,7 +7,7 @@
 		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
 		<div class="cn">
 			<div class="card inner bg-secondary small">
-				<i class="fa small" [ngClass]="{'fa-video': media.relationships.item[0].attributes.item_type.key === 'Video', 'fa-image': media.relationships.item[0].attributes.item_type.key === 'Image', 'fa-align-left': media.relationships.item[0].attributes.item_type.key === 'Text'}">&nbsp;&nbsp;{{media.relationships.record_sources[0].relationships.provider[0].attributes.identifier || 'n/a'}}</i>
+				<i class="fa small" [ngClass]="{'fa-video': media._item[0].item_type.key === 'Video', 'fa-image': media._item[0].item_type.key === 'Image', 'fa-align-left': media._item[0].item_type.key === 'Text'}">&nbsp;&nbsp;{{media._record_sources[0]._provider[0].identifier || 'n/a'}}</i>
 			</div>
 		</div>
 	</div>
@@ -18,8 +18,8 @@
 			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
 			</h4>
 			<span>
-				<i *ngIf="media.attributes.production_years > 0">({{media.attributes.production_years[0]}})</i>
-				<i *ngIf="media.attributes.date_created > 0">({{media.attributes.date_created[0]}})</i>
+				<i *ngIf="media.production_years > 0">({{media.production_years[0]}})</i>
+				<i *ngIf="media.date_created > 0">({{media.date_created[0]}})</i>
 			</span>
 		</div>
 		<div class="space-4"></div>
@@ -30,9 +30,9 @@
 		<div class="search-actions text-center">
 			<div class="duration" *ngIf="media.type == 'aventity'">
 				<i class="imc-icon fa fa-clock-o"></i>
-				<span class="blue">{{media.relationships.item[0].attributes.duration | duration}}</span>
+				<span class="blue">{{media._item[0].duration | duration}}</span>
 			</div>
-			<span class="badge badge-primary label-city">{{(media.relationships.record_sources[0].relationships.provider[0].attributes.identifier | providerToCity) || 'n/a'}}</span>
+			<span class="badge badge-primary label-city">{{(media._record_sources[0]._provider[0].identifier | providerToCity) || 'n/a'}}</span>
 			<!-- <div class="action-buttons bigger-125 pull-down">
 				<a href="#">
 					<i class="imc-icon fa fa-eye light-blue"></i>

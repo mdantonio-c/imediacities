@@ -29,9 +29,9 @@ export class AppMediaService {
         ).subscribe(
             response => {
 
-                this._media = response.data[0];
+                this._media = response[0];
                 this._media_id = media_id;
-                this._owner = this._media.relationships.item[0].relationships.ownership[0];
+                this._owner = this._media._item[0]._ownership[0];
 
                 cb(this._media);
 
@@ -60,8 +60,8 @@ export class AppMediaService {
     }
 
     revisionState(): string {
-        return (this._media.relationships.item[0].relationships.revision) ?
-            this._media.relationships.item[0].relationships.revision[0].attributes.state.key : '';
+        return (this._media._item[0]._revision) ?
+            this._media._item[0]._revision[0].state.key : '';
     }
 
     updatePublicAccess(newVal: boolean) {
@@ -72,7 +72,7 @@ export class AppMediaService {
             }
         ).subscribe(
             response => {
-                this._media.relationships.item[0].attributes.public_access = newVal;
+                this._media._item[0].public_access = newVal;
             },
             err => {
                 console.error("Error updating public access: ", err);

@@ -6,7 +6,7 @@
 			<div class="col-12">
 				<div class="row no-gutters">
 					<div class="col-1 imc--flex--vertical-center box-single-shot--number">
-						<span class="shot-number"><strong>{{shot.attributes.shot_num +1}}</strong></span>
+						<span class="shot-number"><strong>{{shot.shot_num +1}}</strong></span>
 					</div>
 					<div class="col-3 imc--flex--vertical-center" style="flex-direction: column;">
 						<!-- Anteprima dello shot del video -->
@@ -16,22 +16,22 @@
                                 <img holderjs
                                     [attr.data-src]="'holder.js/135x102?bg=707070&text=NO THUMBNAIL&?auto=yes'">
 							</ng-template>
-							<span>{{shot.attributes.duration | number:'2.2'}}</span>
+							<span>{{shot.duration | number:'2.2'}}</span>
 						</span>
 					</div>
 					<div class="col-8 imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">
-						<strong [innerHTML]="shot.attributes.timestamp || '&nbsp;'"></strong>
+						<strong [innerHTML]="shot.timestamp || '&nbsp;'"></strong>
 						<span>
 							frame range:
 							<span class="paragraph-not-divide">
-								<strong class="click-event" (click)="player_seek_at(shot.attributes.start_frame_idx)" *ngIf="i === 0">{{shot.attributes.start_frame_idx}}</strong>
+								<strong class="click-event" (click)="player_seek_at(shot.start_frame_idx)" *ngIf="i === 0">{{shot.start_frame_idx}}</strong>
 								<strong class="click-event" (click)="player_seek_at(current_cut)" *ngIf="i === 1" [ngClass]="{'text-danger': changed}">
 								{{current_cut}}</strong>
 								-
 								<strong class="click-event" (click)="player_seek_at(current_cut - 1)" *ngIf="i === 0" [ngClass]="{'text-danger': changed}">
 								{{current_cut - 1}}</strong>
-								<strong class="click-event" (click)="player_seek_at(shot.attributes.end_frame_idx)" *ngIf="i === 1">
-								{{shot.attributes.end_frame_idx}}</strong>
+								<strong class="click-event" (click)="player_seek_at(shot.end_frame_idx)" *ngIf="i === 1">
+								{{shot.end_frame_idx}}</strong>
 							</span>
 						</span>
 						<ul class="box--icon-list">

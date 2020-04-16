@@ -120,16 +120,15 @@ export class MultiItemCarouselComponent implements OnChanges {
         this.listsService.getLists(undefined, true).subscribe(
           response => {
             this.slickModal.unslick();
-            this.slides = response.data.map(lst => {
+            this.slides = response.map(lst => {
               return {
                 'id': lst.id,
-                'title': lst.attributes.name,
-                'description': lst.attributes.description,
+                'title': lst.name,
+                'description': lst.description,
                 'type': lst.type,
                 'nb_items': lst.nb_items
               }
             });
-            /*this.total = response["Meta"].totalItems;*/
             this.total = this.slides.length;
             this.onResult.emit(this.total);
             this.loading = false;
@@ -147,12 +146,12 @@ export class MultiItemCarouselComponent implements OnChanges {
         this.close();
         this.listsService.getListItems(this.listId).subscribe(
           response => {
-            this.slides = response.data.map(media => {
+            this.slides = response.map(media => {
               let mediaType = '';
               if (media.type === 'shot') {
                 mediaType = 'aventity';
               } else {
-                mediaType = (media.attributes.item_type.key === 'Video') ? 'aventity' : 'nonaventity';
+                mediaType = (media.item_type.key === 'Video') ? 'aventity' : 'nonaventity';
               }
               let r = {
                 'id': media.id,
@@ -164,7 +163,7 @@ export class MultiItemCarouselComponent implements OnChanges {
                 'listId': this.listId,
                 'ref': media
               }
-              if (mediaType === 'aventity') r['duration'] = media.attributes.duration;
+              if (mediaType === 'aventity') r['duration'] = media.duration;
               return r;
             });
             this.total = this.slides.length;
@@ -183,7 +182,7 @@ export class MultiItemCarouselComponent implements OnChanges {
         /*console.log(this.filter);*/
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
-            this.slides = this.update_results(append, this.currentPage, response["Response"].data.map(media => {
+            this.slides = this.update_results(append, this.currentPage, response.map(media => {
               let r = {
                 'id': media.id,
                 'title': MediaUtilsService.getIdentifyingTitle(media),
@@ -191,10 +190,11 @@ export class MultiItemCarouselComponent implements OnChanges {
                 'type': media.type,
                 'thumbnail': media.links['thumbnail']
               }
-              if (media.type === 'aventity') r['duration'] = media.relationships.item[0].attributes.duration;
+              if (media.type === 'aventity') r['duration'] = media._item[0].duration;
               return r;
             }));
-            this.total = response["Meta"].totalItems;
+            console.warn("Meta.totalItems temporary disabled")
+            // this.total = response["Meta"].totalItems;
             this.onResult.emit(this.total);
             this.loading = false;
             /*this.slickModal.initSlick();*/

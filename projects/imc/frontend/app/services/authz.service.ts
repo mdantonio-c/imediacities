@@ -50,7 +50,7 @@ export class AuthzService {
 
 	private isPublicDomain(media) {
 		if (!media) return false;
-		let k = media.attributes.rights_status.key;
+		let k = media.rights_status.key;
 
 		// EU Orphan Work
 		if (k == "02") return true;

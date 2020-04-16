@@ -62,7 +62,7 @@ export class AppAddToListComponent {
 
     private loadMyLists() {
         this.listsService.getLists(this.item_id).subscribe(resp => {
-            this.my_lists = this.listsService.parseLists(resp.data);
+            this.my_lists = this.listsService.parseLists(resp);
             /*console.log(this.my_lists);*/
         }, error => {
             console.error('There was an error loading lists', error.errors);

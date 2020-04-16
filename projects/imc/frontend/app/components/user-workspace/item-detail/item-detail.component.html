@@ -43,7 +43,7 @@
              *ngIf="!media.thumbnail" (contextmenu)="disableSaveAs($event)">
 		<img (contextmenu)="disableSaveAs($event)" src="{{media.thumbnail}}" *ngIf="media.thumbnail" class="img-fluid"/>
 		<span *ngIf="media.type === 'aventity'" class="anteprima-duration" [innerHTML]="media.duration | secondsToTime"></span>
-    <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge">shot {{media.ref.attributes.shot_num + 1}}</span>
+    <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge">shot {{media.ref.shot_num + 1}}</span>
 	</div>
   <div class="card-body">
     <ng-container *ngIf="editable">

@@ -540,20 +540,12 @@ class ListItems(EndpointResource):
                 "Very strange. Item <{}}> with no metadata".format(item.uuid))
         creation = creation.downcast()
 
-        res = self.getJsonResponse(mdo)
-        if 'relationships' in res:
-            del res['relationships']
+        res = self.getJsonResponse(mdo, max_relationship_depth=0)
 
         api_url = get_api_url(request, PRODUCTION)
         if isinstance(mdo, self.graph.Item):
             # always consider v2 properties if exists
             v2 = item.other_version.single()
-            # if v2 is not None:
-            #     # should I consider v2 attibutes instead?
-            #     log.debug('get v2 for item <{}>', mdo.uuid)
-            #     # FIXME the following doesn't work
-            #     # v2_res = self.getJsonResponse(v2)
-            #     # res["attributes"] = v2_res["attributes"]
             content_type = 'videos' if item.item_type == 'Video' else 'images'
             res['links']['content'] = (
                 api_url
@@ -652,7 +644,7 @@ class ListItems(EndpointResource):
             if video_format is not None:
                 res['video_format'] = self.getJsonResponse(
                     video_format, max_relationship_depth=0
-                )['attributes']
+                )
         # add notes and links
         res["annotations"] = {}
         notes = mdo.annotation.search(annotation_type='DSC', private=False)

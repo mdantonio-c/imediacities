@@ -85,7 +85,7 @@ export class AppModalInsertLinkComponent implements OnChanges {
                     }
                     let resp = r[0].data;
                     let anno: IMC_Annotation = {
-                        creation_date: resp.attributes.creation_datetime,
+                        creation_date: resp.creation_datetime,
                         creator: resp.creator ? resp.creator.id : null,
                         creator_type: resp.creator ? resp.creator.type : null,
                         embargo: resp.embargo || null,
@@ -93,12 +93,12 @@ export class AppModalInsertLinkComponent implements OnChanges {
                         body_id: resp.bodies[0].id,
                         id: resp.id,
                         iri: null,
-                        name: resp.bodies[0].attributes.value,
-                        private: resp.attributes.private,
+                        name: resp.bodies[0].value,
+                        private: resp.private,
                         language: null,
                         spatial: null,
-                        type: resp.attributes.annotation_type.key,
-                        source: resp.source.attributes.item_type.key,
+                        type: resp.annotation_type.key,
+                        source: resp.source.item_type.key,
                         source_uuid: resp.source.id
                     }
                     this.links_all.push(anno);

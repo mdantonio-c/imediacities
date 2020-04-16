@@ -1,11 +1,11 @@
 <!-- Template per il singolo shot, da mettere in loop per la creazione di tutti gli shot o segmenti -->
 <div class="row no-gutters box-single-shot" *ngIf="shot" [ngClass]="{'active': is_attivo}">
-    <span class="col-12" *ngIf="canRevise && shot.attributes.shot_num > 0">
+    <span class="col-12" *ngIf="canRevise && shot.shot_num > 0">
         <div class="row no-gutters">
             <div class="col-11 revision-tool-div">
                 <div class="box-checkbox float-left ml-2">
                     <span class="click-event" (click)=doubleCheck()>
-                        <i class="fa fa-thumb-tack revision-tool-icon" aria-hidden="true" *ngIf="shot.attributes.revision_check; else rotateThumbtack"
+                        <i class="fa fa-thumb-tack revision-tool-icon" aria-hidden="true" *ngIf="shot.revision_check; else rotateThumbtack"
                         ngbTooltip="uncheck" placement="right"></i>
                         <ng-template #rotateThumbtack>
                             <i class="fa fa-thumb-tack fa-rotate-180" aria-hidden="true"
@@ -13,12 +13,12 @@
                         </ng-template>
                     </span>
                 </div>
-                <ng-container *ngIf="!shot.attributes.revision_confirmed">
+                <ng-container *ngIf="!shot.revision_confirmed">
                     <div class="d-inline mr-1">
                         <i class="material-icons revision-tool-icon"
                         mwlConfirmationPopover
                         [popoverTitle]="'Remove cut'"
-                        [popoverMessage]="'Remove cut between shot '+ shot.attributes.shot_num + ' and shot ' + (shot.attributes.shot_num+1)+'.<br/>Do you wish to continue?'"
+                        [popoverMessage]="'Remove cut between shot '+ shot.shot_num + ' and shot ' + (shot.shot_num+1)+'.<br/>Do you wish to continue?'"
                         (confirm)="remove_cut()">delete</i>
                     </div>
                     <div class="d-inline mr-1">
@@ -28,9 +28,9 @@
                 </ng-container>
                 <div class="box-checkbox float-right">
                     <input class="imc--input-checkbox styled-checkbox" 
-                        id="cut-confimed-{{shot.attributes.shot_num}}" type="checkbox" value="on"
-                        [(ngModel)]="shot.attributes.revision_confirmed">
-                    <label for="cut-confimed-{{shot.attributes.shot_num}}" style="margin: 0 !important;"
+                        id="cut-confimed-{{shot.shot_num}}" type="checkbox" value="on"
+                        [(ngModel)]="shot.revision_confirmed">
+                    <label for="cut-confimed-{{shot.shot_num}}" style="margin: 0 !important;"
                         ngbTooltip="confirmed" placement="bottom"></label>
                 </div>
             </div>
@@ -41,7 +41,7 @@
         <div class="box-checkbox">
             <input class="imc--input-checkbox styled-checkbox"
             [id]="checkbox_selection_label" type="checkbox"
-            [value]="shot.attributes.shot_num"
+            [value]="shot.shot_num"
             (click)="shot_seleziona($event)"
             >
             <label [for]="checkbox_selection_label"></label>
@@ -49,7 +49,7 @@
     </span>
     <span class="col-1 imc--flex--vertical-center box-single-shot--number">
         <!-- Numero dello shot, da scambiare con l'icona dell'active -->
-        <span class="shot-number"><strong [innerHTML]="shot.attributes.shot_num +1" ></strong></span>
+        <span class="shot-number"><strong [innerHTML]="shot.shot_num +1" ></strong></span>
         <!-- Icona freccia azzurra per l'active sullo shot -->
         <i class="material-icons font-media-color" *ngIf="is_attivo">play_arrow</i>
     </span>
@@ -57,7 +57,7 @@
         <!-- Anteprima dello shot del video -->
         <span class="anteprima-shot click-event" [ngClass]="{'click-event': media_type === 'video'}" (click)="shot_play()">
             <img [src]="shot.links.thumbnail" alt="" *ngIf="shot.links && shot.links.thumbnail">
-            <span [innerHTML]="shot.attributes.duration | number:'2.2'"></span>
+            <span [innerHTML]="shot.duration | number:'2.2'"></span>
         </span>
         <span *ngIf="canRevise && is_attivo">
             <i class="fa fa-cut revision-tool-icon"
@@ -66,13 +66,13 @@
         </span>
     </span>
     <span [ngClass]="!multiSelection ? 'col-7' : 'col-6'" class="imc--flex--vertical-center row no-gutters anteprima-shot--info" style="flex-direction:column;align-items:flex-start;">
-        <strong [innerHTML]="shot.attributes.timestamp || '&nbsp;'"></strong>
+        <strong [innerHTML]="shot.timestamp || '&nbsp;'"></strong>
         <span *ngIf="media_type === 'video'">
             frame range:
             <span class="paragraph-not-divide">
-                <strong class="click-event" [innerHTML]="shot.attributes.start_frame_idx" (click)="shot_goto(shot.attributes.start_frame_idx)"></strong>
+                <strong class="click-event" [innerHTML]="shot.start_frame_idx" (click)="shot_goto(shot.start_frame_idx)"></strong>
                 -
-                <strong class="click-event" [innerHTML]="shot.attributes.end_frame_idx" (click)="shot_goto(shot.attributes.end_frame_idx)"></strong>
+                <strong class="click-event" [innerHTML]="shot.end_frame_idx" (click)="shot_goto(shot.end_frame_idx)"></strong>
             </span>
         </span>
         <span *ngIf="media_type !== 'video'">&nbsp;</span>

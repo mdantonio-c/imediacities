@@ -87,7 +87,7 @@ export class CatalogService {
 			data.match = { term: filter.searchTerm, fields: matchFields }
 		}
 		if (cached) this.cacheValues();
-		return this.api.post(endpoint, data, { "rawResponse": true });
+		return this.api.post(endpoint, data);
 	}
 
 	/**

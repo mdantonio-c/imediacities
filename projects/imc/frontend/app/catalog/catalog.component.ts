@@ -65,11 +65,11 @@ export class CatalogComponent implements OnInit {
 
 		this.catalogService.search(this.filter, page, this.pageSize).subscribe(
 			response => {
-				this.results = response["Response"].data;
-				this.totalItems = response["Meta"].totalItems;
-				this.countByYears = response["Meta"].countByYears;
+				this.results = response.data;
+				this.totalItems = response.meta.totalItems;
+				this.countByYears = response.meta.countByYears;
 				this.calculateCountMissingDate();
-				this.countByProviders = response["Meta"].countByProviders;
+				this.countByProviders = response.meta.countByProviders;
 				this.loading = false;
 			},
 			error => {
@@ -118,7 +118,7 @@ export class CatalogComponent implements OnInit {
 		this.loadingMapResults = true;
 		this.catalogService.getRelevantCreations(entityPlaceMap).subscribe(
 			response => {
-				this.mediaTags = response["Response"].data;
+				this.mediaTags = response;
 				this.loadingMapResults = false;
 			},
 			error => {

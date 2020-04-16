@@ -2,8 +2,8 @@
 
     <div class="row no-gutters">
         <div class="mr-auto">
-            <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.attributes.shot_num+1}}
-            <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.attributes.shot_num+2}}</ng-container>
+            <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.shot_num+1}}
+            <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.shot_num+2}}</ng-container>
             </h4>
         </div>
         <div class="ml-auto" >
@@ -22,14 +22,14 @@
             <ng-template [ngIf]="media_type === 'video'">
                 <ng-container *ngIf="!revision">
                 <div class="row">
-                    <span class="col-12 col-lg-3 pr-0"><strong [innerHTML]="shot_corrente.attributes.timestamp"></strong></span>
+                    <span class="col-12 col-lg-3 pr-0"><strong [innerHTML]="shot_corrente.timestamp"></strong></span>
                     <span class="col-6 col-lg-7 imc--flex--horizontal-center">frame-range:
-                        <span [innerHTML]="shot_corrente.attributes.start_frame_idx"></span>
+                        <span [innerHTML]="shot_corrente.start_frame_idx"></span>
                         -
-                        <span [innerHTML]="shot_corrente.attributes.end_frame_idx"></span>
+                        <span [innerHTML]="shot_corrente.end_frame_idx"></span>
                     </span>
                     <span class="col-6 col-lg-2 imc--flex--horizontal-end">
-                       duration:&nbsp; <span [innerHTML]="shot_corrente.attributes.duration | number:'2.2'"></span> s
+                       duration:&nbsp; <span [innerHTML]="shot_corrente.duration | number:'2.2'"></span> s
                     </span>
                 </div>
                 </ng-container>
@@ -43,12 +43,12 @@
                 <div class="col-12 row no-gutters mt-2" *ngIf="!revision && data.shots.length > 1">
                    <span class="imc--thumb"
                          *ngFor="let shot of data.shots let index = index"
-                         [ngClass]="{active: shot.attributes.shot_num === shot_corrente.attributes.shot_num}"
-                         [ngStyle]="{border: shot.attributes.shot_num === shot_corrente.attributes.shot_num ? '5px solid' : 0}"
+                         [ngClass]="{active: shot.shot_num === shot_corrente.shot_num}"
+                         [ngStyle]="{border: shot.shot_num === shot_corrente.shot_num ? '5px solid' : 0}"
                          (click)="shot_cambia(index)">
                         <img [src]="shot.links.thumbnail" alt="">
-                        <span [innerHTML]="shot.attributes.duration | number:'2.2'" class="duration"></span>
-                       <span class="shot-number" [innerHTML]="shot.attributes.shot_num+1">3</span>
+                        <span [innerHTML]="shot.duration | number:'2.2'" class="duration"></span>
+                       <span class="shot-number" [innerHTML]="shot.shot_num+1">3</span>
                     </span>
                 </div>
             </ng-template>

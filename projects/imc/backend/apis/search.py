@@ -288,9 +288,6 @@ class Search(EndpointResource):
             numels = [row[0] for row in self.graph.cypher(countv)][0]
         except BaseException as e:
             log.error(e)
-            return self.response(
-                meta=meta_response, errors=['Invalid query parameters']
-            )
             raise RestApiException('Invalid query parameters')
 
         log.debug("Number of elements retrieved: {0}", numels)
@@ -326,7 +323,7 @@ class Search(EndpointResource):
                         'item.revision',
                     ],
                 )
-                log.debug("video links {}", video['links'])
+                video['links'] = {}
                 video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
                 if item.thumbnail is not None:
@@ -393,4 +390,9 @@ class Search(EndpointResource):
             group_by_years[row[0]] = row[1]
         meta_response["countByYears"] = group_by_years
 
-        return self.response(data, meta=meta_response)
+        resp = {
+            "data": data,
+            "meta": meta_response
+        }
+
+        return self.response(resp)

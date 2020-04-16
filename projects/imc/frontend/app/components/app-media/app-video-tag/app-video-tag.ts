@@ -32,7 +32,7 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
     }
 
     scene_click(idx) {
-        this.scena_visualizza.emit(this.data[idx].attributes.start_frame_idx / this.parent.fps);
+        this.scena_visualizza.emit(this.data[idx].start_frame_idx / this.parent.fps);
     }
 
 
@@ -61,8 +61,8 @@ export class AppVideoTagComponent extends AppVideoControlComponent implements Af
 
         super.ngOnInit();
         this.data.forEach(s => {
-            if (!this.min_detected || s.attributes.duration < this.min_detected) {
-                this.min_detected = s.attributes.duration
+            if (!this.min_detected || s.duration < this.min_detected) {
+                this.min_detected = s.duration
             }
         });
     }
