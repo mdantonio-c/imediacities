@@ -267,17 +267,17 @@ class SearchAnnotations(EndpointResource):
                         )
 
         # first request to get the number of elements to be returned
-        countv = (
-            "{starters} MATCH (anno:Annotation)"
-            " {filters} "
-            " RETURN COUNT(DISTINCT body)".format(
-                starters=' '.join(starters), filters=' '.join(filters)
-            )
-        )
+        # countv = (
+        #     "{starters} MATCH (anno:Annotation)"
+        #     " {filters} "
+        #     " RETURN COUNT(DISTINCT body)".format(
+        #         starters=' '.join(starters), filters=' '.join(filters)
+        #     )
+        # )
 
         # get total number of elements
-        numels = [row[0] for row in self.graph.cypher(countv)][0]
-        log.debug("Number of elements retrieved: {0}", numels)
+        # numels = [row[0] for row in self.graph.cypher(countv)][0]
+        # log.debug("Number of elements retrieved: {0}", numels)
 
         query = (
             "{starters} MATCH (anno:Annotation)"
@@ -326,5 +326,6 @@ class SearchAnnotations(EndpointResource):
             # }
             data.append(res)
 
-        meta_response = {"totalItems": numels}
-        return self.response(data, meta=meta_response)
+        # meta_response = {"totalItems": numels}
+        # return self.response(data, meta=meta_response)
+        return self.response(data)

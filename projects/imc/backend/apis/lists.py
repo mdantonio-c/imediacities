@@ -113,17 +113,11 @@ class Lists(EndpointResource):
         # if limit < 0:
         #     raise RestApiException('Page size cannot be a negative value',
         #                            status_code=hcodes.HTTP_BAD_REQUEST)
-        count = (
-            "MATCH (n:List)"
-            " {match} "
-            "RETURN COUNT(DISTINCT(n))".format(match=user_match)
-        )
-        # query = "MATCH (n:List)" \
-        #         " {match} " \
-        #         "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
-        #             match=user_match,
-        #             offset=offset * limit,
-        #             limit=limit)
+        # count = (
+        #     "MATCH (n:List)"
+        #     " {match} "
+        #     "RETURN COUNT(DISTINCT(n))".format(match=user_match)
+        # )
         count_items = ', count(r)' if nb_items else ''
         query = (
             "MATCH (n:List) "
@@ -136,11 +130,11 @@ class Lists(EndpointResource):
         log.debug("query: {}", query)
 
         # get total number of lists
-        numels = [row[0] for row in self.graph.cypher(count)][0]
-        log.debug("Total number of lists: {0}", numels)
+        # numels = [row[0] for row in self.graph.cypher(count)][0]
+        # log.debug("Total number of lists: {0}", numels)
 
         data = []
-        meta_response = {"totalItems": numels}
+        # meta_response = {"totalItems": numels}
         results = self.graph.cypher(query)
         # for res in [self.graph.List.inflate(row[0]) for row in results]:
         for row in results:
@@ -161,7 +155,9 @@ class Lists(EndpointResource):
             if nb_items:
                 user_list['nb_items'] = row[1]
             data.append(user_list)
-        return self.response(data, meta=meta_response)
+
+        # return self.response(data, meta=meta_response)
+        return self.response(data)
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

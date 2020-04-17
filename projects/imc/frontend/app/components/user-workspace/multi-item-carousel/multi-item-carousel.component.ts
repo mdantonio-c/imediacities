@@ -182,7 +182,7 @@ export class MultiItemCarouselComponent implements OnChanges {
         /*console.log(this.filter);*/
         this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
           response => {
-            this.slides = this.update_results(append, this.currentPage, response.map(media => {
+            this.slides = this.update_results(append, this.currentPage, response.data.map(media => {
               let r = {
                 'id': media.id,
                 'title': MediaUtilsService.getIdentifyingTitle(media),
@@ -193,8 +193,7 @@ export class MultiItemCarouselComponent implements OnChanges {
               if (media.type === 'aventity') r['duration'] = media._item[0].duration;
               return r;
             }));
-            console.warn("Meta.totalItems temporary disabled")
-            // this.total = response["Meta"].totalItems;
+            this.total = response.meta.totalItems;
             this.onResult.emit(this.total);
             this.loading = false;
             /*this.slickModal.initSlick();*/
