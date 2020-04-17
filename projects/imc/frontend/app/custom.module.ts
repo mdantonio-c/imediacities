@@ -232,23 +232,6 @@ const routes: Routes = [
     }
   ],
 
-  // TO BE REMOVED!
-  entryComponents: [
-    CatalogComponent,
-    SearchFilterComponent,
-    SearchNavbarComponent,
-    SearchThumbnailComponent,
-    SearchMediaComponent,
-    SearchMapComponent,
-    SearchTimelineComponent,
-    SearchMediaTagComponent,
-    AppModalInsertTermtagComponent,
-    AppModalInsertGeotagComponent,
-    AppModalInsertNoteComponent,
-    AppModalInsertLinkComponent,
-    AppModalInsertReferenceComponent,
-    AppModalMoveCutComponent,
-  ],
   exports: [
     RouterModule
   ]
