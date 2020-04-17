@@ -76,8 +76,7 @@ class Videos(EndpointResource):
                 ],
             )
             item = v.item.single()
-            # video['links']['self'] = api_url + \
-            #     'api/videos/' + v.uuid
+            video['links'] = {}
             video['links']['content'] = (
                 api_url + 'api/videos/' + v.uuid + '/content?type=video'
             )
@@ -432,7 +431,9 @@ class VideoShots(EndpointResource):
             for concept in row[3]:
                 b = self.graph.AnnotationBody.inflate(concept)
                 b = b.downcast()  # most derivative body
-                res['bodies'].append(self.getJsonResponse(b, max_relationship_depth=0))
+                b_data = self.getJsonResponse(b, max_relationship_depth=0)
+                b_data['type'] = type(b).__name__.lower()
+                res['bodies'].append(b_data)
 
             if shot_uuid not in annotations:
                 annotations[shot_uuid] = []
@@ -470,51 +471,9 @@ class VideoShots(EndpointResource):
         for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
             shot_url = api_url + 'api/shots/' + s.uuid
+            shot['links'] = {}
             shot['links']['self'] = shot_url
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
-
-            # get all shot annotations:
-            # at the moment filter by vim and tag annotations
-            """
-            shot['annotations'] = []
-            for anno in s.annotation.all():
-                creator = anno.creator.single()
-                if anno.private:
-                    if creator is None:
-                        log.warning('Invalid state: missing creator for private '
-                                 'note [UUID:{}]'.format(anno.uuid))
-                        continue
-                    if user is None or (creator is not None and creator.uuid != user.uuid):
-                        continue
-                res = self.getJsonResponse(anno, max_relationship_depth=0)
-                if (anno.annotation_type in ('TAG', 'DSC', 'LNK') and
-                        creator is not None):
-                    res['creator'] = self.getJsonResponse(
-                        anno.creator.single(), max_relationship_depth=0)
-                # attach bodies
-                res['bodies'] = []
-                for b in anno.bodies.all():
-                    mdb = b.downcast()  # most derivative body
-                    res['bodies'].append(
-                        self.getJsonResponse(mdb, max_relationship_depth=0))
-                shot['annotations'].append(res)
-
-            # add automatic tags from "embedded segments"
-            query_auto_tags = "MATCH (s:Shot {{ uuid:'{shot_id}'}})-[:WITHIN_SHOT]-(sgm:VideoSegment) " \
-                              "MATCH (sgm)<-[:HAS_TARGET]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}})-[:HAS_BODY]-(b:ODBody)-[:CONCEPT]-(res:ResourceBody) " \
-                              "RETURN anno, collect(res)".format(
-                                  shot_id=s.uuid)
-            result = self.graph.cypher(query_auto_tags)
-            for row in result:
-                auto_anno = self.graph.Annotation.inflate(row[0])
-                res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
-                # attach bodies
-                res['bodies'] = []
-                for concept in row[1]:
-                    res['bodies'].append(
-                        self.getJsonResponse(self.graph.ResourceBody.inflate(concept), max_relationship_depth=0))
-                shot['annotations'].append(res)
-            """
 
             # Retrieving annotations from prefetched data
             shot['annotations'] = annotations.get(s.uuid, [])

@@ -1,5 +1,7 @@
-import {Injectable, Output, EventEmitter} from '@angular/core';
-import {ApiService} from '@rapydo/services/api';
+import { Injectable, Output, EventEmitter } from '@angular/core';
+
+import { ApiService } from '@rapydo/services/api';
+import { NotificationService } from '@rapydo/services/notification';
 
 @Injectable()
 export class AppShotsService {
@@ -14,7 +16,7 @@ export class AppShotsService {
     @Output() update: EventEmitter<any> = new EventEmitter();
     private _others_data_as_object;
 
-    constructor(private api: ApiService) {
+    constructor(private api: ApiService, private notify: NotificationService) {
     }
 
     /**
@@ -47,17 +49,14 @@ export class AppShotsService {
             return;
         }
 
-        this.api.get(
-            endpoint || 'videos',
-            `${media_id}/shots`
-        ).subscribe(
+        this.api.get(endpoint || 'videos', `${media_id}/shots`).subscribe(
             response => {
                 this._media_id = media_id;
                 this._shots_parse(response, 'video');
                 this.update.emit(this._shots);
             },
-            err => {
-                console.log('AppShotService', err)
+            error => {
+                this.notify.showError(error);
             }
         )
     }
@@ -148,10 +147,15 @@ export class AppShotsService {
         let shots_processed = [];
         //  per ogni shot
         shots.forEach( (s, index) => {
-
             let shot_processato: IMC_Shot = {
                 id: s.id,
-                attributes: s.attributes,
+                shot_num: s.shot_num,
+                timestamp: s.timestamp,
+                duration: s.duration,
+                revision_confirmed: s.revision_confirmed,
+                revision_check: s.revision_check,
+                end_frame_idx: s.end_frame_idx,
+                start_frame_idx: s.start_frame_idx,
                 links: s.links,
                 annotations: {
                     locations: [],
@@ -181,7 +185,7 @@ export class AppShotsService {
      * @param shot_indice shot in cui compare l'annotazione
      * @private
      */
-    private _annotations_parse (target, annotations, media_type, shot_indice) {
+    private _annotations_parse(target, annotations, media_type, shot_indice) {
 
         annotations.forEach(annotation => {
             //  Term tag e locations
@@ -211,7 +215,6 @@ export class AppShotsService {
                 }
             }
         })
-
     }
     /**
      * Aggiunge l'annotazione annotation all'array target
@@ -221,7 +224,7 @@ export class AppShotsService {
      * @param shot_indice Shot in cui compare l'annotazione
      * @private
      */
-    private _annotation_add (target, annotation, shot_indice) {
+    private _annotation_add(target, annotation, shot_indice) {
 
         annotation.shots_idx = [shot_indice];
         target.push(annotation);
@@ -255,18 +258,17 @@ export class AppShotsService {
         }
 
     }
-    private _annotations_all_from_map () {
+    private _annotations_all_from_map() {
         this._annotations_all = Array.from(this._annotations_map).map(annotation => annotation[1]);
         this._annotations_all.sort(AppShotsService._sort_alpha);
         this._annotations_map.clear();
     }
-    private _tags_all_from_map () {
+    private _tags_all_from_map() {
         this._tags_all = Array.from(this._tags_map).map(tag => tag[1]);
-        /*console.log(this._tags_all);*/
         this._tags_all.sort(AppShotsService._sort_alpha);
         this._tags_map.clear();
     }
-    private _decode_language (lang): string {
+    private _decode_language(lang): string {
         let language;
         switch (lang){
             case 'ca':
@@ -314,12 +316,12 @@ export class AppShotsService {
      * @returns {IMC_Annotation}
      * @private
      */
-    private _annotation_set (annotation, annotation_body, media_type): IMC_Annotation {
+    private _annotation_set(annotation, annotation_body, media_type): IMC_Annotation {
         let name, group, language = null;
         if (annotation_body.type === 'textualbody') {
             name = annotation_body.value;
             group = (annotation.type === 'TAG') ? 'term' : null;
-            if(annotation_body.language){
+            if (annotation_body.language) {
                 language = this._decode_language(annotation_body.language);
             }
         } else if (annotation_body.type === 'resourcebody') {
@@ -328,6 +330,10 @@ export class AppShotsService {
         } else if (annotation_body.type === 'bibliographicreference') {
             name = annotation_body.type;
             group = 'reference';
+        } else {
+            console.warn('Cannot extract name and group from annotation_body');
+            name = '';
+            group = '';
         }
         return {
             creation_date: annotation.creation_datetime,
@@ -354,9 +360,9 @@ export class AppShotsService {
      * @param target
      * @private
      */
-    static _annotations_sort (target) {
+    static _annotations_sort(target) {
         for (let key in target) {
-            if (target.hasOwnProperty(key) && target[key].length) {
+            if (target[key].length) {
                 target[key].sort(AppShotsService._sort_alpha)
             }
         }
@@ -369,7 +375,7 @@ export class AppShotsService {
      * @returns {number}
      * @private
      */
-    static _sort_alpha (a, b) {
+    static _sort_alpha(a, b) {
         if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
         if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
         return 0;
@@ -397,9 +403,17 @@ export interface IMC_Annotation {
     reference?: BibliographicReference
 }
 
+
+
 export interface IMC_Shot {
     id: string,
-    attributes: {},
+    shot_num: number,
+    timestamp: string,
+    duration: number,
+    revision_confirmed: boolean,
+    revision_check: boolean,
+    end_frame_idx: number,
+    start_frame_idx: number,
     links: {},
     annotations: {
         locations: IMC_Annotation[],
