@@ -1,6 +1,7 @@
-<ngb-tabset class="imc--tab">
-    <ngb-tab title="General Info">
-        <ng-template ngbTabContent>
+<ul ngbNav #nav="ngbNav" class="nav-tabs imc--tab">
+    <li [ngbNavItem]="'General Info'">
+        <a ngbNavLink>General Info</a>
+        <ng-template ngbNavContent>
             <div id="general-info_accordion" class="imc--accordion">
 
                 <app-expansion-panel title="Titles" [subtitle]="info.identifying_title"
@@ -191,9 +192,10 @@
             </div>
 
         </ng-template>
-    </ngb-tab>
-    <ngb-tab title="Technical Info">
-        <ng-template ngbTabContent>
+    </li>
+    <li [ngbNavItem]="'Technical Info'">
+        <a ngbNavLink>Technical Info</a>
+        <ng-template ngbNavContent>
             <div id="tech-info_accordion" class="imc--accordion">
 
                 <ng-template [ngIf]="info.type === 'aventity'">
@@ -311,5 +313,6 @@
 
             </div>
         </ng-template>
-    </ngb-tab>
-</ngb-tabset>
+    </li>
+</ul>
+<div [ngbNavOutlet]="nav"></div>
