@@ -13,174 +13,36 @@
 <div class='card-block'>
 
 	<div class='row'>
-	<div class="col-md-3">
+	<div class="col-md-12">
 
-		<h3>Select files</h3>
+        <input *ngIf='upload_options' type="file" [uploadx]="upload_options" (uploadxState)="onUpload($event)">
 
-		<br>
-
-<!-- 		
-        <input type="file" ng2FileSelect [uploader]="uploader" multiple/><br/>
--->
-
-		<br><br>
-<!-- 
-	    <div ng2FileDrop
-	         [ngClass]="{'nv-file-over': hasDropZoneOver}"
-	         (fileOver)="fileOver($event)"
-	         [uploader]="uploader"
-	         class="well my-drop-zone">
-	        Drop here your files 
-	    </div>
-    -->
-    </div>
-
-    <div class="col-md-9" style="margin-bottom: 40px">
-
-    	<div class='row'>
-    	<div class='col-4'>
-        	<h3>Upload queue</h3>
-        </div>
-        <div class='col-8'>
-            <ngb-progressbar 
-	            *ngIf='uploader.queue.length'
-            	showValue="true"
-            	type="info"
-            	[value]="uploader.progress"
-            ></ngb-progressbar>
-        </div>
-        </div>
-		<br>
-
-        <ng-template #emptyQueue>
-			No element in queue
-        </ng-template>
-        <table class="table" *ngIf='uploader.queue.length; else emptyQueue'>
-            <thead>
-            <tr>
-                <th width="50%">Name</th>
-                <th>Size</th>
-                <th>Status</th>
-                <th colspan=2>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let item of uploader.queue">
-                <td><strong>{{ item?.file?.name }}</strong></td>
-                <td>{{item?.file?.size | bytes}}</td>
-
-                <td>
-
-		            <ngb-progressbar 
-		            	*ngIf="item.isUploading"
-		            	showValue="false"
-		            	type="info"
-		            	[value]="item.progress"
-		            ></ngb-progressbar>
-
-                    <span *ngIf="item.isSuccess">
-	                    <i class='fa fa-check fa-large'
-	                    	style='color:green;'
-	                    	ngbTooltip='Upload completed'
-	                    	></i>
-                    </span>
-
-                    <span *ngIf="item.isCancel">
-	                    <i class='fa fa-ban fa-large'
-	                    	style='color:orange;'
-	                    	ngbTooltip='Upload cancelled'
-	                    	></i>
-                    </span>
-
-                    <span *ngIf="item.isError">
-	                    <i class='fa fa-exclamation fa-large'
-	                    	style='color:red;'
-	                    	ngbTooltip='Upload errored'
-	                    	></i>
-                    </span>
-
-                </td>
-
-                <td>
-
-                    <i class='fa fa-trash fa-large' style='color:red;'
-                		(click)="item.remove()"
-                        ngbTooltip='Remove upload'></i>
-
-                </td>
-
-                <td>
-                    <i class='fa fa-play fa-large' style='color:green;'
-                		(click)="item.upload()"
-                        *ngIf="!item.isReady && !item.isUploading && !item.isSuccess"
-                        ngbTooltip='Start upload'></i>
-
-                    <i class='fa fa-ban fa-large' style='color:orange;'
-                		(click)="item.cancel()"
-                        *ngIf="item.isUploading"
-                        ngbTooltip='Cancel upload'></i>
-                </td>
-
-            </tr>
-            </tbody>
-        </table>
-
-        <div *ngIf='uploader.queue.length'>
-            <button type="button" class="btn btn-success btn-s"
-                    (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
-                <span class="glyphicon glyphicon-upload"></span> Upload all
-            </button>
-            <button type="button" class="btn btn-warning btn-s"
-                    (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
-                <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
-            </button>
-            <button type="button" class="btn btn-danger btn-s"
-                    (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
-                <span class="glyphicon glyphicon-trash"></span> Remove all
-            </button>
-	    </div>
-	</div>
-	</div>
-</div>
-</div>
-
-<!--
-    <div flow-init="flowOptions"
-        ng-controller='NgFlowController'
-        flow-upload-started='ctrl.uploadStart(event, $flow, $flowFile)'
-        flow-complete='ctrl.uploadComplete(event, $flow, flowFile)'
-        flow-file-error='showNgUploadErrors($file, $message, $flow)'
-        flow-files-submitted="$flow.upload()"
-        flow-file-success="$file.msg = $message">
-        <span class="btn btn-small btn-info" flow-btn><i class="icon icon-file"></i>Upload a file</span>
-        <span class="btn btn-small btn-info" flow-btn flow-directory><i class="icon icon-folder-open"></i>
-          Upload a folder
-        </span>
         <br><br>
-        <div class="well">
-          <a class="btn btn-small btn-success" ng-click="$flow.resume()">Resume all</a>
-          <a class="btn btn-small btn-warning" ng-click="$flow.pause()">Pause all</a>
-          <a class="btn btn-small btn-danger" ng-click="$flow.cancel()">Cancel all</a>
-          <span ng-if='$flow.getSize() > 0' class="label label-info">Total Size: {{$flow.getSize() | bytes}}</span>
+
+        <div *ngFor="let item of upload_progress | keyvalue">
+            <div class='row'>
+                <div class='col-6'>
+                    {{item.key}}
+                </div>
+                <div class='col-6'>
+                    <ngb-progressbar 
+                        *ngIf='item.value > 0'
+                        type="info" height="2rem" showValue="true" [value]="item.value">
+                    </ngb-progressbar>
+                    <span *ngIf='item.value == 0'>
+                        upload initialization...
+                    </span>
+                </div>
+
+            <br>
         </div>
-        <div class='table-responsive' ng-if='$flow.files.length'>
-          <table class='table table-hover'>
-            <tr>
-              <th>#</th>
-              <th>name</th>
-              <th>size</th>
-              <th>progress</th>
-            </tr>
-            <tr ng-repeat="file in $flow.files">
-              <td>{{$index+1}}</td>
-              <td>{{file.name}}</td>
-              <td>{{file.size | bytes}}</td>
-              <td ng-include="main.templateDir + 'ngflow.progressbar.html'"></td>
-            </tr>
-          </table>
-        </div>
+
     </div>
-    -->
+
+	</div>
+</div>
+</div>
+
 <br>
 
 <div class='card'>
@@ -192,20 +54,28 @@
 
 <div class='card-block'>
 
-<loading *ngIf="loading"></loading>
+<div class="table-responsive">
 
-<div class="table-responsive" *ngIf="data?.length">
-
-	<ngx-datatable
+    <div class="table-wrapper" #tableWrapper>
+    <ngx-spinner [fullScreen] = "false"></ngx-spinner>
+    <ngx-datatable
         class="bootstrap"
-		[rows]="data"
-		[columns]="columns"
+        [rows]="data"
+        [columns]="columns"
         [columnMode]="ColumnMode.flex"
         [headerHeight]="40"
         [footerHeight]="40"
-		[limit]="paging.itemsPerPage"
+
+        [externalPaging]="true"
+        [count]="paging.dataLength"
+        [limit]="paging.itemsPerPage"
+        [offset]="paging.page"
+        (page)="serverSidePagination($event)"
+
         [rowHeight]="'auto'">
-	</ngx-datatable>
+    </ngx-datatable>
+
+    </div>
 
 </div>
 	<ng-template #dataSize let-row="row" let-value="value" let-i="index">

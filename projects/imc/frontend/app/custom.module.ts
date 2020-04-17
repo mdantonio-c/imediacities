@@ -14,7 +14,6 @@ import { HttpClientJsonpModule } from '@angular/common/http';
 import { NguiMapModule, NgMapApiLoader} from '@ngui/map';
 // import { HolderJsModule } from 'angular2-holderjs/component';
 // import { IonRangeSliderModule } from "ng2-ion-range-slider";
-// import { FileUploadModule } from 'ng2-file-upload';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { ArchiveComponent } from './components/admin/archive/archive'
@@ -148,7 +147,6 @@ const routes: Routes = [
     //HolderJsModule,
     // IonRangeSliderModule,
     SlickCarouselModule,
-    // FileUploadModule
   ],
   declarations: [
     ArchivesListComponent, ArchiveComponent,

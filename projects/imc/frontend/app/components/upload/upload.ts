@@ -1,7 +1,8 @@
 
 import { Component, ViewChild, TemplateRef, Injector } from '@angular/core';
+import { Observable } from 'rxjs';
 import { saveAs as importedSaveAs } from "file-saver";
-import { FileSelectDirective, FileDropDirective, FileUploader } from 'ng2-file-upload';
+import { UploadxOptions, UploadState, UploadxService } from 'ngx-uploadx';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApiService } from '@rapydo/services/api';
@@ -32,47 +33,61 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 	@ViewChild('dataStatus', { static: false }) public dataStatus: TemplateRef<any>;
 	@ViewChild('controlsCell', { static: false }) public controlsCell: TemplateRef<any>;
 	@ViewChild('emptyHeader', { static: false }) public emptyHeader: TemplateRef<any>;
-	public uploader:FileUploader;
-	public hasDropZoneOver:boolean = false;
- 
-	constructor(protected injector: Injector) {
+
+	public upload_options :any;
+	public upload_progress: any = {};
+	/*
+	public allowedMimeType:any = [
+		'application/x-zip-compressed',
+		'application/x-compressed',
+		'application/zip',
+		'multipart/x-zip'
+	];
+	*/
+	// public maxFileSize:number = 200*1024*1024; // 200 MB
+
+	public upload_endpoint:string;
+
+	constructor(protected injector: Injector, private uploadService: UploadxService) {
 
 		super(injector);
-		this.init("group");
+		this.init("file");
 
 		this.server_side_pagination = true;
 		this.endpoint = 'stage';
 		this.counter_endpoint = 'stage';
-		this.initPaging(20);
+		this.initPaging(50);
 		this.list();
-
-		let token = this.auth.getToken();
-		this.uploader = new FileUploader(
-			{
-				url: environment.apiUrl + '/upload',
-				authToken: `Bearer ${token}`,
-				disableMultipart: true,
-				// authToken: this.auth.getToken()
-			}
-		);
-/*		this.uploader.onAfterAddingFile = (item => {
-			console.log(item);	
-			// item.withCredentials = false;
-		});*/
-
-		this.uploader.onBeforeUploadItem = (item => {
-			item.url += "/" + item._file.name;
-			// item.withCredentials = false;
-		});
-
-		this.uploader.onCompleteItem = (item:any, response:any, status:any, headers:any) => {
-
-			this.list();
-
-		}
 	}
 
-	public ngOnInit(): void { }
+	public ngOnInit(): void {
+
+		this.upload_endpoint = environment.apiUrl + '/upload';
+
+		this.upload_options = {
+			endpoint: this.upload_endpoint,
+			token: this.auth.getToken(),
+			allowedTypes: 'application/x-zip-compressed,application/x-compressed,application/zip,multipart/x-zip',
+			multiple2: true,
+			autoUpload: true
+		}
+        
+		this.uploadService.connect(this.upload_options).subscribe(
+			response => {
+				if (response && response.length > 0) {
+					// Show Error from last response
+					let resp = response[response.length-1];
+					if (resp.response) {
+						if (resp.responseStatus == 200) {
+							this.notify.showSuccess("Upload completed: " + resp.response.filename);
+						} else {
+							this.notify.showError(resp.response);
+						}
+					}
+				}
+			}
+		);
+	}
 	public ngAfterViewInit(): void {
 
 		this.columns = [
@@ -85,8 +100,20 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 		];
 	}
 
-	public fileOver(e:any):void {
-		this.hasDropZoneOver = e;
+	onUpload(state: Observable<UploadState>) {
+	    state.subscribe((item: UploadState) => {
+
+	    	if (item.progress > 0) {
+	    		this.upload_progress[item.name] = item.progress;
+	    	} else {
+	    		// set 0 also in case of null and undefined
+	    		this.upload_progress[item.name] = 0;
+	    	}
+			if (item.progress == 100 && item.remaining == 0 && item.status == 'complete') {
+				this.list();
+				delete this.upload_progress[item.name];
+			}
+	    });
 	}
 
 	list() {

@@ -23,13 +23,17 @@ class Upload(Uploader, EndpointResource):
 
     labels = ['file']
     GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
-    POST = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    POST = {'/upload': {'summary': 'Initialize file upload', 'responses': {'200': {'description': 'File upload successfully initialized'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    PUT = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=['Archive'])
-    def post(self, filename):
+    def post(self):
+
+        data = self.get_input()
+        filename = data.get("name")
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -44,7 +48,31 @@ class Upload(Uploader, EndpointResource):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
 
-        upload_response = self.upload_data(filename, subfolder=upload_dir, force=False)
+        return self.init_chunk_upload(upload_dir, filename, force=True)
+
+        # upload_response = self.upload_data(
+        #     filename, subfolder=upload_dir, force=False)
+        # return upload_response
+
+    @decorators.catch_errors()
+    @decorators.catch_graph_exceptions
+    @graph_transactions
+    @decorators.auth.required(roles=['Archive'])
+    def put(self, filename):
+
+        self.graph = self.get_service_instance('neo4j')
+        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+
+        if group is None:
+            raise RestApiException(
+                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
+            )
+
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            os.mkdir(upload_dir)
+
+        completed, upload_response = self.chunk_upload(upload_dir, filename)
 
         return upload_response
 
