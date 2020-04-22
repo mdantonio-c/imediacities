@@ -179,7 +179,7 @@ class Annotations(EndpointResource):
         if selector is not None:
             if selector['type'] != 'FragmentSelector':
                 raise RestApiException(
-                    'Invalid selector type for: ' + selector['type'],
+                    'Invalid selector type for: {}'.format(selector['type']),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             s_val = selector['value']

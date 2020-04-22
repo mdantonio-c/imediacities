@@ -24,21 +24,22 @@ from restapi.utilities.templates import get_html_template
 
 celery_app = CeleryExt.celery_app
 
-try:
-    from scripts.analysis.analyze import (
-        make_movie_analize_folder,
-        analize,
-        stage_area,
-        transcode,
-        transcoded_tech_info,
-        transcoded_num_frames,
-        get_framerate,
-        v2_image_transcode,
-        image_transcoded_tech_info,
-        update_storyboard,
-    )
-except BaseException:
-    log.warning("Unable to import analyze script, not required in backend")
+if os.environ.get("IS_CELERY_CONTAINER", "0") == '1':
+    try:
+        from scripts.analysis.analyze import (
+            make_movie_analize_folder,
+            analize,
+            stage_area,
+            transcode,
+            transcoded_tech_info,
+            transcoded_num_frames,
+            get_framerate,
+            v2_image_transcode,
+            image_transcoded_tech_info,
+            update_storyboard,
+        )
+    except BaseException:
+        log.warning("Unable to import analyze script")
 
 
 ####################

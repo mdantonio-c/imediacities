@@ -8,11 +8,14 @@
           </h4>
         </div>
         <div class='card-block'>
-          <loading *ngIf="loading"></loading>
-          <ngb-accordion close-others=true *ngIf="!loading">
+          <ngx-spinner [fullScreen] = "false"></ngx-spinner>
+          <ngb-accordion close-others=true>
           <ngb-panel *ngFor="let group of groups | iterate">
           <ng-template ngbPanelTitle>
-          Stage files uploaded by <b>{{group.value.fullname}}</b> (<i>{{group.value.id}}</i>)
+            <span class='text-left'>
+              Stage files uploaded by <b>{{group.value.fullname}}</b> 
+              (<i>{{group.value.id}}</i>)
+            </span>
           </ng-template>
           <ng-template ngbPanelContent>
           <imc-archive [group]="group.value"></imc-archive>

@@ -432,7 +432,6 @@ class VideoShots(EndpointResource):
                 b = self.graph.AnnotationBody.inflate(concept)
                 b = b.downcast()  # most derivative body
                 b_data = self.getJsonResponse(b, max_relationship_depth=0)
-                b_data['type'] = type(b).__name__.lower()
                 res['bodies'].append(b_data)
 
             if shot_uuid not in annotations:
@@ -472,7 +471,6 @@ class VideoShots(EndpointResource):
             shot = self.getJsonResponse(s)
             shot_url = api_url + 'api/shots/' + s.uuid
             shot['links'] = {}
-            shot['links']['self'] = shot_url
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
 
             # Retrieving annotations from prefetched data

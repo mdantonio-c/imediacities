@@ -568,9 +568,6 @@ class ListItems(EndpointResource):
                 + '/content?type='
                 + content_type[:-1]
             )
-            res['links']['webpage'] = (
-                api_url + 'app/catalog/' + content_type + '/' + creation.uuid
-            )
         else:
             # SHOT
             res['links']['content'] = (
@@ -650,7 +647,10 @@ class ListItems(EndpointResource):
                 # expected single body here
                 note_text = n.bodies.single().downcast()
                 res["annotations"]["notes"].append(
-                    {"text": note_text.value, "language": note_text.language}
+                    {
+                        "text": note_text.value,
+                        "language": note_text.language
+                    }
                 )
         links = mdo.annotation.search(annotation_type='LNK', private=False)
         if links:

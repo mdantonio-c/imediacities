@@ -319,11 +319,6 @@ class SearchAnnotations(EndpointResource):
                 res['sources'].append(creation)
 
             res['distance'] = row[2]
-            # creator = self.graph.User.inflate(row[3])
-            # res['creator'] = {
-            #     'uuid': creator.uuid,
-            #     'name': creator.surname + ', ' + creator.name
-            # }
             data.append(res)
 
         # meta_response = {"totalItems": numels}

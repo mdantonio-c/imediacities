@@ -1,5 +1,5 @@
-
 import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { NgxSpinnerService } from "ngx-spinner";
 
 import { ApiService } from '@rapydo/services/api';
 import { NotificationService } from '@rapydo/services/notification';
@@ -10,7 +10,7 @@ import { NotificationService } from '@rapydo/services/notification';
 })
 export class ArchiveComponent implements OnInit {
 
-	@Input() private group: any;
+	@Input() public group: any;
 	@ViewChild('dataSize', { static: false }) public dataSize: TemplateRef<any>;
 	@ViewChild('dataModification', { static: false }) public dataModification: TemplateRef<any>;
 	@ViewChild('dataStatus', { static: false }) public dataStatus: TemplateRef<any>;
@@ -22,9 +22,13 @@ export class ArchiveComponent implements OnInit {
 	public page: number = 1;
 	public itemsPerPage: number = 10;
 	public dataLength: number = 0;
-	public loading: boolean = false;
+	// public loading: boolean = false;
 
-	constructor(private api: ApiService, private notify: NotificationService) { }
+	constructor(
+		private api: ApiService,
+		private notify: NotificationService,
+		private spinner: NgxSpinnerService
+	) { }
 
 	ngOnInit(): void {
 		this.list();
@@ -41,7 +45,8 @@ export class ArchiveComponent implements OnInit {
 	}
 
 	list() {
-		this.loading = true;
+		// this.loading = true;
+		this.spinner.show(this.group.id);
 		let data = {
 			"currentpage": 1,
 			"perpage": 100000
@@ -52,10 +57,12 @@ export class ArchiveComponent implements OnInit {
 				this.dataLength = this.data.length;
 				this.numPages = Math.ceil(this.dataLength / this.itemsPerPage);
 				this.rows = this.changePage(this.data);
-				this.loading = false;
+				// this.loading = false;
+				this.spinner.hide(this.group.id);
 			}, error => {
 				this.notify.showError(error);
-				this.loading = false;
+				// this.loading = false;
+				this.spinner.hide(this.group.id);
 			}
 		);
 	}

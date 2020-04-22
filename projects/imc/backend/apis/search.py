@@ -324,7 +324,6 @@ class Search(EndpointResource):
                     ],
                 )
                 video['links'] = {}
-                video['links']['self'] = video_url
                 video['links']['content'] = video_url + '/content?type=video'
                 if item.thumbnail is not None:
                     video['links']['thumbnail'] = video_url + '/content?type=thumbnail'
@@ -344,8 +343,6 @@ class Search(EndpointResource):
                         # 'descriptions.creation',
                     ],
                 )
-                log.debug("image links {}", image['links'])
-                image['links']['self'] = image_url
                 image['links']['content'] = image_url + '/content?type=image'
                 if item.thumbnail is not None:
                     image['links']['thumbnail'] = image_url + '/content?type=thumbnail'

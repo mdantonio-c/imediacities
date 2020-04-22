@@ -1,12 +1,11 @@
-<loading *ngIf="loading"></loading>
+<ngx-spinner [name]="group.id" [fullScreen] = "false"></ngx-spinner>
 
-<div class="table-responsive" *ngIf="!loading">
+<div class="table-responsive">
 
 	<ngx-datatable
 		[rows]="rows"
 		[columns]="columns"
 		[columnMode]="'force'"
-		[loadingIndicator]='true'
 		[footerHeight]="50"
 		[limit]="itemsPerPage">
 		<ngx-datatable-footer>
