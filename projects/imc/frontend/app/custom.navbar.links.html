@@ -14,7 +14,8 @@
       Catalogue
     </a>
   </li>
-  <li class='nav-item' *ngIf="user && (user.isAdmin || user.isLocalAdmin)">
+  <!-- <li class='nav-item' *ngIf="user && (user.isAdmin || user.isLocalAdmin)"> -->
+  <li class='nav-item' *ngIf="user && user.isAdmin">
     <a class='nav-link' routerLink="/app/admin/users">
       Users
     </a>
