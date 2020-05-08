@@ -10,7 +10,7 @@
         <div class='card-block'>
           <ngx-spinner [fullScreen] = "false"></ngx-spinner>
           <ngb-accordion close-others=true>
-          <ngb-panel *ngFor="let group of groups | iterate">
+          <ngb-panel *ngFor="let group of groups | keyvalue">
           <ng-template ngbPanelTitle>
             <span class='text-left'>
               Stage files uploaded by <b>{{group.value.fullname}}</b> 

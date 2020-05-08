@@ -13,11 +13,7 @@ export class ArchivesListComponent {
 	// public loading: boolean = false;
 	public groups: Array<any> = [];
 
-	constructor(
-		private api: ApiService,
-		private notify: NotificationService,
-		private spinner: NgxSpinnerService
-	) {
+	constructor(private api: ApiService, private notify: NotificationService, private spinner: NgxSpinnerService) {
 
 		this.list();
 
