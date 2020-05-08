@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { NgxSpinnerService } from "ngx-spinner";
 
 import { ApiService } from '@rapydo/services/api';
@@ -6,7 +6,8 @@ import { NotificationService } from '@rapydo/services/notification';
 
 @Component({
 	selector: 'imc-archive',
-	templateUrl: './archive.html'
+	templateUrl: './archive.html',
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArchiveComponent implements OnInit {
 
