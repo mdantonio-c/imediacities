@@ -59,7 +59,5 @@ services:
 
   frontend:
     environment:
-      ALLOW_PASSWORD_RESET: "true"
-      ALLOW_REGISTRATION: "true"
       INJECT_GMAP_KEY: ${GMAP_KEY}
       INJECT_VIRTUAL_GALLERY_URL: ${VIRTUAL_GALLERY_URL}
