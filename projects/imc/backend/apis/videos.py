@@ -561,7 +561,7 @@ class VideoContent(IMCEndpoint, Downloader):
     __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
     labels = ['video']
     _GET = {'/videos/<video_id>/content': {'summary': 'Gets the video content', 'tags': ['video'], 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Video content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video content does not exists.'}}}}
-    HEAD = {'/videos/<video_id>/content': {'summary': 'Check for video existence', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary, orf)', 'type': 'string'}], 'responses': {'200': {'description': 'The video content exists.'}, '404': {'description': 'The video content does not exists.'}}}}
+    _HEAD = {'/videos/<video_id>/content': {'summary': 'Check for video existence', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary, orf)', 'type': 'string'}], 'responses': {'200': {'description': 'The video content exists.'}, '404': {'description': 'The video content does not exists.'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

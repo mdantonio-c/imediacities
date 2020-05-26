@@ -32,7 +32,8 @@ from neomodel import ZeroOrMore, OneOrMore, ZeroOrOne, One
 
 from neomodel.util import NodeClassRegistry
 
-from restapi.models.neo4j import User as UserBase
+from restapi.connectors.neo4j.models import User as UserBase
+from restapi.connectors.neo4j.models import Group as GroupBase
 from imc.models import codelists
 
 
@@ -43,6 +44,12 @@ for c in registry._NODE_CLASS_REGISTRY:
         registry._NODE_CLASS_REGISTRY.pop(base_user)
         break
 
+registry = NodeClassRegistry()
+base_group = frozenset({'Group'})
+for c in registry._NODE_CLASS_REGISTRY:
+    if c == base_group:
+        registry._NODE_CLASS_REGISTRY.pop(base_group)
+        break
 
 class HeritableStructuredNode(StructuredNode):
 
@@ -146,12 +153,7 @@ class User(UserBase):
     )
 
 
-class Group(IdentifiedNode):
-    fullname = StringProperty(required=True, unique_index=True, show=True)
-    shortname = StringProperty(required=True, unique_index=True, show=True)
-
-    members = RelationshipFrom('User', 'BELONGS_TO', cardinality=ZeroOrMore, show=True)
-    coordinator = RelationshipFrom('User', 'PI_FOR', cardinality=ZeroOrMore, show=True)
+class Group(GroupBase):
     stage_files = RelationshipFrom(
         'Stage', 'IS_OWNED_BY', cardinality=ZeroOrMore, show=False
     )
