@@ -21,7 +21,7 @@ from restapi.utilities.logs import log
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.rest.definition import EndpointResource
+from imc.apis import IMCEndpoint
 from imc.tasks.services.creation_repository import CreationRepository
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
@@ -30,12 +30,12 @@ from restapi.connectors.celery import CeleryExt
 
 
 #####################################
-class Bulk(EndpointResource):
+class Bulk(IMCEndpoint):
 
     allowed_actions = ('update', 'import', 'delete', 'v2')
 
     labels = ['bulk']
-    POST = {'/bulk': {'summary': 'Perform many operations such as import, update, delete etc.', 'description': 'The bulk API makes it possible to perform many operations in a single API call.', 'responses': {'202': {'description': 'Bulk action successfully accepted'}, '400': {'description': 'Bad request.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {'/bulk': {'summary': 'Perform many operations such as import, update, delete etc.', 'description': 'The bulk API makes it possible to perform many operations in a single API call.', 'responses': {'202': {'description': 'Bulk action successfully accepted'}, '400': {'description': 'Bad request.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     def check_item_type_coherence(self, resource, standard_path):
         """

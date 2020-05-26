@@ -8,17 +8,17 @@ from restapi.utilities.logs import log
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.rest.definition import EndpointResource
+from imc.apis import IMCEndpoint
 from imc.models import codelists
 
 
-class SearchAnnotations(EndpointResource):
+class SearchAnnotations(IMCEndpoint):
 
     allowed_anno_types = ('TAG', 'VIM', 'TVS')
     allowed_item_types = ('all', 'video', 'image', 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
-    POST = {'/annotations/search': {'summary': 'Search for annotations', 'description': 'Search for annotations', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of annotation matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {'/annotations/search': {'summary': 'Search for annotations', 'description': 'Search for annotations', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of annotation matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

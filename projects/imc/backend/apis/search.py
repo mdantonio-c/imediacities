@@ -14,15 +14,15 @@ from restapi.utilities.logs import log
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from restapi.rest.definition import EndpointResource
+from imc.apis import IMCEndpoint
 from imc.models import codelists
 
 
 #####################################
-class Search(EndpointResource):
+class Search(IMCEndpoint):
 
     labels = ['file']
-    POST = {'/search': {'summary': 'Search some videos', 'description': 'Search videos previously staged in the area.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/SearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of videos matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {'/search': {'summary': 'Search some videos', 'description': 'Search videos previously staged in the area.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/SearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of videos matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     allowed_item_types = ('all', 'video', 'image')  # , 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')

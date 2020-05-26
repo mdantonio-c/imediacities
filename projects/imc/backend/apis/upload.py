@@ -12,19 +12,19 @@ from restapi import decorators
 from restapi.utilities.logs import log
 from restapi.utilities.htmlcodes import hcodes
 from restapi.services.uploader import Uploader
-from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.connectors.neo4j import graph_transactions
+from imc.apis import IMCEndpoint
 
 mime = MimeTypes()
 
 
-class Upload(Uploader, EndpointResource):
+class Upload(Uploader, IMCEndpoint):
 
     labels = ['file']
-    GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
-    POST = {'/upload': {'summary': 'Initialize file upload', 'responses': {'200': {'description': 'File upload successfully initialized'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    PUT = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
+    _POST = {'/upload': {'summary': 'Initialize file upload', 'responses': {'200': {'description': 'File upload successfully initialized'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _PUT = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -49,10 +49,6 @@ class Upload(Uploader, EndpointResource):
             os.mkdir(upload_dir)
 
         return self.init_chunk_upload(upload_dir, filename, force=True)
-
-        # upload_response = self.upload_data(
-        #     filename, subfolder=upload_dir, force=False)
-        # return upload_response
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

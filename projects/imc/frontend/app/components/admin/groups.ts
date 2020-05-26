@@ -56,16 +56,11 @@ export class AdminGroupsComponent extends BasePaginationComponent<Group> {
 	}
 
 	create() {
-		let data = { 'get_schema': true, 'autocomplete': false }
-
-		return this.post(this.endpoint, data, this.formModal, false);
+		return this.post(this.endpoint, this.formModal);
 	}
 
 	update(row) {
-
-		let data = { 'get_schema': true, 'autocomplete': false }
-
-		return this.put(row, this.endpoint, data, this.formModal, false);
+		return this.put(row, this.endpoint, this.formModal);
 	}
 
 	submit() {

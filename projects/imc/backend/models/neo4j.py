@@ -12,7 +12,8 @@ import sys
 from datetime import datetime
 import pytz
 
-from restapi.connectors.neo4j.types import (
+from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
+from imc.models.neo4j_types import (
     StringProperty,
     ArrayProperty,
     IntegerProperty,
@@ -24,8 +25,6 @@ from restapi.connectors.neo4j.types import (
     EmailProperty,
     StructuredNode,
     StructuredRel,
-    IdentifiedNode,
-    TimestampedNode,
     RelationshipTo,
     RelationshipFrom,
 )

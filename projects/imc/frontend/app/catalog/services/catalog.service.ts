@@ -139,7 +139,7 @@ export class CatalogService {
 	 */
     getRelevantCreations = function(relevantCreations) {
         if (relevantCreations === undefined || relevantCreations.size === 0) {
-        	return of({'Response': {'data': []}});
+        	return of([]);
         }
         let data = {
             'relevant-list': []

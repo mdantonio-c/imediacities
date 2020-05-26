@@ -354,18 +354,3 @@ definitions:
         items:
           description: Annotation's uuid
           type: string
-
-FormDataParameters:
-  AdminUsers:
-    - name: group
-      in: formData
-      type: string
-      required: true
-      description: Select a group
-      custom:
-        autocomplete: true
-        islink: true
-        label: Group
-        model_key: _belongs_to
-        select_label: shortname
-        select_id: id

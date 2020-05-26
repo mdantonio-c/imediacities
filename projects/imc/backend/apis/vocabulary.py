@@ -4,16 +4,16 @@
 Expose the controlled vocabulary
 """
 from restapi.utilities.logs import log
-from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi import decorators
+from imc.apis import IMCEndpoint
 
 
-class Vocabulary(EndpointResource):
+class Vocabulary(IMCEndpoint):
 
     labels = ['vocabulary']
-    GET = {'/vocabulary': {'summary': 'Returns the controlled vocabulary.', 'responses': {'200': {'description': 'The controlled vocabulary'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _GET = {'/vocabulary': {'summary': 'Returns the controlled vocabulary.', 'responses': {'200': {'description': 'The controlled vocabulary'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}}}}
 
     @decorators.catch_errors()
     @decorators.auth.required()

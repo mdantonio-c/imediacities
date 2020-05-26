@@ -3,6 +3,7 @@
 """
 Handle your image entity
 """
+import os
 from flask import request, send_file
 from restapi.confs import get_api_url
 from restapi.confs import PRODUCTION
@@ -10,11 +11,11 @@ from restapi.confs import PRODUCTION
 from restapi.utilities.logs import log
 from imc.security import authz
 from restapi import decorators
-from restapi.rest.definition import EndpointResource
 from restapi.services.download import Downloader
 from restapi.exceptions import RestApiException
 from restapi.connectors.neo4j import graph_transactions
 from restapi.utilities.htmlcodes import hcodes
+from imc.apis import IMCEndpoint
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.annotation_repository import AnnotationRepository
 
@@ -22,7 +23,7 @@ from restapi.connectors.celery import CeleryExt
 
 
 #####################################
-class Images(EndpointResource):
+class Images(IMCEndpoint):
 
     """
     Get an NonAVEntity if its id is passed as an argument.
@@ -30,9 +31,9 @@ class Images(EndpointResource):
     """
 
     labels = ['image']
-    GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}}
-    POST = {'/images': {'summary': 'Create a new image description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).', 'responses': {'200': {'description': 'Image description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    DELETE = {'/images/<image_id>': {'summary': 'Delete a image description', 'responses': {'200': {'description': 'Image successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}}
+    _POST = {'/images': {'summary': 'Create a new image description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).', 'responses': {'200': {'description': 'Image description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _DELETE = {'/images/<image_id>': {'summary': 'Delete a image description', 'responses': {'200': {'description': 'Image successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -99,11 +100,9 @@ class Images(EndpointResource):
         if len(v) == 0:
             raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
 
-        # schema = self.get_endpoint_custom_definition()
-
         data = self.get_input()
 
-        log.critical(data)
+        log.info(data)
 
         return self.empty_response()
 
@@ -134,9 +133,9 @@ class Images(EndpointResource):
             )
 
 
-class ImageItem(EndpointResource):
+class ImageItem(IMCEndpoint):
 
-    PUT = {'/images/<image_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Image does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _PUT = {'/images/<image_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Image does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -198,12 +197,12 @@ class ImageItem(EndpointResource):
         return self.empty_response()
 
 
-class ImageAnnotations(EndpointResource):
+class ImageAnnotations(IMCEndpoint):
     """
         Get all image annotations for a given image.
     """
     labels = ['image_annotations']
-    GET = {'/images/<image_id>/annotations': {'summary': 'Gets image annotations', 'description': 'Returns all the annotations targeting the given image item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Image does not exist.'}}}}
+    _GET = {'/images/<image_id>/annotations': {'summary': 'Gets image annotations', 'description': 'Returns all the annotations targeting the given image item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Image does not exist.'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -273,13 +272,13 @@ class ImageAnnotations(EndpointResource):
         return self.response(data)
 
 
-class ImageContent(EndpointResource):
+class ImageContent(IMCEndpoint, Downloader):
     """
     Gets image content or thumbnail
     """
 
     labels = ['image']
-    GET = {'/images/<image_id>/content': {'summary': 'Gets the image content', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. image, thumbnail)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Image content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image content does not exists.'}}}}
+    _GET = {'/images/<image_id>/content': {'summary': 'Gets the image content', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. image, thumbnail)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Image content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image content does not exists.'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -325,10 +324,17 @@ class ImageContent(EndpointResource):
                 raise RestApiException(
                     "Image not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
+            filename = os.path.basename(image_uri)
+            folder = os.path.dirname(image_uri)
+
             # image is always jpeg
-            mime = "image/jpeg"
-            download = Downloader()
-            return download.send_file_partial(image_uri, mime)
+
+            # return self.send_file_partial(image_uri, mime)
+            return self.download(
+                filename=filename,
+                subfolder=folder,
+                mime="image/jpeg"
+            )
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
@@ -350,11 +356,11 @@ class ImageContent(EndpointResource):
             )
 
 
-class ImageTools(EndpointResource):
+class ImageTools(IMCEndpoint):
 
     __available_tools__ = ('object-detection', 'building-recognition')
     labels = ['image_tools']
-    POST = {'/images/<image_id>/tools': {'summary': 'Allow to launch the execution of some image tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Image not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
+    _POST = {'/images/<image_id>/tools': {'summary': 'Allow to launch the execution of some image tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Image not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

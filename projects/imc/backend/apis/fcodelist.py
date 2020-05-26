@@ -5,16 +5,16 @@ Expose the codelists
 """
 import json
 from restapi.utilities.logs import log
-from restapi.rest.definition import EndpointResource
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
 from restapi import decorators
+from imc.apis import IMCEndpoint
 
 
-class Fcodelist(EndpointResource):
+class Fcodelist(IMCEndpoint):
 
     labels = ['fcodelist']
-    GET = {'/fcodelist/<codelist>': {'summary': 'GET codelists', 'description': 'Returns a codelist', 'parameters': [{'name': 'lang', 'in': 'query', 'description': 'Language of the codelist', 'type': 'string'}], 'responses': {'200': {'description': 'A codelist.'}, '404': {'description': 'Codelist does not exist.'}}}}
+    _GET = {'/fcodelist/<codelist>': {'summary': 'GET codelists', 'description': 'Returns a codelist', 'parameters': [{'name': 'lang', 'in': 'query', 'description': 'Language of the codelist', 'type': 'string'}], 'responses': {'200': {'description': 'A codelist.'}, '404': {'description': 'Codelist does not exist.'}}}}
 
     @decorators.catch_errors()
     @decorators.auth.required()
