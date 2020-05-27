@@ -222,20 +222,6 @@ class Lists(IMCEndpoint):
                 user_list['nb_frames'] = len(res.items)
             return self.response(user_list)
 
-        # request for multiple lists
-        # offset, limit = self.get_paging()
-        # offset -= 1
-        # if offset < 0:
-        #     raise RestApiException('Page number cannot be a negative value',
-        #                            status_code=hcodes.HTTP_BAD_REQUEST)
-        # if limit < 0:
-        #     raise RestApiException('Page size cannot be a negative value',
-        #                            status_code=hcodes.HTTP_BAD_REQUEST)
-        # count = (
-        #     "MATCH (n:List)"
-        #     " {match} "
-        #     "RETURN COUNT(DISTINCT(n))".format(match=user_match)
-        # )
         count_items = ', count(r)' if nb_items else ''
         query = (
             "MATCH (n:List) "
@@ -442,20 +428,6 @@ class ListItems(IMCEndpoint):
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
-            'parameters': [
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of lists returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
-            ],
         },
         '/lists/<list_id>/items': {
             'summary': 'List of items in a list.',
@@ -465,20 +437,6 @@ class ListItems(IMCEndpoint):
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
-            'parameters': [
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of lists returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
-            ],
         },
     }
     _POST = {
@@ -572,20 +530,7 @@ class ListItems(IMCEndpoint):
                 user_list.uuid, user_list.name
             )
         )
-        # do we need pagination here?
-        offset, limit = self.get_paging()
-        offset -= 1
-        log.debug("paging: offset {0}, limit {1}", offset, limit)
-        if offset < 0:
-            raise RestApiException(
-                'Page number cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        if limit < 0:
-            raise RestApiException(
-                'Page size cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+
         data = []
         for list_item in user_list.items.all():
             data.append(self.get_list_item_response(list_item))

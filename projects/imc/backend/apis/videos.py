@@ -1093,18 +1093,6 @@ class VideoShotRevision(IMCEndpoint):
             'description': 'Returns a list containing all videos under revision together with the assignee. The list supports paging.',
             'parameters': [
                 {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of videos returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
-                {
                     'name': 'assignee',
                     'in': 'query',
                     'description': "Assignee's uuid of the revision",
@@ -1190,19 +1178,6 @@ class VideoShotRevision(IMCEndpoint):
 
         input_parameters = self.get_input()
         input_assignee = input_parameters['assignee']
-        offset, limit = self.get_paging()
-        offset -= 1
-        log.debug("paging: offset {0}, limit {1}", offset, limit)
-        if offset < 0:
-            raise RestApiException(
-                'Page number cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        if limit < 0:
-            raise RestApiException(
-                'Page size cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
         # naive solution for getting VideoInRevision
         items = self.graph.Item.nodes.has(revision=True)

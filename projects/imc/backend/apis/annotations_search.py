@@ -29,18 +29,6 @@ class SearchAnnotations(IMCEndpoint):
                     'description': 'Criteria for the search.',
                     'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'},
                 },
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of annotations returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
             ],
             'responses': {
                 '200': {'description': 'A list of annotation matching search criteria.'},
@@ -56,19 +44,6 @@ class SearchAnnotations(IMCEndpoint):
         self.graph = self.get_service_instance('neo4j')
 
         input_parameters = self.get_input()
-        offset, limit = self.get_paging()
-        offset -= 1
-        log.debug("paging: offset {0}, limit {1}", offset, limit)
-        if offset < 0:
-            raise RestApiException(
-                'Page number cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        if limit < 0:
-            raise RestApiException(
-                'Page size cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
         filters = []
         starters = []
