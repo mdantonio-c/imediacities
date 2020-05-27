@@ -45,12 +45,7 @@ class Stage(IMCEndpoint):
                 },
             ],
             'responses': {
-                '200': {
-                    'description': 'List of files and directories successfully retrieved'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '200': {'description': 'List of files and directories successfully retrieved'},
             },
         },
         '/stage/<group>': {
@@ -76,12 +71,7 @@ class Stage(IMCEndpoint):
                 },
             ],
             'responses': {
-                '200': {
-                    'description': 'List of files and directories successfully retrieved'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '200': {'description': 'List of files and directories successfully retrieved'},
             },
         },
     }
@@ -122,9 +112,6 @@ class Stage(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'File successfully imported'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '409': {'description': 'No source ID found in metadata file.'},
             },
         }
@@ -134,9 +121,6 @@ class Stage(IMCEndpoint):
             'summary': 'Delete a file from the stage area',
             'responses': {
                 '200': {'description': 'File successfully deleted'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }

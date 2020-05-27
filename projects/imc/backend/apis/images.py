@@ -37,9 +37,6 @@ class Images(IMCEndpoint):
             'description': 'Returns a list containing all images. The list supports paging.',
             'responses': {
                 '200': {'description': 'List of images successfully retrieved'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The image does not exists.'},
             },
         },
@@ -48,9 +45,6 @@ class Images(IMCEndpoint):
             'description': 'Returns a list containing all images. The list supports paging.',
             'responses': {
                 '200': {'description': 'List of images successfully retrieved'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The image does not exists.'},
             },
         },
@@ -61,9 +55,6 @@ class Images(IMCEndpoint):
             'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).',
             'responses': {
                 '200': {'description': 'Image description successfully created'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -72,9 +63,6 @@ class Images(IMCEndpoint):
             'summary': 'Delete a image description',
             'responses': {
                 '200': {'description': 'Image successfully deleted'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -191,12 +179,8 @@ class ImageItem(IMCEndpoint):
             'responses': {
                 '204': {'description': 'Item info successfully updated.'},
                 '400': {'description': 'Request not valid.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Image does not exist.'},
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }
@@ -282,9 +266,6 @@ class ImageAnnotations(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'An annotation object.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Image does not exist.'},
             },
         }
@@ -384,9 +365,6 @@ class ImageContent(IMCEndpoint, Downloader):
             ],
             'responses': {
                 '200': {'description': 'Image content successfully retrieved'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The image content does not exists.'},
             },
         }
@@ -495,17 +473,10 @@ class ImageTools(IMCEndpoint):
             ],
             'responses': {
                 '202': {'description': 'Execution task accepted.'},
-                '200': {
-                    'description': 'Execution completed successfully. Only with delete operation.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
+                '200': {'description': 'Execution completed successfully. Only with delete operation.'},
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Image not found.'},
-                '409': {
-                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
-                },
+                '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'},
             },
         }
     }

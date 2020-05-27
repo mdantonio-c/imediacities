@@ -43,12 +43,7 @@ class SearchAnnotations(IMCEndpoint):
                 },
             ],
             'responses': {
-                '200': {
-                    'description': 'A list of annotation matching search criteria.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '200': {'description': 'A list of annotation matching search criteria.'},
             },
         }
     }

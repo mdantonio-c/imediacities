@@ -18,10 +18,6 @@ class Vocabulary(IMCEndpoint):
             'summary': 'Returns the controlled vocabulary.',
             'responses': {
                 '200': {'description': 'The controlled vocabulary'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }

@@ -42,9 +42,6 @@ class Bulk(IMCEndpoint):
             'responses': {
                 '202': {'description': 'Bulk action successfully accepted'},
                 '400': {'description': 'Bad request.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }

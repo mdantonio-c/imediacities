@@ -39,9 +39,6 @@ class Videos(IMCEndpoint):
             'responses': {
                 '200': {'description': 'List of videos successfully retrieved'},
                 '404': {'description': 'The video does not exists.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         },
         '/videos': {
@@ -51,9 +48,6 @@ class Videos(IMCEndpoint):
             'responses': {
                 '200': {'description': 'List of videos successfully retrieved'},
                 '404': {'description': 'The video does not exists.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         },
     }
@@ -63,9 +57,6 @@ class Videos(IMCEndpoint):
             'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).',
             'responses': {
                 '200': {'description': 'Video description successfully created'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -74,9 +65,6 @@ class Videos(IMCEndpoint):
             'summary': 'Delete a video description',
             'responses': {
                 '200': {'description': 'Video successfully deleted'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -207,12 +195,8 @@ class VideoItem(IMCEndpoint):
             'responses': {
                 '204': {'description': 'Item info successfully updated.'},
                 '400': {'description': 'Request not valid.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Video does not exist.'},
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }
@@ -303,9 +287,6 @@ class VideoAnnotations(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'An annotation object.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Video does not exist.'},
             },
         }
@@ -462,9 +443,6 @@ class VideoShots(IMCEndpoint):
             'description': 'Returns a list of shots belonging to the given video item.',
             'responses': {
                 '200': {'description': 'An list of shots.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Video does not exist.'},
             },
         }
@@ -606,9 +584,6 @@ class VideoSegments(IMCEndpoint):
             'description': 'Returns a list of the manual segments belonging to the given video item.',
             'responses': {
                 '200': {'description': 'An list of manual segments.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Video does not exist.'},
             },
         },
@@ -617,9 +592,6 @@ class VideoSegments(IMCEndpoint):
             'description': 'Returns a list of the manual segments belonging to the given video item.',
             'responses': {
                 '200': {'description': 'An list of manual segments.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Video does not exist.'},
             },
         },
@@ -648,9 +620,6 @@ class VideoSegments(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Manual video segment successfully updated.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Manual video segment does not exist.'},
             },
@@ -661,9 +630,6 @@ class VideoSegments(IMCEndpoint):
             'summary': 'Delete a video segment.',
             'responses': {
                 '200': {'description': 'Video segment successfully deleted'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'Video segment does not exist'},
             },
         }
@@ -763,9 +729,6 @@ class VideoContent(IMCEndpoint, Downloader):
             ],
             'responses': {
                 '200': {'description': 'Video content successfully retrieved'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The video content does not exists.'},
             },
         }
@@ -1003,17 +966,10 @@ class VideoTools(IMCEndpoint):
             ],
             'responses': {
                 '202': {'description': 'Execution task accepted.'},
-                '200': {
-                    'description': 'Execution completed successfully. Only with delete operation.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
+                '200': {'description': 'Execution completed successfully. Only with delete operation.'},
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Video not found.'},
-                '409': {
-                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
-                },
+                '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'},
             },
         }
     }
@@ -1163,9 +1119,6 @@ class VideoShotRevision(IMCEndpoint):
                         'items': {'$ref': '#/definitions/VideoInRevision'},
                     },
                 },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -1182,9 +1135,6 @@ class VideoShotRevision(IMCEndpoint):
             ],
             'responses': {
                 '201': {'description': 'Execution launched.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Video not found.'},
                 '409': {'description': 'Invalid state for the video.'},
@@ -1212,15 +1162,9 @@ class VideoShotRevision(IMCEndpoint):
             'responses': {
                 '204': {'description': 'Video under revision successfully.'},
                 '400': {'description': 'Assignee not valid.'},
-                '409': {
-                    'description': 'Video is already under revision or it is not ready for revision.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '409': {'description': 'Video is already under revision or it is not ready for revision.'},
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Video does not exist.'},
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }
@@ -1229,9 +1173,6 @@ class VideoShotRevision(IMCEndpoint):
             'summary': 'Take off revision from a video.',
             'responses': {
                 '204': {'description': 'Video revision successfully exited.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Video not found.'},
             },

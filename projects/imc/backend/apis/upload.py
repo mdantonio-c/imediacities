@@ -27,9 +27,6 @@ class Upload(Uploader, IMCEndpoint):
             'summary': 'Download an uploaded file',
             'responses': {
                 '200': {'description': 'File successfully downloaded'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The uploaded content does not exists.'},
             },
         }
@@ -39,9 +36,6 @@ class Upload(Uploader, IMCEndpoint):
             'summary': 'Initialize file upload',
             'responses': {
                 '200': {'description': 'File upload successfully initialized'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }
@@ -50,9 +44,6 @@ class Upload(Uploader, IMCEndpoint):
             'summary': 'Upload a file into the stage area',
             'responses': {
                 '200': {'description': 'File successfully uploaded'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }

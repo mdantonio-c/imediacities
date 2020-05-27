@@ -32,9 +32,6 @@ class Shots(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'Shot information successfully retrieved'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
                 '404': {'description': 'The video does not exists.'},
             },
         }
@@ -111,9 +108,6 @@ class ShotAnnotations(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'List of annotations.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
                 '404': {'description': 'Shot does not exist.'},
             },
         }

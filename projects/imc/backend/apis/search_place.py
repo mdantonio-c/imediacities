@@ -51,9 +51,6 @@ class SearchPlace(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'A list of creations for relevant places.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }

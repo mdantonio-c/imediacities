@@ -53,12 +53,7 @@ class Lists(IMCEndpoint):
                     'description': 'The list of the researcher.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'The requested list does not exist.'},
             },
         },
@@ -91,12 +86,7 @@ class Lists(IMCEndpoint):
                     'description': 'The list of the researcher.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'The requested list does not exist.'},
             },
         },
@@ -117,15 +107,8 @@ class Lists(IMCEndpoint):
                     'description': 'List created successfully.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '400': {
-                    'description': 'There is no content present in the request body or the content is not valid for list.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '400': {'description': 'There is no content present in the request body or the content is not valid for list.'},
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '409': {'description': 'There is already a list with that name.'},
             },
         }
@@ -144,19 +127,10 @@ class Lists(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'List updated successfully.'},
-                '400': {
-                    'description': 'There is no content present in the request body or the content is not valid for list.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '400': {'description': 'There is no content present in the request body or the content is not valid for list.'},
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List does not exist.'},
-                '409': {
-                    'description': 'There is already another list with the same name among your lists.'
-                },
+                '409': {'description': 'There is already another list with the same name among your lists.'},
             },
         }
     }
@@ -166,12 +140,7 @@ class Lists(IMCEndpoint):
             'description': 'Delete a list of the researcher.',
             'responses': {
                 '204': {'description': 'List deleted successfully.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List does not exist.'},
             },
         }
@@ -469,12 +438,7 @@ class ListItems(IMCEndpoint):
             'summary': 'List of items in a list.',
             'responses': {
                 '200': {'description': 'An list of items.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
@@ -497,12 +461,7 @@ class ListItems(IMCEndpoint):
             'summary': 'List of items in a list.',
             'responses': {
                 '200': {'description': 'An list of items.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorzation token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
@@ -543,15 +502,8 @@ class ListItems(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Item added successfully.'},
-                '400': {
-                    'description': 'Bad request body or target node does not exist.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '400': {'description': 'Bad request body or target node does not exist.'},
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List does not exist.'},
                 '409': {'description': 'The item is already connected to that list.'},
             },
@@ -562,12 +514,7 @@ class ListItems(IMCEndpoint):
             'summary': 'Delete an item from a list.',
             'responses': {
                 '204': {'description': 'Item deleted successfully.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token.'
-                },
-                '403': {
-                    'description': 'The user is not authorized to perform this operation.'
-                },
+                '403': {'description': 'The user is not authorized to perform this operation.'},
                 '404': {'description': 'List or item does not exist.'},
             },
         }

@@ -48,9 +48,6 @@ class Search(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'A list of videos matching search criteria.'},
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
             },
         }
     }

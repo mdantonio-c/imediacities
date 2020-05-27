@@ -129,9 +129,7 @@ class Annotations(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully updated.'},
-                '400': {
-                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
-                },
+                '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'},
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
             },
@@ -143,13 +141,6 @@ class Annotations(IMCEndpoint):
             'description': 'Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.',
             'parameters': [
                 {
-                    'name': 'uuid',
-                    'in': 'path',
-                    'required': True,
-                    'description': "The annotation's uuid",
-                    'type': 'string',
-                },
-                {
                     'name': 'JsonPatch',
                     'in': 'body',
                     'required': True,
@@ -159,15 +150,9 @@ class Annotations(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully updated.'},
-                '400': {
-                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'},
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }
@@ -177,13 +162,6 @@ class Annotations(IMCEndpoint):
             'description': 'Delete a single annotation identified via its uuid',
             'parameters': [
                 {
-                    'name': 'uuid',
-                    'in': 'path',
-                    'required': True,
-                    'description': "The annotation's uuid",
-                    'type': 'string',
-                },
-                {
                     'name': 'body_ref',
                     'in': 'query',
                     'description': 'optional body reference for annotation with multiple bodies. This reference MUST be in the form "textual:your_term_value" or "resource:your_term_IRI"',
@@ -192,15 +170,9 @@ class Annotations(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully deleted.'},
-                '400': {
-                    'description': 'Annotation cannot be deleted. No body found for the given reference.'
-                },
-                '401': {
-                    'description': 'This endpoint requires a valid authorization token'
-                },
+                '400': {'description': 'Annotation cannot be deleted. No body found for the given reference.'},
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
-                '500': {'description': 'An unexpected error occured.'},
             },
         }
     }
