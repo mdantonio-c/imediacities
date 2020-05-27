@@ -22,7 +22,38 @@ from imc.models import codelists
 class Search(IMCEndpoint):
 
     labels = ['file']
-    _POST = {'/search': {'summary': 'Search some videos', 'description': 'Search videos previously staged in the area.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/SearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of videos matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {
+        '/search': {
+            'summary': 'Search some videos',
+            'description': 'Search videos previously staged in the area.',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria for the search.',
+                    'schema': {'$ref': '#/definitions/SearchCriteria'},
+                },
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of videos returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+            ],
+            'responses': {
+                '200': {'description': 'A list of videos matching search criteria.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     allowed_item_types = ('all', 'video', 'image')  # , 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
@@ -75,7 +106,8 @@ class Search(IMCEndpoint):
             if item_type not in self.__class__.allowed_item_types:
                 raise RestApiException(
                     "Bad item type parameter: expected one of {}".format(
-                        self.__class__.allowed_item_types),
+                        self.__class__.allowed_item_types
+                    ),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if item_type == 'all':
@@ -212,7 +244,8 @@ class Search(IMCEndpoint):
                 if anno_type not in self.__class__.allowed_anno_types:
                     raise RestApiException(
                         "Bad annotation type in annotated_by filter: expected one of {}".format(
-                            self.__class__.allowed_anno_types),
+                            self.__class__.allowed_anno_types
+                        ),
                         status_code=hcodes.HTTP_BAD_REQUEST,
                     )
                 filters.append(
@@ -387,9 +420,6 @@ class Search(IMCEndpoint):
             group_by_years[row[0]] = row[1]
         meta_response["countByYears"] = group_by_years
 
-        resp = {
-            "data": data,
-            "meta": meta_response
-        }
+        resp = {"data": data, "meta": meta_response}
 
         return self.response(resp)

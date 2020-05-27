@@ -19,7 +19,44 @@ from imc.apis import IMCEndpoint
 #####################################
 class SearchPlace(IMCEndpoint):
 
-    _POST = {'/search_place': {'summary': 'Search some creations for specific place annotations', 'description': 'Search some creations for specific place annotations.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'required': ['relevant-list'], 'properties': {'relevant-list': {'type': 'array', 'items': {'required': ['creation-id', 'place-ids'], 'properties': {'creation-id': {'type': 'string'}, 'place-ids': {'type': 'array', 'items': {'type': 'string', 'minItems': 1}}}}, 'minItems': 1}}}}], 'responses': {'200': {'description': 'A list of creations for relevant places.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {
+        '/search_place': {
+            'summary': 'Search some creations for specific place annotations',
+            'description': 'Search some creations for specific place annotations.',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria for the search.',
+                    'schema': {
+                        'required': ['relevant-list'],
+                        'properties': {
+                            'relevant-list': {
+                                'type': 'array',
+                                'items': {
+                                    'required': ['creation-id', 'place-ids'],
+                                    'properties': {
+                                        'creation-id': {'type': 'string'},
+                                        'place-ids': {
+                                            'type': 'array',
+                                            'items': {'type': 'string', 'minItems': 1},
+                                        },
+                                    },
+                                },
+                                'minItems': 1,
+                            }
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '200': {'description': 'A list of creations for relevant places.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

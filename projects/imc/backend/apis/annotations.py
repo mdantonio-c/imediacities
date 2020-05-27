@@ -42,11 +42,168 @@ class Annotations(IMCEndpoint):
     allowed_patch_operations = ('add', 'remove')
 
     labels = ['annotation']
-    _GET = {'/annotations': {'summary': 'Get a single annotation', 'description': 'Returns a single annotation for its uuid', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'filter by annotation type', 'type': 'string'}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}], 'responses': {'200': {'description': 'An annotation', 'schema': {'$ref': '#/definitions/Annotation'}}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}, '404': {'description': 'Annotation does not exist.'}}}, '/annotations/<anno_id>': {'summary': 'Get a single annotation', 'description': 'Returns a single annotation for its uuid', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'filter by annotation type', 'type': 'string'}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}], 'responses': {'200': {'description': 'An annotation', 'schema': {'$ref': '#/definitions/Annotation'}}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}, '404': {'description': 'Annotation does not exist.'}}}}
-    _POST = {'/annotations': {'summary': 'Create an annotation', 'description': 'Add a new annotation using WADM-based model to some specified target', 'parameters': [{'name': 'annotation', 'in': 'body', 'description': 'The annotation to create.', 'schema': {'$ref': '#/definitions/Annotation'}}], 'responses': {'201': {'description': 'Annotation successfully created.'}, '400': {'description': "Annotation couldn't have been created."}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    _PUT = {'/annotations/<anno_id>': {'summary': 'Updates an annotation', 'description': 'Update a single annotation identified via its uuid', 'parameters': [{'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}, {'name': 'annotation', 'in': 'body', 'required': True, 'description': 'The annotation to update.', 'schema': {'$ref': '#/definitions/Annotation'}}], 'responses': {'204': {'description': 'Annotation successfully updated.'}, '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Annotation does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
-    _PATCH = {'/annotations/<anno_id>': {'summary': 'Updates partially an annotation', 'description': 'Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.', 'parameters': [{'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}, {'name': 'JsonPatch', 'in': 'body', 'required': True, 'description': 'The annotation to update.', 'schema': {'$ref': '#/definitions/PatchRequest'}}], 'responses': {'204': {'description': 'Annotation successfully updated.'}, '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Annotation does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
-    _DELETE = {'/annotations/<anno_id>': {'summary': 'Deletes an annotation', 'description': 'Delete a single annotation identified via its uuid', 'parameters': [{'name': 'uuid', 'in': 'path', 'required': True, 'description': "The annotation's uuid", 'type': 'string'}, {'name': 'body_ref', 'in': 'query', 'description': 'optional body reference for annotation with multiple bodies. This reference MUST be in the form "textual:your_term_value" or "resource:your_term_IRI"', 'type': 'string'}], 'responses': {'204': {'description': 'Annotation successfully deleted.'}, '400': {'description': 'Annotation cannot be deleted. No body found for the given reference.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Annotation does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _GET = {
+        '/annotations': {
+            'summary': 'Get a single annotation',
+            'description': 'Returns a single annotation for its uuid',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'description': 'filter by annotation type',
+                    'type': 'string',
+                },
+                {
+                    'name': 'onlyManual',
+                    'in': 'query',
+                    'type': 'boolean',
+                    'default': False,
+                    'allowEmptyValue': True,
+                }
+            ],
+            'responses': {
+                '200': {
+                    'description': 'An annotation',
+                    'schema': {'$ref': '#/definitions/Annotation'},
+                },
+                '404': {'description': 'Annotation does not exist.'},
+            },
+        },
+        '/annotations/<anno_id>': {
+            'summary': 'Get a single annotation',
+            'description': 'Returns a single annotation for its uuid',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'description': 'filter by annotation type',
+                    'type': 'string',
+                },
+                {
+                    'name': 'onlyManual',
+                    'in': 'query',
+                    'type': 'boolean',
+                    'default': False,
+                    'allowEmptyValue': True,
+                }
+            ],
+            'responses': {
+                '200': {
+                    'description': 'An annotation',
+                    'schema': {'$ref': '#/definitions/Annotation'},
+                },
+                '404': {'description': 'Annotation does not exist.'},
+            },
+        },
+    }
+    _POST = {
+        '/annotations': {
+            'summary': 'Create an annotation',
+            'description': 'Add a new annotation using WADM-based model to some specified target',
+            'parameters': [
+                {
+                    'name': 'annotation',
+                    'in': 'body',
+                    'description': 'The annotation to create.',
+                    'schema': {'$ref': '#/definitions/Annotation'},
+                }
+            ],
+            'responses': {
+                '201': {'description': 'Annotation successfully created.'},
+                '400': {'description': "Annotation couldn't have been created."},
+            },
+        }
+    }
+    _PUT = {
+        '/annotations/<anno_id>': {
+            'summary': 'Updates an annotation',
+            'description': 'Update a single annotation identified via its uuid',
+            'parameters': [
+                {
+                    'name': 'annotation',
+                    'in': 'body',
+                    'required': True,
+                    'description': 'The annotation to update.',
+                    'schema': {'$ref': '#/definitions/Annotation'},
+                },
+            ],
+            'responses': {
+                '204': {'description': 'Annotation successfully updated.'},
+                '400': {
+                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Annotation does not exist.'},
+            },
+        }
+    }
+    _PATCH = {
+        '/annotations/<anno_id>': {
+            'summary': 'Updates partially an annotation',
+            'description': 'Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.',
+            'parameters': [
+                {
+                    'name': 'uuid',
+                    'in': 'path',
+                    'required': True,
+                    'description': "The annotation's uuid",
+                    'type': 'string',
+                },
+                {
+                    'name': 'JsonPatch',
+                    'in': 'body',
+                    'required': True,
+                    'description': 'The annotation to update.',
+                    'schema': {'$ref': '#/definitions/PatchRequest'},
+                },
+            ],
+            'responses': {
+                '204': {'description': 'Annotation successfully updated.'},
+                '400': {
+                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Annotation does not exist.'},
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
+    _DELETE = {
+        '/annotations/<anno_id>': {
+            'summary': 'Deletes an annotation',
+            'description': 'Delete a single annotation identified via its uuid',
+            'parameters': [
+                {
+                    'name': 'uuid',
+                    'in': 'path',
+                    'required': True,
+                    'description': "The annotation's uuid",
+                    'type': 'string',
+                },
+                {
+                    'name': 'body_ref',
+                    'in': 'query',
+                    'description': 'optional body reference for annotation with multiple bodies. This reference MUST be in the form "textual:your_term_value" or "resource:your_term_IRI"',
+                    'type': 'string',
+                },
+            ],
+            'responses': {
+                '204': {'description': 'Annotation successfully deleted.'},
+                '400': {
+                    'description': 'Annotation cannot be deleted. No body found for the given reference.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Annotation does not exist.'},
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -115,7 +272,8 @@ class Annotations(IMCEndpoint):
         if motivation not in self.__class__.allowed_motivations:
             raise RestApiException(
                 "Bad motivation parameter: expected one of {}".format(
-                    self.__class__.allowed_motivations),
+                    self.__class__.allowed_motivations
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # check for private and embargo date
@@ -331,7 +489,7 @@ class Annotations(IMCEndpoint):
             # manual annotation without creator!
             log.warning(
                 'Invalid state: manual annotation [{id}] MUST have a creator',
-                id=anno.uuid
+                id=anno.uuid,
             )
             raise RestApiException(
                 'Annotation with no creator', status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -520,7 +678,8 @@ class Annotations(IMCEndpoint):
             if patch_op not in self.__class__.allowed_patch_operations:
                 raise RestApiException(
                     "Bad patch operation: allowed one of {}".format(
-                        self.__class__.allowed_patch_operations),
+                        self.__class__.allowed_patch_operations
+                    ),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if 'path' not in data:

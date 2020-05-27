@@ -31,9 +31,53 @@ class Images(IMCEndpoint):
     """
 
     labels = ['image']
-    _GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}}}
-    _POST = {'/images': {'summary': 'Create a new image description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).', 'responses': {'200': {'description': 'Image description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    _DELETE = {'/images/<image_id>': {'summary': 'Delete a image description', 'responses': {'200': {'description': 'Image successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _GET = {
+        '/images/<image_id>': {
+            'summary': 'List of images',
+            'description': 'Returns a list containing all images. The list supports paging.',
+            'responses': {
+                '200': {'description': 'List of images successfully retrieved'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The image does not exists.'},
+            },
+        },
+        '/images': {
+            'summary': 'List of images',
+            'description': 'Returns a list containing all images. The list supports paging.',
+            'responses': {
+                '200': {'description': 'List of images successfully retrieved'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The image does not exists.'},
+            },
+        },
+    }
+    _POST = {
+        '/images': {
+            'summary': 'Create a new image description',
+            'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).',
+            'responses': {
+                '200': {'description': 'Image description successfully created'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
+    _DELETE = {
+        '/images/<image_id>': {
+            'summary': 'Delete a image description',
+            'responses': {
+                '200': {'description': 'Image successfully deleted'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -41,8 +85,7 @@ class Images(IMCEndpoint):
 
         if image_id is None and not self.auth.verify_admin():
             raise RestApiException(
-                "You are not authorized",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+                "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
             )
 
         log.debug("getting NonAVEntity id: {}", image_id)
@@ -127,7 +170,36 @@ class Images(IMCEndpoint):
 
 class ImageItem(IMCEndpoint):
 
-    _PUT = {'/images/<image_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Image does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _PUT = {
+        '/images/<image_id>/item': {
+            'summary': 'Update item info. At the moment ONLY used for the public access flag',
+            'parameters': [
+                {
+                    'name': 'item_update',
+                    'in': 'body',
+                    'description': 'The item properties to be updated.',
+                    'schema': {
+                        'properties': {
+                            'public_access': {
+                                'description': 'Whether or not the item is accessible by a public user.',
+                                'type': 'boolean',
+                            }
+                        }
+                    },
+                }
+            ],
+            'responses': {
+                '204': {'description': 'Item info successfully updated.'},
+                '400': {'description': 'Request not valid.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Image does not exist.'},
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -193,8 +265,30 @@ class ImageAnnotations(IMCEndpoint):
     """
         Get all image annotations for a given image.
     """
+
     labels = ['image_annotations']
-    _GET = {'/images/<image_id>/annotations': {'summary': 'Gets image annotations', 'description': 'Returns all the annotations targeting the given image item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Image does not exist.'}}}}
+    _GET = {
+        '/images/<image_id>/annotations': {
+            'summary': 'Gets image annotations',
+            'description': 'Returns all the annotations targeting the given image item.',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'description': 'Filter by annotation type (e.g. TAG)',
+                    'type': 'string',
+                    'enum': ['TAG', 'DSC'],
+                }
+            ],
+            'responses': {
+                '200': {'description': 'An annotation object.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Image does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -270,7 +364,33 @@ class ImageContent(IMCEndpoint, Downloader):
     """
 
     labels = ['image']
-    _GET = {'/images/<image_id>/content': {'summary': 'Gets the image content', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. image, thumbnail)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Image content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image content does not exists.'}}}}
+    _GET = {
+        '/images/<image_id>/content': {
+            'summary': 'Gets the image content',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'required': True,
+                    'description': 'content type (e.g. image, thumbnail)',
+                    'type': 'string',
+                },
+                {
+                    'name': 'size',
+                    'in': 'query',
+                    'description': 'used to get large thumbnail (only for that at the moment)',
+                    'type': 'string',
+                },
+            ],
+            'responses': {
+                '200': {'description': 'Image content successfully retrieved'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The image content does not exists.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -322,11 +442,7 @@ class ImageContent(IMCEndpoint, Downloader):
             # image is always jpeg
 
             # return self.send_file_partial(image_uri, mime)
-            return self.download(
-                filename=filename,
-                subfolder=folder,
-                mime="image/jpeg"
-            )
+            return self.download(filename=filename, subfolder=folder, mime="image/jpeg")
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
@@ -352,7 +468,47 @@ class ImageTools(IMCEndpoint):
 
     __available_tools__ = ('object-detection', 'building-recognition')
     labels = ['image_tools']
-    _POST = {'/images/<image_id>/tools': {'summary': 'Allow to launch the execution of some image tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Image not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
+    _POST = {
+        '/images/<image_id>/tools': {
+            'summary': 'Allow to launch the execution of some image tools.',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria to launch the tool.',
+                    'schema': {
+                        'required': ['tool'],
+                        'properties': {
+                            'tool': {
+                                'description': 'Tool to be launched.',
+                                'type': 'string',
+                                'enum': ['object-detection', 'building-recognition'],
+                            },
+                            'operation': {
+                                'description': 'At the moment used only to delete automatic tags.',
+                                'type': 'string',
+                                'enum': ['delete'],
+                            },
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '202': {'description': 'Execution task accepted.'},
+                '200': {
+                    'description': 'Execution completed successfully. Only with delete operation.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {'description': 'Request forbidden.'},
+                '404': {'description': 'Image not found.'},
+                '409': {
+                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -397,7 +553,8 @@ class ImageTools(IMCEndpoint):
         if tool not in self.__available_tools__:
             raise RestApiException(
                 "Please specify a valid tool. Expected one of {}".format(
-                    self.__available_tools__),
+                    self.__available_tools__
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 

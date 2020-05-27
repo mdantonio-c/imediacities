@@ -20,18 +20,13 @@ class CustomProfile(object):
                 required=False,
                 default="none",
                 validate=validate.OneOf(
-                    choices=[
-                        'archive',
-                        'university',
-                        'research_institution',
-                        'none',
-                    ],
+                    choices=['archive', 'university', 'research_institution', 'none'],
                     labels=[
                         'Archive',
                         'University',
                         'Research Institution',
                         'None of the above',
-                    ]
-                )
+                    ],
+                ),
             )
         }

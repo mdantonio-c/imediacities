@@ -22,9 +22,40 @@ mime = MimeTypes()
 class Upload(Uploader, IMCEndpoint):
 
     labels = ['file']
-    _GET = {'/download/<filename>': {'summary': 'Download an uploaded file', 'responses': {'200': {'description': 'File successfully downloaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The uploaded content does not exists.'}}}}
-    _POST = {'/upload': {'summary': 'Initialize file upload', 'responses': {'200': {'description': 'File upload successfully initialized'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    _PUT = {'/upload/<filename>': {'summary': 'Upload a file into the stage area', 'responses': {'200': {'description': 'File successfully uploaded'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _GET = {
+        '/download/<filename>': {
+            'summary': 'Download an uploaded file',
+            'responses': {
+                '200': {'description': 'File successfully downloaded'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The uploaded content does not exists.'},
+            },
+        }
+    }
+    _POST = {
+        '/upload': {
+            'summary': 'Initialize file upload',
+            'responses': {
+                '200': {'description': 'File upload successfully initialized'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
+    _PUT = {
+        '/upload/<filename>': {
+            'summary': 'Upload a file into the stage area',
+            'responses': {
+                '200': {'description': 'File successfully uploaded'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

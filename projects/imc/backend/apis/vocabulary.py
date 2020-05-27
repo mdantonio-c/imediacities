@@ -13,7 +13,18 @@ from imc.apis import IMCEndpoint
 class Vocabulary(IMCEndpoint):
 
     labels = ['vocabulary']
-    _GET = {'/vocabulary': {'summary': 'Returns the controlled vocabulary.', 'responses': {'200': {'description': 'The controlled vocabulary'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _GET = {
+        '/vocabulary': {
+            'summary': 'Returns the controlled vocabulary.',
+            'responses': {
+                '200': {'description': 'The controlled vocabulary'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.auth.required()

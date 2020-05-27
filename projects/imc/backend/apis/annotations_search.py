@@ -18,7 +18,40 @@ class SearchAnnotations(IMCEndpoint):
     allowed_item_types = ('all', 'video', 'image', 'text')
     allowed_term_fields = ('title', 'description', 'keyword', 'contributor')
 
-    _POST = {'/annotations/search': {'summary': 'Search for annotations', 'description': 'Search for annotations', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the search.', 'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'}}, {'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}], 'responses': {'200': {'description': 'A list of annotation matching search criteria.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {
+        '/annotations/search': {
+            'summary': 'Search for annotations',
+            'description': 'Search for annotations',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria for the search.',
+                    'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'},
+                },
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of annotations returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'A list of annotation matching search criteria.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -57,7 +90,8 @@ class SearchAnnotations(IMCEndpoint):
             if anno_type not in self.__class__.allowed_anno_types:
                 raise RestApiException(
                     "Bad annotation type parameter: expected one of {}".format(
-                        self.__class__.allowed_anno_types),
+                        self.__class__.allowed_anno_types
+                    ),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             filters.append(
@@ -120,7 +154,8 @@ class SearchAnnotations(IMCEndpoint):
                         if f not in self.__class__.allowed_term_fields:
                             raise RestApiException(
                                 "Bad field: expected one of {}".format(
-                                    self.__class__.allowed_term_fields),
+                                    self.__class__.allowed_term_fields
+                                ),
                                 status_code=hcodes.HTTP_BAD_REQUEST,
                             )
                         if not term:
@@ -185,7 +220,8 @@ class SearchAnnotations(IMCEndpoint):
                 if c_type not in self.__class__.allowed_item_types:
                     raise RestApiException(
                         "Bad item type parameter: expected one of {}".format(
-                            self.__class__.allowed_item_types),
+                            self.__class__.allowed_item_types
+                        ),
                         status_code=hcodes.HTTP_BAD_REQUEST,
                     )
                 if c_type != 'all':

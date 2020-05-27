@@ -40,9 +40,9 @@ class TestApp(BaseTests):
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
-        # GET all annotations of type TVS, with pagination parameters
+        # GET all annotations of type TVS
         res = client.get(
-            '/api/annotations?type=VIM&pageSize=10&pageNumber=1', headers=headers
+            '/api/annotations?type=VIM', headers=headers
         )
         assert res.status_code == hcodes.HTTP_OK_BASIC
         content = json.loads(res.data.decode('utf-8'))

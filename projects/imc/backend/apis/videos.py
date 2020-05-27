@@ -32,14 +32,53 @@ class Videos(IMCEndpoint):
 
     labels = ['video']
     _GET = {
-        '/videos/<video_id>': {'summary': 'List of videos', 'description': 'Returns a list containing all videos. The list supports paging.', 'tags': ['videos', 'admin'], 'responses': {'200': {'description': 'List of videos successfully retrieved'}, '404': {'description': 'The video does not exists.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}},
-        '/videos': {'summary': 'List of videos', 'description': 'Returns a list containing all videos. The list supports paging.', 'tags': ['videos', 'admin'], 'responses': {'200': {'description': 'List of videos successfully retrieved'}, '404': {'description': 'The video does not exists.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}
+        '/videos/<video_id>': {
+            'summary': 'List of videos',
+            'description': 'Returns a list containing all videos. The list supports paging.',
+            'tags': ['videos', 'admin'],
+            'responses': {
+                '200': {'description': 'List of videos successfully retrieved'},
+                '404': {'description': 'The video does not exists.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        },
+        '/videos': {
+            'summary': 'List of videos',
+            'description': 'Returns a list containing all videos. The list supports paging.',
+            'tags': ['videos', 'admin'],
+            'responses': {
+                '200': {'description': 'List of videos successfully retrieved'},
+                '404': {'description': 'The video does not exists.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        },
     }
     _POST = {
-        '/videos': {'summary': 'Create a new video description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).', 'responses': {'200': {'description': 'Video description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}
+        '/videos': {
+            'summary': 'Create a new video description',
+            'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).',
+            'responses': {
+                '200': {'description': 'Video description successfully created'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
     }
     _DELETE = {
-        '/videos/<video_id>': {'summary': 'Delete a video description', 'responses': {'200': {'description': 'Video successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}
+        '/videos/<video_id>': {
+            'summary': 'Delete a video description',
+            'responses': {
+                '200': {'description': 'Video successfully deleted'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
     }
 
     @decorators.catch_errors()
@@ -48,8 +87,7 @@ class Videos(IMCEndpoint):
 
         if video_id is None and not self.auth.verify_admin():
             raise RestApiException(
-                "You are not authorized",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+                "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
             )
 
         log.debug("getting AVEntity id: {}", video_id)
@@ -148,7 +186,36 @@ class Videos(IMCEndpoint):
 
 class VideoItem(IMCEndpoint):
 
-    _PUT = {'/videos/<video_id>/item': {'summary': 'Update item info. At the moment ONLY used for the public access flag', 'parameters': [{'name': 'item_update', 'in': 'body', 'description': 'The item properties to be updated.', 'schema': {'properties': {'public_access': {'description': 'Whether or not the item is accessible by a public user.', 'type': 'boolean'}}}}], 'responses': {'204': {'description': 'Item info successfully updated.'}, '400': {'description': 'Request not valid.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Video does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
+    _PUT = {
+        '/videos/<video_id>/item': {
+            'summary': 'Update item info. At the moment ONLY used for the public access flag',
+            'parameters': [
+                {
+                    'name': 'item_update',
+                    'in': 'body',
+                    'description': 'The item properties to be updated.',
+                    'schema': {
+                        'properties': {
+                            'public_access': {
+                                'description': 'Whether or not the item is accessible by a public user.',
+                                'type': 'boolean',
+                            }
+                        }
+                    },
+                }
+            ],
+            'responses': {
+                '204': {'description': 'Item info successfully updated.'},
+                '400': {'description': 'Request not valid.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Video does not exist.'},
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -214,7 +281,35 @@ class VideoAnnotations(IMCEndpoint):
     """
 
     labels = ['video_annotations']
-    _GET = {'/videos/<video_id>/annotations': {'summary': 'Gets video annotations', 'description': 'Returns all the annotations targeting the given video item.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC', 'TVS']}, {'name': 'onlyManual', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}], 'responses': {'200': {'description': 'An annotation object.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
+    _GET = {
+        '/videos/<video_id>/annotations': {
+            'summary': 'Gets video annotations',
+            'description': 'Returns all the annotations targeting the given video item.',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'description': 'Filter by annotation type (e.g. TAG)',
+                    'type': 'string',
+                    'enum': ['TAG', 'DSC', 'TVS'],
+                },
+                {
+                    'name': 'onlyManual',
+                    'in': 'query',
+                    'type': 'boolean',
+                    'default': False,
+                    'allowEmptyValue': True,
+                },
+            ],
+            'responses': {
+                '200': {'description': 'An annotation object.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Video does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -361,7 +456,19 @@ class VideoShots(IMCEndpoint):
     """
 
     labels = ['video_shots']
-    _GET = {'/videos/<video_id>/shots': {'summary': 'Gets video shots', 'description': 'Returns a list of shots belonging to the given video item.', 'responses': {'200': {'description': 'An list of shots.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
+    _GET = {
+        '/videos/<video_id>/shots': {
+            'summary': 'Gets video shots',
+            'description': 'Returns a list of shots belonging to the given video item.',
+            'responses': {
+                '200': {'description': 'An list of shots.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Video does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -396,7 +503,8 @@ class VideoShots(IMCEndpoint):
             MATCH (:AVEntity {uuid: '%s'})<-[:CREATION]-(:Item)-[:SHOT]->(shot:Shot)<-[:HAS_TARGET]-(anno:Annotation)-[:HAS_BODY]->(b:AnnotationBody)
             OPTIONAL MATCH (anno)-[:IS_ANNOTATED_BY]->(creator:User)
             RETURN shot.uuid, anno, creator, collect(b)
-        """ % video_id
+        """
+            % video_id
         )
 
         log.debug("Prefetching annotations...")
@@ -492,9 +600,74 @@ class VideoSegments(IMCEndpoint):
     """
 
     labels = ['video_segments', 'video-segment']
-    _GET = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Gets all manual segments for a video.', 'description': 'Returns a list of the manual segments belonging to the given video item.', 'responses': {'200': {'description': 'An list of manual segments.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}, '/videos/<video_id>/segments': {'summary': 'Gets all manual segments for a video.', 'description': 'Returns a list of the manual segments belonging to the given video item.', 'responses': {'200': {'description': 'An list of manual segments.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Video does not exist.'}}}}
-    _PUT = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Updates a manual video segment', 'description': 'Update a manual video segment identified by uuid', 'parameters': [{'name': 'updated_segment', 'in': 'body', 'description': 'The manual video segment to update.', 'schema': {'required': ['start_frame_idx', 'end_frame_idx'], 'properties': {'start_frame_idx': {'type': 'integer', 'format': 'int32', 'minimum': 0}, 'end_frame_idx': {'type': 'integer', 'format': 'int32'}}}}], 'responses': {'204': {'description': 'Manual video segment successfully updated.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Manual video segment does not exist.'}}}}
-    _DELETE = {'/videos/<video_id>/segments/<segment_id>': {'summary': 'Delete a video segment.', 'responses': {'200': {'description': 'Video segment successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'Video segment does not exist'}}}}
+    _GET = {
+        '/videos/<video_id>/segments/<segment_id>': {
+            'summary': 'Gets all manual segments for a video.',
+            'description': 'Returns a list of the manual segments belonging to the given video item.',
+            'responses': {
+                '200': {'description': 'An list of manual segments.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Video does not exist.'},
+            },
+        },
+        '/videos/<video_id>/segments': {
+            'summary': 'Gets all manual segments for a video.',
+            'description': 'Returns a list of the manual segments belonging to the given video item.',
+            'responses': {
+                '200': {'description': 'An list of manual segments.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Video does not exist.'},
+            },
+        },
+    }
+    _PUT = {
+        '/videos/<video_id>/segments/<segment_id>': {
+            'summary': 'Updates a manual video segment',
+            'description': 'Update a manual video segment identified by uuid',
+            'parameters': [
+                {
+                    'name': 'updated_segment',
+                    'in': 'body',
+                    'description': 'The manual video segment to update.',
+                    'schema': {
+                        'required': ['start_frame_idx', 'end_frame_idx'],
+                        'properties': {
+                            'start_frame_idx': {
+                                'type': 'integer',
+                                'format': 'int32',
+                                'minimum': 0,
+                            },
+                            'end_frame_idx': {'type': 'integer', 'format': 'int32'},
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '204': {'description': 'Manual video segment successfully updated.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Manual video segment does not exist.'},
+            },
+        }
+    }
+    _DELETE = {
+        '/videos/<video_id>/segments/<segment_id>': {
+            'summary': 'Delete a video segment.',
+            'responses': {
+                '200': {'description': 'Video segment successfully deleted'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'Video segment does not exist'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -541,8 +714,9 @@ class VideoSegments(IMCEndpoint):
     @decorators.auth.required()
     def delete(self, video_id, segment_id):
         log.debug(
-            "delete manual segment [uuid:{sid}] for AVEntity "
-            "[uuid:{vid}]", vid=video_id, sid=segment_id
+            "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
+            vid=video_id,
+            sid=segment_id,
         )
         raise RestApiException(
             "Delete operation not yet implemented",
@@ -554,8 +728,9 @@ class VideoSegments(IMCEndpoint):
     @decorators.auth.required()
     def put(self, video_id, segment_id):
         log.debug(
-            "update manual segment [uuid:{sid}] for AVEntity "
-            "[uuid:{vid}]", vid=video_id, sid=segment_id
+            "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
+            vid=video_id,
+            sid=segment_id,
         )
         raise RestApiException(
             "Update operation not yet implemented",
@@ -567,8 +742,52 @@ class VideoContent(IMCEndpoint, Downloader):
 
     __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
     labels = ['video']
-    _GET = {'/videos/<video_id>/content': {'summary': 'Gets the video content', 'tags': ['video'], 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary)', 'type': 'string'}, {'name': 'size', 'in': 'query', 'description': 'used to get large thumbnail (only for that at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Video content successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video content does not exists.'}}}}
-    _HEAD = {'/videos/<video_id>/content': {'summary': 'Check for video existence', 'parameters': [{'name': 'type', 'in': 'query', 'required': True, 'description': 'content type (e.g. video, thumbnail, summary, orf)', 'type': 'string'}], 'responses': {'200': {'description': 'The video content exists.'}, '404': {'description': 'The video content does not exists.'}}}}
+    _GET = {
+        '/videos/<video_id>/content': {
+            'summary': 'Gets the video content',
+            'tags': ['video'],
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'required': True,
+                    'description': 'content type (e.g. video, thumbnail, summary)',
+                    'type': 'string',
+                },
+                {
+                    'name': 'size',
+                    'in': 'query',
+                    'description': 'used to get large thumbnail (only for that at the moment)',
+                    'type': 'string',
+                },
+            ],
+            'responses': {
+                '200': {'description': 'Video content successfully retrieved'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The video content does not exists.'},
+            },
+        }
+    }
+    _HEAD = {
+        '/videos/<video_id>/content': {
+            'summary': 'Check for video existence',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'required': True,
+                    'description': 'content type (e.g. video, thumbnail, summary, orf)',
+                    'type': 'string',
+                }
+            ],
+            'responses': {
+                '200': {'description': 'The video content exists.'},
+                '404': {'description': 'The video content does not exists.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -588,7 +807,8 @@ class VideoContent(IMCEndpoint, Downloader):
         if content_type is None or content_type not in self.__available_content_types__:
             raise RestApiException(
                 "Bad type parameter: expected one of {}".format(
-                    self.__available_content_types__),
+                    self.__available_content_types__
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -620,11 +840,7 @@ class VideoContent(IMCEndpoint, Downloader):
             filename = os.path.basename(video_uri)
             folder = os.path.dirname(video_uri)
             # return self.send_file_partial(video_uri, mime)
-            return self.download(
-                filename=filename,
-                subfolder=folder,
-                mime="video/mp4"
-            )
+            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
         elif content_type == 'orf':
             # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
@@ -642,11 +858,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 )
 
             # return self.send_file_partial(orf_uri, mime)
-            return self.download(
-                filename=filename,
-                subfolder=folder,
-                mime="video/mp4"
-            )
+            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
         elif content_type == 'thumbnail':
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
@@ -707,7 +919,8 @@ class VideoContent(IMCEndpoint, Downloader):
         if content_type is None or content_type not in self.__available_content_types__:
             raise RestApiException(
                 "Bad type parameter: expected one of {}".format(
-                    self.__available_content_types__),
+                    self.__available_content_types__
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -763,7 +976,47 @@ class VideoTools(IMCEndpoint):
     __available_tools__ = ('object-detection', 'building-recognition')
 
     labels = ['video_tools']
-    _POST = {'/videos/<video_id>/tools': {'summary': 'Allow to launch the execution of some video tools.', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria to launch the tool.', 'schema': {'required': ['tool'], 'properties': {'tool': {'description': 'Tool to be launched.', 'type': 'string', 'enum': ['object-detection', 'building-recognition']}, 'operation': {'description': 'At the moment used only to delete automatic tags.', 'type': 'string', 'enum': ['delete']}}}}], 'responses': {'202': {'description': 'Execution task accepted.'}, '200': {'description': 'Execution completed successfully. Only with delete operation.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}, '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'}}}}
+    _POST = {
+        '/videos/<video_id>/tools': {
+            'summary': 'Allow to launch the execution of some video tools.',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria to launch the tool.',
+                    'schema': {
+                        'required': ['tool'],
+                        'properties': {
+                            'tool': {
+                                'description': 'Tool to be launched.',
+                                'type': 'string',
+                                'enum': ['object-detection', 'building-recognition'],
+                            },
+                            'operation': {
+                                'description': 'At the moment used only to delete automatic tags.',
+                                'type': 'string',
+                                'enum': ['delete'],
+                            },
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '202': {'description': 'Execution task accepted.'},
+                '200': {
+                    'description': 'Execution completed successfully. Only with delete operation.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {'description': 'Request forbidden.'},
+                '404': {'description': 'Video not found.'},
+                '409': {
+                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
+                },
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -808,7 +1061,8 @@ class VideoTools(IMCEndpoint):
         if tool not in self.__available_tools__:
             raise RestApiException(
                 "Please specify a valid tool. Expected one of {}".format(
-                    self.__available_tools__),
+                    self.__available_tools__
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -877,10 +1131,112 @@ class VideoShotRevision(IMCEndpoint):
     """Shot revision endpoint"""
 
     labels = ['video_shot_revision']
-    _GET = {'/videos-under-revision': {'summary': 'List of videos under revision.', 'description': 'Returns a list containing all videos under revision together with the assignee. The list supports paging.', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of videos returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'assignee', 'in': 'query', 'description': "Assignee's uuid of the revision", 'type': 'string'}], 'responses': {'200': {'description': 'List of videos under revision successfully retrieved', 'schema': {'type': 'array', 'items': {'$ref': '#/definitions/VideoInRevision'}}}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
-    _POST = {'/videos/<video_id>/shot-revision': {'summary': 'Launch the execution of the shot revision tool.', 'parameters': [{'name': 'revision', 'in': 'body', 'description': 'The new list of cut.', 'schema': {'$ref': '#/definitions/ShotRevision'}}], 'responses': {'201': {'description': 'Execution launched.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}, '409': {'description': 'Invalid state for the video.'}}}}
-    _PUT = {'/videos/<video_id>/shot-revision': {'summary': 'Put a video under revision', 'parameters': [{'name': 'revision', 'in': 'body', 'description': 'The revision request.', 'schema': {'properties': {'assignee': {'description': 'The assignee for the revision (user uuid with Reviser role).', 'type': 'string'}}}}], 'responses': {'204': {'description': 'Video under revision successfully.'}, '400': {'description': 'Assignee not valid.'}, '409': {'description': 'Video is already under revision or it is not ready for revision.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'Operation forbidden.'}, '404': {'description': 'Video does not exist.'}, '500': {'description': 'An unexpected error occured.'}}}}
-    _DELETE = {'/videos/<video_id>/shot-revision': {'summary': 'Take off revision from a video.', 'responses': {'204': {'description': 'Video revision successfully exited.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'Request forbidden.'}, '404': {'description': 'Video not found.'}}}}
+    _GET = {
+        '/videos-under-revision': {
+            'summary': 'List of videos under revision.',
+            'description': 'Returns a list containing all videos under revision together with the assignee. The list supports paging.',
+            'parameters': [
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of videos returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'assignee',
+                    'in': 'query',
+                    'description': "Assignee's uuid of the revision",
+                    'type': 'string',
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'List of videos under revision successfully retrieved',
+                    'schema': {
+                        'type': 'array',
+                        'items': {'$ref': '#/definitions/VideoInRevision'},
+                    },
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
+    _POST = {
+        '/videos/<video_id>/shot-revision': {
+            'summary': 'Launch the execution of the shot revision tool.',
+            'parameters': [
+                {
+                    'name': 'revision',
+                    'in': 'body',
+                    'description': 'The new list of cut.',
+                    'schema': {'$ref': '#/definitions/ShotRevision'},
+                }
+            ],
+            'responses': {
+                '201': {'description': 'Execution launched.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {'description': 'Request forbidden.'},
+                '404': {'description': 'Video not found.'},
+                '409': {'description': 'Invalid state for the video.'},
+            },
+        }
+    }
+    _PUT = {
+        '/videos/<video_id>/shot-revision': {
+            'summary': 'Put a video under revision',
+            'parameters': [
+                {
+                    'name': 'revision',
+                    'in': 'body',
+                    'description': 'The revision request.',
+                    'schema': {
+                        'properties': {
+                            'assignee': {
+                                'description': 'The assignee for the revision (user uuid with Reviser role).',
+                                'type': 'string',
+                            }
+                        }
+                    },
+                }
+            ],
+            'responses': {
+                '204': {'description': 'Video under revision successfully.'},
+                '400': {'description': 'Assignee not valid.'},
+                '409': {
+                    'description': 'Video is already under revision or it is not ready for revision.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {'description': 'Operation forbidden.'},
+                '404': {'description': 'Video does not exist.'},
+                '500': {'description': 'An unexpected error occured.'},
+            },
+        }
+    }
+    _DELETE = {
+        '/videos/<video_id>/shot-revision': {
+            'summary': 'Take off revision from a video.',
+            'responses': {
+                '204': {'description': 'Video revision successfully exited.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {'description': 'Request forbidden.'},
+                '404': {'description': 'Video not found.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions

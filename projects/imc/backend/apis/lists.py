@@ -23,10 +23,159 @@ __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 class Lists(IMCEndpoint):
 
     labels = ['list']
-    _GET = {'/lists': {'summary': 'Get a list of the researcher', 'description': 'Returns all the list of a researcher.', 'parameters': [{'name': 'researcher', 'in': 'query', 'description': 'Researcher uuid', 'type': 'string'}, {'name': 'item', 'in': 'query', 'description': 'Item uuid (used to check whether the item belongs to the list or not)', 'type': 'string'}, {'name': 'includeNumberOfItems', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}], 'responses': {'200': {'description': 'The list of the researcher.', 'schema': {'$ref': '#/definitions/List'}}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'The requested list does not exist.'}}}, '/lists/<list_id>': {'summary': 'Get a list of the researcher', 'description': 'Returns all the list of a researcher.', 'parameters': [{'name': 'item', 'in': 'query', 'description': 'Item uuid (used to check whether the item belongs to the list or not)', 'type': 'string'}, {'name': 'includeNumberOfItems', 'in': 'query', 'type': 'boolean', 'default': False, 'allowEmptyValue': True}, {'name': 'researcher', 'in': 'query', 'description': 'Researcher uuid', 'type': 'string'}], 'responses': {'200': {'description': 'The list of the researcher.', 'schema': {'$ref': '#/definitions/List'}}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'The requested list does not exist.'}}}}
-    _POST = {'/lists': {'summary': 'Create a new list', 'parameters': [{'name': 'list', 'in': 'body', 'description': 'The list to be created.', 'schema': {'$ref': '#/definitions/List'}}], 'responses': {'201': {'description': 'List created successfully.', 'schema': {'$ref': '#/definitions/List'}}, '400': {'description': 'There is no content present in the request body or the content is not valid for list.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '409': {'description': 'There is already a list with that name.'}}}}
-    _PUT = {'/lists/<list_id>': {'summary': 'Update a list', 'description': 'Update a list of the researcher', 'parameters': [{'name': 'updatedList', 'in': 'body', 'description': 'The updated list.', 'schema': {'$ref': '#/definitions/List'}}], 'responses': {'200': {'description': 'List updated successfully.'}, '400': {'description': 'There is no content present in the request body or the content is not valid for list.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}, '409': {'description': 'There is already another list with the same name among your lists.'}}}}
-    _DELETE = {'/lists/<list_id>': {'summary': 'Delete a list', 'description': 'Delete a list of the researcher.', 'responses': {'204': {'description': 'List deleted successfully.'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}}}}
+    _GET = {
+        '/lists': {
+            'summary': 'Get a list of the researcher',
+            'description': 'Returns all the list of a researcher.',
+            'parameters': [
+                {
+                    'name': 'researcher',
+                    'in': 'query',
+                    'description': 'Researcher uuid',
+                    'type': 'string',
+                },
+                {
+                    'name': 'item',
+                    'in': 'query',
+                    'description': 'Item uuid (used to check whether the item belongs to the list or not)',
+                    'type': 'string',
+                },
+                {
+                    'name': 'includeNumberOfItems',
+                    'in': 'query',
+                    'type': 'boolean',
+                    'default': False,
+                    'allowEmptyValue': True,
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'The list of the researcher.',
+                    'schema': {'$ref': '#/definitions/List'},
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'The requested list does not exist.'},
+            },
+        },
+        '/lists/<list_id>': {
+            'summary': 'Get a list of the researcher',
+            'description': 'Returns all the list of a researcher.',
+            'parameters': [
+                {
+                    'name': 'item',
+                    'in': 'query',
+                    'description': 'Item uuid (used to check whether the item belongs to the list or not)',
+                    'type': 'string',
+                },
+                {
+                    'name': 'includeNumberOfItems',
+                    'in': 'query',
+                    'type': 'boolean',
+                    'default': False,
+                    'allowEmptyValue': True,
+                },
+                {
+                    'name': 'researcher',
+                    'in': 'query',
+                    'description': 'Researcher uuid',
+                    'type': 'string',
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'The list of the researcher.',
+                    'schema': {'$ref': '#/definitions/List'},
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'The requested list does not exist.'},
+            },
+        },
+    }
+    _POST = {
+        '/lists': {
+            'summary': 'Create a new list',
+            'parameters': [
+                {
+                    'name': 'list',
+                    'in': 'body',
+                    'description': 'The list to be created.',
+                    'schema': {'$ref': '#/definitions/List'},
+                }
+            ],
+            'responses': {
+                '201': {
+                    'description': 'List created successfully.',
+                    'schema': {'$ref': '#/definitions/List'},
+                },
+                '400': {
+                    'description': 'There is no content present in the request body or the content is not valid for list.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '409': {'description': 'There is already a list with that name.'},
+            },
+        }
+    }
+    _PUT = {
+        '/lists/<list_id>': {
+            'summary': 'Update a list',
+            'description': 'Update a list of the researcher',
+            'parameters': [
+                {
+                    'name': 'updatedList',
+                    'in': 'body',
+                    'description': 'The updated list.',
+                    'schema': {'$ref': '#/definitions/List'},
+                }
+            ],
+            'responses': {
+                '200': {'description': 'List updated successfully.'},
+                '400': {
+                    'description': 'There is no content present in the request body or the content is not valid for list.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List does not exist.'},
+                '409': {
+                    'description': 'There is already another list with the same name among your lists.'
+                },
+            },
+        }
+    }
+    _DELETE = {
+        '/lists/<list_id>': {
+            'summary': 'Delete a list',
+            'description': 'Delete a list of the researcher.',
+            'responses': {
+                '204': {'description': 'List deleted successfully.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -316,11 +465,113 @@ class ListItems(IMCEndpoint):
 
     labels = ['list_items']
     _GET = {
-        '/lists/<list_id>/items/<item_id>': {'summary': 'List of items in a list.', 'responses': {'200': {'description': 'An list of items.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}}, 'description': 'Get all the items of a list. The result supports paging.', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of lists returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, 
-        '/lists/<list_id>/items': {'summary': 'List of items in a list.', 'responses': {'200': {'description': 'An list of items.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}}, 'description': 'Get all the items of a list. The result supports paging.', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of lists returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}
+        '/lists/<list_id>/items/<item_id>': {
+            'summary': 'List of items in a list.',
+            'responses': {
+                '200': {'description': 'An list of items.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List does not exist.'},
+            },
+            'description': 'Get all the items of a list. The result supports paging.',
+            'parameters': [
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of lists returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+            ],
+        },
+        '/lists/<list_id>/items': {
+            'summary': 'List of items in a list.',
+            'responses': {
+                '200': {'description': 'An list of items.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List does not exist.'},
+            },
+            'description': 'Get all the items of a list. The result supports paging.',
+            'parameters': [
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of lists returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+            ],
+        },
     }
-    _POST = {'/lists/<list_id>/items': {'summary': 'Add an item to a list.', 'parameters': [{'name': 'item', 'in': 'body', 'description': "Item to be added. It can be 'item' or 'shot'.", 'schema': {'required': ['target'], 'properties': {'target': {'type': 'string', 'pattern': '(item|shot):[a-z0-9-]+'}}}}], 'responses': {'204': {'description': 'Item added successfully.'}, '400': {'description': 'Bad request body or target node does not exist.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List does not exist.'}, '409': {'description': 'The item is already connected to that list.'}}}}
-    _DELETE = {'/lists/<list_id>/items/<item_id>': {'summary': 'Delete an item from a list.', 'responses': {'204': {'description': 'Item deleted successfully.'}, '401': {'description': 'This endpoint requires a valid authorization token.'}, '403': {'description': 'The user is not authorized to perform this operation.'}, '404': {'description': 'List or item does not exist.'}}}}
+    _POST = {
+        '/lists/<list_id>/items': {
+            'summary': 'Add an item to a list.',
+            'parameters': [
+                {
+                    'name': 'item',
+                    'in': 'body',
+                    'description': "Item to be added. It can be 'item' or 'shot'.",
+                    'schema': {
+                        'required': ['target'],
+                        'properties': {
+                            'target': {
+                                'type': 'string',
+                                'pattern': '(item|shot):[a-z0-9-]+',
+                            }
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '204': {'description': 'Item added successfully.'},
+                '400': {
+                    'description': 'Bad request body or target node does not exist.'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List does not exist.'},
+                '409': {'description': 'The item is already connected to that list.'},
+            },
+        }
+    }
+    _DELETE = {
+        '/lists/<list_id>/items/<item_id>': {
+            'summary': 'Delete an item from a list.',
+            'responses': {
+                '204': {'description': 'Item deleted successfully.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
+                '404': {'description': 'List or item does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -533,7 +784,8 @@ class ListItems(IMCEndpoint):
         creation = item.creation.single()
         if creation is None:
             raise ValueError(
-                "Very strange. Item <{}}> with no metadata".format(item.uuid))
+                "Very strange. Item <{}}> with no metadata".format(item.uuid)
+            )
         creation = creation.downcast()
 
         res = self.getJsonResponse(mdo, max_relationship_depth=0)
@@ -647,10 +899,7 @@ class ListItems(IMCEndpoint):
                 # expected single body here
                 note_text = n.bodies.single().downcast()
                 res["annotations"]["notes"].append(
-                    {
-                        "text": note_text.value,
-                        "language": note_text.language
-                    }
+                    {"text": note_text.value, "language": note_text.language}
                 )
         links = mdo.annotation.search(annotation_type='LNK', private=False)
         if links:

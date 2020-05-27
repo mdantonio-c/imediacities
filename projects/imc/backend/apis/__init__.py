@@ -17,7 +17,6 @@ def string_from_timestamp(timestamp):
 
 
 class IMCEndpoint(EndpointResource):
-
     def getJsonResponse(
         self,
         instance,
@@ -48,9 +47,7 @@ class IMCEndpoint(EndpointResource):
         else:
             res_id = None
 
-        data = self.get_show_fields(
-            instance, 'show_fields', view_public_only, fields
-        )
+        data = self.get_show_fields(instance, 'show_fields', view_public_only, fields)
         if not skip_missing_ids or res_id is not None:
             data['id'] = res_id
 
@@ -109,7 +106,10 @@ class IMCEndpoint(EndpointResource):
                     if k in subnode:
                         log.warning(
                             "Name collision {} on node {}, model {}, property model={}",
-                            k, subnode, type(node), type(r)
+                            k,
+                            subnode,
+                            type(node),
+                            type(r),
                         )
                     subnode[k] = attrs[k]
 

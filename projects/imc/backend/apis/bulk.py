@@ -35,7 +35,19 @@ class Bulk(IMCEndpoint):
     allowed_actions = ('update', 'import', 'delete', 'v2')
 
     labels = ['bulk']
-    _POST = {'/bulk': {'summary': 'Perform many operations such as import, update, delete etc.', 'description': 'The bulk API makes it possible to perform many operations in a single API call.', 'responses': {'202': {'description': 'Bulk action successfully accepted'}, '400': {'description': 'Bad request.'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {
+        '/bulk': {
+            'summary': 'Perform many operations such as import, update, delete etc.',
+            'description': 'The bulk API makes it possible to perform many operations in a single API call.',
+            'responses': {
+                '202': {'description': 'Bulk action successfully accepted'},
+                '400': {'description': 'Bad request.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     def check_item_type_coherence(self, resource, standard_path):
         """
@@ -47,7 +59,8 @@ class Bulk(IMCEndpoint):
         """
         log.debug(
             "check_item_type_coherence: resource id {} and path {}",
-            resource.uuid, standard_path
+            resource.uuid,
+            standard_path,
         )
         coherent = False
         # check for existing item
@@ -63,9 +76,7 @@ class Bulk(IMCEndpoint):
                 try:
                     incoming_item_type = self.extract_item_type(standard_path)
                     if incoming_item_type is None:
-                        log.warning(
-                            "No item type found for filename {}", standard_path
-                        )
+                        log.warning("No item type found for filename {}", standard_path)
                     elif existent_item_type == incoming_item_type:
                         coherent = True
                 except Exception as e:
@@ -229,9 +240,7 @@ class Bulk(IMCEndpoint):
                 standard_path = os.path.join(upload_dir, standard_filename)
                 try:
                     copyfile(file_path, standard_path)
-                    log.info(
-                        "Copied file {} to file {}", file_path, standard_path
-                    )
+                    log.info("Copied file {} to file {}", file_path, standard_path)
                 except BaseException:
                     log.warning("Cannot copy file: SKIPPED filename {}", file_path)
                     skipped += 1
@@ -263,7 +272,8 @@ class Bulk(IMCEndpoint):
                         log.warning(
                             "Database incoherence: there is more than one MetaStage \
                             related to the same source id {}: SKIPPED file {}",
-                            source_id, standard_filename
+                            source_id,
+                            standard_filename,
                         )
                         skipped += 1
                         continue
@@ -272,15 +282,13 @@ class Bulk(IMCEndpoint):
                         # Source id already exists in database
                         log.info(
                             "MetaStage already exists in database for source id {}",
-                            source_id
+                            source_id,
                         )
                         meta_stage = c[0]
                         log.debug("MetaStage={}", meta_stage)
 
                 except self.graph.MetaStage.DoesNotExist:
-                    log.info(
-                        "MetaStage does not exist for source id {}", source_id
-                    )
+                    log.info("MetaStage does not exist for source id {}", source_id)
 
                 try:
                     # se il source_id non esiste nel database,
@@ -308,9 +316,7 @@ class Bulk(IMCEndpoint):
 
                         try:
                             resource = self.graph.MetaStage.nodes.get(**properties)
-                            log.info(
-                                "MetaStage already exists for {}", standard_path
-                            )
+                            log.info("MetaStage already exists for {}", standard_path)
 
                             # check for existing item
                             item_node, coherent = self.check_item_type_coherence(
@@ -319,8 +325,8 @@ class Bulk(IMCEndpoint):
                             if item_node is not None:
                                 if not coherent:
                                     resource.status = 'ERROR'
-                                    resource.status_message = (
-                                        "Incoming item_type different from item_type in database for file: {}".format(standard_path)
+                                    resource.status_message = "Incoming item_type different from item_type in database for file: {}".format(
+                                        standard_path
                                     )
                                     resource.save()
                                     log.error(resource.status_message)
@@ -330,8 +336,8 @@ class Bulk(IMCEndpoint):
                                 creation = item_node.creation.single()
                                 if creation is not None:
                                     resource.status = 'ERROR'
-                                    resource.status_message = (
-                                        "A creation with a different SOURCE_ID is already associated to file: {}".format(standard_path)
+                                    resource.status_message = "A creation with a different SOURCE_ID is already associated to file: {}".format(
+                                        standard_path
                                     )
                                     resource.save()
                                     log.error(resource.status_message)
@@ -369,14 +375,10 @@ class Bulk(IMCEndpoint):
 
                         except self.graph.MetaStage.DoesNotExist:
                             # import di un nuovo contenuto
-                            log.debug(
-                                "Creating MetaStage for file {}", standard_path
-                            )
+                            log.debug("Creating MetaStage for file {}", standard_path)
                             meta_stage = self.graph.MetaStage(**properties).save()
                             meta_stage.ownership.connect(group)
-                            log.debug(
-                                "MetaStage created for source_id {}", source_id
-                            )
+                            log.debug("MetaStage created for source_id {}", source_id)
                             mode = "clean"
                             task = CeleryExt.import_file.apply_async(
                                 args=[standard_path, meta_stage.uuid, mode],
@@ -398,8 +400,8 @@ class Bulk(IMCEndpoint):
                         if related_item is not None and not coherent:
 
                             meta_stage.status = 'ERROR'
-                            meta_stage.status_message = (
-                                "Incoming item_type different from item_type in database for file: {}".format(standard_path)
+                            meta_stage.status_message = "Incoming item_type different from item_type in database for file: {}".format(
+                                standard_path
                             )
                             meta_stage.save()
                             log.error(meta_stage.status_message)
@@ -429,7 +431,7 @@ class Bulk(IMCEndpoint):
                             if metastage_samepath.uuid != meta_stage.uuid:
                                 log.error(
                                     "Another metastage exists for file {}",
-                                    standard_path
+                                    standard_path,
                                 )
                                 meta_stage.status = 'ERROR'
                                 meta_stage.status_message = (
@@ -440,9 +442,7 @@ class Bulk(IMCEndpoint):
                                 continue
 
                         except self.graph.MetaStage.DoesNotExist:
-                            log.info(
-                                "MetaStage does not exist for {}", standard_path
-                            )
+                            log.info("MetaStage does not exist for {}", standard_path)
                             # aggiorno nel MetaStage i campi nomefile e path
                             meta_stage.filename = standard_filename
                             meta_stage.path = standard_path
@@ -452,7 +452,7 @@ class Bulk(IMCEndpoint):
                             # update dei metadati e reprocessing
                             log.info(
                                 "Starting task import_file for meta_stage.uuid {}",
-                                meta_stage.uuid
+                                meta_stage.uuid,
                             )
                             mode = "clean"
                             metadata_update = True
@@ -474,7 +474,7 @@ class Bulk(IMCEndpoint):
                             # update dei soli metadati
                             log.info(
                                 "Starting task update_metadata for meta_stage.uuid {}",
-                                meta_stage.uuid
+                                meta_stage.uuid,
                             )
                             task = CeleryExt.update_metadata.apply_async(
                                 args=[standard_path, meta_stage.uuid], countdown=10
@@ -488,7 +488,8 @@ class Bulk(IMCEndpoint):
                 except Exception as e:
                     log.error(
                         "Update operation failed for filename {}, error message={}",
-                        file_path, e
+                        file_path,
+                        e,
                     )
                     failed += 1
                     continue
@@ -502,9 +503,7 @@ class Bulk(IMCEndpoint):
             log.info("failed {}", failed)
             log.info("------------------------------------")
 
-            return self.response(
-                "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
-            )
+            return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
 
         # ##################################################################
         elif req_action == 'import':
@@ -525,7 +524,10 @@ class Bulk(IMCEndpoint):
             retry = bool(action.get('retry'))
             log.info(
                 "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})",
-                group.shortname, mode, update, retry
+                group.shortname,
+                mode,
+                update,
+                retry,
             )
 
             # retrieve XML files from upload dir
@@ -595,9 +597,7 @@ class Bulk(IMCEndpoint):
             log.info("skipped {}", skipped)
             log.info("------------------------------------")
 
-            return self.response(
-                "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
-            )
+            return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
 
         # ##################################################################
         elif req_action == 'v2':
@@ -633,9 +633,7 @@ class Bulk(IMCEndpoint):
                     'No v2 content for group {}'.format(group.shortname),
                     status_code=hcodes.HTTP_OK_NORESPONSE,
                 )
-            log.info(
-                "Total v2 files currently available: {}", total_available
-            )
+            log.info("Total v2 files currently available: {}", total_available)
             skipped = 0
             imported = 0
             warnings = 0
@@ -653,7 +651,7 @@ class Bulk(IMCEndpoint):
                     log.warning(
                         'Cannot load {v2} because origin content does '
                         'not exist or its status is NOT completed',
-                        v2=f
+                        v2=f,
                     )
                     warnings += 1
                     continue
@@ -732,6 +730,4 @@ class Bulk(IMCEndpoint):
         # ##################################################################
         # add here any other bulk request
 
-        return self.response(
-            "Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED
-        )
+        return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)

@@ -22,11 +22,124 @@ class Stage(IMCEndpoint):
 
     labels = ['file']
     _GET = {
-        '/stage': {'summary': 'List of files contained in the stage area of the specified group', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}], 'responses': {'200': {'description': 'List of files and directories successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}},
-        '/stage/<group>': {'summary': 'List of files contained in the stage area of the specified group', 'parameters': [{'name': 'perpage', 'in': 'query', 'description': 'Number of annotations returned', 'type': 'integer'}, {'name': 'currentpage', 'in': 'query', 'description': 'Page number', 'type': 'integer'}, {'name': 'get_total', 'in': 'query', 'description': 'Retrieve total number of items', 'type': 'boolean'}], 'responses': {'200': {'description': 'List of files and directories successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}
+        '/stage': {
+            'summary': 'List of files contained in the stage area of the specified group',
+            'parameters': [
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of annotations returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'get_total',
+                    'in': 'query',
+                    'description': 'Retrieve total number of items',
+                    'type': 'boolean',
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'List of files and directories successfully retrieved'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        },
+        '/stage/<group>': {
+            'summary': 'List of files contained in the stage area of the specified group',
+            'parameters': [
+                {
+                    'name': 'perpage',
+                    'in': 'query',
+                    'description': 'Number of annotations returned',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'currentpage',
+                    'in': 'query',
+                    'description': 'Page number',
+                    'type': 'integer',
+                },
+                {
+                    'name': 'get_total',
+                    'in': 'query',
+                    'description': 'Retrieve total number of items',
+                    'type': 'boolean',
+                },
+            ],
+            'responses': {
+                '200': {
+                    'description': 'List of files and directories successfully retrieved'
+                },
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        },
     }
-    _POST = {'/stage': {'summary': 'Import a file from the stage area', 'parameters': [{'name': 'criteria', 'in': 'body', 'description': 'Criteria for the import.', 'schema': {'required': ['filename'], 'properties': {'filename': {'type': 'string', 'description': 'The metadata file to be imported'}, 'mode': {'type': 'string', 'description': 'Different modes for pipeline execution', 'default': 'fast', 'enum': ['fast', 'clean', 'skip']}, 'update': {'type': 'boolean', 'description': 'only for metadata update', 'default': True}, 'force_reprocessing': {'type': 'boolean', 'description': 'Allow to force re-processing of COMPLETED contents', 'default': False}}}}], 'responses': {'200': {'description': 'File successfully imported'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '409': {'description': 'No source ID found in metadata file.'}}}}
-    _DELETE = {'/stage/<filename>': {'summary': 'Delete a file from the stage area', 'responses': {'200': {'description': 'File successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
+    _POST = {
+        '/stage': {
+            'summary': 'Import a file from the stage area',
+            'parameters': [
+                {
+                    'name': 'criteria',
+                    'in': 'body',
+                    'description': 'Criteria for the import.',
+                    'schema': {
+                        'required': ['filename'],
+                        'properties': {
+                            'filename': {
+                                'type': 'string',
+                                'description': 'The metadata file to be imported',
+                            },
+                            'mode': {
+                                'type': 'string',
+                                'description': 'Different modes for pipeline execution',
+                                'default': 'fast',
+                                'enum': ['fast', 'clean', 'skip'],
+                            },
+                            'update': {
+                                'type': 'boolean',
+                                'description': 'only for metadata update',
+                                'default': True,
+                            },
+                            'force_reprocessing': {
+                                'type': 'boolean',
+                                'description': 'Allow to force re-processing of COMPLETED contents',
+                                'default': False,
+                            },
+                        },
+                    },
+                }
+            ],
+            'responses': {
+                '200': {'description': 'File successfully imported'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '409': {'description': 'No source ID found in metadata file.'},
+            },
+        }
+    }
+    _DELETE = {
+        '/stage/<filename>': {
+            'summary': 'Delete a file from the stage area',
+            'responses': {
+                '200': {'description': 'File successfully deleted'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+            },
+        }
+    }
 
     def getType(self, filename):
         name, file_extension = os.path.splitext(filename)
@@ -267,7 +380,8 @@ class Stage(IMCEndpoint):
         if mode not in self.__class__.allowed_import_mode:
             raise RestApiException(
                 "Bad mode parameter: expected one of {}".format(
-                    self.__class__.allowed_import_mode),
+                    self.__class__.allowed_import_mode
+                ),
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -275,7 +389,7 @@ class Stage(IMCEndpoint):
         if not os.path.isfile(path):
             raise RestApiException(
                 "File not found: {}".format(filename),
-                status_code=hcodes.HTTP_BAD_REQUEST
+                status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
         # 1) estraggo il source id dal file dei metadati
@@ -284,7 +398,8 @@ class Stage(IMCEndpoint):
         if source_id is None:
             log.debug("No source ID found in metadata file {}", path)
             raise RestApiException(
-                "No source ID found in metadata file: {}", filename,
+                "No source ID found in metadata file: {}",
+                filename,
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
         log.debug("Source id {} found in metadata file", source_id)
@@ -307,7 +422,8 @@ class Stage(IMCEndpoint):
             if len(c) > 1:
                 # there are more than one MetaStage related to the same source id: Database incoherence!
                 log.errors(
-                    "Database incoherence: there are more than one MetaStage related to the same source id {}", source_id
+                    "Database incoherence: there are more than one MetaStage related to the same source id {}",
+                    source_id,
                 )
                 raise RestApiException(
                     "System incoherent state: it is not possible to perform the import",
@@ -322,7 +438,9 @@ class Stage(IMCEndpoint):
                     log.debug("dbFilename={}", dbFilename)
                     if filename != dbFilename:
                         raise RestApiException(
-                            "Source id {} already esists in database but with different filename {}: cannot proceed with import!".format(source_id, dbFilename),
+                            "Source id {} already esists in database but with different filename {}: cannot proceed with import!".format(
+                                source_id, dbFilename
+                            ),
                             status_code=hcodes.HTTP_BAD_CONFLICT,
                         )
 
@@ -356,14 +474,16 @@ class Stage(IMCEndpoint):
             if len(c) == 0:
                 # Source id does not exist in database: creating new element
                 log.debug(
-                    "Source id {} does not exist in database: creating new element", source_id
+                    "Source id {} does not exist in database: creating new element",
+                    source_id,
                 )
                 # forziamo la convenzione del filename '<archive code>_<source id>.xml'
                 standard_filename = group.shortname + '_' + source_id + '.xml'
                 if filename != standard_filename:
                     log.debug(
                         "File {} has not standard file name: renaming it to {}",
-                        filename, standard_filename
+                        filename,
+                        standard_filename,
                     )
                     standard_path = os.path.join(upload_dir, standard_filename)
                     # rinomino il file nel filesystem
@@ -390,7 +510,8 @@ class Stage(IMCEndpoint):
                     meta_stage = self.graph.MetaStage.nodes.get(**properties)
                     log.debug(
                         "MetaStage already exists for file {}, meta_stage.uuid={}",
-                        path, meta_stage.uuid
+                        path,
+                        meta_stage.uuid,
                     )
                 except self.graph.MetaStage.DoesNotExist:
                     log.debug("MetaStage does not exists for file {}", path)
@@ -398,7 +519,8 @@ class Stage(IMCEndpoint):
                     meta_stage.ownership.connect(group)
                     log.debug(
                         "MetaStage created for {}, meta_stage.uuid={}",
-                        path, meta_stage.uuid
+                        path,
+                        meta_stage.uuid,
                     )
 
             metadata_update = input_parameters.get('update', True)
@@ -455,7 +577,7 @@ class Stage(IMCEndpoint):
         if not os.path.isfile(path):
             raise RestApiException(
                 "File not found: {}".format(filename),
-                status_code=hcodes.HTTP_BAD_REQUEST
+                status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
         os.remove(path)

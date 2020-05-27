@@ -14,7 +14,24 @@ from imc.apis import IMCEndpoint
 class Fcodelist(IMCEndpoint):
 
     labels = ['fcodelist']
-    _GET = {'/fcodelist/<codelist>': {'summary': 'GET codelists', 'description': 'Returns a codelist', 'parameters': [{'name': 'lang', 'in': 'query', 'description': 'Language of the codelist', 'type': 'string'}], 'responses': {'200': {'description': 'A codelist.'}, '404': {'description': 'Codelist does not exist.'}}}}
+    _GET = {
+        '/fcodelist/<codelist>': {
+            'summary': 'GET codelists',
+            'description': 'Returns a codelist',
+            'parameters': [
+                {
+                    'name': 'lang',
+                    'in': 'query',
+                    'description': 'Language of the codelist',
+                    'type': 'string',
+                }
+            ],
+            'responses': {
+                '200': {'description': 'A codelist.'},
+                '404': {'description': 'Codelist does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.auth.required()

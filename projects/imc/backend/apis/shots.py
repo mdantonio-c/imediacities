@@ -18,7 +18,27 @@ from imc.apis import IMCEndpoint
 class Shots(IMCEndpoint):
 
     labels = ['shot']
-    _GET = {'/shots/<shot_id>': {'summary': 'Gets information about a shot', 'description': 'Returns a single shot for its id', 'parameters': [{'name': 'content', 'in': 'query', 'description': 'content type (ONLY thumbnail at the moment)', 'type': 'string'}], 'responses': {'200': {'description': 'Shot information successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The video does not exists.'}}}}
+    _GET = {
+        '/shots/<shot_id>': {
+            'summary': 'Gets information about a shot',
+            'description': 'Returns a single shot for its id',
+            'parameters': [
+                {
+                    'name': 'content',
+                    'in': 'query',
+                    'description': 'content type (ONLY thumbnail at the moment)',
+                    'type': 'string',
+                }
+            ],
+            'responses': {
+                '200': {'description': 'Shot information successfully retrieved'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorization token'
+                },
+                '404': {'description': 'The video does not exists.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
@@ -76,7 +96,28 @@ class ShotAnnotations(IMCEndpoint):
     """
 
     labels = ['shot_annotations']
-    _GET = {'/shots/<shot_id>/annotations': {'summary': 'Gets shot annotations.', 'description': 'Returns all the annotations targeting the given shot.', 'parameters': [{'name': 'type', 'in': 'query', 'description': 'Filter by annotation type (e.g. TAG)', 'type': 'string', 'enum': ['TAG', 'DSC']}], 'responses': {'200': {'description': 'List of annotations.'}, '401': {'description': 'This endpoint requires a valid authorzation token.'}, '404': {'description': 'Shot does not exist.'}}}}
+    _GET = {
+        '/shots/<shot_id>/annotations': {
+            'summary': 'Gets shot annotations.',
+            'description': 'Returns all the annotations targeting the given shot.',
+            'parameters': [
+                {
+                    'name': 'type',
+                    'in': 'query',
+                    'description': 'Filter by annotation type (e.g. TAG)',
+                    'type': 'string',
+                    'enum': ['TAG', 'DSC'],
+                }
+            ],
+            'responses': {
+                '200': {'description': 'List of annotations.'},
+                '401': {
+                    'description': 'This endpoint requires a valid authorzation token.'
+                },
+                '404': {'description': 'Shot does not exist.'},
+            },
+        }
+    }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
