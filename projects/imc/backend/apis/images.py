@@ -31,7 +31,7 @@ class Images(IMCEndpoint):
     """
 
     labels = ['image']
-    _GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}, 'parameters': [{'name': 'pageSize', 'in': 'query', 'description': 'Number of images returned', 'type': 'integer'}, {'name': 'pageNumber', 'in': 'query', 'description': 'Page number', 'type': 'integer'}]}}
+    _GET = {'/images/<image_id>': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}}, '/images': {'summary': 'List of images', 'description': 'Returns a list containing all images. The list supports paging.', 'responses': {'200': {'description': 'List of images successfully retrieved'}, '401': {'description': 'This endpoint requires a valid authorization token'}, '404': {'description': 'The image does not exists.'}}}}
     _POST = {'/images': {'summary': 'Create a new image description', 'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).', 'responses': {'200': {'description': 'Image description successfully created'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
     _DELETE = {'/images/<image_id>': {'summary': 'Delete a image description', 'responses': {'200': {'description': 'Image successfully deleted'}, '401': {'description': 'This endpoint requires a valid authorization token'}}}}
 
@@ -95,14 +95,6 @@ class Images(IMCEndpoint):
     @decorators.auth.required()
     def post(self):
         self.graph = self.get_service_instance('neo4j')
-
-        v = self.get_input()
-        if len(v) == 0:
-            raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
-
-        data = self.get_input()
-
-        log.info(data)
 
         return self.empty_response()
 
