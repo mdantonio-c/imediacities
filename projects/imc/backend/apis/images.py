@@ -54,16 +54,14 @@ class Images(IMCEndpoint):
             'summary': 'Create a new image description',
             'description': 'Simple method to attach descriptive metadata to a previously uploaded image (item).',
             'responses': {
-                '200': {'description': 'Image description successfully created'},
+                '200': {'description': 'Image description successfully created'}
             },
         }
     }
     _DELETE = {
         '/images/<image_id>': {
             'summary': 'Delete a image description',
-            'responses': {
-                '200': {'description': 'Image successfully deleted'},
-            },
+            'responses': {'200': {'description': 'Image successfully deleted'}},
         }
     }
 
@@ -214,7 +212,7 @@ class ImageItem(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_NOTFOUND,
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
@@ -236,9 +234,8 @@ class ImageItem(IMCEndpoint):
         item.public_access = public_access
         item.save()
         log.debug(
-            "Item successfully updated for NonAVEntity uuid {}. {}".format(
-                image_id, item
-            )
+            "Item successfully updated for NonAVEntity uuid {}. {}",
+            image_id, item
         )
 
         # 204: Item successfully updated.
@@ -297,7 +294,7 @@ class ImageAnnotations(IMCEndpoint):
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
 
         item = image.item.single()
         for anno in item.targeting_annotations:
@@ -308,7 +305,7 @@ class ImageAnnotations(IMCEndpoint):
                     # expected ALWAYS a creator for private annotation
                     log.warning(
                         'Invalid state: missing creator for private '
-                        'anno [UUID:{}]'.format(anno.uuid)
+                        'anno [UUID:{}]', anno.uuid
                     )
                     continue
                 creator = anno.creator.single()
@@ -473,10 +470,14 @@ class ImageTools(IMCEndpoint):
             ],
             'responses': {
                 '202': {'description': 'Execution task accepted.'},
-                '200': {'description': 'Execution completed successfully. Only with delete operation.'},
+                '200': {
+                    'description': 'Execution completed successfully. Only with delete operation.'
+                },
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Image not found.'},
-                '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'},
+                '409': {
+                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
+                },
             },
         }
     }

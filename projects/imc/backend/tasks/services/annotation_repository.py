@@ -306,15 +306,13 @@ class AnnotationRepository:
                     body_type=btype, body_id=bid
                 )
             log.info(
-                'Annotation with ID:{anno_id} successfully deleted.{msg}'.format(
-                    anno_id=anno.uuid, msg=single_body_removed
-                )
+                'Annotation with ID:{} successfully deleted.{}',
+                anno.uuid, single_body_removed
             )
         else:
             log.info(
-                'Annotation with ID:{anno_id}. ONLY body {body_type}:{body_id} removed'.format(
-                    anno_id=anno.uuid, body_type=btype, body_id=bid
-                )
+                'Annotation with ID:{}. ONLY body {}:{} removed',
+                anno.uuid, btype, bid
             )
 
     @staticmethod

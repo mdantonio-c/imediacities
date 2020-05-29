@@ -28,10 +28,10 @@ class SearchAnnotations(IMCEndpoint):
                     'in': 'body',
                     'description': 'Criteria for the search.',
                     'schema': {'$ref': '#/definitions/AnnotationSearchCriteria'},
-                },
+                }
             ],
             'responses': {
-                '200': {'description': 'A list of annotation matching search criteria.'},
+                '200': {'description': 'A list of annotation matching search criteria.'}
             },
         }
     }

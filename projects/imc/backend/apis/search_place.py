@@ -50,7 +50,7 @@ class SearchPlace(IMCEndpoint):
                 }
             ],
             'responses': {
-                '200': {'description': 'A list of creations for relevant places.'},
+                '200': {'description': 'A list of creations for relevant places.'}
             },
         }
     }

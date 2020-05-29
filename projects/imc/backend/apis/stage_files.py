@@ -24,54 +24,18 @@ class Stage(IMCEndpoint):
     _GET = {
         '/stage': {
             'summary': 'List of files contained in the stage area of the specified group',
-            'parameters': [
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of annotations returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'get_total',
-                    'in': 'query',
-                    'description': 'Retrieve total number of items',
-                    'type': 'boolean',
-                },
-            ],
             'responses': {
-                '200': {'description': 'List of files and directories successfully retrieved'},
+                '200': {
+                    'description': 'List of files and directories successfully retrieved'
+                }
             },
         },
         '/stage/<group>': {
             'summary': 'List of files contained in the stage area of the specified group',
-            'parameters': [
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of annotations returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'get_total',
-                    'in': 'query',
-                    'description': 'Retrieve total number of items',
-                    'type': 'boolean',
-                },
-            ],
             'responses': {
-                '200': {'description': 'List of files and directories successfully retrieved'},
+                '200': {
+                    'description': 'List of files and directories successfully retrieved'
+                }
             },
         },
     }
@@ -119,9 +83,7 @@ class Stage(IMCEndpoint):
     _DELETE = {
         '/stage/<filename>': {
             'summary': 'Delete a file from the stage area',
-            'responses': {
-                '200': {'description': 'File successfully deleted'},
-            },
+            'responses': {'200': {'description': 'File successfully deleted'}},
         }
     }
 
@@ -178,46 +140,11 @@ class Stage(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
-    # @decorators.catch_errors()
-    # @decorators.catch_graph_exceptions
-    # @decorators.auth.required()
-    # def head(self, group=None):
-    #     self.graph = self.get_service_instance('neo4j')
-
-    #     if not self.auth.verify_admin():
-    #         # Only admins can specify a different group to be inspected
-    #         group = None
-
-    #     if group is None:
-    #         group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
-    #     else:
-    #         group = self.graph.Group.nodes.get_or_none(uuid=group)
-
-    #     if group is None:
-    #         return 0
-
-    #     upload_dir = os.path.join("/uploads", group.uuid)
-    #     if not os.path.exists(upload_dir):
-    #         return 0
-
-    #     counter = 0
-    #     for f in os.listdir(upload_dir):
-
-    #         path = os.path.join(upload_dir, f)
-    #         if not os.path.isfile(path):
-    #             continue
-    #         if f[0] == '.':
-    #             continue
-
-    #         counter += 1
-
-    #     return counter
-
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
+    @decorators.get_pagination
     @decorators.auth.required()
-    def get(self, group=None):
-
+    def get(self, group=None, get_total=None, page=None, size=None):
         self.graph = self.get_service_instance('neo4j')
 
         if not self.auth.verify_admin():
@@ -225,7 +152,7 @@ class Stage(IMCEndpoint):
             group = None
 
         if group is None:
-            group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+            group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
@@ -238,18 +165,18 @@ class Stage(IMCEndpoint):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.response(errors=["Upload dir not found"])
+                raise RestApiException("Upload dir not found")
 
-        data = []
+        dirs = os.listdir(upload_dir)
 
-        params = self.get_input()
-        get_total = params.get('get_total', False)
-        if not get_total:
-            current_page, limit = self.get_paging()
-            offset = (current_page - 1) * limit
+        if get_total:
+            return {"total": len(dirs)}
+
+        offset = (page - 1) * size
 
         counter = 0
-        for f in os.listdir(upload_dir):
+        data = []
+        for f in dirs:
 
             path = os.path.join(upload_dir, f)
             if not os.path.isfile(path):
@@ -259,13 +186,10 @@ class Stage(IMCEndpoint):
 
             counter += 1
 
-            if get_total:
-                continue
-
             if offset >= counter:
                 continue
 
-            if offset + limit < counter:
+            if offset + size < counter:
                 break
 
             stat = os.stat(path)
@@ -309,9 +233,6 @@ class Stage(IMCEndpoint):
 
             data.append(row)
 
-        if get_total:
-            return {"total": counter}
-
         return self.response(data)
 
     @decorators.catch_errors()
@@ -338,7 +259,7 @@ class Stage(IMCEndpoint):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -535,7 +456,7 @@ class Stage(IMCEndpoint):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
 
         if group is None:
             raise RestApiException(

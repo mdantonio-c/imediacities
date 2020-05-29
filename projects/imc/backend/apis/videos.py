@@ -56,16 +56,14 @@ class Videos(IMCEndpoint):
             'summary': 'Create a new video description',
             'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).',
             'responses': {
-                '200': {'description': 'Video description successfully created'},
+                '200': {'description': 'Video description successfully created'}
             },
         }
     }
     _DELETE = {
         '/videos/<video_id>': {
             'summary': 'Delete a video description',
-            'responses': {
-                '200': {'description': 'Video successfully deleted'},
-            },
+            'responses': {'200': {'description': 'Video successfully deleted'}},
         }
     }
 
@@ -230,7 +228,7 @@ class VideoItem(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_NOTFOUND,
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
@@ -252,7 +250,8 @@ class VideoItem(IMCEndpoint):
         item.public_access = public_access
         item.save()
         log.debug(
-            "Item successfully updated for AVEntity uuid {}. {}".format(video_id, item)
+            "Item successfully updated for AVEntity uuid {}. {}",
+            video_id, item
         )
 
         # 204: Item successfully updated.
@@ -319,7 +318,7 @@ class VideoAnnotations(IMCEndpoint):
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         is_manual = params.get('onlyManual')
         if isinstance(is_manual, str) and (
             is_manual == '' or is_manual.lower() == 'true'
@@ -341,8 +340,8 @@ class VideoAnnotations(IMCEndpoint):
             if a.private:
                 if creator is None:
                     log.warning(
-                        'Invalid state: missing creator for private '
-                        'note [UUID:{}]'.format(a.uuid)
+                        'Invalid state: missing creator for private note [UUID:{}]',
+                        a.uuid
                     )
                     continue
                 if creator.uuid != user.uuid:
@@ -375,7 +374,8 @@ class VideoAnnotations(IMCEndpoint):
                                 if creator is None:
                                     log.warning(
                                         'Invalid state: missing creator for private '
-                                        'note [UUID:{}]'.format(anno.uuid)
+                                        'note [UUID:{}]',
+                                        anno.uuid
                                     )
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
@@ -641,12 +641,13 @@ class VideoSegments(IMCEndpoint):
     def get(self, video_id, segment_id):
         if segment_id is not None:
             log.debug(
-                "get manual segment [uuid:{sid}] for AVEntity "
-                "[uuid:{vid}]".format(vid=video_id, sid=segment_id)
+                "get manual segment [uuid:{}] for AVEntity [uuid:{}]",
+                segment_id, video_id
             )
         else:
             log.debug(
-                "get all manual segments for AVEntity [uuid:{vid}]".format(vid=video_id)
+                "get all manual segments for AVEntity [uuid:{}]",
+                video_id
             )
         if video_id is None:
             raise RestApiException(
@@ -665,7 +666,7 @@ class VideoSegments(IMCEndpoint):
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        # user = self.get_current_user()
+        # user = self.auth.get_user()
 
         item = video.item.single()
         log.debug('get manual segments for Item [{}]', item.uuid)
@@ -966,10 +967,14 @@ class VideoTools(IMCEndpoint):
             ],
             'responses': {
                 '202': {'description': 'Execution task accepted.'},
-                '200': {'description': 'Execution completed successfully. Only with delete operation.'},
+                '200': {
+                    'description': 'Execution completed successfully. Only with delete operation.'
+                },
                 '403': {'description': 'Request forbidden.'},
                 '404': {'description': 'Video not found.'},
-                '409': {'description': 'Invalid state. E.g. object detection results cannot be imported twice.'},
+                '409': {
+                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
+                },
             },
         }
     }
@@ -1097,7 +1102,7 @@ class VideoShotRevision(IMCEndpoint):
                     'in': 'query',
                     'description': "Assignee's uuid of the revision",
                     'type': 'string',
-                },
+                }
             ],
             'responses': {
                 '200': {
@@ -1106,7 +1111,7 @@ class VideoShotRevision(IMCEndpoint):
                         'type': 'array',
                         'items': {'$ref': '#/definitions/VideoInRevision'},
                     },
-                },
+                }
             },
         }
     }
@@ -1150,7 +1155,9 @@ class VideoShotRevision(IMCEndpoint):
             'responses': {
                 '204': {'description': 'Video under revision successfully.'},
                 '400': {'description': 'Assignee not valid.'},
-                '409': {'description': 'Video is already under revision or it is not ready for revision.'},
+                '409': {
+                    'description': 'Video is already under revision or it is not ready for revision.'
+                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Video does not exist.'},
             },
@@ -1235,12 +1242,11 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         iamadmin = self.auth.verify_admin()
         log.debug(
-            "Request for revision from user [{0}, {1} {2}]".format(
-                user.uuid, user.name, user.surname
-            )
+            "Request for revision from user [{}, {} {}]",
+            user.uuid, user.name, user.surname
         )
         # Be sure user can revise this specific video
         assignee = user
@@ -1319,7 +1325,7 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
         # ONLY the reviser and the administrator can provide a new list of cuts
-        user = self.get_current_user()
+        user = self.auth.get_user()
         iamadmin = self.auth.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(
@@ -1425,7 +1431,7 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # ONLY the reviser and the administrator can exit revision
-        user = self.get_current_user()
+        user = self.auth.get_user()
         iamadmin = self.auth.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(

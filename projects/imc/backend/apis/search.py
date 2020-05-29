@@ -32,22 +32,10 @@ class Search(IMCEndpoint):
                     'in': 'body',
                     'description': 'Criteria for the search.',
                     'schema': {'$ref': '#/definitions/SearchCriteria'},
-                },
-                {
-                    'name': 'perpage',
-                    'in': 'query',
-                    'description': 'Number of videos returned',
-                    'type': 'integer',
-                },
-                {
-                    'name': 'currentpage',
-                    'in': 'query',
-                    'description': 'Page number',
-                    'type': 'integer',
-                },
+                }
             ],
             'responses': {
-                '200': {'description': 'A list of videos matching search criteria.'},
+                '200': {'description': 'A list of videos matching search criteria.'}
             },
         }
     }
@@ -58,25 +46,15 @@ class Search(IMCEndpoint):
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    def post(self):
+    @decorators.get_pagination
+    def post(self, get_total=None, page=None, size=None):
 
         self.graph = self.get_service_instance('neo4j')
 
         user = self.get_user_if_logged()
         input_parameters = self.get_input()
-        offset, limit = self.get_paging()
-        offset -= 1
-        log.debug("paging: offset {0}, limit {1}", offset, limit)
-        if offset < 0:
-            raise RestApiException(
-                'Page number cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        if limit < 0:
-            raise RestApiException(
-                'Page size cannot be a negative value',
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+        page -= 1
+        log.debug("paging: offset {}, limit {}", page, size)
 
         # check request for term matching
         provider = None
@@ -284,8 +262,8 @@ class Search(IMCEndpoint):
                 "RETURN DISTINCT(n) SKIP {offset} LIMIT {limit}".format(
                     fulltext=fulltext,
                     filters=' '.join(filters),
-                    offset=offset * limit,
-                    limit=limit,
+                    offset=page * size,
+                    limit=size,
                 )
             )
 
@@ -306,8 +284,8 @@ class Search(IMCEndpoint):
                     entity=entity,
                     filters=' '.join(filters),
                     match=multi_match_query,
-                    offset=offset * limit,
-                    limit=limit,
+                    offset=page * size,
+                    limit=size,
                 )
             )
 

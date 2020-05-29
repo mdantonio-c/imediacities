@@ -31,7 +31,7 @@ class TestApp(BaseTests):
         # search all item of type video with pagination parameters
         post_data = {'type': 'video', 'term': '*'}
         res = client.post(
-            '/api/search?perpage=10&currentpage=1',
+            '/api/search?size=10&page=1',
             headers=headers,
             data=json.dumps(post_data),
         )

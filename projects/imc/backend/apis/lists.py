@@ -53,7 +53,9 @@ class Lists(IMCEndpoint):
                     'description': 'The list of the researcher.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'The requested list does not exist.'},
             },
         },
@@ -86,7 +88,9 @@ class Lists(IMCEndpoint):
                     'description': 'The list of the researcher.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'The requested list does not exist.'},
             },
         },
@@ -107,8 +111,12 @@ class Lists(IMCEndpoint):
                     'description': 'List created successfully.',
                     'schema': {'$ref': '#/definitions/List'},
                 },
-                '400': {'description': 'There is no content present in the request body or the content is not valid for list.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '400': {
+                    'description': 'There is no content present in the request body or the content is not valid for list.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '409': {'description': 'There is already a list with that name.'},
             },
         }
@@ -127,10 +135,16 @@ class Lists(IMCEndpoint):
             ],
             'responses': {
                 '200': {'description': 'List updated successfully.'},
-                '400': {'description': 'There is no content present in the request body or the content is not valid for list.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '400': {
+                    'description': 'There is no content present in the request body or the content is not valid for list.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List does not exist.'},
-                '409': {'description': 'There is already another list with the same name among your lists.'},
+                '409': {
+                    'description': 'There is already another list with the same name among your lists.'
+                },
             },
         }
     }
@@ -140,7 +154,9 @@ class Lists(IMCEndpoint):
             'description': 'Delete a list of the researcher.',
             'responses': {
                 '204': {'description': 'List deleted successfully.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List does not exist.'},
             },
         }
@@ -155,7 +171,7 @@ class Lists(IMCEndpoint):
 
         iamadmin = self.auth.verify_admin()
         params = self.get_input()
-        researcher = self.get_current_user() if not iamadmin else None
+        researcher = self.auth.get_user() if not iamadmin else None
         r_uuid = params.get('researcher', None)
         if iamadmin and list_id is None and r_uuid is not None:
             try:
@@ -288,7 +304,7 @@ class Lists(IMCEndpoint):
             )
 
         self.graph = self.get_service_instance('neo4j')
-        user = self.get_current_user()
+        user = self.auth.get_user()
         # check if there is already a list with the same name belonging to the user.
         results = self.graph.cypher(
             "MATCH (l:List)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
@@ -327,7 +343,7 @@ class Lists(IMCEndpoint):
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
             raise RestApiException(
@@ -395,9 +411,10 @@ class Lists(IMCEndpoint):
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
         log.debug(
-            'current user: {email} - {uuid}'.format(email=user.email, uuid=user.uuid)
+            'current user: {} - {}',
+            user.email, user.uuid
         )
         iamadmin = self.auth.verify_admin()
         log.debug('current user is admin? {0}', iamadmin)
@@ -424,7 +441,9 @@ class ListItems(IMCEndpoint):
             'summary': 'List of items in a list.',
             'responses': {
                 '200': {'description': 'An list of items.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
@@ -433,7 +452,9 @@ class ListItems(IMCEndpoint):
             'summary': 'List of items in a list.',
             'responses': {
                 '200': {'description': 'An list of items.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List does not exist.'},
             },
             'description': 'Get all the items of a list. The result supports paging.',
@@ -460,8 +481,12 @@ class ListItems(IMCEndpoint):
             ],
             'responses': {
                 '204': {'description': 'Item added successfully.'},
-                '400': {'description': 'Bad request body or target node does not exist.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '400': {
+                    'description': 'Bad request body or target node does not exist.'
+                },
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List does not exist.'},
                 '409': {'description': 'The item is already connected to that list.'},
             },
@@ -472,7 +497,9 @@ class ListItems(IMCEndpoint):
             'summary': 'Delete an item from a list.',
             'responses': {
                 '204': {'description': 'Item deleted successfully.'},
-                '403': {'description': 'The user is not authorized to perform this operation.'},
+                '403': {
+                    'description': 'The user is not authorized to perform this operation.'
+                },
                 '404': {'description': 'List or item does not exist.'},
             },
         }
@@ -493,7 +520,7 @@ class ListItems(IMCEndpoint):
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
         # am I the owner of the list? (allowed also to admin)
-        user = self.get_current_user()
+        user = self.auth.get_user()
         iamadmin = self.auth.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
@@ -526,9 +553,8 @@ class ListItems(IMCEndpoint):
             return self.response(self.get_list_item_response(res[0]))
 
         log.debug(
-            "Get all the items of the list <{0}, {1}>".format(
-                user_list.uuid, user_list.name
-            )
+            "Get all the items of the list <{}, {}>",
+            user_list.uuid, user_list.name
         )
 
         data = []
@@ -569,7 +595,7 @@ class ListItems(IMCEndpoint):
             )
 
         # am I the creator of the list?
-        user = self.get_current_user()
+        user = self.auth.get_user()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
             raise RestApiException(
@@ -597,7 +623,7 @@ class ListItems(IMCEndpoint):
         # check if the incoming target is already connected to the list
         if targetNode.lists.is_connected(user_list):
             raise RestApiException(
-                'The item is already connected to the list <{0}, {1}>.'.format(
+                'The item is already connected to the list <{}, {}>.'.format(
                     list_id, user_list.name
                 ),
                 status_code=hcodes.HTTP_BAD_CONFLICT,
@@ -605,9 +631,8 @@ class ListItems(IMCEndpoint):
         # connect the target to the list
         user_list.items.connect(targetNode)
         log.debug(
-            "Item {0} added successfully to list <{1}, {2}>".format(
-                target, list_id, user_list.name
-            )
+            "Item {} added successfully to list <{}, {}>",
+            target, list_id, user_list.name
         )
         # 204: return empty response (?)
         self.empty_response()
@@ -627,12 +652,11 @@ class ListItems(IMCEndpoint):
                 "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
         log.debug(
-            "delete item <{0}> from the list <{1}, {2}>".format(
-                item_id, user_list.uuid, user_list.name
-            )
+            "delete item <{}> from the list <{}, {}>",
+            item_id, user_list.uuid, user_list.name
         )
         # am I the creator of the list? (allowed also to admin)
-        user = self.get_current_user()
+        user = self.auth.get_user()
         iamadmin = self.auth.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
@@ -648,17 +672,16 @@ class ListItems(IMCEndpoint):
                 break
         if matched_item is None:
             raise RestApiException(
-                "Item <{uuid}> does not belong the the list <{list_id}, {list_name}>".format(
-                    uuid=item_id, list_id=user_list.uuid, list_name=user_list.name
+                "Item <{}> does not belong the the list <{}, {}>".format(
+                    item_id, user_list.uuid, user_list.name
                 ),
                 status_code=hcodes.HTTP_BAD_NOTFOUND,
             )
         # disconnect the item
         user_list.items.disconnect(matched_item)
         log.debug(
-            "Item <{0}> remeved from the list <{1}, {2}>successfully.".format(
-                item_id, user_list.uuid, user_list.name
-            )
+            "Item <{}> remeved from the list <{}, {}>successfully.",
+            item_id, user_list.uuid, user_list.name
         )
         return self.empty_response()
 

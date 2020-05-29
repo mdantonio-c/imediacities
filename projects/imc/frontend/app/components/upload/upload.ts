@@ -20,10 +20,6 @@ export interface Data {
 
 @Component({
   selector: 'upload',
-  styles: [
-  	'.my-drop-zone { border: dotted 2px lightgray; text-align:center; height: 100px; line-height: 100px;}',
-  	'.nv-file-over { border: dotted 2px red; }'
-  ],
   templateUrl: './upload.html'
 })
 export class UploadComponent extends BasePaginationComponent<Data> {
@@ -36,16 +32,6 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 
 	public upload_options :any;
 	public upload_progress: any = {};
-	/*
-	public allowedMimeType:any = [
-		'application/x-zip-compressed',
-		'application/x-compressed',
-		'application/zip',
-		'multipart/x-zip'
-	];
-	*/
-	// public maxFileSize:number = 200*1024*1024; // 200 MB
-
 	public upload_endpoint:string;
 
 	constructor(protected injector: Injector, private uploadService: UploadxService) {

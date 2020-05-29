@@ -59,7 +59,7 @@ class Annotations(IMCEndpoint):
                     'type': 'boolean',
                     'default': False,
                     'allowEmptyValue': True,
-                }
+                },
             ],
             'responses': {
                 '200': {
@@ -85,7 +85,7 @@ class Annotations(IMCEndpoint):
                     'type': 'boolean',
                     'default': False,
                     'allowEmptyValue': True,
-                }
+                },
             ],
             'responses': {
                 '200': {
@@ -125,11 +125,13 @@ class Annotations(IMCEndpoint):
                     'required': True,
                     'description': 'The annotation to update.',
                     'schema': {'$ref': '#/definitions/Annotation'},
-                },
+                }
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully updated.'},
-                '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'},
+                '400': {
+                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
+                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
             },
@@ -146,11 +148,13 @@ class Annotations(IMCEndpoint):
                     'required': True,
                     'description': 'The annotation to update.',
                     'schema': {'$ref': '#/definitions/PatchRequest'},
-                },
+                }
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully updated.'},
-                '400': {'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'},
+                '400': {
+                    'description': 'Annotation cannot be updated. Operation allowed only for specific use cases.'
+                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
             },
@@ -166,11 +170,13 @@ class Annotations(IMCEndpoint):
                     'in': 'query',
                     'description': 'optional body reference for annotation with multiple bodies. This reference MUST be in the form "textual:your_term_value" or "resource:your_term_IRI"',
                     'type': 'string',
-                },
+                }
             ],
             'responses': {
                 '204': {'description': 'Annotation successfully deleted.'},
-                '400': {'description': 'Annotation cannot be deleted. No body found for the given reference.'},
+                '400': {
+                    'description': 'Annotation cannot be deleted. No body found for the given reference.'
+                },
                 '403': {'description': 'Operation forbidden.'},
                 '404': {'description': 'Annotation does not exist.'},
             },
@@ -280,7 +286,7 @@ class Annotations(IMCEndpoint):
         self.graph = self.get_service_instance('neo4j')
 
         # check user
-        user = self.get_current_user()
+        user = self.auth.get_user()
         if user is None:
             raise RestApiException('Invalid user', status_code=hcodes.HTTP_BAD_REQUEST)
 
@@ -449,7 +455,7 @@ class Annotations(IMCEndpoint):
                 'Annotation not found', status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
 
         log.debug('current user: {email} - {uuid}', email=user.email, uuid=user.uuid)
         iamadmin = self.auth.verify_admin()
@@ -524,7 +530,7 @@ class Annotations(IMCEndpoint):
                 'Annotation not found', status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
 
         creator = anno.creator.single()
         if creator is None:
@@ -620,7 +626,7 @@ class Annotations(IMCEndpoint):
                 'Annotation not found', status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
 
         creator = anno.creator.single()
         if creator is None:

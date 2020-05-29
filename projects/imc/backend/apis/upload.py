@@ -35,16 +35,14 @@ class Upload(Uploader, IMCEndpoint):
         '/upload': {
             'summary': 'Initialize file upload',
             'responses': {
-                '200': {'description': 'File upload successfully initialized'},
+                '200': {'description': 'File upload successfully initialized'}
             },
         }
     }
     _PUT = {
         '/upload/<filename>': {
             'summary': 'Upload a file into the stage area',
-            'responses': {
-                '200': {'description': 'File successfully uploaded'},
-            },
+            'responses': {'200': {'description': 'File successfully uploaded'}},
         }
     }
 
@@ -59,7 +57,7 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -79,7 +77,7 @@ class Upload(Uploader, IMCEndpoint):
     def put(self, filename):
 
         self.graph = self.get_service_instance('neo4j')
-        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
 
         if group is None:
             raise RestApiException(
@@ -107,7 +105,7 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = self.get_service_instance('neo4j')
 
-        group = self.graph.getSingleLinkedNode(self.get_current_user().belongs_to)
+        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
 
         if group is None:
             raise RestApiException(

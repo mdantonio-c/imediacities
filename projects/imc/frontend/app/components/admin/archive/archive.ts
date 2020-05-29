@@ -49,8 +49,8 @@ export class ArchiveComponent implements OnInit {
 		// this.loading = true;
 		this.spinner.show(this.group.id);
 		let data = {
-			"currentpage": 1,
-			"perpage": 100000
+			"page": 1,
+			"size": 100000
 		}
 		this.api.get('stage', this.group.id, data).subscribe(
 			response => {

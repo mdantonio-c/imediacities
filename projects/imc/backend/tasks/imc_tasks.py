@@ -113,10 +113,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             if file_extension.startswith("."):
                 file_extension = file_extension[1:]
             log.debug(
-                'filename [{0}], extension [{1}]'.format(filename, file_extension)
+                'filename [{}], extension [{}]',
+                filename, file_extension
             )
             basedir = os.path.dirname(os.path.abspath(path))
-            log.debug("Content basedir {0}", basedir)
+            log.debug("Content basedir {}", basedir)
             content_path, content_filename = lookup_content(self, basedir, source_id)
 
             if content_path is not None:
@@ -230,11 +231,10 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
                 if old_fps is not None and old_fps != item_node.framerate:
                     log.info(
-                        "Re-importing video item [{id}] with different fps: {old_fps} --> {new_fps}".format(
-                            id=item_node.uuid,
-                            old_fps=old_fps,
-                            new_fps=item_node.framerate,
-                        )
+                        "Re-importing video item [{}] with different fps: {} --> {}",
+                        item_node.uuid,
+                        old_fps,
+                        item_node.framerate,
                     )
 
                 # extract TVS and VIM results
@@ -311,9 +311,8 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
     new_shot_list : <dict>
     '''
     log.info(
-        "Set the new shot list with the current annotations for video [{}]".format(
-            item.uuid
-        )
+        "Set the new shot list with the current annotations for video [{}]",
+        item.uuid
     )
     for shot in item.shots.all():
         log.debug('-----------------------------------------------------')
@@ -336,12 +335,11 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
             if properties['start_frame_idx'] <= ft <= properties['end_frame_idx']:
                 log.info(
                     'Append annotation list {list} to the new shot '
-                    '{shot_num} [{shot_start}-{shot_end}]'.format(
-                        list=annotations,
-                        shot_num=shot_num,
-                        shot_start=properties['start_frame_idx'],
-                        shot_end=properties['end_frame_idx'],
-                    )
+                    '{shot_num} [{shot_start}-{shot_end}]',
+                    list=annotations,
+                    shot_num=shot_num,
+                    shot_start=properties['start_frame_idx'],
+                    shot_end=properties['end_frame_idx'],
                 )
                 if 'annotations' not in properties:
                     properties['annotations'] = []
@@ -589,9 +587,8 @@ def shot_revision(self, revision, item_id):
             rel.save()
 
     log.info(
-        'Shot revision task completed successfully (exit: {exit})'.format(
-            exit=exitRevision
-        )
+        'Shot revision task completed successfully (exit: {})',
+        exitRevision
     )
     return 1
 
@@ -710,12 +707,11 @@ def update_meta_stage(self, resource_id, path, metadata_update):
                 item_node.public_access = creation.get_default_public_access()
                 log.info(
                     "Default public access flag for {type} [{uuid}] "
-                    "rights status '{rs}' = {access}".format(
-                        type=item_node.item_type,
-                        uuid=creation.uuid,
-                        rs=creation.get_rights_status_display(),
-                        access=item_node.public_access,
-                    )
+                    "rights status '{rs}' = {access}",
+                    type=item_node.item_type,
+                    uuid=creation.uuid,
+                    rs=creation.get_rights_status_display(),
+                    access=item_node.public_access,
                 )
                 item_node.save()
         else:
@@ -820,9 +816,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         summary_path = os.path.join(os.path.dirname(analyze_dir_path), summary_filename)
         if not os.path.exists(summary_path):
             log.warning(
-                "{0} CANNOT be found in the path: [{1}]".format(
-                    summary_filename, analyze_dir_path
-                )
+                "{} CANNOT be found in the path: [{}]",
+                summary_filename, analyze_dir_path
             )
         else:
             item.summary = summary_path
@@ -858,7 +853,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     else:
         log.warning(
             'Invalid type. Technical info CANNOT be extracted for '
-            'Item[{uuid}] with type {type}'.format(uuid=item.uuid, type=item.item_type)
+            'Item[{uuid}] with type {type}',
+            uuid=item.uuid, type=item.item_type
         )
         return
 
@@ -908,10 +904,8 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
             duration = s['len_seconds']
         except ValueError:
             log.warning(
-                "Invalid duration in the shot {0} \
-                for value '{1}'".format(
-                    s['shot_num'], s['len_seconds']
-                )
+                "Invalid duration in the shot {} for value '{}'",
+                s['shot_num'], s['len_seconds']
             )
             duration = None
         shots[s['shot_num']] = {
@@ -1011,8 +1005,6 @@ def extract_br_annotations(self, item, analyze_dir_path):
             continue
         # filter by belonging city
         if city != building_resource.get('city'):
-            # log.debug('Building {0} does NOT belong to city of {1}'
-            #           .format(concept_name, city))
             wrong_city_counter += 1
             continue
         concept = {
@@ -1051,9 +1043,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
         od_confidences = [e for e in confidence if e is not None]
         avg_confidence = sum(od_confidences) / float(len(od_confidences))
         log.debug(
-            'AVG confidence for building {0} in shot {1}: {2}'.format(
-                key[0], key[1], avg_confidence
-            )
+            'AVG confidence for building {} in shot {}: {}',
+            key[0], key[1], avg_confidence
         )
         if avg_confidence < 0.5:
             # discard detections with low confidence
@@ -1081,12 +1072,12 @@ def extract_br_annotations(self, item, analyze_dir_path):
         saved_counter += 1
 
     log.info(
-        'Number of discarded recognized buildings with wrong city: {counter}'.format(
-            counter=wrong_city_counter
-        )
+        'Number of discarded recognized buildings with wrong city: {}',
+        wrong_city_counter
     )
     log.info(
-        'Number of saved automatic annotations: {counter}'.format(counter=saved_counter)
+        'Number of saved automatic annotations: {}',
+        saved_counter
     )
     log.info('-----------------------------------------------------')
 
@@ -1199,9 +1190,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
             huge_size = len(region_sequence)
             region_sequence = []
             log.warning(
-                'Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}'.format(
-                    objID=key[0], concept=concept['name'], size=huge_size
-                )
+                'Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}',
+                objID=key[0], concept=concept['name'], size=huge_size
             )
         od_body = {
             'type': 'ODBody',

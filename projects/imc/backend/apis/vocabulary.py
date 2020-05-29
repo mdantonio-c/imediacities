@@ -16,9 +16,7 @@ class Vocabulary(IMCEndpoint):
     _GET = {
         '/vocabulary': {
             'summary': 'Returns the controlled vocabulary.',
-            'responses': {
-                '200': {'description': 'The controlled vocabulary'},
-            },
+            'responses': {'200': {'description': 'The controlled vocabulary'}},
         }
     }
 

@@ -141,7 +141,7 @@ class ShotAnnotations(IMCEndpoint):
                 "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.get_current_user()
+        user = self.auth.get_user()
 
         for a in shot.annotation:
             if anno_type is not None and a.annotation_type != anno_type:
@@ -150,7 +150,8 @@ class ShotAnnotations(IMCEndpoint):
                 if a.creator is None:
                     log.warning(
                         'Invalid state: missing creator for private '
-                        'note [UUID:{}]'.format(a.uuid)
+                        'note [UUID:{}]',
+                        a.uuid
                     )
                     continue
                 creator = a.creator.single()

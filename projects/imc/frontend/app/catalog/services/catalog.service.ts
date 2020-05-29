@@ -64,7 +64,7 @@ export class CatalogService {
      * @param pageSize
      */
 	search(filter: SearchFilter, pageIdx: number, pageSize: number, cached: boolean = true) {
-		let endpoint = 'search?currentpage=' + pageIdx + '&perpage=' + pageSize;
+		let endpoint = 'search?page=' + pageIdx + '&size=' + pageSize;
 		this._filter = filter;
 		let data = {
 			match: null,
