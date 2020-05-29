@@ -62,9 +62,7 @@ class SearchAnnotations(IMCEndpoint):
                     ),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-            filters.append(
-                f"WHERE anno.annotation_type='{anno_type}'"
-            )
+            filters.append(f"WHERE anno.annotation_type='{anno_type}'")
             # add filter for processed content with COMPLETE status
             filters.append(
                 "MATCH (creation:Creation)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) "
@@ -134,25 +132,19 @@ class SearchAnnotations(IMCEndpoint):
                                 "MATCH (creation)-[:HAS_TITLE]->(t:Title)"
                             )
                             multi_match_fields.append('t')
-                            multi_match_where.append(
-                                f"t.text =~ '(?i).*{term}.*'"
-                            )
+                            multi_match_where.append(f"t.text =~ '(?i).*{term}.*'")
                         elif f == 'description':
                             multi_match.append(
                                 "OPTIONAL MATCH (creation)-[:HAS_DESCRIPTION]->(d:Description)"
                             )
                             multi_match_fields.append('d')
-                            multi_match_where.append(
-                                f"d.text =~ '(?i).*{term}.*'"
-                            )
+                            multi_match_where.append(f"d.text =~ '(?i).*{term}.*'")
                         elif f == 'keyword':
                             multi_optional_match.append(
                                 "OPTIONAL MATCH (creation)-[:HAS_KEYWORD]->(k:Keyword)"
                             )
                             multi_match_fields.append('k')
-                            multi_match_where.append(
-                                f"k.term =~ '(?i){term}'"
-                            )
+                            multi_match_where.append(f"k.term =~ '(?i){term}'")
                         elif f == 'contributor':
                             multi_optional_match.append(
                                 "OPTIONAL MATCH (creation)-[:CONTRIBUTED_BY]->(a:Agent)"
@@ -260,9 +252,7 @@ class SearchAnnotations(IMCEndpoint):
                         if 'iri' not in term and 'label' in term
                     ]
                     if free_terms:
-                        term_clauses.append(
-                            f'term.value IN {free_terms}'
-                        )
+                        term_clauses.append(f'term.value IN {free_terms}')
                     if term_clauses:
                         filters.append(
                             "MATCH (i)<-[:SOURCE]-(anno2)-[:HAS_BODY]-(term) WHERE {clauses}".format(

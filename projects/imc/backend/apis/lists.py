@@ -410,10 +410,7 @@ class Lists(IMCEndpoint):
             )
 
         user = self.auth.get_user()
-        log.debug(
-            'current user: {} - {}',
-            user.email, user.uuid
-        )
+        log.debug('current user: {} - {}', user.email, user.uuid)
         iamadmin = self.auth.verify_admin()
         log.debug('current user is admin? {0}', iamadmin)
 
@@ -551,8 +548,7 @@ class ListItems(IMCEndpoint):
             return self.response(self.get_list_item_response(res[0]))
 
         log.debug(
-            "Get all the items of the list <{}, {}>",
-            user_list.uuid, user_list.name
+            "Get all the items of the list <{}, {}>", user_list.uuid, user_list.name
         )
 
         data = []
@@ -630,7 +626,9 @@ class ListItems(IMCEndpoint):
         user_list.items.connect(targetNode)
         log.debug(
             "Item {} added successfully to list <{}, {}>",
-            target, list_id, user_list.name
+            target,
+            list_id,
+            user_list.name,
         )
         # 204: return empty response (?)
         self.empty_response()
@@ -651,7 +649,9 @@ class ListItems(IMCEndpoint):
             )
         log.debug(
             "delete item <{}> from the list <{}, {}>",
-            item_id, user_list.uuid, user_list.name
+            item_id,
+            user_list.uuid,
+            user_list.name,
         )
         # am I the creator of the list? (allowed also to admin)
         user = self.auth.get_user()
@@ -679,7 +679,9 @@ class ListItems(IMCEndpoint):
         user_list.items.disconnect(matched_item)
         log.debug(
             "Item <{}> remeved from the list <{}, {}>successfully.",
-            item_id, user_list.uuid, user_list.name
+            item_id,
+            user_list.uuid,
+            user_list.name,
         )
         return self.empty_response()
 

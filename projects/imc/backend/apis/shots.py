@@ -147,9 +147,8 @@ class ShotAnnotations(IMCEndpoint):
             if a.private:
                 if a.creator is None:
                     log.warning(
-                        'Invalid state: missing creator for private '
-                        'note [UUID:{}]',
-                        a.uuid
+                        'Invalid state: missing creator for private ' 'note [UUID:{}]',
+                        a.uuid,
                     )
                     continue
                 creator = a.creator.single()

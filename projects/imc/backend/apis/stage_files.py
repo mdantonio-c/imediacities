@@ -291,8 +291,7 @@ class Stage(IMCEndpoint):
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                f"File not found: {filename}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
         # 1) estraggo il source id dal file dei metadati
@@ -479,8 +478,7 @@ class Stage(IMCEndpoint):
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                f"File not found: {filename}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
         os.remove(path)

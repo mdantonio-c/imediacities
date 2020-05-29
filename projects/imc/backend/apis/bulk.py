@@ -167,8 +167,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found',
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             log.info("Update procedure for Group '{0}'", group.shortname)
             # check if the parameter 'force_reprocessing' has been specified
@@ -511,8 +510,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found',
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             update = bool(action.get('update'))
             mode = action.get('mode') or 'skip'
@@ -605,8 +603,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found',
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             retry = bool(action.get('retry'))
             log.info("V2 procedure for Group '{}'", group.shortname)

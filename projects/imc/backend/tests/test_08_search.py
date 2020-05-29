@@ -29,9 +29,7 @@ class TestApp(BaseTests):
         # search all item of type video with pagination parameters
         post_data = {'type': 'video', 'term': '*'}
         res = client.post(
-            '/api/search?size=10&page=1',
-            headers=headers,
-            data=json.dumps(post_data),
+            '/api/search?size=10&page=1', headers=headers, data=json.dumps(post_data)
         )
 
         assert res.status_code == hcodes.HTTP_OK_BASIC

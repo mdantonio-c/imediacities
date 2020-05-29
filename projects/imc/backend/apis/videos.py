@@ -247,10 +247,7 @@ class VideoItem(IMCEndpoint):
 
         item.public_access = public_access
         item.save()
-        log.debug(
-            "Item successfully updated for AVEntity uuid {}. {}",
-            video_id, item
-        )
+        log.debug("Item successfully updated for AVEntity uuid {}. {}", video_id, item)
 
         # 204: Item successfully updated.
         return self.empty_response()
@@ -339,7 +336,7 @@ class VideoAnnotations(IMCEndpoint):
                 if creator is None:
                     log.warning(
                         'Invalid state: missing creator for private note [UUID:{}]',
-                        a.uuid
+                        a.uuid,
                     )
                     continue
                 if creator.uuid != user.uuid:
@@ -373,7 +370,7 @@ class VideoAnnotations(IMCEndpoint):
                                     log.warning(
                                         'Invalid state: missing creator for private '
                                         'note [UUID:{}]',
-                                        anno.uuid
+                                        anno.uuid,
                                     )
                                     continue
                                 if creator is not None and creator.uuid != user.uuid:
@@ -640,13 +637,11 @@ class VideoSegments(IMCEndpoint):
         if segment_id is not None:
             log.debug(
                 "get manual segment [uuid:{}] for AVEntity [uuid:{}]",
-                segment_id, video_id
+                segment_id,
+                video_id,
             )
         else:
-            log.debug(
-                "get all manual segments for AVEntity [uuid:{}]",
-                video_id
-            )
+            log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
@@ -1244,7 +1239,9 @@ class VideoShotRevision(IMCEndpoint):
         iamadmin = self.auth.verify_admin()
         log.debug(
             "Request for revision from user [{}, {} {}]",
-            user.uuid, user.name, user.surname
+            user.uuid,
+            user.name,
+            user.surname,
         )
         # Be sure user can revise this specific video
         assignee = user

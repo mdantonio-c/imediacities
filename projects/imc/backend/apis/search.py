@@ -178,9 +178,7 @@ class Search(IMCEndpoint):
                     if 'iri' not in term or term['iri'] is None and 'label' in term
                 ]
                 if free_terms:
-                    term_clauses.append(
-                        f'body.value IN {free_terms}'
-                    )
+                    term_clauses.append(f'body.value IN {free_terms}')
                 if term_clauses:
                     filters.append(
                         "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body) "

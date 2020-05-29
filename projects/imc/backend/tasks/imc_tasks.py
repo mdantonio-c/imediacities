@@ -110,10 +110,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             filename, file_extension = os.path.splitext(path)
             if file_extension.startswith("."):
                 file_extension = file_extension[1:]
-            log.debug(
-                'filename [{}], extension [{}]',
-                filename, file_extension
-            )
+            log.debug('filename [{}], extension [{}]', filename, file_extension)
             basedir = os.path.dirname(os.path.abspath(path))
             log.debug("Content basedir {}", basedir)
             content_path, content_filename = lookup_content(self, basedir, source_id)
@@ -309,8 +306,7 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
     new_shot_list : <dict>
     '''
     log.info(
-        "Set the new shot list with the current annotations for video [{}]",
-        item.uuid
+        "Set the new shot list with the current annotations for video [{}]", item.uuid
     )
     for shot in item.shots.all():
         log.debug('-----------------------------------------------------')
@@ -357,9 +353,7 @@ def launch_tool(self, tool_name, item_id):
         self.graph = celery_app.get_service('neo4j')
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
-            content_source = self.graph.getSingleLinkedNode(
-                item.content_source
-            )
+            content_source = self.graph.getSingleLinkedNode(item.content_source)
             group = self.graph.getSingleLinkedNode(item.ownership)
             movie = content_source.filename
             m_name = os.path.splitext(os.path.basename(movie))[0]
@@ -393,9 +387,7 @@ def load_v2(self, other_version, item_id, retry=False):
         self.graph = celery_app.get_service('neo4j')
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
-            content_source = self.graph.getSingleLinkedNode(
-                item.content_source
-            )
+            content_source = self.graph.getSingleLinkedNode(item.content_source)
             group = self.graph.getSingleLinkedNode(item.ownership)
             source_filename = content_source.filename
             m_name = os.path.splitext(os.path.basename(source_filename))[0]
@@ -474,9 +466,7 @@ def load_v2(self, other_version, item_id, retry=False):
 
             other_version_uri = os.path.join(analyze_path, 'v2_transcoded.' + ext)
             if not os.path.exists(other_version_uri):
-                raise Exception(
-                    f'Unable to find transcoded v2 at {other_version_uri}'
-                )
+                raise Exception(f'Unable to find transcoded v2 at {other_version_uri}')
             other_item = item.other_version.single()
             if other_item is None:
                 other_item_properties = {}
@@ -584,10 +574,7 @@ def shot_revision(self, revision, item_id):
             rel.state = 'W'
             rel.save()
 
-    log.info(
-        'Shot revision task completed successfully (exit: {})',
-        exitRevision
-    )
+    log.info('Shot revision task completed successfully (exit: {})', exitRevision)
     return 1
 
 
@@ -662,8 +649,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
             source_id = extract_creation_ref(self, path)
             if source_id is None:
-                raise Exception(
-                    f"No source ID found importing metadata file {path}")
+                raise Exception(f"No source ID found importing metadata file {path}")
 
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
@@ -752,9 +738,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
         creation = parser.parse_non_av_creation(record)
     else:
         # should never be reached
-        raise Exception(
-            f"Extracting metadata for type {item_type} not yet implemented"
-        )
+        raise Exception(f"Extracting metadata for type {item_type} not yet implemented")
     # log.debug(creation['properties'])
     repo.create_entity(creation['properties'], item_node, creation['relationships'], av)
     return parser.warnings
@@ -766,8 +750,7 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     file tech_info_filename and save them as Item properties in the database.
     """
     if not os.path.exists(analyze_dir_path):
-        raise OSError(
-            f"Analyze results does not exist in the path {analyze_dir_path}")
+        raise OSError(f"Analyze results does not exist in the path {analyze_dir_path}")
 
     # check for info result
     tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
@@ -815,7 +798,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         if not os.path.exists(summary_path):
             log.warning(
                 "{} CANNOT be found in the path: [{}]",
-                summary_filename, analyze_dir_path
+                summary_filename,
+                analyze_dir_path,
             )
         else:
             item.summary = summary_path
@@ -852,7 +836,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
         log.warning(
             'Invalid type. Technical info CANNOT be extracted for '
             'Item[{uuid}] with type {type}',
-            uuid=item.uuid, type=item.item_type
+            uuid=item.uuid,
+            type=item.item_type,
         )
         return
 
@@ -880,9 +865,7 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
     """
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
-        raise OSError(
-            f"Storyboard directory does not exist in the path {tvs_dir_path}"
-        )
+        raise OSError(f"Storyboard directory does not exist in the path {tvs_dir_path}")
     # check for info result
     tvs_filename = 'storyboard.json'
     tvs_path = os.path.join(os.path.dirname(tvs_dir_path), tvs_filename)
@@ -903,7 +886,8 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
         except ValueError:
             log.warning(
                 "Invalid duration in the shot {} for value '{}'",
-                s['shot_num'], s['len_seconds']
+                s['shot_num'],
+                s['len_seconds'],
             )
             duration = None
         shots[s['shot_num']] = {
@@ -931,8 +915,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
     brf_results_filename = 'brf.xml'
     brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
     if not os.path.exists(brf_results_path):
-        raise OSError(
-            f"Analyze results does not exist in the path {brf_results_path}")
+        raise OSError(f"Analyze results does not exist in the path {brf_results_path}")
     log.info('get automatic building recognition from file [{}]', brf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(brf_results_path)
@@ -1042,7 +1025,9 @@ def extract_br_annotations(self, item, analyze_dir_path):
         avg_confidence = sum(od_confidences) / float(len(od_confidences))
         log.debug(
             'AVG confidence for building {} in shot {}: {}',
-            key[0], key[1], avg_confidence
+            key[0],
+            key[1],
+            avg_confidence,
         )
         if avg_confidence < 0.5:
             # discard detections with low confidence
@@ -1071,12 +1056,9 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
     log.info(
         'Number of discarded recognized buildings with wrong city: {}',
-        wrong_city_counter
+        wrong_city_counter,
     )
-    log.info(
-        'Number of saved automatic annotations: {}',
-        saved_counter
-    )
+    log.info('Number of saved automatic annotations: {}', saved_counter)
     log.info('-----------------------------------------------------')
 
 
@@ -1088,8 +1070,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
     orf_results_filename = 'orf.xml'
     orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
     if not os.path.exists(orf_results_path):
-        raise OSError(
-            f"Analyze results does not exist in the path {orf_results_path}")
+        raise OSError(f"Analyze results does not exist in the path {orf_results_path}")
     log.info('get automatic object detection from file [{}]', orf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(orf_results_path)
@@ -1189,7 +1170,9 @@ def extract_od_annotations(self, item, analyze_dir_path):
             region_sequence = []
             log.warning(
                 'Detected Object [{objID}/{concept}]: area sequence too big! Number of regions: {size}',
-                objID=key[0], concept=concept['name'], size=huge_size
+                objID=key[0],
+                concept=concept['name'],
+                size=huge_size,
             )
         od_body = {
             'type': 'ODBody',

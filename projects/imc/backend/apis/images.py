@@ -232,8 +232,7 @@ class ImageItem(IMCEndpoint):
         item.public_access = public_access
         item.save()
         log.debug(
-            "Item successfully updated for NonAVEntity uuid {}. {}",
-            image_id, item
+            "Item successfully updated for NonAVEntity uuid {}. {}", image_id, item
         )
 
         # 204: Item successfully updated.
@@ -302,8 +301,8 @@ class ImageAnnotations(IMCEndpoint):
                 if anno.creator is None:
                     # expected ALWAYS a creator for private annotation
                     log.warning(
-                        'Invalid state: missing creator for private '
-                        'anno [UUID:{}]', anno.uuid
+                        'Invalid state: missing creator for private ' 'anno [UUID:{}]',
+                        anno.uuid,
                     )
                     continue
                 creator = anno.creator.single()

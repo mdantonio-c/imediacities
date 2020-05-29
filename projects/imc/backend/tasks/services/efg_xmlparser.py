@@ -131,8 +131,7 @@ class EFG_XMLParser:
             p_scheme = provider_el.get('schemeID')
             scheme = codelists.fromDescription(p_scheme, codelists.PROVIDER_SCHEMES)
             if scheme is None:
-                raise ValueError(
-                    f'Invalid provider scheme value for [{p_scheme}]')
+                raise ValueError(f'Invalid provider scheme value for [{p_scheme}]')
             provider['scheme'] = scheme[0]
             log.debug('Record Provider: {}', provider)
 

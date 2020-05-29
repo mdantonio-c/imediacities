@@ -114,9 +114,7 @@ class CreationRepository:
                     if rightholder is None:
                         rightholder = self.graph.Rightholder(**props).save()
                     else:
-                        log.debug(
-                            'Found existing rightholder: {}', rightholder.name
-                        )
+                        log.debug('Found existing rightholder: {}', rightholder.name)
                     entity.rightholders.connect(rightholder)
 
         return entity

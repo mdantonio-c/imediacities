@@ -57,7 +57,11 @@ class AnnotationRepository:
             raise ValueError("Invalid Target instance.")
 
         # target to a segment only for videos with a provided selector
-        if (selector is not None and isinstance(target, self.graph.Item) and target.item_type == 'Video'):
+        if (
+            selector is not None
+            and isinstance(target, self.graph.Item)
+            and target.item_type == 'Video'
+        ):
             if not isinstance(target, self.graph.Item):
                 raise ValueError('Selector allowed only for Item target.')
             s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
@@ -103,7 +107,8 @@ class AnnotationRepository:
             elif body['type'] == 'TextualBody':
                 text_lang = body.get('language')
                 bodyNode = self.graph.TextualBody(
-                    value=body['value'], language=text_lang).save()
+                    value=body['value'], language=text_lang
+                ).save()
                 bodyNode.save()
             elif body['type'] == 'ODBody':
                 properties = {
@@ -187,7 +192,8 @@ class AnnotationRepository:
                 )
             text_lang = body.get('language')
             bodyNode = self.graph.TextualBody(
-                value=body['value'], language=text_lang).save()
+                value=body['value'], language=text_lang
+            ).save()
             anno.bodies.connect(bodyNode)
 
         return anno
@@ -243,7 +249,9 @@ class AnnotationRepository:
         '''
         log.debug(
             'Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]',
-            anno_id=anno.uuid, btype=btype, bid=bid
+            anno_id=anno.uuid,
+            btype=btype,
+            bid=bid,
         )
         bodies = anno.bodies.all()
         body_list_size_before = len(bodies)
@@ -256,12 +264,18 @@ class AnnotationRepository:
             log.debug('body instance of {}', original_body.__class__)
             if single_body:
                 # ONLY the referenced body
-                if isinstance(original_body, self.graph.ResourceBody) and btype == 'resource':
+                if (
+                    isinstance(original_body, self.graph.ResourceBody)
+                    and btype == 'resource'
+                ):
                     if bid == original_body.iri:
                         # disconnect that node
                         body_found = True
                         anno.bodies.disconnect(body)
-                elif isinstance(original_body, self.graph.TextualBody) and btype == 'textual':
+                elif (
+                    isinstance(original_body, self.graph.TextualBody)
+                    and btype == 'textual'
+                ):
                     if bid == original_body.value:
                         # remove the textual node
                         body_found = True
@@ -282,7 +296,9 @@ class AnnotationRepository:
             raise ReferenceError(
                 "Annotation ID:{anno_id} cannot be deleted."
                 " No body found for {btype}:{bid}",
-                anno_id=anno.uuid, btype=btype, bid=bid
+                anno_id=anno.uuid,
+                btype=btype,
+                bid=bid,
             )
         if body_list_size_after == 0:
             # delete any orphan video segments (NOT SHOT!)
@@ -305,12 +321,12 @@ class AnnotationRepository:
                 )
             log.info(
                 'Annotation with ID:{} successfully deleted.{}',
-                anno.uuid, single_body_removed
+                anno.uuid,
+                single_body_removed,
             )
         else:
             log.info(
-                'Annotation with ID:{}. ONLY body {}:{} removed',
-                anno.uuid, btype, bid
+                'Annotation with ID:{}. ONLY body {}:{} removed', anno.uuid, btype, bid
             )
 
     @staticmethod
@@ -326,7 +342,9 @@ class AnnotationRepository:
         if not shots:
             raise ValueError('List of shots cannot be empty')
         # create annotation node
-        annotation = self.graph.Annotation(generator='FHG', annotation_type='TVS').save()
+        annotation = self.graph.Annotation(
+            generator='FHG', annotation_type='TVS'
+        ).save()
         # add target
         annotation.targets.connect(item)
         annotation.source_item.connect(item)
@@ -627,7 +645,9 @@ class AnnotationRepository:
                 continue
 
             # create annotation node
-            annotation = self.graph.Annotation(generator='FHG', annotation_type='VIM').save()
+            annotation = self.graph.Annotation(
+                generator='FHG', annotation_type='VIM'
+            ).save()
             # add target
             annotation.targets.connect(shot)
             annotation.source_item.connect(item)
@@ -748,7 +768,11 @@ class AnnotationRepository:
         '''
         Return the shot list of the item enclosing the given segment.
         '''
-        if item is None or not isinstance(item, self.graph.Item) or item.item_type != 'Video':
+        if (
+            item is None
+            or not isinstance(item, self.graph.Item)
+            or item.item_type != 'Video'
+        ):
             raise ValueError('Invalid item in getting enclosing shots.')
         s_start = segment.start_frame_idx
         s_end = segment.end_frame_idx
@@ -907,7 +931,9 @@ class AnnotationRepository:
         segment = self.lookup_existing_segment(s_start, s_end, item)
         log.debug('Segment does exist? {}', True if segment else False)
         if segment is None:
-            segment = self.graph.VideoSegment(start_frame_idx=s_start, end_frame_idx=s_end).save()
+            segment = self.graph.VideoSegment(
+                start_frame_idx=s_start, end_frame_idx=s_end
+            ).save()
             # look up the shot where the segment is enclosed
             shots = self.get_enclosing_shots(segment, item)
             if shots is None or len(shots) == 0:

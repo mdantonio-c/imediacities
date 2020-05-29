@@ -2,5 +2,3 @@
 
 # from pymongo.write_concern import WriteConcern
 from pymodm import MongoModel, fields
-
-

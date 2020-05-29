@@ -49,6 +49,7 @@ for c in registry._NODE_CLASS_REGISTRY:
         registry._NODE_CLASS_REGISTRY.pop(base_group)
         break
 
+
 class HeritableStructuredNode(StructuredNode):
 
     # noqa see: http://stackoverflow.com/questions/35744456/relationship-to-multiple-types-polymorphism-in-neomodel
@@ -104,7 +105,8 @@ class HeritableStructuredNode(StructuredNode):
             if target_class not in classes:
                 raise ValueError(
                     '{} is not a sub-class of {}'.format(
-                        target_class, self.__class__.__name__)
+                        target_class, self.__class__.__name__
+                    )
                 )
         if cls is None:
             cls = getattr(sys.modules[__name__], target_class)
