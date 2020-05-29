@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # NEOMODEL BASE CLASSES EXTENSION #
 import inspect
 
@@ -77,7 +76,7 @@ class StringProperty(originalStringProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(StringProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class IntegerProperty(originalIntegerProperty, myAttribProperty):
@@ -87,7 +86,7 @@ class IntegerProperty(originalIntegerProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(IntegerProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class FloatProperty(originalFloatProperty, myAttribProperty):
@@ -97,7 +96,7 @@ class FloatProperty(originalFloatProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(FloatProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class BooleanProperty(originalBooleanProperty, myAttribProperty):
@@ -107,7 +106,7 @@ class BooleanProperty(originalBooleanProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(BooleanProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class DateTimeProperty(originalDateTimeProperty, myAttribProperty):
@@ -117,7 +116,7 @@ class DateTimeProperty(originalDateTimeProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(DateTimeProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class DateProperty(originalDateProperty, myAttribProperty):
@@ -127,7 +126,7 @@ class DateProperty(originalDateProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(DateProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class ArrayProperty(originalArrayProperty, myAttribProperty):
@@ -143,7 +142,7 @@ class ArrayProperty(originalArrayProperty, myAttribProperty):
     ):
 
         self.save_extra_info(show, is_restricted)
-        super(ArrayProperty, self).__init__(base_property, *args, **kwargs)
+        super().__init__(base_property, *args, **kwargs)
 
 
 class JSONProperty(originalJSONProperty, myAttribProperty):
@@ -153,7 +152,7 @@ class JSONProperty(originalJSONProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(JSONProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class EmailProperty(originalEmailProperty, myAttribProperty):
@@ -163,7 +162,7 @@ class EmailProperty(originalEmailProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(EmailProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class AliasProperty(originalAliasProperty, myAttribProperty):
@@ -173,7 +172,7 @@ class AliasProperty(originalAliasProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(AliasProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UniqueIdProperty(originalUniqueIdProperty, myAttribProperty):
@@ -183,7 +182,7 @@ class UniqueIdProperty(originalUniqueIdProperty, myAttribProperty):
 
     def __init__(self, show=None, is_restricted=False, *args, **kwargs):
         self.save_extra_info(show, is_restricted)
-        super(UniqueIdProperty, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class StructuredRel(originalStructuredRel):

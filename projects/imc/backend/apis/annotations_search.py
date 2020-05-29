@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Search endpoint for annotations
 """
@@ -65,7 +63,7 @@ class SearchAnnotations(IMCEndpoint):
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             filters.append(
-                "WHERE anno.annotation_type='{anno_type}'".format(anno_type=anno_type)
+                f"WHERE anno.annotation_type='{anno_type}'"
             )
             # add filter for processed content with COMPLETE status
             filters.append(
@@ -137,7 +135,7 @@ class SearchAnnotations(IMCEndpoint):
                             )
                             multi_match_fields.append('t')
                             multi_match_where.append(
-                                "t.text =~ '(?i).*{term}.*'".format(term=term)
+                                f"t.text =~ '(?i).*{term}.*'"
                             )
                         elif f == 'description':
                             multi_match.append(
@@ -145,7 +143,7 @@ class SearchAnnotations(IMCEndpoint):
                             )
                             multi_match_fields.append('d')
                             multi_match_where.append(
-                                "d.text =~ '(?i).*{term}.*'".format(term=term)
+                                f"d.text =~ '(?i).*{term}.*'"
                             )
                         elif f == 'keyword':
                             multi_optional_match.append(
@@ -153,7 +151,7 @@ class SearchAnnotations(IMCEndpoint):
                             )
                             multi_match_fields.append('k')
                             multi_match_where.append(
-                                "k.term =~ '(?i){term}'".format(term=term)
+                                f"k.term =~ '(?i){term}'"
                             )
                         elif f == 'contributor':
                             multi_optional_match.append(
@@ -255,7 +253,7 @@ class SearchAnnotations(IMCEndpoint):
                     term_clauses = []
                     iris = [term['iri'] for term in terms if 'iri' in term]
                     if iris:
-                        term_clauses.append('term.iri IN {iris}'.format(iris=iris))
+                        term_clauses.append(f'term.iri IN {iris}')
                     free_terms = [
                         term['label']
                         for term in terms
@@ -263,7 +261,7 @@ class SearchAnnotations(IMCEndpoint):
                     ]
                     if free_terms:
                         term_clauses.append(
-                            'term.value IN {free_terms}'.format(free_terms=free_terms)
+                            f'term.value IN {free_terms}'
                         )
                     if term_clauses:
                         filters.append(

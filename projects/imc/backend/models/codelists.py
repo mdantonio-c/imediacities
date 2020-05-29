@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 def fromDescription(descr, codelist):
     """
     Returns the matched element by description in the give codelist. None

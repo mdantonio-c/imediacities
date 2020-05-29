@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Search endpoint
 
@@ -108,7 +106,7 @@ class Search(IMCEndpoint):
             if city is not None:
                 filters.append(
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)"
-                    + " WHERE p.city='{city}'".format(city=city.strip())
+                    + f" WHERE p.city='{city.strip()}'"
                 )
             log.debug("city {0}", city)
             # COUNTRY
@@ -173,7 +171,7 @@ class Search(IMCEndpoint):
                     if 'iri' in term and term['iri'] is not None
                 ]
                 if iris:
-                    term_clauses.append('body.iri IN {iris}'.format(iris=iris))
+                    term_clauses.append(f'body.iri IN {iris}')
                 free_terms = [
                     term['label']
                     for term in terms
@@ -181,7 +179,7 @@ class Search(IMCEndpoint):
                 ]
                 if free_terms:
                     term_clauses.append(
-                        'body.value IN {free_terms}'.format(free_terms=free_terms)
+                        f'body.value IN {free_terms}'
                     )
                 if term_clauses:
                     filters.append(

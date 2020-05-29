@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 concept_mapping = {}
 concept_mapping['person'] = 'https://www.wikidata.org/wiki/Q5'  # 1
 concept_mapping['bicycle'] = 'https://www.wikidata.org/wiki/Q11442'  # 2

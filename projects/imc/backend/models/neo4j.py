@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Graph DB abstraction from neo4j server.
 These are custom models!

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ CUSTOM Models for the relational database """
 
 from restapi.models.sql import db, User

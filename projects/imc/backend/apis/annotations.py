@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Handle annotations
 """
@@ -21,7 +19,7 @@ import re
 
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
 BODY_PATTERN = re.compile("(resource|textual):.+")
-SELECTOR_PATTERN = re.compile("t=\d+,\d+")
+SELECTOR_PATTERN = re.compile(r"t=\d+,\d+")
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
@@ -385,7 +383,7 @@ class Annotations(IMCEndpoint):
                         status_code=hcodes.HTTP_BAD_REQUEST,
                     )
             else:
-                raise RestApiException('Invalid body type for: {}'.format(b_type))
+                raise RestApiException(f'Invalid body type for: {b_type}')
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
@@ -402,7 +400,7 @@ class Annotations(IMCEndpoint):
                 )
             if target_type != 'item':
                 raise RestApiException(
-                    "Invalid target. Only item allowed.".format(b_type=b_type),
+                    f"Invalid target. Only item allowed.",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             try:
@@ -500,7 +498,7 @@ class Annotations(IMCEndpoint):
             elif anno.annotation_type == 'TAG':
                 repo.delete_auto_annotation(anno)
             else:
-                raise ValueError('Cannot delete anno {id}'.format(id=anno.uuid))
+                raise ValueError(f'Cannot delete anno {anno.uuid}')
         except ReferenceError as error:
             raise RestApiException(error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
 
@@ -545,7 +543,7 @@ class Annotations(IMCEndpoint):
 
         if anno.annotation_type not in ('DSC', 'COM', 'RPL'):
             raise RestApiException(
-                'Operation not allowed for annotation {}'.format(anno.annotation_type),
+                f'Operation not allowed for annotation {anno.annotation_type}',
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -585,7 +583,7 @@ class Annotations(IMCEndpoint):
             b_type = body.get('type')
             if b_type != 'TextualBody':
                 raise RestApiException(
-                    'Invalid body type for: {}. Expected TextualBody.'.format(b_type)
+                    f'Invalid body type for: {b_type}. Expected TextualBody.'
                 )
             if 'value' not in body:
                 raise RestApiException(
@@ -641,7 +639,7 @@ class Annotations(IMCEndpoint):
 
         if anno.annotation_type not in ('TVS'):
             raise RestApiException(
-                'Operation not allowed for annotation {}'.format(anno.annotation_type),
+                f'Operation not allowed for annotation {anno.annotation_type}',
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -689,7 +687,7 @@ class Annotations(IMCEndpoint):
                     segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
                     if segment is None:
                         raise RestApiException(
-                            'Segment with ID {uuid} not found.'.format(uuid=value),
+                            f'Segment with ID {value} not found.',
                             status_code=hcodes.HTTP_BAD_NOTFOUND,
                         )
                     try:
@@ -719,7 +717,7 @@ class Annotations(IMCEndpoint):
                 else:
                     # should NOT be reached
                     raise RestApiException(
-                        'Operation {op} not yet implemented'.format(op=patch_op),
+                        f'Operation {patch_op} not yet implemented',
                         status_code=hcodes.HTTP_NOT_IMPLEMENTED,
                     )
         else:

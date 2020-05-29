@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Handle your image entity
 """
@@ -216,7 +214,7 @@ class ImageItem(IMCEndpoint):
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
-                "User [{0}, {1} {2}] cannot update public access for videos that does not belong to him/her".format(
+                "User [{}, {} {}] cannot update public access for videos that does not belong to him/her".format(
                     user.uuid, user.name, user.surname
                 ),
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
@@ -434,7 +432,7 @@ class ImageContent(IMCEndpoint, Downloader):
         else:
             # it should never be reached
             raise RestApiException(
-                "Invalid content type: {0}".format(content_type),
+                f"Invalid content type: {content_type}",
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 
@@ -582,7 +580,7 @@ class ImageTools(IMCEndpoint):
         else:
             # should never be reached
             raise RestApiException(
-                "Specified tool '{}' NOT implemented".format(tool),
+                f"Specified tool '{tool}' NOT implemented",
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 

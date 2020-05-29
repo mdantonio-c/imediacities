@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
 import pytz
 import json
@@ -76,7 +74,7 @@ class AnnotationRepository:
                 if shots is None or len(shots) == 0:
                     raise ValueError(
                         'Invalid state: cannot be found shot(s) enclosing '
-                        'selected segment [{0}]'.format(selector['value'])
+                        'selected segment [{}]'.format(selector['value'])
                     )
                 for shot in shots:
                     segment.within_shots.connect(shot)
@@ -567,7 +565,7 @@ class AnnotationRepository:
                 if shots is None or len(shots) == 0:
                     raise ValueError(
                         'Invalid state: cannot be found shot(s) enclosing '
-                        'selected segment [{0}]'.format(s)
+                        'selected segment [{}]'.format(s)
                     )
                 for shot in shots:
                     segment.within_shots.connect(shot)
@@ -623,7 +621,7 @@ class AnnotationRepository:
                 shot = item.shots.search(shot_num=q[0])[0]
             except BaseException:
                 log.warning(
-                    "Cannot find shot number {0}. "
+                    "Cannot find shot number {}. "
                     "VIM Annotation *NOT* created.".format(q[0])
                 )
                 continue
@@ -863,7 +861,7 @@ class AnnotationRepository:
                 break
         if not found:
             raise ValueError(
-                "Segment [{}] does NOT belong to this segmentation".format(segment.uuid)
+                f"Segment [{segment.uuid}] does NOT belong to this segmentation"
             )
 
         # check if the segment is the last

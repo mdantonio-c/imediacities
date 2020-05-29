@@ -132,7 +132,7 @@ class EFG_XMLParser:
             scheme = codelists.fromDescription(p_scheme, codelists.PROVIDER_SCHEMES)
             if scheme is None:
                 raise ValueError(
-                    'Invalid provider scheme value for [{}]'.format(p_scheme))
+                    f'Invalid provider scheme value for [{p_scheme}]')
             provider['scheme'] = scheme[0]
             log.debug('Record Provider: {}', provider)
 
@@ -488,7 +488,7 @@ class EFG_XMLParser:
                 props['agent_type'] = 'C'
             else:
                 # should never be reached
-                raise ValueError('Invalid tag name for: {}'.format(agent_node.tag))
+                raise ValueError(f'Invalid tag name for: {agent_node.tag}')
 
             agent = None
             # de-duplicate agents

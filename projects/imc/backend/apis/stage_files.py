@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 List content from upload dir and import of data and metadata
 """
@@ -293,7 +291,7 @@ class Stage(IMCEndpoint):
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                "File not found: {}".format(filename),
+                f"File not found: {filename}",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -401,7 +399,7 @@ class Stage(IMCEndpoint):
                             "Error in renaming file {} to {}: ", path, standard_path
                         )
                         raise RestApiException(
-                            "System error: cannot rename file {}".format(path),
+                            f"System error: cannot rename file {path}",
                             status_code=hcodes.HTTP_BAD_CONFLICT,
                         )
 
@@ -481,7 +479,7 @@ class Stage(IMCEndpoint):
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
             raise RestApiException(
-                "File not found: {}".format(filename),
+                f"File not found: {filename}",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Handle your video entity
 """
@@ -232,7 +230,7 @@ class VideoItem(IMCEndpoint):
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
-                "User [{0}, {1} {2}] cannot update public access for videos that does not belong to him/her".format(
+                "User [{}, {} {}] cannot update public access for videos that does not belong to him/her".format(
                     user.uuid, user.name, user.surname
                 ),
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
@@ -861,7 +859,7 @@ class VideoContent(IMCEndpoint, Downloader):
         else:
             # it should never be reached
             raise RestApiException(
-                "Invalid content type: {0}".format(content_type),
+                f"Invalid content type: {content_type}",
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 
@@ -929,7 +927,7 @@ class VideoContent(IMCEndpoint, Downloader):
         else:
             # it should never be reached
             raise RestApiException(
-                "Invalid content type: {0}".format(content_type),
+                f"Invalid content type: {content_type}",
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
         return self.response([], headers=headers)
@@ -1079,7 +1077,7 @@ class VideoTools(IMCEndpoint):
         else:
             # should never be reached
             raise RestApiException(
-                "Specified tool '{}' NOT implemented".format(tool),
+                f"Specified tool '{tool}' NOT implemented",
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 
@@ -1275,7 +1273,7 @@ class VideoShotRevision(IMCEndpoint):
 
         if not assignee_is_admin and not repo.item_belongs_to_user(item, assignee):
             raise RestApiException(
-                "User [{0}, {1} {2}] cannot revise video that does not belong to him/her".format(
+                "User [{}, {} {}] cannot revise video that does not belong to him/her".format(
                     user.uuid, user.name, user.surname
                 ),
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
@@ -1283,7 +1281,7 @@ class VideoShotRevision(IMCEndpoint):
         if repo.is_video_under_revision(item):
             # 409: Video is already under revision.
             raise RestApiException(
-                "Video [{uuid}] is already under revision".format(uuid=v.uuid),
+                f"Video [{v.uuid}] is already under revision",
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
 
@@ -1321,7 +1319,7 @@ class VideoShotRevision(IMCEndpoint):
         # be sure video is under revision
         if not repo.is_video_under_revision(item):
             raise RestApiException(
-                "This video [{vid}] is not under revision!".format(vid=video_id),
+                f"This video [{video_id}] is not under revision!",
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
         # ONLY the reviser and the administrator can provide a new list of cuts
@@ -1329,7 +1327,7 @@ class VideoShotRevision(IMCEndpoint):
         iamadmin = self.auth.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(
-                "User [{0}, {1} {2}] cannot revise video that is not assigned to him/her".format(
+                "User [{}, {} {}] cannot revise video that is not assigned to him/her".format(
                     user.uuid, user.name, user.surname
                 ),
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
@@ -1344,12 +1342,12 @@ class VideoShotRevision(IMCEndpoint):
         for idx, s in enumerate(revision['shots']):
             if 'shot_num' not in s:
                 raise RestApiException(
-                    'Missing shot_num in shot: {}'.format(s),
+                    f'Missing shot_num in shot: {s}',
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if idx > 0 and 'cut' not in s:
                 raise RestApiException(
-                    'Missing cut for shot[{0}]'.format(s['shot_num']),
+                    'Missing cut for shot[{}]'.format(s['shot_num']),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if 'confirmed' in s and not isinstance(s['confirmed'], bool):
@@ -1362,7 +1360,7 @@ class VideoShotRevision(IMCEndpoint):
                 )
             if 'annotations' not in s:
                 raise RestApiException(
-                    'Missing annotations in shot: {}'.format(s),
+                    f'Missing annotations in shot: {s}',
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if (
@@ -1427,7 +1425,7 @@ class VideoShotRevision(IMCEndpoint):
         if not repo.is_video_under_revision(item):
             # 409: Video is already under revision.
             raise RestApiException(
-                "Video [{uuid}] is not under revision".format(uuid=v.uuid),
+                f"Video [{v.uuid}] is not under revision",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # ONLY the reviser and the administrator can exit revision
@@ -1435,7 +1433,7 @@ class VideoShotRevision(IMCEndpoint):
         iamadmin = self.auth.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(
-                "User [{0}, {1} {2}] cannot exit revision for video that is "
+                "User [{}, {} {}] cannot exit revision for video that is "
                 "not assigned to him/her".format(user.uuid, user.name, user.surname),
                 status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )

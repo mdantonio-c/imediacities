@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 import json
 import random
@@ -149,7 +147,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             if content_node is None:
                 raise Exception(
                     "Pipeline cannot be started: "
-                    + "content does not exist in the path {0} for source ID {1}".format(
+                    + "content does not exist in the path {} for source ID {}".format(
                         basedir, source_id
                     )
                 )
@@ -268,13 +266,13 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             # extract automatic object detection results
             try:
                 extract_od_annotations(self, item_node, analyze_path)
-            except IOError:
+            except OSError:
                 log.warning('Could not find OD results file.')
 
             # extract automatic building recognition results
             try:
                 extract_br_annotations(self, item_node, analyze_path)
-            except IOError:
+            except OSError:
                 log.warning('Could not find BR results file.')
 
             content_node.status = 'COMPLETED'
@@ -354,7 +352,7 @@ def launch_tool(self, tool_name, item_id):
     with celery_app.app.app_context():
         log.debug('launch tool {0} for item {1}', tool_name, item_id)
         if tool_name not in ['object-detection', 'building-recognition']:
-            raise ValueError('Unexpected tool for: {}'.format(tool_name))
+            raise ValueError(f'Unexpected tool for: {tool_name}')
 
         self.graph = celery_app.get_service('neo4j')
         try:
@@ -379,7 +377,7 @@ def launch_tool(self, tool_name, item_id):
                 # here we expect building recognition results in brf.xml
                 extract_br_annotations(self, item, analyze_path)
             else:
-                raise NotImplementedError('Invalid tool name: '.format(tool_name))
+                raise NotImplementedError(f'Invalid tool name: ')
         except Exception as e:
             log.error("Task error, {}", e)
             raise e
@@ -477,7 +475,7 @@ def load_v2(self, other_version, item_id, retry=False):
             other_version_uri = os.path.join(analyze_path, 'v2_transcoded.' + ext)
             if not os.path.exists(other_version_uri):
                 raise Exception(
-                    'Unable to find transcoded v2 at {}'.format(other_version_uri)
+                    f'Unable to find transcoded v2 at {other_version_uri}'
                 )
             other_item = item.other_version.single()
             if other_item is None:
@@ -637,7 +635,7 @@ def lookup_content(self, path, source_id):
     if not content_filename:
         content_filename = None
     elif len(content_filename) > 1:
-        raise Exception('Multiple content FOUND: {}'.format(content_filename))
+        raise Exception(f'Multiple content FOUND: {content_filename}')
     else:
         content_filename = content_filename[0]
         content_path = os.path.join(path, content_filename)
@@ -665,7 +663,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             source_id = extract_creation_ref(self, path)
             if source_id is None:
                 raise Exception(
-                    "No source ID found importing metadata file {}".format(path))
+                    f"No source ID found importing metadata file {path}")
 
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
@@ -755,7 +753,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     else:
         # should never be reached
         raise Exception(
-            "Extracting metadata for type {} not yet implemented".format(item_type)
+            f"Extracting metadata for type {item_type} not yet implemented"
         )
     # log.debug(creation['properties'])
     repo.create_entity(creation['properties'], item_node, creation['relationships'], av)
@@ -768,8 +766,8 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     file tech_info_filename and save them as Item properties in the database.
     """
     if not os.path.exists(analyze_dir_path):
-        raise IOError(
-            "Analyze results does not exist in the path {}".format(analyze_dir_path))
+        raise OSError(
+            f"Analyze results does not exist in the path {analyze_dir_path}")
 
     # check for info result
     tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
@@ -882,14 +880,14 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
     """
     tvs_dir_path = os.path.join(analyze_dir_path, 'storyboard/')
     if not os.path.exists(tvs_dir_path):
-        raise IOError(
-            "Storyboard directory does not exist in the path {}".format(tvs_dir_path)
+        raise OSError(
+            f"Storyboard directory does not exist in the path {tvs_dir_path}"
         )
     # check for info result
     tvs_filename = 'storyboard.json'
     tvs_path = os.path.join(os.path.dirname(tvs_dir_path), tvs_filename)
     if not os.path.exists(tvs_path):
-        raise IOError("Shots CANNOT be extracted: [{}] does not exist".format(tvs_path))
+        raise OSError(f"Shots CANNOT be extracted: [{tvs_path}] does not exist")
 
     log.debug('Get shots and vimotion from file [{}]', tvs_path)
 
@@ -933,8 +931,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
     brf_results_filename = 'brf.xml'
     brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
     if not os.path.exists(brf_results_path):
-        raise IOError(
-            "Analyze results does not exist in the path {}".format(brf_results_path))
+        raise OSError(
+            f"Analyze results does not exist in the path {brf_results_path}")
     log.info('get automatic building recognition from file [{}]', brf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(brf_results_path)
@@ -984,7 +982,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
     print_out = 'Report of detected concepts per shot:\n'
     for k in sorted(shot_list.keys()):
         v = '{ }' if len(shot_list[k]) == 0 else shot_list[k]
-        print_out += "{}:\t{}\n".format(k, v)
+        print_out += f"{k}:\t{v}\n"
     log.info(print_out)
 
     # get item "city" code
@@ -1090,8 +1088,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
     orf_results_filename = 'orf.xml'
     orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
     if not os.path.exists(orf_results_path):
-        raise IOError(
-            "Analyze results does not exist in the path {}".format(orf_results_path))
+        raise OSError(
+            f"Analyze results does not exist in the path {orf_results_path}")
     log.info('get automatic object detection from file [{}]', orf_results_path)
     parser = ORF_XMLParser()
     frames = parser.parse(orf_results_path)
@@ -1234,12 +1232,12 @@ def send_notification(
     about failure.
     """
     body = get_html_template(template, replaces)
-    plain = "Sorry User, your job ID {task} is failed".format(task=task_id)
+    plain = f"Sorry User, your job ID {task_id} is failed"
     send_mail(body, subject, recipient, plain_body=plain)
 
     if failure is not None:
         replaces['task_id'] = task_id
         replaces['failure'] = failure
         body = get_html_template(template, replaces)
-        plain = "Job ID {task} is failed".format(task=task_id)
+        plain = f"Job ID {task_id} is failed"
         send_mail(body, subject, plain_body=plain)

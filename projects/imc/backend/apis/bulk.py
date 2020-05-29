@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Bulk endpoint.
 
@@ -150,7 +148,7 @@ class Bulk(IMCEndpoint):
                 break
         if action is None:
             raise RestApiException(
-                "Bad action: expected one of {}".format(self.__class__.allowed_actions),
+                f"Bad action: expected one of {self.__class__.allowed_actions}",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
@@ -169,7 +167,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    'Group ID {} not found'.format(guid),
+                    f'Group ID {guid} not found',
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
             log.info("Update procedure for Group '{0}'", group.shortname)
@@ -513,7 +511,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    'Group ID {} not found'.format(guid),
+                    f'Group ID {guid} not found',
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
             update = bool(action.get('update'))
@@ -607,7 +605,7 @@ class Bulk(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    'Group ID {} not found'.format(guid),
+                    f'Group ID {guid} not found',
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
             retry = bool(action.get('retry'))
@@ -627,7 +625,7 @@ class Bulk(IMCEndpoint):
             total_available = len(files)
             if total_available == 0:
                 raise RestApiException(
-                    'No v2 content for group {}'.format(group.shortname),
+                    f'No v2 content for group {group.shortname}',
                     status_code=hcodes.HTTP_OK_NORESPONSE,
                 )
             log.info("Total v2 files currently available: {}", total_available)
@@ -686,7 +684,7 @@ class Bulk(IMCEndpoint):
             labels = [row[0] for row in self.graph.cypher(labels_query)]
             if entity not in labels:
                 raise RestApiException(
-                    'Invalid or missing entity label for {}'.format(entity),
+                    f'Invalid or missing entity label for {entity}',
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             uuids = action.get('uuids')
@@ -699,7 +697,7 @@ class Bulk(IMCEndpoint):
                     raise RestApiException(
                         'Expected list of uuid', status_code=hcodes.HTTP_BAD_REQUEST
                     )
-                all_query = "match (n:{}) return n.uuid".format(entity)
+                all_query = f"match (n:{entity}) return n.uuid"
                 uuids = [row[0] for row in self.graph.cypher(all_query)]
             deleted = 0
             if entity == 'AVEntity':
@@ -718,7 +716,7 @@ class Bulk(IMCEndpoint):
                         deleted += 1
             else:
                 raise RestApiException(
-                    'Entity {} not yet managed for deletion'.format(entity),
+                    f'Entity {entity} not yet managed for deletion',
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             log.debug("Deleted: {} in {}", deleted, len(uuids))

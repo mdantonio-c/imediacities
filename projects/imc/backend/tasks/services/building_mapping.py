@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 building_mapping = {}
 # ------------------------------------------------------------------
 building_mapping['Athens_Acropolis'] = {  # 1

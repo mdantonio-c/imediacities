@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 from marshmallow import fields, validate
 
 
-class CustomProfile(object):
+class CustomProfile:
     def __init__(self):
         pass
 

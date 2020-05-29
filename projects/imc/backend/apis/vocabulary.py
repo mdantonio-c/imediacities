@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Expose the controlled vocabulary
 """
@@ -26,7 +24,7 @@ class Vocabulary(IMCEndpoint):
         """Get the controlled vocabulary."""
         log.debug('load the controlled vocabulary')
         try:
-            f = open("../../scripts/convert-vocabulary/vocabulary.json", "r")
+            f = open("../../scripts/convert-vocabulary/vocabulary.json")
         except FileNotFoundError:
             log.warning('Vocabulary file not found')
             raise RestApiException(

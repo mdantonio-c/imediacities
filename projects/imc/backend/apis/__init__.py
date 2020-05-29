@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from datetime import datetime
 from restapi.rest.definition import EndpointResource
 from restapi.utilities.logs import log
@@ -64,7 +62,7 @@ class IMCEndpoint(EndpointResource):
         # Used by IMC
         elif relationships_expansion is not None:
             for e in relationships_expansion:
-                if e.startswith("{}.".format(relationship_name)):
+                if e.startswith(f"{relationship_name}."):
                     rel_name_len = len(relationship_name) + 1
                     expansion_rel = e[rel_name_len:]
                     log.debug(
@@ -84,7 +82,7 @@ class IMCEndpoint(EndpointResource):
                 if relationship_name == "":
                     rel_name = relationship
                 else:
-                    rel_name = "{}.{}".format(relationship_name, relationship)
+                    rel_name = f"{relationship_name}.{relationship}"
                 subnode = self.getJsonResponse(
                     node,
                     view_public_only=view_public_only,
@@ -116,7 +114,7 @@ class IMCEndpoint(EndpointResource):
                 subrelationship.append(subnode)
 
             if len(subrelationship) > 0:
-                data["_{}".format(relationship)] = subrelationship
+                data[f"_{relationship}"] = subrelationship
 
         if 'type' not in data:
             data['type'] = type(instance).__name__.lower()
@@ -164,7 +162,7 @@ class IMCEndpoint(EndpointResource):
 
                     # Based on neomodel choices:
                     # http://neomodel.readthedocs.io/en/latest/properties.html#choices
-                    choice_function = "get_{}_display".format(key)
+                    choice_function = f"get_{key}_display"
                     if hasattr(obj, choice_function):
                         fn = getattr(obj, choice_function)
                         description = fn()

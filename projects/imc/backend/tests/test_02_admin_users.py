@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import json
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes

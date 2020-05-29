@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Manage the lists of the researcher
 """
@@ -530,7 +528,7 @@ class ListItems(IMCEndpoint):
             )
         if item_id is not None:
             log.debug(
-                "Get item <{0}> of the list <{1}, {2}>".format(
+                "Get item <{}> of the list <{}, {}>".format(
                     item_id, user_list.uuid, user_list.name
                 )
             )
@@ -545,7 +543,7 @@ class ListItems(IMCEndpoint):
             res = [self.graph.ListItem.inflate(row[0]) for row in results]
             if not res:
                 raise RestApiException(
-                    "Item <{0}> is not connected to the list <{1}, {2}>".format(
+                    "Item <{}> is not connected to the list <{}, {}>".format(
                         item_id, user_list.uuid, user_list.name
                     ),
                     status_code=hcodes.HTTP_BAD_NOTFOUND,

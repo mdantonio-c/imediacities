@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 from restapi.utilities.logs import log
 
 
-class Initializer(object):
+class Initializer:
     def __init__(self, services, app=None):
 
         self.neo4j = services['neo4j']
@@ -242,7 +241,7 @@ class Initializer(object):
             log.info("Provider MNC successfully created")
 
 
-class Customizer(object):
+class Customizer:
     def custom_user_properties(self, properties):
         return properties
 
