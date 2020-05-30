@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'customlinks',
-  providers: [],
   templateUrl: './custom.navbar.links.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CustomNavbarComponent {
 
@@ -16,8 +16,8 @@ export class CustomNavbarComponent {
 
 @Component({
   selector: 'custombrand',
-  providers: [],
   templateUrl: './custom.navbar.brand.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CustomBrandComponent {
 
