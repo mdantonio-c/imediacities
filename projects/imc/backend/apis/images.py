@@ -2,9 +2,8 @@
 Handle your image entity
 """
 import os
-from flask import request, send_file
-from restapi.confs import get_api_url
-from restapi.confs import PRODUCTION
+from flask import send_file
+from restapi.confs import get_backend_url
 
 from restapi.utilities.logs import log
 from imc.security import authz
@@ -90,7 +89,7 @@ class Images(IMCEndpoint):
         else:
             images = self.graph.NonAVEntity.nodes.all()
 
-        api_url = get_api_url(request, PRODUCTION)
+        host = get_backend_url()
         for v in images:
             image = self.getJsonResponse(
                 v,
@@ -98,16 +97,13 @@ class Images(IMCEndpoint):
                 relationships_expansion=['record_sources.provider', 'item.ownership'],
             )
             item = v.item.single()
-            image['links']['content'] = (
-                api_url + 'api/images/' + v.uuid + '/content?type=image'
-            )
+            image_url = f"{host}/api/images/{v.uuid}/content?type=image"
+            image['links']['content'] = image_url
             if item.thumbnail is not None:
-                image['links']['thumbnail'] = (
-                    api_url + 'api/images/' + v.uuid + '/content?type=thumbnail'
-                )
-            image['links']['summary'] = (
-                api_url + 'api/images/' + v.uuid + '/content?type=summary'
-            )
+                thumbnail_url = f"{host}/api/images/{v.uuid}/content?type=thumbnail"
+                image['links']['thumbnail'] = thumbnail_url
+            summary_url = f"{host}/api/images/{v.uuid}/content?type=summary"
+            image['links']['summary'] = summary_url
             data.append(image)
 
         return self.response(data)

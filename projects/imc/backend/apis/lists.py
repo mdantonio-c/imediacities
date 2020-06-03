@@ -1,9 +1,7 @@
 """
 Manage the lists of the researcher
 """
-from flask import request
-from restapi.confs import get_api_url
-from restapi.confs import PRODUCTION
+from restapi.confs import get_backend_url
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.connectors.neo4j import graph_transactions
@@ -705,14 +703,14 @@ class ListItems(IMCEndpoint):
 
         res = self.getJsonResponse(mdo, max_relationship_depth=0)
 
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url()
         if isinstance(mdo, self.graph.Item):
             # always consider v2 properties if exists
             v2 = item.other_version.single()
             content_type = 'videos' if item.item_type == 'Video' else 'images'
             res['links']['content'] = (
                 api_url
-                + 'api/'
+                + '/api/'
                 + content_type
                 + '/'
                 + creation.uuid
@@ -721,14 +719,14 @@ class ListItems(IMCEndpoint):
             )
             res['links']['thumbnail'] = (
                 api_url
-                + 'api/'
+                + '/api/'
                 + content_type
                 + '/'
                 + creation.uuid
                 + '/content?type=thumbnail&size=large'
                 if item.item_type == 'Video' or v2 is None
                 else api_url
-                + 'api/'
+                + '/api/'
                 + content_type
                 + '/'
                 + creation.uuid
@@ -738,11 +736,12 @@ class ListItems(IMCEndpoint):
         else:
             # SHOT
             res['links']['content'] = (
-                api_url + 'api/videos/' + creation.uuid + '/content?type=video'
+                api_url + '/api/videos/' + creation.uuid + '/content?type=video'
             )
-            res['links']['webpage'] = api_url + 'app/catalog/videos/' + creation.uuid
+            # THIS IS WRONG. SHOULD BE get_frontend_url
+            res['links']['webpage'] = api_url + '/app/catalog/videos/' + creation.uuid
             res['links']['thumbnail'] = (
-                api_url + 'api/shots/' + mdo.uuid + '?content=thumbnail'
+                api_url + '/api/shots/' + mdo.uuid + '?content=thumbnail'
             )
             # add some video item attributes
             res['item'] = {

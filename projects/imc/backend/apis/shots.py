@@ -2,9 +2,7 @@
 Handle your video metadata
 """
 from flask import send_file
-from flask import request
-from restapi.confs import get_api_url
-from restapi.confs import PRODUCTION
+from restapi.confs import get_backend_url
 from restapi.utilities.logs import log
 from restapi import decorators
 from restapi.exceptions import RestApiException
@@ -75,11 +73,11 @@ class Shots(IMCEndpoint):
                 )
             return send_file(thumbnail_uri, mimetype='image/jpeg')
 
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url()
         shot = self.getJsonResponse(node)
-        shot['links']['self'] = api_url + 'api/shots/' + node.uuid
+        shot['links']['self'] = api_url + '/api/shots/' + node.uuid
         shot['links']['thumbnail'] = (
-            api_url + 'api/shots/' + node.uuid + '?content=thumbnail'
+            api_url + '/api/shots/' + node.uuid + '?content=thumbnail'
         )
 
         return self.response(shot)

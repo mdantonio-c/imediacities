@@ -4,9 +4,7 @@ Search endpoint
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-from flask import request
-from restapi.confs import get_api_url
-from restapi.confs import PRODUCTION
+from restapi.confs import get_backend_url
 
 from restapi.utilities.logs import log
 from restapi import decorators
@@ -301,7 +299,7 @@ class Search(IMCEndpoint):
         # log.debug(query)
 
         result = self.graph.cypher(query)
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url()
         for row in result:
             if 'AVEntity' in row[0].labels:
                 v = self.graph.AVEntity.inflate(row[0])

@@ -3,7 +3,7 @@ Handle your video entity
 """
 import os
 from flask import request, send_file
-from restapi.confs import get_api_url
+from restapi.confs import get_backend_url
 from restapi.confs import PRODUCTION
 
 from restapi.utilities.logs import log
@@ -92,7 +92,7 @@ class Videos(IMCEndpoint):
         else:
             videos = self.graph.AVEntity.nodes.all()
 
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url()
         for v in videos:
             video = self.getJsonResponse(
                 v,
@@ -107,14 +107,14 @@ class Videos(IMCEndpoint):
             item = v.item.single()
             video['links'] = {}
             video['links']['content'] = (
-                api_url + 'api/videos/' + v.uuid + '/content?type=video'
+                api_url + '/api/videos/' + v.uuid + '/content?type=video'
             )
             if item.thumbnail is not None:
                 video['links']['thumbnail'] = (
-                    api_url + 'api/videos/' + v.uuid + '/content?type=thumbnail'
+                    api_url + '/api/videos/' + v.uuid + '/content?type=thumbnail'
                 )
             video['links']['summary'] = (
-                api_url + 'api/videos/' + v.uuid + '/content?type=summary'
+                api_url + '/api/videos/' + v.uuid + '/content?type=summary'
             )
             data.append(video)
 
@@ -467,7 +467,7 @@ class VideoShots(IMCEndpoint):
         user = self.get_user_if_logged()
 
         item = video.item.single()
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url(request, PRODUCTION)
 
         annotations = {}
 
@@ -555,7 +555,7 @@ class VideoShots(IMCEndpoint):
 
         for s in item.shots.order_by('start_frame_idx'):
             shot = self.getJsonResponse(s)
-            shot_url = api_url + 'api/shots/' + s.uuid
+            shot_url = api_url + '/api/shots/' + s.uuid
             shot['links'] = {}
             shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
 
@@ -663,7 +663,6 @@ class VideoSegments(IMCEndpoint):
 
         item = video.item.single()
         log.debug('get manual segments for Item [{}]', item.uuid)
-        # api_url = get_api_url(request, PRODUCTION)
 
         # TODO
 

@@ -4,9 +4,7 @@ Search endpoint for places
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-from flask import request
-from restapi.confs import get_api_url
-from restapi.confs import PRODUCTION
+from restapi.confs import get_backend_url
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
@@ -74,7 +72,7 @@ class SearchPlace(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         data = []
-        api_url = get_api_url(request, PRODUCTION)
+        api_url = get_backend_url()
         for item in place_list:
             creation_id = item.get('creation-id')
             if creation_id is None:
@@ -118,22 +116,22 @@ class SearchPlace(IMCEndpoint):
                 if creation_type == 'Video':
                     creation['links'] = {}
                     creation['links']['content'] = (
-                        api_url + 'api/videos/' + creation_uuid + '/content?type=video'
+                        api_url + '/api/videos/' + creation_uuid + '/content?type=video'
                     )
                     creation['links']['thumbnail'] = (
                         api_url
-                        + 'api/videos/'
+                        + '/api/videos/'
                         + creation_uuid
                         + '/content?type=thumbnail'
                     )
                 elif creation_type == 'Image':
                     creation['links'] = {}
                     creation['links']['content'] = (
-                        api_url + 'api/images/' + creation_uuid + '/content?type=video'
+                        api_url + '/api/images/' + creation_uuid + '/content?type=video'
                     )
                     creation['links']['thumbnail'] = (
                         api_url
-                        + 'api/images/'
+                        + '/api/images/'
                         + creation_uuid
                         + '/content?type=thumbnail'
                     )
