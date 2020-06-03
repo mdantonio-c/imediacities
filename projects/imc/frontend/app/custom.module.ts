@@ -18,7 +18,6 @@ import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 import { ArchiveComponent } from './components/admin/archive/archive'
 import { ArchivesListComponent } from './components/admin/archive/archives.list'
-import { AdminGroupsComponent } from './components/admin/groups';
 import { UploadComponent } from './components/upload/upload';
 import { UserWorkspaceComponent } from './components/user-workspace/user-workspace';
 import { MultiItemCarouselComponent } from './components/user-workspace/multi-item-carousel/multi-item-carousel.component';
@@ -103,13 +102,6 @@ const routes: Routes = [
     data: { roles: ['admin_root'] }
   },
   {
-    path: 'app/admin/groups',
-    component: AdminGroupsComponent,
-    canActivate: [AuthGuard],
-    runGuardsAndResolvers: 'always',
-    data: { roles: ['admin_root'] }
-  },
-  {
     path: 'app/upload',
     component: UploadComponent,
     canActivate: [AuthGuard],
@@ -150,7 +142,6 @@ const routes: Routes = [
   ],
   declarations: [
     ArchivesListComponent, ArchiveComponent,
-    AdminGroupsComponent,
     UploadComponent,
     UserWorkspaceComponent,
     MultiItemCarouselComponent,
