@@ -5,6 +5,7 @@ Upload a file
 import os
 from flask import send_file, make_response
 from mimetypes import MimeTypes
+from flask_apispec import MethodResource
 
 from restapi import decorators
 from restapi.utilities.logs import log
@@ -17,7 +18,7 @@ from imc.apis import IMCEndpoint
 mime = MimeTypes()
 
 
-class Upload(Uploader, IMCEndpoint):
+class Upload(MethodResource, Uploader, IMCEndpoint):
 
     labels = ['file']
     _GET = {
@@ -47,11 +48,9 @@ class Upload(Uploader, IMCEndpoint):
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
+    @decorators.init_chunk_upload
     @decorators.auth.required(roles=['Archive'])
-    def post(self):
-
-        data = self.get_input()
-        filename = data.get("name")
+    def post(self, name, **kwargs):
 
         self.graph = self.get_service_instance('neo4j')
 
@@ -66,7 +65,7 @@ class Upload(Uploader, IMCEndpoint):
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
 
-        return self.init_chunk_upload(upload_dir, filename, force=True)
+        return self.init_chunk_upload(upload_dir, name, force=True)
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
