@@ -478,7 +478,6 @@ class Annotations(IMCEndpoint):
 
         body_type = None
         bid = None
-        # body_ref = self.get_input(single_parameter='body_ref')
         body_ref = request.args.get('body_ref')
         if body_ref is not None:
             if not BODY_PATTERN.match(body_ref):
