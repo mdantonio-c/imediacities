@@ -13,33 +13,31 @@ POST api/bulk
 
 import os
 import re
-from shutil import copyfile
 from datetime import datetime
-from restapi.utilities.logs import log
+from shutil import copyfile
+
+from imc.apis import IMCEndpoint
+from imc.tasks.services.creation_repository import CreationRepository
+from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
-from imc.apis import IMCEndpoint
-from imc.tasks.services.creation_repository import CreationRepository
-
-from imc.tasks.services.efg_xmlparser import EFG_XMLParser
-
-from restapi.connectors.celery import CeleryExt
+from restapi.utilities.logs import log
 
 
 #####################################
 class Bulk(IMCEndpoint):
 
-    allowed_actions = ('update', 'import', 'delete', 'v2')
+    allowed_actions = ("update", "import", "delete", "v2")
 
-    labels = ['bulk']
+    labels = ["bulk"]
     _POST = {
-        '/bulk': {
-            'summary': 'Perform many operations such as import, update, delete etc.',
-            'description': 'The bulk API makes it possible to perform many operations in a single API call.',
-            'responses': {
-                '202': {'description': 'Bulk action successfully accepted'},
-                '400': {'description': 'Bad request.'},
+        "/bulk": {
+            "summary": "Perform many operations such as import, update, delete etc.",
+            "description": "The bulk API makes it possible to perform many operations in a single API call.",
+            "responses": {
+                "202": {"description": "Bulk action successfully accepted"},
+                "400": {"description": "Bad request."},
             },
         }
     }
@@ -90,7 +88,7 @@ class Bulk(IMCEndpoint):
         """
         log.debug("lookup_latest_dir.input path = {}", path)
 
-        POSSIBLE_FORMATS = ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S.%fZ']
+        POSSIBLE_FORMATS = ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S.%fZ"]
 
         found_date = None
         found_dir = None
@@ -133,14 +131,15 @@ class Bulk(IMCEndpoint):
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=['admin_root'])
+    @decorators.auth.required(roles=["admin_root"])
     def post(self):
         log.debug("Start bulk procedure...")
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
+        celery = self.get_service_instance("celery")
 
         params = self.get_input()
-        log.debug('input: {}', params)
+        log.debug("input: {}", params)
         for allowed_action in self.__class__.allowed_actions:
             action = params.get(allowed_action)
             if action is not None:
@@ -157,22 +156,22 @@ class Bulk(IMCEndpoint):
         #                   reprocessing anche nel caso
         #                   che la action sia 'update'
         # ##################################################################
-        if req_action == 'update':
+        if req_action == "update":
             # check group uid
-            guid = action.get('guid')
+            guid = action.get("guid")
             if guid is None:
                 raise RestApiException(
-                    'Group id (guid) is mandatory', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
                 )
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
+                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             log.info("Update procedure for Group '{0}'", group.shortname)
             # check if the parameter 'force_reprocessing' has been specified
-            force_reprocessing = action.get('force_reprocessing', False)
-            log.debug('force_reprocessing: {}', force_reprocessing)
+            force_reprocessing = action.get("force_reprocessing", False)
+            log.debug("force_reprocessing: {}", force_reprocessing)
 
             # retrieve XML files from delta upload dir
             #  (scaricato con oai-pmh solo delta rispetto all'ultimo harvest
@@ -192,7 +191,7 @@ class Bulk(IMCEndpoint):
 
             log.info("Processing files from dir {}", upload_latest_dir)
 
-            files = [f for f in os.listdir(upload_latest_dir) if f.endswith('.xml')]
+            files = [f for f in os.listdir(upload_latest_dir) if f.endswith(".xml")]
             total_to_be_imported = len(files)
             skipped = 0
             updated = 0
@@ -228,9 +227,9 @@ class Bulk(IMCEndpoint):
 
                 # To use source id in the filename we must
                 # replace non alpha-numeric characters with a dash
-                source_id_clean = re.sub(r'[\W_]+', '-', source_id.strip())
+                source_id_clean = re.sub(r"[\W_]+", "-", source_id.strip())
 
-                standard_filename = group.shortname + '_' + source_id_clean + '.xml'
+                standard_filename = group.shortname + "_" + source_id_clean + ".xml"
                 standard_path = os.path.join(upload_dir, standard_filename)
                 try:
                     copyfile(file_path, standard_path)
@@ -241,8 +240,8 @@ class Bulk(IMCEndpoint):
                     continue
 
                 properties = {}
-                properties['filename'] = standard_filename
-                properties['path'] = standard_path
+                properties["filename"] = standard_filename
+                properties["path"] = standard_path
 
                 # cerco nel db se esiste già un META_STAGE collegato a quel SOURCE_ID
                 # e appartenente al gruppo
@@ -318,7 +317,7 @@ class Bulk(IMCEndpoint):
                             )
                             if item_node is not None:
                                 if not coherent:
-                                    resource.status = 'ERROR'
+                                    resource.status = "ERROR"
                                     resource.status_message = "Incoming item_type different from item_type in database for file: {}".format(
                                         standard_path
                                     )
@@ -329,7 +328,7 @@ class Bulk(IMCEndpoint):
                                 # check for existing creation
                                 creation = item_node.creation.single()
                                 if creation is not None:
-                                    resource.status = 'ERROR'
+                                    resource.status = "ERROR"
                                     resource.status_message = "A creation with a different SOURCE_ID is already associated to file: {}".format(
                                         standard_path
                                     )
@@ -341,7 +340,7 @@ class Bulk(IMCEndpoint):
                             if force_reprocessing:
                                 mode = "clean"
                                 metadata_update = True
-                                task = CeleryExt.import_file.apply_async(
+                                task = celery.import_file.apply_async(
                                     args=[
                                         standard_path,
                                         resource.uuid,
@@ -358,7 +357,7 @@ class Bulk(IMCEndpoint):
                                 resource.save()
                                 updatedAndReprocessing += 1
                             else:
-                                task = CeleryExt.update_metadata.apply_async(
+                                task = celery.update_metadata.apply_async(
                                     args=[standard_path, resource.uuid], countdown=10
                                 )
                                 log.debug("Task id={}", task.id)
@@ -374,7 +373,7 @@ class Bulk(IMCEndpoint):
                             meta_stage.ownership.connect(group)
                             log.debug("MetaStage created for source_id {}", source_id)
                             mode = "clean"
-                            task = CeleryExt.import_file.apply_async(
+                            task = celery.import_file.apply_async(
                                 args=[standard_path, meta_stage.uuid, mode],
                                 countdown=10,
                             )
@@ -393,7 +392,7 @@ class Bulk(IMCEndpoint):
                         )
                         if related_item is not None and not coherent:
 
-                            meta_stage.status = 'ERROR'
+                            meta_stage.status = "ERROR"
                             meta_stage.status_message = "Incoming item_type different from item_type in database for file: {}".format(
                                 standard_path
                             )
@@ -410,8 +409,8 @@ class Bulk(IMCEndpoint):
                         #              al nostro meta_stage (ovviamente avranno source_id diverso)
                         #              altrimenti viene lanciata una eccezione
                         props2 = {}
-                        props2['filename'] = standard_filename
-                        props2['path'] = standard_path
+                        props2["filename"] = standard_filename
+                        props2["path"] = standard_path
                         try:
                             metastage_samepath = self.graph.MetaStage.nodes.get(
                                 **props2
@@ -427,7 +426,7 @@ class Bulk(IMCEndpoint):
                                     "Another metastage exists for file {}",
                                     standard_path,
                                 )
-                                meta_stage.status = 'ERROR'
+                                meta_stage.status = "ERROR"
                                 meta_stage.status_message = (
                                     "Another metastage exists for file " + standard_path
                                 )
@@ -450,7 +449,7 @@ class Bulk(IMCEndpoint):
                             )
                             mode = "clean"
                             metadata_update = True
-                            task = CeleryExt.import_file.apply_async(
+                            task = celery.import_file.apply_async(
                                 args=[
                                     standard_path,
                                     meta_stage.uuid,
@@ -470,7 +469,7 @@ class Bulk(IMCEndpoint):
                                 "Starting task update_metadata for meta_stage.uuid {}",
                                 meta_stage.uuid,
                             )
-                            task = CeleryExt.update_metadata.apply_async(
+                            task = celery.update_metadata.apply_async(
                                 args=[standard_path, meta_stage.uuid], countdown=10
                             )
                             log.info("Task id={}", task.id)
@@ -500,21 +499,21 @@ class Bulk(IMCEndpoint):
             return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
 
         # ##################################################################
-        elif req_action == 'import':
+        elif req_action == "import":
             # check group uid
-            guid = action.get('guid')
+            guid = action.get("guid")
             if guid is None:
                 raise RestApiException(
-                    'Group id (guid) is mandatory', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
                 )
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
+                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            update = bool(action.get('update'))
-            mode = action.get('mode') or 'skip'
-            retry = bool(action.get('retry'))
+            update = bool(action.get("update"))
+            mode = action.get("mode") or "skip"
+            retry = bool(action.get("retry"))
             log.info(
                 "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})",
                 group.shortname,
@@ -528,7 +527,7 @@ class Bulk(IMCEndpoint):
             if not os.path.exists(upload_dir):
                 return self.response(errors=["Upload dir not found"])
 
-            files = [f for f in os.listdir(upload_dir) if f.endswith('.xml')]
+            files = [f for f in os.listdir(upload_dir) if f.endswith(".xml")]
             total_to_be_imported = len(files)
             skipped = 0
             imported = 0
@@ -536,14 +535,14 @@ class Bulk(IMCEndpoint):
                 path = os.path.join(upload_dir, f)
                 filename = f
                 properties = {}
-                properties['filename'] = filename
-                properties['path'] = path
+                properties["filename"] = filename
+                properties["path"] = path
 
                 # ignore previous failures
                 if not retry:
                     try:
                         # props = {'status': 'ERROR', 'filename': f} #OLD
-                        props = {'status': 'ERROR', 'path': path}
+                        props = {"status": "ERROR", "path": path}
                         self.graph.MetaStage.nodes.get(**props)
                         skipped += 1
                         log.debug(
@@ -575,7 +574,7 @@ class Bulk(IMCEndpoint):
                     resource.ownership.connect(group)
                     log.debug("Metadata Resource created for {}", path)
 
-                task = CeleryExt.import_file.apply_async(
+                task = celery.import_file.apply_async(
                     args=[path, resource.uuid, mode], countdown=10
                 )
 
@@ -593,19 +592,19 @@ class Bulk(IMCEndpoint):
             return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
 
         # ##################################################################
-        elif req_action == 'v2':
+        elif req_action == "v2":
             # check group uid
-            guid = action.get('guid')
+            guid = action.get("guid")
             if guid is None:
                 raise RestApiException(
-                    'Group id (guid) is mandatory', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
                 )
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
-                    f'Group ID {guid} not found', status_code=hcodes.HTTP_BAD_NOTFOUND
+                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            retry = bool(action.get('retry'))
+            retry = bool(action.get("retry"))
             log.info("V2 procedure for Group '{}'", group.shortname)
 
             # retrieve v2_ XML files from upload dir
@@ -617,12 +616,12 @@ class Bulk(IMCEndpoint):
             files = [
                 f
                 for f in os.listdir(upload_dir)
-                if not f.endswith('.xml') and re.match(r'^v2_.*', f, re.I)
+                if not f.endswith(".xml") and re.match(r"^v2_.*", f, re.I)
             ]
             total_available = len(files)
             if total_available == 0:
                 raise RestApiException(
-                    f'No v2 content for group {group.shortname}',
+                    f"No v2 content for group {group.shortname}",
                     status_code=hcodes.HTTP_OK_NORESPONSE,
                 )
             log.info("Total v2 files currently available: {}", total_available)
@@ -641,8 +640,8 @@ class Bulk(IMCEndpoint):
                 c = [self.graph.Item.inflate(row[0]) for row in results]
                 if len(c) == 0:
                     log.warning(
-                        'Cannot load {v2} because origin content does '
-                        'not exist or its status is NOT completed',
+                        "Cannot load {v2} because origin content does "
+                        "not exist or its status is NOT completed",
                         v2=f,
                     )
                     warnings += 1
@@ -655,7 +654,7 @@ class Bulk(IMCEndpoint):
                         continue
                     # launch here async task
                     path = os.path.join(upload_dir, f)
-                    task = CeleryExt.load_v2.apply_async(
+                    task = celery.load_v2.apply_async(
                         args=[path, item.uuid, retry], countdown=10
                     )
                     imported += 1
@@ -668,11 +667,11 @@ class Bulk(IMCEndpoint):
             log.info("------------------------------------")
 
         # ##################################################################
-        elif req_action == 'delete':
-            entity = action.get('entity')
+        elif req_action == "delete":
+            entity = action.get("entity")
             if entity is None:
                 raise RestApiException(
-                    'Entity is mandatory', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Entity is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
                 )
             labels_query = "MATCH (n) \
                             WITH DISTINCT labels(n) AS labels \
@@ -681,30 +680,30 @@ class Bulk(IMCEndpoint):
             labels = [row[0] for row in self.graph.cypher(labels_query)]
             if entity not in labels:
                 raise RestApiException(
-                    f'Invalid or missing entity label for {entity}',
+                    f"Invalid or missing entity label for {entity}",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-            uuids = action.get('uuids')
+            uuids = action.get("uuids")
             if uuids is None:
                 raise RestApiException(
-                    'Expected list of uuid', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Expected list of uuid", status_code=hcodes.HTTP_BAD_REQUEST
                 )
             if isinstance(uuids, str):
-                if uuids != 'all':
+                if uuids != "all":
                     raise RestApiException(
-                        'Expected list of uuid', status_code=hcodes.HTTP_BAD_REQUEST
+                        "Expected list of uuid", status_code=hcodes.HTTP_BAD_REQUEST
                     )
                 all_query = f"match (n:{entity}) return n.uuid"
                 uuids = [row[0] for row in self.graph.cypher(all_query)]
             deleted = 0
-            if entity == 'AVEntity':
+            if entity == "AVEntity":
                 repo = CreationRepository(self.graph)
                 for uuid in uuids:
                     av_entity = self.graph.AVEntity.nodes.get_or_none(uuid=uuid)
                     if av_entity is not None:
                         repo.delete_av_entity(av_entity)
                         deleted += 1
-            elif entity == 'NonAVEntity':
+            elif entity == "NonAVEntity":
                 repo = CreationRepository(self.graph)
                 for uuid in uuids:
                     non_av_entity = self.graph.NonAVEntity.nodes.get_or_none(uuid=uuid)
@@ -713,7 +712,7 @@ class Bulk(IMCEndpoint):
                         deleted += 1
             else:
                 raise RestApiException(
-                    f'Entity {entity} not yet managed for deletion',
+                    f"Entity {entity} not yet managed for deletion",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             log.debug("Deleted: {} in {}", deleted, len(uuids))

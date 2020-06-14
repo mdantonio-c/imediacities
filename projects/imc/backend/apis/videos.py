@@ -2,22 +2,19 @@
 Handle your video entity
 """
 import os
+
 from flask import request, send_file
-from restapi.confs import get_backend_url
-from restapi.confs import PRODUCTION
-
-from restapi.utilities.logs import log
-from imc.security import authz
-from restapi import decorators
-from restapi.services.download import Downloader
-from restapi.exceptions import RestApiException
-from restapi.connectors.neo4j import graph_transactions
-from restapi.utilities.htmlcodes import hcodes
 from imc.apis import IMCEndpoint
-from imc.tasks.services.creation_repository import CreationRepository
+from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
-
-from restapi.connectors.celery import CeleryExt
+from imc.tasks.services.creation_repository import CreationRepository
+from restapi import decorators
+from restapi.confs import PRODUCTION, get_backend_url
+from restapi.connectors.neo4j import graph_transactions
+from restapi.exceptions import RestApiException
+from restapi.services.download import Downloader
+from restapi.utilities.htmlcodes import hcodes
+from restapi.utilities.logs import log
 
 
 #####################################
@@ -28,40 +25,40 @@ class Videos(IMCEndpoint):
     Else return all AVEntities in the repository.
     """
 
-    labels = ['video']
+    labels = ["video"]
     _GET = {
-        '/videos/<video_id>': {
-            'summary': 'List of videos',
-            'description': 'Returns a list containing all videos. The list supports paging.',
-            'tags': ['videos', 'admin'],
-            'responses': {
-                '200': {'description': 'List of videos successfully retrieved'},
-                '404': {'description': 'The video does not exists.'},
+        "/videos/<video_id>": {
+            "summary": "List of videos",
+            "description": "Returns a list containing all videos. The list supports paging.",
+            "tags": ["videos", "admin"],
+            "responses": {
+                "200": {"description": "List of videos successfully retrieved"},
+                "404": {"description": "The video does not exists."},
             },
         },
-        '/videos': {
-            'summary': 'List of videos',
-            'description': 'Returns a list containing all videos. The list supports paging.',
-            'tags': ['videos', 'admin'],
-            'responses': {
-                '200': {'description': 'List of videos successfully retrieved'},
-                '404': {'description': 'The video does not exists.'},
+        "/videos": {
+            "summary": "List of videos",
+            "description": "Returns a list containing all videos. The list supports paging.",
+            "tags": ["videos", "admin"],
+            "responses": {
+                "200": {"description": "List of videos successfully retrieved"},
+                "404": {"description": "The video does not exists."},
             },
         },
     }
     _POST = {
-        '/videos': {
-            'summary': 'Create a new video description',
-            'description': 'Simple method to attach descriptive metadata to a previously uploaded video (item).',
-            'responses': {
-                '200': {'description': 'Video description successfully created'}
+        "/videos": {
+            "summary": "Create a new video description",
+            "description": "Simple method to attach descriptive metadata to a previously uploaded video (item).",
+            "responses": {
+                "200": {"description": "Video description successfully created"}
             },
         }
     }
     _DELETE = {
-        '/videos/<video_id>': {
-            'summary': 'Delete a video description',
-            'responses': {'200': {'description': 'Video successfully deleted'}},
+        "/videos/<video_id>": {
+            "summary": "Delete a video description",
+            "responses": {"200": {"description": "Video successfully deleted"}},
         }
     }
 
@@ -75,7 +72,7 @@ class Videos(IMCEndpoint):
             )
 
         log.debug("getting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         data = []
 
         if video_id is not None:
@@ -98,23 +95,23 @@ class Videos(IMCEndpoint):
                 v,
                 max_relationship_depth=1,
                 relationships_expansion=[
-                    'record_sources.provider',
-                    'item.ownership',
-                    'item.revision',
-                    'item.other_version',
+                    "record_sources.provider",
+                    "item.ownership",
+                    "item.revision",
+                    "item.other_version",
                 ],
             )
             item = v.item.single()
-            video['links'] = {}
-            video['links']['content'] = (
-                api_url + '/api/videos/' + v.uuid + '/content?type=video'
+            video["links"] = {}
+            video["links"]["content"] = (
+                api_url + "/api/videos/" + v.uuid + "/content?type=video"
             )
             if item.thumbnail is not None:
-                video['links']['thumbnail'] = (
-                    api_url + '/api/videos/' + v.uuid + '/content?type=thumbnail'
+                video["links"]["thumbnail"] = (
+                    api_url + "/api/videos/" + v.uuid + "/content?type=thumbnail"
                 )
-            video['links']['summary'] = (
-                api_url + '/api/videos/' + v.uuid + '/content?type=summary'
+            video["links"]["summary"] = (
+                api_url + "/api/videos/" + v.uuid + "/content?type=summary"
             )
             data.append(video)
 
@@ -129,11 +126,11 @@ class Videos(IMCEndpoint):
     @graph_transactions
     @decorators.auth.required()
     def post(self):
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
 
         v = self.get_input()
         if len(v) == 0:
-            raise RestApiException('Empty input', status_code=hcodes.HTTP_BAD_REQUEST)
+            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
 
         data = self.get_input()
 
@@ -144,13 +141,13 @@ class Videos(IMCEndpoint):
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=['admin_root'])
+    @decorators.auth.required(roles=["admin_root"])
     def delete(self, video_id):
         """
         Delete existing video description.
         """
         log.debug("deleting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
 
         if video_id is None:
             raise RestApiException(
@@ -171,28 +168,28 @@ class Videos(IMCEndpoint):
 class VideoItem(IMCEndpoint):
 
     _PUT = {
-        '/videos/<video_id>/item': {
-            'summary': 'Update item info. At the moment ONLY used for the public access flag',
-            'parameters': [
+        "/videos/<video_id>/item": {
+            "summary": "Update item info. At the moment ONLY used for the public access flag",
+            "parameters": [
                 {
-                    'name': 'item_update',
-                    'in': 'body',
-                    'description': 'The item properties to be updated.',
-                    'schema': {
-                        'properties': {
-                            'public_access': {
-                                'description': 'Whether or not the item is accessible by a public user.',
-                                'type': 'boolean',
+                    "name": "item_update",
+                    "in": "body",
+                    "description": "The item properties to be updated.",
+                    "schema": {
+                        "properties": {
+                            "public_access": {
+                                "description": "Whether or not the item is accessible by a public user.",
+                                "type": "boolean",
                             }
                         }
                     },
                 }
             ],
-            'responses': {
-                '204': {'description': 'Item info successfully updated.'},
-                '400': {'description': 'Request not valid.'},
-                '403': {'description': 'Operation forbidden.'},
-                '404': {'description': 'Video does not exist.'},
+            "responses": {
+                "204": {"description": "Item info successfully updated."},
+                "400": {"description": "Request not valid."},
+                "403": {"description": "Operation forbidden."},
+                "404": {"description": "Video does not exist."},
             },
         }
     }
@@ -200,7 +197,7 @@ class VideoItem(IMCEndpoint):
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=['Archive', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=["Archive", "admin_root"], required_roles="any")
     def put(self, video_id):
         """
         Allow user to update item information.
@@ -210,7 +207,7 @@ class VideoItem(IMCEndpoint):
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
@@ -238,7 +235,7 @@ class VideoItem(IMCEndpoint):
 
         data = self.get_input()
         # ONLY public_access allowed at the moment
-        public_access = data.get('public_access')
+        public_access = data.get("public_access")
         if public_access is None or type(public_access) != bool:
             raise RestApiException(
                 "Please specify a valid value for public_access",
@@ -258,30 +255,30 @@ class VideoAnnotations(IMCEndpoint):
         Get all video annotations for a given video.
     """
 
-    labels = ['video_annotations']
+    labels = ["video_annotations"]
     _GET = {
-        '/videos/<video_id>/annotations': {
-            'summary': 'Gets video annotations',
-            'description': 'Returns all the annotations targeting the given video item.',
-            'parameters': [
+        "/videos/<video_id>/annotations": {
+            "summary": "Gets video annotations",
+            "description": "Returns all the annotations targeting the given video item.",
+            "parameters": [
                 {
-                    'name': 'type',
-                    'in': 'query',
-                    'description': 'Filter by annotation type (e.g. TAG)',
-                    'type': 'string',
-                    'enum': ['TAG', 'DSC', 'TVS'],
+                    "name": "type",
+                    "in": "query",
+                    "description": "Filter by annotation type (e.g. TAG)",
+                    "type": "string",
+                    "enum": ["TAG", "DSC", "TVS"],
                 },
                 {
-                    'name': 'onlyManual',
-                    'in': 'query',
-                    'type': 'boolean',
-                    'default': False,
-                    'allowEmptyValue': True,
+                    "name": "onlyManual",
+                    "in": "query",
+                    "type": "boolean",
+                    "default": False,
+                    "allowEmptyValue": True,
                 },
             ],
-            'responses': {
-                '200': {'description': 'An annotation object.'},
-                '404': {'description': 'Video does not exist.'},
+            "responses": {
+                "200": {"description": "An annotation object."},
+                "404": {"description": "Video does not exist."},
             },
         }
     }
@@ -297,11 +294,11 @@ class VideoAnnotations(IMCEndpoint):
             )
 
         params = self.get_input()
-        anno_type = params.get('type')
+        anno_type = params.get("type")
         if anno_type is not None:
             anno_type = anno_type.upper()
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         data = []
 
         video = None
@@ -314,9 +311,9 @@ class VideoAnnotations(IMCEndpoint):
             )
 
         user = self.auth.get_user()
-        is_manual = params.get('onlyManual')
+        is_manual = params.get("onlyManual")
         if isinstance(is_manual, str) and (
-            is_manual == '' or is_manual.lower() == 'true'
+            is_manual == "" or is_manual.lower() == "true"
         ):
             is_manual = True
         elif type(is_manual) == bool:
@@ -335,23 +332,23 @@ class VideoAnnotations(IMCEndpoint):
             if a.private:
                 if creator is None:
                     log.warning(
-                        'Invalid state: missing creator for private note [UUID:{}]',
+                        "Invalid state: missing creator for private note [UUID:{}]",
                         a.uuid,
                     )
                     continue
                 if creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
-            if a.annotation_type in ('TAG', 'DSC', 'TVS') and a.creator is not None:
-                res['creator'] = self.getJsonResponse(
+            if a.annotation_type in ("TAG", "DSC", "TVS") and a.creator is not None:
+                res["creator"] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0
                 )
             # attach bodies
-            res['bodies'] = []
+            res["bodies"] = []
             for b in a.bodies.all():
                 anno_body = b.downcast()
                 body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-                if a.annotation_type == 'TVS':
+                if a.annotation_type == "TVS":
                     segments = []
                     for segment in anno_body.segments:
                         # look at the most derivative class
@@ -360,16 +357,16 @@ class VideoAnnotations(IMCEndpoint):
                         )
                         # collect annotations and tags
                         # code duplicated for VideoShots.get
-                        json_segment['annotations'] = []
-                        json_segment['tags'] = []
+                        json_segment["annotations"] = []
+                        json_segment["tags"] = []
                         # <dict(iri, name)>{iri, name, spatial, auto, hits}
                         tags = {}
                         for anno in segment.annotation.all():
                             if anno.private:
                                 if creator is None:
                                     log.warning(
-                                        'Invalid state: missing creator for private '
-                                        'note [UUID:{}]',
+                                        "Invalid state: missing creator for private "
+                                        "note [UUID:{}]",
                                         anno.uuid,
                                     )
                                     continue
@@ -379,48 +376,48 @@ class VideoAnnotations(IMCEndpoint):
                                 anno, max_relationship_depth=0
                             )
                             if (
-                                anno.annotation_type in ('TAG', 'DSC')
+                                anno.annotation_type in ("TAG", "DSC")
                                 and creator is not None
                             ):
-                                s_anno['creator'] = self.getJsonResponse(
+                                s_anno["creator"] = self.getJsonResponse(
                                     anno.creator.single(), max_relationship_depth=0
                                 )
                             # attach bodies
-                            s_anno['bodies'] = []
+                            s_anno["bodies"] = []
                             for b in anno.bodies.all():
                                 mdb = b.downcast()  # most derivative body
-                                s_anno['bodies'].append(
+                                s_anno["bodies"].append(
                                     self.getJsonResponse(mdb, max_relationship_depth=0)
                                 )
-                                if anno.annotation_type == 'TAG':
+                                if anno.annotation_type == "TAG":
                                     spatial = None
-                                    if 'ResourceBody' in mdb.labels():
+                                    if "ResourceBody" in mdb.labels():
                                         iri = mdb.iri
                                         name = mdb.name
                                         spatial = mdb.spatial
-                                    elif 'TextualBody' in mdb.labels():
+                                    elif "TextualBody" in mdb.labels():
                                         iri = None
                                         name = mdb.value
                                     else:
                                         # unmanaged body type for tag
                                         continue
-                                    ''' only for manual tag annotations  '''
+                                    """ only for manual tag annotations  """
                                     tag = tags.get((iri, name))
                                     if tag is None:
                                         tags[(iri, name)] = {
-                                            'iri': iri,
-                                            'name': name,
-                                            'hits': 1,
+                                            "iri": iri,
+                                            "name": name,
+                                            "hits": 1,
                                         }
                                         if spatial is not None:
-                                            tags[(iri, name)]['spatial'] = spatial
+                                            tags[(iri, name)]["spatial"] = spatial
                                     else:
-                                        tag['hits'] += 1
-                            json_segment['annotations'].append(s_anno)
-                        json_segment['tags'] = list(tags.values())
+                                        tag["hits"] += 1
+                            json_segment["annotations"].append(s_anno)
+                        json_segment["tags"] = list(tags.values())
                         segments.append(json_segment)
-                    body['segments'] = segments
-                res['bodies'].append(body)
+                    body["segments"] = segments
+                res["bodies"].append(body)
             data.append(res)
 
         return self.response(data)
@@ -431,14 +428,14 @@ class VideoShots(IMCEndpoint):
         Get the list of shots for a given video.
     """
 
-    labels = ['video_shots']
+    labels = ["video_shots"]
     _GET = {
-        '/videos/<video_id>/shots': {
-            'summary': 'Gets video shots',
-            'description': 'Returns a list of shots belonging to the given video item.',
-            'responses': {
-                '200': {'description': 'An list of shots.'},
-                '404': {'description': 'Video does not exist.'},
+        "/videos/<video_id>/shots": {
+            "summary": "Gets video shots",
+            "description": "Returns a list of shots belonging to the given video item.",
+            "responses": {
+                "200": {"description": "An list of shots."},
+                "404": {"description": "Video does not exist."},
             },
         }
     }
@@ -452,7 +449,7 @@ class VideoShots(IMCEndpoint):
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         data = []
 
         video = None
@@ -494,7 +491,7 @@ class VideoShots(IMCEndpoint):
             if annotation.private:
                 if creator is None:
                     log.warning(
-                        'Invalid state: missing creator for private note [UUID: {}]',
+                        "Invalid state: missing creator for private note [UUID: {}]",
                         annotation.uuid,
                     )
                     continue
@@ -506,19 +503,19 @@ class VideoShots(IMCEndpoint):
             res = self.getJsonResponse(annotation, max_relationship_depth=0)
 
             # attach creator
-            if annotation.annotation_type in ('TAG', 'DSC', 'LNK'):
+            if annotation.annotation_type in ("TAG", "DSC", "LNK"):
                 if creator is not None:
-                    res['creator'] = self.getJsonResponse(
+                    res["creator"] = self.getJsonResponse(
                         creator, max_relationship_depth=0
                     )
 
             # attach bodies
-            res['bodies'] = []
+            res["bodies"] = []
             for concept in row[3]:
                 b = self.graph.AnnotationBody.inflate(concept)
                 b = b.downcast()  # most derivative body
                 b_data = self.getJsonResponse(b, max_relationship_depth=0)
-                res['bodies'].append(b_data)
+                res["bodies"].append(b_data)
 
             if shot_uuid not in annotations:
                 annotations[shot_uuid] = []
@@ -543,9 +540,9 @@ class VideoShots(IMCEndpoint):
             auto_anno = self.graph.Annotation.inflate(row[1])
             res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
             # attach bodies
-            res['bodies'] = []
+            res["bodies"] = []
             for concept in row[2]:
-                res['bodies'].append(
+                res["bodies"].append(
                     self.getJsonResponse(
                         self.graph.ResourceBody.inflate(concept),
                         max_relationship_depth=0,
@@ -553,14 +550,14 @@ class VideoShots(IMCEndpoint):
                 )
             annotations[shot_uuid].append(res)
 
-        for s in item.shots.order_by('start_frame_idx'):
+        for s in item.shots.order_by("start_frame_idx"):
             shot = self.getJsonResponse(s)
-            shot_url = api_url + '/api/shots/' + s.uuid
-            shot['links'] = {}
-            shot['links']['thumbnail'] = shot_url + '?content=thumbnail'
+            shot_url = api_url + "/api/shots/" + s.uuid
+            shot["links"] = {}
+            shot["links"]["thumbnail"] = shot_url + "?content=thumbnail"
 
             # Retrieving annotations from prefetched data
-            shot['annotations'] = annotations.get(s.uuid, [])
+            shot["annotations"] = annotations.get(s.uuid, [])
 
             data.append(shot)
 
@@ -572,60 +569,60 @@ class VideoSegments(IMCEndpoint):
         Get the list of manual segments for a given video.
     """
 
-    labels = ['video_segments', 'video-segment']
+    labels = ["video_segments", "video-segment"]
     _GET = {
-        '/videos/<video_id>/segments/<segment_id>': {
-            'summary': 'Gets all manual segments for a video.',
-            'description': 'Returns a list of the manual segments belonging to the given video item.',
-            'responses': {
-                '200': {'description': 'An list of manual segments.'},
-                '404': {'description': 'Video does not exist.'},
+        "/videos/<video_id>/segments/<segment_id>": {
+            "summary": "Gets all manual segments for a video.",
+            "description": "Returns a list of the manual segments belonging to the given video item.",
+            "responses": {
+                "200": {"description": "An list of manual segments."},
+                "404": {"description": "Video does not exist."},
             },
         },
-        '/videos/<video_id>/segments': {
-            'summary': 'Gets all manual segments for a video.',
-            'description': 'Returns a list of the manual segments belonging to the given video item.',
-            'responses': {
-                '200': {'description': 'An list of manual segments.'},
-                '404': {'description': 'Video does not exist.'},
+        "/videos/<video_id>/segments": {
+            "summary": "Gets all manual segments for a video.",
+            "description": "Returns a list of the manual segments belonging to the given video item.",
+            "responses": {
+                "200": {"description": "An list of manual segments."},
+                "404": {"description": "Video does not exist."},
             },
         },
     }
     _PUT = {
-        '/videos/<video_id>/segments/<segment_id>': {
-            'summary': 'Updates a manual video segment',
-            'description': 'Update a manual video segment identified by uuid',
-            'parameters': [
+        "/videos/<video_id>/segments/<segment_id>": {
+            "summary": "Updates a manual video segment",
+            "description": "Update a manual video segment identified by uuid",
+            "parameters": [
                 {
-                    'name': 'updated_segment',
-                    'in': 'body',
-                    'description': 'The manual video segment to update.',
-                    'schema': {
-                        'required': ['start_frame_idx', 'end_frame_idx'],
-                        'properties': {
-                            'start_frame_idx': {
-                                'type': 'integer',
-                                'format': 'int32',
-                                'minimum': 0,
+                    "name": "updated_segment",
+                    "in": "body",
+                    "description": "The manual video segment to update.",
+                    "schema": {
+                        "required": ["start_frame_idx", "end_frame_idx"],
+                        "properties": {
+                            "start_frame_idx": {
+                                "type": "integer",
+                                "format": "int32",
+                                "minimum": 0,
                             },
-                            'end_frame_idx': {'type': 'integer', 'format': 'int32'},
+                            "end_frame_idx": {"type": "integer", "format": "int32"},
                         },
                     },
                 }
             ],
-            'responses': {
-                '204': {'description': 'Manual video segment successfully updated.'},
-                '403': {'description': 'Operation forbidden.'},
-                '404': {'description': 'Manual video segment does not exist.'},
+            "responses": {
+                "204": {"description": "Manual video segment successfully updated."},
+                "403": {"description": "Operation forbidden."},
+                "404": {"description": "Manual video segment does not exist."},
             },
         }
     }
     _DELETE = {
-        '/videos/<video_id>/segments/<segment_id>': {
-            'summary': 'Delete a video segment.',
-            'responses': {
-                '200': {'description': 'Video segment successfully deleted'},
-                '404': {'description': 'Video segment does not exist'},
+        "/videos/<video_id>/segments/<segment_id>": {
+            "summary": "Delete a video segment.",
+            "responses": {
+                "200": {"description": "Video segment successfully deleted"},
+                "404": {"description": "Video segment does not exist"},
             },
         }
     }
@@ -647,7 +644,7 @@ class VideoSegments(IMCEndpoint):
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         data = []
 
         video = None
@@ -662,7 +659,7 @@ class VideoSegments(IMCEndpoint):
         # user = self.auth.get_user()
 
         item = video.item.single()
-        log.debug('get manual segments for Item [{}]', item.uuid)
+        log.debug("get manual segments for Item [{}]", item.uuid)
 
         # TODO
 
@@ -699,48 +696,48 @@ class VideoSegments(IMCEndpoint):
 
 class VideoContent(IMCEndpoint, Downloader):
 
-    __available_content_types__ = ('video', 'thumbnail', 'summary', 'orf')
-    labels = ['video']
+    __available_content_types__ = ("video", "thumbnail", "summary", "orf")
+    labels = ["video"]
     _GET = {
-        '/videos/<video_id>/content': {
-            'summary': 'Gets the video content',
-            'tags': ['video'],
-            'parameters': [
+        "/videos/<video_id>/content": {
+            "summary": "Gets the video content",
+            "tags": ["video"],
+            "parameters": [
                 {
-                    'name': 'type',
-                    'in': 'query',
-                    'required': True,
-                    'description': 'content type (e.g. video, thumbnail, summary)',
-                    'type': 'string',
+                    "name": "type",
+                    "in": "query",
+                    "required": True,
+                    "description": "content type (e.g. video, thumbnail, summary)",
+                    "type": "string",
                 },
                 {
-                    'name': 'size',
-                    'in': 'query',
-                    'description': 'used to get large thumbnail (only for that at the moment)',
-                    'type': 'string',
+                    "name": "size",
+                    "in": "query",
+                    "description": "used to get large thumbnail (only for that at the moment)",
+                    "type": "string",
                 },
             ],
-            'responses': {
-                '200': {'description': 'Video content successfully retrieved'},
-                '404': {'description': 'The video content does not exists.'},
+            "responses": {
+                "200": {"description": "Video content successfully retrieved"},
+                "404": {"description": "The video content does not exists."},
             },
         }
     }
     _HEAD = {
-        '/videos/<video_id>/content': {
-            'summary': 'Check for video existence',
-            'parameters': [
+        "/videos/<video_id>/content": {
+            "summary": "Check for video existence",
+            "parameters": [
                 {
-                    'name': 'type',
-                    'in': 'query',
-                    'required': True,
-                    'description': 'content type (e.g. video, thumbnail, summary, orf)',
-                    'type': 'string',
+                    "name": "type",
+                    "in": "query",
+                    "required": True,
+                    "description": "content type (e.g. video, thumbnail, summary, orf)",
+                    "type": "string",
                 }
             ],
-            'responses': {
-                '200': {'description': 'The video content exists.'},
-                '404': {'description': 'The video content does not exists.'},
+            "responses": {
+                "200": {"description": "The video content exists."},
+                "404": {"description": "The video content does not exists."},
             },
         }
     }
@@ -759,7 +756,7 @@ class VideoContent(IMCEndpoint, Downloader):
             )
 
         input_parameters = self.get_input()
-        content_type = input_parameters['type']
+        content_type = input_parameters["type"]
         if content_type is None or content_type not in self.__available_content_types__:
             raise RestApiException(
                 "Bad type parameter: expected one of {}".format(
@@ -768,7 +765,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -779,7 +776,7 @@ class VideoContent(IMCEndpoint, Downloader):
             )
 
         item = video.item.single()
-        if content_type == 'video':
+        if content_type == "video":
             # TODO manage here content access (see issue 190)
             # always return the other version if available
             video_uri = item.uri
@@ -797,7 +794,7 @@ class VideoContent(IMCEndpoint, Downloader):
             folder = os.path.dirname(video_uri)
             # return self.send_file_partial(video_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="video/mp4")
-        elif content_type == 'orf':
+        elif content_type == "orf":
             # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
                 raise RestApiException(
@@ -805,7 +802,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 )
 
             folder = os.path.dirname(item.uri)
-            filename = 'orf.mp4'
+            filename = "orf.mp4"
             # orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
             # if orf_uri is None or not os.path.exists(orf_uri):
             if not os.path.exists(os.path.join(folder, filename)):
@@ -815,41 +812,41 @@ class VideoContent(IMCEndpoint, Downloader):
 
             # return self.send_file_partial(orf_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="video/mp4")
-        elif content_type == 'thumbnail':
+        elif content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
-            thumbnail_size = input_parameters.get('size')
+            thumbnail_size = input_parameters.get("size")
             # workaround when original thumnail is renamed by revision procedure
             if thumbnail_size is None and not os.path.exists(thumbnail_uri):
-                log.debug('File {0} not found', thumbnail_uri)
+                log.debug("File {0} not found", thumbnail_uri)
                 thumbnail_filename = os.path.basename(thumbnail_uri)
                 thumbs_dir = os.path.dirname(thumbnail_uri)
                 f_name, f_ext = os.path.splitext(thumbnail_filename)
-                tokens = f_name.split('_')
+                tokens = f_name.split("_")
                 if len(tokens) > 0:
-                    f = 'f_' + tokens[-1] + f_ext
+                    f = "f_" + tokens[-1] + f_ext
                     thumbnail_uri = os.path.join(thumbs_dir, f)
-            if thumbnail_size is not None and thumbnail_size.lower() == 'large':
+            if thumbnail_size is not None and thumbnail_size.lower() == "large":
                 # load image file in the parent folder with the same name
                 thumbnail_filename = os.path.basename(thumbnail_uri)
                 thumbs_parent_dir = os.path.dirname(
                     os.path.dirname(os.path.abspath(thumbnail_uri))
                 )
                 thumbnail_uri = os.path.join(thumbs_parent_dir, thumbnail_filename)
-                log.debug('request for large thumbnail: {}', thumbnail_uri)
+                log.debug("request for large thumbnail: {}", thumbnail_uri)
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            return send_file(thumbnail_uri, mimetype='image/jpeg')
-        elif content_type == 'summary':
+            return send_file(thumbnail_uri, mimetype="image/jpeg")
+        elif content_type == "summary":
             summary_uri = item.summary
             log.debug("summary content uri: {}", summary_uri)
             if summary_uri is None:
                 raise RestApiException(
                     "Summary not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            return send_file(summary_uri, mimetype='image/jpeg')
+            return send_file(summary_uri, mimetype="image/jpeg")
         else:
             # it should never be reached
             raise RestApiException(
@@ -871,7 +868,7 @@ class VideoContent(IMCEndpoint, Downloader):
             )
 
         input_parameters = self.get_input()
-        content_type = input_parameters['type']
+        content_type = input_parameters["type"]
         if content_type is None or content_type not in self.__available_content_types__:
             raise RestApiException(
                 "Bad type parameter: expected one of {}".format(
@@ -880,7 +877,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -892,32 +889,32 @@ class VideoContent(IMCEndpoint, Downloader):
 
         item = video.item.single()
         headers = {}
-        if content_type == 'video':
+        if content_type == "video":
             if item.uri is None or not os.path.exists(item.uri):
                 raise RestApiException(
                     "Video not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            headers['Content-Type'] = 'video/mp4'
-        elif content_type == 'orf':
-            orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
+            headers["Content-Type"] = "video/mp4"
+        elif content_type == "orf":
+            orf_uri = os.path.dirname(item.uri) + "/orf.mp4"
             log.debug(orf_uri)
             if item.uri is None or not os.path.exists(orf_uri):
                 raise RestApiException(
                     "Video ORF not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            headers['Content-Type'] = 'video/mp4'
-        elif content_type == 'thumbnail':
+            headers["Content-Type"] = "video/mp4"
+        elif content_type == "thumbnail":
             if item.thumbnail is None or not os.path.exists(item.thumbnail):
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            headers['Content-Type'] = 'image/jpeg'
-        elif content_type == 'summary':
+            headers["Content-Type"] = "image/jpeg"
+        elif content_type == "summary":
             if item.summary is None or not os.path.exists(item.summary):
                 raise RestApiException(
                     "Summary not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            headers['Content-Type'] = 'image/jpeg'
+            headers["Content-Type"] = "image/jpeg"
         else:
             # it should never be reached
             raise RestApiException(
@@ -929,43 +926,43 @@ class VideoContent(IMCEndpoint, Downloader):
 
 class VideoTools(IMCEndpoint):
 
-    __available_tools__ = ('object-detection', 'building-recognition')
+    __available_tools__ = ("object-detection", "building-recognition")
 
-    labels = ['video_tools']
+    labels = ["video_tools"]
     _POST = {
-        '/videos/<video_id>/tools': {
-            'summary': 'Allow to launch the execution of some video tools.',
-            'parameters': [
+        "/videos/<video_id>/tools": {
+            "summary": "Allow to launch the execution of some video tools.",
+            "parameters": [
                 {
-                    'name': 'criteria',
-                    'in': 'body',
-                    'description': 'Criteria to launch the tool.',
-                    'schema': {
-                        'required': ['tool'],
-                        'properties': {
-                            'tool': {
-                                'description': 'Tool to be launched.',
-                                'type': 'string',
-                                'enum': ['object-detection', 'building-recognition'],
+                    "name": "criteria",
+                    "in": "body",
+                    "description": "Criteria to launch the tool.",
+                    "schema": {
+                        "required": ["tool"],
+                        "properties": {
+                            "tool": {
+                                "description": "Tool to be launched.",
+                                "type": "string",
+                                "enum": ["object-detection", "building-recognition"],
                             },
-                            'operation': {
-                                'description': 'At the moment used only to delete automatic tags.',
-                                'type': 'string',
-                                'enum': ['delete'],
+                            "operation": {
+                                "description": "At the moment used only to delete automatic tags.",
+                                "type": "string",
+                                "enum": ["delete"],
                             },
                         },
                     },
                 }
             ],
-            'responses': {
-                '202': {'description': 'Execution task accepted.'},
-                '200': {
-                    'description': 'Execution completed successfully. Only with delete operation.'
+            "responses": {
+                "202": {"description": "Execution task accepted."},
+                "200": {
+                    "description": "Execution completed successfully. Only with delete operation."
                 },
-                '403': {'description': 'Request forbidden.'},
-                '404': {'description': 'Video not found.'},
-                '409': {
-                    'description': 'Invalid state. E.g. object detection results cannot be imported twice.'
+                "403": {"description": "Request forbidden."},
+                "404": {"description": "Video not found."},
+                "409": {
+                    "description": "Invalid state. E.g. object detection results cannot be imported twice."
                 },
             },
         }
@@ -973,17 +970,17 @@ class VideoTools(IMCEndpoint):
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=['admin_root'])
+    @decorators.auth.required(roles=["admin_root"])
     def post(self, video_id):
 
-        log.debug('launch automatic tool for video id: {}', video_id)
+        log.debug("launch automatic tool for video id: {}", video_id)
 
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -998,19 +995,19 @@ class VideoTools(IMCEndpoint):
                 "Item not available. Execute the pipeline first!",
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
-        if item.item_type != 'Video':
+        if item.item_type != "Video":
             raise RestApiException(
                 "Content item is not a video. Use a valid video id",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
         params = self.get_input()
-        if 'tool' not in params:
+        if "tool" not in params:
             raise RestApiException(
-                'Please specify the tool to be launched',
+                "Please specify the tool to be launched",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
-        tool = params['tool']
+        tool = params["tool"]
         if tool not in self.__available_tools__:
             raise RestApiException(
                 "Please specify a valid tool. Expected one of {}".format(
@@ -1021,15 +1018,15 @@ class VideoTools(IMCEndpoint):
 
         repo = AnnotationRepository(self.graph)
         if tool == self.__available_tools__[0]:  # object-detection
-            if 'operation' in params and params['operation'] == 'delete':
+            if "operation" in params and params["operation"] == "delete":
                 # get all automatic object detection tags
                 deleted = 0
                 for anno in item.sourcing_annotations.search(
-                    annotation_type='TAG', generator='FHG'
+                    annotation_type="TAG", generator="FHG"
                 ):
                     # expected always single body for automatic tags
                     body = anno.bodies.single()
-                    if 'ODBody' in body.labels() and 'BRBody' not in body.labels():
+                    if "ODBody" in body.labels() and "BRBody" not in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
                 return self.response(
@@ -1045,15 +1042,15 @@ class VideoTools(IMCEndpoint):
                     status_code=hcodes.HTTP_BAD_CONFLICT,
                 )
         elif tool == self.__available_tools__[1]:  # building-recognition
-            if 'operation' in params and params['operation'] == 'delete':
+            if "operation" in params and params["operation"] == "delete":
                 # get all automatic building recognition tags
                 deleted = 0
                 for anno in item.sourcing_annotations.search(
-                    annotation_type='TAG', generator='FHG'
+                    annotation_type="TAG", generator="FHG"
                 ):
                     # expected always single body for automatic tags
                     body = anno.bodies.single()
-                    if 'BRBody' in body.labels():
+                    if "BRBody" in body.labels():
                         deleted += 1
                         repo.delete_auto_annotation(anno)
                 return self.response(
@@ -1075,7 +1072,8 @@ class VideoTools(IMCEndpoint):
                 status_code=hcodes.HTTP_NOT_IMPLEMENTED,
             )
 
-        task = CeleryExt.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        celery = self.get_service_instance("celery")
+        task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
         return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
 
@@ -1083,100 +1081,100 @@ class VideoTools(IMCEndpoint):
 class VideoShotRevision(IMCEndpoint):
     """Shot revision endpoint"""
 
-    labels = ['video_shot_revision']
+    labels = ["video_shot_revision"]
     _GET = {
-        '/videos-under-revision': {
-            'summary': 'List of videos under revision.',
-            'description': 'Returns a list containing all videos under revision together with the assignee. The list supports paging.',
-            'parameters': [
+        "/videos-under-revision": {
+            "summary": "List of videos under revision.",
+            "description": "Returns a list containing all videos under revision together with the assignee. The list supports paging.",
+            "parameters": [
                 {
-                    'name': 'assignee',
-                    'in': 'query',
-                    'description': "Assignee's uuid of the revision",
-                    'type': 'string',
+                    "name": "assignee",
+                    "in": "query",
+                    "description": "Assignee's uuid of the revision",
+                    "type": "string",
                 }
             ],
-            'responses': {
-                '200': {
-                    'description': 'List of videos under revision successfully retrieved',
-                    'schema': {
-                        'type': 'array',
-                        'items': {'$ref': '#/definitions/VideoInRevision'},
+            "responses": {
+                "200": {
+                    "description": "List of videos under revision successfully retrieved",
+                    "schema": {
+                        "type": "array",
+                        "items": {"$ref": "#/definitions/VideoInRevision"},
                     },
                 }
             },
         }
     }
     _POST = {
-        '/videos/<video_id>/shot-revision': {
-            'summary': 'Launch the execution of the shot revision tool.',
-            'parameters': [
+        "/videos/<video_id>/shot-revision": {
+            "summary": "Launch the execution of the shot revision tool.",
+            "parameters": [
                 {
-                    'name': 'revision',
-                    'in': 'body',
-                    'description': 'The new list of cut.',
-                    'schema': {'$ref': '#/definitions/ShotRevision'},
+                    "name": "revision",
+                    "in": "body",
+                    "description": "The new list of cut.",
+                    "schema": {"$ref": "#/definitions/ShotRevision"},
                 }
             ],
-            'responses': {
-                '201': {'description': 'Execution launched.'},
-                '403': {'description': 'Request forbidden.'},
-                '404': {'description': 'Video not found.'},
-                '409': {'description': 'Invalid state for the video.'},
+            "responses": {
+                "201": {"description": "Execution launched."},
+                "403": {"description": "Request forbidden."},
+                "404": {"description": "Video not found."},
+                "409": {"description": "Invalid state for the video."},
             },
         }
     }
     _PUT = {
-        '/videos/<video_id>/shot-revision': {
-            'summary': 'Put a video under revision',
-            'parameters': [
+        "/videos/<video_id>/shot-revision": {
+            "summary": "Put a video under revision",
+            "parameters": [
                 {
-                    'name': 'revision',
-                    'in': 'body',
-                    'description': 'The revision request.',
-                    'schema': {
-                        'properties': {
-                            'assignee': {
-                                'description': 'The assignee for the revision (user uuid with Reviser role).',
-                                'type': 'string',
+                    "name": "revision",
+                    "in": "body",
+                    "description": "The revision request.",
+                    "schema": {
+                        "properties": {
+                            "assignee": {
+                                "description": "The assignee for the revision (user uuid with Reviser role).",
+                                "type": "string",
                             }
                         }
                     },
                 }
             ],
-            'responses': {
-                '204': {'description': 'Video under revision successfully.'},
-                '400': {'description': 'Assignee not valid.'},
-                '409': {
-                    'description': 'Video is already under revision or it is not ready for revision.'
+            "responses": {
+                "204": {"description": "Video under revision successfully."},
+                "400": {"description": "Assignee not valid."},
+                "409": {
+                    "description": "Video is already under revision or it is not ready for revision."
                 },
-                '403': {'description': 'Operation forbidden.'},
-                '404': {'description': 'Video does not exist.'},
+                "403": {"description": "Operation forbidden."},
+                "404": {"description": "Video does not exist."},
             },
         }
     }
     _DELETE = {
-        '/videos/<video_id>/shot-revision': {
-            'summary': 'Take off revision from a video.',
-            'responses': {
-                '204': {'description': 'Video revision successfully exited.'},
-                '403': {'description': 'Request forbidden.'},
-                '404': {'description': 'Video not found.'},
+        "/videos/<video_id>/shot-revision": {
+            "summary": "Take off revision from a video.",
+            "responses": {
+                "204": {"description": "Video revision successfully exited."},
+                "403": {"description": "Request forbidden."},
+                "404": {"description": "Video not found."},
             },
         }
     }
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def get(self):
         """Get all videos under revision"""
-        log.debug('Getting videos under revision.')
-        self.graph = self.get_service_instance('neo4j')
+        log.debug("Getting videos under revision.")
+        self.graph = self.get_service_instance("neo4j")
         data = []
 
         input_parameters = self.get_input()
-        input_assignee = input_parameters['assignee']
+        input_assignee = input_parameters["assignee"]
 
         # naive solution for getting VideoInRevision
         items = self.graph.Item.nodes.has(revision=True)
@@ -1192,14 +1190,14 @@ class VideoShotRevision(IMCEndpoint):
             number_of_confirmed = len([s for s in shots if s.revision_confirmed])
             percentage = 100 * number_of_confirmed / number_of_shots
             res = {
-                'video': {'uuid': video.uuid, 'title': video.identifying_title},
-                'assignee': {
-                    'uuid': assignee.uuid,
-                    'name': assignee.name + ' ' + assignee.surname,
+                "video": {"uuid": video.uuid, "title": video.identifying_title},
+                "assignee": {
+                    "uuid": assignee.uuid,
+                    "name": assignee.name + " " + assignee.surname,
                 },
-                'since': rel.when.isoformat(),
-                'state': rel.state,
-                'progress': percentage,
+                "since": rel.when.isoformat(),
+                "state": rel.state,
+                "progress": percentage,
             }
             data.append(res)
 
@@ -1208,16 +1206,16 @@ class VideoShotRevision(IMCEndpoint):
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def put(self, video_id):
         """Put a video under revision"""
-        log.debug('Put video {0} under revision', video_id)
+        log.debug("Put video {0} under revision", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
@@ -1247,23 +1245,23 @@ class VideoShotRevision(IMCEndpoint):
         assignee_is_admin = iamadmin
         # allow admin to pass the assignee
         data = self.get_input()
-        if iamadmin and 'assignee' in data:
-            assignee = self.graph.User.nodes.get_or_none(uuid=data['assignee'])
+        if iamadmin and "assignee" in data:
+            assignee = self.graph.User.nodes.get_or_none(uuid=data["assignee"])
             if assignee is None:
                 # 400: description: Assignee not valid.
                 raise RestApiException(
                     "Invalid candidate. User [{uuid}] does not exist".format(
-                        uuid=data['assignee']
+                        uuid=data["assignee"]
                     ),
                     status_code=hcodes.HTTP_BAD_NOTFOUND,
                 )
             # is the assignee an admin_root?
             assignee_is_admin = False
             for role in assignee.roles.all():
-                if role.name == 'admin_root':
+                if role.name == "admin_root":
                     assignee_is_admin = True
                     break
-        log.debug('Assignee is admin? {}', assignee_is_admin)
+        log.debug("Assignee is admin? {}", assignee_is_admin)
 
         repo = CreationRepository(self.graph)
 
@@ -1287,15 +1285,15 @@ class VideoShotRevision(IMCEndpoint):
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def post(self, video_id):
         """Start a shot revision procedure"""
-        log.debug('Start shot revision for video {0}', video_id)
+        log.debug("Start shot revision for video {0}", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
@@ -1331,59 +1329,60 @@ class VideoShotRevision(IMCEndpoint):
 
         revision = self.get_input()
         # validate request body
-        if 'shots' not in revision or not revision['shots']:
+        if "shots" not in revision or not revision["shots"]:
             raise RestApiException(
-                'Provide a valid list of cuts', status_code=hcodes.HTTP_BAD_REQUEST
+                "Provide a valid list of cuts", status_code=hcodes.HTTP_BAD_REQUEST
             )
-        for idx, s in enumerate(revision['shots']):
-            if 'shot_num' not in s:
+        for idx, s in enumerate(revision["shots"]):
+            if "shot_num" not in s:
                 raise RestApiException(
-                    f'Missing shot_num in shot: {s}',
+                    f"Missing shot_num in shot: {s}",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-            if idx > 0 and 'cut' not in s:
+            if idx > 0 and "cut" not in s:
                 raise RestApiException(
-                    'Missing cut for shot[{}]'.format(s['shot_num']),
+                    "Missing cut for shot[{}]".format(s["shot_num"]),
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-            if 'confirmed' in s and not isinstance(s['confirmed'], bool):
+            if "confirmed" in s and not isinstance(s["confirmed"], bool):
                 raise RestApiException(
-                    'Invalid confirmed value', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Invalid confirmed value", status_code=hcodes.HTTP_BAD_REQUEST
                 )
-            if 'double_check' in s and not isinstance(s['double_check'], bool):
+            if "double_check" in s and not isinstance(s["double_check"], bool):
                 raise RestApiException(
-                    'Invalid double_check value', status_code=hcodes.HTTP_BAD_REQUEST
+                    "Invalid double_check value", status_code=hcodes.HTTP_BAD_REQUEST
                 )
-            if 'annotations' not in s:
+            if "annotations" not in s:
                 raise RestApiException(
-                    f'Missing annotations in shot: {s}',
+                    f"Missing annotations in shot: {s}",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
             if (
-                'annotations' in s
-                and not isinstance(s['annotations'], type(list))
-                and not all(isinstance(val, str) for val in s['annotations'])
+                "annotations" in s
+                and not isinstance(s["annotations"], type(list))
+                and not all(isinstance(val, str) for val in s["annotations"])
             ):
                 raise RestApiException(
-                    'Invalid annotations value. Expected list<str>',
+                    "Invalid annotations value. Expected list<str>",
                     status_code=hcodes.HTTP_BAD_REQUEST,
                 )
-        if 'exitRevision' in revision and not isinstance(
-            revision['exitRevision'], bool
+        if "exitRevision" in revision and not isinstance(
+            revision["exitRevision"], bool
         ):
             raise RestApiException(
-                'Invalid exitRevision', status_code=hcodes.HTTP_BAD_REQUEST
+                "Invalid exitRevision", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        revision['reviser'] = user.uuid
+        revision["reviser"] = user.uuid
         # launch asynch task
         try:
-            task = CeleryExt.shot_revision.apply_async(
+            celery = self.get_service_instance("celery")
+            task = celery.shot_revision.apply_async(
                 args=[revision, item.uuid], countdown=10, priority=5
             )
             assignee = item.revision.single()
             rel = item.revision.relationship(assignee)
-            rel.state = 'R'
+            rel.state = "R"
             rel.save()
             # 202: OK_ACCEPTED
             return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
@@ -1392,15 +1391,15 @@ class VideoShotRevision(IMCEndpoint):
 
     @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=['Reviser', 'admin_root'], required_roles='any')
+    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def delete(self, video_id):
         """Take off revision from a video"""
-        log.debug('Exit revision for video {0}', video_id)
+        log.debug("Exit revision for video {0}", video_id)
         if video_id is None:
             raise RestApiException(
                 "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
             )
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
