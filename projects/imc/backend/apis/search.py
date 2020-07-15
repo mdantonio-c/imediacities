@@ -343,7 +343,7 @@ class Search(IMCEndpoint):
                         # 'descriptions.creation',
                     ],
                 )
-                video["links"] = {}
+                image["links"] = {}
                 image["links"]["content"] = image_url + "/content?type=image"
                 if item.thumbnail is not None:
                     image["links"]["thumbnail"] = image_url + "/content?type=thumbnail"
