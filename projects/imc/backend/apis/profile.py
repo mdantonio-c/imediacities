@@ -1,4 +1,4 @@
-from marshmallow import fields, validate
+from restapi.models import fields, validate
 
 
 class CustomProfile:
@@ -7,7 +7,7 @@ class CustomProfile:
 
     @staticmethod
     def manipulate(ref, user, data):
-        data['declared_institution'] = user.declared_institution
+        data["declared_institution"] = user.declared_institution
 
         return data
 
@@ -15,16 +15,16 @@ class CustomProfile:
     @staticmethod
     def get_custom_fields(strip_required=False):
         return {
-            'declared_institution': fields.Str(
+            "declared_institution": fields.Str(
                 required=False,
                 default="none",
                 validate=validate.OneOf(
-                    choices=['archive', 'university', 'research_institution', 'none'],
+                    choices=["archive", "university", "research_institution", "none"],
                     labels=[
-                        'Archive',
-                        'University',
-                        'Research Institution',
-                        'None of the above',
+                        "Archive",
+                        "University",
+                        "Research Institution",
+                        "None of the above",
                     ],
                 ),
             )

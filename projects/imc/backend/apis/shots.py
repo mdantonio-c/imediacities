@@ -2,57 +2,48 @@
 Handle your video metadata
 """
 from flask import send_file
-from restapi.confs import get_backend_url
-from restapi.utilities.logs import log
-from restapi import decorators
-from restapi.exceptions import RestApiException
-from restapi.utilities.htmlcodes import hcodes
 from imc.apis import IMCEndpoint
+from restapi import decorators
+from restapi.confs import get_backend_url
+from restapi.exceptions import RestApiException
+from restapi.models import fields, validate
+from restapi.utilities.htmlcodes import hcodes
+from restapi.utilities.logs import log
 
 
 #####################################
 class Shots(IMCEndpoint):
 
-    labels = ['shot']
+    labels = ["shot"]
     _GET = {
-        '/shots/<shot_id>': {
-            'summary': 'Gets information about a shot',
-            'description': 'Returns a single shot for its id',
-            'parameters': [
-                {
-                    'name': 'content',
-                    'in': 'query',
-                    'description': 'content type (ONLY thumbnail at the moment)',
-                    'type': 'string',
-                }
-            ],
-            'responses': {
-                '200': {'description': 'Shot information successfully retrieved'},
-                '404': {'description': 'The video does not exists.'},
+        "/shots/<shot_id>": {
+            "summary": "Gets information about a shot",
+            "description": "Returns a single shot for its id",
+            "responses": {
+                "200": {"description": "Shot information successfully retrieved"},
+                "404": {"description": "The video does not exists."},
             },
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    def get(self, shot_id=None):
+    @decorators.use_kwargs(
+        {
+            "content_type": fields.Str(
+                required=False,
+                data_key="content",
+                validate=validate.OneOf(["thumbnail"]),
+            )
+        },
+        locations=["query"],
+    )
+    def get(self, shot_id, content_type=None):
         """
         Get shot by id.
         """
         log.debug("getting Shot id: {}", shot_id)
-        if shot_id is None:
-            raise RestApiException(
-                "Please specify a valid shot uuid", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        self.graph = self.get_service_instance('neo4j')
 
-        input_parameters = self.get_input()
-        content_type = input_parameters['content']
-        if content_type is not None and content_type != 'thumbnail':
-            raise RestApiException(
-                "Bad type parameter: expected 'thumbnail'",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+        self.graph = self.get_service_instance("neo4j")
 
         # check if the shot exists
         node = None
@@ -71,13 +62,13 @@ class Shots(IMCEndpoint):
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            return send_file(thumbnail_uri, mimetype='image/jpeg')
+            return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         api_url = get_backend_url()
         shot = self.getJsonResponse(node)
-        shot['links']['self'] = api_url + '/api/shots/' + node.uuid
-        shot['links']['thumbnail'] = (
-            api_url + '/api/shots/' + node.uuid + '?content=thumbnail'
+        shot["links"]["self"] = api_url + "/api/shots/" + node.uuid
+        shot["links"]["thumbnail"] = (
+            api_url + "/api/shots/" + node.uuid + "?content=thumbnail"
         )
 
         return self.response(shot)
@@ -88,64 +79,54 @@ class ShotAnnotations(IMCEndpoint):
         Get all shot annotations for a given shot.
     """
 
-    labels = ['shot_annotations']
+    labels = ["shot_annotations"]
     _GET = {
-        '/shots/<shot_id>/annotations': {
-            'summary': 'Gets shot annotations.',
-            'description': 'Returns all the annotations targeting the given shot.',
-            'parameters': [
-                {
-                    'name': 'type',
-                    'in': 'query',
-                    'description': 'Filter by annotation type (e.g. TAG)',
-                    'type': 'string',
-                    'enum': ['TAG', 'DSC'],
-                }
-            ],
-            'responses': {
-                '200': {'description': 'List of annotations.'},
-                '404': {'description': 'Shot does not exist.'},
+        "/shots/<shot_id>/annotations": {
+            "summary": "Gets shot annotations.",
+            "description": "Returns all the annotations targeting the given shot.",
+            "responses": {
+                "200": {"description": "List of annotations."},
+                "404": {"description": "Shot does not exist."},
             },
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
-    def get(self, shot_id):
-        log.info("get annotations for Shot id: {}", shot_id)
-        if shot_id is None:
-            raise RestApiException(
-                "Please specify a shot id", status_code=hcodes.HTTP_BAD_REQUEST
+    @decorators.use_kwargs(
+        {
+            "anno_type": fields.Str(
+                required=False,
+                data_key="type",
+                description="Filter by annotation type (e.g. TAG)",
+                validate=validate.OneOf(["TAG", "DSC"]),
             )
+        },
+        locations=["query"],
+    )
+    def get(self, shot_id, anno_type=None):
+        log.info("get annotations for Shot id: {}", shot_id)
 
-        params = self.get_input()
-        log.debug("inputs {}", params)
-        anno_type = params.get('type')
-        if anno_type is not None:
-            anno_type = anno_type.upper()
+        self.graph = self.get_service_instance("neo4j")
 
-        self.graph = self.get_service_instance('neo4j')
-        data = []
+        shot = self.graph.Shot.nodes.get_or_none(uuid=shot_id)
 
-        shot = None
-        try:
-            shot = self.graph.Shot.nodes.get(uuid=shot_id)
-        except self.graph.AVEntity.DoesNotExist:
+        if not shot:
             log.debug("Shot with uuid {} does not exist", shot_id)
             raise RestApiException(
                 "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.auth.get_user()
+        user = self.get_user()
 
+        data = []
         for a in shot.annotation:
             if anno_type is not None and a.annotation_type != anno_type:
                 continue
             if a.private:
                 if a.creator is None:
                     log.warning(
-                        'Invalid state: missing creator for private ' 'note [UUID:{}]',
+                        "Invalid state: missing creator for private " "note [UUID:{}]",
                         a.uuid,
                     )
                     continue
@@ -153,16 +134,16 @@ class ShotAnnotations(IMCEndpoint):
                 if creator.uuid != user.uuid:
                     continue
             res = self.getJsonResponse(a, max_relationship_depth=0)
-            if a.annotation_type in ('TAG', 'DSC') and a.creator is not None:
-                res['creator'] = self.getJsonResponse(
+            if a.annotation_type in ("TAG", "DSC") and a.creator is not None:
+                res["creator"] = self.getJsonResponse(
                     a.creator.single(), max_relationship_depth=0
                 )
             # attach bodies
-            res['bodies'] = []
+            res["bodies"] = []
             for b in a.bodies.all():
                 anno_body = b.downcast()
                 body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-                res['bodies'].append(body)
+                res["bodies"].append(body)
             data.append(res)
 
         return self.response(data)

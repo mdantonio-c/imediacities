@@ -12,6 +12,7 @@ from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
+from restapi.models import fields, validate
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -60,11 +61,10 @@ class Images(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     def get(self, image_id=None):
 
-        if image_id is None and not self.auth.verify_admin():
+        if image_id is None and not self.verify_admin():
             raise RestApiException(
                 "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
             )
@@ -110,7 +110,6 @@ class Images(IMCEndpoint):
     Create a new image description.
     """
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required()
@@ -119,7 +118,6 @@ class Images(IMCEndpoint):
 
         return self.empty_response()
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=["admin_root"])
@@ -175,7 +173,6 @@ class ImageItem(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=["Archive", "admin_root"], required_roles="any")
@@ -204,7 +201,7 @@ class ImageItem(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_NOTFOUND,
             )
 
-        user = self.auth.get_user()
+        user = self.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
@@ -243,15 +240,6 @@ class ImageAnnotations(IMCEndpoint):
         "/images/<image_id>/annotations": {
             "summary": "Gets image annotations",
             "description": "Returns all the annotations targeting the given image item.",
-            "parameters": [
-                {
-                    "name": "type",
-                    "in": "query",
-                    "description": "Filter by annotation type (e.g. TAG)",
-                    "type": "string",
-                    "enum": ["TAG", "DSC"],
-                }
-            ],
             "responses": {
                 "200": {"description": "An annotation object."},
                 "404": {"description": "Image does not exist."},
@@ -259,33 +247,32 @@ class ImageAnnotations(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
-    def get(self, image_id):
-        log.debug("get annotations for NonAVEntity id: {}", image_id)
-        if image_id is None:
-            raise RestApiException(
-                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
+    @decorators.use_kwargs(
+        {
+            "anno_type": fields.Str(
+                required=False,
+                data_key="type",
+                description="Filter by annotation type (e.g. TAG, DSC)",
+                validate=validate.OneOf(["TAG", "DSC"]),
             )
-
-        params = self.get_input()
-        anno_type = params.get("type")
-        if anno_type is not None:
-            anno_type = anno_type.upper()
+        },
+        locations=["query"],
+    )
+    def get(self, image_id, anno_type=None):
+        log.debug("get annotations for NonAVEntity id: {}", image_id)
 
         self.graph = self.get_service_instance("neo4j")
         data = []
 
-        image = None
-        try:
-            image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-        except self.graph.NonAVEntity.DoesNotExist:
+        image = self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)
+        if not image:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise RestApiException(
                 "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.auth.get_user()
+        user = self.get_user()
 
         item = image.item.single()
         for anno in item.targeting_annotations:
@@ -336,21 +323,6 @@ class ImageContent(IMCEndpoint, Downloader):
     _GET = {
         "/images/<image_id>/content": {
             "summary": "Gets the image content",
-            "parameters": [
-                {
-                    "name": "type",
-                    "in": "query",
-                    "required": True,
-                    "description": "content type (e.g. image, thumbnail)",
-                    "type": "string",
-                },
-                {
-                    "name": "size",
-                    "in": "query",
-                    "description": "used to get large thumbnail (only for that at the moment)",
-                    "type": "string",
-                },
-            ],
             "responses": {
                 "200": {"description": "Image content successfully retrieved"},
                 "404": {"description": "The image content does not exists."},
@@ -358,25 +330,27 @@ class ImageContent(IMCEndpoint, Downloader):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
+    @decorators.use_kwargs(
+        {
+            "content_type": fields.Str(
+                required=True,
+                data_key="type",
+                description="content type (e.g. image, thumbnail)",
+                validate=validate.OneOf(["image", "thumbnail"]),
+            ),
+            "thumbnail_size": fields.Str(
+                required=False,
+                data_key="size",
+                description="used to get large thumbnails",
+                validate=validate.OneOf(["large"]),
+            ),
+        },
+        locations=["query"],
+    )
     @authz.pre_authorize
-    def get(self, image_id):
+    def get(self, image_id, content_type, thumbnail_size=None):
         log.info("get image content for id {}", image_id)
-        if image_id is None:
-            raise RestApiException(
-                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        input_parameters = self.get_input()
-        content_type = input_parameters["type"]
-        if content_type is None or (
-            content_type != "image" and content_type != "thumbnail"
-        ):
-            raise RestApiException(
-                "Bad type parameter: expected 'image' or 'thumbnail'",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
         self.graph = self.get_service_instance("neo4j")
         image = None
@@ -409,11 +383,13 @@ class ImageContent(IMCEndpoint, Downloader):
 
             # return self.send_file_partial(image_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="image/jpeg")
-        elif content_type == "thumbnail":
+
+        if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
-            thumbnail_size = input_parameters.get("size")
-            if thumbnail_size is not None and thumbnail_size.lower() == "large":
+            # if thumbnail_size and thumbnail_size== "large":
+            # large is the only allowed size at the moment
+            if thumbnail_size:
                 # load large image file as the original (i.e. transcoded.jpg)
                 thumbnail_uri = item.uri
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
@@ -422,12 +398,12 @@ class ImageContent(IMCEndpoint, Downloader):
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             return send_file(thumbnail_uri, mimetype="image/jpeg")
-        else:
-            # it should never be reached
-            raise RestApiException(
-                f"Invalid content type: {content_type}",
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-            )
+
+        # it should never be reached
+        raise RestApiException(
+            f"Invalid content type: {content_type}",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+        )
 
 
 class ImageTools(IMCEndpoint):
@@ -473,7 +449,6 @@ class ImageTools(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required(roles=["admin_root"])
     def post(self, image_id):

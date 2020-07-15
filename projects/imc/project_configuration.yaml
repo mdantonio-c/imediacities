@@ -1,16 +1,14 @@
 project:
-    title: "iMediaCities Repository"
-    description: "..."
-    version: "1.7.4"
-    rapydo: 0.7.4
+  title: "iMediaCities Repository"
+  description: "..."
+  version: "1.7.5"
+  rapydo: 0.7.5
 
 variables:
-
   env:
-
     FRONTEND_FRAMEWORK: angular
 
-    AUTH_SERVICE: neo4j 
+    AUTH_SERVICE: neo4j
 
     ACTIVATE_FTP: 1
     ACTIVATE_CELERY: 1
@@ -22,6 +20,7 @@ variables:
     ALLOW_ACCESS_TOKEN_PARAMETER: True
     ALLOW_PASSWORD_RESET: "true"
     ALLOW_REGISTRATION: "true"
+    ALLOW_TERMS_OF_USE: "true"
 
     GRAPHDB_PASSWORD: "**PLACEHOLDER**"
     GMAP_KEY: "**PLACEHOLDER**"
@@ -52,9 +51,9 @@ variables:
       - normal_user
 
 tags:
-    file: "All endpoints to handle files"
-    admin: "Operations only allowed for admin users"
-    miscellaneous: "Endpoints not classified in other specific sections"
+  file: "All endpoints to handle files"
+  admin: "Operations only allowed for admin users"
+  miscellaneous: "Endpoints not classified in other specific sections"
 
 controller:
   commands:

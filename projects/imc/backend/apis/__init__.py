@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from restapi.rest.definition import EndpointResource
 from restapi.utilities.logs import log
 
@@ -45,9 +46,9 @@ class IMCEndpoint(EndpointResource):
         else:
             res_id = None
 
-        data = self.get_show_fields(instance, 'show_fields', view_public_only, fields)
+        data = self.get_show_fields(instance, "show_fields", view_public_only, fields)
         if not skip_missing_ids or res_id is not None:
-            data['id'] = res_id
+            data["id"] = res_id
 
         # Relationships
         max_depth_reached = relationship_depth >= max_relationship_depth
@@ -65,7 +66,7 @@ class IMCEndpoint(EndpointResource):
                 if e.startswith(f"{relationship_name}."):
                     rel_name_len = len(relationship_name) + 1
                     expansion_rel = e[rel_name_len:]
-                    log.debug(
+                    log.verbose(
                         "Expanding {} relationship with {}",
                         relationship_name,
                         expansion_rel,
@@ -98,7 +99,7 @@ class IMCEndpoint(EndpointResource):
                 # as show=True. In this case, append relationship
                 # properties to the attribute model of the node
                 r = rel.relationship(node)
-                attrs = self.get_show_fields(r, 'show_fields', view_public_only)
+                attrs = self.get_show_fields(r, "show_fields", view_public_only)
 
                 for k in attrs:
                     if k in subnode:
@@ -116,8 +117,8 @@ class IMCEndpoint(EndpointResource):
             if len(subrelationship) > 0:
                 data[f"_{relationship}"] = subrelationship
 
-        if 'type' not in data:
-            data['type'] = type(instance).__name__.lower()
+        if "type" not in data:
+            data["type"] = type(instance).__name__.lower()
 
         return data
 
@@ -127,11 +128,11 @@ class IMCEndpoint(EndpointResource):
         if fields is None:
             fields = []
 
-        if type(obj).__name__ == 'User':
-            fields = ['email', 'name', 'surname']
+        if type(obj).__name__ == "User":
+            fields = ["email", "name", "surname"]
 
-        elif type(obj).__name__ == 'Role':
-            fields = ['name', 'description']
+        elif type(obj).__name__ == "Role":
+            fields = ["name", "description"]
 
         elif len(fields) < 1:
             if hasattr(obj, function_name):
@@ -156,7 +157,7 @@ class IMCEndpoint(EndpointResource):
                 if attribute is None:
                     attributes[key] = None
                 elif isinstance(attribute, datetime):
-                    dval = string_from_timestamp(attribute.strftime('%s'))
+                    dval = string_from_timestamp(attribute.strftime("%s"))
                     attributes[key] = dval
                 else:
 

@@ -3,15 +3,16 @@ Handle your video entity
 """
 import os
 
-from flask import request, send_file
+from flask import send_file
 from imc.apis import IMCEndpoint
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
-from restapi.confs import PRODUCTION, get_backend_url
+from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
+from restapi.models import fields, validate
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -62,11 +63,10 @@ class Videos(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     def get(self, video_id=None):
 
-        if video_id is None and not self.auth.verify_admin():
+        if video_id is None and not self.verify_admin():
             raise RestApiException(
                 "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
             )
@@ -121,7 +121,6 @@ class Videos(IMCEndpoint):
     Create a new video description.
     """
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required()
@@ -138,7 +137,6 @@ class Videos(IMCEndpoint):
 
         return self.empty_response()
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=["admin_root"])
@@ -194,7 +192,6 @@ class VideoItem(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=["Archive", "admin_root"], required_roles="any")
@@ -223,7 +220,7 @@ class VideoItem(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_NOTFOUND,
             )
 
-        user = self.auth.get_user()
+        user = self.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             raise RestApiException(
@@ -260,22 +257,6 @@ class VideoAnnotations(IMCEndpoint):
         "/videos/<video_id>/annotations": {
             "summary": "Gets video annotations",
             "description": "Returns all the annotations targeting the given video item.",
-            "parameters": [
-                {
-                    "name": "type",
-                    "in": "query",
-                    "description": "Filter by annotation type (e.g. TAG)",
-                    "type": "string",
-                    "enum": ["TAG", "DSC", "TVS"],
-                },
-                {
-                    "name": "onlyManual",
-                    "in": "query",
-                    "type": "boolean",
-                    "default": False,
-                    "allowEmptyValue": True,
-                },
-            ],
             "responses": {
                 "200": {"description": "An annotation object."},
                 "404": {"description": "Video does not exist."},
@@ -283,20 +264,24 @@ class VideoAnnotations(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
+    @decorators.use_kwargs(
+        {
+            "anno_type": fields.Str(
+                required=False,
+                data_key="type",
+                description="Filter by annotation type (e.g. TAG)",
+                validate=validate.OneOf(["TAG", "DSC", "TVS"]),
+            ),
+            "is_manual": fields.Bool(
+                required=False, missing=False, data_key="onlyManual"
+            ),
+        },
+        locations=["query"],
+    )
     @decorators.auth.required()
-    def get(self, video_id):
+    def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        params = self.get_input()
-        anno_type = params.get("type")
-        if anno_type is not None:
-            anno_type = anno_type.upper()
 
         self.graph = self.get_service_instance("neo4j")
         data = []
@@ -310,17 +295,7 @@ class VideoAnnotations(IMCEndpoint):
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        user = self.auth.get_user()
-        is_manual = params.get("onlyManual")
-        if isinstance(is_manual, str) and (
-            is_manual == "" or is_manual.lower() == "true"
-        ):
-            is_manual = True
-        elif type(is_manual) == bool:
-            # do nothing
-            pass
-        else:
-            is_manual = False
+        user = self.get_user()
 
         item = video.item.single()
         for a in item.targeting_annotations:
@@ -440,7 +415,6 @@ class VideoShots(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     def get(self, video_id):
         log.debug("get shots for AVEntity id: {}", video_id)
@@ -464,7 +438,7 @@ class VideoShots(IMCEndpoint):
         user = self.get_user_if_logged()
 
         item = video.item.single()
-        api_url = get_backend_url(request, PRODUCTION)
+        api_url = get_backend_url()
 
         annotations = {}
 
@@ -627,7 +601,6 @@ class VideoSegments(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
     def get(self, video_id, segment_id):
@@ -656,7 +629,7 @@ class VideoSegments(IMCEndpoint):
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
 
-        # user = self.auth.get_user()
+        # user = self.get_user()
 
         item = video.item.single()
         log.debug("get manual segments for Item [{}]", item.uuid)
@@ -665,7 +638,6 @@ class VideoSegments(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
     def delete(self, video_id, segment_id):
@@ -679,7 +651,6 @@ class VideoSegments(IMCEndpoint):
             status_code=hcodes.HTTP_NOT_IMPLEMENTED,
         )
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
     def put(self, video_id, segment_id):
@@ -696,27 +667,11 @@ class VideoSegments(IMCEndpoint):
 
 class VideoContent(IMCEndpoint, Downloader):
 
-    __available_content_types__ = ("video", "thumbnail", "summary", "orf")
     labels = ["video"]
     _GET = {
         "/videos/<video_id>/content": {
             "summary": "Gets the video content",
             "tags": ["video"],
-            "parameters": [
-                {
-                    "name": "type",
-                    "in": "query",
-                    "required": True,
-                    "description": "content type (e.g. video, thumbnail, summary)",
-                    "type": "string",
-                },
-                {
-                    "name": "size",
-                    "in": "query",
-                    "description": "used to get large thumbnail (only for that at the moment)",
-                    "type": "string",
-                },
-            ],
             "responses": {
                 "200": {"description": "Video content successfully retrieved"},
                 "404": {"description": "The video content does not exists."},
@@ -726,15 +681,6 @@ class VideoContent(IMCEndpoint, Downloader):
     _HEAD = {
         "/videos/<video_id>/content": {
             "summary": "Check for video existence",
-            "parameters": [
-                {
-                    "name": "type",
-                    "in": "query",
-                    "required": True,
-                    "description": "content type (e.g. video, thumbnail, summary, orf)",
-                    "type": "string",
-                }
-            ],
             "responses": {
                 "200": {"description": "The video content exists."},
                 "404": {"description": "The video content does not exists."},
@@ -742,28 +688,30 @@ class VideoContent(IMCEndpoint, Downloader):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
+    @decorators.use_kwargs(
+        {
+            "content_type": fields.Str(
+                required=True,
+                data_key="type",
+                description="content type (e.g. video, thumbnail, summary)",
+                validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
+            ),
+            "thumbnail_size": fields.Str(
+                required=False,
+                data_key="size",
+                description="used to get large thumbnails",
+                validate=validate.OneOf(["large"]),
+            ),
+        },
+        locations=["query"],
+    )
     @authz.pre_authorize
-    def get(self, video_id):
+    def get(self, video_id, content_type, thumbnail_size=None):
         """
         Gets video content such as video strem and thumbnail
         """
         log.debug("get video content for id {}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        input_parameters = self.get_input()
-        content_type = input_parameters["type"]
-        if content_type is None or content_type not in self.__available_content_types__:
-            raise RestApiException(
-                "Bad type parameter: expected one of {}".format(
-                    self.__available_content_types__
-                ),
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
         self.graph = self.get_service_instance("neo4j")
         video = None
@@ -794,7 +742,8 @@ class VideoContent(IMCEndpoint, Downloader):
             folder = os.path.dirname(video_uri)
             # return self.send_file_partial(video_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="video/mp4")
-        elif content_type == "orf":
+
+        if content_type == "orf":
             # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
                 raise RestApiException(
@@ -812,12 +761,13 @@ class VideoContent(IMCEndpoint, Downloader):
 
             # return self.send_file_partial(orf_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="video/mp4")
-        elif content_type == "thumbnail":
+
+        if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
-            thumbnail_size = input_parameters.get("size")
+
             # workaround when original thumnail is renamed by revision procedure
-            if thumbnail_size is None and not os.path.exists(thumbnail_uri):
+            if not thumbnail_size and not os.path.exists(thumbnail_uri):
                 log.debug("File {0} not found", thumbnail_uri)
                 thumbnail_filename = os.path.basename(thumbnail_uri)
                 thumbs_dir = os.path.dirname(thumbnail_uri)
@@ -826,7 +776,10 @@ class VideoContent(IMCEndpoint, Downloader):
                 if len(tokens) > 0:
                     f = "f_" + tokens[-1] + f_ext
                     thumbnail_uri = os.path.join(thumbs_dir, f)
-            if thumbnail_size is not None and thumbnail_size.lower() == "large":
+
+            # if thumbnail_size and thumbnail_size== "large":
+            # large is the only allowed size at the moment
+            if thumbnail_size:
                 # load image file in the parent folder with the same name
                 thumbnail_filename = os.path.basename(thumbnail_uri)
                 thumbs_parent_dir = os.path.dirname(
@@ -834,12 +787,14 @@ class VideoContent(IMCEndpoint, Downloader):
                 )
                 thumbnail_uri = os.path.join(thumbs_parent_dir, thumbnail_filename)
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
+
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise RestApiException(
                     "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             return send_file(thumbnail_uri, mimetype="image/jpeg")
-        elif content_type == "summary":
+
+        if content_type == "summary":
             summary_uri = item.summary
             log.debug("summary content uri: {}", summary_uri)
             if summary_uri is None:
@@ -847,35 +802,31 @@ class VideoContent(IMCEndpoint, Downloader):
                     "Summary not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
             return send_file(summary_uri, mimetype="image/jpeg")
-        else:
-            # it should never be reached
-            raise RestApiException(
-                f"Invalid content type: {content_type}",
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-            )
 
-    @decorators.catch_errors()
+        # it should never be reached
+        raise RestApiException(
+            f"Invalid content type: {content_type}",
+            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+        )
+
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def head(self, video_id):
+    @decorators.use_kwargs(
+        {
+            "content_type": fields.Str(
+                required=True,
+                data_key="type",
+                description="content type (e.g. video, thumbnail, summary)",
+                validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
+            )
+        },
+        locations=["query"],
+    )
+    def head(self, video_id, content_type):
         """
         Check for video content existance.
         """
         log.debug("check for video content existence with id {}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        input_parameters = self.get_input()
-        content_type = input_parameters["type"]
-        if content_type is None or content_type not in self.__available_content_types__:
-            raise RestApiException(
-                "Bad type parameter: expected one of {}".format(
-                    self.__available_content_types__
-                ),
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
         self.graph = self.get_service_instance("neo4j")
         video = None
@@ -968,7 +919,6 @@ class VideoTools(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required(roles=["admin_root"])
     def post(self, video_id):
@@ -1030,9 +980,7 @@ class VideoTools(IMCEndpoint):
                         deleted += 1
                         repo.delete_auto_annotation(anno)
                 return self.response(
-                    "There are no more automatic object detection tags for video {}. Deleted {}".format(
-                        video_id, deleted
-                    ),
+                    f"No more automatic object detection tags for video {video_id}. Deleted {deleted}",
                     code=hcodes.HTTP_OK_BASIC,
                 )
             # DO NOT re-import object detection twice for the same video!
@@ -1086,14 +1034,6 @@ class VideoShotRevision(IMCEndpoint):
         "/videos-under-revision": {
             "summary": "List of videos under revision.",
             "description": "Returns a list containing all videos under revision together with the assignee. The list supports paging.",
-            "parameters": [
-                {
-                    "name": "assignee",
-                    "in": "query",
-                    "description": "Assignee's uuid of the revision",
-                    "type": "string",
-                }
-            ],
             "responses": {
                 "200": {
                     "description": "List of videos under revision successfully retrieved",
@@ -1164,17 +1104,23 @@ class VideoShotRevision(IMCEndpoint):
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
+    @decorators.use_kwargs(
+        {
+            "input_assignee": fields.Str(
+                required=False,
+                data_key="assignee",
+                description="Assignee's uuid of the revision",
+            )
+        },
+        locations=["query"],
+    )
     @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
-    def get(self):
+    def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
         self.graph = self.get_service_instance("neo4j")
         data = []
-
-        input_parameters = self.get_input()
-        input_assignee = input_parameters["assignee"]
 
         # naive solution for getting VideoInRevision
         items = self.graph.Item.nodes.has(revision=True)
@@ -1203,7 +1149,6 @@ class VideoShotRevision(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
@@ -1232,8 +1177,8 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
 
-        user = self.auth.get_user()
-        iamadmin = self.auth.verify_admin()
+        user = self.get_user()
+        iamadmin = self.verify_admin()
         log.debug(
             "Request for revision from user [{}, {} {}]",
             user.uuid,
@@ -1283,7 +1228,6 @@ class VideoShotRevision(IMCEndpoint):
         # 204: Video under revision successfully.
         return self.empty_response()
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def post(self, video_id):
@@ -1317,8 +1261,8 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
         # ONLY the reviser and the administrator can provide a new list of cuts
-        user = self.auth.get_user()
-        iamadmin = self.auth.verify_admin()
+        user = self.get_user()
+        iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(
                 "User [{}, {} {}] cannot revise video that is not assigned to him/her".format(
@@ -1389,7 +1333,6 @@ class VideoShotRevision(IMCEndpoint):
         except BaseException as e:
             raise e
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def delete(self, video_id):
@@ -1424,8 +1367,8 @@ class VideoShotRevision(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # ONLY the reviser and the administrator can exit revision
-        user = self.auth.get_user()
-        iamadmin = self.auth.verify_admin()
+        user = self.get_user()
+        iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise RestApiException(
                 "User [{}, {} {}] cannot exit revision for video that is "

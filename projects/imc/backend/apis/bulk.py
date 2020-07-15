@@ -129,7 +129,6 @@ class Bulk(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_type(path)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required(roles=["admin_root"])
     def post(self):

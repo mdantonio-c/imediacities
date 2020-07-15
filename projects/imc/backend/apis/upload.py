@@ -3,58 +3,56 @@ Upload a file
 """
 
 import os
-from flask import send_file, make_response
 from mimetypes import MimeTypes
-from flask_apispec import MethodResource
 
-from restapi import decorators
-from restapi.utilities.logs import log
-from restapi.utilities.htmlcodes import hcodes
-from restapi.services.uploader import Uploader
-from restapi.exceptions import RestApiException
-from restapi.connectors.neo4j import graph_transactions
+from flask import make_response, send_file
 from imc.apis import IMCEndpoint
+from restapi import decorators
+from restapi.connectors.neo4j import graph_transactions
+from restapi.exceptions import RestApiException
+from restapi.services.uploader import Uploader
+from restapi.utilities.htmlcodes import hcodes
+from restapi.utilities.logs import log
 
 mime = MimeTypes()
 
 
-class Upload(MethodResource, Uploader, IMCEndpoint):
+class Upload(Uploader, IMCEndpoint):
 
-    labels = ['file']
+    labels = ["file"]
     _GET = {
-        '/download/<filename>': {
-            'summary': 'Download an uploaded file',
-            'responses': {
-                '200': {'description': 'File successfully downloaded'},
-                '404': {'description': 'The uploaded content does not exists.'},
+        "/download/<filename>": {
+            "summary": "Download an uploaded file",
+            "responses": {
+                "200": {"description": "File successfully downloaded"},
+                "404": {"description": "The uploaded content does not exists."},
             },
         }
     }
     _POST = {
-        '/upload': {
-            'summary': 'Initialize file upload',
-            'responses': {
-                '200': {'description': 'File upload successfully initialized'}
+        "/upload": {
+            "summary": "Initialize file upload",
+            "responses": {
+                "200": {"description": "File upload successfully initialized"}
             },
         }
     }
     _PUT = {
-        '/upload/<filename>': {
-            'summary': 'Upload a file into the stage area',
-            'responses': {'200': {'description': 'File successfully uploaded'}},
+        "/upload/<filename>": {
+            "summary": "Upload a file into the stage area",
+            "responses": {"200": {"description": "File successfully uploaded"}},
         }
     }
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.init_chunk_upload
-    @decorators.auth.required(roles=['Archive'])
+    @decorators.auth.required(roles=["Archive"])
     def post(self, name, **kwargs):
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
 
-        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+        group = self.get_user().belongs_to.single()
 
         if group is None:
             raise RestApiException(
@@ -67,14 +65,13 @@ class Upload(MethodResource, Uploader, IMCEndpoint):
 
         return self.init_chunk_upload(upload_dir, name, force=True)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=['Archive'])
+    @decorators.auth.required(roles=["Archive"])
     def put(self, filename):
 
-        self.graph = self.get_service_instance('neo4j')
-        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+        self.graph = self.get_service_instance("neo4j")
+        group = self.get_user().belongs_to.single()
 
         if group is None:
             raise RestApiException(
@@ -89,10 +86,9 @@ class Upload(MethodResource, Uploader, IMCEndpoint):
 
         return upload_response
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=['Archive'])
+    @decorators.auth.required(roles=["Archive"])
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:
@@ -100,9 +96,9 @@ class Upload(MethodResource, Uploader, IMCEndpoint):
                 "Please specify a stage filename", status_code=hcodes.HTTP_BAD_REQUEST
             )
 
-        self.graph = self.get_service_instance('neo4j')
+        self.graph = self.get_service_instance("neo4j")
 
-        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+        group = self.get_user().belongs_to.single()
 
         if group is None:
             raise RestApiException(
@@ -128,8 +124,8 @@ class Upload(MethodResource, Uploader, IMCEndpoint):
             )
 
         mime_type = mime.guess_type(filename)
-        log.debug('mime type: {}', mime_type)
+        log.debug("mime type: {}", mime_type)
 
         response = make_response(send_file(staged_file))
-        response.headers['Content-Type'] = mime_type[0]
+        response.headers["Content-Type"] = mime_type[0]
         return response

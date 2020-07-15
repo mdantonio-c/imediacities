@@ -136,19 +136,18 @@ class Stage(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.auth.required()
     def get(self, group=None, get_total=None, page=None, size=None):
         self.graph = self.get_service_instance("neo4j")
 
-        if not self.auth.verify_admin():
+        if not self.verify_admin():
             # Only admins can specify a different group to be inspected
             group = None
 
         if group is None:
-            group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+            group = self.get_user().belongs_to.single()
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
@@ -231,7 +230,6 @@ class Stage(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
     def post(self):
@@ -256,7 +254,7 @@ class Stage(IMCEndpoint):
         self.graph = self.get_service_instance("neo4j")
         celery = self.get_service_instance("celery")
 
-        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+        group = self.get_user().belongs_to.single()
 
         if group is None:
             raise RestApiException(
@@ -445,14 +443,13 @@ class Stage(IMCEndpoint):
 
         return self.response(task.id)
 
-    @decorators.catch_errors()
     @decorators.catch_graph_exceptions
     @decorators.auth.required()
     def delete(self, filename):
 
         self.graph = self.get_service_instance("neo4j")
 
-        group = self.graph.getSingleLinkedNode(self.auth.get_user().belongs_to)
+        group = self.get_user().belongs_to.single()
 
         if group is None:
             raise RestApiException(
@@ -464,15 +461,6 @@ class Stage(IMCEndpoint):
             raise RestApiException(
                 "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
             )
-
-        # input_parameters = self.get_input()
-
-        # if 'filename' not in input_parameters:
-        #     raise RestApiException(
-        #         "Filename not found",
-        #         status_code=hcodes.HTTP_BAD_REQUEST)
-
-        # filename = input_parameters['filename']
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
