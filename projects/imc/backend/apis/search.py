@@ -313,7 +313,7 @@ class Search(IMCEndpoint):
 
             if isinstance(v, self.graph.AVEntity):
                 # video
-                video_url = api_url + "api/videos/" + v.uuid
+                video_url = api_url + "/api/videos/" + v.uuid
                 video = self.getJsonResponse(
                     v,
                     max_relationship_depth=1,
@@ -331,7 +331,7 @@ class Search(IMCEndpoint):
                 data.append(video)
             elif isinstance(v, self.graph.NonAVEntity):
                 # image
-                image_url = api_url + "api/images/" + v.uuid
+                image_url = api_url + "/api/images/" + v.uuid
                 image = self.getJsonResponse(
                     v,
                     max_relationship_depth=1,
