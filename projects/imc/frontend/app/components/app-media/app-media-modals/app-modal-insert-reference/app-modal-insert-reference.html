@@ -1,101 +1,214 @@
 <!-- Modale per l'iserimento di nuove note -->
 <app-media-modal [data]="data" [media_type]="media_type">
-    <div class="col-12 col-sm-7 row no-gutters justify-content-between space-paragraph-xs-20" modal-col>
-        <form [formGroup]="referenceForm" class="w-100">
-            <div class="form-group">
-                <label for="authors" class="small mb-0">Author(s)*</label>
-                <input id="authors" type="text" class="imc--input"aria-label="authors" 
-                    formControlName="authors" required>
-                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('authors').touched && referenceForm.get('authors').invalid">At least one author is required</div>
-            </div>
-            <div class="form-group">
-                <label for="bookTitle" class="small mb-0">Book title</label>
-                <input id="bookTitle" type="text" class="imc--input" aria-label="booktitle"
-                    formControlName="book_title">
-            </div>
-            <div class="form-group">
-                <label for="_title" class="small mb-0">Title*</label>
-                <input id="_title" type="text" class="imc--input" aria-label="title"
-                    formControlName="title" required>
-                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('title').touched && referenceForm.get('title').invalid">Title is required</div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-5">
-                    <label for="journal" class="small mb-0">Journal</label>
-                    <input id="Journal" type="text" class="imc--input" aria-label="journal"
-                        formControlName="journal">
-                </div>
-                <div class="form-group offset-2 col-5">
-                    <label for="volume" class="small mb-0">Volume</label>
-                    <input id="volume" type="text" class="imc--input" aria-label="volume"
-                        formControlName="volume">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-5">
-                    <label for="number" class="small mb-0">Number</label>
-                    <input id="number" type="text" class="imc--input" aria-label="number"
-                        formControlName="number">
-                </div>
-                <div class="form-group offset-2 col-5">
-                    <label for="year" class="small mb-0">Year</label>
-                    <input id="year" type="number" class="imc--input" aria-label="year"
-                        formControlName="year">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-5">
-                    <label for="month" class="small mb-0">Month</label>
-                    <select id="month" class="imc--input" id="month" aria-label="month" formControlName="month">
-                        <option value=""></option>
-                        <option *ngFor="let m of months" [value]="m.value">{{m.key}}</option>
-                    </select>
-                </div>
-                <div class="form-group offset-2 col-5">
-                    <label for="editor" class="small mb-0">Editor</label>
-                    <input id="editor" type="text" class="imc--input" aria-label="editor"
-                        formControlName="editor">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-5">
-                    <label for="publisher" class="small mb-0">Publisher</label>
-                    <input id="publisher" type="text" class="imc--input" aria-label="publisher"
-                        formControlName="publisher">
-                </div>
-                <div class="form-group offset-2 col-5">
-                    <label for="address" class="small mb-0">Address</label>
-                    <input id="address" type="text" class="imc--input" aria-label="address"
-                        formControlName="address">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="url" class="small mb-0">URL</label>
-                <input id="url" type="text" class="imc--input" aria-label="url"
-                    formControlName="url">
-                <div class="invalid-feedback d-block" *ngIf="referenceForm.get('url').dirty && referenceForm.get('url').invalid">Please provide a valid URL</div>
-            </div>
-            <div class="form-row">
-                <div class="form-group col-5">
-                    <label for="isbn" class="small mb-0">ISBN</label>
-                    <input id="isbn" type="text" class="imc--input" aria-label="isbn"
-                        formControlName="isbn">
-                    <div class="invalid-feedback d-block" *ngIf="referenceForm.get('isbn').dirty && referenceForm.get('isbn').invalid">Please provide a valid ISBN</div>
-                </div>
-                <div class="form-group offset-2 col-5">
-                    <label for="doi" class="small mb-0">DOI</label>
-                    <input id="doi" type="text" class="imc--input imc--flex--item-end" aria-label="doi"
-                        formControlName="doi">
-                    <div class="invalid-feedback d-block" *ngIf="referenceForm.get('doi').dirty && referenceForm.get('doi').invalid">Please provide a valid DOI</div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <button type="button" class="btn btn-accent" modal-button
-        [disabled]="referenceForm.invalid" (click)="save()">Save</button>
-    <!--esito-->
-    <app-info modal-button
-              [message]="save_result.message" [result]="save_result.status"
-              *ngIf="save_result.visible"
-              (click)="save_result.visible = false"></app-info>
+  <div
+    class="col-12 col-sm-7 row no-gutters justify-content-between space-paragraph-xs-20"
+    modal-col
+  >
+    <form [formGroup]="referenceForm" class="w-100">
+      <div class="form-group">
+        <label for="authors" class="small mb-0">Author(s)*</label>
+        <input
+          id="authors"
+          type="text"
+          class="imc--input"
+          aria-label="authors"
+          formControlName="authors"
+          required
+        />
+        <div
+          class="invalid-feedback d-block"
+          *ngIf="referenceForm.get('authors').touched && referenceForm.get('authors').invalid"
+        >
+          At least one author is required
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="bookTitle" class="small mb-0">Book title</label>
+        <input
+          id="bookTitle"
+          type="text"
+          class="imc--input"
+          aria-label="booktitle"
+          formControlName="book_title"
+        />
+      </div>
+      <div class="form-group">
+        <label for="_title" class="small mb-0">Title*</label>
+        <input
+          id="_title"
+          type="text"
+          class="imc--input"
+          aria-label="title"
+          formControlName="title"
+          required
+        />
+        <div
+          class="invalid-feedback d-block"
+          *ngIf="referenceForm.get('title').touched && referenceForm.get('title').invalid"
+        >
+          Title is required
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label for="journal" class="small mb-0">Journal</label>
+          <input
+            id="Journal"
+            type="text"
+            class="imc--input"
+            aria-label="journal"
+            formControlName="journal"
+          />
+        </div>
+        <div class="form-group offset-2 col-5">
+          <label for="volume" class="small mb-0">Volume</label>
+          <input
+            id="volume"
+            type="text"
+            class="imc--input"
+            aria-label="volume"
+            formControlName="volume"
+          />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label for="number" class="small mb-0">Number</label>
+          <input
+            id="number"
+            type="text"
+            class="imc--input"
+            aria-label="number"
+            formControlName="number"
+          />
+        </div>
+        <div class="form-group offset-2 col-5">
+          <label for="year" class="small mb-0">Year</label>
+          <input
+            id="year"
+            type="number"
+            class="imc--input"
+            aria-label="year"
+            formControlName="year"
+          />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label for="month" class="small mb-0">Month</label>
+          <select
+            id="month"
+            class="imc--input"
+            id="month"
+            aria-label="month"
+            formControlName="month"
+          >
+            <option value=""></option>
+            <option *ngFor="let m of months" [value]="m.value"
+              >{{m.key}}</option
+            >
+          </select>
+        </div>
+        <div class="form-group offset-2 col-5">
+          <label for="editor" class="small mb-0">Editor</label>
+          <input
+            id="editor"
+            type="text"
+            class="imc--input"
+            aria-label="editor"
+            formControlName="editor"
+          />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label for="publisher" class="small mb-0">Publisher</label>
+          <input
+            id="publisher"
+            type="text"
+            class="imc--input"
+            aria-label="publisher"
+            formControlName="publisher"
+          />
+        </div>
+        <div class="form-group offset-2 col-5">
+          <label for="address" class="small mb-0">Address</label>
+          <input
+            id="address"
+            type="text"
+            class="imc--input"
+            aria-label="address"
+            formControlName="address"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="url" class="small mb-0">URL</label>
+        <input
+          id="url"
+          type="text"
+          class="imc--input"
+          aria-label="url"
+          formControlName="url"
+        />
+        <div
+          class="invalid-feedback d-block"
+          *ngIf="referenceForm.get('url').dirty && referenceForm.get('url').invalid"
+        >
+          Please provide a valid URL
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-5">
+          <label for="isbn" class="small mb-0">ISBN</label>
+          <input
+            id="isbn"
+            type="text"
+            class="imc--input"
+            aria-label="isbn"
+            formControlName="isbn"
+          />
+          <div
+            class="invalid-feedback d-block"
+            *ngIf="referenceForm.get('isbn').dirty && referenceForm.get('isbn').invalid"
+          >
+            Please provide a valid ISBN
+          </div>
+        </div>
+        <div class="form-group offset-2 col-5">
+          <label for="doi" class="small mb-0">DOI</label>
+          <input
+            id="doi"
+            type="text"
+            class="imc--input imc--flex--item-end"
+            aria-label="doi"
+            formControlName="doi"
+          />
+          <div
+            class="invalid-feedback d-block"
+            *ngIf="referenceForm.get('doi').dirty && referenceForm.get('doi').invalid"
+          >
+            Please provide a valid DOI
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <button
+    type="button"
+    class="btn btn-accent"
+    modal-button
+    [disabled]="referenceForm.invalid"
+    (click)="save()"
+  >
+    Save
+  </button>
+  <!--esito-->
+  <app-info
+    modal-button
+    [message]="save_result.message"
+    [result]="save_result.status"
+    *ngIf="save_result.visible"
+    (click)="save_result.visible = false"
+  ></app-info>
 </app-media-modal>

@@ -1,5 +1,5 @@
 // Layout per la modale
-@import 'vars';
+@import "vars";
 
 .imc--modal {
   z-index: 1050;
@@ -162,7 +162,7 @@
 
   .modal--list-info {
     box-sizing: border-box;
-    padding: 0 15px  0 20px !important;
+    padding: 0 15px 0 20px !important;
   }
 
   p {
@@ -182,7 +182,6 @@
 }
 
 .modal--list-thumb {
-
   span {
     background: $bg-dark;
     display: block;
@@ -197,7 +196,6 @@
 }
 
 .modal--accordion {
-
   .card {
     border-bottom: 1px solid $bg-dark;
     border-top: 1px solid $bg-dark;
@@ -212,7 +210,6 @@
   }
 
   .card-body {
-
     h3 {
       margin: 5px 20px;
     }
@@ -292,18 +289,16 @@
     left: 0 !important;
     top: 0 !important;
     width: auto;
-
   }
 
   .popover-body {
     padding: 0;
   }
-
 }
 
 .popover-left .popover {
   top: 25px !important;
-  left:0 !important;
+  left: 0 !important;
   max-width: unset;
 }
 

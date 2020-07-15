@@ -1,39 +1,72 @@
 <div class="media search-media">
-	<div class="media-left">
-		<span class="badge badge-warning revision" *ngIf="underRevision()">
-			<i class="fa fa-wrench"></i>
-		</span>
-		<img (contextmenu)="disableSaveAs($event)" src="{{media.links['thumbnail']}}" *ngIf="media.links['thumbnail']"/>
-		<img alt="no thumbnail" holder="holder.js/80x80?text=NO THUMBNAIL" *ngIf="media.links['thumbnail'] == null"/>
-		<div class="cn">
-			<div class="card inner bg-secondary small">
-				<i class="fa small" [ngClass]="{'fa-video': media._item[0].item_type.key === 'Video', 'fa-image': media._item[0].item_type.key === 'Image', 'fa-align-left': media._item[0].item_type.key === 'Text'}">&nbsp;&nbsp;{{media._record_sources[0]._provider[0].identifier || 'n/a'}}</i>
-			</div>
-		</div>
-	</div>
-	<div class="media-body">
-		<div>
-			<h4 class="media-heading">
-			<a [routerLink]="['images', media.id]" *ngIf="media.type == 'nonaventity'" class="blue">{{identifyingTitle}}</a>
-			<a [routerLink]="['videos', media.id]" *ngIf="media.type == 'aventity'" class="blue">{{identifyingTitle}}</a>
-			</h4>
-			<span>
-				<i *ngIf="media.production_years > 0">({{media.production_years[0]}})</i>
-				<i *ngIf="media.date_created > 0">({{media.date_created[0]}})</i>
-			</span>
-		</div>
-		<div class="space-4"></div>
-		<p class="text" *ngIf="description">
-			<i class="imc-icon fa fa-quote-left"></i>
-			{{description}}
-		</p>
-		<div class="search-actions text-center">
-			<div class="duration" *ngIf="media.type == 'aventity'">
-				<i class="imc-icon fa fa-clock-o"></i>
-				<span class="blue">{{media._item[0].duration | duration}}</span>
-			</div>
-			<span class="badge badge-primary label-city">{{(media._record_sources[0]._provider[0].identifier | providerToCity) || 'n/a'}}</span>
-			<!-- <div class="action-buttons bigger-125 pull-down">
+  <div class="media-left">
+    <span class="badge badge-warning revision" *ngIf="underRevision()">
+      <i class="fa fa-wrench"></i>
+    </span>
+    <img
+      (contextmenu)="disableSaveAs($event)"
+      src="{{ media.links['thumbnail'] }}"
+      *ngIf="media.links['thumbnail']"
+    />
+    <img
+      alt="no thumbnail"
+      holder="holder.js/80x80?text=NO THUMBNAIL"
+      *ngIf="media.links['thumbnail'] == null"
+    />
+    <div class="cn">
+      <div class="card inner bg-secondary small">
+        <i
+          class="fa small"
+          [ngClass]="{
+            'fa-video': media._item[0].item_type.key === 'Video',
+            'fa-image': media._item[0].item_type.key === 'Image',
+            'fa-align-left': media._item[0].item_type.key === 'Text'
+          }"
+          >&nbsp;&nbsp;{{
+            media._record_sources[0]._provider[0].identifier || "n/a"
+          }}</i
+        >
+      </div>
+    </div>
+  </div>
+  <div class="media-body">
+    <div>
+      <h4 class="media-heading">
+        <a
+          [routerLink]="['images', media.id]"
+          *ngIf="media.type == 'nonaventity'"
+          class="blue"
+          >{{ identifyingTitle }}</a
+        >
+        <a
+          [routerLink]="['videos', media.id]"
+          *ngIf="media.type == 'aventity'"
+          class="blue"
+          >{{ identifyingTitle }}</a
+        >
+      </h4>
+      <span>
+        <i *ngIf="media.production_years > 0"
+          >({{ media.production_years[0] }})</i
+        >
+        <i *ngIf="media.date_created > 0">({{ media.date_created[0] }})</i>
+      </span>
+    </div>
+    <div class="space-4"></div>
+    <p class="text" *ngIf="description">
+      <i class="imc-icon fa fa-quote-left"></i>
+      {{ description }}
+    </p>
+    <div class="search-actions text-center">
+      <div class="duration" *ngIf="media.type == 'aventity'">
+        <i class="imc-icon fa fa-clock-o"></i>
+        <span class="blue">{{ media._item[0].duration | duration }}</span>
+      </div>
+      <span class="badge badge-primary label-city">{{
+        (media._record_sources[0]._provider[0].identifier | providerToCity) ||
+          "n/a"
+      }}</span>
+      <!-- <div class="action-buttons bigger-125 pull-down">
 				<a href="#">
 					<i class="imc-icon fa fa-eye light-blue"></i>
 				</a>
@@ -44,6 +77,6 @@
 					<i class="imc-icon fa fa-heart light-blue"></i>
 				</a>
 			</div> -->
-		</div>
-	</div>
+    </div>
+  </div>
 </div>

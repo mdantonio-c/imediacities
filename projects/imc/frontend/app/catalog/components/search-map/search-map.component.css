@@ -4,102 +4,102 @@
 }
 
 #custom-control .imc-icon:hover {
-	color: #333 !important
+  color: #333 !important;
 }
 
 #custom-control {
-	user-select: none;
-	box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
-	border-radius: 2px;
-	cursor: pointer;
-	background-color: rgb(255, 255, 255);
-	width: 28px;
-	height: 56px;
-	margin: 10px;
+  user-select: none;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+  border-radius: 2px;
+  cursor: pointer;
+  background-color: rgb(255, 255, 255);
+  width: 28px;
+  height: 56px;
+  margin: 10px;
 }
 
 #custom-control button {
-	background: none;
-	display: block;
-	border: 0px;
-	margin: 0px;
-	padding: 0px;
-	position: relative;
-	cursor: pointer;
-	user-select: none;
-	width: 28px;
-	height: 28px;
-	top: 0px;
-	left: 0px;
+  background: none;
+  display: block;
+  border: 0px;
+  margin: 0px;
+  padding: 0px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  width: 28px;
+  height: 28px;
+  top: 0px;
+  left: 0px;
 }
 
 #custom-control .separator {
-	position: relative;
-	overflow: hidden;
-	width: 67%;
-	height: 1px;
-	left: 16%;
-	background-color: rgb(230, 230, 230);
-	top: 0px;
+  position: relative;
+  overflow: hidden;
+  width: 67%;
+  height: 1px;
+  left: 16%;
+  background-color: rgb(230, 230, 230);
+  top: 0px;
 }
 
 #place-control {
-	margin: 10px;
-	line-height: 24px;
+  margin: 10px;
+  line-height: 24px;
 }
 
 #place-control input {
-	width: 280px;
-	font-size: small;
-	padding-left: 5px;
+  width: 280px;
+  font-size: small;
+  padding-left: 5px;
 }
 
 #infowindow-content .place-info .title {
-	color: #6e7a7f;
-    font-weight: bold;
-    font-size: 14px;
+  color: #6e7a7f;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 #infowindow-content .place-item-list {
-	border-top: 1px solid rgb(204, 204, 204);
-	margin-top: 9px;
-	padding: 6px;
-	font-size: 13px;
-	max-height: 80px;
-    overflow: auto;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	font-family: Roboto, Arial;
+  border-top: 1px solid rgb(204, 204, 204);
+  margin-top: 9px;
+  padding: 6px;
+  font-size: 13px;
+  max-height: 80px;
+  overflow: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: Roboto, Arial;
 }
 
 #infowindow-content .place-item-list a {
-	cursor: pointer;
-	color: rgb(66, 127, 237);
-	text-decoration: none;
-	padding: 0px 4px;
+  cursor: pointer;
+  color: rgb(66, 127, 237);
+  text-decoration: none;
+  padding: 0px 4px;
 }
 
 .map-counter-panel {
-	top: -30px;
-    left: -11px;
-    position: absolute;
-	border: 4px double #e08374;
-	background: #ffffff;
-	border-radius: 2px;
-	padding: 3px;
-	font-weight: 700;
-	text-align: center;
-	min-width: 25px;
+  top: -30px;
+  left: -11px;
+  position: absolute;
+  border: 4px double #e08374;
+  background: #ffffff;
+  border-radius: 2px;
+  padding: 3px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 25px;
 }
 .map-counter-panel:before {
-	position: absolute;
-	display: inline-block;
-	top: 22px;
-	left: 1px !important;
-	right: auto;
-	border-right: 6px solid transparent !important;
-    border-top: 6px solid #e08374 !important;
-    border-bottom: 0 solid #e08374 !important;
-    border-left: 6px solid transparent !important;
-    content: " ";
+  position: absolute;
+  display: inline-block;
+  top: 22px;
+  left: 1px !important;
+  right: auto;
+  border-right: 6px solid transparent !important;
+  border-top: 6px solid #e08374 !important;
+  border-bottom: 0 solid #e08374 !important;
+  border-left: 6px solid transparent !important;
+  content: " ";
 }

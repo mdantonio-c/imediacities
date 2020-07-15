@@ -1,22 +1,31 @@
 <div class="imc--card space-paragraph-sm-20">
-    <div class="imc--toolbar">
-        <input type="text" class="imc--input--no-line imc--input-search"
-               placeholder="Search in tags" aria-label="Search in tags" (keyup)="annotations_filter($event)">
+  <div class="imc--toolbar">
+    <input
+      type="text"
+      class="imc--input--no-line imc--input-search"
+      placeholder="Search in tags"
+      aria-label="Search in tags"
+      (keyup)="annotations_filter($event)"
+    />
+  </div>
+  <div class="content">
+    <ng-template ngFor let-annotation [ngForOf]="annotations.visualizzate">
+      <app-media-annotation
+        [clickable]="true"
+        [annotation]="annotation"
+        [tag]="true"
+        (click)="annotation_show($event, annotation)"
+      >
+      </app-media-annotation>
+    </ng-template>
+    <div class="imc--flex--horizontal-end">
+      <button
+        type="button"
+        class="btn btn-border-classic"
+        (click)="all_tags_show()"
+      >
+        Show all
+      </button>
     </div>
-    <div class="content">
-        <ng-template
-                ngFor
-                let-annotation
-                [ngForOf]="annotations.visualizzate">
-            <app-media-annotation
-                    [clickable]="true"
-                    [annotation]="annotation"
-                    [tag]="true"
-                    (click)="annotation_show($event, annotation)">
-            </app-media-annotation>
-        </ng-template>
-        <div class="imc--flex--horizontal-end">
-            <button type="button" class="btn btn-border-classic" (click)="all_tags_show()">Show all</button>
-        </div>
-    </div>
+  </div>
 </div>

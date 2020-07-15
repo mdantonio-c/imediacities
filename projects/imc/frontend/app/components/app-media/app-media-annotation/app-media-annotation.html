@@ -1,16 +1,16 @@
 <span class="badge" [ngClass]="{'click-event': clickable}">
-    <span
-        [innerHTML]="annotation.name"></span>
-    <span *ngIf="tag && annotation.count>1">&nbsp;({{annotation.count}})</span>
-    <i
-        *ngIf="can_delete"
-        class="material-icons click-event"
-        mwlConfirmationPopover
-        [isDisabled]="disable_confirmation"
-        [popoverTitle]="popover.popoverTitle + ' \'' + annotation.name + '\'?'"
-        [popoverMessage]="popover.popoverMessage"
-        [appendToBody]="popover.appendToBody"
-        (confirm)="delete()"
-        (click)="cancella_senza_popover()"
-    >close</i>
+  <span [innerHTML]="annotation.name"></span>
+  <span *ngIf="tag && annotation.count>1">&nbsp;({{annotation.count}})</span>
+  <i
+    *ngIf="can_delete"
+    class="material-icons click-event"
+    mwlConfirmationPopover
+    [isDisabled]="disable_confirmation"
+    [popoverTitle]="popover.popoverTitle + ' \'' + annotation.name + '\'?'"
+    [popoverMessage]="popover.popoverMessage"
+    [appendToBody]="popover.appendToBody"
+    (confirm)="delete()"
+    (click)="cancella_senza_popover()"
+    >close</i
+  >
 </span>

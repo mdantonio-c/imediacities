@@ -1,8 +1,8 @@
 //  Variabili globali condivise dai componenti
-@import url('https://fonts.googleapis.com/css?family=Maven+Pro:400,500');
+@import url("https://fonts.googleapis.com/css?family=Maven+Pro:400,500");
 
 // Font utilizzato
-$font-family: 'Maven Pro', sans-serif;
+$font-family: "Maven Pro", sans-serif;
 $font-size: 16px;
 $font-size-small: 12px;
 $font-size-title: 20px;
@@ -26,8 +26,6 @@ $badge-geotag-active: #f7a84c;
 $termtag-color: #824eb5;
 $badge-termtag-active: #b87ef1;
 
-
-
 $theme-video-color: #53b8e2;
 $theme-image-color: #e43432;
 
@@ -36,7 +34,7 @@ $box-shadow-card: 0 3px 4px 0 rgba(0, 0, 0, 0.16);
 $box-shadow-small-card: 0 1px 4px 0 rgba(0, 0, 0, 0.18);
 
 // Animations
-$transition-all: all .25s ease-out;
+$transition-all: all 0.25s ease-out;
 
 //Standard padding
 $padding-card: 25px;

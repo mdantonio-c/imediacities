@@ -5,14 +5,13 @@
 			};
 		})
 * */
-import {Pipe, PipeTransform} from '@angular/core';
+import { Pipe, PipeTransform } from "@angular/core";
 
 @Pipe({
-    name: 'nocomma'
+  name: "nocomma",
 })
-
 export class NoCommaPipe implements PipeTransform {
-    transform(value: any, ...args: any[]): any {
-        return (!value) ? '' : value.replace(/,/g, '');
-    }
+  transform(value: any, ...args: any[]): any {
+    return !value ? "" : value.replace(/,/g, "");
+  }
 }

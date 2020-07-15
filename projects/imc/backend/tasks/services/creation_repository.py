@@ -1,9 +1,9 @@
 from datetime import datetime
-import pytz
 
-from restapi.utilities.logs import log
-from restapi.connectors.neo4j import graph_transactions
+import pytz
 from neomodel.cardinality import CardinalityViolation
+from restapi.connectors.neo4j import graph_transactions
+from restapi.utilities.logs import log
 
 
 class CreationRepository:
@@ -29,7 +29,7 @@ class CreationRepository:
                 self.delete_non_av_entity(existing_creation)
             log.info("Existing creation [UUID:{0}] deleted", creation_id)
             # use the same uuid for the new replacing creation
-            properties['uuid'] = creation_id
+            properties["uuid"] = creation_id
 
         entity = (
             self.graph.AVEntity(**properties).save()
@@ -41,47 +41,47 @@ class CreationRepository:
 
         # add relatioships
         for r in relationships.keys():
-            if r == 'record_sources':
+            if r == "record_sources":
                 # connect to record sources
                 for item in relationships[r]:
                     record_source = self.graph.RecordSource(**item[0]).save()
                     entity.record_sources.connect(record_source)
                     # look for existing content provider
                     provider = self.find_provider_by_identifier(
-                        item[1]['identifier'], item[1]['scheme']
+                        item[1]["identifier"], item[1]["scheme"]
                     )
                     if provider is None:
                         provider = self.graph.Provider(**item[1]).save()
                     record_source.provider.connect(provider)
-            elif r == 'titles':
+            elif r == "titles":
                 # connect to titles
                 for title in relationships[r]:
                     # if 'relation' not in title:
                     #     title['relation'] = 'Original title'
                     title_node = self.graph.Title(**title).save()
                     entity.titles.connect(title_node)
-            elif r == 'keywords':
+            elif r == "keywords":
                 # connect to keywords
                 for props in relationships[r]:
                     keyword = self.graph.Keyword(**props).save()
                     entity.keywords.connect(keyword)
-            elif r == 'descriptions':
+            elif r == "descriptions":
                 for props in relationships[r]:
                     description = self.graph.Description(**props).save()
                     entity.descriptions.connect(description)
-            elif r == 'languages':
+            elif r == "languages":
                 # connect to languages
                 for lang_usage in relationships[r]:
                     lang = self.graph.Language.nodes.get_or_none(code=lang_usage[0])
                     if lang is None:
                         lang = self.graph.Language(code=lang_usage[0]).save()
-                    entity.languages.connect(lang, {'usage': lang_usage[1]})
-            elif r == 'coverages':
+                    entity.languages.connect(lang, {"usage": lang_usage[1]})
+            elif r == "coverages":
                 for props in relationships[r]:
                     # connect to coverages
                     coverage = self.graph.Coverage(**props).save()
                     entity.coverages.connect(coverage)
-            elif av and r == 'production_countries':
+            elif av and r == "production_countries":
                 for country_reference in relationships[r]:
                     country = self.graph.Country.nodes.get_or_none(
                         code=country_reference[0]
@@ -89,32 +89,32 @@ class CreationRepository:
                     if country is None:
                         country = self.graph.Country(code=country_reference[0]).save()
                     entity.production_countries.connect(
-                        country, {'reference': country_reference[1]}
+                        country, {"reference": country_reference[1]}
                     )
-            elif av and r == 'video_format' and relationships[r] is not None:
+            elif av and r == "video_format" and relationships[r] is not None:
                 video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
-            elif r == 'agents':
+            elif r == "agents":
                 for agent_activities in relationships[r]:
                     # look for existing agents
                     props = agent_activities[0]
-                    res = self.find_agents_by_name(props['names'][0])
+                    res = self.find_agents_by_name(props["names"][0])
                     if len(res) > 0:
-                        log.debug('Found existing agent: {}', res[0].names)
+                        log.debug("Found existing agent: {}", res[0].names)
                         agent = res[0]
                     else:
                         agent = self.graph.Agent(**props).save()
                     entity.contributors.connect(
-                        agent, {'activities': agent_activities[1]}
+                        agent, {"activities": agent_activities[1]}
                     )
-            elif r == 'rightholders':
+            elif r == "rightholders":
                 for props in relationships[r]:
                     # look for existing rightholder
-                    rightholder = self.find_rightholder_by_name(props['name'])
+                    rightholder = self.find_rightholder_by_name(props["name"])
                     if rightholder is None:
                         rightholder = self.graph.Rightholder(**props).save()
                     else:
-                        log.debug('Found existing rightholder: {}', rightholder.name)
+                        log.debug("Found existing rightholder: {}", rightholder.name)
                     entity.rightholders.connect(rightholder)
 
         return entity
@@ -148,14 +148,14 @@ class CreationRepository:
         if video_format is not None:
             video_format.delete()
         av_entity.delete()
-        log.debug('Delete AVEntity with uuid {}', uuid)
+        log.debug("Delete AVEntity with uuid {}", uuid)
 
     def delete_non_av_entity(self, node):
         self.__delete_entity(node)
         non_av_entity = node.downcast()
         uuid = non_av_entity.uuid
         non_av_entity.delete()
-        log.debug('Delete NonAVEntity with uuid {}', uuid)
+        log.debug("Delete NonAVEntity with uuid {}", uuid)
 
     def search_item_by_term(self, term, item_type):
         """
@@ -166,14 +166,14 @@ class CreationRepository:
         pass
 
     def find_agents_by_name(self, name):
-        log.debug('Find all agents with name: {}', name)
+        log.debug("Find all agents with name: {}", name)
         name = self.graph.sanitize_input(name)
         query = "MATCH (a:Agent) WHERE '{name}' in a.names RETURN a"
         results = self.graph.cypher(query.format(name=name))
         return [self.graph.Agent.inflate(row[0]) for row in results]
 
     def find_provider_by_identifier(self, pid, scheme):
-        log.debug('Find provider by identifier [{}, {}]', pid, scheme)
+        log.debug("Find provider by identifier [{}, {}]", pid, scheme)
         # query = "MATCH (p:Provider {identifier: '{pid}', \
         # scheme:'{scheme}'}) RETURN p"
         # results = self.graph.Provider.cypher(
@@ -182,7 +182,7 @@ class CreationRepository:
         return self.graph.Provider.nodes.get_or_none(identifier=pid, scheme=scheme)
 
     def find_rightholder_by_name(self, name):
-        log.debug('Find rightholder by name: {}', name)
+        log.debug("Find rightholder by name: {}", name)
         return self.graph.Rightholder.nodes.get_or_none(name=name)
 
     def item_belongs_to_user(self, item, user):
@@ -192,7 +192,7 @@ class CreationRepository:
         return item.ownership.is_connected(group)
 
     def move_video_under_revision(self, item, user):
-        item.revision.connect(user, {'when': datetime.now(pytz.utc), 'state': 'W'})
+        item.revision.connect(user, {"when": datetime.now(pytz.utc), "state": "W"})
 
     def exit_video_under_revision(self, item):
         item.revision.disconnect_all()
@@ -214,7 +214,7 @@ class CreationRepository:
         return item.public_access
 
     def get_belonging_city(self, item):
-        log.debug('Look for belonging city for item {}', item.uuid)
+        log.debug("Look for belonging city for item {}", item.uuid)
         query = (
             "MATCH (i:Item {{uuid:'{item_id}'}})-[:CREATION]-()"
             "-[:RECORD_SOURCE]->()-[:PROVIDED_BY]->(p:Provider) "

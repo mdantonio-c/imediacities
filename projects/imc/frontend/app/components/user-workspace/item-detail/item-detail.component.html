@@ -1,79 +1,137 @@
 <div class="card item-detail">
   <div class="media-image-wrapper">
     <ng-template #tipContent>
-      <ng-container *ngIf="media.listItem">Remove item from list</ng-container >
-      <ng-container *ngIf="media.type === 'list'">Delete the list</ng-container >
+      <ng-container *ngIf="media.listItem">Remove item from list</ng-container>
+      <ng-container *ngIf="media.type === 'list'">Delete the list</ng-container>
     </ng-template>
-  	<span class="badge item-del" *ngIf="(media.type === 'list' || media.listItem) && media.focus">
-      <i class="material-icons click-event" 
-      	(click)="delete()"
+    <span
+      class="badge item-del"
+      *ngIf="(media.type === 'list' || media.listItem) && media.focus"
+    >
+      <i
+        class="material-icons click-event"
+        (click)="delete()"
         [ngbTooltip]="tipContent"
         placement="bottom"
-        container="body">cancel_presentation</i>
-		</span>
+        container="body"
+        >cancel_presentation</i
+      >
+    </span>
     <ng-template #optionsContent>
       <ul id="item-menu-options" class="nav flex-column">
         <li class="nav-item">
-          <a class="nav-link click-event p-0" [routerLink]=""
-            (click)="toggleEdit()"><i class="fa fa-edit"></i> Edit</a>
+          <a
+            class="nav-link click-event p-0"
+            [routerLink]=""
+            (click)="toggleEdit()"
+            ><i class="fa fa-edit"></i> Edit</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link click-event p-0"
+          <a
+            class="nav-link click-event p-0"
             [attr.href]="getVGalleryURL()"
-            target="_blank">
-            <i class="fa fa-cube" aria-hidden="true"></i> Virtual Gallery</a>
+            target="_blank"
+          >
+            <i class="fa fa-cube" aria-hidden="true"></i> Virtual Gallery</a
+          >
         </li>
       </ul>
     </ng-template>
     <span class="badge item-options" *ngIf="media.type === 'list'">
-      <i class="material-icons click-event"
+      <i
+        class="material-icons click-event"
         [ngbPopover]="optionsContent"
         placement="right"
-        container="body">more_vert</i>
+        container="body"
+        >more_vert</i
+      >
     </span>
-		<span class="search-item label bigger-110">
-			<span class="fa-stack">
-				<i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.thumbnail"></i>
-				<i class="fa fa-circle fa-stack-2x" *ngIf="media.thumbnail"></i>
-				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video': media.type === 'aventity', 'fa-camera': media.type === 'nonaventity'}"></i>
-			</span>
-		</span>
-        <img holderjs
-             [attr.data-src]="'holder.js/146x110?text=NO THUMBNAIL'"
-             *ngIf="!media.thumbnail" (contextmenu)="disableSaveAs($event)">
-		<img (contextmenu)="disableSaveAs($event)" src="{{media.thumbnail}}" *ngIf="media.thumbnail" class="img-fluid"/>
-		<span *ngIf="media.type === 'aventity'" class="anteprima-duration" [innerHTML]="media.duration | secondsToTime"></span>
-    <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge">shot {{media.ref.shot_num + 1}}</span>
-	</div>
+    <span class="search-item label bigger-110">
+      <span class="fa-stack">
+        <i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.thumbnail"></i>
+        <i class="fa fa-circle fa-stack-2x" *ngIf="media.thumbnail"></i>
+        <i
+          class="fa fa-stack-1x light-blue"
+          [ngClass]="{
+            'fa-video': media.type === 'aventity',
+            'fa-camera': media.type === 'nonaventity'
+          }"
+        ></i>
+      </span>
+    </span>
+    <img
+      holderjs
+      [attr.data-src]="'holder.js/146x110?text=NO THUMBNAIL'"
+      *ngIf="!media.thumbnail"
+      (contextmenu)="disableSaveAs($event)"
+    />
+    <img
+      (contextmenu)="disableSaveAs($event)"
+      src="{{ media.thumbnail }}"
+      *ngIf="media.thumbnail"
+      class="img-fluid"
+    />
+    <span
+      *ngIf="media.type === 'aventity'"
+      class="anteprima-duration"
+      [innerHTML]="media.duration | secondsToTime"
+    ></span>
+    <span *ngIf="media?.ref?.type === 'shot'" class="anteprima-shot--badge"
+      >shot {{ media.ref.shot_num + 1 }}</span
+    >
+  </div>
   <div class="card-body">
     <ng-container *ngIf="editable">
-    <h5 class="card-title" *ngIf="media.nb_items !== undefined">{{media.nb_items}} item(s)</h5>
-    <form class="item-edit">
-      <input name="title" [(ngModel)]="mediaForm.name" class="mb-1">
-      <textarea name="description" [(ngModel)]="mediaForm.description"></textarea>
-    </form>
+      <h5 class="card-title" *ngIf="media.nb_items !== undefined">
+        {{ media.nb_items }} item(s)
+      </h5>
+      <form class="item-edit">
+        <input name="title" [(ngModel)]="mediaForm.name" class="mb-1" />
+        <textarea
+          name="description"
+          [(ngModel)]="mediaForm.description"
+        ></textarea>
+      </form>
     </ng-container>
     <ng-container *ngIf="!editable">
-    <h5 class="card-title"*ngIf="media.nb_items !== undefined">{{media.nb_items}} item(s)</h5>
-    <h5 class="card-title blue">{{media.title}}</h5>
-    <p class="card-text" *ngIf="media.description"><i class="imc-icon fa fa-quote-left"></i>{{media.description}}</p>
+      <h5 class="card-title" *ngIf="media.nb_items !== undefined">
+        {{ media.nb_items }} item(s)
+      </h5>
+      <h5 class="card-title blue">{{ media.title }}</h5>
+      <p class="card-text" *ngIf="media.description">
+        <i class="imc-icon fa fa-quote-left"></i>{{ media.description }}
+      </p>
     </ng-container>
   </div>
   <div class="card-footer p-0" *ngIf="media.focus || editable">
     <ng-container *ngIf="!editable">
-    <span class="imc--flex--vertical-center imc--flex--horizontal-center">
-      <i class="material-icons click-event" (click)="loadListItems()" *ngIf="media.type === 'list'"
-        ngbTooltip="Open the contents of my list"
-        placement="top"
-        container="body">expand_more</i>
-      <i class="material-icons click-event" (click)="route()" *ngIf="media.type !== 'list'"
-        ngbTooltip="Open the content page"
-        placement="top"
-        container="body">launch</i>
-    </span>
+      <span class="imc--flex--vertical-center imc--flex--horizontal-center">
+        <i
+          class="material-icons click-event"
+          (click)="loadListItems()"
+          *ngIf="media.type === 'list'"
+          ngbTooltip="Open the contents of my list"
+          placement="top"
+          container="body"
+          >expand_more</i
+        >
+        <i
+          class="material-icons click-event"
+          (click)="route()"
+          *ngIf="media.type !== 'list'"
+          ngbTooltip="Open the content page"
+          placement="top"
+          container="body"
+          >launch</i
+        >
+      </span>
     </ng-container>
     <ng-container *ngIf="editable">
-      <span class="imc--flex--vertical-center" style="justify-content: flex-end;">
+      <span
+        class="imc--flex--vertical-center"
+        style="justify-content: flex-end;"
+      >
         <i class="material-icons click-event" (click)="cancel()">cancel</i>
         <i class="material-icons click-event mr-1" (click)="save()">save</i>
       </span>

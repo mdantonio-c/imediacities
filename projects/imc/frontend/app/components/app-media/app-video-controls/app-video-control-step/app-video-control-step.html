@@ -1,8 +1,12 @@
 <div class="controls__status controls__row">
-    <span>Step x frames</span>
+  <span>Step x frames</span>
 </div>
 <div class="controls__status controls__row">
-    <i class="material-icons control_button" (click)="step_prev()">navigate_before</i>
-    <input type="text" inputNumeric inputSelect [(ngModel)]="step_value">
-    <i class="material-icons control_button" (click)="step_next()">navigate_next</i>
+  <i class="material-icons control_button" (click)="step_prev()"
+    >navigate_before</i
+  >
+  <input type="text" inputNumeric inputSelect [(ngModel)]="step_value" />
+  <i class="material-icons control_button" (click)="step_next()"
+    >navigate_next</i
+  >
 </div>

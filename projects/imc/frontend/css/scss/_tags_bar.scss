@@ -1,4 +1,4 @@
-@import 'vars';
+@import "vars";
 
 .imc--video-tag-bar {
   background: $bg-dark;
@@ -16,7 +16,7 @@
 
 .imc--video-tag--button {
   background: $bg-dark;
-  border: 1px solid rgba($border, .5);
+  border: 1px solid rgba($border, 0.5);
   //cursor: pointer;
   text-align: center;
   transition: $transition-all;

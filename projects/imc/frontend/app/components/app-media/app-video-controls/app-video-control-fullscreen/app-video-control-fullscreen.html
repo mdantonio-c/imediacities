@@ -1,6 +1,12 @@
 <div class="controls__status">
-    <span id="fullscreen">
-        <span #fullscreen_on [ngClass]="{'display-none': fullscreen_stato === 'on'}"><i class="material-icons control_button">fullscreen</i></span>
-        <span #fullscreen_off [ngClass]="{'display-none': fullscreen_stato === 'off'}"><i class="material-icons control_button">fullscreen_exit</i></span>
-    </span>
+  <span id="fullscreen">
+    <span #fullscreen_on [ngClass]="{'display-none': fullscreen_stato === 'on'}"
+      ><i class="material-icons control_button">fullscreen</i></span
+    >
+    <span
+      #fullscreen_off
+      [ngClass]="{'display-none': fullscreen_stato === 'off'}"
+      ><i class="material-icons control_button">fullscreen_exit</i></span
+    >
+  </span>
 </div>

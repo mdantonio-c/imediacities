@@ -1,38 +1,39 @@
 // Variabili
-@import 'vars';
+@import "vars";
 // Tema e layout customizzato
-@import 'theme';
+@import "theme";
 // Header del sito
-@import 'header';
+@import "header";
 // Topbar
-@import 'topbar';
+@import "topbar";
 // Tabs
-@import 'tabs';
+@import "tabs";
 // Badge per i tag
-@import 'badge';
+@import "badge";
 // Buttons customizzati
-@import 'buttons';
+@import "buttons";
 // Commenti
-@import 'comments';
+@import "comments";
 // Tabs shots/segments/areas
-@import 'tabs_shots';
+@import "tabs_shots";
 // Media map
-@import 'media_map';
+@import "media_map";
 // Modal
-@import 'modal';
+@import "modal";
 // Tags bar sotto al player
-@import 'tags_bar';
+@import "tags_bar";
 // Layout dell'accordio multilivello (vocabolario)
-@import 'multilevel_accordion';
+@import "multilevel_accordion";
 // Layout Picture
-@import '_layout_picture';
-@import 'search-term-results';
-@import '_app-info';
-@import '_app-notes';
-@import '_app-references';
+@import "_layout_picture";
+@import "search-term-results";
+@import "_app-info";
+@import "_app-notes";
+@import "_app-references";
 
 // Stile generale
-body, a {
+body,
+a {
   color: $text-color;
   font-size: $font-size !important;
   font-family: $font-family;

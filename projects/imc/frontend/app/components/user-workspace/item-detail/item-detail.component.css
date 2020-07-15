@@ -1,88 +1,88 @@
 .item-detail {
-	max-width: 150px;
-	border: none;
+  max-width: 150px;
+  border: none;
 }
 
 .item-detail .card-body {
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column;
-	margin-top: 8px;
-    padding: .25rem;
-    height: 135px;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  margin-top: 8px;
+  padding: 0.25rem;
+  height: 135px;
 }
 
 .item-detail .card-title,
 .item-detail .card-text {
-	font-size: small;	
+  font-size: small;
 }
 .item-detail .card-title {
-    margin-bottom: .4rem;
+  margin-bottom: 0.4rem;
 }
 .item-detail .card-text {
-    margin-bottom: 1.2rem;
+  margin-bottom: 1.2rem;
 }
 
 .item-detail .card-text {
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.2;
-    font-size: .65em;
-    max-height: 100px;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  font-size: 0.65em;
+  max-height: 100px;
 }
 
 .item-detail .search-item.label {
-	bottom: -20px !important;
+  bottom: -20px !important;
 }
 
 .item-detail .media-image-wrapper {
-    padding-top: 2px;
-	justify-content: center;
-    display: flex;
-    outline: none;
+  padding-top: 2px;
+  justify-content: center;
+  display: flex;
+  outline: none;
 }
 
 .item-detail .media-image-wrapper img {
-	height: 110px;
-    display: block;
-    padding: 0px 2px;
+  height: 110px;
+  display: block;
+  padding: 0px 2px;
 }
 
 .item-detail .card-footer {
-    margin-top: -25px;
+  margin-top: -25px;
 }
 
 .item-detail .item-del .material-icons,
 .item-detail .item-options .material-icons {
-    color: #707070;
-    font-size: 16px !important;
+  color: #707070;
+  font-size: 16px !important;
 }
 
 .media-image-wrapper .anteprima-duration,
 .media-image-wrapper .anteprima-shot--badge {
-	position: absolute;
-    bottom: 5px;
-    padding: 0 2px;
-    background: #000;
-    font-size: 12px;
-    font-weight: bold;
-    color: #fff;
+  position: absolute;
+  bottom: 5px;
+  padding: 0 2px;
+  background: #000;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
 }
 .media-image-wrapper .anteprima-duration {
-    right: 5px;
+  right: 5px;
 }
 .media-image-wrapper .anteprima-shot--badge {
-    left: 5px;
+  left: 5px;
 }
 
 .item-detail .item-edit input,
 .item-detail .item-edit textarea {
-    width: 142px;
-    font-size: small;
+  width: 142px;
+  font-size: small;
 }
 .item-detail .item-edit textarea {
-    resize: none;
-    height: 48px;
+  resize: none;
+  height: 48px;
 }

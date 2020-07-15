@@ -1,70 +1,92 @@
 <div class="modal-body">
+  <div class="row no-gutters">
+    <div class="mr-auto">
+      <h4 *ngIf="media_type === 'video'">
+        Shot: {{shot_corrente.shot_num+1}}
+        <ng-container *ngIf="revision"
+          >&nbsp; - Shot: {{shot_corrente.shot_num+2}}</ng-container
+        >
+      </h4>
+    </div>
+    <div class="ml-auto">
+      <app-add-to-list
+        [item_id]="data.shots[0].id"
+        [item_type]="(media_type === 'video') ? 'shot' : 'item'"
+        [flag]="'inner'"
+        *ngIf="user && user.roles['Researcher']"
+      ></app-add-to-list>
+    </div>
+  </div>
 
-    <div class="row no-gutters">
-        <div class="mr-auto">
-            <h4 *ngIf="media_type === 'video'">Shot: {{shot_corrente.shot_num+1}}
-            <ng-container *ngIf="revision">&nbsp; - Shot: {{shot_corrente.shot_num+2}}</ng-container>
-            </h4>
+  <div class="row modal-body-content">
+    <!-- Video preview -->
+    <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
+      <ng-template [ngIf]="media_type === 'video'">
+        <ng-container *ngIf="!revision">
+          <div class="row">
+            <span class="col-12 col-lg-3 pr-0"
+              ><strong [innerHTML]="shot_corrente.timestamp"></strong
+            ></span>
+            <span class="col-6 col-lg-7 imc--flex--horizontal-center"
+              >frame-range:
+              <span [innerHTML]="shot_corrente.start_frame_idx"></span>
+              -
+              <span [innerHTML]="shot_corrente.end_frame_idx"></span>
+            </span>
+            <span class="col-6 col-lg-2 imc--flex--horizontal-end">
+              duration:&nbsp;
+              <span [innerHTML]="shot_corrente.duration | number:'2.2'"></span>
+              s
+            </span>
+          </div>
+        </ng-container>
+
+        <!-- Video player -->
+        <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
+          <app-video-player
+            #videoPlayer
+            layout="modale"
+            [data]="mediaData"
+            [shots]="shots"
+            [revision]="revision"
+          ></app-video-player>
+        </span>
+
+        <!-- Previews of other shots after multiple selection -->
+        <div
+          class="col-12 row no-gutters mt-2"
+          *ngIf="!revision && data.shots.length > 1"
+        >
+          <span
+            class="imc--thumb"
+            *ngFor="let shot of data.shots let index = index"
+            [ngClass]="{active: shot.shot_num === shot_corrente.shot_num}"
+            [ngStyle]="{border: shot.shot_num === shot_corrente.shot_num ? '5px solid' : 0}"
+            (click)="shot_cambia(index)"
+          >
+            <img [src]="shot.links.thumbnail" alt="" />
+            <span
+              [innerHTML]="shot.duration | number:'2.2'"
+              class="duration"
+            ></span>
+            <span class="shot-number" [innerHTML]="shot.shot_num+1">3</span>
+          </span>
         </div>
-        <div class="ml-auto" >
-            <app-add-to-list
-                [item_id]="data.shots[0].id"
-                [item_type]="(media_type === 'video') ? 'shot' : 'item'"
-                [flag]="'inner'"
-                *ngIf="user && user.roles['Researcher']"></app-add-to-list>
-        </div>
+      </ng-template>
+      <ng-template [ngIf]="media_type !== 'video'">
+        <img [src]="mediaData.links.content" class="img-fluid" />
+      </ng-template>
     </div>
 
-    <div class="row modal-body-content">
-
-        <!-- Video preview -->
-        <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
-            <ng-template [ngIf]="media_type === 'video'">
-                <ng-container *ngIf="!revision">
-                <div class="row">
-                    <span class="col-12 col-lg-3 pr-0"><strong [innerHTML]="shot_corrente.timestamp"></strong></span>
-                    <span class="col-6 col-lg-7 imc--flex--horizontal-center">frame-range:
-                        <span [innerHTML]="shot_corrente.start_frame_idx"></span>
-                        -
-                        <span [innerHTML]="shot_corrente.end_frame_idx"></span>
-                    </span>
-                    <span class="col-6 col-lg-2 imc--flex--horizontal-end">
-                       duration:&nbsp; <span [innerHTML]="shot_corrente.duration | number:'2.2'"></span> s
-                    </span>
-                </div>
-                </ng-container>
-
-                <!-- Video player -->
-                <span class="col-12 modal-media--anteprima" *ngIf="mediaData">
-                   <app-video-player #videoPlayer layout="modale" [data]="mediaData" [shots]="shots" [revision]="revision"></app-video-player>
-               </span>
-
-                <!-- Previews of other shots after multiple selection -->
-                <div class="col-12 row no-gutters mt-2" *ngIf="!revision && data.shots.length > 1">
-                   <span class="imc--thumb"
-                         *ngFor="let shot of data.shots let index = index"
-                         [ngClass]="{active: shot.shot_num === shot_corrente.shot_num}"
-                         [ngStyle]="{border: shot.shot_num === shot_corrente.shot_num ? '5px solid' : 0}"
-                         (click)="shot_cambia(index)">
-                        <img [src]="shot.links.thumbnail" alt="">
-                        <span [innerHTML]="shot.duration | number:'2.2'" class="duration"></span>
-                       <span class="shot-number" [innerHTML]="shot.shot_num+1">3</span>
-                    </span>
-                </div>
-            </ng-template>
-            <ng-template [ngIf]="media_type !== 'video'">
-                <img [src]="mediaData.links.content" class="img-fluid">
-            </ng-template>
-        </div>
-
-        <ng-content select="[modal-col]"></ng-content>
-
-    </div>
+    <ng-content select="[modal-col]"></ng-content>
+  </div>
 </div>
 
 <ng-content select="[modal-row]"></ng-content>
 
 <div class="modal-footer" modal-footer>
-    <button type="button" class="btn btn-border-classic" (click)="chiudi()">Cancel</button>
-    <ng-content select="[modal-button]"></ng-content>
+  <button type="button" class="btn btn-border-classic" (click)="chiudi()">
+    Cancel
+  </button>
+  <ng-content select="[modal-button]"></ng-content>
 </div>

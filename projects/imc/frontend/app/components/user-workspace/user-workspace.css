@@ -1,24 +1,24 @@
 .imc--topbar .material-icons,
 .imc--topbar .imc--topbar--title {
-	color: #fff;
-	margin-right: 10px;
+  color: #fff;
+  margin-right: 10px;
 }
 
 .imc--topbar .box-search {
-	background: #fff;
-    padding: 5px;
-    border-radius: 2px;
-    border: 2px solid #707070;
+  background: #fff;
+  padding: 5px;
+  border-radius: 2px;
+  border: 2px solid #707070;
 }
 
 .container-workspace {
-	box-sizing: border-box;
-    padding: 25px 15px;
-    width: 100%;
+  box-sizing: border-box;
+  padding: 25px 15px;
+  width: 100%;
 }
 
 .dropdown-toggle::after {
-  content:initial;
+  content: initial;
 }
 
 .form-header,
@@ -27,5 +27,3 @@
   display: flex;
   justify-content: flex-end;
 }
-
-

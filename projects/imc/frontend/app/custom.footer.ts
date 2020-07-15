@@ -1,12 +1,10 @@
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
 @Component({
-  selector: 'customfooter',
+  selector: "customfooter",
   providers: [],
-  templateUrl: './custom.footer.html',
+  templateUrl: "./custom.footer.html",
 })
 export class CustomFooterComponent {
-
-  constructor() { }
-
+  constructor() {}
 }

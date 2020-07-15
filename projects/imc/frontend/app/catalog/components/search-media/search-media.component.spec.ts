@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SearchMediaComponent } from './search-media.component';
+import { SearchMediaComponent } from "./search-media.component";
 
-describe('SearchMediaComponent', () => {
+describe("SearchMediaComponent", () => {
   let component: SearchMediaComponent;
   let fixture: ComponentFixture<SearchMediaComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchMediaComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchMediaComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('SearchMediaComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

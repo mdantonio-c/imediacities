@@ -1,7 +1,7 @@
 // Layout della mappa all'interno dell'item media (e geotag)
-@import 'vars';
+@import "vars";
 
-$transition-map: all .4s ease-out;
+$transition-map: all 0.4s ease-out;
 
 .map {
   background: $bg-light-grey;
@@ -45,7 +45,6 @@ $transition-map: all .4s ease-out;
 }*/
 
 .page-type-video {
-
   .map--container {
     .mappa {
       border-bottom: 8px solid $theme-video-color !important;
@@ -68,7 +67,6 @@ $transition-map: all .4s ease-out;
 }
 
 .page-type-image {
-
   .map--container {
     .mappa {
       border-bottom: 8px solid $theme-image-color !important;

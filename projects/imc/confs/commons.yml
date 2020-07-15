@@ -1,5 +1,5 @@
 # Customize this file to include compose configurations common to bluprints
-version: '3'
+version: "3"
 
 services:
   backend:
@@ -25,7 +25,7 @@ services:
     expose:
       - "15672"
     ports:
-      -  15672:15672
+      - 15672:15672
 
   celery:
     build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery

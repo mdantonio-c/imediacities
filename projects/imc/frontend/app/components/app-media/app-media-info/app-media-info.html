@@ -1,318 +1,381 @@
 <ul ngbNav #nav="ngbNav" class="nav-tabs imc--tab">
-    <li [ngbNavItem]="'General Info'">
-        <a ngbNavLink>General Info</a>
-        <ng-template ngbNavContent>
-            <div id="general-info_accordion" class="imc--accordion">
+  <li [ngbNavItem]="'General Info'">
+    <a ngbNavLink>General Info</a>
+    <ng-template ngbNavContent>
+      <div id="general-info_accordion" class="imc--accordion">
+        <app-expansion-panel
+          title="Titles"
+          [subtitle]="info.identifying_title"
+          [allow_expansion]="info._titles.length"
+        >
+          <div *ngIf="info._titles.length">
+            <h5 class="col-12">Other Titles</h5>
+            <p
+              class="col-12"
+              *ngFor="let title of info._titles"
+              [innerHTML]="title.text"
+            ></p>
+          </div>
+        </app-expansion-panel>
 
-                <app-expansion-panel title="Titles" [subtitle]="info.identifying_title"
-                                     [allow_expansion]="info._titles.length">
-                    <div *ngIf="info._titles.length">
-                        <h5 class="col-12">Other Titles</h5>
-                        <p class="col-12" *ngFor="let title of info._titles"
-                           [innerHTML]="title.text"></p>
-                    </div>
-                </app-expansion-panel>
-
-                <div class="card imc--expansion-panel" *ngIf="this.info._descriptions">
-                    <div class="card-header" id="description_head">
-                        <h5 class="mb-0">
-                            <span class="btn btn-link collapsed"
-                                  (click)="expandCard('description')"
-                                  [attr.aria-expanded]="!isCollapsed.description"
-                                  aria-controls="description_content">
-                                <div class="row">
-                                    <div class="col-8 col-sm-7">
-                                        Description
-                                    </div>
-                                    <div class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs">
-                                        <!--option caricate dinamicamente nell'AfterViewInit-->
-                                      <select class="imc--input"
-                                              *ngIf="description_languages.size > 1"
-                                              #description_languages_selector
-                                              id="description-language-select">
-                                      </select>
-                                    </div>
-                                    <div class="col-4 col-sm-2 imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.description"
-                                           class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.description" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </span>
-                        </h5>
-                    </div>
-                    <div id="description_content" class="collapse" [ngbCollapse]="isCollapsed.description">
-                        <div class="card-body row">
-                            <ng-template
-                                    ngFor
-                                    let-descrizione
-                                    [ngForOf]="this.info._descriptions">
-                                <p class="col-12"
-                                   *ngIf="descrizione.language && descrizione.language.key === description_active; else missingLanguage"
-                                   [attr.data-languagekey]="descrizione.language.key"
-                                   [innerHTML]="descrizione.text"></p>
-                                <p class="col-12"
-                                   *ngIf="description_active === 'n/a' && !descrizione.language"
-                                   [innerHTML]="descrizione.text"></p>
-                            </ng-template>
-                        </div>
-                    </div>
+        <div class="card imc--expansion-panel" *ngIf="this.info._descriptions">
+          <div class="card-header" id="description_head">
+            <h5 class="mb-0">
+              <span
+                class="btn btn-link collapsed"
+                (click)="expandCard('description')"
+                [attr.aria-expanded]="!isCollapsed.description"
+                aria-controls="description_content"
+              >
+                <div class="row">
+                  <div class="col-8 col-sm-7">
+                    Description
+                  </div>
+                  <div
+                    class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs"
+                  >
+                    <!--option caricate dinamicamente nell'AfterViewInit-->
+                    <select
+                      class="imc--input"
+                      *ngIf="description_languages.size > 1"
+                      #description_languages_selector
+                      id="description-language-select"
+                    >
+                    </select>
+                  </div>
+                  <div class="col-4 col-sm-2 imc--flex--horizontal-end">
+                    <i *ngIf="isCollapsed.description" class="material-icons"
+                      >keyboard_arrow_down</i
+                    >
+                    <i *ngIf="!isCollapsed.description" class="material-icons"
+                      >keyboard_arrow_up</i
+                    >
+                  </div>
                 </div>
+              </span>
+            </h5>
+          </div>
+          <div
+            id="description_content"
+            class="collapse"
+            [ngbCollapse]="isCollapsed.description"
+          >
+            <div class="card-body row">
+              <ng-template
+                ngFor
+                let-descrizione
+                [ngForOf]="this.info._descriptions"
+              >
+                <p
+                  class="col-12"
+                  *ngIf="descrizione.language && descrizione.language.key === description_active; else missingLanguage"
+                  [attr.data-languagekey]="descrizione.language.key"
+                  [innerHTML]="descrizione.text"
+                ></p>
+                <p
+                  class="col-12"
+                  *ngIf="description_active === 'n/a' && !descrizione.language"
+                  [innerHTML]="descrizione.text"
+                ></p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
 
-                <div class="card imc--expansion-panel" *ngIf="this.info._keywords">
-                    <div class="card-header" id="keyword_head">
-                        <h5 class="mb-0">
-                            <span class="btn btn-link collapsed"
-                                  (click)="expandCard('keyword')"
-                                  [attr.aria-expanded]="!isCollapsed.keyword"
-                                  aria-controls="keyword_content">
-                                <div class="row">
-                                    <div class="col-8 col-sm-7">
-                                        Keywords
-                                    </div>
-                                    <div class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs">
-                                        <!--option caricate dinamicamente nell'AfterViewInit-->
-                                      <select class="imc--input"
-                                              *ngIf="keyword_languages.size > 1"
-                                              #keyword_languages_selector
-                                              id="keyword-language-select">              
-                                      </select>
-                                    </div>
-                                    <div class="col-4 col-sm-2 imc--flex--horizontal-end">
-                                        <i *ngIf="isCollapsed.keyword" class="material-icons">keyboard_arrow_down</i>
-                                        <i *ngIf="!isCollapsed.keyword" class="material-icons">keyboard_arrow_up</i>
-                                    </div>
-                                </div>
-                            </span>
-                        </h5>
-                    </div>
-                    <div id="keyword_content" class="collapse" [ngbCollapse]="isCollapsed.keyword">
-                        <div class="card-body row">
-                            <ng-template
-                                    ngFor
-                                    let-pchiave
-                                    [ngForOf]="this.info._keywords">
-                                <div class="d-inline keyword-div"
-                                     *ngIf="pchiave.language && pchiave.language.key === keyword_active; else missingLanguage"
-                                     [attr.data-languagekey]="pchiave.language.key"
-                                     [innerHTML]="pchiave.term"></div>
-                                <div class="d-inline keyword-div"
-                                     *ngIf="keyword_active === 'n/a' && !pchiave.language"
-                                     [innerHTML]="pchiave.term"></div>
-                            </ng-template>
-                        </div>
-                    </div>
+        <div class="card imc--expansion-panel" *ngIf="this.info._keywords">
+          <div class="card-header" id="keyword_head">
+            <h5 class="mb-0">
+              <span
+                class="btn btn-link collapsed"
+                (click)="expandCard('keyword')"
+                [attr.aria-expanded]="!isCollapsed.keyword"
+                aria-controls="keyword_content"
+              >
+                <div class="row">
+                  <div class="col-8 col-sm-7">
+                    Keywords
+                  </div>
+                  <div
+                    class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs"
+                  >
+                    <!--option caricate dinamicamente nell'AfterViewInit-->
+                    <select
+                      class="imc--input"
+                      *ngIf="keyword_languages.size > 1"
+                      #keyword_languages_selector
+                      id="keyword-language-select"
+                    >
+                    </select>
+                  </div>
+                  <div class="col-4 col-sm-2 imc--flex--horizontal-end">
+                    <i *ngIf="isCollapsed.keyword" class="material-icons"
+                      >keyboard_arrow_down</i
+                    >
+                    <i *ngIf="!isCollapsed.keyword" class="material-icons"
+                      >keyboard_arrow_up</i
+                    >
+                  </div>
                 </div>
-                <ng-template #missingLanguage></ng-template>
-
-                <app-expansion-panel title="Production information">
-
-                    <!--Anno di produzione-->
-                    <div class="col-3"><strong>Year:</strong>
-                        <span *ngIf="info.production_years"
-                              [innerHTML]="info.production_years[0]"></span>
-                    </div>
-                    <!--Paesi di produzione-->
-                    <!-- @NSI non esiste production_countries per le immagini-->
-
-                    <ng-template [ngIf]="info.type === 'aventity'">
-                        <div class="col-3">
-                            <strong>Country:</strong>
-                            <span
-                                    *ngFor="let production_country of info._production_countries; last as last">
-                                    {{ production_country.code.description }}{{ last ? '' : '/'}}
-                            </span>
-                        </div>
-                    </ng-template>
-                    <!--Crediti-->
-                    <ng-template [ngIf]="info._contributors && info._contributors.length">
-                        <div class="col-12 space-paragraph-10"><strong>Credits:</strong></div>
-                        <div class="col-12">
-                            <ul>
-                                <ng-template ngFor let-contributor [ngForOf]="info._contributors">
-                                    <li
-                                            *ngFor="let role of contributor.activities">
-                                        {{ role }}:
-                                        <span [innerHTML]="contributor.names[0] | nocomma"></span>
-                                    </li>
-
-                                </ng-template>
-                            </ul>
-                        </div>
-                    </ng-template>
-                </app-expansion-panel>
-
-                <app-expansion-panel title="Copyright">
-                    <div class="col-12">
-                        <strong>Right Status: </strong>
-                        <span [innerHTML]="info.rights_status.description"></span>
-                    </div>
-                </app-expansion-panel>
-
-                <app-expansion-panel title="More information on film">
-                    <h5 class="col-12"
-                        [innerHTML]="info._record_sources[0]._provider[0].name"></h5>
-                    <div class="col-12"><strong>Contacts:</strong></div>
-                    <div class="col-12">
-                        <ul>
-                            <li *ngIf="info._record_sources[0]._provider[0].address">
-                                {{ info._record_sources[0]._provider[0].address }}
-                            </li>
-                            <li *ngIf="info._record_sources[0]._provider[0].phone">
-                                tel: {{ info._record_sources[0]._provider[0].phone }}</li>
-                            <li *ngIf="info._record_sources[0]._provider[0].fax">
-                                fax: {{ info._record_sources[0]._provider[0].fax }}</li>
-                            <li *ngIf="info._record_sources[0]._provider[0].email">
-                                <a [href]="'mailto:' + info._record_sources[0]._provider[0].email">{{ info._record_sources[0]._provider[0].email }}</a>
-                            </li>
-                            <li *ngIf="info._record_sources[0]._provider[0].website">
-                                <a href="//{{ info._record_sources[0]._provider[0].website }}"
-                                   target="_blank">{{ info._record_sources[0]._provider[0].website }}</a>
-                            </li>
-                            <li></li>
-                        </ul>
-                    </div>
-                    <div class="col-12 space-paragraph-10">
-                        <strong>Film ID in Archive: </strong>
-                        <span [innerHTML]="info._record_sources[0].source_id"></span>
-                    </div>
-                    <div class="col-12 space-paragraph-10"
-                         *ngIf="user && user.roles['Archive'] && is_item_owner(user, info._item[0])">
-                        <strong>Public Access: </strong>
-                        <input class="imc--input-checkbox styled-checkbox" id="public-access" type="checkbox" value="on"
-                               (click)="$event.preventDefault()"
-                               [(ngModel)]="info._item[0].public_access"
-                               mwlConfirmationPopover
-                               [popoverMessage]="info._item[0].public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
-                               (confirm)="togglePublicAccess()">
-                        <label for="public-access"></label>
-                    </div>
-                </app-expansion-panel>
-
+              </span>
+            </h5>
+          </div>
+          <div
+            id="keyword_content"
+            class="collapse"
+            [ngbCollapse]="isCollapsed.keyword"
+          >
+            <div class="card-body row">
+              <ng-template ngFor let-pchiave [ngForOf]="this.info._keywords">
+                <div
+                  class="d-inline keyword-div"
+                  *ngIf="pchiave.language && pchiave.language.key === keyword_active; else missingLanguage"
+                  [attr.data-languagekey]="pchiave.language.key"
+                  [innerHTML]="pchiave.term"
+                ></div>
+                <div
+                  class="d-inline keyword-div"
+                  *ngIf="keyword_active === 'n/a' && !pchiave.language"
+                  [innerHTML]="pchiave.term"
+                ></div>
+              </ng-template>
             </div>
+          </div>
+        </div>
+        <ng-template #missingLanguage></ng-template>
 
-        </ng-template>
-    </li>
-    <li [ngbNavItem]="'Technical Info'">
-        <a ngbNavLink>Technical Info</a>
-        <ng-template ngbNavContent>
-            <div id="tech-info_accordion" class="imc--accordion">
+        <app-expansion-panel title="Production information">
+          <!--Anno di produzione-->
+          <div class="col-3">
+            <strong>Year:</strong>
+            <span
+              *ngIf="info.production_years"
+              [innerHTML]="info.production_years[0]"
+            ></span>
+          </div>
+          <!--Paesi di produzione-->
+          <!-- @NSI non esiste production_countries per le immagini-->
 
-                <ng-template [ngIf]="info.type === 'aventity'">
-
-                    <app-expansion-panel title="Analogue film format">
-                        <div class="col-12">
-                            <ul class="list-space">
-
-                                <li *ngIf="info._video_format && info._video_format[0].sound">
-                                    <strong>Sound: </strong>
-                                    <span [innerHTML]="info._video_format[0].sound.description"></span>
-
-                                </li>
-                                <li *ngIf="info._video_format && info._video_format[0].colour">
-                                    <strong>Colour: </strong>
-                                    <span [innerHTML]="info._video_format[0].colour.description"></span>
-                                </li>
-                                <li *ngIf="info._video_format && info._video_format[0].gauge">
-                                    <strong>Gauge: </strong>
-                                    <span [innerHTML]="info._video_format[0].gauge.description"></span>
-                                </li>
-                                <li *ngIf="info._video_format && info._video_format[0].aspect_ratio">
-                                    <strong>Aspect ratio: </strong>
-                                    <span [innerHTML]="info._video_format[0].aspect_ratio.description"></span>
-                                </li>
-                            </ul>
-                        </div>
-                    </app-expansion-panel>
-
-                    <app-expansion-panel title="Digital format">
-                        <div class="col-12">
-                            <ul class="list-space">
-                                <li *ngIf="item && item.digital_format.length >= 1">
-                                    <strong>Container: </strong>
-                                    <span [innerHTML]="printContainerInfo()"></span>
-                                </li>
-
-                                <li *ngIf="item && item.digital_format.length >= 2">
-                                    <strong>Encoding: </strong>
-                                    <span [innerHTML]="printEncodingInfo()"></span>
-                                </li>
-
-                                <li *ngIf="item && item.digital_format.length >= 3">
-                                    <strong>Format: </strong>
-                                    <!-- <span [innerHTML]="item.digital_format[2]"></span> -->
-                                    <!-- ALWAYS MPEG-4-->
-                                    <span>MPEG-4</span>
-                                </li>
-
-                                <li *ngIf="item && item.digital_format.length >= 4">
-                                    <strong>Resolution: </strong> <span
-                                        [innerHTML]="item.digital_format[3]"></span>
-                                </li>
-
-                                <li *ngIf="item && item.framerate">
-                                    <strong>Frame rate: </strong> <span [innerHTML]="item.framerate"></span>
-                                </li>
-
-                                <li *ngIf="item && item.duration">
-                                    <strong>Duration: </strong>
-                                    <span [innerHTML]="item.duration | secondsToTime"></span>
-                                </li>
-
-                                <li *ngIf="item && item.dimension">
-                                    <strong>Size: </strong>
-                                    <span [innerHTML]="item.dimension | bytes:2"></span>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </app-expansion-panel>
-
-                </ng-template>
-
-                <ng-template [ngIf]="info.type !== 'aventity'">
-
-                    <app-expansion-panel title="Analogue format">
-                        <ul class="list-space">
-
-                            <li *ngIf="info.specific_type">
-                                <strong>Media type: </strong>
-                                <span [innerHTML]="info.specific_type.description"></span>
-                            </li>
-
-                            <li *ngIf="info.phisical_format_size">
-                                <strong>Physical format: </strong>
-                                <span [innerHTML]="info.phisical_format_size.join(' ')"></span>
-                            </li>
-
-                            <li *ngIf="info.colour">
-                                <strong>Colour: </strong>
-                                <span [innerHTML]="info.colour.description"></span>
-                            </li>
-                        </ul>
-                    </app-expansion-panel>
-
-                    <app-expansion-panel title="Digital format"
-                                         *ngIf="info._item[0] && info._item[0]">
-                        <ul class="list-space">
-
-                            <li *ngIf="info._item[0].item_type">
-                                <strong>Item type:</strong>
-                                <span [innerHTML]="info._item[0].item_type.description"></span>
-                            </li>
-
-                            <li *ngIf="info._item[0].digital_format">
-                                <strong>Format:</strong>
-                                <span [innerHTML]="info._item[0].digital_format.join(' ')"></span>
-                            </li>
-
-                        </ul>
-                    </app-expansion-panel>
-
-                </ng-template>
-
+          <ng-template [ngIf]="info.type === 'aventity'">
+            <div class="col-3">
+              <strong>Country:</strong>
+              <span
+                *ngFor="let production_country of info._production_countries; last as last"
+              >
+                {{ production_country.code.description }}{{ last ? '' : '/'}}
+              </span>
             </div>
+          </ng-template>
+          <!--Crediti-->
+          <ng-template [ngIf]="info._contributors && info._contributors.length">
+            <div class="col-12 space-paragraph-10">
+              <strong>Credits:</strong>
+            </div>
+            <div class="col-12">
+              <ul>
+                <ng-template
+                  ngFor
+                  let-contributor
+                  [ngForOf]="info._contributors"
+                >
+                  <li *ngFor="let role of contributor.activities">
+                    {{ role }}:
+                    <span [innerHTML]="contributor.names[0] | nocomma"></span>
+                  </li>
+                </ng-template>
+              </ul>
+            </div>
+          </ng-template>
+        </app-expansion-panel>
+
+        <app-expansion-panel title="Copyright">
+          <div class="col-12">
+            <strong>Right Status: </strong>
+            <span [innerHTML]="info.rights_status.description"></span>
+          </div>
+        </app-expansion-panel>
+
+        <app-expansion-panel title="More information on film">
+          <h5
+            class="col-12"
+            [innerHTML]="info._record_sources[0]._provider[0].name"
+          ></h5>
+          <div class="col-12"><strong>Contacts:</strong></div>
+          <div class="col-12">
+            <ul>
+              <li *ngIf="info._record_sources[0]._provider[0].address">
+                {{ info._record_sources[0]._provider[0].address }}
+              </li>
+              <li *ngIf="info._record_sources[0]._provider[0].phone">
+                tel: {{ info._record_sources[0]._provider[0].phone }}
+              </li>
+              <li *ngIf="info._record_sources[0]._provider[0].fax">
+                fax: {{ info._record_sources[0]._provider[0].fax }}
+              </li>
+              <li *ngIf="info._record_sources[0]._provider[0].email">
+                <a
+                  [href]="'mailto:' + info._record_sources[0]._provider[0].email"
+                  >{{ info._record_sources[0]._provider[0].email }}</a
+                >
+              </li>
+              <li *ngIf="info._record_sources[0]._provider[0].website">
+                <a
+                  href="//{{ info._record_sources[0]._provider[0].website }}"
+                  target="_blank"
+                  >{{ info._record_sources[0]._provider[0].website }}</a
+                >
+              </li>
+              <li></li>
+            </ul>
+          </div>
+          <div class="col-12 space-paragraph-10">
+            <strong>Film ID in Archive: </strong>
+            <span [innerHTML]="info._record_sources[0].source_id"></span>
+          </div>
+          <div
+            class="col-12 space-paragraph-10"
+            *ngIf="user && user.roles['Archive'] && is_item_owner(user, info._item[0])"
+          >
+            <strong>Public Access: </strong>
+            <input
+              class="imc--input-checkbox styled-checkbox"
+              id="public-access"
+              type="checkbox"
+              value="on"
+              (click)="$event.preventDefault()"
+              [(ngModel)]="info._item[0].public_access"
+              mwlConfirmationPopover
+              [popoverMessage]="info._item[0].public_access ? 'Do you want to prevent access to this content to the public?' : 'Do you want to make this content accessible to the public?'"
+              (confirm)="togglePublicAccess()"
+            />
+            <label for="public-access"></label>
+          </div>
+        </app-expansion-panel>
+      </div>
+    </ng-template>
+  </li>
+  <li [ngbNavItem]="'Technical Info'">
+    <a ngbNavLink>Technical Info</a>
+    <ng-template ngbNavContent>
+      <div id="tech-info_accordion" class="imc--accordion">
+        <ng-template [ngIf]="info.type === 'aventity'">
+          <app-expansion-panel title="Analogue film format">
+            <div class="col-12">
+              <ul class="list-space">
+                <li *ngIf="info._video_format && info._video_format[0].sound">
+                  <strong>Sound: </strong>
+                  <span
+                    [innerHTML]="info._video_format[0].sound.description"
+                  ></span>
+                </li>
+                <li *ngIf="info._video_format && info._video_format[0].colour">
+                  <strong>Colour: </strong>
+                  <span
+                    [innerHTML]="info._video_format[0].colour.description"
+                  ></span>
+                </li>
+                <li *ngIf="info._video_format && info._video_format[0].gauge">
+                  <strong>Gauge: </strong>
+                  <span
+                    [innerHTML]="info._video_format[0].gauge.description"
+                  ></span>
+                </li>
+                <li
+                  *ngIf="info._video_format && info._video_format[0].aspect_ratio"
+                >
+                  <strong>Aspect ratio: </strong>
+                  <span
+                    [innerHTML]="info._video_format[0].aspect_ratio.description"
+                  ></span>
+                </li>
+              </ul>
+            </div>
+          </app-expansion-panel>
+
+          <app-expansion-panel title="Digital format">
+            <div class="col-12">
+              <ul class="list-space">
+                <li *ngIf="item && item.digital_format.length >= 1">
+                  <strong>Container: </strong>
+                  <span [innerHTML]="printContainerInfo()"></span>
+                </li>
+
+                <li *ngIf="item && item.digital_format.length >= 2">
+                  <strong>Encoding: </strong>
+                  <span [innerHTML]="printEncodingInfo()"></span>
+                </li>
+
+                <li *ngIf="item && item.digital_format.length >= 3">
+                  <strong>Format: </strong>
+                  <!-- <span [innerHTML]="item.digital_format[2]"></span> -->
+                  <!-- ALWAYS MPEG-4-->
+                  <span>MPEG-4</span>
+                </li>
+
+                <li *ngIf="item && item.digital_format.length >= 4">
+                  <strong>Resolution: </strong>
+                  <span [innerHTML]="item.digital_format[3]"></span>
+                </li>
+
+                <li *ngIf="item && item.framerate">
+                  <strong>Frame rate: </strong>
+                  <span [innerHTML]="item.framerate"></span>
+                </li>
+
+                <li *ngIf="item && item.duration">
+                  <strong>Duration: </strong>
+                  <span [innerHTML]="item.duration | secondsToTime"></span>
+                </li>
+
+                <li *ngIf="item && item.dimension">
+                  <strong>Size: </strong>
+                  <span [innerHTML]="item.dimension | bytes:2"></span>
+                </li>
+              </ul>
+            </div>
+          </app-expansion-panel>
         </ng-template>
-    </li>
+
+        <ng-template [ngIf]="info.type !== 'aventity'">
+          <app-expansion-panel title="Analogue format">
+            <ul class="list-space">
+              <li *ngIf="info.specific_type">
+                <strong>Media type: </strong>
+                <span [innerHTML]="info.specific_type.description"></span>
+              </li>
+
+              <li *ngIf="info.phisical_format_size">
+                <strong>Physical format: </strong>
+                <span [innerHTML]="info.phisical_format_size.join(' ')"></span>
+              </li>
+
+              <li *ngIf="info.colour">
+                <strong>Colour: </strong>
+                <span [innerHTML]="info.colour.description"></span>
+              </li>
+            </ul>
+          </app-expansion-panel>
+
+          <app-expansion-panel
+            title="Digital format"
+            *ngIf="info._item[0] && info._item[0]"
+          >
+            <ul class="list-space">
+              <li *ngIf="info._item[0].item_type">
+                <strong>Item type:</strong>
+                <span [innerHTML]="info._item[0].item_type.description"></span>
+              </li>
+
+              <li *ngIf="info._item[0].digital_format">
+                <strong>Format:</strong>
+                <span
+                  [innerHTML]="info._item[0].digital_format.join(' ')"
+                ></span>
+              </li>
+            </ul>
+          </app-expansion-panel>
+        </ng-template>
+      </div>
+    </ng-template>
+  </li>
 </ul>
 <div [ngbNavOutlet]="nav"></div>

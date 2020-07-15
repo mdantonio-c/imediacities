@@ -1,26 +1,21 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 
 @Component({
-  selector: 'customlinks',
-  templateUrl: './custom.navbar.links.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: "customlinks",
+  templateUrl: "./custom.navbar.links.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomNavbarComponent {
+  @Input() user: any;
 
-    @Input() user: any;
-
-    constructor() { }
-
+  constructor() {}
 }
 
-
 @Component({
-  selector: 'custombrand',
-  templateUrl: './custom.navbar.brand.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  selector: "custombrand",
+  templateUrl: "./custom.navbar.brand.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomBrandComponent {
-
-    constructor() { }
-
+  constructor() {}
 }

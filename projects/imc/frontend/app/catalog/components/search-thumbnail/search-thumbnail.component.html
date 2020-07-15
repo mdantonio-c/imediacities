@@ -1,41 +1,67 @@
 <div class="media-thumbnail search-thumbnail grid-result">
-	<div class="media-image-wrapper click-event" (click)="route(media.id, media.type)" style="outline: none;">
-		<span class="badge badge-warning revision" *ngIf="underRevision()">
-			revision
-		</span>
-		<span class="search-item label bigger-180">
-			<span class="fa-stack">
-				<!-- <i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.links['thumbnail']"></i> -->
-				<i class="fa fa-circle fa-stack-2x"></i>
-				<i class="fa fa-stack-1x light-blue" [ngClass]="{'fa-video': media._item[0].item_type.key === 'Video', 'fa-camera': media._item[0].item_type.key === 'Image', 'fa-align-left': media._item[0].item_type.key === 'Text'}"></i>
-			</span>
-		</span>
-        <img holderjs
-             [attr.data-src]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"
-             *ngIf="!media.links['thumbnail']">
-		<img (contextmenu)="disableSaveAs($event)"
-             src="{{media.links['thumbnail']+'&size=large'}}" *ngIf="media.links['thumbnail']"
-             style="height: 200px; /*width: 100%;*/ display: block;" class="img-fluid"/>
-		<span *ngIf="media.type == 'aventity'" class="anteprima-duration" [innerHTML]="media._item[0].duration | secondsToTime"></span>
-	</div>
-	<div class="caption-wrapper">
-		<div class="caption">
-			<div class="clearfix">
-				<span class="float-right badge badge-primary label-city">{{(media._record_sources[0]._provider[0].identifier | providerToCity) || 'n/a'}}</span>
-				<!-- <div class="float-left bigger-110">
+  <div
+    class="media-image-wrapper click-event"
+    (click)="route(media.id, media.type)"
+    style="outline: none;"
+  >
+    <span class="badge badge-warning revision" *ngIf="underRevision()">
+      revision
+    </span>
+    <span class="search-item label bigger-180">
+      <span class="fa-stack">
+        <!-- <i class="fa fa-circle-thin fa-stack-2x" *ngIf="!media.links['thumbnail']"></i> -->
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i
+          class="fa fa-stack-1x light-blue"
+          [ngClass]="{
+            'fa-video': media._item[0].item_type.key === 'Video',
+            'fa-camera': media._item[0].item_type.key === 'Image',
+            'fa-align-left': media._item[0].item_type.key === 'Text'
+          }"
+        ></i>
+      </span>
+    </span>
+    <img
+      holderjs
+      [attr.data-src]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"
+      *ngIf="!media.links['thumbnail']"
+    />
+    <img
+      (contextmenu)="disableSaveAs($event)"
+      src="{{ media.links['thumbnail'] + '&size=large' }}"
+      *ngIf="media.links['thumbnail']"
+      style="height: 200px; /*width: 100%;*/ display: block;"
+      class="img-fluid"
+    />
+    <span
+      *ngIf="media.type == 'aventity'"
+      class="anteprima-duration"
+      [innerHTML]="media._item[0].duration | secondsToTime"
+    ></span>
+  </div>
+  <div class="caption-wrapper">
+    <div class="caption">
+      <div class="clearfix">
+        <span class="float-right badge badge-primary label-city">{{
+          (media._record_sources[0]._provider[0].identifier | providerToCity) ||
+            "n/a"
+        }}</span>
+        <!-- <div class="float-left bigger-110">
 					<i class="imc-icon fa fa-eye light-blue"></i>
 					<i class="imc-icon fa fa-asterisk light-blue"></i>
 					<i class="imc-icon fa fa-heart light-blue"></i>
 				</div> -->
-			</div>
-			<h3 class="search-title">
-				<a class="blue click-event" (click)="route(media.id, media.type)">{{identifyingTitle}}</a>
-			</h3>
-			<div class="space-5"></div>
-			<p class="text" *ngIf="description">
-				<i class="imc-icon fa fa-quote-left"></i>
-				{{description}}
-			</p>
-		</div>
-	</div>
+      </div>
+      <h3 class="search-title">
+        <a class="blue click-event" (click)="route(media.id, media.type)">{{
+          identifyingTitle
+        }}</a>
+      </h3>
+      <div class="space-5"></div>
+      <p class="text" *ngIf="description">
+        <i class="imc-icon fa fa-quote-left"></i>
+        {{ description }}
+      </p>
+    </div>
+  </div>
 </div>

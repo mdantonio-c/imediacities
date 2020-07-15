@@ -1,13 +1,12 @@
 /* Timeline */
-.timeline
-.timeline-horizontal {
-	list-style: none;
-  	padding: 20px;
-  	position: relative;
+.timeline .timeline-horizontal {
+  list-style: none;
+  padding: 20px;
+  position: relative;
 }
 .timeline {
-	display: flex;
-	justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .timeline:before {
   top: 40px;
@@ -42,7 +41,7 @@
   top: 18px;
   left: 50%;
   margin-left: -25px;
-  background-color: #4AA4CE;
+  background-color: #4aa4ce;
   border: 3px solid #ffffff;
   z-index: 100;
   border-top-right-radius: 50%;
@@ -171,6 +170,6 @@
 }
 
 .timeline-horizontal .timeline-item .timeline-badge .timeline-time {
-	font-size: small;
-	font-weight: bold;
+  font-size: small;
+  font-weight: bold;
 }

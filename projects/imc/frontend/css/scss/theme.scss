@@ -1,4 +1,4 @@
-@import 'vars';
+@import "vars";
 
 // Titoli
 .imc--title-bold {
@@ -137,8 +137,7 @@
 
 // Campi di input
 .imc--input,
-.imc--input--no-line
-{
+.imc--input--no-line {
   background: transparent;
   border: none;
   border-bottom: 1px solid $text-color;
@@ -170,23 +169,21 @@
     top: 10.5px;
   }
 
-  .dropdown-menu{
+  .dropdown-menu {
     //@extend .imc--input;
     font-size: unset;
   }
 
   .dropdown-item {
-    border:0;
-    cursor:pointer;
+    border: 0;
+    cursor: pointer;
     display: block;
-    font-size:inherit;
+    font-size: inherit;
     font-weight: normal;
     min-height: 1.2em;
     padding: 0 2px;
   }
 }
-
-
 
 textarea {
   &.imc--input {
@@ -234,10 +231,8 @@ input[type="radio"] {
 }
 
 .page-type-video {
-
   input[type="radio"]:checked {
     & + .imc--radio-label {
-
       &:before {
         border: 2px solid $theme-video-color !important;
         background: $white;
@@ -250,10 +245,8 @@ input[type="radio"] {
 }
 
 .page-type-image {
-
   input[type="radio"]:checked {
     & + .imc--radio-label {
-
       &:before {
         border: 2px solid $theme-image-color !important;
         background: $white;
@@ -271,7 +264,7 @@ input[type="radio"] {
   padding-right: 30px;*/
   width: 80%;
 
- /* & + .input-group-append {
+  /* & + .input-group-append {
     align-items: center;
     border-bottom: 1px solid $text-color;
     justify-content: flex-end;
@@ -302,7 +295,6 @@ input[type="radio"] {
   }
 }
 
-
 // Input checkbox
 .container-checkbox {
   align-items: center;
@@ -329,7 +321,7 @@ input[type="radio"] {
 
   //box
   & + label:before {
-    content: '';
+    content: "";
     margin-right: 10px;
     display: inline-block;
     width: 20px;
@@ -351,20 +343,15 @@ input[type="radio"] {
 
   // Checkmark
   &:checked + label:after {
-    content: '';
+    content: "";
     position: absolute;
     left: 5px;
     top: 11px;
     background: white;
     width: 2px;
     height: 2px;
-    box-shadow:
-            2px 0 0 white,
-            4px 0 0 white,
-            4px -2px 0 white,
-            4px -4px 0 white,
-            4px -6px 0 white,
-            4px -8px 0 white;
+    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white,
+      4px -6px 0 white, 4px -8px 0 white;
     transform: rotate(45deg);
   }
 }
@@ -416,7 +403,7 @@ input[type="radio"] {
     cursor: pointer;
 
     &:before {
-      content: '';
+      content: "";
       position: absolute;
       top: 5px;
       left: 0;
@@ -425,11 +412,11 @@ input[type="radio"] {
       background-color: $bg-dark-grey;
       border-radius: 14px;
       z-index: 1;
-      transition: background-color 0.28s cubic-bezier(.4, 0, .2, 1);
+      transition: background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     &:after {
-      content: '';
+      content: "";
       position: absolute;
       top: 2px;
       left: 0;
@@ -437,9 +424,10 @@ input[type="radio"] {
       height: 20px;
       background-color: $white;
       border-radius: 14px;
-      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14),0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
       z-index: 2;
-      transition: all 0.28s cubic-bezier(.4, 0, .2, 1);
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
       transition-property: left, background-color;
     }
   }
@@ -467,7 +455,6 @@ input[type="radio"] {
 
   @media (max-width: 991.98px) {
     padding: 35px 25px;
-
   }
 }
 
@@ -482,7 +469,6 @@ input[type="radio"] {
   /*min-height: 480px;*/
   align-self: stretch;
 }
-
 
 .imc--tab,
 .imc--card {
@@ -528,7 +514,6 @@ input[type="radio"] {
         outline: none;
         border: 0;
       }
-
     }
   }
 
@@ -610,7 +595,7 @@ input[type="radio"] {
   min-height: 120px;
   margin: 15px 0;
 
-  img{
+  img {
     width: 100%;
     height: auto;
   }
@@ -649,7 +634,6 @@ input[type="radio"] {
     }
   }
 }
-
 
 // Colonna destra
 .imc--colonna-destra {

@@ -1,19 +1,17 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {AppVideoControlComponent} from "../app-video-control";
+import { Component, Input, OnInit } from "@angular/core";
+import { AppVideoControlComponent } from "../app-video-control";
 
 @Component({
-    selector: 'app-video-control-goto-start',
-    templateUrl: 'app-video-control-goto-start.html'
+  selector: "app-video-control-goto-start",
+  templateUrl: "app-video-control-goto-start.html",
 })
-
 export class AppVideoControlGotoStartComponent extends AppVideoControlComponent {
+  constructor() {
+    super();
+  }
 
-    constructor() {
-        super();
-    }
-
-    goto_start () {
-        this.video.pause();
-        this.video.currentTime = this.parent.player.begin;
-    }
+  goto_start() {
+    this.video.pause();
+    this.video.currentTime = this.parent.player.begin;
+  }
 }

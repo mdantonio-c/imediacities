@@ -1,17 +1,20 @@
 <!-- Modal for inserting new notes -->
 <app-media-modal [data]="data" [media_type]="media_type">
-
   <!-- add a note -->
   <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
     <span class="col-11 space-paragraph-20">
-      <textarea class="imc--input" placeholder="Text" aria-label="Text"
-      [(ngModel)]="note.text"></textarea>
+      <textarea
+        class="imc--input"
+        placeholder="Text"
+        aria-label="Text"
+        [(ngModel)]="note.text"
+      ></textarea>
     </span>
     <span class="col-12 col-sm-6 col-lg-4 space-paragraph-20">
       <select class="imc--input col-7" #visibility [(ngModel)]="note.private">
         <option selected value="true">Private</option>
-        <option value="false">Public</option>
-      </select>&nbsp;
+        <option value="false">Public</option> </select
+      >&nbsp;
     </span>
     <span class="col-12 col-sm-6 col-lg-6 space-paragraph-20">
       <select class="imc--input col-7" #language [(ngModel)]="note.language">
@@ -24,20 +27,27 @@
         <option value="it">Italiano</option>
         <option value="nl">Nederlands</option>
         <option value="sv">Svenska</option>
-        <option value="el">Ελληνικά</option>
-      </select>&nbsp;
+        <option value="el">Ελληνικά</option> </select
+      >&nbsp;
     </span>
   </div>
 
-  <button type="button" class="btn btn-accent" modal-button
-  [disabled]="!note.text.length"
-  (click)="save()">
-  Save
+  <button
+    type="button"
+    class="btn btn-accent"
+    modal-button
+    [disabled]="!note.text.length"
+    (click)="save()"
+  >
+    Save
   </button>
 
   <!-- outcome -->
-  <app-info modal-button
-    [message]="save_result.message" [result]="save_result.status"
+  <app-info
+    modal-button
+    [message]="save_result.message"
+    [result]="save_result.status"
     *ngIf="save_result.visible"
-  (click)="save_result.visible = false"></app-info>
+    (click)="save_result.visible = false"
+  ></app-info>
 </app-media-modal>

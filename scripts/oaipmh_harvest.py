@@ -1,23 +1,20 @@
-# -*- coding: utf-8 -*-
-
 """
 sudo pip3 install click pyoai
 """
 
-import click
+import codecs
 import json
 import os
-import codecs
-# import urllib
 import re
-from oaipmh.client import Client
-from oaipmh.metadata import MetadataRegistry, oai_dc_reader
-from oaipmh.error import NoRecordsMatchError
-from lxml import etree
 import time
 from datetime import datetime
-from restapi.utilities.logs import log
 
+import click
+from lxml import etree
+from oaipmh.client import Client
+from oaipmh.error import NoRecordsMatchError
+from oaipmh.metadata import MetadataRegistry, oai_dc_reader
+from restapi.utilities.logs import log
 
 # for s in client.listSets()
 #     print(s)
@@ -25,50 +22,59 @@ from restapi.utilities.logs import log
 # for f in client.listMetadataFormats():
 #     print(f)
 
+
 def tag(tag):
-    tag_prefix = '{http://www.europeanfilmgateway.eu/efg}'
-    return "%s%s" % (tag_prefix, tag)
+    tag_prefix = "{http://www.europeanfilmgateway.eu/efg}"
+    return f"{tag_prefix}{tag}"
 
 
 def parse_date(date_string):
 
+    try:
+        fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+        d = datetime.strptime(date_string, fmt)
+        log.info("time data '%s' matches format '%s'", date_string, fmt)
+        return d
+    except ValueError as e:
+        log.warning(e)
         try:
-            fmt = "%Y-%m-%dT%H:%M:%S.%fZ"
+            fmt = "%Y-%m-%d"
             d = datetime.strptime(date_string, fmt)
-            log.info(
-                "time data '%s' matches format '%s'", date_string, fmt)
+            log.info("time data '%s' matches format '%s'", date_string, fmt)
             return d
         except ValueError as e:
-            log.warning(e)
-            try:
-                fmt = "%Y-%m-%d"
-                d = datetime.strptime(date_string, fmt)
-                log.info(
-                    "time data '%s' matches format '%s'", date_string, fmt)
-                return d
-            except ValueError as e:
-                log.error(e)
+            log.error(e)
 
-        return None
+    return None
 
 
 @click.command()
-@click.option('--metadata_set', prompt='Name of set to be retrieved',
-              help='Examples: fdc, ofm, mnc')
-@click.option('--dest_folder', prompt='Path of destination folder',
-              help='Path of destination folder')
-@click.option('--log_file', prompt='Name of log file',
-              help='Name of log file')
-@click.option('--content-type',
-              help='Type of content, e.g. video')
-@click.option('--from', 'from_date',
-              help='Downloading content starting from this date')
-@click.option('--until', 'until_date',
-              help='Downloading content only until this date')
-@click.option('--no-keyword-filter', is_flag=True,
-              help="Exclute filter on keyword IMediaCities")
-def harvest(metadata_set, dest_folder, log_file, content_type,
-            from_date, until_date, no_keyword_filter):
+@click.option(
+    "--metadata_set",
+    prompt="Name of set to be retrieved",
+    help="Examples: fdc, ofm, mnc",
+)
+@click.option(
+    "--dest_folder",
+    prompt="Path of destination folder",
+    help="Path of destination folder",
+)
+@click.option("--log_file", prompt="Name of log file", help="Name of log file")
+@click.option("--content-type", help="Type of content, e.g. video")
+@click.option("--from", "from_date", help="Downloading content starting from this date")
+@click.option("--until", "until_date", help="Downloading content only until this date")
+@click.option(
+    "--no-keyword-filter", is_flag=True, help="Exclute filter on keyword IMediaCities"
+)
+def harvest(
+    metadata_set,
+    dest_folder,
+    log_file,
+    content_type,
+    from_date,
+    until_date,
+    no_keyword_filter,
+):
 
     #############################
     # ### FILESYSTEM CHECKS ### #
@@ -82,7 +88,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
         log.exit("Unable to create destination folder: %s" % dest_folder)
 
     try:
-        test_path = os.path.join(dest_folder, '__test_permissions__')
+        test_path = os.path.join(dest_folder, "__test_permissions__")
         os.makedirs(test_path)
         os.rmdir(test_path)
     except BaseException as e:
@@ -90,7 +96,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
         log.exit("Unable to use destination folder: %s" % dest_folder)
 
     try:
-        log_handle = open(log_file, 'a+')
+        log_handle = open(log_file, "a+")
         log_handle.close()
     except BaseException as e:
         log.error(str(e))
@@ -99,8 +105,8 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
     #################################
     # ### OAI-PMH CONFIGURATION ### #
     #################################
-    URL = 'https://node0-d-efg.d4science.org/efg/mvc/oai/oai.do'
-    metadata_prefix = 'efg'
+    URL = "https://node0-d-efg.d4science.org/efg/mvc/oai/oai.do"
+    metadata_prefix = "efg"
 
     ###################################
     # ### OPEN OAI-PMH CONNECTION ### #
@@ -136,12 +142,12 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
             log.exit("Unable to convert until date")
 
     report_data = {
-        'downloaded': 0,
-        'filtered': 0,
-        'saved': 0,
-        'saved_files': [],
-        'missing_sourceid': [],
-        'wrong_content_type': []
+        "downloaded": 0,
+        "filtered": 0,
+        "saved": 0,
+        "saved_files": [],
+        "missing_sourceid": [],
+        "wrong_content_type": [],
     }
     timestamp = int(1000 * time.time())
     log.info("Retrieving records for %s..." % metadata_set)
@@ -150,7 +156,8 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
             metadataPrefix=metadata_prefix,
             set=metadata_set,
             from_=from_date,
-            until=until_date)
+            until=until_date,
+        )
     except NoRecordsMatchError as e:
         log.exit(e)
 
@@ -173,17 +180,18 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
             #   Returns a list containing all matching elements
             #   in document order.
 
-            report_data['downloaded'] += 1
+            report_data["downloaded"] += 1
 
-            if report_data['downloaded'] % 100 == 0:
-                print('.', end='', flush=True)
+            if report_data["downloaded"] % 100 == 0:
+                print(".", end="", flush=True)
 
-                if report_data['downloaded'] % 5000 == 0:
+                if report_data["downloaded"] % 5000 == 0:
                     print(
-                        ' %s downloaded - %s saved' % (
-                            report_data['downloaded'],
-                            report_data['saved']
-                        ), flush=True)
+                        " {} downloaded - {} saved".format(
+                            report_data["downloaded"], report_data["saved"]
+                        ),
+                        flush=True,
+                    )
 
             efgEntity = element.find(tag("efgEntity"))
             if efgEntity is None:
@@ -197,17 +205,17 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                 recordSource = avcreation.find(tag("recordSource"))
                 keywords = avcreation.findall(tag("keywords"))
                 title_el = avcreation.find(tag("identifyingTitle"))
-                title = (title_el.text
-                         if title_el is not None
-                         else "Unknown title")
+                title = title_el.text if title_el is not None else "Unknown title"
             elif nonavcreation is not None:
                 manifestation = nonavcreation.find(tag("nonAVManifestation"))
                 recordSource = nonavcreation.find(tag("recordSource"))
                 keywords = nonavcreation.findall(tag("keywords"))
                 title_el = nonavcreation.find(tag("title"))
-                title = (title_el.find(tag("text")).text
-                         if title_el is not None
-                         else "Unknown title")
+                title = (
+                    title_el.find(tag("text")).text
+                    if title_el is not None
+                    else "Unknown title"
+                )
             else:
                 title = "Unknown title"
                 # log.warning("(non)avcreation not found, skipping record")
@@ -227,10 +235,10 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                 if not is_good:
                     continue
 
-            report_data['filtered'] += 1
+            report_data["filtered"] += 1
 
             if manifestation is None:
-                report_data['missing_sourceid'].append(title)
+                report_data["missing_sourceid"].append(title)
                 # log.warning("avManifestation not found, skipping record")
                 continue
 
@@ -240,18 +248,18 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
                 item = manifestation.find(tag("item"))
                 if item is None:
                     # missing <item> => type cannot be found
-                    report_data['wrong_content_type'].append(title)
+                    report_data["wrong_content_type"].append(title)
                     continue
 
                 item_type = item.find(tag("type"))
                 if item_type is None:
                     # missing <type>
-                    report_data['wrong_content_type'].append(title)
+                    report_data["wrong_content_type"].append(title)
                     continue
 
                 if item_type.text.lower() != content_type:
                     # wrong type
-                    report_data['wrong_content_type'].append(title)
+                    report_data["wrong_content_type"].append(title)
                     continue
 
             # ATTENZIONE: il sourceID va preso dal recordSource che sta
@@ -260,13 +268,13 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
 
             # recordSource = manifestation.find(tag("recordSource"))
             if recordSource is None:
-                report_data['missing_sourceid'].append(title)
+                report_data["missing_sourceid"].append(title)
                 # log.warning("recordSource not found, skipping record")
                 continue
 
             sourceID = recordSource.find(tag("sourceID"))
             if sourceID is None:
-                report_data['missing_sourceid'].append(title)
+                report_data["missing_sourceid"].append(title)
                 # log.warning("sourceID not found, skipping record")
                 continue
 
@@ -274,20 +282,16 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
 
             # id_text = urllib.parse.quote_plus(sourceID.text.strip())
             # replace non alpha-numeric characters with a dash
-            id_text = re.sub(r'[\W_]+', '-', sourceID.text.strip())
+            id_text = re.sub(r"[\W_]+", "-", sourceID.text.strip())
             # fine cinzia
 
-            filename = "%s_%s_%s.xml" % (
-                metadata_set,
-                id_text,
-                timestamp
-            )
+            filename = f"{metadata_set}_{id_text}_{timestamp}.xml"
             filepath = os.path.join(dest_folder, filename)
-            with codecs.open(filepath, 'wb', "utf-8") as f:
-                f.write(content.decode('utf-8'))
+            with codecs.open(filepath, "wb", "utf-8") as f:
+                f.write(content.decode("utf-8"))
 
-            report_data['saved'] += 1
-            report_data['saved_files'].append(filename)
+            report_data["saved"] += 1
+            report_data["saved_files"].append(filename)
 
     except NoRecordsMatchError as e:
         log.warning("No more records after filtering?")
@@ -302,7 +306,7 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
         # the list of records that do not contain the record ID
         #     (by writing the content of the element title)
 
-    with open(log_file, 'w+') as f:
+    with open(log_file, "w+") as f:
         json.dump(report_data, f)
 
     f.close()
@@ -310,11 +314,14 @@ def harvest(metadata_set, dest_folder, log_file, content_type,
     # Just to close previous dot line
     print("")
 
-    log.info("""
+    log.info(
+        """
 
-%s records from set [%s] downloaded
-open log file [%s] for details
-""" % (report_data['saved'], metadata_set, log_file)
+{} records from set [{}] downloaded
+open log file [{}] for details
+""".format(
+            report_data["saved"], metadata_set, log_file
+        )
     )
 
     # log.info("Report data for set %s" % (metadata_set))
@@ -329,5 +336,5 @@ open log file [%s] for details
     #     log.warning(s)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     harvest()

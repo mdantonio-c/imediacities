@@ -1,4 +1,4 @@
-@import 'vars';
+@import "vars";
 
 /*
   Bottoni da utilizzare
@@ -33,9 +33,12 @@
   color: #fff;
 }
 
-.btn-accent.disabled, .btn-accent.disabled:active, .btn-accent:disabled, .btn-accent:disabled:hover{
-  border-color: #ABBAC3 !important;
-  color:#fff !important;
+.btn-accent.disabled,
+.btn-accent.disabled:active,
+.btn-accent:disabled,
+.btn-accent:disabled:hover {
+  border-color: #abbac3 !important;
+  color: #fff !important;
 }
 
 .page-type-video {
@@ -60,7 +63,7 @@
       color: $theme-image-color;
     }
 
-   /* &:focus {
+    /* &:focus {
       color: $white;
     }*/
   }

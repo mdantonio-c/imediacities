@@ -1,7 +1,7 @@
 #
 # Script to import analysis XML flies into neo4j Annotation Model
 
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree as ET
 
 
 class XMLResultParser:

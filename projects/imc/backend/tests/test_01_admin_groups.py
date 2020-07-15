@@ -1,4 +1,5 @@
 import json
+
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -42,11 +43,11 @@ class TestApp(BaseTests):
         # Non e' prevista la possibilita' di fare get con uno specifico group_id
 
         log.info("*** Testing get /api/group/")
-        res = client.get('/api/group/test', headers=headers)
+        res = client.get("/api/group/test", headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        contents = json.loads(res.data.decode('utf-8'))
+        contents = json.loads(res.data.decode("utf-8"))
         if contents is not None:
-            datas = contents.get('Response', {}).get('data', {})
+            datas = contents.get("Response", {}).get("data", {})
             if datas is not None and datas[0] is not None:
                 # datas e' una lista
                 group_id = datas[0].get("id")
@@ -57,22 +58,22 @@ class TestApp(BaseTests):
         user_id = None
         # creo un nuovo utente per i test
         log.info("*** Creating user test")
-        group_data = {'id': group_id, 'shortname': group_shortname}
+        group_data = {"id": group_id, "shortname": group_shortname}
         post_user_data = {
-            'group': group_data,
-            'email': 'test@imediacities.org',
-            'name': 'test',
-            'password': 'test',
-            'surname': 'test',
+            "group": group_data,
+            "email": "test@imediacities.org",
+            "name": "test",
+            "password": "test",
+            "surname": "test",
         }
         res = client.post(
-            '/api/admin/users', headers=headers, data=json.dumps(post_user_data)
+            "/api/admin/users", headers=headers, data=json.dumps(post_user_data)
         )
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        contents = json.loads(res.data.decode('utf-8'))
+        contents = json.loads(res.data.decode("utf-8"))
         # log.debug("*** Response of post new user: "+json.dumps(contents))
         if contents is not None:
-            datas = contents.get('Response', {}).get('data', {})
+            datas = contents.get("Response", {}).get("data", {})
             if datas is not None:
                 user_id = datas
         # test della creazione di un nuovo gruppo e della sua modifica
@@ -80,35 +81,35 @@ class TestApp(BaseTests):
             new_group_id = None
             log.info("*** Testing POST group")
             post_data = {
-                'shortname': 'test_group',
-                'fullname': 'TEST_GROUP',
-                'coordinator': user_id,
+                "shortname": "test_group",
+                "fullname": "TEST_GROUP",
+                "coordinator": user_id,
             }
             # POST: try without log in
             res = client.post(
-                '/api/admin/groups', headers=None, data=json.dumps(post_data)
+                "/api/admin/groups", headers=None, data=json.dumps(post_data)
             )
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
             # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # POST: create a new group
             res = client.post(
-                '/api/admin/groups', headers=headers, data=json.dumps(post_data)
+                "/api/admin/groups", headers=headers, data=json.dumps(post_data)
             )
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            response = json.loads(res.data.decode('utf-8'))
+            response = json.loads(res.data.decode("utf-8"))
             # log.debug("*** Response of post: "+json.dumps(response))
             if response is not None:
-                new_group_id = response.get('Response', {}).get('data', {})
+                new_group_id = response.get("Response", {}).get("data", {})
             if new_group_id is not None:
                 # PUT: modify the metadata of the new group
                 log.info("*** Testing PUT group")
                 put_data = {
-                    'shortname': 'test_group_2',
-                    'fullname': 'TEST_GROUP_2',
-                    'coordinator': user_id,
+                    "shortname": "test_group_2",
+                    "fullname": "TEST_GROUP_2",
+                    "coordinator": user_id,
                 }
                 res = client.put(
-                    '/api/admin/groups/' + new_group_id,
+                    "/api/admin/groups/" + new_group_id,
                     headers=headers,
                     data=json.dumps(put_data),
                 )
@@ -117,17 +118,17 @@ class TestApp(BaseTests):
                 # faccio il test della get e intanto verifico che la put abbia funzionato
                 log.info("*** Testing GET groups")
                 # GET: try without log in
-                res = client.get('/api/admin/groups')
+                res = client.get("/api/admin/groups")
                 # This endpoint requires a valid authorization token
                 assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
                 # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
                 # GET all groups
-                res = client.get('/api/admin/groups', headers=headers)
+                res = client.get("/api/admin/groups", headers=headers)
                 assert res.status_code == hcodes.HTTP_OK_BASIC
-                contents = json.loads(res.data.decode('utf-8'))
+                contents = json.loads(res.data.decode("utf-8"))
                 # log.debug("*** Response of GET groups: "+json.dumps(contents))
                 if contents is not None:
-                    datas = contents.get('Response', {}).get('data', {})
+                    datas = contents.get("Response", {}).get("data", {})
                     # datas e' una lista
                     if datas is not None:
                         # scorro la lista per trovare il gruppo nuovo e verifico lo shortname
@@ -136,21 +137,21 @@ class TestApp(BaseTests):
                             if x.get("id") == new_group_id:
                                 assert (
                                     x.get("attributes").get("shortname")
-                                    == 'test_group_2'
+                                    == "test_group_2"
                                 )
                                 break
 
                 # DELETE: delete the new group
                 log.info("*** Testing DELETE group")
                 res = client.delete(
-                    '/api/admin/groups/' + new_group_id, headers=headers
+                    "/api/admin/groups/" + new_group_id, headers=headers
                 )
                 assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
         # cancello l'utente creato per questi test
         if user_id is not None:
             log.info("*** DELETE user test")
-            res = client.delete('/api/admin/users/' + user_id, headers=headers)
+            res = client.delete("/api/admin/users/" + user_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test

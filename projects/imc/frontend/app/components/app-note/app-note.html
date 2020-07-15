@@ -1,42 +1,52 @@
 <div class="notes-container">
-    <div class="notes-text">
-    	<div style="margin: 3px;padding: 3px;">
-          <i class="material-icons click-event"
-            title="Click to turn public"
-            style="font-size:15px !important"
-            *ngIf="note.private && can_delete"
-            mwlConfirmationPopover
-            [popoverTitle]="'Turn the note to public?'"
-            [popoverMessage]=""
-            [appendToBody]="popover.appendToBody"
-            (confirm)="unlock_note()"
-          >lock</i>
-           <span class="note-attribute-status" *ngIf="note.private">Private</span>
-          <i class="material-icons click-event"
-            title="Click to turn private"
-            style="font-size:15px !important"
-            *ngIf="!note.private && can_delete"
-            mwlConfirmationPopover
-            [popoverTitle]="'Turn the note to private?'"
-            [popoverMessage]=""
-            [appendToBody]="popover.appendToBody"
-            (confirm)="lock_note()"
-          >lock_open</i>
-          <span class="note-attribute-status" *ngIf="!note.private">Public</span>
-    		<span class="note-attribute" *ngIf="note.language" [innerHTML]="note.language"></span>
-    	</div>
-      <div [innerHTML]="note.name"></div>
+  <div class="notes-text">
+    <div style="margin: 3px; padding: 3px;">
+      <i
+        class="material-icons click-event"
+        title="Click to turn public"
+        style="font-size: 15px !important;"
+        *ngIf="note.private && can_delete"
+        mwlConfirmationPopover
+        [popoverTitle]="'Turn the note to public?'"
+        [popoverMessage]=""
+        [appendToBody]="popover.appendToBody"
+        (confirm)="unlock_note()"
+        >lock</i
+      >
+      <span class="note-attribute-status" *ngIf="note.private">Private</span>
+      <i
+        class="material-icons click-event"
+        title="Click to turn private"
+        style="font-size: 15px !important;"
+        *ngIf="!note.private && can_delete"
+        mwlConfirmationPopover
+        [popoverTitle]="'Turn the note to private?'"
+        [popoverMessage]=""
+        [appendToBody]="popover.appendToBody"
+        (confirm)="lock_note()"
+        >lock_open</i
+      >
+      <span class="note-attribute-status" *ngIf="!note.private">Public</span>
+      <span
+        class="note-attribute"
+        *ngIf="note.language"
+        [innerHTML]="note.language"
+      ></span>
     </div>
-    <!--
+    <div [innerHTML]="note.name"></div>
+  </div>
+  <!--
     <i class="material-icons click-event" [innerHTML]="icon" (click)="toggle()"></i>
   -->
 </div>
 <div class="notes-buttons" *ngIf="can_delete">
-    <i class="material-icons click-event"
-       mwlConfirmationPopover
-       [popoverTitle]="popover.popoverTitle + ' note?'"
-       [popoverMessage]="popover.popoverMessage"
-       [appendToBody]="popover.appendToBody"
-       (confirm)="delete()"
-    >delete</i>
+  <i
+    class="material-icons click-event"
+    mwlConfirmationPopover
+    [popoverTitle]="popover.popoverTitle + ' note?'"
+    [popoverMessage]="popover.popoverMessage"
+    [appendToBody]="popover.appendToBody"
+    (confirm)="delete()"
+    >delete</i
+  >
 </div>

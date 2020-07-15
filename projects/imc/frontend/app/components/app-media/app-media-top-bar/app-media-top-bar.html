@@ -1,17 +1,22 @@
 <!-- Black Topbar -->
 <div class="nav imc--topbar">
-    <span class="imc--flex--vertical-center back-icon">
-        <i class="material-icons click-event" (click)="backClicked()">keyboard_arrow_left</i>
-    </span>
-    <span class="imc--topbar--title imc--flex--vertical-center">
-        <i class="material-icons" [innerHTML]="icon"></i>
-        &nbsp;
-        <strong [innerHTML]="label"></strong>
-    </span>
-    <span class="imc--flex--item-end box-icons-share">
-        <app-add-to-list [item_id]="item_id" [flag]="'root'"
-            *ngIf="user && user.roles['Researcher']"></app-add-to-list>
-        <!-- <div>
+  <span class="imc--flex--vertical-center back-icon">
+    <i class="material-icons click-event" (click)="backClicked()"
+      >keyboard_arrow_left</i
+    >
+  </span>
+  <span class="imc--topbar--title imc--flex--vertical-center">
+    <i class="material-icons" [innerHTML]="icon"></i>
+    &nbsp;
+    <strong [innerHTML]="label"></strong>
+  </span>
+  <span class="imc--flex--item-end box-icons-share">
+    <app-add-to-list
+      [item_id]="item_id"
+      [flag]="'root'"
+      *ngIf="user && user.roles['Researcher']"
+    ></app-add-to-list>
+    <!-- <div>
             <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                 <i class="material-icons click-event">playlist_add</i>
             </a>
@@ -22,8 +27,8 @@
                 <a class="dropdown-item" href="#">Share your segment list</a>
             </div>
         </div> -->
-        
-        <!-- <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+
+    <!-- <a data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
             <i class="material-icons">share</i>
         </a>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -31,5 +36,5 @@
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="#">Share your segment list</a>
         </div> -->
-    </span>
+  </span>
 </div>

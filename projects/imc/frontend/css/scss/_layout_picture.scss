@@ -3,22 +3,21 @@
   height: 500px;
   text-align: center;
 }
-.imc--picture{
-
-  position:relative;
-  height:100%;
-  display:inline-block;
+.imc--picture {
+  position: relative;
+  height: 100%;
+  display: inline-block;
 
   img {
-    height:100%;
+    height: 100%;
   }
 
   svg {
-    position:absolute;
-    width:100%;
-    height:100%;
-    left:0;
-    top:0;
-    z-index:20;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 20;
   }
 }

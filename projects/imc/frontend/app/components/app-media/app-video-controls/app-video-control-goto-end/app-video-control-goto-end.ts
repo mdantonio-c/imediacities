@@ -1,20 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {AppVideoControlComponent} from "../app-video-control";
-
+import { Component, Input, OnInit } from "@angular/core";
+import { AppVideoControlComponent } from "../app-video-control";
 
 @Component({
-    selector: 'app-video-control-goto-end',
-    templateUrl: 'app-video-control-goto-end.html'
+  selector: "app-video-control-goto-end",
+  templateUrl: "app-video-control-goto-end.html",
 })
+export class AppVideoControlGotoEndComponent extends AppVideoControlComponent {
+  constructor() {
+    super();
+  }
 
-export class AppVideoControlGotoEndComponent extends AppVideoControlComponent  {
-
-    constructor() {
-        super();
-    }
-
-    goto_end () {
-        this.video.pause();
-        this.video.currentTime = this.parent.player.begin + this.parent.player.duration;
-    }
+  goto_end() {
+    this.video.pause();
+    this.video.currentTime =
+      this.parent.player.begin + this.parent.player.duration;
+  }
 }

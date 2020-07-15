@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SearchNavbarComponent } from './search-navbar.component';
+import { SearchNavbarComponent } from "./search-navbar.component";
 
-describe('SearchNavbarComponent', () => {
+describe("SearchNavbarComponent", () => {
   let component: SearchNavbarComponent;
   let fixture: ComponentFixture<SearchNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchNavbarComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchNavbarComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('SearchNavbarComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-@import 'vars';
+@import "vars";
 
 // Layout delle tab di fianco al player (shots, segments, areas, ecc)
 
@@ -48,11 +48,11 @@
 
   .imc--toolbar,
   .tab-content--footer {
-
     @media (max-width: 991.98px) {
       padding: 10px 18px !important;
 
-      .btn, button {
+      .btn,
+      button {
         font-size: 14px;
         padding: 5px 2.5px;
       }
@@ -69,7 +69,7 @@
   }
 }
 
-.tab-shots{
+.tab-shots {
   margin: 0 !important;
   text-align: right;
 
@@ -93,10 +93,9 @@
 
   .box-single-shot {
     &.active {
-      background-color: rgba($theme-image-color, .2);
+      background-color: rgba($theme-image-color, 0.2);
     }
   }
-
 }
 
 .page-type-video {
@@ -111,12 +110,10 @@
 
   .box-single-shot {
     &.active {
-      background-color: rgba($theme-video-color, .2);
+      background-color: rgba($theme-video-color, 0.2);
     }
   }
-
 }
-
 
 // Tab segment
 

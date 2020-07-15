@@ -1,87 +1,113 @@
 <!-- Sezione COMMENTI -->
 
 <div class="imc--content-comments">
-    <h3 class="imc--title-bold">2 Comments</h3>
+  <h3 class="imc--title-bold">2 Comments</h3>
 
-    <div class="row box-add-comment no-gutters">
-        <div class="col-2 col-sm-1">
-            <span class="profile-image">
-                <!-- @NSI se l'immagine del profilo non esiste, appare in background l'icona utente generale, su invision c'è l'iniziale del
+  <div class="row box-add-comment no-gutters">
+    <div class="col-2 col-sm-1">
+      <span class="profile-image">
+        <!-- @NSI se l'immagine del profilo non esiste, appare in background l'icona utente generale, su invision c'è l'iniziale del
                 nome utente, vedere se cambiarlo o meno -->
-            </span>
-        </div>
-        <div class="col-10 col-sm-11 imc--flex--vertical-center">
-            <textarea class="imc--input"
-                      placeholder="Add a public comment"
-                      aria-label="comment"></textarea>
-        </div>
+      </span>
     </div>
+    <div class="col-10 col-sm-11 imc--flex--vertical-center">
+      <textarea
+        class="imc--input"
+        placeholder="Add a public comment"
+        aria-label="comment"
+      ></textarea>
+    </div>
+  </div>
 
-    <div class="row no-gutters box-comment">
+  <div class="row no-gutters box-comment">
+    <!-- @NSI esempio di primo commento -->
+    <div class="col-2 col-sm-1">
+      <span class="profile-image"></span>
+    </div>
+    <div class="col-10 col-sm-11">
+      <div>
+        <h5 class="box-comment--vote"><strong>Gianna Roghi</strong></h5>
+        &nbsp; 3 years ago &nbsp;
+        <i class="material-icons click-event">delete</i>
+      </div>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
+        sollicitudin fermentum sem, ut ornare augue ullamcorper non. Sed
+        facilisis a lectus ultricies ornare. Donec fringilla, nisl feugiat porta
+        mattis, lacus lacus molestie nibh, non pharetra lacus dolor eget dolor.
+      </p>
+      <span class="box-comment--vote">
+        <!-- @NSI rendere i dati numerici dinamici -->
+        <i class="material-icons click-event">thumb_up</i> 52
+      </span>
+      <span class="box-comment--vote">
+        <i class="material-icons click-event">thumb_down</i> 2
+      </span>
+      <!-- @NSI bottone che aziona la risposta -->
+      <span class="box-comment--vote">
+        <a
+          href="javascript:void(0)"
+          *ngIf="!addReply"
+          (click)="mostraTextarea()"
+          >REPLY</a
+        >
+        <a href="javascript:void(0)" *ngIf="addReply" (click)="mostraTextarea()"
+          >CANCEL</a
+        >
+      </span>
 
-        <!-- @NSI esempio di primo commento -->
-        <div class="col-2 col-sm-1">
-            <span class="profile-image"></span>
-        </div>
-        <div class="col-10 col-sm-11">
+      <!-- @NSI input per l'inserimento di una risposta -->
+      <textarea
+        *ngIf="addReply"
+        class="imc--input space-paragraph-10"
+        placeholder="Insert reply"
+        aria-label="reply"
+      ></textarea>
+
+      <!-- Risposte ai commenti -->
+      <div class="row no-gutters">
+        <!-- @NSI label che mostra e nasconde le risposte al commento principale -->
+        <h5
+          *ngIf="!reply"
+          (click)="mostraRisposte()"
+          class="box-comment--vote click-event"
+        >
+          View 1 replies <i class="material-icons">keyboard_arrow_down</i>
+        </h5>
+        <h5
+          *ngIf="reply"
+          (click)="mostraRisposte()"
+          class="box-comment--vote click-event"
+        >
+          Hide replies <i class="material-icons"> keyboard_arrow_up</i>
+        </h5>
+        <div *ngIf="reply" class="col-12 row no-gutters">
+          <div class="col-2 col-sm-1"><span class="profile-image"></span></div>
+          <div class="col-10 col-sm-11">
             <div>
-                <h5 class="box-comment--vote"><strong>Gianna Roghi</strong></h5> &nbsp;
-                3 years ago &nbsp;
-                <i class="material-icons click-event">delete</i>
+              <h5 class="box-comment--vote"><strong>Luca Rossi</strong></h5>
+              &nbsp; 2 years ago &nbsp;
+              <i class="material-icons click-event">delete</i>
             </div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin fermentum sem, ut ornare augue ullamcorper non. Sed
-               facilisis a lectus ultricies ornare. Donec fringilla, nisl feugiat porta mattis, lacus lacus molestie nibh, non pharetra lacus
-               dolor eget dolor.</p>
+            <p>
+              Morbi sollicitudin fermentum sem, ut ornare augue ullamcorper non.
+              Sed facilisis a lectus ultricies ornare. Lacus lacus molestie
+              nibh, non pharetra lacus dolor eget dolor.
+            </p>
             <span class="box-comment--vote">
-                <!-- @NSI rendere i dati numerici dinamici -->
-                <i class="material-icons click-event">thumb_up</i> 52
+              <!-- @NSI rendere i dati numerici dinamici -->
+              <i class="material-icons click-event">thumb_up</i> 6
             </span>
             <span class="box-comment--vote">
-                <i class="material-icons click-event">thumb_down</i> 2
+              <i class="material-icons click-event">thumb_down</i> 0
             </span>
-            <!-- @NSI bottone che aziona la risposta -->
-            <span class="box-comment--vote">
-                <a href="javascript:void(0)" *ngIf="!addReply" (click)="mostraTextarea()">REPLY</a>
-                <a href="javascript:void(0)" *ngIf="addReply" (click)="mostraTextarea()">CANCEL</a>
-            </span>
-
-            <!-- @NSI input per l'inserimento di una risposta -->
-            <textarea *ngIf="addReply" class="imc--input space-paragraph-10" placeholder="Insert reply" aria-label="reply"></textarea>
-
-            <!-- Risposte ai commenti -->
-            <div class="row no-gutters">
-                <!-- @NSI label che mostra e nasconde le risposte al commento principale -->
-                <h5 *ngIf="!reply" (click)="mostraRisposte()" class="box-comment--vote click-event">View 1 replies
-                    <i class="material-icons">keyboard_arrow_down</i></h5>
-                <h5 *ngIf="reply" (click)="mostraRisposte()" class="box-comment--vote click-event">Hide replies <i class="material-icons">
-                    keyboard_arrow_up</i></h5>
-                <div *ngIf="reply" class="col-12 row no-gutters">
-                    <div class="col-2 col-sm-1"><span class="profile-image"></span></div>
-                    <div class="col-10 col-sm-11">
-                        <div>
-                            <h5 class="box-comment--vote"><strong>Luca Rossi</strong></h5> &nbsp;
-                            2 years ago &nbsp;
-                            <i class="material-icons click-event">delete</i>
-                        </div>
-                        <p>Morbi sollicitudin fermentum sem, ut ornare augue ullamcorper non. Sed
-                           facilisis a lectus ultricies ornare. Lacus lacus molestie nibh, non pharetra lacus
-                           dolor eget dolor.</p>
-                        <span class="box-comment--vote">
-                            <!-- @NSI rendere i dati numerici dinamici -->
-                            <i class="material-icons click-event">thumb_up</i> 6
-                        </span>
-                        <span class="box-comment--vote">
-                            <i class="material-icons click-event">thumb_down</i> 0
-                        </span>
-                       <!-- <span class="box-comment&#45;&#45;vote"><a href="#">REPLY</a></span>
+            <!-- <span class="box-comment&#45;&#45;vote"><a href="#">REPLY</a></span>
                         <div class="row ">
                             <h5 class="box-comment&#45;&#45;vote">View all 2 replies <i class="material-icons">keyboard_arrow_down</i></h5>
                         </div>-->
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
+      </div>
     </div>
-
+  </div>
 </div>

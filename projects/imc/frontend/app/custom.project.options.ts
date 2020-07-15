@@ -1,125 +1,122 @@
-import { Injectable } from '@angular/core';
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import { Injectable } from "@angular/core";
+import { FormlyFieldConfig } from "@ngx-formly/core";
 
 @Injectable()
 export class ProjectOptions {
-    private terms_of_use: string;
-    private privacy_policy: string;
-    private research_declaration: string;
+  private terms_of_use: string;
+  private privacy_policy: string;
+  private research_declaration: string;
 
-	constructor() {
-        this.initTemplates();
+  constructor() {
+    this.initTemplates();
+  }
+
+  public get_option(opt): any {
+    if (opt == "registration") {
+      return this.registration_options();
     }
 
-	public get_option(opt):any {
-
-		if (opt == 'registration') {
-			return this.registration_options()
-		}
-
-        if (opt == 'privacy_acceptance') {
-            return this.privacy_acceptance()
-        }
-
-        if (opt == 'user_page') {
-            return {
-                "group": true,
-                "custom": [
-                    {name: 'Institution', prop: "declared_institution", flexGrow: 0.7}
-                ]
-            }
-        }
-
-		return null;
-	}
-
-    private privacy_acceptance() {
-
-        return [
-            {'label': 'Terms of Use', 'text': this.terms_of_use},
-            {'label': 'Privacy Policy', 'text': this.privacy_policy},
-            {'label': 'Research declaration', 'text': this.research_declaration}
-        ];
+    if (opt == "privacy_acceptance") {
+      return this.privacy_acceptance();
     }
-	
-	private registration_options() {
 
-		let fields: FormlyFieldConfig[] = []; 
+    if (opt == "user_page") {
+      return {
+        group: true,
+        custom: [
+          { name: "Institution", prop: "declared_institution", flexGrow: 0.7 },
+        ],
+      };
+    }
 
-		fields.push(
-            {
-                "key": 'declared_institution',
-                "type": 'select',
-                "templateOptions": {
-                    "label": 'Do you work at one of the following institutions:',
-                    "required": true,
-                    "addonLeft": {
-                        "class": "fa fa-bank"
-                    },
-                    "options": [
-                      { label: 'Archive', value: 'archive' },
-                      { label: 'University', value: 'university' },
-                      { label: 'Research Institution', value: 'research_institution' },
-                      { label: 'None of the above', value: 'none' },
-                    ]
-                }
-            },
-            {
-                "className": "section-label",
-                "template": "<hr><div><strong>To protect your privacy we ask you to accept our:</strong></div><br>"
-            },
-            {
-                "key": 'terms_of_use_optin',
-                "type": 'terms_of_use',
-                "templateOptions": {
-                    "label": 'Terms of Use',
-                    "terms_of_use": this.terms_of_use
-                },
-                "validators": {
-                    "fieldMatch": {
-                        "expression": (control) => control.value,
-                    }
-                }
-            },
-            {
-                "key": 'privacy_policy_optin',
-                "type": 'terms_of_use',
-                "templateOptions": {
-                    "label": 'Privacy Policy',
-                    "terms_of_use": this.privacy_policy
-                },
-                "validators": {
-                    "fieldMatch": {
-                        "expression": (control) => control.value,
-                    }
-                }
-            },
-            {
-                "key": 'research_optin',
-                "type": 'terms_of_use',
-                "templateOptions": {
-                    "label": 'Research declaration',
-                    "terms_of_use": this.research_declaration
-                },
-                "validators": {
-                    "fieldMatch": {
-                        "expression": (control) => control.value,
-                    }
-                }
-            }
+    return null;
+  }
 
-        );
+  private privacy_acceptance() {
+    return [
+      { label: "Terms of Use", text: this.terms_of_use },
+      { label: "Privacy Policy", text: this.privacy_policy },
+      { label: "Research declaration", text: this.research_declaration },
+    ];
+  }
 
-        let disclaimer = `
+  private registration_options() {
+    let fields: FormlyFieldConfig[] = [];
+
+    fields.push(
+      {
+        key: "declared_institution",
+        type: "select",
+        templateOptions: {
+          label: "Do you work at one of the following institutions:",
+          required: true,
+          addonLeft: {
+            class: "fa fa-bank",
+          },
+          options: [
+            { label: "Archive", value: "archive" },
+            { label: "University", value: "university" },
+            { label: "Research Institution", value: "research_institution" },
+            { label: "None of the above", value: "none" },
+          ],
+        },
+      },
+      {
+        className: "section-label",
+        template:
+          "<hr><div><strong>To protect your privacy we ask you to accept our:</strong></div><br>",
+      },
+      {
+        key: "terms_of_use_optin",
+        type: "terms_of_use",
+        templateOptions: {
+          label: "Terms of Use",
+          terms_of_use: this.terms_of_use,
+        },
+        validators: {
+          fieldMatch: {
+            expression: (control) => control.value,
+          },
+        },
+      },
+      {
+        key: "privacy_policy_optin",
+        type: "terms_of_use",
+        templateOptions: {
+          label: "Privacy Policy",
+          terms_of_use: this.privacy_policy,
+        },
+        validators: {
+          fieldMatch: {
+            expression: (control) => control.value,
+          },
+        },
+      },
+      {
+        key: "research_optin",
+        type: "terms_of_use",
+        templateOptions: {
+          label: "Research declaration",
+          terms_of_use: this.research_declaration,
+        },
+        validators: {
+          fieldMatch: {
+            expression: (control) => control.value,
+          },
+        },
+      }
+    );
+
+    let disclaimer = `
 Welcome to the registration page of I-Media-Cities. Registering a personal account is free of charge, in compliance with European law, and will allow you to enjoy a whole list of additional platform functionalities, such as adding your own information to films and photographs.<br>
 <br>
 <strong>In order to explore the I Media Cities platform you have to register yourself with a valid e-mail address. We will send you a confirmation link after the registration.</strong>
 `;
-		return {"fields": fields, "disclaimer": disclaimer}
-	}
+    return { fields: fields, disclaimer: disclaimer };
+  }
 
-    private initTemplates() {
-        this.terms_of_use = `
+  private initTemplates() {
+    this.terms_of_use = `
 <p>
     <br/>
     Please read these Terms of Use,
@@ -704,7 +701,7 @@ announce the change via our main site (    <u><a href="http://www.imediacities.e
 </p>
 
         `;
-        this.privacy_policy = `
+    this.privacy_policy = `
 <p>
     Please read this Privacy Policy,
     <u>
@@ -880,7 +877,7 @@ open source newsletter software provider    <a href="http://www.mailchimp.com/">
     </strong>
 </p>
         `;
-        this.research_declaration = `
+    this.research_declaration = `
 By accepting this research declaration, you agree to the following:
 <ul>
     <li> You agree to only use the I-Media-Cities platform and functionalities to
@@ -907,6 +904,5 @@ By accepting this research declaration, you agree to the following:
     licensors of the Content.
 </ul>
         `;
-    }
-
+  }
 }

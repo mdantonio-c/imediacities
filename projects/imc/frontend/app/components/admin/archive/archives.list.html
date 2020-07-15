@@ -1,26 +1,24 @@
-<div class='container-fluid'>
+<div class="container-fluid">
   <div class="row justify-content-md-center">
-    <div class='col-12'>
-      <div class='card'>
-        <div class='card-header'>
-          <h4>
-          <i class='fa fa-file-archive-o'></i> Data archive
-          </h4>
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4><i class="fa fa-file-archive-o"></i> Data archive</h4>
         </div>
-        <div class='card-block'>
-          <ngx-spinner [fullScreen] = "false"></ngx-spinner>
-          <ngb-accordion close-others=true>
-          <ngb-panel *ngFor="let group of groups | keyvalue">
-          <ng-template ngbPanelTitle>
-            <span class='text-left'>
-              Stage files uploaded by <b>{{group.value.fullname}}</b> 
-              (<i>{{group.value.id}}</i>)
-            </span>
-          </ng-template>
-          <ng-template ngbPanelContent>
-          <imc-archive [group]="group.value"></imc-archive>
-          </ng-template>
-          </ngb-panel>
+        <div class="card-block">
+          <ngx-spinner [fullScreen]="false"></ngx-spinner>
+          <ngb-accordion close-others="true">
+            <ngb-panel *ngFor="let group of groups | keyvalue">
+              <ng-template ngbPanelTitle>
+                <span class="text-left">
+                  Stage files uploaded by <b>{{group.value.fullname}}</b>
+                  (<i>{{group.value.id}}</i>)
+                </span>
+              </ng-template>
+              <ng-template ngbPanelContent>
+                <imc-archive [group]="group.value"></imc-archive>
+              </ng-template>
+            </ngb-panel>
           </ngb-accordion>
         </div>
       </div>

@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SearchTimelineComponent } from './search-timeline.component';
+import { SearchTimelineComponent } from "./search-timeline.component";
 
-describe('SearchTimelineComponent', () => {
+describe("SearchTimelineComponent", () => {
   let component: SearchTimelineComponent;
   let fixture: ComponentFixture<SearchTimelineComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchTimelineComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchTimelineComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('SearchTimelineComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

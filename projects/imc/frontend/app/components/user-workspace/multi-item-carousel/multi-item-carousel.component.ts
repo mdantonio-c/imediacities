@@ -1,28 +1,38 @@
-import { Component, Input, Output, OnChanges, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NotificationService } from '@rapydo/services/notification';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Providers } from '../../../catalog/services/data';
-import { MediaUtilsService } from '../../../catalog/services/media-utils.service'
-import { CatalogService, SearchFilter } from '../../../catalog/services/catalog.service';
-import { ListsService } from '../../../services/lists.service'
-import { ItemDetail } from '../item-detail/item-detail.component';
+import {
+  Component,
+  Input,
+  Output,
+  OnChanges,
+  EventEmitter,
+  ViewChild,
+  ChangeDetectorRef,
+} from "@angular/core";
+import { NotificationService } from "@rapydo/services/notification";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Providers } from "../../../catalog/services/data";
+import { MediaUtilsService } from "../../../catalog/services/media-utils.service";
+import {
+  CatalogService,
+  SearchFilter,
+} from "../../../catalog/services/catalog.service";
+import { ListsService } from "../../../services/lists.service";
+import { ItemDetail } from "../item-detail/item-detail.component";
 
 @Component({
-  selector: 'multi-item-carousel',
-  templateUrl: './multi-item-carousel.component.html',
-  styleUrls: ['./multi-item-carousel.component.css'],
+  selector: "multi-item-carousel",
+  templateUrl: "./multi-item-carousel.component.html",
+  styleUrls: ["./multi-item-carousel.component.css"],
 })
 export class MultiItemCarouselComponent implements OnChanges {
-
   @Input() filter: SearchFilter = {};
-  @Input() endpoint: string = 'search';
+  @Input() endpoint: string = "search";
   @Input() listId: string;
   @Output() onResult: EventEmitter<number> = new EventEmitter<number>();
   @Output() onDelete: EventEmitter<string> = new EventEmitter<string>();
 
-  @ViewChild('slickModal', { static: false }) slickModal;
-  @ViewChild('confirmModal', { static: false }) confirmModal;
-  @ViewChild('itemConfirmModal', { static: false }) itemConfirmModal;
+  @ViewChild("slickModal", { static: false }) slickModal;
+  @ViewChild("confirmModal", { static: false }) confirmModal;
+  @ViewChild("itemConfirmModal", { static: false }) itemConfirmModal;
 
   slides: ItemDetail[] = [];
   loading = false;
@@ -32,12 +42,12 @@ export class MultiItemCarouselComponent implements OnChanges {
   private total: number;
 
   slideConfig = {
-    "infinite": false,
-    "slidesToShow": 8,
-    "slidesToScroll": 1,
-    "swipeToSlide": true,
-    "variableWidth": true,
-    "lazyLoad": "progressive"
+    infinite: false,
+    slidesToShow: 8,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    variableWidth: true,
+    lazyLoad: "progressive",
   };
 
   _trackBy(slide) {
@@ -49,7 +59,8 @@ export class MultiItemCarouselComponent implements OnChanges {
     private listsService: ListsService,
     private modalService: NgbModal,
     private cdRef: ChangeDetectorRef,
-    private notify: NotificationService) { }
+    private notify: NotificationService
+  ) {}
 
   slickInit(e) {
     /*console.log('slick initialized');*/
@@ -69,7 +80,10 @@ export class MultiItemCarouselComponent implements OnChanges {
       let end = e.currentSlide + slidesToShow - 1;
       /*console.log(`Active slides [${e.currentSlide}-${end}]`);*/
       let offset = 1; // load next page one step before the end
-      if (this.slides.length < this.total && (end + offset) == this.slides.length) {
+      if (
+        this.slides.length < this.total &&
+        end + offset == this.slides.length
+      ) {
         this.currentPage += 1;
         this.load(true);
       }
@@ -100,7 +114,7 @@ export class MultiItemCarouselComponent implements OnChanges {
     } else {
       this.slides = new_results;
     }
-    return this.slides
+    return this.slides;
   }
 
   close() {
@@ -118,26 +132,27 @@ export class MultiItemCarouselComponent implements OnChanges {
         /*console.log('load my list...');*/
         this.close();
         this.listsService.getLists(undefined, true).subscribe(
-          response => {
+          (response) => {
             this.slickModal.unslick();
-            this.slides = response.map(lst => {
+            this.slides = response.map((lst) => {
               return {
-                'id': lst.id,
-                'title': lst.name,
-                'description': lst.description,
-                'type': lst.type,
-                'nb_items': lst.nb_items
-              }
+                id: lst.id,
+                title: lst.name,
+                description: lst.description,
+                type: lst.type,
+                nb_items: lst.nb_items,
+              };
             });
             this.total = this.slides.length;
             this.onResult.emit(this.total);
             this.loading = false;
           },
-          error => {
+          (error) => {
             this.notify.showError(error);
             this.loading = false;
             this.slickModal.initSlick();
-          });
+          }
+        );
         break;
       case "listItems":
         console.log(`load items for list <${this.listId}>`);
@@ -145,63 +160,73 @@ export class MultiItemCarouselComponent implements OnChanges {
         this.slickModal.unslick();*/
         this.close();
         this.listsService.getListItems(this.listId).subscribe(
-          response => {
-            this.slides = response.map(media => {
-              let mediaType = '';
-              if (media.type === 'shot') {
-                mediaType = 'aventity';
+          (response) => {
+            this.slides = response.map((media) => {
+              let mediaType = "";
+              if (media.type === "shot") {
+                mediaType = "aventity";
               } else {
-                mediaType = (media.item_type.key === 'Video') ? 'aventity' : 'nonaventity';
+                mediaType =
+                  media.item_type.key === "Video" ? "aventity" : "nonaventity";
               }
               let r = {
-                'id': media.id,
-                'title': media.title,
-                'description': media.description,
-                'type': mediaType,
-                'thumbnail': media.links['thumbnail'],
-                'listItem': true,
-                'listId': this.listId,
-                'ref': media
-              }
-              if (mediaType === 'aventity') r['duration'] = media.duration;
+                id: media.id,
+                title: media.title,
+                description: media.description,
+                type: mediaType,
+                thumbnail: media.links["thumbnail"],
+                listItem: true,
+                listId: this.listId,
+                ref: media,
+              };
+              if (mediaType === "aventity") r["duration"] = media.duration;
               return r;
             });
             this.total = this.slides.length;
             this.onResult.emit(this.total);
             this.loading = false;
           },
-          error => {
+          (error) => {
             this.notify.showError(error);
             this.loading = false;
-          });
+          }
+        );
         break;
       default:
         if (!append) {
           this.close();
         }
         /*console.log(this.filter);*/
-        this.catalogService.search(this.filter, this.currentPage, this.pageSize, false).subscribe(
-          response => {
-            this.slides = this.update_results(append, this.currentPage, response.data.map(media => {
-              let r = {
-                'id': media.id,
-                'title': MediaUtilsService.getIdentifyingTitle(media),
-                'description': MediaUtilsService.getDescription(media),
-                'type': media.type,
-                'thumbnail': media.links['thumbnail']
-              }
-              if (media.type === 'aventity') r['duration'] = media._item[0].duration;
-              return r;
-            }));
-            this.total = response.meta.totalItems;
-            this.onResult.emit(this.total);
-            this.loading = false;
-            /*this.slickModal.initSlick();*/
-          },
-          error => {
-            this.notify.showError(error);
-            this.loading = false;
-          });
+        this.catalogService
+          .search(this.filter, this.currentPage, this.pageSize, false)
+          .subscribe(
+            (response) => {
+              this.slides = this.update_results(
+                append,
+                this.currentPage,
+                response.data.map((media) => {
+                  let r = {
+                    id: media.id,
+                    title: MediaUtilsService.getIdentifyingTitle(media),
+                    description: MediaUtilsService.getDescription(media),
+                    type: media.type,
+                    thumbnail: media.links["thumbnail"],
+                  };
+                  if (media.type === "aventity")
+                    r["duration"] = media._item[0].duration;
+                  return r;
+                })
+              );
+              this.total = response.meta.totalItems;
+              this.onResult.emit(this.total);
+              this.loading = false;
+              /*this.slickModal.initSlick();*/
+            },
+            (error) => {
+              this.notify.showError(error);
+              this.loading = false;
+            }
+          );
         break;
     }
   }
@@ -214,55 +239,66 @@ export class MultiItemCarouselComponent implements OnChanges {
       this.modalService.open(this.itemConfirmModal).result.then(
         (result) => {
           this.listsService.removeItemfromList(item.id, item.listId).subscribe(
-            response => {
-              this.notify.showSuccess(`Item <${itemTitle}> removed successfully`);
-              this.slides = this.slides.filter(s =>  s.id !== item.id);
+            (response) => {
+              this.notify.showSuccess(
+                `Item <${itemTitle}> removed successfully`
+              );
+              this.slides = this.slides.filter((s) => s.id !== item.id);
               this.total = this.slides.length;
               this.onResult.emit(this.total);
               if (this.total === 0) {
                 this.slickModal.unslick();
               }
             },
-            error => {
+            (error) => {
               this.notify.showError(error);
-            });
-        }, (reason) => {
+            }
+          );
+        },
+        (reason) => {
           // keep focus on item
           item.focus = true;
-        });
+        }
+      );
       return;
     }
 
     const modalRef = this.modalService.open(this.confirmModal);
-    modalRef.result.then((result) => {
-      switch (item.type) {
-        case "list":
-          console.log(`delete list <${itemTitle}>`);
-          this.listsService.removeList(item.id).subscribe(
-            response => {
-              this.notify.showSuccess(`List <${itemTitle}> removed successfully`);
-              // update the list in the view
-              this.slides = this.slides.filter(s =>  s.id !== item.id);
-              this.total = this.slides.length;
-              this.onResult.emit(this.total);
-              if (this.total === 0) {
-                this.slickModal.unslick();
+    modalRef.result.then(
+      (result) => {
+        switch (item.type) {
+          case "list":
+            console.log(`delete list <${itemTitle}>`);
+            this.listsService.removeList(item.id).subscribe(
+              (response) => {
+                this.notify.showSuccess(
+                  `List <${itemTitle}> removed successfully`
+                );
+                // update the list in the view
+                this.slides = this.slides.filter((s) => s.id !== item.id);
+                this.total = this.slides.length;
+                this.onResult.emit(this.total);
+                if (this.total === 0) {
+                  this.slickModal.unslick();
+                }
+                // close the related item list if open
+                this.onDelete.emit(item.id);
+              },
+              (error) => {
+                this.notify.showError(error);
               }
-              // close the related item list if open
-              this.onDelete.emit(item.id);
-            },
-            error => {
-              this.notify.showError(error);
-            });
-          break;
+            );
+            break;
 
-        default:
-          console.warn(`Delete operation not allowed for type ${item.type}`);
-          break;
+          default:
+            console.warn(`Delete operation not allowed for type ${item.type}`);
+            break;
+        }
+      },
+      (reason) => {
+        // keep focus on item
+        item.focus = true;
       }
-    }, (reason) => {
-      // keep focus on item
-      item.focus = true;
-    });
+    );
   }
 }

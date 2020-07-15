@@ -1,24 +1,39 @@
 <div class="card-header">
-    <h5 class="mb-0">
-        <button class="btn btn-link collapsed"
-                (click)="panel_expand()"
-                [attr.aria-expanded]="!panel_is_expanded"
-                [attr.aria-controls]="panel_id">
-            <div class="row">
-                <div class="col-9 col-sm-10">
-                    <span [innerHTML]="title"></span>
-                    <span class="imc--title-bold" [innerHTML]="subtitle" *ngIf="subtitle"></span>
-                </div>
-                <div class="col imc--flex--horizontal-end" *ngIf="allow_expansion">
-                    <i *ngIf="panel_is_expanded" class="material-icons">keyboard_arrow_down</i>
-                    <i *ngIf="!panel_is_expanded" class="material-icons">keyboard_arrow_up</i>
-                </div>
-            </div>
-        </button>
-    </h5>
+  <h5 class="mb-0">
+    <button
+      class="btn btn-link collapsed"
+      (click)="panel_expand()"
+      [attr.aria-expanded]="!panel_is_expanded"
+      [attr.aria-controls]="panel_id"
+    >
+      <div class="row">
+        <div class="col-9 col-sm-10">
+          <span [innerHTML]="title"></span>
+          <span
+            class="imc--title-bold"
+            [innerHTML]="subtitle"
+            *ngIf="subtitle"
+          ></span>
+        </div>
+        <div class="col imc--flex--horizontal-end" *ngIf="allow_expansion">
+          <i *ngIf="panel_is_expanded" class="material-icons"
+            >keyboard_arrow_down</i
+          >
+          <i *ngIf="!panel_is_expanded" class="material-icons"
+            >keyboard_arrow_up</i
+          >
+        </div>
+      </div>
+    </button>
+  </h5>
 </div>
-<div [id]="panel_id" class="collapse"  [ngbCollapse]="panel_is_expanded" *ngIf="allow_expansion">
-    <div class="card-body row">
-        <ng-content></ng-content>
-    </div>
+<div
+  [id]="panel_id"
+  class="collapse"
+  [ngbCollapse]="panel_is_expanded"
+  *ngIf="allow_expansion"
+>
+  <div class="card-body row">
+    <ng-content></ng-content>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 // Layout per il vocabolario
 
-@import 'vars';
+@import "vars";
 
 .imc--container-tree {
   width: 100%;
@@ -18,8 +18,6 @@
     line-height: 23px;
     margin: 0;
     padding: 3px 0;
-
-
 
     /* si può togliere se non piace */
     &:hover {
@@ -64,7 +62,6 @@
       .page-type-image & {
         color: $theme-image-color;
       }
-
     }
   }
 
@@ -83,7 +80,6 @@
     }
   }*/
 
-
   // Lista secondaria
 
   .term-list {
@@ -101,7 +97,7 @@
         padding: 3px 10px 3px 20px;
       }
 
-     /* i, .term {
+      /* i, .term {
         display: table-cell;
       }*/
     }
@@ -123,17 +119,11 @@
 }
 
 .page-type-image {
-
   .child-list {
-
     li .term {
-
       &:hover {
         background: rgba($theme-image-color, 0.3) !important;
       }
     }
   }
 }
-
-
-

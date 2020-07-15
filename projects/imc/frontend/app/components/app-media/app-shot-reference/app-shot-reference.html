@@ -1,11 +1,12 @@
 <div class="col-5 modal--list-thumb click-event" (click)="shot_play()">
-    <span><img [src]="shot.links.thumbnail" alt=""></span>
+  <span><img [src]="shot.links.thumbnail" alt="" /></span>
 </div>
 <div class="col-7 modal--list-info" *ngIf="isVideo()">
-    <strong>SHOT <span [innerHTML]="shot.shot_num +1"></span></strong>
-    <p>
-        smpte: <span [innerHTML]="shot.timestamp"></span> <br>
-        frame range: <span [innerHTML]="shot.start_frame_idx"></span> - <span [innerHTML]="shot.end_frame_idx"></span> <br>
-        duration: <span [innerHTML]="shot.duration"></span>s
-    </p>
+  <strong>SHOT <span [innerHTML]="shot.shot_num +1"></span></strong>
+  <p>
+    smpte: <span [innerHTML]="shot.timestamp"></span> <br />
+    frame range: <span [innerHTML]="shot.start_frame_idx"></span> -
+    <span [innerHTML]="shot.end_frame_idx"></span> <br />
+    duration: <span [innerHTML]="shot.duration"></span>s
+  </p>
 </div>

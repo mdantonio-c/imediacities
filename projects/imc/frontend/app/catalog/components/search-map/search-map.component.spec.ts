@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SearchMapComponent } from './search-map.component';
+import { SearchMapComponent } from "./search-map.component";
 
-describe('SearchMapComponent', () => {
+describe("SearchMapComponent", () => {
   let component: SearchMapComponent;
   let fixture: ComponentFixture<SearchMapComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchMapComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchMapComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('SearchMapComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

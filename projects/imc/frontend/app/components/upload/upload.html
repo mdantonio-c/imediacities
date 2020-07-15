@@ -1,146 +1,165 @@
-
-<div class='container-fluid'>
-<div class="row justify-content-md-center">
-<div class='col-12'>
-
-<div class='card'>
-<div class='card-header'>
-	<h4 class='panel-title'>
-		<i class='fa fa-cloud-upload'></i> Upload new content
-	</h4>
-</div>
-
-<div class='card-block'>
-
-	<div class='row'>
-	<div class="col-md-12">
-
-        <input *ngIf='upload_options' type="file" [uploadx]="upload_options" (uploadxState)="onUpload($event)">
-
-        <br><br>
-
-        <div *ngFor="let item of upload_progress | keyvalue">
-            <div class='row'>
-                <div class='col-6'>
-                    {{item.key}}
-                </div>
-                <div class='col-6'>
-                    <ngb-progressbar 
-                        *ngIf='item.value > 0'
-                        type="info" height="2rem" showValue="true" [value]="item.value">
-                    </ngb-progressbar>
-                    <span *ngIf='item.value == 0'>
-                        upload initialization...
-                    </span>
-                </div>
-
-            <br>
+<div class="container-fluid">
+  <div class="row justify-content-md-center">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="panel-title">
+            <i class="fa fa-cloud-upload"></i> Upload new content
+          </h4>
         </div>
 
-    </div>
+        <div class="card-block">
+          <div class="row">
+            <div class="col-md-12">
+              <input
+                *ngIf="upload_options"
+                type="file"
+                [uploadx]="upload_options"
+                (uploadxState)="onUpload($event)"
+              />
 
-	</div>
-</div>
-</div>
+              <br /><br />
 
-<br>
+              <div *ngFor="let item of upload_progress | keyvalue">
+                <div class="row">
+                  <div class="col-6">
+                    {{item.key}}
+                  </div>
+                  <div class="col-6">
+                    <ngb-progressbar
+                      *ngIf="item.value > 0"
+                      type="info"
+                      height="2rem"
+                      showValue="true"
+                      [value]="item.value"
+                    >
+                    </ngb-progressbar>
+                    <span *ngIf="item.value == 0">
+                      upload initialization...
+                    </span>
+                  </div>
 
-<div class='card'>
-<div class='card-header'>
-	<h4 class='panel-title'>
-		<i class='fa fa-files-o'></i> Your files
-	</h4>
-</div>
+                  <br />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<div class='card-block'>
+        <br />
 
-<div class="table-responsive">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="panel-title">
+              <i class="fa fa-files-o"></i> Your files
+            </h4>
+          </div>
 
-    <div class="table-wrapper" #tableWrapper>
-    <ngx-spinner [fullScreen] = "false"></ngx-spinner>
-    <ngx-datatable
-        class="bootstrap"
-        [rows]="data"
-        [columns]="columns"
-        [columnMode]="ColumnMode.flex"
-        [headerHeight]="40"
-        [footerHeight]="40"
-
-        [externalPaging]="true"
-        [count]="paging.dataLength"
-        [limit]="paging.itemsPerPage"
-        [offset]="paging.page"
-        (page)="serverSidePagination($event)"
-
-        [rowHeight]="'auto'">
-    </ngx-datatable>
-
-    </div>
-
-</div>
-	<ng-template #dataSize let-row="row" let-value="value" let-i="index">
-
-        {{value | bytes}}
-
-	</ng-template>
-
-	<ng-template #dataUploadData let-row="row" let-value="value" let-i="index">
-        <span 
-            ngbTooltip="{{1000*value | date : 'yyyy MMM dd HH:mm:ss'}}"
+          <div class="card-block">
+            <div class="table-responsive">
+              <div class="table-wrapper" #tableWrapper>
+                <ngx-spinner [fullScreen]="false"></ngx-spinner>
+                <ngx-datatable
+                  class="bootstrap"
+                  [rows]="data"
+                  [columns]="columns"
+                  [columnMode]="ColumnMode.flex"
+                  [headerHeight]="40"
+                  [footerHeight]="40"
+                  [externalPaging]="true"
+                  [count]="paging.dataLength"
+                  [limit]="paging.itemsPerPage"
+                  [offset]="paging.page"
+                  (page)="serverSidePagination($event)"
+                  [rowHeight]="'auto'"
+                >
+                </ngx-datatable>
+              </div>
+            </div>
+            <ng-template
+              #dataSize
+              let-row="row"
+              let-value="value"
+              let-i="index"
             >
-            {{value | amFromUnix | amTimeAgo:false }}
-        </span>
-    </ng-template>
+              {{value | bytes}}
+            </ng-template>
 
-	<ng-template #dataStatus let-row="row" let-value="value" let-i="index">
-        <span *ngIf='row.status_message; else noStatus'
-        	class='badge badge-secondary'
-        	[ngClass]="{
+            <ng-template
+              #dataUploadData
+              let-row="row"
+              let-value="value"
+              let-i="index"
+            >
+              <span ngbTooltip="{{1000*value | date : 'yyyy MMM dd HH:mm:ss'}}">
+                {{value | amFromUnix | amTimeAgo:false }}
+              </span>
+            </ng-template>
+
+            <ng-template
+              #dataStatus
+              let-row="row"
+              let-value="value"
+              let-i="index"
+            >
+              <span
+                *ngIf="row.status_message; else noStatus"
+                class="badge badge-secondary"
+                [ngClass]="{
 	            'badge-success': row.status == 'COMPLETED',
 	            'badge-danger': row.status == 'ERROR',
 	            'badge-info': row.status == 'IMPORTING'
 	        }"
-    	   	ngbTooltip="{{row.status_message}}">
+                ngbTooltip="{{row.status_message}}"
+              >
+                {{value}}
+                <span class="badge badge-warning" *ngIf="row.warnings">
+                  <i class="imc-icon fa fa-exclamation-triangle"></i>
+                </span>
+              </span>
 
-            {{value}}
-            <span class="badge badge-warning" *ngIf="row.warnings">
-				<i class="imc-icon fa fa-exclamation-triangle"></i>
-            </span>
-		</span>
-                      
-        <ng-template #noStatus>
-			{{value}}
-        </ng-template>
+              <ng-template #noStatus>
+                {{value}}
+              </ng-template>
+            </ng-template>
 
-    </ng-template>
+            <ng-template #emptyHeader let-column="column">
+              &nbsp;
+            </ng-template>
 
+            <ng-template
+              #controlsCell
+              let-row="row"
+              let-value="value"
+              let-i="index"
+            >
+              <i
+                class="fa fa-download fa-large"
+                (click)="download(row.name)"
+              ></i>
 
-	<ng-template #emptyHeader let-column="column">
-		&nbsp;
-	</ng-template>
+              <i
+                class="fa fa-trash fa-large"
+                style="color: red;"
+                *ngIf="row.status != 'IMPORTING'; else disableDelete"
+                mwlConfirmationPopover
+                [popoverTitle]="deleteConfirmation.title"
+                [popoverMessage]="deleteConfirmation.message"
+                placement="left"
+                (confirm)="remove(row.name)"
+              ></i>
 
-	<ng-template #controlsCell let-row="row" let-value="value" let-i="index">
-		<i class='fa fa-download fa-large' (click)='download(row.name)'></i>
-
-		<i 
-			class='fa fa-trash fa-large' style='color:red;'
-			*ngIf="row.status != 'IMPORTING'; else disableDelete"
-	        mwlConfirmationPopover
-	        [popoverTitle]="deleteConfirmation.title"
-	        [popoverMessage]="deleteConfirmation.message"
-	        placement="left"
-	        (confirm)="remove(row.name)"></i>
-
-        <ng-template #disableDelete>
-			<i class='fa fa-trash fa-large'
-				ngbTooltip="Disabled during the import">
-			</i>
-        </ng-template>
-	</ng-template>
-
-</div>
-</div>
-
-</div>
-</div>
+              <ng-template #disableDelete>
+                <i
+                  class="fa fa-trash fa-large"
+                  ngbTooltip="Disabled during the import"
+                >
+                </i>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

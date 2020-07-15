@@ -1,232 +1,323 @@
 <app-media-modal [data]="data" [media_type]="media_type" class="">
+  <!-- VOCABULARY -->
+  <div class="col-12 col-sm-4 col-lg-3 space-paragraph-xs-20" modal-col>
+    <h5>Vocabulary</h5>
 
-    <!-- VOCABULARY -->
-    <div class="col-12 col-sm-4 col-lg-3 space-paragraph-xs-20" modal-col>
-        <h5>Vocabulary</h5>
-
-
-        <div class="imc--container-tree">
-
-            <ul *ngIf="vocabolario && vocabolario_visualizza">
-                <li *ngFor="let term of vocabolario.terms">
-                    <h3>
-                           <span class="term" (click)="vocabolario_term(term)">
-                               <span [innerHTML]="term.label"></span>
-                               <i class="material-icons" *ngIf="!term.open">keyboard_arrow_down</i>
-                               <i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
-                           </span>
-                    </h3>
-                    <ul class="term-list" [ngClass]="{'display-none': !term.open}">
-                        <li *ngFor="let child of term.children">
-                            <span class="term" (click)="vocabolario_term(child, term)">
-                                <span [innerHTML]="child.label"></span>
-                                <i class="material-icons" *ngIf="!child.open">keyboard_arrow_down</i>
-                                <i class="material-icons" *ngIf="child.open">keyboard_arrow_up</i>
-                            </span>
-                            <ul class="child-list" [ngClass]="{'display-none': !child.open}">
-                                <li *ngFor="let leaf of child.children">
-                                       <span class="term leaf" (click)="vocabolario_leaf(leaf)">
-                                           <span [innerHTML]="leaf.label"></span>
-                                           <i *ngIf="leaf.selected" class="material-icons icon-check-vocabulary">check</i>
-                                       </span>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+    <div class="imc--container-tree">
+      <ul *ngIf="vocabolario && vocabolario_visualizza">
+        <li *ngFor="let term of vocabolario.terms">
+          <h3>
+            <span class="term" (click)="vocabolario_term(term)">
+              <span [innerHTML]="term.label"></span>
+              <i class="material-icons" *ngIf="!term.open"
+                >keyboard_arrow_down</i
+              >
+              <i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
+            </span>
+          </h3>
+          <ul class="term-list" [ngClass]="{'display-none': !term.open}">
+            <li *ngFor="let child of term.children">
+              <span class="term" (click)="vocabolario_term(child, term)">
+                <span [innerHTML]="child.label"></span>
+                <i class="material-icons" *ngIf="!child.open"
+                  >keyboard_arrow_down</i
+                >
+                <i class="material-icons" *ngIf="child.open"
+                  >keyboard_arrow_up</i
+                >
+              </span>
+              <ul class="child-list" [ngClass]="{'display-none': !child.open}">
+                <li *ngFor="let leaf of child.children">
+                  <span class="term leaf" (click)="vocabolario_leaf(leaf)">
+                    <span [innerHTML]="leaf.label"></span>
+                    <i
+                      *ngIf="leaf.selected"
+                      class="material-icons icon-check-vocabulary"
+                      >check</i
+                    >
+                  </span>
                 </li>
-            </ul>
-
-        </div>
-
-
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
+  </div>
 
-    <!-- RICERCA MANUALE DEI TAG -->
-    <div class="col-12 col-sm-3 col-lg-4 row no-gutters space-paragraph-xs-20 popover-no-arrow popover-left" modal-col>
-        <div class="row no-gutters imc--flex--vertical-end" *ngIf="vocabolario && vocabolario_visualizza">
-            <span class="col-12 col-lg-7">
-                <!--<input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag"
+  <!-- RICERCA MANUALE DEI TAG -->
+  <div
+    class="col-12 col-sm-3 col-lg-4 row no-gutters space-paragraph-xs-20 popover-no-arrow popover-left"
+    modal-col
+  >
+    <div
+      class="row no-gutters imc--flex--vertical-end"
+      *ngIf="vocabolario && vocabolario_visualizza"
+    >
+      <span class="col-12 col-lg-7">
+        <!--<input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag"
                        (keyup)="search_vocabulary_and_lods($event)" [(ngModel)]="ricerca_model"
                 >-->
-                <input type="text" 
-                    class="imc--input imc--input-search" 
-                    placeholder="Search here" 
-                    aria-label="Tag" 
-                    (keyup)="onKeyup($event)" 
-                    [(ngModel)]="ricerca_model"
-                >
-                <span
-                    [ngbPopover]="popContent"
-                    #p="ngbPopover"
-                    data-placement="bottom"
-                    triggers="manual"
-                    [autoClose]="'outside'"
-                 ></span>
-           </span>
-            <span class="col-12 col-lg-5 imc--flex--horizontal-end space-paragraph-sm-20">
-                <button type="button" class="btn btn-accent" [disabled]="term_add_disable()" (click)="term_add(ricerca_model)">Add term</button>
-            </span>
-        </div>
-
-        <!--Tag duplicati-->
-        <div class="col-12" *ngIf="add_tag.visible">
-            <app-info  [message]="add_tag.message" [result]="add_tag.status"
-                       *ngIf="add_tag.visible"
-                       (click)="add_tag.visible = false"></app-info>
-        </div>
-
-        <!-- Tag appena inseriti -->
-        <div class="col-12 new-badge space-paragraph-25">
-            <h5 *ngIf="terms.length">Tags to be added</h5>
-            <ng-template ngFor let-term [ngForOf]="terms">
-                <app-media-annotation
-                        [annotation]="term"
-                        [can_delete]="true"
-                        [disable_confirmation]="true"
-                        [delete_fn]="term_remove.bind(this)"
-                ></app-media-annotation>
-            </ng-template>
-        </div>
-
-        <!-- Attivazione della data di pubblicazione -->
-        <div class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center">
-
-            <div class="col-12 col-lg-10 box-checkbox imc--flex--vertical-center">
-                <!--@NSI Attiva il campo date sotto -->
-                <input class="imc--input-checkbox styled-checkbox" id="multi-annotation" type="checkbox" value="on"
-                       [(ngModel)]="embargo_enable">
-                <label for="multi-annotation">Not public until</label>
-            </div>
-
-            <div class="col-12 col-lg-10 space-paragraph-10">
-                <!-- datapicker di boostrap -->
-                <div class="form-group">
-                    <div class="input-group">
-                        <input class="imc--input imc--input-data"
-                               placeholder="yyyy-mm-dd"
-                               name="dp"
-                               [(ngModel)]="embargo_model"
-                               ngbDatepicker
-                               [disabled]="!embargo_enable"
-                               #d="ngbDatepicker">
-                        <div class="input-group-append">
-                            <button class="btn-reset"
-                                    type="button"
-                                    [disabled]="!embargo_enable"
-                                    (click)="d.toggle()">
-                                <i class="material-icons" style="width: 1.2rem; height: 1rem; cursor: pointer;">today</i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-12 space-paragraph-25">
-            <h5>Current tags</h5>
-            <ng-template ngFor let-term [ngForOf]="terms_all">
-                <app-media-annotation [annotation]="term"></app-media-annotation>
-            </ng-template>
-        </div>
-
-        <!--Risultati ricerca-->
-        <ng-template #popContent>
-            <div class="search-term-results">
-                <div class="search-term-header" [ngClass]="{lod: results.show === 'l'}">
-                    <!--switch risultati-->
-                    <span class="search-term-label search-term-type-vocabolary click-event"
-                          tabindex="0"
-                          [ngClass]="{'active': results.show === 'v'}"
-                          (keydown.enter)="show_results('v')"
-                          (click)="show_results('v')">
-                            Vocabulary
-                            <small class="search-results-number" [innerHTML]="results.vocabulary.length"></small>
-                    </span>
-                    <span class="search-term-label search-term-type-lods click-event"
-                          tabindex="0"
-                          [ngClass]="{'active': results.show === 'l'}"
-                          (keydown.enter)="show_results('l')"
-                          (click)="show_results('l')">
-                            LODs
-                            <small class="search-results-number" [innerHTML]="results.lods.length"></small>
-                    </span>
-                    <span class="search-term-close">
-                        <i class="material-icons click-event" (click)="p.close()">close</i>
-                    </span>
-                </div>
-                <!--risultati dal vocabolario-->
-                <div [ngStyle]="{display: results.show === 'v' ? 'block' : 'none'}">
-                    <div class="search-term-result click-event"
-                         tabindex="0"
-                         *ngFor="let term of results.vocabulary | slice:results.vocabulary_nav.page_start:results.vocabulary_nav.page_end"
-                         (keydown.enter)="term_selected(term)"
-                         (click)="term_selected(term)">
-                        <strong [ngClass]="{'lod': term.source !== 'vocabulary'}" [innerHTML]="term.name"></strong>
-                        <br>
-                        <small [innerHTML]="term.description"></small>
-                    </div>
-                    <div *ngIf="!results.vocabulary.length" class="search-term-no-results">
-                        no results
-                    </div>
-                    <!--navigazione-->
-                    <div class="search-term-footer">
-                        <div class="search-terms-nav search-term-type-vocabolary">
-                            <button class="btn btn-sm"
-                                    tabindex="0"
-                                    [ngClass]="{'search-term-nav-hide': results.vocabulary_nav.hide_prev}"
-                                    (keydown.enter)="nav_prev('vocabulary')"
-                                    (click)="nav_prev('vocabulary')"> &laquo; </button>
-                            <button class="btn btn-sm"
-                                    tabindex="0"
-                                    [ngClass]="{'search-term-nav-hide': results.vocabulary_nav.hide_next}"
-                                    (keydown.enter)="nav_next('vocabulary')"
-                                    (click)="nav_next('vocabulary')"> &raquo; </button>
-                        </div>
-                    </div>
-                </div>
-                <!--risultati dai lods-->
-                <div [ngStyle]="{display: results.show === 'l' ? 'block' : 'none'}">
-                    <div class="search-term-result"
-                         tabindex="0"
-                         *ngFor="let term of results.lods | slice:results.lods_nav.page_start:results.lods_nav.page_end">
-                         <div class="click-event" (keydown.enter)="term_selected(term)"
-                         (click)="term_selected(term)">
-                            <strong [ngClass]="{'lod': term.source !== 'vocabulary'}" [innerHTML]="term.name"></strong>
-                        </div>
-                        <small class="d-block">{{term.description}}</small>
-                        <a href="{{term.iri}}" target="#" title="open a new window with more info about the this item">{{term.iri}}&nbsp;<i class="fa fa-external-link blue"></i></a>
-                    </div>
-                    <div *ngIf="!results.lods.length" class="search-term-no-results">
-                        no results
-                    </div>
-                    <!--navigazione-->
-                    <div class="search-term-footer lod">
-                        <div class="search-terms-nav search-term-type-lod">
-                            <button class="btn btn-sm"
-                                    tabindex="0"
-                                    [ngClass]="{'search-term-nav-hide': results.lods_nav.hide_prev}"
-                                    (keydown.enter)="nav_prev('lods')"
-                                    (click)="nav_prev('lods')"> &laquo; </button>
-                            <button class="btn btn-sm"
-                                    tabindex="0"
-                                    [ngClass]="{'search-term-nav-hide': results.lods_nav.hide_next}"
-                                    (keydown.enter)="nav_next('lods')"
-                                    (click)="nav_next('lods')"> &raquo; </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </ng-template>
-
+        <input
+          type="text"
+          class="imc--input imc--input-search"
+          placeholder="Search here"
+          aria-label="Tag"
+          (keyup)="onKeyup($event)"
+          [(ngModel)]="ricerca_model"
+        />
+        <span
+          [ngbPopover]="popContent"
+          #p="ngbPopover"
+          data-placement="bottom"
+          triggers="manual"
+          [autoClose]="'outside'"
+        ></span>
+      </span>
+      <span
+        class="col-12 col-lg-5 imc--flex--horizontal-end space-paragraph-sm-20"
+      >
+        <button
+          type="button"
+          class="btn btn-accent"
+          [disabled]="term_add_disable()"
+          (click)="term_add(ricerca_model)"
+        >
+          Add term
+        </button>
+      </span>
     </div>
 
-    <button type="button" class="btn btn-accent" modal-button
-            [disabled]="!terms.length"
-            (click)="salva()">Save</button>
-    <!--esito-->
-    <app-info modal-button
-              [message]="save_result.message" [result]="save_result.status"
-              *ngIf="save_result.visible"
-              (click)="save_result.visible = false"></app-info>
+    <!--Tag duplicati-->
+    <div class="col-12" *ngIf="add_tag.visible">
+      <app-info
+        [message]="add_tag.message"
+        [result]="add_tag.status"
+        *ngIf="add_tag.visible"
+        (click)="add_tag.visible = false"
+      ></app-info>
+    </div>
+
+    <!-- Tag appena inseriti -->
+    <div class="col-12 new-badge space-paragraph-25">
+      <h5 *ngIf="terms.length">Tags to be added</h5>
+      <ng-template ngFor let-term [ngForOf]="terms">
+        <app-media-annotation
+          [annotation]="term"
+          [can_delete]="true"
+          [disable_confirmation]="true"
+          [delete_fn]="term_remove.bind(this)"
+        ></app-media-annotation>
+      </ng-template>
+    </div>
+
+    <!-- Attivazione della data di pubblicazione -->
+    <div
+      class="col-12 new-badge space-paragraph-10 row no-gutters imc--flex--vertical-center"
+    >
+      <div class="col-12 col-lg-10 box-checkbox imc--flex--vertical-center">
+        <!--@NSI Attiva il campo date sotto -->
+        <input
+          class="imc--input-checkbox styled-checkbox"
+          id="multi-annotation"
+          type="checkbox"
+          value="on"
+          [(ngModel)]="embargo_enable"
+        />
+        <label for="multi-annotation">Not public until</label>
+      </div>
+
+      <div class="col-12 col-lg-10 space-paragraph-10">
+        <!-- datapicker di boostrap -->
+        <div class="form-group">
+          <div class="input-group">
+            <input
+              class="imc--input imc--input-data"
+              placeholder="yyyy-mm-dd"
+              name="dp"
+              [(ngModel)]="embargo_model"
+              ngbDatepicker
+              [disabled]="!embargo_enable"
+              #d="ngbDatepicker"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn-reset"
+                type="button"
+                [disabled]="!embargo_enable"
+                (click)="d.toggle()"
+              >
+                <i
+                  class="material-icons"
+                  style="width: 1.2rem; height: 1rem; cursor: pointer;"
+                  >today</i
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 space-paragraph-25">
+      <h5>Current tags</h5>
+      <ng-template ngFor let-term [ngForOf]="terms_all">
+        <app-media-annotation [annotation]="term"></app-media-annotation>
+      </ng-template>
+    </div>
+
+    <!--Risultati ricerca-->
+    <ng-template #popContent>
+      <div class="search-term-results">
+        <div class="search-term-header" [ngClass]="{lod: results.show === 'l'}">
+          <!--switch risultati-->
+          <span
+            class="search-term-label search-term-type-vocabolary click-event"
+            tabindex="0"
+            [ngClass]="{'active': results.show === 'v'}"
+            (keydown.enter)="show_results('v')"
+            (click)="show_results('v')"
+          >
+            Vocabulary
+            <small
+              class="search-results-number"
+              [innerHTML]="results.vocabulary.length"
+            ></small>
+          </span>
+          <span
+            class="search-term-label search-term-type-lods click-event"
+            tabindex="0"
+            [ngClass]="{'active': results.show === 'l'}"
+            (keydown.enter)="show_results('l')"
+            (click)="show_results('l')"
+          >
+            LODs
+            <small
+              class="search-results-number"
+              [innerHTML]="results.lods.length"
+            ></small>
+          </span>
+          <span class="search-term-close">
+            <i class="material-icons click-event" (click)="p.close()">close</i>
+          </span>
+        </div>
+        <!--risultati dal vocabolario-->
+        <div [ngStyle]="{display: results.show === 'v' ? 'block' : 'none'}">
+          <div
+            class="search-term-result click-event"
+            tabindex="0"
+            *ngFor="let term of results.vocabulary | slice:results.vocabulary_nav.page_start:results.vocabulary_nav.page_end"
+            (keydown.enter)="term_selected(term)"
+            (click)="term_selected(term)"
+          >
+            <strong
+              [ngClass]="{'lod': term.source !== 'vocabulary'}"
+              [innerHTML]="term.name"
+            ></strong>
+            <br />
+            <small [innerHTML]="term.description"></small>
+          </div>
+          <div
+            *ngIf="!results.vocabulary.length"
+            class="search-term-no-results"
+          >
+            no results
+          </div>
+          <!--navigazione-->
+          <div class="search-term-footer">
+            <div class="search-terms-nav search-term-type-vocabolary">
+              <button
+                class="btn btn-sm"
+                tabindex="0"
+                [ngClass]="{'search-term-nav-hide': results.vocabulary_nav.hide_prev}"
+                (keydown.enter)="nav_prev('vocabulary')"
+                (click)="nav_prev('vocabulary')"
+              >
+                &laquo;
+              </button>
+              <button
+                class="btn btn-sm"
+                tabindex="0"
+                [ngClass]="{'search-term-nav-hide': results.vocabulary_nav.hide_next}"
+                (keydown.enter)="nav_next('vocabulary')"
+                (click)="nav_next('vocabulary')"
+              >
+                &raquo;
+              </button>
+            </div>
+          </div>
+        </div>
+        <!--risultati dai lods-->
+        <div [ngStyle]="{display: results.show === 'l' ? 'block' : 'none'}">
+          <div
+            class="search-term-result"
+            tabindex="0"
+            *ngFor="let term of results.lods | slice:results.lods_nav.page_start:results.lods_nav.page_end"
+          >
+            <div
+              class="click-event"
+              (keydown.enter)="term_selected(term)"
+              (click)="term_selected(term)"
+            >
+              <strong
+                [ngClass]="{'lod': term.source !== 'vocabulary'}"
+                [innerHTML]="term.name"
+              ></strong>
+            </div>
+            <small class="d-block">{{term.description}}</small>
+            <a
+              href="{{term.iri}}"
+              target="#"
+              title="open a new window with more info about the this item"
+              >{{term.iri}}&nbsp;<i class="fa fa-external-link blue"></i
+            ></a>
+          </div>
+          <div *ngIf="!results.lods.length" class="search-term-no-results">
+            no results
+          </div>
+          <!--navigazione-->
+          <div class="search-term-footer lod">
+            <div class="search-terms-nav search-term-type-lod">
+              <button
+                class="btn btn-sm"
+                tabindex="0"
+                [ngClass]="{'search-term-nav-hide': results.lods_nav.hide_prev}"
+                (keydown.enter)="nav_prev('lods')"
+                (click)="nav_prev('lods')"
+              >
+                &laquo;
+              </button>
+              <button
+                class="btn btn-sm"
+                tabindex="0"
+                [ngClass]="{'search-term-nav-hide': results.lods_nav.hide_next}"
+                (keydown.enter)="nav_next('lods')"
+                (click)="nav_next('lods')"
+              >
+                &raquo;
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+
+  <button
+    type="button"
+    class="btn btn-accent"
+    modal-button
+    [disabled]="!terms.length"
+    (click)="salva()"
+  >
+    Save
+  </button>
+  <!--esito-->
+  <app-info
+    modal-button
+    [message]="save_result.message"
+    [result]="save_result.status"
+    *ngIf="save_result.visible"
+    (click)="save_result.visible = false"
+  ></app-info>
 </app-media-modal>

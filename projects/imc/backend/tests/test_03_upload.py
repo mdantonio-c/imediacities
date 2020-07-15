@@ -1,7 +1,8 @@
-from restapi.utilities.logs import log
+import json
+
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
-import json
+from restapi.utilities.logs import log
 
 
 class TestApp(BaseTests):
@@ -25,11 +26,11 @@ class TestApp(BaseTests):
         log.info("*** Cerco il gruppo di test")
         group_id = None
         group_shortname = None
-        res_group = client.get('/api/group/test', headers=headers)
+        res_group = client.get("/api/group/test", headers=headers)
         assert res_group.status_code == hcodes.HTTP_OK_BASIC
-        contents_group = json.loads(res_group.data.decode('utf-8'))
+        contents_group = json.loads(res_group.data.decode("utf-8"))
         if contents_group is not None:
-            datas_group = contents_group.get('Response', {}).get('data', {})
+            datas_group = contents_group.get("Response", {}).get("data", {})
             if datas_group is not None and datas_group[0] is not None:
                 # datas e' una lista
                 group_id = datas_group[0].get("id")
@@ -40,12 +41,12 @@ class TestApp(BaseTests):
         # mi serve il mio userid
         user_id = None
         log.info("*** Faccio get del profile")
-        res_profile = client.get('/auth/profile', headers=headers)
+        res_profile = client.get("/auth/profile", headers=headers)
         assert res_profile.status_code == hcodes.HTTP_OK_BASIC
-        contents_profile = json.loads(res_profile.data.decode('utf-8'))
+        contents_profile = json.loads(res_profile.data.decode("utf-8"))
         if contents_profile is not None:
             # log.debug("*** Response of get profile: "+json.dumps(contents_profile))
-            data_profile = contents_profile.get('Response', {}).get('data', {})
+            data_profile = contents_profile.get("Response", {}).get("data", {})
             if data_profile is not None:
                 # log.debug("*** Data of get profile: "+json.dumps(data_profile))
                 if data_profile.get("uuid") is not None:
@@ -58,76 +59,76 @@ class TestApp(BaseTests):
         #  role 'Archive' e associarlo al gruppo di test
         roles = [
             {
-                'description': 'Role allowed to upload contents and metadata',
-                'name': 'Archive',
+                "description": "Role allowed to upload contents and metadata",
+                "name": "Archive",
             },
-            {'description': 'Admin', 'name': 'admin_root'},
-            {'description': 'automatic', 'name': 'normal_user'},
-            {'description': 'automatic', 'name': 'staff_user'},
+            {"description": "Admin", "name": "admin_root"},
+            {"description": "automatic", "name": "normal_user"},
+            {"description": "automatic", "name": "staff_user"},
         ]
-        group_data = {'id': group_id, 'shortname': group_shortname}
+        group_data = {"id": group_id, "shortname": group_shortname}
         put_data = {
-            'group': group_data,
-            'email': 'user@nomail.org',
-            'name': 'Default',
-            'password': 'test',
-            'surname': 'User',
-            'roles': roles,
+            "group": group_data,
+            "email": "user@nomail.org",
+            "name": "Default",
+            "password": "test",
+            "surname": "User",
+            "roles": roles,
         }
         res_put = client.put(
-            '/api/admin/users/' + user_id, headers=headers, data=json.dumps(put_data)
+            "/api/admin/users/" + user_id, headers=headers, data=json.dumps(put_data)
         )
         assert res_put.status_code == hcodes.HTTP_OK_NORESPONSE
 
         log.info("*** Testing post /api/upload/")
 
         post_md_data = {
-            'file': ('tests/custom/testdata/test_md_1234.xml', 'test_md_1234.xml'),
-            'flowChunkNumber': 1,
-            'flowFilename': 'test_md_1234.xml',
-            'flowTotalChunks': 1,
-            'flowChunkSize': 1,
+            "file": ("tests/custom/testdata/test_md_1234.xml", "test_md_1234.xml"),
+            "flowChunkNumber": 1,
+            "flowFilename": "test_md_1234.xml",
+            "flowTotalChunks": 1,
+            "flowChunkSize": 1,
         }
         res = client.post(
-            '/api/upload',
+            "/api/upload",
             headers=headers,
-            content_type='multipart/form-data',
+            content_type="multipart/form-data",
             data=post_md_data,
         )
         assert res.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res.data.decode('utf-8'))
+        json.loads(res.data.decode("utf-8"))
 
         post_video_data = {
-            'file': (
-                'tests/custom/testdata/test_video_1234.mp4',
-                'test_video_1234.mp4',
+            "file": (
+                "tests/custom/testdata/test_video_1234.mp4",
+                "test_video_1234.mp4",
             ),
-            'flowChunkNumber': 1,
-            'flowFilename': 'test_video_1234.mp4',
-            'flowTotalChunks': 1,
-            'flowChunkSize': 1,
+            "flowChunkNumber": 1,
+            "flowFilename": "test_video_1234.mp4",
+            "flowTotalChunks": 1,
+            "flowChunkSize": 1,
         }
         res2 = client.post(
-            '/api/upload',
+            "/api/upload",
             headers=headers,
-            content_type='multipart/form-data',
+            content_type="multipart/form-data",
             data=post_video_data,
         )
         assert res2.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res2.data.decode('utf-8'))
+        json.loads(res2.data.decode("utf-8"))
 
         post_filetodel_data = {
-            'file': ('tests/custom/testdata/to_del.txt', 'to_del.txt'),
-            'flowChunkNumber': 1,
-            'flowFilename': 'to_del.txt',
-            'flowTotalChunks': 1,
-            'flowChunkSize': 1,
+            "file": ("tests/custom/testdata/to_del.txt", "to_del.txt"),
+            "flowChunkNumber": 1,
+            "flowFilename": "to_del.txt",
+            "flowTotalChunks": 1,
+            "flowChunkSize": 1,
         }
         res3 = client.post(
-            '/api/upload',
+            "/api/upload",
             headers=headers,
-            content_type='multipart/form-data',
+            content_type="multipart/form-data",
             data=post_filetodel_data,
         )
         assert res3.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res3.data.decode('utf-8'))
+        json.loads(res3.data.decode("utf-8"))

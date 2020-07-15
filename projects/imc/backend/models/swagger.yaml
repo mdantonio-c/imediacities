@@ -19,9 +19,9 @@ definitions:
         $ref: "#/definitions/Body"
       target:
         type: string
-        pattern: '(item|shot|anno):[a-z0-9-]+'
+        pattern: "(item|shot|anno):[a-z0-9-]+"
       selector:
-        $ref: '#/definitions/Selector'
+        $ref: "#/definitions/Selector"
       private:
         type: boolean
         default: false
@@ -81,7 +81,7 @@ definitions:
             type: string
           language:
             type: string
-            default: 'en'
+            default: "en"
   TVSBody:
     allOf:
       - $ref: "#/definitions/Body"
@@ -94,7 +94,7 @@ definitions:
             minItems: 1
             items:
               type: string
-              pattern: 't=[0-9],[0-9]'
+              pattern: "t=[0-9],[0-9]"
   Selector:
     required:
       - type
@@ -118,11 +118,11 @@ definitions:
       name:
         type: string
       alternativesNames:
-        $ref: "#/definitions/AlternativeNames" 
+        $ref: "#/definitions/AlternativeNames"
 
   AlternativeNames:
     additionalProperties:
-        type: string
+      type: string
 
   Spatial:
     required:
@@ -162,23 +162,23 @@ definitions:
         type: string
       filter:
         properties:
-          geo_distance: 
+          geo_distance:
             $ref: "#/definitions/GeoDistance"
-          
+
   SearchMatch:
     required:
       - term
       - fields
     properties:
-      term:        
+      term:
         type: string
       fields:
         type: array
         items:
           type: string
-          enum:               
-            - title               
-            - contributor               
+          enum:
+            - title
+            - contributor
             - keyword
             - description
         minItems: 1
@@ -187,11 +187,11 @@ definitions:
     properties:
       type:
         type: string
-        enum:               
-          - all               
-          - video               
-          - image       
-      provider:             
+        enum:
+          - all
+          - video
+          - image
+      provider:
         type: string
       country:
         type: string
@@ -240,31 +240,31 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/PatchDocument"
-  PatchDocument: 
-    description: A JSONPatch document as defined by RFC 6902 
+  PatchDocument:
+    description: A JSONPatch document as defined by RFC 6902
     required:
-     - "op"
-     - "path"
-    properties: 
-     op: 
-      type: string 
-      description: The operation to be performed 
-      enum:
-       - "add"
-       - "remove"
-       - "replace"
-       - "move"
-       - "copy"
-       - "test"
-     path: 
-      type: string 
-      description: A JSON-Pointer 
-     value: 
-      type: object 
-      description: The value to be used within the operations.
-     from: 
-      type: string 
-      description: A string containing a JSON Pointer value.
+      - "op"
+      - "path"
+    properties:
+      op:
+        type: string
+        description: The operation to be performed
+        enum:
+          - "add"
+          - "remove"
+          - "replace"
+          - "move"
+          - "copy"
+          - "test"
+      path:
+        type: string
+        description: A JSON-Pointer
+      value:
+        type: object
+        description: The value to be used within the operations.
+      from:
+        type: string
+        description: A string containing a JSON Pointer value.
 
   VideoInRevision:
     description: Video under revision
@@ -321,7 +321,7 @@ definitions:
         description: The new list of scene cuts.
         type: array
         items:
-          $ref: '#/definitions/SceneCut'
+          $ref: "#/definitions/SceneCut"
         minItems: 1
       exitRevision:
         type: boolean

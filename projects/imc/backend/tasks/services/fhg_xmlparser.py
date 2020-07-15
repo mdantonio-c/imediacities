@@ -1,5 +1,5 @@
 import os
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree as ET
 
 # from xml.dom import minidom
 # from restapi.utilities.logs import log
@@ -27,12 +27,12 @@ class FHG_XMLParser:
         tvs_dirname = os.path.dirname(filepath)
         from imc.models.neo4j import Shot
 
-        for frame in shot_module_node.iter('frame'):
-            start_idx = frame.get('idx')
+        for frame in shot_module_node.iter("frame"):
+            start_idx = frame.get("idx")
             shot = Shot(start_frame_idx=start_idx)
-            frame_filename = 'tvs_s_' + str(start_idx).zfill(5) + '.jpg'
+            frame_filename = "tvs_s_" + str(start_idx).zfill(5) + ".jpg"
             shot.frame_uri = os.path.join(tvs_dirname, frame_filename)
-            shot.thumbnail_uri = os.path.join(tvs_dirname, 'thumbs/' + frame_filename)
+            shot.thumbnail_uri = os.path.join(tvs_dirname, "thumbs/" + frame_filename)
             shots.append(shot)
         return shots
 

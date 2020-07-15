@@ -1,4 +1,5 @@
 import json
+
 from restapi.tests import BaseTests
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -39,11 +40,11 @@ class TestApp(BaseTests):
         # Non e' prevista la possibilita' di fare get con uno specifico user_id
         #
         log.info("*** Search for the test group")
-        res = client.get('/api/group/test', headers=headers)
+        res = client.get("/api/group/test", headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        contents = json.loads(res.data.decode('utf-8'))
+        contents = json.loads(res.data.decode("utf-8"))
         if contents is not None:
-            datas = contents.get('Response', {}).get('data', {})
+            datas = contents.get("Response", {}).get("data", {})
             if datas is not None and datas[0] is not None:
                 # datas e' una lista
                 group_id = datas[0].get("id")
@@ -53,11 +54,11 @@ class TestApp(BaseTests):
 
         # cerco i Role esistenti
         log.info("*** Search for the roles")
-        res2 = client.get('/api/role/a', headers=headers)
+        res2 = client.get("/api/role/a", headers=headers)
         assert res2.status_code == hcodes.HTTP_OK_BASIC
-        contents2 = json.loads(res2.data.decode('utf-8'))
+        contents2 = json.loads(res2.data.decode("utf-8"))
         if contents2 is not None:
-            datas2 = contents2.get('Response', {}).get('data', {})
+            datas2 = contents2.get("Response", {}).get("data", {})
             if datas2 is not None:
                 # datas2 e' una lista
                 roles = datas2
@@ -66,23 +67,23 @@ class TestApp(BaseTests):
         user_id = None
         # creo un nuovo utente
         log.info("*** Testing POST user")
-        group_data = {'id': group_id, 'shortname': group_shortname}
+        group_data = {"id": group_id, "shortname": group_shortname}
         post_user_data = {
-            'group': group_data,
-            'email': 'test@imediacities.org',
-            'name': 'test',
-            'password': 'test',
-            'surname': 'test',
-            'roles': [],
+            "group": group_data,
+            "email": "test@imediacities.org",
+            "name": "test",
+            "password": "test",
+            "surname": "test",
+            "roles": [],
         }
         res = client.post(
-            '/api/admin/users', headers=headers, data=json.dumps(post_user_data)
+            "/api/admin/users", headers=headers, data=json.dumps(post_user_data)
         )
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        contents = json.loads(res.data.decode('utf-8'))
+        contents = json.loads(res.data.decode("utf-8"))
         # log.debug("*** Response of post new user: "+json.dumps(contents))
         if contents is not None:
-            datas = contents.get('Response', {}).get('data', {})
+            datas = contents.get("Response", {}).get("data", {})
             if datas is not None:
                 user_id = datas
                 assert user_id is not None
@@ -91,15 +92,15 @@ class TestApp(BaseTests):
             # PUT: modify the metadata of the new user
             log.info("*** Testing PUT user")
             put_data = {
-                'group': group_data,
-                'email': 'test2@imediacities.org',
-                'name': 'test2',
-                'password': 'test2',
-                'surname': 'test2',
-                'roles': roles,
+                "group": group_data,
+                "email": "test2@imediacities.org",
+                "name": "test2",
+                "password": "test2",
+                "surname": "test2",
+                "roles": roles,
             }
             res = client.put(
-                '/api/admin/users/' + user_id,
+                "/api/admin/users/" + user_id,
                 headers=headers,
                 data=json.dumps(put_data),
             )
@@ -108,30 +109,30 @@ class TestApp(BaseTests):
             # faccio il test della get e intanto verifico che la put abbia funzionato
             log.info("*** Testing GET users")
             # GET: try without log in
-            res = client.get('/api/admin/users')
+            res = client.get("/api/admin/users")
             # This endpoint requires a valid authorization token
             assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
             # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # GET all users
-            res = client.get('/api/admin/users', headers=headers)
+            res = client.get("/api/admin/users", headers=headers)
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            contents = json.loads(res.data.decode('utf-8'))
+            contents = json.loads(res.data.decode("utf-8"))
             # log.debug("*** Response of GET users: "+json.dumps(contents))
             if contents is not None:
-                datas = contents.get('Response', {}).get('data', {})
+                datas = contents.get("Response", {}).get("data", {})
                 # datas e' una lista
                 if datas is not None:
                     # scorro la lista per trovare l'utente nuovo e verifico il name
                     for x in datas:
                         if x.get("id") == user_id:
                             # log.debug("*** user: " + json.dumps(x))
-                            assert x.get("attributes").get("name") == 'test2'
+                            assert x.get("attributes").get("name") == "test2"
                             break
 
         # cancello l'utente
         if user_id is not None:
             log.info("*** Testing DELETE user")
-            res = client.delete('/api/admin/users/' + user_id, headers=headers)
+            res = client.delete("/api/admin/users/" + user_id, headers=headers)
             assert res.status_code == hcodes.HTTP_OK_NORESPONSE
 
     # a questo punto il database dovrebbe essere tornato come prima dei test

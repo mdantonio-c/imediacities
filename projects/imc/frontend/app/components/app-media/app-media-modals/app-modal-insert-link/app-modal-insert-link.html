@@ -3,14 +3,18 @@
   <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
     <span class="col-11">
       <div class="custom-control custom-radio custom-control-inline">
-        <input type="radio"
-        id="insertUrl"
-        name="insertUrl"
-        [(ngModel)]="options"
-        [value]="true"
-        [checked]="options"
-        class="custom-control-input">
-        <label class="custom-control-label imc--radio-label" for="insertUrl">Insert URL</label>
+        <input
+          type="radio"
+          id="insertUrl"
+          name="insertUrl"
+          [(ngModel)]="options"
+          [value]="true"
+          [checked]="options"
+          class="custom-control-input"
+        />
+        <label class="custom-control-label imc--radio-label" for="insertUrl"
+          >Insert URL</label
+        >
       </div>
       <!-- <div class="custom-control custom-radio custom-control-inline">
         <input type="radio"
@@ -23,10 +27,20 @@
         <label class="custom-control-label imc--radio-label" for="insertLink">Search in IMC</label>
       </div> -->
     </span>
-    <span *ngIf="options" class="col-11 row imc--flex--vertical-center space-paragraph-20">
+    <span
+      *ngIf="options"
+      class="col-11 row imc--flex--vertical-center space-paragraph-20"
+    >
       <span class="col-9">
-        <input type="text" class="imc--input space-paragraph-20" placeholder="Insert URL" aria-label="url"
-          [(ngModel)]="link.url" (keydown.enter)="addLink()" required>
+        <input
+          type="text"
+          class="imc--input space-paragraph-20"
+          placeholder="Insert URL"
+          aria-label="url"
+          [(ngModel)]="link.url"
+          (keydown.enter)="addLink()"
+          required
+        />
       </span>
       <span class="col-3">
         <button class="btn btn-accent" (click)="addLink()">Add</button>
@@ -34,34 +48,51 @@
     </span>
     <!-- show error -->
     <div class="col-10 new-badge" *ngIf="add_link_info.visible">
-      <app-info  [message]="add_link_info.message" [result]="add_link_info.status"
+      <app-info
+        [message]="add_link_info.message"
+        [result]="add_link_info.status"
         *ngIf="add_link_info.visible"
-      (click)="add_link_info.visible = false"></app-info>
+        (click)="add_link_info.visible = false"
+      ></app-info>
     </div>
 
     <div class="col-12 space-paragraph-25" *ngIf="links_all.length">
-        <h5>Current links</h5>
-        <span>
-            <ul class="list-group modal--link-list list-group-flush">
-                <li *ngFor="let link of links_all" class="list-group-item d-flex justify-content-between align-items-center py-1 pl-1">
-                    <div class="col-11 px-0 text-truncate">
-                      <a href="{{link.name}}" target=”_blank”>{{link.name}}</a>
-                    </div>
-                    <div class="col-1" *ngIf="canRemoveLink(link)">
-                      <i class="material-icons click-event"
-                        mwlConfirmationPopover
-                        [popoverTitle]="'Remove link'"
-                        [popoverMessage]="'This operation cannot be undone. Do you wish to continue?'"
-                        (confirm)="removeLink(link)">delete</i>
-                    </div>
-                </li>
-            </ul>
-        </span>
+      <h5>Current links</h5>
+      <span>
+        <ul class="list-group modal--link-list list-group-flush">
+          <li
+            *ngFor="let link of links_all"
+            class="list-group-item d-flex justify-content-between align-items-center py-1 pl-1"
+          >
+            <div class="col-11 px-0 text-truncate">
+              <a href="{{link.name}}" target="”_blank”">{{link.name}}</a>
+            </div>
+            <div class="col-1" *ngIf="canRemoveLink(link)">
+              <i
+                class="material-icons click-event"
+                mwlConfirmationPopover
+                [popoverTitle]="'Remove link'"
+                [popoverMessage]="'This operation cannot be undone. Do you wish to continue?'"
+                (confirm)="removeLink(link)"
+                >delete</i
+              >
+            </div>
+          </li>
+        </ul>
+      </span>
     </div>
 
-    <span *ngIf="!options" class="col-12 row no-gutters imc--flex--vertical-center space-paragraph-20">
+    <span
+      *ngIf="!options"
+      class="col-12 row no-gutters imc--flex--vertical-center space-paragraph-20"
+    >
       <span class="col-7 col-sm-8">
-        <input type="text" class="imc--input imc--input-search space-paragraph-20" placeholder="Insert URL" aria-label="url">
+        <input
+          type="text"
+          class="imc--input imc--input-search space-paragraph-20"
+          placeholder="Insert URL"
+          aria-label="url"
+        />
       </span>
       <span class="col-4 col-sm-3 imc--flex--horizontal-end">
         <button class="btn btn-accent">Search</button>
@@ -69,11 +100,13 @@
       <div class="col-12 space-paragraph-20 box-checkbox-group">
         <!-- @NSI checkbox per filtrare i media da linkare -->
         <span *ngFor="let opt of optionsCheckbox; let i = index">
-          <input class="imc--input-checkbox styled-checkbox"
-          id="multi-link"
-          type="checkbox"
-          value="opt"
-          [checked]="opt.checked">
+          <input
+            class="imc--input-checkbox styled-checkbox"
+            id="multi-link"
+            type="checkbox"
+            value="opt"
+            [checked]="opt.checked"
+          />
           <label for="multi-link">{{opt.label}}</label>
         </span>
       </div>
@@ -108,7 +141,9 @@
           <ul class="pagination">
             <li class="page-item">
               <a href="#" aria-label="Previous">
-                <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i>
+                <i class="material-icons" aria-hidden="true"
+                  >keyboard_arrow_left</i
+                >
                 <span class="sr-only">Previous</span>
               </a>
             </li>
@@ -117,7 +152,9 @@
             <li class="page-item"><a class="page-link" href="#">3</a></li>
             <li class="page-item">
               <a href="#" aria-label="Next">
-                <i class="material-icons" aria-hidden="true">keyboard_arrow_right</i>
+                <i class="material-icons" aria-hidden="true"
+                  >keyboard_arrow_right</i
+                >
                 <span class="sr-only">Next</span>
               </a>
             </li>
@@ -128,10 +165,13 @@
   </div>
   <!-- <button type="button" class="btn btn-accent" modal-button (click)="ok()">Ok</button> -->
   <!--esito-->
-  <app-info modal-button
-    [message]="save_result.message" [result]="save_result.status"
+  <app-info
+    modal-button
+    [message]="save_result.message"
+    [result]="save_result.status"
     *ngIf="save_result.visible"
-    (click)="save_result.visible = false"></app-info>
+    (click)="save_result.visible = false"
+  ></app-info>
 </app-media-modal>
 <!--
 <div class="modal-content">

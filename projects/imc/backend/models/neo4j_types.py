@@ -1,21 +1,21 @@
 # NEOMODEL BASE CLASSES EXTENSION #
 import inspect
 
-from neomodel import StringProperty as originalStringProperty
-from neomodel import IntegerProperty as originalIntegerProperty
-from neomodel import FloatProperty as originalFloatProperty
+from neomodel import AliasProperty as originalAliasProperty
+from neomodel import ArrayProperty as originalArrayProperty
 from neomodel import BooleanProperty as originalBooleanProperty
 from neomodel import DateProperty as originalDateProperty
 from neomodel import DateTimeProperty as originalDateTimeProperty
-from neomodel import JSONProperty as originalJSONProperty
-from neomodel import ArrayProperty as originalArrayProperty
 from neomodel import EmailProperty as originalEmailProperty
-from neomodel import AliasProperty as originalAliasProperty
-from neomodel import UniqueIdProperty as originalUniqueIdProperty
+from neomodel import FloatProperty as originalFloatProperty
+from neomodel import IntegerProperty as originalIntegerProperty
+from neomodel import JSONProperty as originalJSONProperty
+from neomodel import RelationshipFrom as originalRelationshipFrom
+from neomodel import RelationshipTo as originalRelationshipTo
+from neomodel import StringProperty as originalStringProperty
 from neomodel import StructuredNode as originalStructuredNode
 from neomodel import StructuredRel as originalStructuredRel
-from neomodel import RelationshipTo as originalRelationshipTo
-from neomodel import RelationshipFrom as originalRelationshipFrom
+from neomodel import UniqueIdProperty as originalUniqueIdProperty
 from neomodel.relationship_manager import RelationshipDefinition
 
 
@@ -199,7 +199,7 @@ class StructuredRel(originalStructuredRel):
 
         classes = inspect.getmro(cls)
         for cls_name in classes:
-            if cls_name.__name__ == 'StructuredRel':
+            if cls_name.__name__ == "StructuredRel":
                 break
 
             for c in cls_name.__dict__:
@@ -237,7 +237,7 @@ class StructuredNode(originalStructuredNode):
 
         classes = inspect.getmro(cls)
         for cls_name in classes:
-            if cls_name.__name__ == 'StructuredNode':
+            if cls_name.__name__ == "StructuredNode":
                 break
 
             for c in cls_name.__dict__:
@@ -260,23 +260,23 @@ class StructuredNode(originalStructuredNode):
 
         classes = inspect.getmro(cls)
         for cls_name in classes:
-            if cls_name.__name__ == 'StructuredNode':
+            if cls_name.__name__ == "StructuredNode":
                 break
 
             for c in cls_name.__dict__:
                 attrib = getattr(cls, c)
                 if not isinstance(attrib, RelationshipDefinition):
                     continue
-                if hasattr(attrib, 'show'):
-                    show = getattr(attrib, 'show')
+                if hasattr(attrib, "show"):
+                    show = getattr(attrib, "show")
                 else:
                     show = False
                 if not show:
                     continue
 
                 if view_public_only:
-                    if hasattr(attrib, 'is_restricted'):
-                        is_restricted = getattr(attrib, 'is_restricted')
+                    if hasattr(attrib, "is_restricted"):
+                        is_restricted = getattr(attrib, "is_restricted")
                     else:
                         is_restricted = False
                     if is_restricted:

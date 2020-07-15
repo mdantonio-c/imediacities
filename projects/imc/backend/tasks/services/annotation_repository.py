@@ -1,9 +1,10 @@
-from datetime import datetime
-import pytz
 import json
-from restapi.utilities.logs import log
-from restapi.connectors.neo4j import graph_transactions
+from datetime import datetime
+
+import pytz
 from neomodel.cardinality import CardinalityViolation
+from restapi.connectors.neo4j import graph_transactions
+from restapi.utilities.logs import log
 
 
 class AnnotationRepository:
@@ -38,10 +39,10 @@ class AnnotationRepository:
 
         log.debug("Creating a new tag annotation")
         # create annotation node
-        anno = self.graph.Annotation(annotation_type='TAG')
+        anno = self.graph.Annotation(annotation_type="TAG")
         if automatic:
             # at the moment ONLY FHG tools allowed
-            anno.generator = 'FHG'
+            anno.generator = "FHG"
         anno.save()
         if not automatic:
             # add creator
@@ -60,15 +61,15 @@ class AnnotationRepository:
         if (
             selector is not None
             and isinstance(target, self.graph.Item)
-            and target.item_type == 'Video'
+            and target.item_type == "Video"
         ):
             if not isinstance(target, self.graph.Item):
-                raise ValueError('Selector allowed only for Item target.')
-            s_start, s_end = map(int, selector['value'].lstrip('t=').split(','))
-            log.debug('start:{}, end:{}', s_start, s_end)
+                raise ValueError("Selector allowed only for Item target.")
+            s_start, s_end = map(int, selector["value"].lstrip("t=").split(","))
+            log.debug("start:{}, end:{}", s_start, s_end)
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
-            log.debug('Segment does exist? {}', True if segment else False)
+            log.debug("Segment does exist? {}", True if segment else False)
             if segment is None:
                 segment = self.graph.VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
@@ -77,8 +78,8 @@ class AnnotationRepository:
                 shots = self.get_enclosing_shots(segment, target)
                 if shots is None or len(shots) == 0:
                     raise ValueError(
-                        'Invalid state: cannot be found shot(s) enclosing '
-                        'selected segment [{}]'.format(selector['value'])
+                        "Invalid state: cannot be found shot(s) enclosing "
+                        "selected segment [{}]".format(selector["value"])
                     )
                 for shot in shots:
                     segment.within_shots.connect(shot)
@@ -87,87 +88,87 @@ class AnnotationRepository:
             anno.targets.connect(target)
         # add bodies
         for body in bodies:
-            if body['type'] == 'ResourceBody':
-                source = body['source']
-                iri = source if isinstance(source, str) else source.get('iri')
-                log.debug('ResourceBody with IRI:{}', iri)
+            if body["type"] == "ResourceBody":
+                source = body["source"]
+                iri = source if isinstance(source, str) else source.get("iri")
+                log.debug("ResourceBody with IRI:{}", iri)
                 # look for existing Resource
                 # do not update the existing resource
                 bodyNode = self.graph.ResourceBody.nodes.get_or_none(iri=iri)
                 if bodyNode is None:
-                    log.debug('new ResourceBody for concept: {}', source)
+                    log.debug("new ResourceBody for concept: {}", source)
                     bodyNode = self.graph.ResourceBody(iri=iri)
                     if not isinstance(source, str):
-                        bodyNode.name = source.get('name')
-                    if 'spatial' in body:
-                        coord = [body['spatial']['lat'], body['spatial']['long']]
-                        log.debug('lat: {}, long:{}', coord[0], coord[1])
+                        bodyNode.name = source.get("name")
+                    if "spatial" in body:
+                        coord = [body["spatial"]["lat"], body["spatial"]["long"]]
+                        log.debug("lat: {}, long:{}", coord[0], coord[1])
                         bodyNode.spatial = coord
                     bodyNode.save()
-            elif body['type'] == 'TextualBody':
-                text_lang = body.get('language')
+            elif body["type"] == "TextualBody":
+                text_lang = body.get("language")
                 bodyNode = self.graph.TextualBody(
-                    value=body['value'], language=text_lang
+                    value=body["value"], language=text_lang
                 ).save()
                 bodyNode.save()
-            elif body['type'] == 'ODBody':
+            elif body["type"] == "ODBody":
                 properties = {
-                    'object_id': body['object_id'],
-                    'confidence': body['confidence'],
+                    "object_id": body["object_id"],
+                    "confidence": body["confidence"],
                 }
                 bodyNode = self.graph.ODBody(**properties).save()
-                if 'region_sequence' in body:
-                    sequence = json.dumps(body['region_sequence'])
+                if "region_sequence" in body:
+                    sequence = json.dumps(body["region_sequence"])
                     fragment_selection = self.graph.AreaSequenceSelector(
                         sequence=sequence
                     ).save()
                     anno.refined_selection.connect(fragment_selection)
                 # connect the concept
-                concept = body['concept']['source']
+                concept = body["concept"]["source"]
                 conceptNode = self.graph.ResourceBody.nodes.get_or_none(
-                    iri=concept['iri']
+                    iri=concept["iri"]
                 )
                 if conceptNode is None:
-                    log.debug('new ResourceBody for concept: {}', concept)
+                    log.debug("new ResourceBody for concept: {}", concept)
                     conceptNode = self.graph.ResourceBody(
-                        iri=concept['iri'], name=concept['name']
+                        iri=concept["iri"], name=concept["name"]
                     ).save()
                 bodyNode.object_type.connect(conceptNode)
-            elif body['type'] == 'BRBody':
+            elif body["type"] == "BRBody":
                 properties = {
-                    'object_id': body['object_id'],
-                    'confidence': body['confidence'],
+                    "object_id": body["object_id"],
+                    "confidence": body["confidence"],
                 }
                 bodyNode = self.graph.BRBody(**properties).save()
                 # connect the concept
-                concept = body['concept']['source']
+                concept = body["concept"]["source"]
                 conceptNode = self.graph.ResourceBody.nodes.get_or_none(
-                    iri=concept['iri']
+                    iri=concept["iri"]
                 )
                 if conceptNode is None:
-                    log.debug('new ResourceBody for concept: {}', concept)
+                    log.debug("new ResourceBody for concept: {}", concept)
                     conceptNode = self.graph.ResourceBody(
-                        iri=concept['iri'],
-                        name=concept['name'],
-                        spatial=concept['spatial'],
+                        iri=concept["iri"],
+                        name=concept["name"],
+                        spatial=concept["spatial"],
                     ).save()
                 bodyNode.object_type.connect(conceptNode)
             else:
                 # should never be reached
-                raise ValueError('Invalid body: {}'.format(body['type']))
+                raise ValueError("Invalid body: {}".format(body["type"]))
             anno.bodies.connect(bodyNode)
         return anno
 
     def create_dsc_annotation(
         self, user, bodies, target, selector, is_private=False, embargo_date=None
     ):
-        '''
+        """
         Create a "description" annotation used for private and public notes.
-        '''
-        visibility = 'private' if is_private else 'public'
+        """
+        visibility = "private" if is_private else "public"
         log.debug("Create a new {} description annotation", visibility)
         # create annotation node
-        anno = self.graph.Annotation(annotation_type='DSC', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type="DSC", private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -186,13 +187,13 @@ class AnnotationRepository:
         anno.targets.connect(target)
 
         for body in bodies:
-            if body['type'] != 'TextualBody':
+            if body["type"] != "TextualBody":
                 raise ValueError(
-                    'Invalid body for description annotation: {}'.format(body['type'])
+                    "Invalid body for description annotation: {}".format(body["type"])
                 )
-            text_lang = body.get('language')
+            text_lang = body.get("language")
             bodyNode = self.graph.TextualBody(
-                value=body['value'], language=text_lang
+                value=body["value"], language=text_lang
             ).save()
             anno.bodies.connect(bodyNode)
 
@@ -201,13 +202,13 @@ class AnnotationRepository:
     def create_link_annotation(
         self, user, bodies, target, selector, is_private=False, embargo_date=None
     ):
-        '''
+        """
         Create a link annotation.
-        '''
-        visibility = 'private' if is_private else 'public'
+        """
+        visibility = "private" if is_private else "public"
         log.debug("Create a new {} description annotation", visibility)
         # create annotation node
-        anno = self.graph.Annotation(annotation_type='LNK', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type="LNK", private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -224,49 +225,49 @@ class AnnotationRepository:
 
         # ignore at the moment segment selector
         if selector is not None:
-            log.warning('Selector not yet applicable for the target {0}', target)
+            log.warning("Selector not yet applicable for the target {0}", target)
         anno.targets.connect(target)
 
         # ONLY textual and reference body allowed at the moment
         for body in bodies:
-            if body['type'] == 'TextualBody':
-                bodyNode = self.graph.TextualBody(value=body['value']).save()
-            elif body['type'] == 'BibliographicReference':
-                properties = body['value']
+            if body["type"] == "TextualBody":
+                bodyNode = self.graph.TextualBody(value=body["value"]).save()
+            elif body["type"] == "BibliographicReference":
+                properties = body["value"]
                 bodyNode = self.graph.BibliographicReference(**properties).save()
             else:
                 raise ValueError(
-                    'Invalid body for link annotation: {}'.format(body['type'])
+                    "Invalid body for link annotation: {}".format(body["type"])
                 )
             anno.bodies.connect(bodyNode)
 
         return anno
 
     def delete_manual_annotation(self, anno, btype, bid):
-        '''
+        """
         b_type and b_id can be used to delete only a single body in the
         annotation if multiple bodies exist.
-        '''
+        """
         log.debug(
-            'Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]',
+            "Deleting annotation ID:{anno_id} with body reference [{btype}:{bid}]",
             anno_id=anno.uuid,
             btype=btype,
             bid=bid,
         )
         bodies = anno.bodies.all()
         body_list_size_before = len(bodies)
-        log.debug('body list size before deletion: {}', body_list_size_before)
+        log.debug("body list size before deletion: {}", body_list_size_before)
         single_body = True if btype is not None and bid is not None else False
-        log.debug('Deleting single body?: {}', single_body)
+        log.debug("Deleting single body?: {}", single_body)
         body_found = False
         for body in bodies:
             original_body = body.downcast()
-            log.debug('body instance of {}', original_body.__class__)
+            log.debug("body instance of {}", original_body.__class__)
             if single_body:
                 # ONLY the referenced body
                 if (
                     isinstance(original_body, self.graph.ResourceBody)
-                    and btype == 'resource'
+                    and btype == "resource"
                 ):
                     if bid == original_body.iri:
                         # disconnect that node
@@ -274,7 +275,7 @@ class AnnotationRepository:
                         anno.bodies.disconnect(body)
                 elif (
                     isinstance(original_body, self.graph.TextualBody)
-                    and btype == 'textual'
+                    and btype == "textual"
                 ):
                     if bid == original_body.value:
                         # remove the textual node
@@ -291,7 +292,7 @@ class AnnotationRepository:
         # refresh the list of bodies
         bodies = anno.bodies.all()
         body_list_size_after = len(bodies)
-        log.debug('body list size after deletion: {}', body_list_size_after)
+        log.debug("body list size after deletion: {}", body_list_size_after)
         if single_body and not body_found:
             raise ReferenceError(
                 "Annotation ID:{anno_id} cannot be deleted."
@@ -307,26 +308,26 @@ class AnnotationRepository:
                 target_labels = t.labels()
                 log.debug("Target label(s): {}", target_labels)
                 if (
-                    'VideoSegment' in target_labels
-                    and 'Shot' not in target_labels
-                    and self.is_orphan_segment(t.downcast(target_class='VideoSegment'))
+                    "VideoSegment" in target_labels
+                    and "Shot" not in target_labels
+                    and self.is_orphan_segment(t.downcast(target_class="VideoSegment"))
                 ):
                     t.delete()
-                    log.debug('Deleted orphan segment')
+                    log.debug("Deleted orphan segment")
             anno.delete()
-            single_body_removed = ''
+            single_body_removed = ""
             if single_body:
-                single_body_removed = ' Body {body_type}:{body_id}'.format(
+                single_body_removed = " Body {body_type}:{body_id}".format(
                     body_type=btype, body_id=bid
                 )
             log.info(
-                'Annotation with ID:{} successfully deleted.{}',
+                "Annotation with ID:{} successfully deleted.{}",
                 anno.uuid,
                 single_body_removed,
             )
         else:
             log.info(
-                'Annotation with ID:{}. ONLY body {}:{} removed', anno.uuid, btype, bid
+                "Annotation with ID:{}. ONLY body {}:{} removed", anno.uuid, btype, bid
             )
 
     @staticmethod
@@ -340,10 +341,10 @@ class AnnotationRepository:
     @graph_transactions
     def create_automatic_tvs(self, item, shots):
         if not shots:
-            raise ValueError('List of shots cannot be empty')
+            raise ValueError("List of shots cannot be empty")
         # create annotation node
         annotation = self.graph.Annotation(
-            generator='FHG', annotation_type='TVS'
+            generator="FHG", annotation_type="TVS"
         ).save()
         # add target
         annotation.targets.connect(item)
@@ -355,7 +356,7 @@ class AnnotationRepository:
 
         # foreach shot create a node and connect it properly
         for shot_num, properties in shots.items():
-            properties['shot_num'] = shot_num
+            properties["shot_num"] = shot_num
             shot = self.graph.Shot(**properties).save()
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
@@ -364,7 +365,7 @@ class AnnotationRepository:
     def update_automatic_tvs(
         self, item, shots, vim_estimations, rev=False, reviser=None
     ):
-        '''
+        """
         This procedure updates the automatic shot list preserving existing
         annotations such as TAG, DSC, LNK etc.
 
@@ -384,22 +385,22 @@ class AnnotationRepository:
         On the other hand, for automatic annotations, the segments are
         reorganized after updating the shot list. The segments are reassigned
         to the shots (WITHIN_SHOT) after updating the list of cuts.
-        '''
-        log.info('Update existing shot list preserving anno(s).')
+        """
+        log.info("Update existing shot list preserving anno(s).")
         FHG_TVS = item.targeting_annotations.search(
-            annotation_type='TVS', generator='FHG'
+            annotation_type="TVS", generator="FHG"
         )
         if not FHG_TVS:
-            raise ValueError('Expected TVS anno from FHG.')
+            raise ValueError("Expected TVS anno from FHG.")
 
         tvs = FHG_TVS[0]
         tvs_body = tvs.bodies.single().downcast()
 
         existing_shots = item.shots.all()
         old_size = len(existing_shots)
-        log.debug('Existing shot list size: {}', old_size)
+        log.debug("Existing shot list size: {}", old_size)
         new_size = len(shots)
-        log.debug('Incoming shot list size: {}', new_size)
+        log.debug("Incoming shot list size: {}", new_size)
 
         # for each existing shot we gather and disconnect from them all the
         # manual annotations
@@ -408,10 +409,10 @@ class AnnotationRepository:
             for a in old_shot.annotation.search(generator__isnull=True):
                 existing_annotations.append(a)
                 old_shot.annotation.disconnect(a)
-        log.info('total existing annotations: {}', len(existing_annotations))
+        log.info("total existing annotations: {}", len(existing_annotations))
 
         # foreach incoming shot
-        log.debug('----------')
+        log.debug("----------")
         current_time = datetime.now(pytz.utc)
         for shot_num, properties in shots.items():
             shot_node = None
@@ -419,59 +420,59 @@ class AnnotationRepository:
             if not res:
                 # new incoming shot:
                 # rarely expected (especially for framerate fix)
-                log.info('New incoming shot number: {}', shot_num)
+                log.info("New incoming shot number: {}", shot_num)
                 shot_node = self.graph.Shot(shot_num=shot_num, **properties)
-                if rev and 'revision_confirmed' in properties:
-                    shot_node.revision_confirmed = properties['revision_confirmed']
-                if rev and 'revision_check' in properties:
-                    shot_node.revision_check = properties['revision_check']
+                if rev and "revision_confirmed" in properties:
+                    shot_node.revision_confirmed = properties["revision_confirmed"]
+                if rev and "revision_check" in properties:
+                    shot_node.revision_check = properties["revision_check"]
                 shot_node.save()
                 if reviser is not None and shot_node.revision_confirmed:
-                    shot_node.revised_by.connect(reviser, {'when': current_time})
+                    shot_node.revised_by.connect(reviser, {"when": current_time})
                 tvs_body.segments.connect(shot_node)
                 item.shots.connect(shot_node)
             else:
                 shot_node = res[0]
                 # props to update
-                if rev and 'revision_confirmed' in properties:
+                if rev and "revision_confirmed" in properties:
                     previous_confirmed = shot_node.revision_confirmed
-                    shot_node.revision_confirmed = properties['revision_confirmed']
+                    shot_node.revision_confirmed = properties["revision_confirmed"]
                     if reviser is not None and (
                         (not previous_confirmed and shot_node.revision_confirmed)
-                        or properties['start_frame_idx'] != shot_node.start_frame_idx
+                        or properties["start_frame_idx"] != shot_node.start_frame_idx
                     ):
-                        shot_node.revised_by.connect(reviser, {'when': current_time})
-                    if 'revision_check' in properties:
-                        shot_node.revision_check = properties['revision_check']
-                shot_node.start_frame_idx = properties['start_frame_idx']
-                shot_node.end_frame_idx = properties['end_frame_idx']
-                shot_node.timestamp = properties['timestamp']
-                shot_node.duration = properties['duration']
-                shot_node.thumbnail_uri = properties['thumbnail_uri']
+                        shot_node.revised_by.connect(reviser, {"when": current_time})
+                    if "revision_check" in properties:
+                        shot_node.revision_check = properties["revision_check"]
+                shot_node.start_frame_idx = properties["start_frame_idx"]
+                shot_node.end_frame_idx = properties["end_frame_idx"]
+                shot_node.timestamp = properties["timestamp"]
+                shot_node.duration = properties["duration"]
+                shot_node.thumbnail_uri = properties["thumbnail_uri"]
                 shot_node.save()
             # manage annotations
-            if 'annotations' in properties:
-                for anno_id in properties['annotations']:
+            if "annotations" in properties:
+                for anno_id in properties["annotations"]:
                     # look up ID from existing_annotations
-                    log.debug('look up for annotation ID {}', anno_id)
+                    log.debug("look up for annotation ID {}", anno_id)
                     found = [x for x in existing_annotations if x.uuid == anno_id]
                     if len(found) == 0:
                         continue
                     found[0].targets.connect(shot_node)
             log.debug(shot_node)
-            log.debug('----------')
+            log.debug("----------")
         if old_size > new_size:
             # delete exceeding shots
             # NOTE: we can do this because no annotation targets the shot
             log.warning(
-                'The shot list [size={new_size}] is shorter than the '
-                'previous one [size={old_size}]'.format(
+                "The shot list [size={new_size}] is shorter than the "
+                "previous one [size={old_size}]".format(
                     new_size=new_size, old_size=old_size
                 )
             )
             for i in range(new_size, old_size):
                 shot_to_delete = item.shots.search(shot_num=i)
-                log.warning('Exceeding shot to delete: {}', shot_to_delete)
+                log.warning("Exceeding shot to delete: {}", shot_to_delete)
                 shot_to_delete[0].delete()
 
         # clean-up "orphan" manual annotations
@@ -479,7 +480,7 @@ class AnnotationRepository:
             try:
                 anno.targets.all()
             except CardinalityViolation:
-                log.warning('orphan annotation to delete: {}', anno)
+                log.warning("orphan annotation to delete: {}", anno)
                 # delete anno
                 # NOTE: this could occur if an exisitng manual anno is not
                 # passed in the shot revision request.
@@ -498,10 +499,10 @@ class AnnotationRepository:
         self.arrange_video_segments(item)
 
     def arrange_video_segments(self, item):
-        '''
+        """
         Rearrange the relationships between existing segments and the new shots
         (:VideoSegment)-[:WITHIN_SHOT]->(:Shot)
-        '''
+        """
         query = (
             "MATCH (i:Item {{uuid: '{item_id}'}})<-[:SOURCE]-(anno:Annotation {{annotation_type:'TAG', generator:'FHG'}}) "
             "MATCH (anno)-[:HAS_TARGET]->(sgm:VideoSegment) WHERE NOT sgm:Shot "
@@ -516,8 +517,8 @@ class AnnotationRepository:
             shots = self.get_enclosing_shots(segment, item)
             if shots is None or len(shots) == 0:
                 raise ValueError(
-                    'Invalid state: cannot be found shot(s) enclosing '
-                    'selected segment [t={start},{end}]'.format(
+                    "Invalid state: cannot be found shot(s) enclosing "
+                    "selected segment [t={start},{end}]".format(
                         start=segment.start_frame_idx, end=segment.end_frame_idx
                     )
                 )
@@ -527,25 +528,25 @@ class AnnotationRepository:
     def create_tvs_manual_annotation(
         self, user, bodies, target, is_private=False, embargo_date=None
     ):
-        '''
+        """
         Create a new user manual segmentation for this video. One segmentation
         per user is allowed at the moment.
-        '''
+        """
         if not isinstance(target, self.graph.Item):
-            raise ValueError('Segmentation allowed only for Item target.')
+            raise ValueError("Segmentation allowed only for Item target.")
         # look for existing segmentation for the given user
         segmentation = self.lookup_existing_user_segmentation(user, target)
         if segmentation is not None:
             raise DuplicatedAnnotationError(
-                'Segmentation for user<{email}> '
-                'does already exist for item [{item_id}].'.format(
+                "Segmentation for user<{email}> "
+                "does already exist for item [{item_id}].".format(
                     email=user.email, item_id=target.uuid
                 )
             )
-        visibility = 'private' if is_private else 'public'
+        visibility = "private" if is_private else "public"
         log.debug("Create a new {} segmentation annotation", visibility)
         # create annotation node
-        anno = self.graph.Annotation(annotation_type='TVS', private=is_private).save()
+        anno = self.graph.Annotation(annotation_type="TVS", private=is_private).save()
         if embargo_date is not None:
             anno.embargo = embargo_date
             anno.save()
@@ -555,25 +556,25 @@ class AnnotationRepository:
 
         # Expected single body
         body = bodies[0]
-        if body['type'] != 'TVSBody':
+        if body["type"] != "TVSBody":
             raise ValueError(
-                'Invalid body for segmentation annotation: {}'.format(body['type'])
+                "Invalid body for segmentation annotation: {}".format(body["type"])
             )
         tvs_body = self.graph.TVSBody().save()
         anno.bodies.connect(tvs_body)
-        segments = body.get('segments')
+        segments = body.get("segments")
         if segments is None or type(segments) is not list or len(segments) == 0:
-            raise ValueError('Invalid segments')
+            raise ValueError("Invalid segments")
         for s in segments:
-            s_start, s_end = map(int, s.lstrip('t=').split(','))
-            log.debug('start:{}, end:{}', s_start, s_end)
+            s_start, s_end = map(int, s.lstrip("t=").split(","))
+            log.debug("start:{}, end:{}", s_start, s_end)
             if s_start > s_end:
                 raise ValueError(
-                    'Invalid segment range. The start is greater than the end.'
+                    "Invalid segment range. The start is greater than the end."
                 )
             # search for existing segment for the given item
             segment = self.lookup_existing_segment(s_start, s_end, target)
-            log.debug('Segment does exist? {}', True if segment else False)
+            log.debug("Segment does exist? {}", True if segment else False)
             if segment is None:
                 segment = self.graph.VideoSegment(
                     start_frame_idx=s_start, end_frame_idx=s_end
@@ -582,8 +583,8 @@ class AnnotationRepository:
                 shots = self.get_enclosing_shots(segment, target)
                 if shots is None or len(shots) == 0:
                     raise ValueError(
-                        'Invalid state: cannot be found shot(s) enclosing '
-                        'selected segment [{}]'.format(s)
+                        "Invalid state: cannot be found shot(s) enclosing "
+                        "selected segment [{}]".format(s)
                     )
                 for shot in shots:
                     segment.within_shots.connect(shot)
@@ -593,7 +594,7 @@ class AnnotationRepository:
 
     @graph_transactions
     def delete_tvs_annotation(self, annotation):
-        log.debug('Delete existing TVS annotation')
+        log.debug("Delete existing TVS annotation")
         body = annotation.bodies.single()
         if body:
             tvs_body = body.downcast()
@@ -602,9 +603,9 @@ class AnnotationRepository:
                 annotations = segment.annotation.all()
                 if annotations is not None and len(annotations) > 0:
                     raise ValueError(
-                        'TVS annotation [{anno_id}] cannot be'
-                        ' deleted because referred by one or more'
-                        ' other annotations'.format(anno_id=annotation.uuid)
+                        "TVS annotation [{anno_id}] cannot be"
+                        " deleted because referred by one or more"
+                        " other annotations".format(anno_id=annotation.uuid)
                     )
                 segment.delete()
             tvs_body.delete()
@@ -612,7 +613,7 @@ class AnnotationRepository:
 
     @graph_transactions
     def delete_tvs_manual_annotation(self, annotation):
-        log.debug('Delete existing manual TVS annotation')
+        log.debug("Delete existing manual TVS annotation")
         body = annotation.bodies.single()
         tvs_body = body.downcast()
         for segment in tvs_body.segments:
@@ -631,7 +632,7 @@ class AnnotationRepository:
     @graph_transactions
     def create_vim_annotation(self, item, estimates):
         if not estimates or len(estimates) == 0:
-            raise ValueError('List of video motion estimates cannot be empty')
+            raise ValueError("List of video motion estimates cannot be empty")
         for q in estimates:
             # get video shot by shot number
             shot = None
@@ -646,7 +647,7 @@ class AnnotationRepository:
 
             # create annotation node
             annotation = self.graph.Annotation(
-                generator='FHG', annotation_type='VIM'
+                generator="FHG", annotation_type="VIM"
             ).save()
             # add target
             annotation.targets.connect(shot)
@@ -654,31 +655,31 @@ class AnnotationRepository:
             # add body
             vim_body = self.graph.VIMBody()
             motions_dict = q[1]
-            log.debug('--------------------------------')
+            log.debug("--------------------------------")
             log.debug(motions_dict)
-            log.debug('--------------------------------')
-            vim_body.no_motion = motions_dict['NoMotion']
-            vim_body.left_motion = motions_dict['LeftMotion']
-            vim_body.right_motion = motions_dict['RightMotion']
-            vim_body.up_motion = motions_dict['UpMotion']
-            vim_body.down_motion = motions_dict['DownMotion']
-            vim_body.zoom_in_motion = motions_dict['ZoomInMotion']
-            vim_body.zoom_out_motion = motions_dict['ZoomOutMotion']
-            vim_body.roll_cw_motion = motions_dict['RollCWMotion']
-            vim_body.roll_ccw_motion = motions_dict['RollCCWMotion']
-            vim_body.x_shake = motions_dict['XShake']
-            vim_body.y_shake = motions_dict['YShake']
-            vim_body.roll_shake = motions_dict['RollShake']
-            vim_body.camera_shake = motions_dict['CameraShake']
-            vim_body.inner_rhythm_fluid = motions_dict['InnerRhythmFluid']
-            vim_body.inner_rhythm_staccato = motions_dict['InnerRhythmStaccato']
-            vim_body.inner_rhythm_no_motion = motions_dict['InnerRhythmNoMotion']
+            log.debug("--------------------------------")
+            vim_body.no_motion = motions_dict["NoMotion"]
+            vim_body.left_motion = motions_dict["LeftMotion"]
+            vim_body.right_motion = motions_dict["RightMotion"]
+            vim_body.up_motion = motions_dict["UpMotion"]
+            vim_body.down_motion = motions_dict["DownMotion"]
+            vim_body.zoom_in_motion = motions_dict["ZoomInMotion"]
+            vim_body.zoom_out_motion = motions_dict["ZoomOutMotion"]
+            vim_body.roll_cw_motion = motions_dict["RollCWMotion"]
+            vim_body.roll_ccw_motion = motions_dict["RollCCWMotion"]
+            vim_body.x_shake = motions_dict["XShake"]
+            vim_body.y_shake = motions_dict["YShake"]
+            vim_body.roll_shake = motions_dict["RollShake"]
+            vim_body.camera_shake = motions_dict["CameraShake"]
+            vim_body.inner_rhythm_fluid = motions_dict["InnerRhythmFluid"]
+            vim_body.inner_rhythm_staccato = motions_dict["InnerRhythmStaccato"]
+            vim_body.inner_rhythm_no_motion = motions_dict["InnerRhythmNoMotion"]
             vim_body.save()
             annotation.bodies.connect(vim_body)
 
     @graph_transactions
     def delete_vim_annotation(self, annotation):
-        log.debug('Delete existing VIM annotation')
+        log.debug("Delete existing VIM annotation")
         vim_body = annotation.bodies.single()
         if vim_body:
             original_vim_body = vim_body.downcast()
@@ -688,7 +689,7 @@ class AnnotationRepository:
 
     @graph_transactions
     def delete_auto_annotation(self, annotation):
-        log.debug('Delete existing automatic TAG annotation')
+        log.debug("Delete existing automatic TAG annotation")
         body = annotation.bodies.single()
         object_id = None
         object_type = None
@@ -713,36 +714,36 @@ class AnnotationRepository:
             target_labels = t.labels()
             log.debug("Target label(s): {}", target_labels)
             if (
-                'VideoSegment' in target_labels
-                and 'Shot' not in target_labels
-                and self.is_orphan_segment(t.downcast(target_class='VideoSegment'))
+                "VideoSegment" in target_labels
+                and "Shot" not in target_labels
+                and self.is_orphan_segment(t.downcast(target_class="VideoSegment"))
             ):
                 t.delete()
-                log.debug('Deleted orphan segment')
+                log.debug("Deleted orphan segment")
         annotation.delete()
         log.info(
-            'Automatic TAG[{oid}/{otype}] deleted.'.format(
+            "Automatic TAG[{oid}/{otype}] deleted.".format(
                 oid=object_id, otype=object_type
             )
         )
 
     def deduplicate_tags(self, bodies, target, selector):
-        ''' Check for esisting bodies for the given target. If all bodies
+        """ Check for esisting bodies for the given target. If all bodies
         already exist, throw a duplication exception exception. If the
         annotation contains some duplicates, report them as warnings.
-        '''
+        """
         warnings = []
         filtered_bodies = []
         for body in bodies:
-            if body['type'] != 'ResourceBody':
+            if body["type"] != "ResourceBody":
                 filtered_bodies.append(body)
                 continue
             if selector is not None:
                 # TODO manage deduplication with selector
                 filtered_bodies.append(body)
                 continue
-            source = body['source']
-            iri = source if isinstance(source, str) else source.get('iri')
+            source = body["source"]
+            iri = source if isinstance(source, str) else source.get("iri")
             query = (
                 "MATCH (a:Annotation) WHERE a.annotation_type='TAG' "
                 "match (a)-[:HAS_TARGET]-(t:AnnotationTarget) where t.uuid='{target_uuid}' "
@@ -757,7 +758,7 @@ class AnnotationRepository:
             if count > 0:
                 warnings.append(
                     "Duplicated tag: '{name}' - '{iri}'".format(
-                        name=source.get('name', ''), iri=iri
+                        name=source.get("name", ""), iri=iri
                     )
                 )
                 continue
@@ -765,15 +766,15 @@ class AnnotationRepository:
         return warnings, filtered_bodies
 
     def get_enclosing_shots(self, segment, item):
-        '''
+        """
         Return the shot list of the item enclosing the given segment.
-        '''
+        """
         if (
             item is None
             or not isinstance(item, self.graph.Item)
-            or item.item_type != 'Video'
+            or item.item_type != "Video"
         ):
-            raise ValueError('Invalid item in getting enclosing shots.')
+            raise ValueError("Invalid item in getting enclosing shots.")
         s_start = segment.start_frame_idx
         s_end = segment.end_frame_idx
         shots = []
@@ -787,9 +788,9 @@ class AnnotationRepository:
         return shots
 
     def lookup_existing_user_segmentation(self, user, item):
-        '''
+        """
         Lookup for existing user segmentation for a given item.
-        '''
+        """
         query = (
             "MATCH (anno:Annotation {{annotation_type:'TVS'}})"
             "-[:IS_ANNOTATED_BY]->(:User {{uuid:'{user_id}'}}) "
@@ -801,10 +802,10 @@ class AnnotationRepository:
         return anno[0] if anno else None
 
     def lookup_existing_segment(self, start_frame, end_frame, item):
-        '''
+        """
         Search for existing segment for a given item.
         NOTE: we're excluding shots!
-        '''
+        """
         query = (
             "MATCH (n:VideoSegment) WHERE n.start_frame_idx={start_frame} AND n.end_frame_idx={end_frame} "
             "MATCH (n)-[:WITHIN_SHOT]-(s:Shot)-[:SHOT]-(i:Item {{uuid: '{item_id}'}}) "
@@ -819,10 +820,10 @@ class AnnotationRepository:
         return segment[0] if segment else None
 
     def check_automatic_tagging(self, item_id):
-        '''
+        """
         Check if at least one automatic annotation exists for the given content
         item.
-        '''
+        """
         query = (
             "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) "
             "WHERE a.generator IS NOT NULL "
@@ -834,10 +835,10 @@ class AnnotationRepository:
         return True if count > 0 else False
 
     def check_automatic_od(self, item_id):
-        '''
+        """
         Check if at least one automatic object detection exists for the given
         content item.
-        '''
+        """
         query = (
             "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) "
             "WHERE a.generator IS NOT NULL "
@@ -850,10 +851,10 @@ class AnnotationRepository:
         return True if count > 0 else False
 
     def check_automatic_br(self, item_id):
-        '''
+        """
         Check if at least one automatic building recognition exists for the
         given content item.
-        '''
+        """
         query = (
             "MATCH (a:Annotation {{annotation_type:'TAG'}})-[:SOURCE]-(i:Item {{uuid:'{item_id}'}}) "
             "WHERE a.generator IS NOT NULL "
@@ -866,14 +867,14 @@ class AnnotationRepository:
         return True if count > 0 else False
 
     def remove_segment(self, anno, segment):
-        '''
+        """
         Remove a segment for a given segmentation (TVS anno).
         Keep in mind that at least one segment MUST exist in the segmentation.
         Only disconnect the segment if it belongs to some other segmentation(s)
         and/or is targeted by some TAG annotations.
-        '''
-        if anno is None or anno.annotation_type != 'TVS':
-            raise ValueError('Invalid annotation')
+        """
+        if anno is None or anno.annotation_type != "TVS":
+            raise ValueError("Invalid annotation")
         # check if the segment belongs to the actual segmentation
         bodies = anno.bodies.all()
         tvs_body = bodies[0].downcast()
@@ -889,7 +890,7 @@ class AnnotationRepository:
             )
 
         # check if the segment is the last
-        log.debug('actual segmentation list size: {size}', size=len(segments))
+        log.debug("actual segmentation list size: {size}", size=len(segments))
         if len(segments) == 1:
             raise DuplicatedAnnotationError(
                 "Cannot remove the last segment. "
@@ -907,12 +908,12 @@ class AnnotationRepository:
             segment.delete()
 
     def add_segment(self, anno, value):
-        '''
+        """
         Add a new segment to a given segmentation.
-        '''
-        if anno is None or anno.annotation_type != 'TVS':
-            raise ValueError('Invalid annotation')
-        s_start, s_end = map(int, value.lstrip('t=').split(','))
+        """
+        if anno is None or anno.annotation_type != "TVS":
+            raise ValueError("Invalid annotation")
+        s_start, s_end = map(int, value.lstrip("t=").split(","))
         body = anno.bodies.single()
         tvs_body = body.downcast()
         # look for existing segment in the segmentation
@@ -921,7 +922,7 @@ class AnnotationRepository:
             log.debug(s)
             if s.start_frame_idx == s_start and s.end_frame_idx == s_end:
                 raise DuplicatedAnnotationError(
-                    'Segment [t={start},{end}] does already exist'.format(
+                    "Segment [t={start},{end}] does already exist".format(
                         start=s_start, end=s_end
                     )
                 )
@@ -929,7 +930,7 @@ class AnnotationRepository:
         # search for existing segment for the given item
         item = anno.source_item.single()
         segment = self.lookup_existing_segment(s_start, s_end, item)
-        log.debug('Segment does exist? {}', True if segment else False)
+        log.debug("Segment does exist? {}", True if segment else False)
         if segment is None:
             segment = self.graph.VideoSegment(
                 start_frame_idx=s_start, end_frame_idx=s_end
@@ -938,8 +939,8 @@ class AnnotationRepository:
             shots = self.get_enclosing_shots(segment, item)
             if shots is None or len(shots) == 0:
                 raise ValueError(
-                    'Invalid state: cannot be found shot(s) enclosing '
-                    'selected segment [t={start},{end}]'.format(
+                    "Invalid state: cannot be found shot(s) enclosing "
+                    "selected segment [t={start},{end}]".format(
                         start=s_start, end=s_end
                     )
                 )

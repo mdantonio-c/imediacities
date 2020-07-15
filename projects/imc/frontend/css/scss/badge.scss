@@ -1,4 +1,4 @@
-@import 'vars';
+@import "vars";
 
 /*
   Classi per i Badge da utilizzare per i geotag(arancio) e termtag(viola)
@@ -32,7 +32,6 @@
     padding-left: 4px;
     vertical-align: sub;
   }
-
 }
 
 .badge-geotag,
@@ -84,7 +83,7 @@
   padding-left: 20px;
 
   &:before {
-    content: 'A';
+    content: "A";
     background: $bg-dark;
     line-height: 16px;
     width: 15px;
@@ -102,4 +101,3 @@
     opacity: 0.6;
   }
 }
-

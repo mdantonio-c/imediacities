@@ -1,15 +1,15 @@
-@mixin app-info($color){
+@mixin app-info($color) {
   background: lighten($color, 40%);
   border-color: darken($color, 10%);
   color: $color;
 }
 .app-info {
   align-items: center;
-  border:1px solid;
-  display:flex;
-  font-size:16px;
+  border: 1px solid;
+  display: flex;
+  font-size: 16px;
   justify-content: space-between;
-  padding:5px 10px;
+  padding: 5px 10px;
 
   &.success {
     @include app-info(#76a356);
@@ -20,12 +20,11 @@
   }
 
   &.info {
-    @include app-info(#53B8E1);
+    @include app-info(#53b8e1);
   }
 
   .material-icons {
-    color:inherit !important;
-    padding-left:5px;
+    color: inherit !important;
+    padding-left: 5px;
   }
-
 }
