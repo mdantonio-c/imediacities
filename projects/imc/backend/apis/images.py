@@ -112,7 +112,7 @@ class Images(IMCEndpoint):
 
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def post(self):
         self.graph = self.get_service_instance("neo4j")
 

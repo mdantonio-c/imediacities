@@ -35,7 +35,7 @@ class SearchAnnotations(IMCEndpoint):
     }
 
     @decorators.catch_graph_exceptions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def post(self):
 
         self.graph = self.get_service_instance("neo4j")

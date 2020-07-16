@@ -123,7 +123,7 @@ class Videos(IMCEndpoint):
 
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def post(self):
         self.graph = self.get_service_instance("neo4j")
 
@@ -279,7 +279,7 @@ class VideoAnnotations(IMCEndpoint):
         },
         locations=["query"],
     )
-    @decorators.auth.required()
+    @decorators.auth.require()
     def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
 
@@ -602,7 +602,7 @@ class VideoSegments(IMCEndpoint):
     }
 
     @decorators.catch_graph_exceptions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def get(self, video_id, segment_id):
         if segment_id is not None:
             log.debug(
@@ -639,7 +639,7 @@ class VideoSegments(IMCEndpoint):
         return self.response(data)
 
     @decorators.catch_graph_exceptions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def delete(self, video_id, segment_id):
         log.debug(
             "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
@@ -652,7 +652,7 @@ class VideoSegments(IMCEndpoint):
         )
 
     @decorators.catch_graph_exceptions
-    @decorators.auth.required()
+    @decorators.auth.require()
     def put(self, video_id, segment_id):
         log.debug(
             "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",

@@ -25,7 +25,7 @@ class Fcodelist(IMCEndpoint):
         }
     }
 
-    @decorators.auth.required()
+    @decorators.auth.require()
     @decorators.use_kwargs(
         {
             "lang": fields.Str(

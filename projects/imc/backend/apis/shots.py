@@ -92,7 +92,7 @@ class ShotAnnotations(IMCEndpoint):
     }
 
     @decorators.catch_graph_exceptions
-    @decorators.auth.required()
+    @decorators.auth.require()
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(

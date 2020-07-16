@@ -18,7 +18,7 @@ class Vocabulary(IMCEndpoint):
         }
     }
 
-    @decorators.auth.required()
+    @decorators.auth.require()
     def get(self, lang=None):
         """Get the controlled vocabulary."""
         log.debug("load the controlled vocabulary")
