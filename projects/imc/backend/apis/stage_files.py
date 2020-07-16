@@ -136,9 +136,9 @@ class Stage(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
-    @decorators.auth.require()
     def get(self, group=None, get_total=None, page=None, size=None):
         self.graph = self.get_service_instance("neo4j")
 
@@ -230,8 +230,8 @@ class Stage(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     def post(self):
         """
         Start IMPORT
@@ -443,8 +443,8 @@ class Stage(IMCEndpoint):
 
         return self.response(task.id)
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     def delete(self, filename):
 
         self.graph = self.get_service_instance("neo4j")

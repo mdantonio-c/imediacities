@@ -1,73 +1,70 @@
+from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
 
 class Initializer:
     def __init__(self, services, app=None):
 
-        self.neo4j = services["neo4j"]
-
-        Role = self.neo4j.Role
-        Group = self.neo4j.Group
-        Provider = self.neo4j.Provider
+        neo4j = services["neo4j"]
 
         try:
-            Role.nodes.get(name="local_admin")
-            log.debug("Coordinator role already exists")
-        except Role.DoesNotExist:
-            local_admin = Role()
-            local_admin.name = "local_admin"
+            neo4j.neo4j.Role.nodes.get(name=Role.LOCAL_ADMIN)
+            log.debug("Coordinator neo4j.Role already exists")
+        except neo4j.Role.DoesNotExist:
+            local_admin = neo4j.Role()
+            local_admin.name = Role.LOCAL_ADMIN
             local_admin.description = "Coordinator"
             local_admin.save()
-            log.info("Coordinator role successfully created")
+            log.info("Coordinator neo4j.Role successfully created")
 
         try:
-            Role.nodes.get(name="Archive")
-            log.debug("Archive role already exists")
-        except Role.DoesNotExist:
-            archiver = Role()
+            neo4j.Role.nodes.get(name="Archive")
+            log.debug("Archive neo4j.Role already exists")
+        except neo4j.Role.DoesNotExist:
+            archiver = neo4j.Role()
             archiver.name = "Archive"
             archiver.description = "Archive"
             archiver.save()
-            log.info("Archive role successfully created")
+            log.info("Archive neo4j.Role successfully created")
 
         try:
-            Role.nodes.get(name="Researcher")
-            log.debug("Researcher role already exists")
-        except Role.DoesNotExist:
-            researcher = Role()
+            neo4j.Role.nodes.get(name="Researcher")
+            log.debug("Researcher neo4j.Role already exists")
+        except neo4j.Role.DoesNotExist:
+            researcher = neo4j.Role()
             researcher.name = "Researcher"
             researcher.description = "Researcher"
             researcher.save()
-            log.info("Researcher role successfully created")
+            log.info("Researcher neo4j.Role successfully created")
 
         try:
-            Role.nodes.get(name="Reviser")
-            log.debug("Reviser role already exists")
-        except Role.DoesNotExist:
-            reviser = Role()
+            neo4j.Role.nodes.get(name="Reviser")
+            log.debug("Reviser neo4j.Role already exists")
+        except neo4j.Role.DoesNotExist:
+            reviser = neo4j.Role()
             reviser.name = "Reviser"
             reviser.description = "Reviser"
             reviser.save()
-            log.info("Reviser role successfully created")
+            log.info("Reviser neo4j.Role successfully created")
 
         try:
-            admin = Role.nodes.get(name="admin_root")
+            admin = neo4j.Role.nodes.get(name="admin_root")
             admin.description = "Admin"
             admin.save()
-            log.info("Admin role successfully updated")
-        except Role.DoesNotExist:
-            log.warning("Admin role does not exist")
+            log.info("Admin neo4j.Role successfully updated")
+        except neo4j.Role.DoesNotExist:
+            log.warning("Admin neo4j.Role does not exist")
 
-        if len(Group.nodes) > 0:
+        if len(neo4j.Group.nodes) > 0:
             log.info("Found one or more already defined groups")
         else:
             log.warning("No group defined")
-            group = Group()
+            group = neo4j.Group()
             group.fullname = "test"
             group.shortname = "test"
             group.save()
 
-            group = Group()
+            group = neo4j.Group()
             group.fullname = "Default user group"
             group.shortname = "default"
             group.save()
@@ -76,10 +73,10 @@ class Initializer:
 
         # Providers
         try:
-            Provider.nodes.get(identifier="CCB")
+            neo4j.Provider.nodes.get(identifier="CCB")
             log.debug("Provider CCB already exists")
-        except Provider.DoesNotExist:
-            ccb = Provider()
+        except neo4j.Provider.DoesNotExist:
+            ccb = neo4j.Provider()
             ccb.identifier = "CCB"
             ccb.scheme = "ACRO"
             ccb.name = "Fondazione Cineteca di Bologna"
@@ -93,10 +90,10 @@ class Initializer:
             log.info("Provider CCB successfully created")
 
         try:
-            Provider.nodes.get(identifier="TTE")
+            neo4j.Provider.nodes.get(identifier="TTE")
             log.debug("Provider TTE already exists")
-        except Provider.DoesNotExist:
-            tte = Provider()
+        except neo4j.Provider.DoesNotExist:
+            tte = neo4j.Provider()
             tte.identifier = "TTE"
             tte.scheme = "ACRO"
             tte.name = "Tainiothiki tis Ellados"
@@ -110,10 +107,10 @@ class Initializer:
             log.info("Provider TTE successfully created")
 
         try:
-            Provider.nodes.get(identifier="CRB")
+            neo4j.Provider.nodes.get(identifier="CRB")
             log.debug("Provider CRB already exists")
-        except Provider.DoesNotExist:
-            crb = Provider()
+        except neo4j.Provider.DoesNotExist:
+            crb = neo4j.Provider()
             crb.identifier = "CRB"
             crb.scheme = "ACRO"
             crb.name = "Cinémathèque Royale de Belgique"
@@ -127,10 +124,10 @@ class Initializer:
             log.info("Provider CRB successfully created")
 
         try:
-            Provider.nodes.get(identifier="SFI")
+            neo4j.Provider.nodes.get(identifier="SFI")
             log.debug("Provider SFI already exists")
-        except Provider.DoesNotExist:
-            sfi = Provider()
+        except neo4j.Provider.DoesNotExist:
+            sfi = neo4j.Provider()
             sfi.identifier = "SFI"
             sfi.scheme = "ACRO"
             sfi.name = "Svenska Filminstitutet"
@@ -143,10 +140,10 @@ class Initializer:
             log.info("Provider SFI successfully created")
 
         try:
-            Provider.nodes.get(identifier="DFI")
+            neo4j.Provider.nodes.get(identifier="DFI")
             log.debug("Provider DFI already exists")
-        except Provider.DoesNotExist:
-            dfi = Provider()
+        except neo4j.Provider.DoesNotExist:
+            dfi = neo4j.Provider()
             dfi.identifier = "DFI"
             dfi.scheme = "ACRO"
             dfi.name = "Det Danske Filminstitut"
@@ -160,10 +157,10 @@ class Initializer:
             log.info("Provider DFI successfully created")
 
         try:
-            Provider.nodes.get(identifier="DIF")
+            neo4j.Provider.nodes.get(identifier="DIF")
             log.debug("Provider DIF already exists")
-        except Provider.DoesNotExist:
-            dif = Provider()
+        except neo4j.Provider.DoesNotExist:
+            dif = neo4j.Provider()
             dif.identifier = "DIF"
             dif.scheme = "ACRO"
             dif.name = "Deutsches Filminstitut"
@@ -177,10 +174,10 @@ class Initializer:
             log.info("Provider DIF successfully created")
 
         try:
-            Provider.nodes.get(identifier="OFM")
+            neo4j.Provider.nodes.get(identifier="OFM")
             log.debug("Provider OFM already exists")
-        except Provider.DoesNotExist:
-            ofm = Provider()
+        except neo4j.Provider.DoesNotExist:
+            ofm = neo4j.Provider()
             ofm.identifier = "OFM"
             ofm.scheme = "ACRO"
             ofm.name = "Österreichisches Filmmuseum"
@@ -193,10 +190,10 @@ class Initializer:
             log.info("Provider OFM successfully created")
 
         try:
-            Provider.nodes.get(identifier="WSTLA")
+            neo4j.Provider.nodes.get(identifier="WSTLA")
             log.debug("Provider WSTLA already exists")
-        except Provider.DoesNotExist:
-            ofm = Provider()
+        except neo4j.Provider.DoesNotExist:
+            ofm = neo4j.Provider()
             ofm.identifier = "WSTLA"
             ofm.scheme = "ACRO"
             ofm.name = "Wiener Stadt- und Landesarchiv"
@@ -209,10 +206,10 @@ class Initializer:
             log.info("Provider OFM successfully created")
 
         try:
-            Provider.nodes.get(identifier="FDC")
+            neo4j.Provider.nodes.get(identifier="FDC")
             log.debug("Provider FDC already exists")
-        except Provider.DoesNotExist:
-            fdc = Provider()
+        except neo4j.Provider.DoesNotExist:
+            fdc = neo4j.Provider()
             fdc.identifier = "FDC"
             fdc.scheme = "ACRO"
             fdc.name = "Filmoteca de Catalunya"
@@ -224,10 +221,10 @@ class Initializer:
             log.info("Provider FDC successfully created")
 
         try:
-            Provider.nodes.get(identifier="MNC")
+            neo4j.Provider.nodes.get(identifier="MNC")
             log.debug("Provider MNC already exists")
-        except Provider.DoesNotExist:
-            mnc = Provider()
+        except neo4j.Provider.DoesNotExist:
+            mnc = neo4j.Provider()
             mnc.identifier = "MNC"
             mnc.scheme = "ACRO"
             mnc.name = "Museo Nazionale del Cinema"

@@ -144,8 +144,8 @@ class Annotations(IMCEndpoint):
         }
     }
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -188,9 +188,9 @@ class Annotations(IMCEndpoint):
 
         return self.response(data)
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.require()
     def post(self):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
@@ -400,8 +400,8 @@ class Annotations(IMCEndpoint):
             self.get_annotation_response(created_anno), code=hcodes.HTTP_OK_CREATED
         )
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "body_ref": fields.Str(
@@ -471,9 +471,9 @@ class Annotations(IMCEndpoint):
 
         return self.empty_response()
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.require()
     def put(self, anno_id):
         """
         Update an annotation.
@@ -572,9 +572,9 @@ class Annotations(IMCEndpoint):
 
         return self.response(updated_anno)
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.require()
     def patch(self, anno_id):
         if anno_id is None:
             raise RestApiException(

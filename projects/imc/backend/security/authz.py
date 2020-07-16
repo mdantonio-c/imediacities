@@ -6,6 +6,7 @@
 """
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi.exceptions import RestApiException
+from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -31,9 +32,7 @@ def pre_authorize(func):
         """User is general public if anonymous (not logged in) or is a 'normal
         user'.
         """
-        return (
-            True if (user is None or user.roles.search(name="normal_user")) else False
-        )
+        return True if (user is None or user.roles.search(name=Role.USER)) else False
 
     def _has_rights(self, user, entity_id):
         """

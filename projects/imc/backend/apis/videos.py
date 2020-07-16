@@ -13,6 +13,7 @@ from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
 from restapi.models import fields, validate
+from restapi.services.authentication import Role
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -121,9 +122,9 @@ class Videos(IMCEndpoint):
     Create a new video description.
     """
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.require()
     def post(self):
         self.graph = self.get_service_instance("neo4j")
 
@@ -137,9 +138,9 @@ class Videos(IMCEndpoint):
 
         return self.empty_response()
 
+    @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["admin_root"])
     def delete(self, video_id):
         """
         Delete existing video description.
@@ -192,9 +193,9 @@ class VideoItem(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Archive", "admin_root"], required_roles="any")
     def put(self, video_id):
         """
         Allow user to update item information.
@@ -601,8 +602,8 @@ class VideoSegments(IMCEndpoint):
         }
     }
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     def get(self, video_id, segment_id):
         if segment_id is not None:
             log.debug(
@@ -638,8 +639,8 @@ class VideoSegments(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     def delete(self, video_id, segment_id):
         log.debug(
             "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
@@ -651,8 +652,8 @@ class VideoSegments(IMCEndpoint):
             status_code=hcodes.HTTP_NOT_IMPLEMENTED,
         )
 
-    @decorators.catch_graph_exceptions
     @decorators.auth.require()
+    @decorators.catch_graph_exceptions
     def put(self, video_id, segment_id):
         log.debug(
             "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
@@ -919,8 +920,8 @@ class VideoTools(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["admin_root"])
     def post(self, video_id):
 
         log.debug("launch automatic tool for video id: {}", video_id)
@@ -1115,7 +1116,7 @@ class VideoShotRevision(IMCEndpoint):
         },
         locations=["query"],
     )
-    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
+    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
@@ -1149,9 +1150,9 @@ class VideoShotRevision(IMCEndpoint):
 
         return self.response(data)
 
+    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def put(self, video_id):
         """Put a video under revision"""
         log.debug("Put video {0} under revision", video_id)
@@ -1228,8 +1229,8 @@ class VideoShotRevision(IMCEndpoint):
         # 204: Video under revision successfully.
         return self.empty_response()
 
+    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def post(self, video_id):
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {0}", video_id)
@@ -1333,8 +1334,8 @@ class VideoShotRevision(IMCEndpoint):
         except BaseException as e:
             raise e
 
+    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["Reviser", "admin_root"], required_roles="any")
     def delete(self, video_id):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)

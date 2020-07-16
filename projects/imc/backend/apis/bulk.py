@@ -21,6 +21,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.exceptions import RestApiException
+from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -129,8 +130,8 @@ class Bulk(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_type(path)
 
+    @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["admin_root"])
     def post(self):
         log.debug("Start bulk procedure...")
 

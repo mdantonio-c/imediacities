@@ -10,6 +10,7 @@ from imc.apis import IMCEndpoint
 from restapi import decorators
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
+from restapi.services.authentication import Role
 from restapi.services.uploader import Uploader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -44,10 +45,10 @@ class Upload(Uploader, IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
     @decorators.init_chunk_upload
-    @decorators.auth.required(roles=["Archive"])
     def post(self, name, **kwargs):
 
         self.graph = self.get_service_instance("neo4j")
@@ -65,9 +66,9 @@ class Upload(Uploader, IMCEndpoint):
 
         return self.init_chunk_upload(upload_dir, name, force=True)
 
+    @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Archive"])
     def put(self, filename):
 
         self.graph = self.get_service_instance("neo4j")
@@ -86,9 +87,9 @@ class Upload(Uploader, IMCEndpoint):
 
         return upload_response
 
+    @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Archive"])
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:

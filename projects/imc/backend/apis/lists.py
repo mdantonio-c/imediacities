@@ -9,6 +9,7 @@ from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
 from restapi.models import fields
+from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -126,8 +127,8 @@ class Lists(IMCEndpoint):
     #     {
     #         'name': 'includeNumberOfItems',
     #     },
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["Researcher", "admin_root"], required_roles="any")
     @decorators.use_kwargs(
         {
             "r_uuid": fields.Str(
@@ -247,9 +248,9 @@ class Lists(IMCEndpoint):
         # return self.response(data, meta=meta_response)
         return self.response(data)
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Researcher"])
     def post(self):
         """
         Create a new list.
@@ -294,9 +295,9 @@ class Lists(IMCEndpoint):
             self.getJsonResponse(created_list), code=hcodes.HTTP_OK_CREATED
         )
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Researcher"])
     def put(self, list_id):
         """ Update a list. """
         log.debug("Update list with uuid: {}", list_id)
@@ -357,9 +358,9 @@ class Lists(IMCEndpoint):
             self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
         )
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Researcher", "admin_root"], required_roles="any")
     def delete(self, list_id):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
@@ -467,8 +468,8 @@ class ListItems(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["Researcher", "admin_root"], required_roles="any")
     def get(self, list_id, item_id=None):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
@@ -522,9 +523,9 @@ class ListItems(IMCEndpoint):
             data.append(self.get_list_item_response(list_item))
         return self.response(data)
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Researcher"])
     def post(self, list_id):
         """ Add an item to a list. """
         log.debug("Add an item to list {}", list_id)
@@ -598,9 +599,9 @@ class ListItems(IMCEndpoint):
         # 204: return empty response (?)
         self.empty_response()
 
+    @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Researcher", "admin_root"], required_roles="any")
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
         self.graph = self.get_service_instance("neo4j")

@@ -13,6 +13,7 @@ from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
 from restapi.models import fields, validate
+from restapi.services.authentication import Role
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -110,17 +111,17 @@ class Images(IMCEndpoint):
     Create a new image description.
     """
 
+    @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.require()
     def post(self):
         self.graph = self.get_service_instance("neo4j")
 
         return self.empty_response()
 
+    @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["admin_root"])
     def delete(self, image_id):
         """
         Delete existing image description.
@@ -173,9 +174,9 @@ class ImageItem(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    @decorators.auth.required(roles=["Archive", "admin_root"], required_roles="any")
     def put(self, image_id):
         """
         Allow user to update item information.
@@ -449,8 +450,8 @@ class ImageTools(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    @decorators.auth.required(roles=["admin_root"])
     def post(self, image_id):
 
         log.debug("launch automatic tool for image id: {}", image_id)
