@@ -28,6 +28,7 @@ class Videos(IMCEndpoint):
     """
 
     labels = ["video"]
+
     _GET = {
         "/videos/<video_id>": {
             "summary": "List of videos",
@@ -47,15 +48,6 @@ class Videos(IMCEndpoint):
                 "404": {"description": "The video does not exists."},
             },
         },
-    }
-    _POST = {
-        "/videos": {
-            "summary": "Create a new video description",
-            "description": "Simple method to attach descriptive metadata to a previously uploaded video (item).",
-            "responses": {
-                "200": {"description": "Video description successfully created"}
-            },
-        }
     }
     _DELETE = {
         "/videos/<video_id>": {
@@ -117,26 +109,6 @@ class Videos(IMCEndpoint):
             data.append(video)
 
         return self.response(data)
-
-    """
-    Create a new video description.
-    """
-
-    @decorators.auth.require()
-    @decorators.catch_graph_exceptions
-    @graph_transactions
-    def post(self):
-        self.graph = self.get_service_instance("neo4j")
-
-        v = self.get_input()
-        if len(v) == 0:
-            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
-
-        data = self.get_input()
-
-        log.info(data)
-
-        return self.empty_response()
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
