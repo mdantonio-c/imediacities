@@ -424,7 +424,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     } else if (target.nodeName.toUpperCase() === "A") {
       target = target.querySelector("i");
     }
-    this.tab_title = target.getNamedItem("data-title").value;
+    console.log(target);
+    // this.tab_title = target.getNamedItem("data-title").value;
+    this.tab_title = "Temp";
     // cancel navigation action on tab click
     $event.preventDefault();
   }
