@@ -12,7 +12,6 @@ from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from restapi.connectors.celery import CeleryExt, send_errors_by_email
-from restapi.services.mail import send_mail
 from restapi.utilities.logs import log
 from restapi.utilities.templates import get_html_template
 
@@ -1211,11 +1210,12 @@ def send_notification(
     """
     body = get_html_template(template, replaces)
     plain = f"Sorry User, your job ID {task_id} is failed"
-    send_mail(body, subject, recipient, plain_body=plain)
+    smtp = celery_app.get_service("smtp")
+    smtp.send(body, subject, recipient, plain_body=plain)
 
     if failure is not None:
         replaces["task_id"] = task_id
         replaces["failure"] = failure
         body = get_html_template(template, replaces)
         plain = f"Job ID {task_id} is failed"
-        send_mail(body, subject, plain_body=plain)
+        smtp.send(body, subject, plain_body=plain)
