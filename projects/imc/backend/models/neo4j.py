@@ -25,12 +25,14 @@ from imc.models.neo4j_types import (
     StringProperty,
     StructuredNode,
     StructuredRel,
+    UniqueIdProperty,
 )
 from neomodel import One, OneOrMore, ZeroOrMore, ZeroOrOne
 from neomodel.util import NodeClassRegistry
 from restapi.connectors.neo4j.models import Group as GroupBase
 from restapi.connectors.neo4j.models import User as UserBase
-from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
+
+# from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
 
 registry = NodeClassRegistry()
 base_user = frozenset({"User"})
@@ -45,6 +47,33 @@ for c in registry._NODE_CLASS_REGISTRY:
     if c == base_group:
         registry._NODE_CLASS_REGISTRY.pop(base_group)
         break
+
+
+class IdentifiedNode(StructuredNode):
+
+    """
+        A StructuredNode identified by an uuid
+    """
+
+    __abstract_node__ = True
+
+    uuid = UniqueIdProperty()
+
+
+class TimestampedNode(IdentifiedNode):
+
+    """
+        An IdentifiedNode with creation and modification dates
+    """
+
+    __abstract_node__ = True
+
+    created = DateTimeProperty(default_now=True, show=True)
+    modified = DateTimeProperty(default_now=True, show=True)
+
+    def save(self, *args, **kwargs):
+        self.modified = datetime.now(pytz.utc)
+        return super().save(*args, **kwargs)
 
 
 class HeritableStructuredNode(StructuredNode):
