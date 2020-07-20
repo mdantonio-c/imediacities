@@ -97,6 +97,7 @@ class Images(IMCEndpoint):
             )
             item = v.item.single()
             image_url = f"{host}/api/images/{v.uuid}/content?type=image"
+            image["links"] = {}
             image["links"]["content"] = image_url
             if item.thumbnail is not None:
                 thumbnail_url = f"{host}/api/images/{v.uuid}/content?type=thumbnail"
