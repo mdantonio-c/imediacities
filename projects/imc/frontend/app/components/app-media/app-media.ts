@@ -92,7 +92,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   public media_class = "";
   public media_type = "";
   public media_id = "";
-  public tab_title = "";
   private _subscription;
 
   constructor(
@@ -413,22 +412,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
   video_player_set(event) {
     this.VideoService.video_set(event);
-  }
-
-  /* Seleziona il titolo per le tabs degli shot */
-  tab_title_set($event) {
-    let target = $event.target;
-
-    if (target.nodeName.toUpperCase() === "LI") {
-      target = target.querySelector("a > i");
-    } else if (target.nodeName.toUpperCase() === "A") {
-      target = target.querySelector("i");
-    }
-    console.log(target);
-    // this.tab_title = target.getNamedItem("data-title").value;
-    this.tab_title = "Temp";
-    // cancel navigation action on tab click
-    $event.preventDefault();
   }
 
   media_entity_normalize(mediaEntity) {

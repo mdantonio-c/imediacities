@@ -5,7 +5,7 @@ picture-->
   <!-- TOPBAR -->
   <app-media-top-bar
     [item_type]="media_type"
-    [item_id]="media._item[0].id"
+    [item_id]="media._item.id"
   ></app-media-top-bar>
 
   <!-- MEDIA -->
@@ -100,8 +100,16 @@ picture-->
         <div class="imc--toolbar row no-gutters">
           <span
             class="col-5 col-lg-6 imc--flex--vertical-center"
-            [innerHTML]="tab_title"
-          ></span>
+            *ngIf="media_type === 'video'"
+          >
+            Shots
+          </span>
+          <span
+            class="col-5 col-lg-6 imc--flex--vertical-center"
+            *ngIf="media_type === 'image'"
+          >
+            Whole Picture
+          </span>
           <span class="col-7 col-lg-6 imc--flex--horizontal-end">
             <ul
               class="nav nav-pills mb-3 tab-shots"
@@ -110,7 +118,7 @@ picture-->
             >
               <!--Tab per il video-->
               <ng-container *ngIf="media_type === 'video'">
-                <li class="nav-item" (click)="tab_title_set($event)">
+                <li class="nav-item">
                   <a
                     class="nav-link active"
                     id="shots"
@@ -120,13 +128,13 @@ picture-->
                     aria-controls="pills-shots"
                     aria-selected="true"
                   >
-                    <i class="material-icons" data-title="Shots">movie</i>
+                    <i class="material-icons">movie</i>
                   </a>
                 </li>
               </ng-container>
               <!--Tab per l'immagine-->
               <ng-container *ngIf="media_type === 'image'">
-                <li class="nav-item" (click)="tab_title_set($event)">
+                <li class="nav-item">
                   <a
                     class="nav-link active"
                     id="picture"
@@ -136,9 +144,7 @@ picture-->
                     aria-controls="pills-picture"
                     aria-selected="true"
                   >
-                    <i class="material-icons" data-title="Whole Picture"
-                      >crop_original</i
-                    >
+                    <i class="material-icons">crop_original</i>
                   </a>
                 </li>
               </ng-container>
