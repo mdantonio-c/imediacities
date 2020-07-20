@@ -140,7 +140,7 @@ export class CatalogService {
       }
       data.filter.creation = creation;
     }
-    return this.api.post("annotations/search", data, { rawResponse: true });
+    return this.api.post("annotations/search", data);
   }
 
   /**
@@ -161,7 +161,7 @@ export class CatalogService {
       };
       data["relevant-list"].push(item);
     }
-    return this.api.post("search_place", data, { rawResponse: true });
+    return this.api.post("search_place", data);
   };
 
   getProviderPosition(provider: string) {

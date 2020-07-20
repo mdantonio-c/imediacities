@@ -6,12 +6,6 @@ from restapi.utilities.logs import log
 
 
 class TestApp(BaseTests):
-    #
-    # Al momento il metodo POST (Create a new video description) non
-    #  fa nulla, quindi non faccio il test.
-    # Non potendo creare una new video description non posso nemmeno
-    #  testare la DELETE.
-    #
     def test_get(self, client):  # client e' una fixture di pytest-flask
         """
             Test GET method of /api/videos

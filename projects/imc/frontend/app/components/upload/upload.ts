@@ -139,8 +139,6 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 
   download(filename) {
     let options = {
-      rawResponse: true,
-      // "conf": {'responseType': ResponseContentType.Blob}
       conf: {
         responseType: "arraybuffer",
         observe: "response",
