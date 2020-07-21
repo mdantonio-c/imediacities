@@ -193,7 +193,7 @@ class StructuredRel(originalStructuredRel):
     """
 
     @classmethod
-    def show_fields(cls, view_public_only=False):
+    def show_fields(cls):
 
         fields_to_show = []
 
@@ -208,8 +208,6 @@ class StructuredRel(originalStructuredRel):
                 if not isinstance(attrib, myAttribProperty):
                     continue
                 if not attrib.show:
-                    continue
-                if view_public_only and attrib.is_restricted:
                     continue
 
                 fields_to_show.append(c)
@@ -231,7 +229,7 @@ class StructuredNode(originalStructuredNode):
     __abstract_node__ = True
 
     @classmethod
-    def show_fields(cls, view_public_only=False):
+    def show_fields(cls):
 
         fields_to_show = []
 
@@ -247,14 +245,12 @@ class StructuredNode(originalStructuredNode):
                     continue
                 if not attrib.show:
                     continue
-                if view_public_only and attrib.is_restricted:
-                    continue
 
                 fields_to_show.append(c)
         return fields_to_show
 
     @classmethod
-    def follow_relationships(cls, view_public_only=False):
+    def follow_relationships(cls):
 
         relationship_to_follow = []
 
@@ -274,12 +270,5 @@ class StructuredNode(originalStructuredNode):
                 if not show:
                     continue
 
-                if view_public_only:
-                    if hasattr(attrib, "is_restricted"):
-                        is_restricted = getattr(attrib, "is_restricted")
-                    else:
-                        is_restricted = False
-                    if is_restricted:
-                        continue
                 relationship_to_follow.append(c)
         return relationship_to_follow

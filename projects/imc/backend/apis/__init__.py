@@ -19,9 +19,6 @@ class IMCEndpoint(EndpointResource):
     def getJsonResponse(
         self,
         instance,
-        fields=None,
-        skip_missing_ids=False,
-        view_public_only=False,
         relationship_depth=0,
         max_relationship_depth=1,
         relationship_name="",
@@ -31,9 +28,6 @@ class IMCEndpoint(EndpointResource):
         Lots of meta introspection to guess the JSON specifications
         Very important: this method only works with customized neo4j models
         """
-
-        # Deprecated since 0.7.4
-        # log.warning("Deprecated use of getJsonResponse")
 
         # Get id
         verify_attribute = hasattr
@@ -46,9 +40,8 @@ class IMCEndpoint(EndpointResource):
         else:
             res_id = None
 
-        data = self.get_show_fields(instance, "show_fields", view_public_only, fields)
-        if not skip_missing_ids or res_id is not None:
-            data["id"] = res_id
+        data = self.get_show_fields(instance)
+        data["id"] = res_id
 
         # Relationships
         max_depth_reached = relationship_depth >= max_relationship_depth
@@ -56,9 +49,7 @@ class IMCEndpoint(EndpointResource):
         relationships = []
         if not max_depth_reached:
 
-            relationships = instance.follow_relationships(
-                view_public_only=view_public_only
-            )
+            relationships = instance.follow_relationships()
 
         # Used by IMC
         elif relationships_expansion is not None:
@@ -86,8 +77,6 @@ class IMCEndpoint(EndpointResource):
                     rel_name = f"{relationship_name}.{relationship}"
                 subnode = self.getJsonResponse(
                     node,
-                    view_public_only=view_public_only,
-                    skip_missing_ids=skip_missing_ids,
                     relationship_depth=relationship_depth + 1,
                     max_relationship_depth=max_relationship_depth,
                     relationship_name=rel_name,
@@ -99,7 +88,7 @@ class IMCEndpoint(EndpointResource):
                 # as show=True. In this case, append relationship
                 # properties to the attribute model of the node
                 r = rel.relationship(node)
-                attrs = self.get_show_fields(r, "show_fields", view_public_only)
+                attrs = self.get_show_fields(r)
 
                 for k in attrs:
                     if k in subnode:
@@ -123,21 +112,15 @@ class IMCEndpoint(EndpointResource):
         return data
 
     @staticmethod
-    def get_show_fields(obj, function_name, view_public_only, fields=None):
+    def get_show_fields(obj):
 
-        if fields is None:
-            fields = []
-
+        fields = []
         if type(obj).__name__ == "User":
             fields = ["email", "name", "surname"]
-
         elif type(obj).__name__ == "Role":
             fields = ["name", "description"]
-
-        elif len(fields) < 1:
-            if hasattr(obj, function_name):
-                fn = getattr(obj, function_name)
-                fields = fn(view_public_only=view_public_only)
+        elif hasattr(obj, "show_fields"):
+            fields = obj.show_fields()
 
         verify_attribute = hasattr
         if isinstance(obj, dict):

@@ -119,7 +119,7 @@ picture-->
               <!--Tab per il video-->
               <ng-container *ngIf="media_type === 'video'">
                 <li class="nav-item">
-                  <a
+                  <span
                     class="nav-link active"
                     id="shots"
                     data-toggle="pill"
@@ -129,13 +129,13 @@ picture-->
                     aria-selected="true"
                   >
                     <i class="material-icons">movie</i>
-                  </a>
+                  </span>
                 </li>
               </ng-container>
               <!--Tab per l'immagine-->
               <ng-container *ngIf="media_type === 'image'">
                 <li class="nav-item">
-                  <a
+                  <span
                     class="nav-link active"
                     id="picture"
                     data-toggle="pill"
@@ -145,7 +145,7 @@ picture-->
                     aria-selected="true"
                   >
                     <i class="material-icons">crop_original</i>
-                  </a>
+                  </span>
                 </li>
               </ng-container>
             </ul>
