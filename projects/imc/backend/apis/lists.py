@@ -14,7 +14,7 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import InputModel, fields, validate
+from restapi.models import InputSchema, fields, validate
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -23,7 +23,7 @@ TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
-class Target(InputModel):
+class Target(InputSchema):
     target = fields.Nested(
         {
             "id": fields.Str(required=True),
