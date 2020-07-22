@@ -512,68 +512,17 @@ class VideoSegments(IMCEndpoint):
             },
         },
     }
-    _PUT = {
-        "/videos/<video_id>/segments/<segment_id>": {
-            "summary": "Updates a manual video segment",
-            "description": "Update a manual video segment identified by uuid",
-            "parameters": [
-                {
-                    "name": "updated_segment",
-                    "in": "body",
-                    "description": "The manual video segment to update.",
-                    "schema": {
-                        "required": ["start_frame_idx", "end_frame_idx"],
-                        "properties": {
-                            "start_frame_idx": {
-                                "type": "integer",
-                                "format": "int32",
-                                "minimum": 0,
-                            },
-                            "end_frame_idx": {"type": "integer", "format": "int32"},
-                        },
-                    },
-                }
-            ],
-            "responses": {
-                "204": {"description": "Manual video segment successfully updated."},
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Manual video segment does not exist."},
-            },
-        }
-    }
-    _DELETE = {
-        "/videos/<video_id>/segments/<segment_id>": {
-            "summary": "Delete a video segment.",
-            "responses": {
-                "200": {"description": "Video segment successfully deleted"},
-                "404": {"description": "Video segment does not exist"},
-            },
-        }
-    }
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     def get(self, video_id, segment_id):
-        if segment_id is not None:
-            log.debug(
-                "get manual segment [uuid:{}] for AVEntity [uuid:{}]",
-                segment_id,
-                video_id,
-            )
-        else:
-            log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
+        log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
 
         self.graph = self.get_service_instance("neo4j")
-        data = []
 
-        video = None
-        try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+        video = self.graph.AVEntity.nodes.get_or_None(uuid=video_id)
+        if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise RestApiException(
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
@@ -584,35 +533,43 @@ class VideoSegments(IMCEndpoint):
         item = video.item.single()
         log.debug("get manual segments for Item [{}]", item.uuid)
 
+        data = []
         # TODO
 
         return self.response(data)
 
-    @decorators.auth.require()
-    @decorators.catch_graph_exceptions
-    def delete(self, video_id, segment_id):
-        log.debug(
-            "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
-            vid=video_id,
-            sid=segment_id,
-        )
-        raise RestApiException(
-            "Delete operation not yet implemented",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-        )
+    # "/videos/<video_id>/segments/<segment_id>"
+    # "summary": "Delete a video segment.",
+    # @decorators.auth.require()
+    # @decorators.catch_graph_exceptions
+    # def delete(self, video_id, segment_id):
+    #     log.debug(
+    #         "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
+    #         vid=video_id,
+    #         sid=segment_id,
+    #     )
+    #     raise RestApiException(
+    #         "Delete operation not yet implemented",
+    #         status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+    #     )
 
-    @decorators.auth.require()
-    @decorators.catch_graph_exceptions
-    def put(self, video_id, segment_id):
-        log.debug(
-            "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
-            vid=video_id,
-            sid=segment_id,
-        )
-        raise RestApiException(
-            "Update operation not yet implemented",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-        )
+    # "/videos/<video_id>/segments/<segment_id>"
+    # "summary": "Updates a manual video segment"
+    # "description": "Update a manual video segment identified by uuid"
+    # "start_frame_idx": fields.Int(required=True)
+    # "end_frame_idx": fields.Int(required=True)
+    # @decorators.auth.require()
+    # @decorators.catch_graph_exceptions
+    # def put(self, video_id, segment_id):
+    #     log.debug(
+    #         "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
+    #         vid=video_id,
+    #         sid=segment_id,
+    #     )
+    #     raise RestApiException(
+    #         "Update operation not yet implemented",
+    #         status_code=hcodes.HTTP_NOT_IMPLEMENTED,
+    #     )
 
 
 class VideoContent(IMCEndpoint, Downloader):

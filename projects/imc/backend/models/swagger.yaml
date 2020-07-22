@@ -44,11 +44,6 @@ definitions:
       description:
         type: string
 
-  Lists:
-    type: array
-    items:
-      $ref: "#/definitions/List"
-
   Body:
     discriminator: type
     required:

@@ -118,15 +118,6 @@ class Lists(IMCEndpoint):
         }
     }
 
-    #     {
-    #         'name': 'researcher',
-    #     },
-    #     {
-    #         'name': 'item',
-    #     },
-    #     {
-    #         'name': 'includeNumberOfItems',
-    #     },
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
