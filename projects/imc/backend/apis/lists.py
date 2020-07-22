@@ -7,9 +7,8 @@ from imc.apis import IMCEndpoint
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import RestApiException
+from restapi.exceptions import Conflict, Forbidden, NotFound, RestApiException
 from restapi.models import fields
-from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -54,14 +53,6 @@ class Lists(IMCEndpoint):
     _POST = {
         "/lists": {
             "summary": "Create a new list",
-            "parameters": [
-                {
-                    "name": "list",
-                    "in": "body",
-                    "description": "The list to be created.",
-                    "schema": {"$ref": "#/definitions/List"},
-                }
-            ],
             "responses": {
                 "201": {
                     "description": "List created successfully.",
@@ -81,14 +72,6 @@ class Lists(IMCEndpoint):
         "/lists/<list_id>": {
             "summary": "Update a list",
             "description": "Update a list of the researcher",
-            "parameters": [
-                {
-                    "name": "updatedList",
-                    "in": "body",
-                    "description": "The updated list.",
-                    "schema": {"$ref": "#/definitions/List"},
-                }
-            ],
             "responses": {
                 "200": {"description": "List updated successfully."},
                 "400": {
@@ -242,7 +225,10 @@ class Lists(IMCEndpoint):
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def post(self):
+    @decorators.use_kwargs(
+        {"name": fields.Str(required=True), "description": fields.Str(required=True)}
+    )
+    def post(self, name, description):
         """
         Create a new list.
 
@@ -250,17 +236,6 @@ class Lists(IMCEndpoint):
         mandatory. There can not be lists with the same name.
         """
         log.debug("create a new list")
-        data = self.get_input()
-        if len(data) == 0:
-            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
-        if "name" not in data or not data["name"].strip():
-            raise RestApiException(
-                "Name is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-        if "description" not in data or not data["description"].strip():
-            raise RestApiException(
-                "Description is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
 
         self.graph = self.get_service_instance("neo4j")
         user = self.get_user()
@@ -268,17 +243,16 @@ class Lists(IMCEndpoint):
         results = self.graph.cypher(
             "MATCH (l:List)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
             " WHERE l.name =~ '(?i){name}' return l".format(
-                user=user.uuid, name=self.graph.sanitize_input(data["name"])
+                user=user.uuid, name=self.graph.sanitize_input(name)
             )
         )
         duplicate = [self.graph.List.inflate(row[0]) for row in results]
         if duplicate:
-            raise RestApiException(
-                "There is already a list with the same name belonging to you",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
+            raise Conflict(
+                "There is already a list with the same name belonging to you"
             )
 
-        created_list = self.graph.List(**data).save()
+        created_list = self.graph.List(name=name, description=description).save()
         # connect the creator
         created_list.creator.connect(user)
         log.debug("List created successfully. UUID {}", created_list.uuid)
@@ -289,37 +263,23 @@ class Lists(IMCEndpoint):
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def put(self, list_id):
+    @decorators.use_kwargs(
+        {"name": fields.Str(required=True), "description": fields.Str(required=True)}
+    )
+    def put(self, list_id, name, description):
         """ Update a list. """
         log.debug("Update list with uuid: {}", list_id)
         self.graph = self.get_service_instance("neo4j")
-        try:
-            user_list = self.graph.List.nodes.get(uuid=list_id)
-        except self.graph.List.DoesNotExist:
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
-            raise RestApiException(
-                "You cannot update an user list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
-
-        # validate input data
-        data = self.get_input()
-        if len(data) == 0:
-            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
-        if "name" not in data or not data["name"].strip():
-            raise RestApiException(
-                "Name is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-        if "description" not in data or not data["description"].strip():
-            raise RestApiException(
-                "Description is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
+            raise Forbidden(
+                "You cannot update an user list that does not belong to you"
             )
 
         # cannot update a list name if that name is already used for another list
@@ -327,24 +287,17 @@ class Lists(IMCEndpoint):
             "MATCH (l:List) WHERE l.uuid <> '{uuid}'"
             " MATCH (l)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
             " WHERE l.name =~ '(?i){name}' return l".format(
-                uuid=list_id,
-                user=user.uuid,
-                name=self.graph.sanitize_input(data["name"]),
+                uuid=list_id, user=user.uuid, name=self.graph.sanitize_input(name),
             )
         )
         duplicate = [self.graph.List.inflate(row[0]) for row in results]
         if duplicate:
-            raise RestApiException(
-                "There is already another list with the same name [{}] among your lists".format(
-                    data["name"]
-                ),
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict(f"You already have a list with this name: {name}")
         # update the list
-        user_list.name = data["name"].strip()
-        user_list.description = data["description"].strip()
+        user_list.name = name.strip()
+        user_list.description = description.strip()
         updated_list = user_list.save()
-        log.debug("List updated successfully. UUID {}", updated_list.uuid)
+        log.debug("List successfully updated. UUID {}", updated_list.uuid)
         return self.response(
             self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
         )
@@ -355,18 +308,12 @@ class Lists(IMCEndpoint):
     def delete(self, list_id):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
-        if list_id is None:
-            raise RestApiException(
-                "Please specify a list id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
         self.graph = self.get_service_instance("neo4j")
-        try:
-            user_list = self.graph.List.nodes.get(uuid=list_id)
-        except self.graph.List.DoesNotExist:
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
         log.debug("current user: {} - {}", user.email, user.uuid)
@@ -375,9 +322,8 @@ class Lists(IMCEndpoint):
 
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
-            raise RestApiException(
-                "You cannot delete an user list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                "You cannot delete an user list that does not belong to you"
             )
 
         # delete the list
