@@ -7,14 +7,31 @@ from imc.apis import IMCEndpoint
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import Conflict, Forbidden, NotFound, RestApiException
-from restapi.models import fields
+from restapi.exceptions import (
+    BadRequest,
+    Conflict,
+    Forbidden,
+    NotFound,
+    RestApiException,
+)
+from restapi.models import InputModel, fields, validate
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+
+
+class Target(InputModel):
+    target = fields.Nested(
+        {
+            "id": fields.Str(required=True),
+            "type": fields.Str(
+                required=True, validate=validate.OneOf(["item", "shot"])
+            ),
+        }
+    )
 
 
 class Lists(IMCEndpoint):
@@ -129,34 +146,25 @@ class Lists(IMCEndpoint):
             researcher = self.graph.User.nodes.get_or_none(uuid=r_uuid)
             if not researcher:
                 log.debug("Researcher with uuid {} does not exist", r_uuid)
-                raise RestApiException(
-                    "Please specify a valid researcher id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
-                )
+                raise NotFound("Please specify a valid researcher id")
+
         user_match = ""
         optional_match = ""
         if researcher:
             user_match = "MATCH (n)-[:LST_BELONGS_TO]->(:User {{uuid:'{user}'}})".format(
                 user=researcher.uuid
             )
-            log.debug(
-                "researcher: {name} {surname}".format(
-                    name=researcher.name, surname=researcher.surname
-                )
-            )
+            log.debug("researcher: {} {}", researcher.name, researcher.surname)
 
         if nb_items:
             optional_match = "OPTIONAL MATCH (n)-[r:LST_ITEM]->(:ListItem)"
 
         if list_id:
-            try:
-                res = self.graph.List.nodes.get(uuid=list_id)
-            except self.graph.List.DoesNotExist:
+            res = self.graph.List.nodes.get_or_none(uuid=list_id)
+            if not res:
                 log.debug("List with uuid {} does not exist", list_id)
-                raise RestApiException(
-                    "Please specify a valid list id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
-                )
+                raise NotFound("Please specify a valid list id")
+
             creator = res.creator.single()
             if not iamadmin and researcher.uuid != creator.uuid:
                 raise RestApiException(
@@ -170,6 +178,7 @@ class Lists(IMCEndpoint):
                     "name": creator.name,
                     "surname": creator.surname,
                 }
+
             if belong_item is not None:
                 found = False
                 for i in res.items.all():
@@ -177,8 +186,10 @@ class Lists(IMCEndpoint):
                         found = True
                         break
                 user_list["belong"] = found
+
             if nb_items:
                 user_list["nb_frames"] = len(res.items)
+
             return self.response(user_list)
 
         count_items = ", count(r)" if nb_items else ""
@@ -363,22 +374,6 @@ class ListItems(IMCEndpoint):
     _POST = {
         "/lists/<list_id>/items": {
             "summary": "Add an item to a list.",
-            "parameters": [
-                {
-                    "name": "item",
-                    "in": "body",
-                    "description": "Item to be added. It can be 'item' or 'shot'.",
-                    "schema": {
-                        "required": ["target"],
-                        "properties": {
-                            "target": {
-                                "type": "string",
-                                "pattern": "(item|shot):[a-z0-9-]+",
-                            }
-                        },
-                    },
-                }
-            ],
             "responses": {
                 "204": {"description": "Item added successfully."},
                 "400": {
@@ -460,70 +455,69 @@ class ListItems(IMCEndpoint):
             data.append(self.get_list_item_response(list_item))
         return self.response(data)
 
+    # Change with target { id, type}:
+    # "target": {
+    #     "id": "http://example.org/website1",
+    #     "type": "Text"
+    #   }
+    #         "target_type": fields.Str(
+    #             required=True,
+    #             validate=validate.OneOf(["item", "shot"])
+    #         ),
+    #         "target": fields.Str(
+    #             required=True
+    #         )
+    # "parameters": [
+    #     {
+    #         "name": "item",
+    #         "in": "body",
+    #         "description": "Item to be added. It can be 'item' or 'shot'.",
+    #         "schema": {
+    #             "required": ["target"],
+    #             "properties": {
+    #                 "target": {
+    #                     "type": "string",
+    #                     "pattern": "(item|shot):[a-z0-9-]+",
+    #                 }
+    #             },
+    #         },
+    #     }
+    # ],
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def post(self, list_id):
+    @decorators.use_kwargs(Target)
+    def post(self, list_id, target):
         """ Add an item to a list. """
-        log.debug("Add an item to list {}", list_id)
-        data = self.get_input()
-        # validate data input
-        if len(data) == 0:
-            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
-        if "target" not in data or not data["target"].strip():
-            raise RestApiException(
-                "Target is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-        target = data["target"]
-        # check if the target is valid
-        if not TARGET_PATTERN.match(target):
-            raise RestApiException(
-                "Invalid Target format", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-        log.debug("Add item with target: {}", target)
+        log.debug("Add an item to list {} with target {}", list_id, target)
 
         self.graph = self.get_service_instance("neo4j")
-        try:
-            user_list = self.graph.List.nodes.get(uuid=list_id)
-        except self.graph.List.DoesNotExist:
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
 
         # am I the creator of the list?
         user = self.get_user()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
-            raise RestApiException(
-                "You cannot add an item to a list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                "You cannot add an item to a list that does not belong to you"
             )
 
-        target_type, tid = target.split(":")
-        log.debug("target type: {}, target id: {}", target_type, tid)
+        log.debug("target type: {}, target id: {}", target.type, target.id)
         targetNode = None
-        if target_type == "item":
-            targetNode = self.graph.Item.nodes.get_or_none(uuid=tid)
-        elif target_type == "shot":
-            targetNode = self.graph.Shot.nodes.get_or_none(uuid=tid)
-        else:
-            # this should never be reached
-            raise RestApiException(
-                "Invalid target type", status_code=hcodes.HTTP_NOT_IMPLEMENTED
-            )
+        if target.type == "item":
+            targetNode = self.graph.Item.nodes.get_or_none(uuid=target.id)
+        elif target.type == "shot":
+            targetNode = self.graph.Shot.nodes.get_or_none(uuid=target.id)
+
         if targetNode is None:
-            raise RestApiException(
-                "Target [" + target_type + ":" + tid + "] does not exist",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+            raise BadRequest(f"Target [{target.type}:{target.id}] does not exist")
         # check if the incoming target is already connected to the list
         if targetNode.lists.is_connected(user_list):
-            raise RestApiException(
-                "The item is already connected to the list <{}, {}>.".format(
-                    list_id, user_list.name
-                ),
-                status_code=hcodes.HTTP_BAD_CONFLICT,
+            raise Conflict(
+                f"The item is already connected to the list {list_id}, {user_list.name}"
             )
         # connect the target to the list
         user_list.items.connect(targetNode)
@@ -542,41 +536,38 @@ class ListItems(IMCEndpoint):
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
         self.graph = self.get_service_instance("neo4j")
-        try:
-            user_list = self.graph.List.nodes.get(uuid=list_id)
-        except self.graph.List.DoesNotExist:
+
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
+
         log.debug(
             "delete item <{}> from the list <{}, {}>",
             item_id,
             user_list.uuid,
             user_list.name,
         )
-        # am I the creator of the list? (allowed also to admin)
+        # am I the creator of the list? (always allowed to admin)
         user = self.get_user()
         iamadmin = self.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
-            raise RestApiException(
-                "You are not allowed to delete an item from a list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                "You are not allowed to delete from a list that does not belong to you",
             )
+
         matched_item = None
         for list_item in user_list.items.all():
             item = list_item.downcast()
             if item.uuid == item_id:
                 matched_item = item
                 break
+
         if matched_item is None:
-            raise RestApiException(
-                "Item <{}> does not belong the the list <{}, {}>".format(
-                    item_id, user_list.uuid, user_list.name
-                ),
-                status_code=hcodes.HTTP_BAD_NOTFOUND,
-            )
+            list_info = f"{user_list.uuid}, {user_list.name}"
+            raise NotFound(f"Item <{item_id}> does not belong the list {list_info}")
+
         # disconnect the item
         user_list.items.disconnect(matched_item)
         log.debug(

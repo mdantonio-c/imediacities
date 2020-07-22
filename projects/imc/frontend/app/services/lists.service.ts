@@ -45,7 +45,7 @@ export class ListsService {
     return this.api.get(`lists/${listId}/items`);
   }
 
-  addItemToList(target: string, listId: string) {
+  addItemToList(target: Record<string, string>, listId: string) {
     return this.api.post(`lists/${listId}/items`, {
       target: `${target}`,
     });
