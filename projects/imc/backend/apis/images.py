@@ -11,7 +11,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import RestApiException
+from restapi.exceptions import Forbidden, NotFound, RestApiException
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
@@ -150,22 +150,7 @@ class ImageItem(IMCEndpoint):
 
     _PUT = {
         "/images/<image_id>/item": {
-            "summary": "Update item info. At the moment ONLY used for the public access flag",
-            "parameters": [
-                {
-                    "name": "item_update",
-                    "in": "body",
-                    "description": "The item properties to be updated.",
-                    "schema": {
-                        "properties": {
-                            "public_access": {
-                                "description": "Whether or not the item is accessible by a public user.",
-                                "type": "boolean",
-                            }
-                        }
-                    },
-                }
-            ],
+            "summary": "Update public access flag for the given image",
             "responses": {
                 "204": {"description": "Item info successfully updated."},
                 "400": {"description": "Request not valid."},
@@ -178,48 +163,35 @@ class ImageItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def put(self, image_id):
+    @decorators.use_kwargs(
+        {
+            "public_access": fields.Bool(
+                required=True,
+                description="Whether or not the item is accessible by a public user.",
+            )
+        }
+    )
+    def put(self, image_id, public_access):
         """
         Allow user to update item information.
         """
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
-        if image_id is None:
-            raise RestApiException(
-                "Please specify a image id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
         self.graph = self.get_service_instance("neo4j")
-        try:
-            v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-        except self.graph.NonAVEntity.DoesNotExist:
+
+        if not (image := self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
-            raise RestApiException(
-                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        item = v.item.single()
-        if item is None:
-            raise RestApiException(
-                "This NonAVEntity may not have been correctly imported. "
-                "Item info not found",
-                status_code=hcodes.HTTP_BAD_NOTFOUND,
-            )
+            raise NotFound("Please specify a valid image id")
+
+        if not (item := image.item.single()):
+            raise NotFound("NonAVEntity not correctly imported: item info not found")
 
         user = self.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
-            raise RestApiException(
-                "User [{}, {} {}] cannot update public access for videos that does not belong to him/her".format(
-                    user.uuid, user.name, user.surname
-                ),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
-
-        data = self.get_input()
-        # ONLY public_access allowed at the moment
-        public_access = data.get("public_access")
-        if public_access is None or type(public_access) != bool:
-            raise RestApiException(
-                "Please specify a valid value for public_access",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+            log.error("User {} not allowed to edit image {}", user.email, image_id)
+            raise Forbidden(
+                "Cannot update public access for images that does not belong to you"
             )
 
         item.public_access = public_access
@@ -228,7 +200,6 @@ class ImageItem(IMCEndpoint):
             "Item successfully updated for NonAVEntity uuid {}. {}", image_id, item
         )
 
-        # 204: Item successfully updated.
         return self.empty_response()
 
 

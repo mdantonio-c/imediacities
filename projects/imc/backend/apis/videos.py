@@ -11,7 +11,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import RestApiException
+from restapi.exceptions import Forbidden, NotFound, RestApiException
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
@@ -140,22 +140,7 @@ class VideoItem(IMCEndpoint):
 
     _PUT = {
         "/videos/<video_id>/item": {
-            "summary": "Update item info. At the moment ONLY used for the public access flag",
-            "parameters": [
-                {
-                    "name": "item_update",
-                    "in": "body",
-                    "description": "The item properties to be updated.",
-                    "schema": {
-                        "properties": {
-                            "public_access": {
-                                "description": "Whether or not the item is accessible by a public user.",
-                                "type": "boolean",
-                            }
-                        }
-                    },
-                }
-            ],
+            "summary": "Update public access flag for the given video",
             "responses": {
                 "204": {"description": "Item info successfully updated."},
                 "400": {"description": "Request not valid."},
@@ -168,55 +153,41 @@ class VideoItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def put(self, video_id):
+    @decorators.use_kwargs(
+        {
+            "public_access": fields.Bool(
+                required=True,
+                description="Whether or not the item is accessible by a public user.",
+            )
+        }
+    )
+    def put(self, video_id, public_access):
         """
         Allow user to update item information.
         """
         log.debug("Update Item for AVEntity uuid: {}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
         self.graph = self.get_service_instance("neo4j")
-        try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+
+        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        item = v.item.single()
-        if item is None:
-            raise RestApiException(
-                "This AVEntity may not have been correctly imported. "
-                "Item info not found",
-                status_code=hcodes.HTTP_BAD_NOTFOUND,
-            )
+            raise NotFound("Please specify a valid video id")
+
+        if not (item := video.item.single()):
+            raise NotFound("AVEntity not correctly imported: item info not found")
 
         user = self.get_user()
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
-            raise RestApiException(
-                "User [{}, {} {}] cannot update public access for videos that does not belong to him/her".format(
-                    user.uuid, user.name, user.surname
-                ),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
-
-        data = self.get_input()
-        # ONLY public_access allowed at the moment
-        public_access = data.get("public_access")
-        if public_access is None or type(public_access) != bool:
-            raise RestApiException(
-                "Please specify a valid value for public_access",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+            log.error("User {} not allowed to edit video {}", user.email, video_id)
+            raise Forbidden(
+                "Cannot update public access for videos that does not belong to you"
             )
 
         item.public_access = public_access
         item.save()
         log.debug("Item successfully updated for AVEntity uuid {}. {}", video_id, item)
 
-        # 204: Item successfully updated.
         return self.empty_response()
 
 
