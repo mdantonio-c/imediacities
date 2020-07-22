@@ -11,7 +11,13 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import Forbidden, NotFound, RestApiException
+from restapi.exceptions import (
+    BadRequest,
+    Conflict,
+    Forbidden,
+    NotFound,
+    RestApiException,
+)
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
@@ -821,34 +827,10 @@ class VideoContent(IMCEndpoint, Downloader):
 
 class VideoTools(IMCEndpoint):
 
-    __available_tools__ = ("object-detection", "building-recognition")
-
     labels = ["video_tools"]
     _POST = {
         "/videos/<video_id>/tools": {
             "summary": "Allow to launch the execution of some video tools.",
-            "parameters": [
-                {
-                    "name": "criteria",
-                    "in": "body",
-                    "description": "Criteria to launch the tool.",
-                    "schema": {
-                        "required": ["tool"],
-                        "properties": {
-                            "tool": {
-                                "description": "Tool to be launched.",
-                                "type": "string",
-                                "enum": ["object-detection", "building-recognition"],
-                            },
-                            "operation": {
-                                "description": "At the moment used only to delete automatic tags.",
-                                "type": "string",
-                                "enum": ["delete"],
-                            },
-                        },
-                    },
-                }
-            ],
             "responses": {
                 "202": {"description": "Execution task accepted."},
                 "200": {
@@ -865,104 +847,85 @@ class VideoTools(IMCEndpoint):
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    def post(self, video_id):
+    @decorators.use_kwargs(
+        {
+            "tool": fields.String(
+                required=True,
+                description="Tool to be launched.",
+                validate=validate.OneOf(["object-detection", "building-recognition"]),
+            ),
+            "operation": fields.String(
+                required=False,
+                description="At the moment used only to delete automatic tags.",
+                validate=validate.OneOf(["delete"]),
+            ),
+        }
+    )
+    def post(self, video_id, tool, operation=None):
 
         log.debug("launch automatic tool for video id: {}", video_id)
 
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
         self.graph = self.get_service_instance("neo4j")
-        video = None
-        try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
-            log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        item = video.item.single()
-        if item is None:
-            raise RestApiException(
-                "Item not available. Execute the pipeline first!",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
-        if item.item_type != "Video":
-            raise RestApiException(
-                "Content item is not a video. Use a valid video id",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
 
-        params = self.get_input()
-        if "tool" not in params:
-            raise RestApiException(
-                "Please specify the tool to be launched",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        tool = params["tool"]
-        if tool not in self.__available_tools__:
-            raise RestApiException(
-                "Please specify a valid tool. Expected one of {}".format(
-                    self.__available_tools__
-                ),
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
+            log.debug("AVEntity with uuid {} does not exist", video_id)
+            raise NotFound("Please specify a valid video id")
+
+        if not (item := video.item.single()):
+            raise Conflict("Item not available. Execute the pipeline first!")
+
+        if item.item_type != "Video":
+            raise BadRequest("Content item is not a video. Use a valid video id")
 
         repo = AnnotationRepository(self.graph)
-        if tool == self.__available_tools__[0]:  # object-detection
-            if "operation" in params and params["operation"] == "delete":
-                # get all automatic object detection tags
-                deleted = 0
-                for anno in item.sourcing_annotations.search(
-                    annotation_type="TAG", generator="FHG"
-                ):
-                    # expected always single body for automatic tags
-                    body = anno.bodies.single()
-                    if "ODBody" in body.labels() and "BRBody" not in body.labels():
-                        deleted += 1
-                        repo.delete_auto_annotation(anno)
-                return self.response(
-                    f"No more automatic object detection tags for video {video_id}. Deleted {deleted}",
-                    code=hcodes.HTTP_OK_BASIC,
-                )
+
+        OBJ_DETECTION = tool == "object-detection"
+        BUILDING_RECOGNITION = tool == "building-recognition"
+
+        if operation and operation == "delete":
+            # get all automatic tags for selected tool
+            deleted = 0
+            annotations = item.sourcing_annotations.search(
+                annotation_type="TAG", generator="FHG"
+            )
+            for anno in annotations:
+                # expected always single body for automatic tags
+                body = anno.bodies.single()
+
+                labels = body.labels()
+
+                if OBJ_DETECTION and "ODBody" in labels and "BRBody" not in labels:
+                    to_be_deleted = True
+                elif BUILDING_RECOGNITION and "BRBody" in labels:
+                    to_be_deleted = True
+                else:
+                    to_be_deleted = False
+
+                if to_be_deleted:
+                    deleted += 1
+                    repo.delete_auto_annotation(anno)
+
+            return self.response(
+                f"There are no more automatic {tool} tags for video {video_id}."
+                f"Deleted {deleted}",
+                code=hcodes.HTTP_OK_BASIC,
+            )
+
+        if OBJ_DETECTION:
             # DO NOT re-import object detection twice for the same video!
             if repo.check_automatic_od(item.uuid):
                 raise RestApiException(
                     "Object detection CANNOT be import twice for the same video.",
                     status_code=hcodes.HTTP_BAD_CONFLICT,
                 )
-        elif tool == self.__available_tools__[1]:  # building-recognition
-            if "operation" in params and params["operation"] == "delete":
-                # get all automatic building recognition tags
-                deleted = 0
-                for anno in item.sourcing_annotations.search(
-                    annotation_type="TAG", generator="FHG"
-                ):
-                    # expected always single body for automatic tags
-                    body = anno.bodies.single()
-                    if "BRBody" in body.labels():
-                        deleted += 1
-                        repo.delete_auto_annotation(anno)
-                return self.response(
-                    "There are no more automatic building recognition tags for video {}. Deleted {}".format(
-                        video_id, deleted
-                    ),
-                    code=hcodes.HTTP_OK_BASIC,
-                )
+        elif BUILDING_RECOGNITION:
+
             # DO NOT re-import building recognition twice for the same video!
             if repo.check_automatic_br(item.uuid):
                 raise RestApiException(
                     "Building recognition CANNOT be import twice for the same video.",
                     status_code=hcodes.HTTP_BAD_CONFLICT,
                 )
-        else:
-            # should never be reached
-            raise RestApiException(
-                f"Specified tool '{tool}' NOT implemented",
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-            )
 
         celery = self.get_service_instance("celery")
         task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
