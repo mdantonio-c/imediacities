@@ -29,11 +29,6 @@ definitions:
         type: string
         format: date
 
-  Annotations:
-    type: array
-    items:
-      $ref: "#/definitions/Annotation"
-
   List:
     required:
       - name
