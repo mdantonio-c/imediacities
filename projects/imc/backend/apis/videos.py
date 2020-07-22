@@ -974,21 +974,6 @@ class VideoShotRevision(IMCEndpoint):
     _PUT = {
         "/videos/<video_id>/shot-revision": {
             "summary": "Put a video under revision",
-            "parameters": [
-                {
-                    "name": "revision",
-                    "in": "body",
-                    "description": "The revision request.",
-                    "schema": {
-                        "properties": {
-                            "assignee": {
-                                "description": "The assignee for the revision (user uuid with Reviser role).",
-                                "type": "string",
-                            }
-                        }
-                    },
-                }
-            ],
             "responses": {
                 "204": {"description": "Video under revision successfully."},
                 "400": {"description": "Assignee not valid."},
@@ -1059,33 +1044,33 @@ class VideoShotRevision(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def put(self, video_id):
-        """Put a video under revision"""
-        log.debug("Put video {0} under revision", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
+    @decorators.use_kwargs(
+        {
+            "assignee_uuid": fields.Str(
+                required=False,
+                description="UUID of the Reviser user to assign the revision",
+                data_key="assignee",
             )
+        }
+    )
+    def put(self, video_id, assignee_uuid=None):
+        """Put a video under revision"""
+        log.debug("Put video {} under revision", video_id)
 
         self.graph = self.get_service_instance("neo4j")
-        try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        item = v.item.single()
-        if item is None:
-            # 409: Video is not ready for revision. (should never be reached)
-            raise RestApiException(
+            raise NotFound("Please specify a valid video id")
+
+        if not (item := video.item.single()):
+            raise Forbidden(
                 "This AVEntity may not have been correctly imported. "
-                "No ready for revision!",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
+                "Not ready for revision!",
             )
 
         user = self.get_user()
         iamadmin = self.verify_admin()
+
         log.debug(
             "Request for revision from user [{}, {} {}]",
             user.uuid,
@@ -1093,46 +1078,35 @@ class VideoShotRevision(IMCEndpoint):
             user.surname,
         )
         # Be sure user can revise this specific video
-        assignee = user
-        assignee_is_admin = iamadmin
+
         # allow admin to pass the assignee
-        data = self.get_input()
-        if iamadmin and "assignee" in data:
-            assignee = self.graph.User.nodes.get_or_none(uuid=data["assignee"])
-            if assignee is None:
-                # 400: description: Assignee not valid.
-                raise RestApiException(
-                    "Invalid candidate. User [{uuid}] does not exist".format(
-                        uuid=data["assignee"]
-                    ),
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+        if iamadmin and assignee_uuid:
+            assignee = self.graph.User.nodes.get_or_none(uuid=assignee_uuid)
+            if not assignee:
+                raise NotFound(
+                    f"Invalid candidate. User [{assignee_uuid}] does not exist"
                 )
-            # is the assignee an admin_root?
-            assignee_is_admin = False
-            for role in assignee.roles.all():
-                if role.name == "admin_root":
-                    assignee_is_admin = True
-                    break
+
+            assignee_is_admin = self.auth.verify_roles(
+                assignee, [Role.ADMIN], warnings=False
+            )
+        else:
+            assignee = user
+            assignee_is_admin = iamadmin
+
         log.debug("Assignee is admin? {}", assignee_is_admin)
 
         repo = CreationRepository(self.graph)
 
         if not assignee_is_admin and not repo.item_belongs_to_user(item, assignee):
-            raise RestApiException(
-                "User [{}, {} {}] cannot revise video that does not belong to him/her".format(
-                    user.uuid, user.name, user.surname
-                ),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                f"User [{user.uuid}, {user.name} {user.surname}] cannot revise video "
+                "that does not belong to him/her"
             )
         if repo.is_video_under_revision(item):
-            # 409: Video is already under revision.
-            raise RestApiException(
-                f"Video [{v.uuid}] is already under revision",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict(f"Video [{video.uuid}] is already under revision")
 
         repo.move_video_under_revision(item, assignee)
-        # 204: Video under revision successfully.
         return self.empty_response()
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
