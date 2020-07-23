@@ -456,34 +456,6 @@ class ListItems(IMCEndpoint):
             data.append(self.get_list_item_response(list_item))
         return self.response(data)
 
-    # Change with target { id, type}:
-    # "target": {
-    #     "id": "http://example.org/website1",
-    #     "type": "Text"
-    #   }
-    #         "target_type": fields.Str(
-    #             required=True,
-    #             validate=validate.OneOf(["item", "shot"])
-    #         ),
-    #         "target": fields.Str(
-    #             required=True
-    #         )
-    # "parameters": [
-    #     {
-    #         "name": "item",
-    #         "in": "body",
-    #         "description": "Item to be added. It can be 'item' or 'shot'.",
-    #         "schema": {
-    #             "required": ["target"],
-    #             "properties": {
-    #                 "target": {
-    #                     "type": "string",
-    #                     "pattern": "(item|shot):[a-z0-9-]+",
-    #                 }
-    #             },
-    #         },
-    #     }
-    # ],
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @graph_transactions
@@ -506,15 +478,18 @@ class ListItems(IMCEndpoint):
                 "You cannot add an item to a list that does not belong to you"
             )
 
-        log.debug("target type: {}, target id: {}", target.type, target.id)
+        target_type = target.get("type")
+        target_id = target.get("id")
+
+        log.debug("target type: {}, target id: {}", target_type, target_id)
         targetNode = None
-        if target.type == "item":
-            targetNode = self.graph.Item.nodes.get_or_none(uuid=target.id)
-        elif target.type == "shot":
-            targetNode = self.graph.Shot.nodes.get_or_none(uuid=target.id)
+        if target_type == "item":
+            targetNode = self.graph.Item.nodes.get_or_none(uuid=target_id)
+        elif target_type == "shot":
+            targetNode = self.graph.Shot.nodes.get_or_none(uuid=target_id)
 
         if targetNode is None:
-            raise BadRequest(f"Target [{target.type}:{target.id}] does not exist")
+            raise BadRequest(f"Target [{target_type}:{target_id}] does not exist")
         # check if the incoming target is already connected to the list
         if targetNode.lists.is_connected(user_list):
             raise Conflict(
