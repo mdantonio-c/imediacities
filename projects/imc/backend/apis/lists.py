@@ -30,7 +30,8 @@ class Target(InputSchema):
             "type": fields.Str(
                 required=True, validate=validate.OneOf(["item", "shot"])
             ),
-        }
+        },
+        required=True,
     )
 
 
