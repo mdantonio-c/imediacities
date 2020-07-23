@@ -96,7 +96,6 @@ export class AppAddToListComponent {
   }
 
   private addToList(listId) {
-    console.log(`add this <${target}> to the list <${listId}>`);
     this.listsService
       .addItemToList(this.item_type, this.item_id, listId)
       .subscribe(
