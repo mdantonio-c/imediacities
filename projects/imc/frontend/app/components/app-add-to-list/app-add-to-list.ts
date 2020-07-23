@@ -96,24 +96,22 @@ export class AppAddToListComponent {
   }
 
   private addToList(listId) {
-    let target = {
-      type: this.item_type,
-      id: this.item_id,
-    };
     console.log(`add this <${target}> to the list <${listId}>`);
-    this.listsService.addItemToList(target, listId).subscribe(
-      (resp) => {
-        // item added to the list
-        this.my_lists.filter((l) => l.uuid == listId)[0].belong = true;
-      },
-      (error) => {
-        console.error(
-          "There was an error adding item to the list",
-          error.errors
-        );
-        this.notify.showError("Error in adding this item to the list");
-      }
-    );
+    this.listsService
+      .addItemToList(this.item_type, this.item_id, listId)
+      .subscribe(
+        (resp) => {
+          // item added to the list
+          this.my_lists.filter((l) => l.uuid == listId)[0].belong = true;
+        },
+        (error) => {
+          console.error(
+            "There was an error adding item to the list",
+            error.errors
+          );
+          this.notify.showError("Error in adding this item to the list");
+        }
+      );
   }
 
   private resetForm() {
