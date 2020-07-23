@@ -7,14 +7,13 @@ from imc.apis import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.exceptions import RestApiException
+from restapi.models import fields, validate
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
 #####################################
 class Stage(IMCEndpoint):
-
-    allowed_import_mode = ("clean", "fast", "skip")
 
     labels = ["file"]
     _GET = {
@@ -38,38 +37,6 @@ class Stage(IMCEndpoint):
     _POST = {
         "/stage": {
             "summary": "Import a file from the stage area",
-            "parameters": [
-                {
-                    "name": "criteria",
-                    "in": "body",
-                    "description": "Criteria for the import.",
-                    "schema": {
-                        "required": ["filename"],
-                        "properties": {
-                            "filename": {
-                                "type": "string",
-                                "description": "The metadata file to be imported",
-                            },
-                            "mode": {
-                                "type": "string",
-                                "description": "Different modes for pipeline execution",
-                                "default": "fast",
-                                "enum": ["fast", "clean", "skip"],
-                            },
-                            "update": {
-                                "type": "boolean",
-                                "description": "only for metadata update",
-                                "default": True,
-                            },
-                            "force_reprocessing": {
-                                "type": "boolean",
-                                "description": "Allow to force re-processing of COMPLETED contents",
-                                "default": False,
-                            },
-                        },
-                    },
-                }
-            ],
             "responses": {
                 "200": {"description": "File successfully imported"},
                 "409": {"description": "No source ID found in metadata file."},
@@ -232,7 +199,27 @@ class Stage(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    def post(self):
+    # "required": ["filename"],
+    @decorators.use_kwargs(
+        {
+            "filename": fields.Str(
+                required=True, description="The metadata file to be imported",
+            ),
+            "mode": fields.Str(
+                missing="fast",
+                description="Different modes for pipeline execution",
+                validate=validate.OneOf(["fast", "clean", "skip"]),
+            ),
+            "update": fields.Bool(
+                missing=True, description="only for metadata update",
+            ),
+            "force_reprocessing": fields.Bool(
+                missing=False,
+                description="Allow to force re-processing of COMPLETED contents",
+            ),
+        }
+    )
+    def post(self, filename, mode, update, force_reprocessing):
         """
         Start IMPORT
         1) estraggo il source id dal file dei metadati
@@ -265,24 +252,6 @@ class Stage(IMCEndpoint):
         if not os.path.exists(upload_dir):
             raise RestApiException(
                 "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        input_parameters = self.get_input()
-
-        if "filename" not in input_parameters:
-            raise RestApiException(
-                "Filename not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-
-        filename = input_parameters["filename"]
-        force_reprocessing = input_parameters.get("force_reprocessing", False)
-        mode = input_parameters.get("mode", "clean").strip().lower()
-        if mode not in self.__class__.allowed_import_mode:
-            raise RestApiException(
-                "Bad mode parameter: expected one of {}".format(
-                    self.__class__.allowed_import_mode
-                ),
-                status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
         path = os.path.join(upload_dir, filename)
@@ -422,19 +391,17 @@ class Stage(IMCEndpoint):
                         meta_stage.uuid,
                     )
 
-            metadata_update = input_parameters.get("update", True)
-
             log.debug("Starting import of file path={}", path)
             log.debug("with meta_stage.uuid={}", meta_stage.uuid)
             log.debug("with mode={}", mode)
-            log.debug("with metadata_update={}", metadata_update)
+            log.debug("with metadata_update={}", update)
 
         except self.graph.MetaStage.DoesNotExist:
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
         task = celery.import_file.apply_async(
-            args=[path, meta_stage.uuid, mode, metadata_update], countdown=10
+            args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
         meta_stage.status = "IMPORTING"
