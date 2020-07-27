@@ -3,31 +3,19 @@ Search endpoint for annotations
 """
 
 from imc.apis import IMCEndpoint
-from imc.models import codelists
+from imc.models import AnnotationSearchCriteria, codelists
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import BadRequest, RestApiException
+from restapi.models import fields
 from restapi.utilities.htmlcodes import hcodes
-from restapi.utilities.logs import log
 
 
 class SearchAnnotations(IMCEndpoint):
-
-    allowed_anno_types = ("TAG", "VIM", "TVS")
-    allowed_item_types = ("all", "video", "image", "text")
-    allowed_term_fields = ("title", "description", "keyword", "contributor")
 
     _POST = {
         "/annotations/search": {
             "summary": "Search for annotations",
             "description": "Search for annotations",
-            "parameters": [
-                {
-                    "name": "criteria",
-                    "in": "body",
-                    "description": "Criteria for the search.",
-                    "schema": {"$ref": "#/definitions/AnnotationSearchCriteria"},
-                }
-            ],
             "responses": {
                 "200": {"description": "A list of annotation matching search criteria."}
             },
@@ -36,31 +24,20 @@ class SearchAnnotations(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    def post(self):
+    @decorators.use_kwargs(
+        {"filtering": fields.Nested(AnnotationSearchCriteria, data_key="filter")}
+    )
+    def post(self, filtering=None):
 
         self.graph = self.get_service_instance("neo4j")
-
-        input_parameters = self.get_input()
 
         filters = []
         starters = []
         projections = []
         order_by = ""
-        filtering = input_parameters.get("filter")
-        if filtering is not None:
-            anno_type = filtering.get("type")
-            if anno_type is None:
-                raise RestApiException(
-                    "Annotation type cannot be empty",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if anno_type not in self.__class__.allowed_anno_types:
-                raise RestApiException(
-                    "Bad annotation type parameter: expected one of {}".format(
-                        self.__class__.allowed_anno_types
-                    ),
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+        if filtering:
+            anno_type = filtering.get("annotation_type")
+
             filters.append(f"WHERE anno.annotation_type='{anno_type}'")
             # add filter for processed content with COMPLETE status
             filters.append(
@@ -82,7 +59,9 @@ class SearchAnnotations(IMCEndpoint):
                     starters.append(
                         "WITH point({{longitude: {lon}, latitude: {lat} }}) as cityPosition, "
                         "{dist} as distanceInMeters".format(
-                            lon=location["long"], lat=location["lat"], dist=distance
+                            lon=location["longitude"],
+                            lat=location["latitude"],
+                            dist=distance,
                         )
                     )
                     filters.append(
@@ -94,12 +73,10 @@ class SearchAnnotations(IMCEndpoint):
                         "distance(cityPosition, point({longitude:body.spatial[0],latitude:body.spatial[1]})) as distance"
                     )
                     order_by = "ORDER BY distance"
-            creation = filtering.get("creation")
-            if creation is not None:
-                c_match = creation.get("match")
-                if c_match is not None:
-                    term = c_match.get("term")
-                    if term is not None:
+
+            if creation := filtering.get("creation"):
+                if c_match := creation.get("match"):
+                    if term := c_match.get("term"):
                         term = self.graph.sanitize_input(term)
                     multi_match = []
                     multi_match_where = []
@@ -107,22 +84,13 @@ class SearchAnnotations(IMCEndpoint):
 
                     fields = c_match.get("fields")
                     if term is not None and (fields is None or len(fields) == 0):
-                        raise RestApiException(
-                            "Match term fields cannot be empty",
-                            status_code=hcodes.HTTP_BAD_REQUEST,
-                        )
+                        raise BadRequest("Match term fields cannot be empty")
                     if fields is None:
                         fields = []
+
                     multi_match_fields = []
                     multi_optional_match = []
                     for f in fields:
-                        if f not in self.__class__.allowed_term_fields:
-                            raise RestApiException(
-                                "Bad field: expected one of {}".format(
-                                    self.__class__.allowed_term_fields
-                                ),
-                                status_code=hcodes.HTTP_BAD_REQUEST,
-                            )
                         if not term:
                             # catch '*'
                             break
@@ -174,15 +142,8 @@ class SearchAnnotations(IMCEndpoint):
 
                 c_filter = creation.get("filter")
                 # TYPE
-                c_type = c_filter.get("type", "all")
-                c_type = c_type.strip().lower()
-                if c_type not in self.__class__.allowed_item_types:
-                    raise RestApiException(
-                        "Bad item type parameter: expected one of {}".format(
-                            self.__class__.allowed_item_types
-                        ),
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                c_type = c_filter.get("type")
+
                 if c_type != "all":
                     filters.append(
                         "MATCH (i) WHERE i.item_type =~ '(?i){c_type}'".format(
@@ -201,7 +162,6 @@ class SearchAnnotations(IMCEndpoint):
                 # IPR STATUS
                 c_iprstatus = c_filter.get("iprstatus")
                 if c_iprstatus is not None:
-                    c_iprstatus = c_iprstatus.strip()
                     if codelists.fromCode(c_iprstatus, codelists.RIGHTS_STATUS) is None:
                         raise RestApiException(
                             "Invalid IPR status code for: " + c_iprstatus
@@ -259,19 +219,6 @@ class SearchAnnotations(IMCEndpoint):
                             )
                         )
 
-        # first request to get the number of elements to be returned
-        # countv = (
-        #     "{starters} MATCH (anno:Annotation)"
-        #     " {filters} "
-        #     " RETURN COUNT(DISTINCT body)".format(
-        #         starters=' '.join(starters), filters=' '.join(filters)
-        #     )
-        # )
-
-        # get total number of elements
-        # numels = [row[0] for row in self.graph.cypher(countv)][0]
-        # log.debug("Number of elements retrieved: {0}", numels)
-
         query = (
             "{starters} MATCH (anno:Annotation)"
             " {filters} "
@@ -314,6 +261,4 @@ class SearchAnnotations(IMCEndpoint):
             res["distance"] = row[2]
             data.append(res)
 
-        # meta_response = {"totalItems": numels}
-        # return self.response(data, meta=meta_response)
         return self.response(data)

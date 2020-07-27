@@ -5,7 +5,6 @@ Handle annotations
 import datetime
 import re
 
-# from imc.tasks.services.xml_result_parser import XMLResultParser
 from imc.apis import IMCEndpoint
 from imc.tasks.services.annotation_repository import (
     AnnotationRepository,
