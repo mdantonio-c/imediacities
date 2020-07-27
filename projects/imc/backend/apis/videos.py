@@ -18,14 +18,36 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import fields, validate
+from restapi.models import AdvancedList, InputSchema, fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
-#####################################
+# Rapresent the scene cut that is the first frame of the shot.
+# For homogeneity, the first zero cut must also be provided.
+class SceneCut(InputSchema):
+
+    shot_num = fields.Int(required=True, validate=validate.Range(min=0))
+    cut = fields.Int(required=True, validate=validate.Range(min=0))
+    confirmed = fields.Bool(missing=False)
+    double_check = fields.Bool(missing=False)
+    annotations = AdvancedList(
+        fields.Str(), required=True, unique=True, description="Annotation's uuid"
+    )
+
+
+class ShotRevision(InputSchema):
+    shots = AdvancedList(
+        fields.Nested(SceneCut),
+        required=True,
+        min_items=1,
+        description="The new list of scene cuts",
+    )
+    exitRevision = fields.Bool(missing=True)
+
+
 class Videos(IMCEndpoint):
 
     """
@@ -912,14 +934,6 @@ class VideoShotRevision(IMCEndpoint):
     _POST = {
         "/videos/<video_id>/shot-revision": {
             "summary": "Launch the execution of the shot revision tool.",
-            "parameters": [
-                {
-                    "name": "revision",
-                    "in": "body",
-                    "description": "The new list of cut.",
-                    "schema": {"$ref": "#/definitions/ShotRevision"},
-                }
-            ],
             "responses": {
                 "201": {"description": "Execution launched."},
                 "403": {"description": "Request forbidden."},
@@ -953,6 +967,7 @@ class VideoShotRevision(IMCEndpoint):
         }
     }
 
+    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
@@ -964,7 +979,6 @@ class VideoShotRevision(IMCEndpoint):
         },
         locations=["query"],
     )
-    @decorators.auth.require_any(Role.ADMIN, "Reviser")
     def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
@@ -1068,95 +1082,40 @@ class VideoShotRevision(IMCEndpoint):
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
-    def post(self, video_id):
+    @decorators.use_kwargs(ShotRevision)
+    def post(self, video_id, shots, exitRevision):
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {0}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
         self.graph = self.get_service_instance("neo4j")
-        try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+
+        video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
+        if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
-        item = v.item.single()
-        if item is None:
+            raise NotFound("Please specify a valid video id")
+
+        if not (item := video.item.single()):
             # 409: Video is not ready for revision. (should never be reached)
-            raise RestApiException(
-                "This AVEntity may not have been correctly imported. "
-                "No ready for revision!",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict("AVEntity not correctly imported: not ready for revision!",)
+
         repo = CreationRepository(self.graph)
         # be sure video is under revision
         if not repo.is_video_under_revision(item):
-            raise RestApiException(
-                f"This video [{video_id}] is not under revision!",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict(f"This video [{video_id}] is not under revision!",)
+
         # ONLY the reviser and the administrator can provide a new list of cuts
         user = self.get_user()
         iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
-            raise RestApiException(
-                "User [{}, {} {}] cannot revise video that is not assigned to him/her".format(
-                    user.uuid, user.name, user.surname
-                ),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
+            raise Forbidden("You cannot revise a video that is not owned by you")
 
-        revision = self.get_input()
-        # validate request body
-        if "shots" not in revision or not revision["shots"]:
-            raise RestApiException(
-                "Provide a valid list of cuts", status_code=hcodes.HTTP_BAD_REQUEST
-            )
-        for idx, s in enumerate(revision["shots"]):
-            if "shot_num" not in s:
-                raise RestApiException(
-                    f"Missing shot_num in shot: {s}",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if idx > 0 and "cut" not in s:
-                raise RestApiException(
-                    "Missing cut for shot[{}]".format(s["shot_num"]),
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if "confirmed" in s and not isinstance(s["confirmed"], bool):
-                raise RestApiException(
-                    "Invalid confirmed value", status_code=hcodes.HTTP_BAD_REQUEST
-                )
-            if "double_check" in s and not isinstance(s["double_check"], bool):
-                raise RestApiException(
-                    "Invalid double_check value", status_code=hcodes.HTTP_BAD_REQUEST
-                )
-            if "annotations" not in s:
-                raise RestApiException(
-                    f"Missing annotations in shot: {s}",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if (
-                "annotations" in s
-                and not isinstance(s["annotations"], type(list))
-                and not all(isinstance(val, str) for val in s["annotations"])
-            ):
-                raise RestApiException(
-                    "Invalid annotations value. Expected list<str>",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-        if "exitRevision" in revision and not isinstance(
-            revision["exitRevision"], bool
-        ):
-            raise RestApiException(
-                "Invalid exitRevision", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+        revision = {
+            "shots": shots,
+            "exitRevision": exitRevision,
+            "reviser": user.uuid,
+        }
 
-        revision["reviser"] = user.uuid
-        # launch asynch task
+        # launch async task
         try:
             celery = self.get_service_instance("celery")
             task = celery.shot_revision.apply_async(
@@ -1176,32 +1135,24 @@ class VideoShotRevision(IMCEndpoint):
     def delete(self, video_id):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
-        if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+
         self.graph = self.get_service_instance("neo4j")
-        try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+        video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
+        if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise RestApiException(
                 "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
             )
-        item = v.item.single()
-        if item is None:
+
+        if not (item := video.item.single()):
             # 409: Video is not ready for revision. (should never be reached)
-            raise RestApiException(
-                "This AVEntity may not have been correctly imported. "
-                "No ready for revision!",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict("AVEntity not correctly imported: not ready for revision!")
 
         repo = CreationRepository(self.graph)
         if not repo.is_video_under_revision(item):
             # 409: Video is already under revision.
             raise RestApiException(
-                f"Video [{v.uuid}] is not under revision",
+                f"Video [{video.uuid}] is not under revision",
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
         # ONLY the reviser and the administrator can exit revision
