@@ -226,36 +226,6 @@ definitions:
         type: string
         description: User's uuid
 
-  PatchRequest:
-    type: array
-    items:
-      $ref: "#/definitions/PatchDocument"
-  PatchDocument:
-    description: A JSONPatch document as defined by RFC 6902
-    required:
-      - "op"
-      - "path"
-    properties:
-      op:
-        type: string
-        description: The operation to be performed
-        enum:
-          - "add"
-          - "remove"
-          - "replace"
-          - "move"
-          - "copy"
-          - "test"
-      path:
-        type: string
-        description: A JSON-Pointer
-      value:
-        type: object
-        description: The value to be used within the operations.
-      from:
-        type: string
-        description: A string containing a JSON Pointer value.
-
   VideoInRevision:
     description: Video under revision
     required:
@@ -301,46 +271,3 @@ definitions:
             type: string
           name:
             type: string
-
-  ShotRevision:
-    description: Shot revision request.
-    required:
-      - shots
-    properties:
-      shots:
-        description: The new list of scene cuts.
-        type: array
-        items:
-          $ref: "#/definitions/SceneCut"
-        minItems: 1
-      exitRevision:
-        type: boolean
-        default: true
-
-  SceneCut:
-    description: Rapresent the scene cut that is the first frame of the shot. For homogeneity, the first zero cut must also be provided.
-    required:
-      - shot_num
-      - cut
-      - annotations
-    properties:
-      shot_num:
-        type: integer
-        format: int32
-        minimum: 0
-      cut:
-        type: integer
-        format: int32
-        minimum: 0
-      confirmed:
-        type: boolean
-        default: false
-      double_check:
-        type: boolean
-        default: false
-      annotations:
-        type: array
-        uniqueItems: true
-        items:
-          description: Annotation's uuid
-          type: string

@@ -13,8 +13,14 @@ from imc.tasks.services.annotation_repository import (
 )
 from restapi import decorators
 from restapi.connectors.neo4j import graph_transactions
-from restapi.exceptions import RestApiException
-from restapi.models import fields
+from restapi.exceptions import (
+    BadRequest,
+    Conflict,
+    Forbidden,
+    NotFound,
+    RestApiException,
+)
+from restapi.models import InputSchema, fields, validate
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -23,6 +29,21 @@ BODY_PATTERN = re.compile("(resource|textual):.+")
 SELECTOR_PATTERN = re.compile(r"t=\d+,\d+")
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+
+
+class PatchDocument(InputSchema):
+
+    patch_op = fields.Str(
+        required=True,
+        data_key="op",
+        description="The operation to be performed",
+        # validate=validate.OneOf(["add", "remove", "replace", "move", "copy", "test"])
+        validate=validate.OneOf(["add", "remove"]),
+    )
+    path = fields.Str(required=True, description="A JSON-Pointer")
+    value = fields.Str(
+        required=True, description="The value to be used within the operations"
+    )
 
 
 #####################################
@@ -38,7 +59,6 @@ class Annotations(IMCEndpoint):
         "replying",
         "segmentation",
     )
-    allowed_patch_operations = ("add", "remove")
 
     labels = ["annotation"]
     _GET = {
@@ -110,15 +130,6 @@ class Annotations(IMCEndpoint):
         "/annotations/<anno_id>": {
             "summary": "Updates partially an annotation",
             "description": "Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.",
-            "parameters": [
-                {
-                    "name": "JsonPatch",
-                    "in": "body",
-                    "required": True,
-                    "description": "The annotation to update.",
-                    "schema": {"$ref": "#/definitions/PatchRequest"},
-                }
-            ],
             "responses": {
                 "204": {"description": "Annotation successfully updated."},
                 "400": {
@@ -575,124 +586,69 @@ class Annotations(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @graph_transactions
-    def patch(self, anno_id):
-        if anno_id is None:
-            raise RestApiException(
-                "Please specify an annotation id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+    @decorators.use_kwargs(PatchDocument)
+    def patch(self, anno_id, patch_op, path, value):
 
         self.graph = self.get_service_instance("neo4j")
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
-            raise RestApiException(
-                "Annotation not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Annotation not found")
+
+        if not (creator := anno.creator.single()):
+            raise NotFound("Annotation with no creator")
 
         user = self.get_user()
-
-        creator = anno.creator.single()
-        if creator is None:
-            raise RestApiException(
-                "Annotation with no creator", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
         if user.uuid != creator.uuid:
-            raise RestApiException(
+            raise Forbidden(
                 "You cannot update an annotation that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )
 
-        if anno.annotation_type not in ("TVS"):
-            raise RestApiException(
-                f"Operation not allowed for annotation {anno.annotation_type}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+        if anno.annotation_type != "TVS":
+            raise BadRequest(
+                f"Operation not allowed for annotation {anno.annotation_type}"
             )
 
-        data = self.get_input()
-        if anno.annotation_type == "TVS":
-            if "op" not in data:
-                raise RestApiException(
-                    "Missing operation for patch request",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            patch_op = data["op"]
-            if patch_op not in self.__class__.allowed_patch_operations:
-                raise RestApiException(
-                    "Bad patch operation: allowed one of {}".format(
-                        self.__class__.allowed_patch_operations
-                    ),
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if "path" not in data:
-                raise RestApiException(
-                    "Missing path for patch request",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            path = data["path"]
-            if path != "/bodies/0/segments":
-                raise RestApiException(
-                    'Invalid path to patch segmentation. Use "/bodies/0/segments"',
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            if "value" not in data:
-                raise RestApiException(
-                    "Missing value for patch request",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            # check for segment value: expected single or multiple temporal
-            # range for add operation or single or multiple segment uuid for
-            # delete operation
-            values = data["value"]
-            if not isinstance(values, list):
-                values = [values]
-            repo = AnnotationRepository(self.graph)
-            for value in values:
-                if patch_op == "remove":
-                    log.debug("remove a segment with uuid:{uuid}", uuid=value)
-                    segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
-                    if segment is None:
-                        raise RestApiException(
-                            f"Segment with ID {value} not found.",
-                            status_code=hcodes.HTTP_BAD_NOTFOUND,
-                        )
-                    try:
-                        repo.remove_segment(anno, segment)
-                    except ValueError as error:
-                        raise RestApiException(
-                            error.args[0], status_code=hcodes.HTTP_BAD_REQUEST
-                        )
-                    except DuplicatedAnnotationError as error:
-                        raise RestApiException(
-                            error.args[0], status_code=hcodes.HTTP_BAD_CONFLICT
-                        )
-                    return self.empty_response()
-                elif patch_op == "add":
-                    log.debug("add a segment with value:{val}", val=value)
-                    if not SELECTOR_PATTERN.match(value):
-                        raise RestApiException(
-                            "Invalid value for: " + value,
-                            status_code=hcodes.HTTP_BAD_REQUEST,
-                        )
-                    try:
-                        repo.add_segment(anno, value)
-                    except DuplicatedAnnotationError as error:
-                        raise RestApiException(
-                            error.args[0], status_code=hcodes.HTTP_BAD_CONFLICT
-                        )
-                else:
-                    # should NOT be reached
-                    raise RestApiException(
-                        f"Operation {patch_op} not yet implemented",
-                        status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-                    )
-        else:
-            raise RestApiException(
-                "Not yet implemented", status_code=hcodes.HTTP_NOT_IMPLEMENTED
+        # ??????
+        if path != "/bodies/0/segments":
+            raise BadRequest(
+                'Invalid path to patch segmentation. Use "/bodies/0/segments"',
             )
 
-        updated_anno = self.get_annotation_response(anno)
+        # check for segment value: expected single or multiple temporal
+        # range for add operation or single or multiple segment uuid for
+        # delete operation
+        repo = AnnotationRepository(self.graph)
 
-        return self.response(updated_anno)
+        if patch_op == "remove":
+            log.debug("remove a segment with uuid:{uuid}", uuid=value)
+            segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+
+            if not segment:
+                raise NotFound(f"Segment with ID {value} not found.")
+
+            try:
+                repo.remove_segment(anno, segment)
+            except ValueError as error:
+                raise BadRequest(error.args[0])
+            except DuplicatedAnnotationError as error:
+                raise Conflict(error.args[0])
+
+            return self.empty_response()
+
+        if patch_op == "add":
+            log.debug("add a segment with value:{val}", val=value)
+            if not SELECTOR_PATTERN.match(value):
+                raise BadRequest(f"Invalid value for: {value}")
+
+            try:
+                repo.add_segment(anno, value)
+            except DuplicatedAnnotationError as error:
+                raise Conflict(error.args[0])
+
+            updated_anno = self.get_annotation_response(anno)
+
+            return self.response(updated_anno)
 
     def get_annotation_response(self, anno):
         """
