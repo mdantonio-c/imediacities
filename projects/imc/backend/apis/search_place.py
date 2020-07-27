@@ -7,9 +7,23 @@ Search endpoint for places
 from imc.apis import IMCEndpoint
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.exceptions import RestApiException
-from restapi.utilities.htmlcodes import hcodes
+from restapi.models import AdvancedList, InputSchema, fields
 from restapi.utilities.logs import log
+
+
+class SearchPlaceParameters(InputSchema):
+    place_list = AdvancedList(
+        fields.Nested(
+            {
+                "creation-id": fields.Str(required=True),
+                "place-ids": AdvancedList(fields.Str(), required=True, min_items=1),
+            },
+        ),
+        description="Criteria for the search",
+        required=True,
+        data_key="relevant-list",
+        min_items=1,
+    )
 
 
 #####################################
@@ -19,32 +33,6 @@ class SearchPlace(IMCEndpoint):
         "/search_place": {
             "summary": "Search some creations for specific place annotations",
             "description": "Search some creations for specific place annotations.",
-            "parameters": [
-                {
-                    "name": "criteria",
-                    "in": "body",
-                    "description": "Criteria for the search.",
-                    "schema": {
-                        "required": ["relevant-list"],
-                        "properties": {
-                            "relevant-list": {
-                                "type": "array",
-                                "items": {
-                                    "required": ["creation-id", "place-ids"],
-                                    "properties": {
-                                        "creation-id": {"type": "string"},
-                                        "place-ids": {
-                                            "type": "array",
-                                            "items": {"type": "string", "minItems": 1},
-                                        },
-                                    },
-                                },
-                                "minItems": 1,
-                            }
-                        },
-                    },
-                }
-            ],
             "responses": {
                 "200": {"description": "A list of creations for relevant places."}
             },
@@ -53,36 +41,18 @@ class SearchPlace(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    def post(self):
+    @decorators.use_kwargs(SearchPlaceParameters)
+    def post(self, place_list):
 
         self.graph = self.get_service_instance("neo4j")
 
-        input_parameters = self.get_input()
-        # at moment ONLY search for creations in a place list is available
-        place_list = input_parameters.get("relevant-list")
-        if place_list is None:
-            raise RestApiException(
-                "Only search for relevant place list allowed",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-        if len(place_list) == 0:
-            raise RestApiException(
-                "Expected at least one relevant place list",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
         data = []
         api_url = get_backend_url()
         for item in place_list:
             creation_id = item.get("creation-id")
-            if creation_id is None:
-                raise RestApiException(
-                    "Missing creation-id", status_code=hcodes.HTTP_BAD_REQUEST
-                )
+
             place_ids = item.get("place-ids")
-            if place_ids is None or len(place_ids) == 0:
-                raise RestApiException(
-                    "Missing place-ids", status_code=hcodes.HTTP_BAD_REQUEST
-                )
+
             query = (
                 "MATCH (n:Creation {{uuid:'{uuid}'}}) "
                 "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(anno:Annotation {{annotation_type:'TAG'}})-[:HAS_BODY]-(body:ResourceBody) "
