@@ -140,7 +140,7 @@ class SearchAnnotations(IMCEndpoint):
                         )
                         filters.append(multi_match_query)
 
-                c_filter = creation.get("filter")
+                c_filter = creation.get("filtering")
                 # TYPE
                 c_type = c_filter.get("type")
 

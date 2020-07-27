@@ -2,8 +2,8 @@ from restapi.models import AdvancedList, InputSchema, fields, validate
 
 
 class Spatial(InputSchema):
-    latitude = fields.Flot(required=True, data_key="lat")
-    longitude = fields.Flot(required=True, data_key="long")
+    latitude = fields.Float(required=True, data_key="lat")
+    longitude = fields.Float(required=True, data_key="long")
 
 
 class GeoDistance(InputSchema):
@@ -53,7 +53,12 @@ class SearchFilter(InputSchema):
     )
 
     geo_distance = fields.Nested(GeoDistance)
-    annotated_by = fields.Dtr(description="User's uuid")
+    annotated_by = fields.Str(description="User's uuid")
+
+
+class SearchCriteria(InputSchema):
+    match = fields.Nested(SearchMatch, required=True)
+    filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
 
 
 class AnnotationSearchCriteria(InputSchema):
@@ -61,6 +66,4 @@ class AnnotationSearchCriteria(InputSchema):
         data_key="type", required=True, validate=validate.OneOf(["TAG", "VIM", "TVS"])
     )
     geo_distance = fields.Nested(GeoDistance)
-    creation = fields.Nested(
-        {"match": fields.Nested(SearchMatch), "filter": fields.Nested(SearchFilter)}
-    )
+    creation = fields.Nested(SearchCriteria)
