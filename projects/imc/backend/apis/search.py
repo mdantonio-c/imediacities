@@ -5,7 +5,7 @@ Search endpoint
 """
 
 from imc.apis import IMCEndpoint
-from imc.models import codelists
+from imc.models import SearchCriteria, codelists
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.exceptions import RestApiException
@@ -21,32 +21,23 @@ class Search(IMCEndpoint):
         "/search": {
             "summary": "Search some videos",
             "description": "Search videos previously staged in the area.",
-            "parameters": [
-                {
-                    "name": "criteria",
-                    "in": "body",
-                    "description": "Criteria for the search.",
-                    "schema": {"$ref": "#/definitions/SearchCriteria"},
-                }
-            ],
             "responses": {
                 "200": {"description": "A list of videos matching search criteria."}
             },
         }
     }
 
-    allowed_item_types = ("all", "video", "image")  # , 'text')
     allowed_term_fields = ("title", "description", "keyword", "contributor")
     allowed_anno_types = ("TAG", "DSC", "LNK")
 
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
-    def post(self, get_total=None, page=None, size=None):
+    @decorators.use_kwargs(SearchCriteria)
+    def post(self, match, filtering, get_total=None, page=None, size=None):
 
         self.graph = self.get_service_instance("neo4j")
 
         user = self.get_user_if_logged()
-        input_parameters = self.get_input()
         page -= 1
         log.debug("paging: offset {}, limit {}", page, size)
 
@@ -64,21 +55,10 @@ class Search(IMCEndpoint):
             + "WHERE content.status = 'COMPLETED'"
         )
         entity = "Creation"
-        filtering = input_parameters.get("filter")
         if filtering is not None:
             # check item type
-            item_type = filtering.get("type", "all")
-            if item_type is None:
-                item_type = "all"
-            else:
-                item_type = item_type.strip().lower()
-            if item_type not in self.__class__.allowed_item_types:
-                raise RestApiException(
-                    "Bad item type parameter: expected one of {}".format(
-                        self.__class__.allowed_item_types
-                    ),
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+            item_type = filtering.get("type")
+
             if item_type == "all":
                 entity = "Creation"
             elif item_type == "video":
@@ -117,9 +97,7 @@ class Search(IMCEndpoint):
                     )
                 )
             # IPR STATUS
-            iprstatus = filtering.get("iprstatus")
-            if iprstatus is not None:
-                iprstatus = iprstatus.strip()
+            if iprstatus := filtering.get("iprstatus"):
                 if codelists.fromCode(iprstatus, codelists.RIGHTS_STATUS) is None:
                     raise RestApiException("Invalid IPR status code for: " + iprstatus)
                 filters.append(
@@ -222,7 +200,6 @@ class Search(IMCEndpoint):
                     )
                 )
 
-        match = input_parameters.get("match")
         fulltext = None
         if match is not None:
 

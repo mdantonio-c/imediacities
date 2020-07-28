@@ -77,7 +77,9 @@ export class CatalogComponent implements OnInit {
         this.loading = false;
       },
       (error) => {
-        this.notify.showError(error);
+        if (error["filter"]) this.notify.showError(error["filter"]);
+        if (error["match"]) this.notify.showError(error["match"]);
+        // this.notify.showError(error);
         this.loading = false;
       }
     );

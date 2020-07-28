@@ -3,7 +3,7 @@ Search endpoint for annotations
 """
 
 from imc.apis import IMCEndpoint
-from imc.models import AnnotationSearchCriteria, codelists
+from imc.models import AnnotationSearch, codelists
 from restapi import decorators
 from restapi.exceptions import BadRequest, RestApiException
 from restapi.models import fields
@@ -25,7 +25,7 @@ class SearchAnnotations(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
-        {"filtering": fields.Nested(AnnotationSearchCriteria, data_key="filter")}
+        {"filtering": fields.Nested(AnnotationSearch, data_key="filter")}
     )
     def post(self, filtering=None):
 
@@ -160,8 +160,7 @@ class SearchAnnotations(IMCEndpoint):
                         )
                     )
                 # IPR STATUS
-                c_iprstatus = c_filter.get("iprstatus")
-                if c_iprstatus is not None:
+                if c_iprstatus := c_filter.get("iprstatus"):
                     if codelists.fromCode(c_iprstatus, codelists.RIGHTS_STATUS) is None:
                         raise RestApiException(
                             "Invalid IPR status code for: " + c_iprstatus
