@@ -4,7 +4,6 @@ import {
   AfterViewInit,
   Output,
   EventEmitter,
-  ViewChild,
   ViewEncapsulation,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
@@ -14,7 +13,8 @@ import { AppVocabularyService } from "../../../services/app-vocabulary";
 import { Observable } from "rxjs";
 import "rxjs/add/observable/combineLatest";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
-import { IonRangeSliderComponent } from "ng2-ion-range-slider";
+
+const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
 
 @Component({
   selector: "search-filter",
@@ -30,6 +30,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   cities: string[] = [];
   minProductionYear: number = 1890;
   maxProductionYear: number = 1999;
+  sliderTicks = SLIDER_TICKS;
+  rangeValue = [this.minProductionYear, this.maxProductionYear];
   enableProdDateText: string = "Enable Production Date";
   disableProdDateText: string = "Disable Production Date";
   missingDateParam: boolean = true;
@@ -38,9 +40,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<
     SearchFilter
   >();
-
-  @ViewChild("rangeSlider", { static: false })
-  rangeSliderEl: IonRangeSliderComponent;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -113,7 +112,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       imageType:
         filter.itemType === "all" || filter.itemType === "image" ? true : false,
       term: "",
-      city: this.providerToCity(filter.provider),
+      city: SearchFilterComponent.providerToCity(filter.provider),
       productionYearFrom: filter.productionYearFrom,
       productionYearTo: filter.productionYearTo,
       iprstatus: filter.iprstatus,
@@ -176,8 +175,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       filter.terms.push({ iri: t.iri, label: t.name });
     }
     if (form.city !== "") {
-      filter.city = this.cityToCode(form.city);
-      filter.provider = this.cityToProvider(form.city);
+      filter.city = SearchFilterComponent.cityToCode(form.city);
+      filter.provider = SearchFilterComponent.cityToProvider(form.city);
     }
     if (form.iprstatus !== "") {
       filter.iprstatus = form.iprstatus;
@@ -194,7 +193,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     this.prodDateTooltip = this.enableProdDateText;
   }
 
-  private cityToProvider(city) {
+  private static cityToProvider(city) {
     let p = null;
     if (city === "Athens") {
       p = "TTE";
@@ -217,7 +216,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     return p;
   }
-  private cityToCode(city) {
+
+  private static cityToCode(city) {
     let p = null;
     if (city === "Athens") {
       p = "Athens";
@@ -240,7 +240,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     return p;
   }
-  private providerToCity(provider) {
+
+  private static providerToCity(provider) {
     let c = null;
     if (provider === "TTE") {
       c = "Athens";
@@ -279,8 +280,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   changeMissingDate() {
-    var newVal = !this.missingDateParam;
-    this.missingDateParam = newVal;
+    this.missingDateParam = !this.missingDateParam;
     if (this.missingDateParam) {
       this.prodDateTooltip = this.enableProdDateText;
     } else {
@@ -370,12 +370,12 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   updateSlider($event) {
-    this.changeYearFrom($event.from);
-    this.changeYearTo($event.to);
+    this.changeYearFrom($event[0]);
+    this.changeYearTo($event[1]);
   }
 
   setSliderTo(from, to) {
-    console.warn("rangeSlider is temporary disabled");
-    // this.rangeSliderEl.update({from: from, to:to});
+    this.rangeValue = [from, to];
   }
+
 }

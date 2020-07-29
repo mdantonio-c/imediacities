@@ -1,6 +1,6 @@
-/* add the ion-range-slider style and skin css */
-@import url("ion-rangeslider/css/ion.rangeSlider.css");
-@import url("ion-rangeslider/css/ion.rangeSlider.skinFlat.css");
+/* add the bootstrap-slider style css */
+@import url("bootstrap-slider/dist/css/bootstrap-slider.min.css");
+@import url("custom-slider.css");
 
 /* Include slick css */
 @import url("slick-carousel/slick/slick.css");

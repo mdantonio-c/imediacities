@@ -233,14 +233,20 @@
             </div>
           </div>
           <div class="space-4"></div>
-          <!-- 
-  					<ion-range-slider #rangeSlider
-  						type="double"
-  						[min]="minProductionYear"
-  						[max]="maxProductionYear"
-  						grid="true"
-  						(onChange)="updateSlider($event)"></ion-range-slider>
- -->
+          <div class="mx-2 mt-4">
+            <mv-slider
+                #rangeSlider
+                id="imc-slider"
+                [range]="true"
+                [(value)]="rangeValue"
+                [min]="minProductionYear"
+                [max]="maxProductionYear"
+                [step]="1"
+                [ticks]="sliderTicks"
+                [ticksLabels]="sliderTicks"
+                (change)="updateSlider($event.newValue)"
+              ></mv-slider>
+          </div>
         </div>
       </div>
       <div class="hr hr-dotted"></div>

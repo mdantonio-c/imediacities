@@ -1,5 +1,4 @@
 import "js-marker-clusterer/src/markerclusterer.js";
-import "ion-rangeslider/js/ion.rangeSlider.min.js";
 import "slick-carousel/slick/slick.min.js";
 
 import { NgModule, ModuleWithProviders } from "@angular/core";
@@ -13,7 +12,7 @@ import { AuthGuard } from "@rapydo/app.auth.guard";
 import { HttpClientJsonpModule } from "@angular/common/http";
 import { NguiMapModule, NgMapApiLoader } from "@ngui/map";
 // import { HolderJsModule } from 'angular2-holderjs/component';
-// import { IonRangeSliderModule } from "ng2-ion-range-slider";
+import { NgxBootstrapSliderModule } from 'ngx-bootstrap-slider';
 import { SlickCarouselModule } from "ngx-slick-carousel";
 
 import { ArchiveComponent } from "./components/admin/archive/archive";
@@ -135,8 +134,8 @@ const routes: Routes = [
     HttpClientJsonpModule,
     // NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+environment.ALL['GMAP_KEY']}),
     NguiMapModule.forRoot(),
+    NgxBootstrapSliderModule,
     //HolderJsModule,
-    // IonRangeSliderModule,
     SlickCarouselModule,
   ],
   declarations: [
