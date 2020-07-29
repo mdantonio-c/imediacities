@@ -5,28 +5,12 @@ Search endpoint for places
 """
 
 from imc.apis import IMCEndpoint
+from imc.models import SearchPlaceParameters
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.models import AdvancedList, InputSchema, fields
 from restapi.utilities.logs import log
 
 
-class SearchPlaceParameters(InputSchema):
-    place_list = AdvancedList(
-        fields.Nested(
-            {
-                "creation-id": fields.Str(required=True),
-                "place-ids": AdvancedList(fields.Str(), required=True, min_items=1),
-            },
-        ),
-        description="Criteria for the search",
-        required=True,
-        data_key="relevant-list",
-        min_items=1,
-    )
-
-
-#####################################
 class SearchPlace(IMCEndpoint):
 
     _POST = {

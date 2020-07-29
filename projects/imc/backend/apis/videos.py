@@ -5,6 +5,7 @@ import os
 
 from flask import send_file
 from imc.apis import IMCEndpoint
+from imc.models import ShotRevision
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
@@ -18,34 +19,11 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import AdvancedList, InputSchema, fields, validate
+from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
-
-
-# Rapresent the scene cut that is the first frame of the shot.
-# For homogeneity, the first zero cut must also be provided.
-class SceneCut(InputSchema):
-
-    shot_num = fields.Int(required=True, validate=validate.Range(min=0))
-    cut = fields.Int(required=True, validate=validate.Range(min=0))
-    confirmed = fields.Bool(missing=False)
-    double_check = fields.Bool(missing=False)
-    annotations = AdvancedList(
-        fields.Str(), required=True, unique=True, description="Annotation's uuid"
-    )
-
-
-class ShotRevision(InputSchema):
-    shots = AdvancedList(
-        fields.Nested(SceneCut),
-        required=True,
-        min_items=1,
-        description="The new list of scene cuts",
-    )
-    exitRevision = fields.Bool(missing=True)
 
 
 class Videos(IMCEndpoint):

@@ -4,6 +4,7 @@ Manage the lists of the researcher
 import re
 
 from imc.apis import IMCEndpoint
+from imc.models import Target
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.connectors.neo4j import graph_transactions
@@ -14,25 +15,13 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import InputSchema, fields, validate
+from restapi.models import fields
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
-
-
-class Target(InputSchema):
-    target = fields.Nested(
-        {
-            "id": fields.Str(required=True),
-            "type": fields.Str(
-                required=True, validate=validate.OneOf(["item", "shot"])
-            ),
-        },
-        required=True,
-    )
 
 
 class Lists(IMCEndpoint):
