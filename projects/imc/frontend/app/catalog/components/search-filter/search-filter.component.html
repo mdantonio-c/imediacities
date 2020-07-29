@@ -121,6 +121,7 @@
             <app-media-annotation
               [annotation]="term"
               [can_delete]="true"
+              [disable_confirmation]="true"
               (click)="removeTerm(term)"
             ></app-media-annotation>
           </ng-template>
@@ -235,17 +236,17 @@
           <div class="space-4"></div>
           <div class="mx-2 mt-4">
             <mv-slider
-                #rangeSlider
-                id="imc-slider"
-                [range]="true"
-                [(value)]="rangeValue"
-                [min]="minProductionYear"
-                [max]="maxProductionYear"
-                [step]="1"
-                [ticks]="sliderTicks"
-                [ticksLabels]="sliderTicks"
-                (change)="updateSlider($event.newValue)"
-              ></mv-slider>
+              #rangeSlider
+              id="imc-slider"
+              [range]="true"
+              [(value)]="rangeValue"
+              [min]="minProductionYear"
+              [max]="maxProductionYear"
+              [step]="1"
+              [ticks]="sliderTicks"
+              [ticksLabels]="sliderTicks"
+              (change)="updateSlider($event.newValue)"
+            ></mv-slider>
           </div>
         </div>
       </div>
