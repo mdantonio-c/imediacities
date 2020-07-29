@@ -6,6 +6,7 @@ import datetime
 import re
 
 from imc.apis import IMCEndpoint
+from imc.models import PatchDocument
 from imc.tasks.services.annotation_repository import (
     AnnotationRepository,
     DuplicatedAnnotationError,
@@ -19,7 +20,7 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import InputSchema, fields, validate
+from restapi.models import fields
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -28,21 +29,6 @@ BODY_PATTERN = re.compile("(resource|textual):.+")
 SELECTOR_PATTERN = re.compile(r"t=\d+,\d+")
 
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
-
-
-class PatchDocument(InputSchema):
-
-    patch_op = fields.Str(
-        required=True,
-        data_key="op",
-        description="The operation to be performed",
-        # validate=validate.OneOf(["add", "remove", "replace", "move", "copy", "test"])
-        validate=validate.OneOf(["add", "remove"]),
-    )
-    path = fields.Str(required=True, description="A JSON-Pointer")
-    value = fields.Str(
-        required=True, description="The value to be used within the operations"
-    )
 
 
 #####################################
@@ -608,15 +594,6 @@ class Annotations(IMCEndpoint):
                 f"Operation not allowed for annotation {anno.annotation_type}"
             )
 
-        # ??????
-        if path != "/bodies/0/segments":
-            raise BadRequest(
-                'Invalid path to patch segmentation. Use "/bodies/0/segments"',
-            )
-
-        # check for segment value: expected single or multiple temporal
-        # range for add operation or single or multiple segment uuid for
-        # delete operation
         repo = AnnotationRepository(self.graph)
 
         if patch_op == "remove":
@@ -655,10 +632,10 @@ class Annotations(IMCEndpoint):
         """
         res = self.getJsonResponse(anno, max_relationship_depth=0)
         if anno.creator is not None:
-            creator = self.getJsonResponse(
+            res["creator"] = self.getJsonResponse(
                 anno.creator.single(), max_relationship_depth=0
             )
-            res["creator"] = creator
+
         res["bodies"] = []
         for b in anno.bodies.all():
             anno_body = b.downcast()
@@ -673,12 +650,13 @@ class Annotations(IMCEndpoint):
                     segments.append(json_segment)
                 body["segments"] = segments
             res["bodies"].append(body)
+
         res["targets"] = []
         for t in anno.targets.all():
             target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
             res["targets"].append(target)
-        source = self.getJsonResponse(
+
+        res["source"] = self.getJsonResponse(
             anno.source_item.single(), max_relationship_depth=0
         )
-        res["source"] = source
         return res

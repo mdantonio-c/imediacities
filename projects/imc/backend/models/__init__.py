@@ -68,7 +68,7 @@ class AnnotationSearchFilter(InputSchema):
     )
     provider = fields.Str(allow_none=True)
     # Sent by postman, not used in endpoint?
-    country = fields.Str(description="production country, codelist iso3166-1")
+    # country = fields.Str(description="production country, codelist iso3166-1")
     yearfrom = fields.Int(
         allow_none=True,
         description="production year range: start year of the range",
@@ -95,19 +95,96 @@ class AnnotationSearchFilter(InputSchema):
     geo_distance = fields.Nested(GeoDistance)
 
 
-class SearchCriteria(InputSchema):
-    match = fields.Nested(SearchMatch, required=True, allow_none=True)
-    filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
-
-
 class AnnotationSearchCriteria(InputSchema):
     match = fields.Nested(SearchMatch, required=True)
     filtering = fields.Nested(AnnotationSearchFilter, data_key="filter", required=True)
 
 
+# used by POST /search
+class SearchCriteria(InputSchema):
+    match = fields.Nested(SearchMatch, required=True, allow_none=True)
+    filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
+
+
+# used by POST /annotations/search
 class AnnotationSearch(InputSchema):
     annotation_type = fields.Str(
         data_key="type", required=True, validate=validate.OneOf(["TAG", "VIM", "TVS"])
     )
     geo_distance = fields.Nested(GeoDistance)
     creation = fields.Nested(AnnotationSearchCriteria)
+
+
+# used by PATCH /annotations/<anno_id>
+class PatchDocument(InputSchema):
+
+    patch_op = fields.Str(
+        required=True,
+        data_key="op",
+        description="The operation to be performed",
+        # validate=validate.OneOf(["add", "remove", "replace", "move", "copy", "test"])
+        validate=validate.OneOf(["add", "remove"]),
+    )
+    path = fields.Str(
+        required=True,
+        description="A JSON-Pointer",
+        # Invalid path to patch segmentation
+        validate=validate.OneOf(["/bodies/0/segments"]),
+    )
+
+    value = fields.Str(
+        required=True, description="The value to be used within the operations"
+    )
+
+
+# used by POST /lists/<list_id>/items
+class Target(InputSchema):
+    target = fields.Nested(
+        {
+            "id": fields.Str(required=True),
+            "type": fields.Str(
+                required=True, validate=validate.OneOf(["item", "shot"])
+            ),
+        },
+        required=True,
+    )
+
+
+# used by POST /search_place
+class SearchPlaceParameters(InputSchema):
+    place_list = AdvancedList(
+        fields.Nested(
+            {
+                "creation-id": fields.Str(required=True),
+                "place-ids": AdvancedList(fields.Str(), required=True, min_items=1),
+            },
+        ),
+        description="Criteria for the search",
+        required=True,
+        data_key="relevant-list",
+        min_items=1,
+    )
+
+
+# Rapresent the scene cut that is the first frame of the shot.
+# For homogeneity, the first zero cut must also be provided.
+class SceneCut(InputSchema):
+
+    shot_num = fields.Int(required=True, validate=validate.Range(min=0))
+    cut = fields.Int(required=True, validate=validate.Range(min=0))
+    confirmed = fields.Bool(missing=False)
+    double_check = fields.Bool(missing=False)
+    annotations = AdvancedList(
+        fields.Str(), required=True, unique=True, description="Annotation's uuid"
+    )
+
+
+# used by POST /videos/<video_id>/shot-revision
+class ShotRevision(InputSchema):
+    shots = AdvancedList(
+        fields.Nested(SceneCut),
+        required=True,
+        min_items=1,
+        description="The new list of scene cuts",
+    )
+    exitRevision = fields.Bool(missing=True)
