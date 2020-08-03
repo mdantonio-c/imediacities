@@ -17,6 +17,7 @@ from datetime import datetime
 from shutil import copyfile
 
 from imc.apis import IMCEndpoint
+from imc.models import BulkDeleteSchema, BulkSchema
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
@@ -45,11 +46,11 @@ class Bulk(IMCEndpoint):
 
     def check_item_type_coherence(self, resource, standard_path):
         """
-        Check if the item_type of the incoming xml (standard_path)
-         is the same of the existent Item in database (from resource)
-        Return data:
-        - if 'item_node' is None, non ha senso andare a vedere 'coherent'
-        - if 'item_node' is not None, allora vado a vedere 'coherent'
+        Check if the item_type of the incoming xml (standard_path) is the same of the existent Item in the database
+        (from resource).
+        :param resource:
+        :param standard_path:
+        :return: item node and coherent boolean
         """
         log.debug(
             "check_item_type_coherence: resource id {} and path {}",
@@ -132,37 +133,16 @@ class Bulk(IMCEndpoint):
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    def post(self):
+    @decorators.use_kwargs(BulkSchema)
+    def post(self, **req_action):
         log.debug("Start bulk procedure...")
 
         self.graph = self.get_service_instance("neo4j")
-        celery = self.get_service_instance("celery")
+        self.celery = self.get_service_instance("celery")
 
-        params = self.get_input()
-        log.debug("input: {}", params)
-        for allowed_action in self.__class__.allowed_actions:
-            action = params.get(allowed_action)
-            if action is not None:
-                req_action = allowed_action
-                break
-        if action is None:
-            raise RestApiException(
-                f"Bad action: expected one of {self.__class__.allowed_actions}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
-
-        # ##################################################################
-        # Cinzia: NOV 2018: aggiungo un parametro per forzare il
-        #                   reprocessing anche nel caso
-        #                   che la action sia 'update'
-        # ##################################################################
-        if req_action == "update":
+        if action := req_action.get("update"):
             # check group uid
             guid = action.get("guid")
-            if guid is None:
-                raise RestApiException(
-                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-                )
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
@@ -174,15 +154,14 @@ class Bulk(IMCEndpoint):
             log.debug("force_reprocessing: {}", force_reprocessing)
 
             # retrieve XML files from delta upload dir
-            #  (scaricato con oai-pmh solo delta rispetto all'ultimo harvest
-            #    prendere dir= /uploads/<guid>/upload/<date>/ con date la data più recente)
+            # (Downloaded with oai-pmh only delta compared to the last harvest.
+            #  Take dir= /uploads/<guid>/upload/<date>/ with the most recent date)
             upload_dir = "/uploads/" + group.uuid
             upload_delta_dir = os.path.join(upload_dir, "upload")
             if not os.path.exists(upload_delta_dir):
                 return self.response(errors=["Upload dir not found"])
 
-            # dentro la upload_delta_dir devo cercare la sotto-dir
-            # che corrisponde alla data più recente
+            # inside the upload_delta_dir I have to look for the sub-dir that corresponds to the most recent date
             upload_latest_dir = self.lookup_latest_dir(upload_delta_dir)
 
             if upload_latest_dir is None:
@@ -202,9 +181,9 @@ class Bulk(IMCEndpoint):
                 file_path = os.path.join(upload_latest_dir, f)
                 filename = f
                 log.debug("Processing file {}", filename)
-                # copio il file nella directory in cui vengono uploadati il file dal Frontend
-                #  come nome del file uso quello nella forma standard "<archive code>_<source id>.xml"
-                #  quindi prima devo estrarre il source id dal file stesso
+                # copy the file in the directory where the file is uploaded from the Frontend.
+                # As filename I use the one in the standard form "<archive code>_<source id>.xml"
+                # so first I have to extract the source id from the file itself
                 log.debug("Extracting source id from metadata file {}", filename)
                 source_id = None
                 try:
@@ -243,8 +222,8 @@ class Bulk(IMCEndpoint):
                 properties["filename"] = standard_filename
                 properties["path"] = standard_path
 
-                # cerco nel db se esiste già un META_STAGE collegato a quel SOURCE_ID
-                # e appartenente al gruppo
+                # I look in the db if there is already a META_STAGE connected to that SOURCE_ID
+                # and belonging to the group
                 meta_stage = None
                 try:
                     query = "match (g:Group)<-[r4:IS_OWNED_BY]-(ms:MetaStage) \
@@ -259,7 +238,7 @@ class Bulk(IMCEndpoint):
                     )
                     c = [self.graph.MetaStage.inflate(row[0]) for row in results]
                     if len(c) > 1:
-                        # TODO gestire meglio questo caso
+                        # TODO better manage this case
                         # there are more than one MetaStage related to
                         # the same source id: Database incoherence!
                         log.warning(
@@ -284,27 +263,26 @@ class Bulk(IMCEndpoint):
                     log.info("MetaStage does not exist for source id {}", source_id)
 
                 try:
-                    # se il source_id non esiste nel database,
-                    # allora possono essere due i casi:
-                    #  1) e' l'import di un nuovo contenuto
-                    #  2) potrebbe esistere un MetaStage associato allo stesso filename
-                    #      ma senza una Creation associata perche' la volta precedente
-                    #      mancava un campo mandatory e quindi l'import era fallito
-                    #  Quindi prima di gestire il caso 1) devo verificare se siamo nel caso 2)
-                    #  Siamo nel caso 2) se esiste MetaStage associato allo stesso filename
-                    #   ma senza una Creation associata. Inoltre devo verificare che l'Item sia
-                    #    del tipo del contenuto che sto caricando (immagine, video,...).
-                    #  Quindi:
-                    #  - se esiste MetaStage associato allo stesso filename che e' associato
-                    #     a un Item di tipo diverso allora lancio eccezione e non proseguo.
-                    #     (Per poter cambiare il tipo bisognerebbe aggiornare Item, Creation e
-                    #     cancellare il ContentStage e ricrearlo, allora non è un aggiornamento
-                    #     dei metadati, meglio cancellare tutto il pezzetto di grafo relativo e
-                    #     crearne uno nuovo).
-                    #  - se esiste MetaStage associato allo stesso filename che ha già una
-                    #     Creation associata (e quindi avrà un source_id diverso) allora lancio
-                    #     eccezione e non proseguo.
-                    #
+                    # if the source_id doesn't exist in the database,
+                    # then there may be two cases:
+                    #  1) import of a new content
+                    #  2) there may be a MetaStage associated with the same filename but without
+                    #     an associated Creation because the previous time a mandatory field was
+                    #     missing and therefore the import had failed
+                    #  So before handling case 1) I have to check if we are in case 2)
+                    #  We are in case 2) if MetaStage exists associated with the same filename but
+                    #  without an associated Creation. Also I have to verify that the Item is of the
+                    #  type of the content I am uploading (image, video, ...).
+                    #  Then:
+                    #  - if MetaStage exists associated with the same filename which is associated
+                    #    with a different Item then I throw exception and do not continue.
+                    #    (In order to change the type, it would be necessary to update Item,
+                    #    Creation and delete the ContentStage and recreate it,
+                    #    then it is not an update of the metadata, better to delete the whole piece
+                    #    of relative graph and create a new one).
+                    #  - if MetaStage exists associated with the same filename which already has an
+                    #    associated Creation (and therefore will have a different source_id)
+                    #    then I throw an exception and do not continue.
                     if meta_stage is None:
 
                         try:
@@ -340,7 +318,7 @@ class Bulk(IMCEndpoint):
                             if force_reprocessing:
                                 mode = "clean"
                                 metadata_update = True
-                                task = celery.import_file.apply_async(
+                                task = self.celery.import_file.apply_async(
                                     args=[
                                         standard_path,
                                         resource.uuid,
@@ -357,7 +335,7 @@ class Bulk(IMCEndpoint):
                                 resource.save()
                                 updatedAndReprocessing += 1
                             else:
-                                task = celery.update_metadata.apply_async(
+                                task = self.celery.update_metadata.apply_async(
                                     args=[standard_path, resource.uuid], countdown=10
                                 )
                                 log.debug("Task id={}", task.id)
@@ -367,13 +345,13 @@ class Bulk(IMCEndpoint):
                                 updated += 1
 
                         except self.graph.MetaStage.DoesNotExist:
-                            # import di un nuovo contenuto
+                            # import of a new content
                             log.debug("Creating MetaStage for file {}", standard_path)
                             meta_stage = self.graph.MetaStage(**properties).save()
                             meta_stage.ownership.connect(group)
                             log.debug("MetaStage created for source_id {}", source_id)
                             mode = "clean"
-                            task = celery.import_file.apply_async(
+                            task = self.celery.import_file.apply_async(
                                 args=[standard_path, meta_stage.uuid, mode],
                                 countdown=10,
                             )
@@ -383,31 +361,29 @@ class Bulk(IMCEndpoint):
                             created += 1
 
                     else:
-                        # nel db esiste già un META_STAGE collegato a quel SOURCE_ID
-
-                        #  anche qui devo fare il
-                        # checking for item_type coherence
+                        # a META_STAGE linked to that SOURCE_ID already exists in the db
+                        # here too I have to check for item_type coherence
                         related_item, coherent = self.check_item_type_coherence(
                             meta_stage, standard_path
                         )
                         if related_item is not None and not coherent:
-
                             meta_stage.status = "ERROR"
-                            meta_stage.status_message = "Incoming item_type different from item_type in database for file: {}".format(
-                                standard_path
+                            meta_stage.status_message = (
+                                "Incoming item_type different from item_type in database for "
+                                "file: {}".format(standard_path)
                             )
                             meta_stage.save()
                             log.error(meta_stage.status_message)
                             failed += 1
                             continue
 
-                        # devo aggiornare nel MetaStage i campi nomefile e path con quelli che
-                        #  vado a usare per l'aggiornamento dei metadati
+                        # I have to update in the MetaStage the filename and path fields with the ones I am going to use
+                        # for updating the metadata
 
-                        # Attenzione: prima bisogna verificare che non esista già un altro metastage
-                        #              che ha lo stesso standard_path che stiamo andando ad associare
-                        #              al nostro meta_stage (ovviamente avranno source_id diverso)
-                        #              altrimenti viene lanciata una eccezione
+                        # Caution:
+                        # first you need to verify that there is not already another MetaStage that has the same
+                        # standard_path that we are going to associate with our meta_stage
+                        # (obviously they will have a different source_id) otherwise an exception is thrown.
                         props2 = {}
                         props2["filename"] = standard_filename
                         props2["path"] = standard_path
@@ -419,8 +395,7 @@ class Bulk(IMCEndpoint):
                                 "metastage_samepath uuid: {}", metastage_samepath.uuid
                             )
                             log.debug("meta_stage uuid: {}", meta_stage.uuid)
-                            # se è distinto rispetto a quello che avevo trovato per source id
-                            #  allora c'è qualcosa che non va
+                            # if it is distinct from what i had found by source id then there is something wrong
                             if metastage_samepath.uuid != meta_stage.uuid:
                                 log.error(
                                     "Another metastage exists for file {}",
@@ -436,20 +411,20 @@ class Bulk(IMCEndpoint):
 
                         except self.graph.MetaStage.DoesNotExist:
                             log.info("MetaStage does not exist for {}", standard_path)
-                            # aggiorno nel MetaStage i campi nomefile e path
+                            # update the filename and path fields in the MetaStage
                             meta_stage.filename = standard_filename
                             meta_stage.path = standard_path
                             meta_stage.save()
 
                         if force_reprocessing:
-                            # update dei metadati e reprocessing
+                            # metadata update and reprocessing
                             log.info(
                                 "Starting task import_file for meta_stage.uuid {}",
                                 meta_stage.uuid,
                             )
                             mode = "clean"
                             metadata_update = True
-                            task = celery.import_file.apply_async(
+                            task = self.celery.import_file.apply_async(
                                 args=[
                                     standard_path,
                                     meta_stage.uuid,
@@ -464,12 +439,12 @@ class Bulk(IMCEndpoint):
                             meta_stage.save()
                             updatedAndReprocessing += 1
                         else:
-                            # update dei soli metadati
+                            # metadata update ONLY
                             log.info(
                                 "Starting task update_metadata for meta_stage.uuid {}",
                                 meta_stage.uuid,
                             )
-                            task = celery.update_metadata.apply_async(
+                            task = self.celery.update_metadata.apply_async(
                                 args=[standard_path, meta_stage.uuid], countdown=10
                             )
                             log.info("Task id={}", task.id)
@@ -496,229 +471,206 @@ class Bulk(IMCEndpoint):
             log.info("failed {}", failed)
             log.info("------------------------------------")
 
-            return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
-
         # ##################################################################
-        elif req_action == "import":
+        elif action := req_action.get("import_"):
             # check group uid
             guid = action.get("guid")
-            if guid is None:
-                raise RestApiException(
-                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-                )
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
                     f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            update = bool(action.get("update"))
-            mode = action.get("mode") or "skip"
-            retry = bool(action.get("retry"))
-            log.info(
-                "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})",
-                group.shortname,
-                mode,
-                update,
-                retry,
-            )
-
-            # retrieve XML files from upload dir
-            upload_dir = os.path.join("/uploads", group.uuid)
-            if not os.path.exists(upload_dir):
-                return self.response(errors=["Upload dir not found"])
-
-            files = [f for f in os.listdir(upload_dir) if f.endswith(".xml")]
-            total_to_be_imported = len(files)
-            skipped = 0
-            imported = 0
-            for f in files:
-                path = os.path.join(upload_dir, f)
-                filename = f
-                properties = {}
-                properties["filename"] = filename
-                properties["path"] = path
-
-                # ignore previous failures
-                if not retry:
-                    try:
-                        # props = {'status': 'ERROR', 'filename': f} #OLD
-                        props = {"status": "ERROR", "path": path}
-                        self.graph.MetaStage.nodes.get(**props)
-                        skipped += 1
-                        log.debug(
-                            "SKIPPED already imported with ERROR. Filename {}", path
-                        )
-                        continue
-                    except self.graph.MetaStage.DoesNotExist:
-                        pass
-
-                if not update:
-                    query = "match (n:MetaStage) WHERE n.path = '{path}' \
-                              match (n)-[r1:META_SOURCE]-(i:Item) \
-                              match (i)-[r2:CREATION]->(c:Creation) \
-                              return c"
-                    results = self.graph.cypher(query.format(path=path))
-                    c = [self.graph.Creation.inflate(row[0]) for row in results]
-                    if len(c) == 1:
-                        skipped += 1
-                        log.debug(
-                            "SKIPPED filename: {0}. Creation uuid: {1}", path, c[0].uuid
-                        )
-                        continue
-                log.info("Importing metadata file: {}", path)
-                try:
-                    resource = self.graph.MetaStage.nodes.get(**properties)
-                    log.debug("Resource already exist for {}", path)
-                except self.graph.MetaStage.DoesNotExist:
-                    resource = self.graph.MetaStage(**properties).save()
-                    resource.ownership.connect(group)
-                    log.debug("Metadata Resource created for {}", path)
-
-                task = celery.import_file.apply_async(
-                    args=[path, resource.uuid, mode], countdown=10
-                )
-
-                resource.status = "IMPORTING"
-                resource.task_id = task.id
-                resource.save()
-                imported += 1
-
-            log.info("------------------------------------")
-            log.info("Total record: {}", total_to_be_imported)
-            log.info("importing: {}", imported)
-            log.info("skipped {}", skipped)
-            log.info("------------------------------------")
-
-            return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
+            update = action.get("update")
+            mode = action.get("mode")
+            retry = action.get("retry")
+            self._bulk_import(group, mode, update, retry)
 
         # ##################################################################
-        elif req_action == "v2":
-            # check group uid
+        elif action := req_action.get("v2"):
             guid = action.get("guid")
-            if guid is None:
-                raise RestApiException(
-                    "Group id (guid) is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-                )
+            # check group uid
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
                 raise RestApiException(
                     f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
                 )
-            retry = bool(action.get("retry"))
-            log.info("V2 procedure for Group '{}'", group.shortname)
-
-            # retrieve v2_ XML files from upload dir
-            upload_dir = os.path.join("/uploads", group.uuid)
-            if not os.path.exists(upload_dir):
-                return self.response(errors=["Upload dir not found"])
-
-            # v2_ is used for the 'other version' (exclude .xml)
-            files = [
-                f
-                for f in os.listdir(upload_dir)
-                if not f.endswith(".xml") and re.match(r"^v2_.*", f, re.I)
-            ]
-            total_available = len(files)
-            if total_available == 0:
-                raise RestApiException(
-                    f"No v2 content for group {group.shortname}",
-                    status_code=hcodes.HTTP_OK_NORESPONSE,
-                )
-            log.info("Total v2 files currently available: {}", total_available)
-            skipped = 0
-            imported = 0
-            warnings = 0
-            for f in files:
-                # cut away prefix and look for the related content
-                origin = f.split("_", 1)[1]
-                source_path = os.path.join(upload_dir, origin)
-                query = (
-                    "MATCH (n:ContentStage {{path:'{path}', status:'COMPLETED'}})"
-                    "<-[:CONTENT_SOURCE]-(i:Item) RETURN i".format(path=source_path)
-                )
-                results = self.graph.cypher(query)
-                c = [self.graph.Item.inflate(row[0]) for row in results]
-                if len(c) == 0:
-                    log.warning(
-                        "Cannot load {v2} because origin content does "
-                        "not exist or its status is NOT completed",
-                        v2=f,
-                    )
-                    warnings += 1
-                    continue
-                else:
-                    item = c[0]
-                    other_version = item.other_version.single()
-                    if other_version is not None:
-                        skipped += 1
-                        continue
-                    # launch here async task
-                    path = os.path.join(upload_dir, f)
-                    task = celery.load_v2.apply_async(
-                        args=[path, item.uuid, retry], countdown=10
-                    )
-                    imported += 1
-
-            log.info("------------------------------------")
-            log.info("Total v2 content: {}", total_available)
-            log.info("loading: {}", imported)
-            log.info("skipped: {}", skipped)
-            log.info("warning: {}", warnings)
-            log.info("------------------------------------")
+            retry = action.get("retry")
+            self._bulk_v2(group, retry)
 
         # ##################################################################
-        elif req_action == "delete":
+        elif action := req_action.get("delete"):
             entity = action.get("entity")
-            if entity is None:
-                raise RestApiException(
-                    "Entity is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-                )
-            labels_query = "MATCH (n) \
-                            WITH DISTINCT labels(n) AS labels \
-                            UNWIND labels AS label \
-                            RETURN DISTINCT label"
-            labels = [row[0] for row in self.graph.cypher(labels_query)]
-            if entity not in labels:
-                raise RestApiException(
-                    f"Invalid or missing entity label for {entity}",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            uuids = action.get("uuids")
-            if uuids is None:
-                raise RestApiException(
-                    "Expected list of uuid", status_code=hcodes.HTTP_BAD_REQUEST
-                )
-            if isinstance(uuids, str):
-                if uuids != "all":
-                    raise RestApiException(
-                        "Expected list of uuid", status_code=hcodes.HTTP_BAD_REQUEST
-                    )
+            if action.get("delete_all"):
                 all_query = f"match (n:{entity}) return n.uuid"
                 uuids = [row[0] for row in self.graph.cypher(all_query)]
-            deleted = 0
-            if entity == "AVEntity":
-                repo = CreationRepository(self.graph)
-                for uuid in uuids:
-                    av_entity = self.graph.AVEntity.nodes.get_or_none(uuid=uuid)
-                    if av_entity is not None:
-                        repo.delete_av_entity(av_entity)
-                        deleted += 1
-            elif entity == "NonAVEntity":
-                repo = CreationRepository(self.graph)
-                for uuid in uuids:
-                    non_av_entity = self.graph.NonAVEntity.nodes.get_or_none(uuid=uuid)
-                    if non_av_entity is not None:
-                        repo.delete_non_av_entity(non_av_entity)
-                        deleted += 1
             else:
-                raise RestApiException(
-                    f"Entity {entity} not yet managed for deletion",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
-            log.debug("Deleted: {} in {}", deleted, len(uuids))
+                uuids = action.get("uuids")
+            self._bulk_delete(entity, uuids)
             return self.empty_response()
 
-        # ##################################################################
-        # add here any other bulk request
+        else:
+            raise RestApiException(
+                f"Bad action: expected one of {self.__class__.allowed_actions}",
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
 
         return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
+
+    def _bulk_import(self, group, mode, update, retry):
+        log.info(
+            "Import procedure for Group '{0}' (mode: {1}; update {2}; retry {3})",
+            group.shortname,
+            mode,
+            update,
+            retry,
+        )
+
+        # retrieve XML files from upload dir
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            return self.response(errors=["Upload dir not found"])
+
+        files = [f for f in os.listdir(upload_dir) if f.endswith(".xml")]
+        total_to_be_imported = len(files)
+        skipped = 0
+        imported = 0
+        for f in files:
+            path = os.path.join(upload_dir, f)
+            filename = f
+            properties = {}
+            properties["filename"] = filename
+            properties["path"] = path
+
+            # ignore previous failures
+            if not retry:
+                try:
+                    # props = {'status': 'ERROR', 'filename': f} #OLD
+                    props = {"status": "ERROR", "path": path}
+                    self.graph.MetaStage.nodes.get(**props)
+                    skipped += 1
+                    log.debug("SKIPPED already imported with ERROR. Filename {}", path)
+                    continue
+                except self.graph.MetaStage.DoesNotExist:
+                    pass
+
+            if not update:
+                query = "match (n:MetaStage) WHERE n.path = '{path}' \
+                                      match (n)-[r1:META_SOURCE]-(i:Item) \
+                                      match (i)-[r2:CREATION]->(c:Creation) \
+                                      return c"
+                results = self.graph.cypher(query.format(path=path))
+                c = [self.graph.Creation.inflate(row[0]) for row in results]
+                if len(c) == 1:
+                    skipped += 1
+                    log.debug(
+                        "SKIPPED filename: {0}. Creation uuid: {1}", path, c[0].uuid
+                    )
+                    continue
+            log.info("Importing metadata file: {}", path)
+            try:
+                resource = self.graph.MetaStage.nodes.get(**properties)
+                log.debug("Resource already exist for {}", path)
+            except self.graph.MetaStage.DoesNotExist:
+                resource = self.graph.MetaStage(**properties).save()
+                resource.ownership.connect(group)
+                log.debug("Metadata Resource created for {}", path)
+
+            task = self.celery.import_file.apply_async(
+                args=[path, resource.uuid, mode], countdown=10
+            )
+
+            resource.status = "IMPORTING"
+            resource.task_id = task.id
+            resource.save()
+            imported += 1
+
+        log.info("------------------------------------")
+        log.info("Total record: {}", total_to_be_imported)
+        log.info("importing: {}", imported)
+        log.info("skipped {}", skipped)
+        log.info("------------------------------------")
+
+    def _bulk_v2(self, group, retry):
+        log.info("V2 procedure for Group '{}'", group.shortname)
+
+        # retrieve v2_ XML files from upload dir
+        upload_dir = os.path.join("/uploads", group.uuid)
+        if not os.path.exists(upload_dir):
+            return self.response(errors=["Upload dir not found"])
+
+        # v2_ is used for the 'other version' (exclude .xml)
+        files = [
+            f
+            for f in os.listdir(upload_dir)
+            if not f.endswith(".xml") and re.match(r"^v2_.*", f, re.I)
+        ]
+        total_available = len(files)
+        if total_available == 0:
+            raise RestApiException(
+                f"No v2 content for group {group.shortname}",
+                status_code=hcodes.HTTP_OK_NORESPONSE,
+            )
+        log.info("Total v2 files currently available: {}", total_available)
+        skipped = 0
+        imported = 0
+        warnings = 0
+        for f in files:
+            # cut away prefix and look for the related content
+            origin = f.split("_", 1)[1]
+            source_path = os.path.join(upload_dir, origin)
+            query = (
+                "MATCH (n:ContentStage {{path:'{path}', status:'COMPLETED'}})"
+                "<-[:CONTENT_SOURCE]-(i:Item) RETURN i".format(path=source_path)
+            )
+            results = self.graph.cypher(query)
+            c = [self.graph.Item.inflate(row[0]) for row in results]
+            if len(c) == 0:
+                log.warning(
+                    "Cannot load {v2} because origin content does "
+                    "not exist or its status is NOT completed",
+                    v2=f,
+                )
+                warnings += 1
+                continue
+            else:
+                item = c[0]
+                other_version = item.other_version.single()
+                if other_version is not None:
+                    skipped += 1
+                    continue
+                # launch here async task
+                path = os.path.join(upload_dir, f)
+                self.celery.load_v2.apply_async(
+                    args=[path, item.uuid, retry], countdown=10
+                )
+                imported += 1
+
+        log.info("------------------------------------")
+        log.info("Total v2 content: {}", total_available)
+        log.info("loading: {}", imported)
+        log.info("skipped: {}", skipped)
+        log.info("warning: {}", warnings)
+        log.info("------------------------------------")
+
+    def _bulk_delete(self, entity, uuids):
+        deleted = 0
+        if entity == "AVEntity":
+            repo = CreationRepository(self.graph)
+            for uuid in uuids:
+                av_entity = self.graph.AVEntity.nodes.get_or_none(uuid=uuid)
+                if av_entity is not None:
+                    repo.delete_av_entity(av_entity)
+                    deleted += 1
+        elif entity == "NonAVEntity":
+            repo = CreationRepository(self.graph)
+            for uuid in uuids:
+                non_av_entity = self.graph.NonAVEntity.nodes.get_or_none(uuid=uuid)
+                if non_av_entity is not None:
+                    repo.delete_non_av_entity(non_av_entity)
+                    deleted += 1
+        else:
+            raise RestApiException(
+                f"Entity {entity} not yet managed for deletion",
+                status_code=hcodes.HTTP_BAD_REQUEST,
+            )
+        log.debug("Deleted: {} in {}", deleted, len(uuids))

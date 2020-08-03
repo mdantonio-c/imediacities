@@ -1,3 +1,4 @@
+from marshmallow import ValidationError, post_load, pre_load
 from restapi.models import AdvancedList, InputSchema, fields, validate
 
 
@@ -104,6 +105,49 @@ class AnnotationSearchCriteria(InputSchema):
 class SearchCriteria(InputSchema):
     match = fields.Nested(SearchMatch, required=True, allow_none=True)
     filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
+
+
+# used by POST /bulk
+class BulkImportSchema(InputSchema):
+    guid = fields.UUID(required=True)
+    mode = fields.Str(missing="skip")
+    update = fields.Bool(missing=False)
+    retry = fields.Bool(missing=False)
+
+
+class BulkUpdateSchema(InputSchema):
+    guid = fields.UUID(required=True)
+    force_reprocessing = fields.Bool(missing=False)
+
+
+class BulkV2Schema(InputSchema):
+    guid = fields.UUID(required=True)
+    retry = fields.Bool(missing=False)
+
+
+class BulkDeleteSchema(InputSchema):
+    @pre_load
+    def set_uuids(self, data, **kwargs):
+        if not data.get("delete_all") and "uuids" not in data:
+            raise ValidationError("Please specify either a list of uuids or delete_all")
+        return data
+
+    entity = fields.Str(
+        required=True, validate=validate.OneOf(["AVEntity", "NonAVEntity"])
+    )
+    uuids = AdvancedList(fields.UUID(), min_items=1)
+    delete_all = fields.Bool(missing=False)
+
+
+class BulkSchema(InputSchema):
+    @pre_load
+    def init_action(self, data, **kwargs):
+        return data
+
+    update = fields.Nested(BulkUpdateSchema)
+    import_ = fields.Nested(BulkImportSchema, data_key="import")
+    v2 = fields.Nested(BulkV2Schema)
+    delete = fields.Nested(BulkDeleteSchema)
 
 
 # used by POST /annotations/search
