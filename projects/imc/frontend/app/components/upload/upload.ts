@@ -45,7 +45,6 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 
     this.server_side_pagination = true;
     this.endpoint = "stage";
-    this.counter_endpoint = "stage";
     this.initPaging(50);
     this.list();
   }

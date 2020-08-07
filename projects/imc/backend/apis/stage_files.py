@@ -106,7 +106,7 @@ class Stage(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
-    def get(self, group=None, get_total=None, page=None, size=None):
+    def get(self, get_total, page, size, sort_by, sort_order, input_filter, group=None):
         self.graph = self.get_service_instance("neo4j")
 
         if not self.verify_admin():

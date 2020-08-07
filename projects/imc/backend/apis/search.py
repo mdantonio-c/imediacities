@@ -33,7 +33,9 @@ class Search(IMCEndpoint):
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.use_kwargs(SearchCriteria)
-    def post(self, match, filtering, get_total=None, page=None, size=None):
+    def post(
+        self, match, filtering, get_total, page, size, sort_by, sort_order, input_filter
+    ):
 
         self.graph = self.get_service_instance("neo4j")
 
