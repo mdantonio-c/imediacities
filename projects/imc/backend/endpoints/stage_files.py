@@ -3,7 +3,7 @@ List content from upload dir and import of data and metadata
 """
 import os
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.exceptions import RestApiException

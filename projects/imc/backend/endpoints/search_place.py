@@ -4,7 +4,7 @@ Search endpoint for places
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import SearchPlaceParameters
 from restapi import decorators
 from restapi.confs import get_backend_url
@@ -12,20 +12,15 @@ from restapi.utilities.logs import log
 
 
 class SearchPlace(IMCEndpoint):
-
-    _POST = {
-        "/search_place": {
-            "summary": "Search some creations for specific place annotations",
-            "description": "Search some creations for specific place annotations.",
-            "responses": {
-                "200": {"description": "A list of creations for relevant places."}
-            },
-        }
-    }
-
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(SearchPlaceParameters)
+    @decorators.endpoint(
+        path="/search_place",
+        summary="Search some creations for specific place annotations",
+        description="Search some creations for specific place annotations.",
+        responses={200: "A list of creations for relevant places."},
+    )
     def post(self, place_list):
 
         self.graph = self.get_service_instance("neo4j")

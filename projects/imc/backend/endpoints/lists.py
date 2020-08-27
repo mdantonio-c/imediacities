@@ -3,11 +3,10 @@ Manage the lists of the researcher
 """
 import re
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import (
     BadRequest,
     Conflict,
@@ -225,7 +224,7 @@ class Lists(IMCEndpoint):
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -263,7 +262,7 @@ class Lists(IMCEndpoint):
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -305,7 +304,7 @@ class Lists(IMCEndpoint):
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def delete(self, list_id):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
@@ -447,7 +446,7 @@ class ListItems(IMCEndpoint):
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(Target)
     def post(self, list_id, target):
         """ Add an item to a list. """
@@ -497,7 +496,7 @@ class ListItems(IMCEndpoint):
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
         self.graph = self.get_service_instance("neo4j")

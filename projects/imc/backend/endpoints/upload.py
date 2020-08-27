@@ -6,11 +6,9 @@ import os
 from mimetypes import MimeTypes
 
 from flask import make_response, send_file
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from restapi import decorators
-from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import RestApiException
-from restapi.services.authentication import Role
 from restapi.services.uploader import Uploader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -47,7 +45,7 @@ class Upload(Uploader, IMCEndpoint):
 
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.init_chunk_upload
     def post(self, name, **kwargs):
 
@@ -68,7 +66,7 @@ class Upload(Uploader, IMCEndpoint):
 
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def put(self, filename):
 
         self.graph = self.get_service_instance("neo4j")
@@ -89,7 +87,7 @@ class Upload(Uploader, IMCEndpoint):
 
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:

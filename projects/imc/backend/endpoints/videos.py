@@ -4,14 +4,13 @@ Handle your video entity
 import os
 
 from flask import send_file
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import ShotRevision
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import (
     BadRequest,
     Conflict,
@@ -118,7 +117,7 @@ class Videos(IMCEndpoint):
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def delete(self, video_id):
         """
         Delete existing video description.
@@ -158,7 +157,7 @@ class VideoItem(IMCEndpoint):
 
     @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {
             "public_access": fields.Bool(
@@ -717,7 +716,7 @@ class VideoContent(IMCEndpoint, Downloader):
         )
 
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
@@ -992,7 +991,7 @@ class VideoShotRevision(IMCEndpoint):
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {
             "assignee_uuid": fields.Str(

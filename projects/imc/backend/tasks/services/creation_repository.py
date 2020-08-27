@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytz
 from neomodel.cardinality import CardinalityViolation
-from restapi.connectors.neo4j import graph_transactions
+from restapi import decorators
 from restapi.utilities.logs import log
 
 
@@ -12,7 +12,7 @@ class CreationRepository:
     def __init__(self, graph):
         self.graph = graph
 
-    @graph_transactions
+    @decorators.graph_transactions
     def create_entity(self, properties, item, relationships, av=True):
         """
         Used to create both audio visual and NON audio visual entity.

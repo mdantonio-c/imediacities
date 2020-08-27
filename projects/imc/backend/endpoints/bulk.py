@@ -16,8 +16,8 @@ import re
 from datetime import datetime
 from shutil import copyfile
 
-from imc.apis import IMCEndpoint
-from imc.models import BulkDeleteSchema, BulkSchema
+from imc.endpoints import IMCEndpoint
+from imc.models import BulkSchema
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
@@ -33,16 +33,6 @@ class Bulk(IMCEndpoint):
     allowed_actions = ("update", "import", "delete", "v2")
 
     labels = ["bulk"]
-    _POST = {
-        "/bulk": {
-            "summary": "Perform many operations such as import, update, delete etc.",
-            "description": "The bulk API makes it possible to perform many operations in a single API call.",
-            "responses": {
-                "202": {"description": "Bulk action successfully accepted"},
-                "400": {"description": "Bad request."},
-            },
-        }
-    }
 
     def check_item_type_coherence(self, resource, standard_path):
         """
@@ -134,6 +124,12 @@ class Bulk(IMCEndpoint):
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(BulkSchema)
+    @decorators.endpoint(
+        path="/bulk",
+        summary="Perform many operations such as import, update, delete etc.",
+        description="The bulk api makes it possible to perform many operations in a single api call",
+        responses={202: "Bulk action successfully accepted", 400: "Bad request."},
+    )
     def post(self, **req_action):
         log.debug("Start bulk procedure...")
 

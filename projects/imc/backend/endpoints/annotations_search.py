@@ -2,7 +2,7 @@
 Search endpoint for annotations
 """
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import AnnotationSearch, codelists
 from restapi import decorators
 from restapi.exceptions import BadRequest, RestApiException
@@ -11,21 +11,16 @@ from restapi.utilities.htmlcodes import hcodes
 
 
 class SearchAnnotations(IMCEndpoint):
-
-    _POST = {
-        "/annotations/search": {
-            "summary": "Search for annotations",
-            "description": "Search for annotations",
-            "responses": {
-                "200": {"description": "A list of annotation matching search criteria."}
-            },
-        }
-    }
-
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {"filtering": fields.Nested(AnnotationSearch, data_key="filter")}
+    )
+    @decorators.endpoint(
+        path="/annotations/search",
+        summary="Search for annotations",
+        description="Search for annotations",
+        responses={200: "A list of annotation matching search criteria."},
     )
     def post(self, filtering=None):
 

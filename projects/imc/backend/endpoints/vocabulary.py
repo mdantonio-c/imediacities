@@ -1,7 +1,7 @@
 """
 Expose the controlled vocabulary
 """
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.exceptions import RestApiException
 from restapi.utilities.htmlcodes import hcodes
@@ -11,14 +11,13 @@ from restapi.utilities.logs import log
 class Vocabulary(IMCEndpoint):
 
     labels = ["vocabulary"]
-    _GET = {
-        "/vocabulary": {
-            "summary": "Returns the controlled vocabulary.",
-            "responses": {"200": {"description": "The controlled vocabulary"}},
-        }
-    }
 
     @decorators.auth.require()
+    @decorators.endpoint(
+        path="/vocabulary",
+        summary="Returns the controlled vocabulary.",
+        responses={200: "The controlled vocabulary"},
+    )
     def get(self, lang=None):
         """Get the controlled vocabulary."""
         log.debug("load the controlled vocabulary")

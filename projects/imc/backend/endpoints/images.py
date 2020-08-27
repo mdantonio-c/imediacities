@@ -4,13 +4,12 @@ Handle your image entity
 import os
 
 from flask import send_file
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import (
     BadRequest,
     Conflict,
@@ -34,41 +33,26 @@ class Images(IMCEndpoint):
     """
 
     labels = ["image"]
-    _GET = {
-        "/images/<image_id>": {
-            "summary": "List of images",
-            "description": "Returns a list containing all images. The list supports paging.",
-            "responses": {
-                "200": {"description": "List of images successfully retrieved"},
-                "404": {"description": "The image does not exists."},
-            },
-        },
-        "/images": {
-            "summary": "List of images",
-            "description": "Returns a list containing all images. The list supports paging.",
-            "responses": {
-                "200": {"description": "List of images successfully retrieved"},
-                "404": {"description": "The image does not exists."},
-            },
-        },
-    }
-    _POST = {
-        "/images": {
-            "summary": "Create a new image description",
-            "description": "Simple method to attach descriptive metadata to a previously uploaded image (item).",
-            "responses": {
-                "200": {"description": "Image description successfully created"}
-            },
-        }
-    }
-    _DELETE = {
-        "/images/<image_id>": {
-            "summary": "Delete a image description",
-            "responses": {"200": {"description": "Image successfully deleted"}},
-        }
-    }
 
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/images/<image_id>",
+        summary="List of images",
+        description="Returns a list containing all images. the list supports paging.",
+        responses={
+            200: "List of images successfully retrieved",
+            404: "The image does not exists.",
+        },
+    )
+    @decorators.endpoint(
+        path="/images",
+        summary="List of images",
+        description="Returns a list containing all images. the list supports paging.",
+        responses={
+            200: "List of images successfully retrieved",
+            404: "The image does not exists.",
+        },
+    )
     def get(self, image_id=None):
 
         if image_id is None and not self.verify_admin():
@@ -120,7 +104,13 @@ class Images(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/images",
+        summary="Create a new image description",
+        description="Simple method to attach descriptive metadata to a previously uploaded image (item).",
+        responses={200: "Image description successfully created"},
+    )
     def post(self):
         self.graph = self.get_service_instance("neo4j")
 
@@ -128,7 +118,12 @@ class Images(IMCEndpoint):
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/images/<image_id>",
+        summary="Delete a image description",
+        responses={200: "Image successfully deleted"},
+    )
     def delete(self, image_id):
         """
         Delete existing image description.
@@ -153,22 +148,9 @@ class Images(IMCEndpoint):
 
 
 class ImageItem(IMCEndpoint):
-
-    _PUT = {
-        "/images/<image_id>/item": {
-            "summary": "Update public access flag for the given image",
-            "responses": {
-                "204": {"description": "Item info successfully updated."},
-                "400": {"description": "Request not valid."},
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Image does not exist."},
-            },
-        }
-    }
-
     @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(
         {
             "public_access": fields.Bool(
@@ -176,6 +158,16 @@ class ImageItem(IMCEndpoint):
                 description="Whether or not the item is accessible by a public user.",
             )
         }
+    )
+    @decorators.endpoint(
+        path="/images/<image_id>/item",
+        summary="Update public access flag for the given image",
+        responses={
+            204: "Item info successfully updated.",
+            400: "Request not valid.",
+            403: "Operation forbidden.",
+            404: "Image does not exist.",
+        },
     )
     def put(self, image_id, public_access):
         """

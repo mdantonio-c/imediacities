@@ -5,14 +5,13 @@ Handle annotations
 import datetime
 import re
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import PatchDocument
 from imc.tasks.services.annotation_repository import (
     AnnotationRepository,
     DuplicatedAnnotationError,
 )
 from restapi import decorators
-from restapi.connectors.neo4j import graph_transactions
 from restapi.exceptions import (
     BadRequest,
     Conflict,
@@ -186,7 +185,7 @@ class Annotations(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def post(self):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
@@ -469,7 +468,7 @@ class Annotations(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     def put(self, anno_id):
         """
         Update an annotation.
@@ -570,7 +569,7 @@ class Annotations(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    @graph_transactions
+    @decorators.graph_transactions
     @decorators.use_kwargs(PatchDocument)
     def patch(self, anno_id, patch_op, path, value):
 

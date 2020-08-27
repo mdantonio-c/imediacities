@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytz
 from neomodel.cardinality import CardinalityViolation
-from restapi.connectors.neo4j import graph_transactions
+from restapi import decorators
 from restapi.utilities.logs import log
 
 
@@ -13,7 +13,7 @@ class AnnotationRepository:
     def __init__(self, graph):
         self.graph = graph
 
-    # @graph_transactions
+    # @decorators.graph_transactions
     def create_tag_annotation(
         self,
         user,
@@ -338,7 +338,7 @@ class AnnotationRepository:
             else True
         )
 
-    @graph_transactions
+    @decorators.graph_transactions
     def create_automatic_tvs(self, item, shots):
         if not shots:
             raise ValueError("List of shots cannot be empty")
@@ -361,7 +361,7 @@ class AnnotationRepository:
             tvs_body.segments.connect(shot)
             item.shots.connect(shot)
 
-    @graph_transactions
+    @decorators.graph_transactions
     def update_automatic_tvs(
         self, item, shots, vim_estimations, rev=False, reviser=None
     ):
@@ -592,7 +592,7 @@ class AnnotationRepository:
 
         return anno
 
-    @graph_transactions
+    @decorators.graph_transactions
     def delete_tvs_annotation(self, annotation):
         log.debug("Delete existing TVS annotation")
         body = annotation.bodies.single()
@@ -611,7 +611,7 @@ class AnnotationRepository:
             tvs_body.delete()
         annotation.delete()
 
-    @graph_transactions
+    @decorators.graph_transactions
     def delete_tvs_manual_annotation(self, annotation):
         log.debug("Delete existing manual TVS annotation")
         body = annotation.bodies.single()
@@ -629,7 +629,7 @@ class AnnotationRepository:
         tvs_body.delete()
         annotation.delete()
 
-    @graph_transactions
+    @decorators.graph_transactions
     def create_vim_annotation(self, item, estimates):
         if not estimates or len(estimates) == 0:
             raise ValueError("List of video motion estimates cannot be empty")
@@ -677,7 +677,7 @@ class AnnotationRepository:
             vim_body.save()
             annotation.bodies.connect(vim_body)
 
-    @graph_transactions
+    @decorators.graph_transactions
     def delete_vim_annotation(self, annotation):
         log.debug("Delete existing VIM annotation")
         vim_body = annotation.bodies.single()
@@ -687,7 +687,7 @@ class AnnotationRepository:
             original_vim_body.delete()
         annotation.delete()
 
-    @graph_transactions
+    @decorators.graph_transactions
     def delete_auto_annotation(self, annotation):
         log.debug("Delete existing automatic TAG annotation")
         body = annotation.bodies.single()

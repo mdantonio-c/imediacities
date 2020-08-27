@@ -2,7 +2,7 @@
 Handle your video metadata
 """
 from flask import send_file
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.confs import get_backend_url
 from restapi.exceptions import RestApiException
@@ -15,16 +15,6 @@ from restapi.utilities.logs import log
 class Shots(IMCEndpoint):
 
     labels = ["shot"]
-    _GET = {
-        "/shots/<shot_id>": {
-            "summary": "Gets information about a shot",
-            "description": "Returns a single shot for its id",
-            "responses": {
-                "200": {"description": "Shot information successfully retrieved"},
-                "404": {"description": "The video does not exists."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -36,6 +26,15 @@ class Shots(IMCEndpoint):
             )
         },
         locations=["query"],
+    )
+    @decorators.endpoint(
+        path="/shots/<shot_id>",
+        summary="Gets information about a shot",
+        description="Returns a single shot for its id",
+        responses={
+            200: "Shot information successfully retrieved",
+            404: "The video does not exists.",
+        },
     )
     def get(self, shot_id, content_type=None):
         """
@@ -80,16 +79,6 @@ class ShotAnnotations(IMCEndpoint):
     """
 
     labels = ["shot_annotations"]
-    _GET = {
-        "/shots/<shot_id>/annotations": {
-            "summary": "Gets shot annotations.",
-            "description": "Returns all the annotations targeting the given shot.",
-            "responses": {
-                "200": {"description": "List of annotations."},
-                "404": {"description": "Shot does not exist."},
-            },
-        }
-    }
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
@@ -103,6 +92,12 @@ class ShotAnnotations(IMCEndpoint):
             )
         },
         locations=["query"],
+    )
+    @decorators.endpoint(
+        path="/shots/<shot_id>/annotations",
+        summary="Gets shot annotations.",
+        description="Returns all the annotations targeting the given shot.",
+        responses={200: "List of annotations.", 404: "Shot does not exist."},
     )
     def get(self, shot_id, anno_type=None):
         log.info("get annotations for Shot id: {}", shot_id)

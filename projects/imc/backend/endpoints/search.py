@@ -4,7 +4,7 @@ Search endpoint
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
 
-from imc.apis import IMCEndpoint
+from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
 from restapi import decorators
 from restapi.confs import get_backend_url
@@ -17,15 +17,6 @@ from restapi.utilities.logs import log
 class Search(IMCEndpoint):
 
     labels = ["file"]
-    _POST = {
-        "/search": {
-            "summary": "Search some videos",
-            "description": "Search videos previously staged in the area.",
-            "responses": {
-                "200": {"description": "A list of videos matching search criteria."}
-            },
-        }
-    }
 
     allowed_term_fields = ("title", "description", "keyword", "contributor")
     allowed_anno_types = ("TAG", "DSC", "LNK")
@@ -33,6 +24,12 @@ class Search(IMCEndpoint):
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.use_kwargs(SearchCriteria)
+    @decorators.endpoint(
+        path="/search",
+        summary="Search some videos",
+        description="Search videos previously staged in the area.",
+        responses={200: "A list of videos matching search criteria."},
+    )
     def post(
         self, match, filtering, get_total, page, size, sort_by, sort_order, input_filter
     ):
