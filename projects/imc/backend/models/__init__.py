@@ -1,5 +1,11 @@
-from marshmallow import ValidationError, post_load, pre_load
-from restapi.models import AdvancedList, InputSchema, fields, validate
+from marshmallow import ValidationError, pre_load
+from restapi.models import (
+    AdvancedList,
+    InputSchema,
+    PartialInputSchema,
+    fields,
+    validate,
+)
 
 
 class Spatial(InputSchema):
@@ -102,7 +108,7 @@ class AnnotationSearchCriteria(InputSchema):
 
 
 # used by POST /search
-class SearchCriteria(InputSchema):
+class SearchCriteria(PartialInputSchema):
     match = fields.Nested(SearchMatch, required=True, allow_none=True)
     filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
 
