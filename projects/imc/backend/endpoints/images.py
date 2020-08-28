@@ -228,7 +228,7 @@ class ImageAnnotations(IMCEndpoint):
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
-        locations=["query"],
+        location="query",
     )
     def get(self, image_id, anno_type=None):
         log.debug("get annotations for NonAVEntity id: {}", image_id)
@@ -317,7 +317,7 @@ class ImageContent(IMCEndpoint, Downloader):
                 validate=validate.OneOf(["large"]),
             ),
         },
-        locations=["query"],
+        location="query",
     )
     @authz.pre_authorize
     def get(self, image_id, content_type, thumbnail_size=None):

@@ -226,7 +226,7 @@ class VideoAnnotations(IMCEndpoint):
                 required=False, missing=False, data_key="onlyManual"
             ),
         },
-        locations=["query"],
+        location="query",
     )
     @decorators.auth.require()
     def get(self, video_id, anno_type=None, is_manual=False):
@@ -610,7 +610,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 validate=validate.OneOf(["large"]),
             ),
         },
-        locations=["query"],
+        location="query",
     )
     @authz.pre_authorize
     def get(self, video_id, content_type, thumbnail_size=None):
@@ -726,7 +726,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
             )
         },
-        locations=["query"],
+        location="query",
     )
     def head(self, video_id, content_type):
         """
@@ -954,7 +954,7 @@ class VideoShotRevision(IMCEndpoint):
                 description="Assignee's uuid of the revision",
             )
         },
-        locations=["query"],
+        location="query",
     )
     def get(self, input_assignee=None):
         """Get all videos under revision"""

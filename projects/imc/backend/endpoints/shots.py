@@ -25,7 +25,7 @@ class Shots(IMCEndpoint):
                 validate=validate.OneOf(["thumbnail"]),
             )
         },
-        locations=["query"],
+        location="query",
     )
     @decorators.endpoint(
         path="/shots/<shot_id>",
@@ -91,7 +91,7 @@ class ShotAnnotations(IMCEndpoint):
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
-        locations=["query"],
+        location="query",
     )
     @decorators.endpoint(
         path="/shots/<shot_id>/annotations",

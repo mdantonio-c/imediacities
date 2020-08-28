@@ -123,7 +123,7 @@ class Lists(IMCEndpoint):
                 required=False, missing=False, data_key="includeNumberOfItems",
             ),
         },
-        locations=["query"],
+        location="query",
     )
     def get(self, list_id=None, r_uuid=None, belong_item=None, nb_items=False):
         """ Get all the list of a user or a certain list if an id is provided."""

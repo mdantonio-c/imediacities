@@ -22,7 +22,7 @@ class Fcodelist(IMCEndpoint):
                 required=False, missing="en", description="Language of the codelist"
             )
         },
-        locations=["query"],
+        location="query",
     )
     @decorators.endpoint(
         path="/fcodelist/<codelist>",

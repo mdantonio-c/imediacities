@@ -149,7 +149,7 @@ class Annotations(IMCEndpoint):
                 description="filter by annotation type",
             )
         },
-        locations=["query"],
+        location="query",
     )
     def get(self, anno_id=None, anno_type=None):
         """ Get an annotation if its id is passed as an argument. """
@@ -404,7 +404,7 @@ class Annotations(IMCEndpoint):
                 description="optional body reference for annotation with multiple bodies. This reference MUST be in the form 'textual:your_term_value' or 'resource:your_term_IRI'",
             )
         },
-        locations=["query"],
+        location="query",
     )
     def delete(self, anno_id, body_ref=None):
         """ Deletes an annotation. """
