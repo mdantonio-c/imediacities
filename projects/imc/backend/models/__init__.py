@@ -149,9 +149,10 @@ class BulkSchema(InputSchema):
     @pre_load
     def init_action(self, data, **kwargs):
 
-        actions = ("update", "import", "delete", "v2")
-        if not any([c in data for c in actions]):
-            raise ValidationError(f"Bad action: expected one of {actions}")
+        if not data:
+            raise ValidationError(
+                "Missing action: expected one of update, import, delete, v2"
+            )
 
         return data
 
