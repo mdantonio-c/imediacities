@@ -148,6 +148,11 @@ class BulkDeleteSchema(InputSchema):
 class BulkSchema(InputSchema):
     @pre_load
     def init_action(self, data, **kwargs):
+
+        actions = ("update", "import", "delete", "v2")
+        if not any([c in data for c in actions]):
+            raise ValidationError(f"Bad action: expected one of {actions}")
+
         return data
 
     update = fields.Nested(BulkUpdateSchema)

@@ -21,7 +21,7 @@ from imc.models import BulkSchema
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import BadRequest, RestApiException
 from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -29,8 +29,6 @@ from restapi.utilities.logs import log
 
 #####################################
 class Bulk(IMCEndpoint):
-
-    allowed_actions = ("update", "import", "delete", "v2")
 
     labels = ["bulk"]
 
@@ -505,10 +503,7 @@ class Bulk(IMCEndpoint):
             return self.empty_response()
 
         else:
-            raise RestApiException(
-                f"Bad action: expected one of {self.__class__.allowed_actions}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+            raise BadRequest("Unexpected action request")
 
         return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
 
