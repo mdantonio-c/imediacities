@@ -67,8 +67,10 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         let resp = response[response.length - 1];
         if (resp.response) {
           if (resp.responseStatus == 200) {
+            console.log(resp.response);
             this.notify.showSuccess(
-              "Upload completed: " + resp.response.filename
+              // "Upload completed: " + resp.response.filename
+              "Upload completed: " + resp.response
             );
           } else {
             this.notify.showError(resp.response);

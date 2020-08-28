@@ -12,7 +12,7 @@ import { AuthGuard } from "@rapydo/app.auth.guard";
 import { HttpClientJsonpModule } from "@angular/common/http";
 import { NguiMapModule, NgMapApiLoader } from "@ngui/map";
 // import { HolderJsModule } from 'angular2-holderjs/component';
-import { NgxBootstrapSliderModule } from 'ngx-bootstrap-slider';
+import { NgxBootstrapSliderModule } from "ngx-bootstrap-slider";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 
 import { ArchiveComponent } from "./components/admin/archive/archive";
@@ -223,7 +223,7 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class CustomModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(): ModuleWithProviders<CustomModule> {
     return {
       ngModule: CustomModule,
       providers: [
