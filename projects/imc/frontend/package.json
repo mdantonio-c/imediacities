@@ -10,6 +10,7 @@
     "@types/googlemaps": "^3.30.16",
     "ngx-bootstrap-slider": "^1.8.0",
     "ngx-slick-carousel": "^0.4.4",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "material-icons": "0.3.1"
   }
 }

@@ -1,5 +1,6 @@
 /* add the bootstrap-slider style css */
 @import url("bootstrap-slider/dist/css/bootstrap-slider.min.css");
+@import url("material-icons/iconfont/material-icons.css");
 @import url("custom-slider.css");
 
 /* Include slick css */
