@@ -137,8 +137,7 @@
               ></i>
 
               <i
-                class="fa fa-trash fa-large"
-                style="color: red;"
+                class="fa fa-trash fa-large red"
                 *ngIf="row.status != 'IMPORTING'; else disableDelete"
                 mwlConfirmationPopover
                 [popoverTitle]="deleteConfirmation.title"
