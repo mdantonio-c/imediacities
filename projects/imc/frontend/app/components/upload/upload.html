@@ -131,13 +131,10 @@
               let-value="value"
               let-i="index"
             >
-              <i
-                class="fa fa-download fa-large"
-                (click)="download(row.name)"
-              ></i>
+              <i class="fa fa-download fa-lg" (click)="download(row.name)"></i>
 
               <i
-                class="fa fa-trash fa-large red"
+                class="fa fa-trash fa-lg red"
                 *ngIf="row.status != 'IMPORTING'; else disableDelete"
                 mwlConfirmationPopover
                 [popoverTitle]="deleteConfirmation.title"
@@ -148,7 +145,7 @@
 
               <ng-template #disableDelete>
                 <i
-                  class="fa fa-trash fa-large"
+                  class="fa fa-trash fa-lg"
                   ngbTooltip="Disabled during the import"
                 >
                 </i>
