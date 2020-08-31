@@ -10,7 +10,7 @@
         <div class="box-checkbox float-left ml-2">
           <span class="click-event" (click)="doubleCheck()">
             <i
-              class="fa fa-thumb-tack revision-tool-icon"
+              class="fa fa-thumbtack revision-tool-icon"
               aria-hidden="true"
               *ngIf="shot.revision_check; else rotateThumbtack"
               ngbTooltip="uncheck"
@@ -18,7 +18,7 @@
             ></i>
             <ng-template #rotateThumbtack>
               <i
-                class="fa fa-thumb-tack fa-rotate-180"
+                class="fa fa-thumbtack fa-rotate-180"
                 aria-hidden="true"
                 ngbTooltip="double check"
                 placement="right"

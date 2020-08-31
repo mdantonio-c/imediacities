@@ -64,9 +64,9 @@
       <div class="place-item-list">
         <div *ngFor="let source of marker.sources" style="display: list-item;">
           <i
-            class="icon-only imc-icon fa fa-video-camera grey bigger-110"
+            class="icon-only imc-icon fa fa-video grey bigger-110"
             [ngClass]="{
-              'fa-video-camera': source.type === 'Video',
+              'fa-video': source.type === 'Video',
               'fa-image': source.type === 'Image'
             }"
           ></i>

@@ -6,7 +6,7 @@
         <i
           class="imc-icon fa light-blue"
           [ngClass]="{
-            'fa-video-camera': media.source.type === 'Video',
+            'fa-video': media.source.type === 'Video',
             'fa-camera': media.source.type === 'Image'
           }"
         ></i>
@@ -90,7 +90,7 @@
                     >{{ anno.creator.name }} {{ anno.creator.surname }}</span
                   >
                   <div class="time">
-                    <i class="imc-icon fa fa-clock-o light-grey"></i>
+                    <i class="imc-icon fa fa-clock light-grey"></i>
                     <span>{{
                       anno.creation_datetime * 1000 | date: "yyyy-MM-dd HH:mm"
                     }}</span>

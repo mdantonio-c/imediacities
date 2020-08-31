@@ -51,7 +51,7 @@ export class ProjectOptions {
           label: "Do you work at one of the following institutions:",
           required: true,
           addonLeft: {
-            class: "fa fa-bank",
+            class: "fa fa-university",
           },
           options: [
             { label: "Archive", value: "archive" },
