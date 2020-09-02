@@ -19,34 +19,16 @@ mime = MimeTypes()
 class Upload(Uploader, IMCEndpoint):
 
     labels = ["file"]
-    _GET = {
-        "/download/<filename>": {
-            "summary": "Download an uploaded file",
-            "responses": {
-                "200": {"description": "File successfully downloaded"},
-                "404": {"description": "The uploaded content does not exists."},
-            },
-        }
-    }
-    _POST = {
-        "/upload": {
-            "summary": "Initialize file upload",
-            "responses": {
-                "200": {"description": "File upload successfully initialized"}
-            },
-        }
-    }
-    _PUT = {
-        "/upload/<filename>": {
-            "summary": "Upload a file into the stage area",
-            "responses": {"200": {"description": "File successfully uploaded"}},
-        }
-    }
 
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.init_chunk_upload
+    @decorators.endpoint(
+        path="/upload",
+        summary="Initialize file upload",
+        responses={200: "File upload successfully initialized"},
+    )
     def post(self, name, **kwargs):
 
         self.graph = self.get_service_instance("neo4j")
@@ -67,6 +49,11 @@ class Upload(Uploader, IMCEndpoint):
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/upload/<filename>",
+        summary="Upload a file into the stage area",
+        responses={200: "File successfully uploaded"},
+    )
     def put(self, filename):
 
         self.graph = self.get_service_instance("neo4j")
@@ -88,6 +75,14 @@ class Upload(Uploader, IMCEndpoint):
     @decorators.auth.require_all("Archive")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/download/<filename>",
+        summary="Download an uploaded file",
+        responses={
+            200: "File successfully downloaded",
+            404: "The uploaded content does not exists",
+        },
+    )
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:

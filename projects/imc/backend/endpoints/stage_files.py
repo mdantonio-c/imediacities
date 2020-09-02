@@ -16,39 +16,6 @@ from restapi.utilities.logs import log
 class Stage(IMCEndpoint):
 
     labels = ["file"]
-    _GET = {
-        "/stage": {
-            "summary": "List of files contained in the stage area of the specified group",
-            "responses": {
-                "200": {
-                    "description": "List of files and directories successfully retrieved"
-                }
-            },
-        },
-        "/stage/<group>": {
-            "summary": "List of files contained in the stage area of the specified group",
-            "responses": {
-                "200": {
-                    "description": "List of files and directories successfully retrieved"
-                }
-            },
-        },
-    }
-    _POST = {
-        "/stage": {
-            "summary": "Import a file from the stage area",
-            "responses": {
-                "200": {"description": "File successfully imported"},
-                "409": {"description": "No source ID found in metadata file."},
-            },
-        }
-    }
-    _DELETE = {
-        "/stage/<filename>": {
-            "summary": "Delete a file from the stage area",
-            "responses": {"200": {"description": "File successfully deleted"}},
-        }
-    }
 
     def getType(self, filename):
         name, file_extension = os.path.splitext(filename)
@@ -106,6 +73,16 @@ class Stage(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.get_pagination
+    @decorators.endpoint(
+        path="/stage",
+        summary="List of files contained in the stage area of the specified group",
+        responses={200: "List of files and directories successfully retrieved"},
+    )
+    @decorators.endpoint(
+        path="/stage/<group>",
+        summary="List of files contained in the stage area of the specified group",
+        responses={200: "List of files and directories successfully retrieved"},
+    )
     def get(self, get_total, page, size, sort_by, sort_order, input_filter, group=None):
         self.graph = self.get_service_instance("neo4j")
 
@@ -199,7 +176,6 @@ class Stage(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
-    # "required": ["filename"],
     @decorators.use_kwargs(
         {
             "filename": fields.Str(
@@ -218,6 +194,14 @@ class Stage(IMCEndpoint):
                 description="Allow to force re-processing of COMPLETED contents",
             ),
         }
+    )
+    @decorators.endpoint(
+        path="/stage",
+        summary="Import a file from the stage area",
+        responses={
+            200: "File successfully imported",
+            409: "No source id found in metadata file.",
+        },
     )
     def post(self, filename, mode, update, force_reprocessing):
         """
@@ -412,6 +396,11 @@ class Stage(IMCEndpoint):
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/stage/<filename>",
+        summary="Delete a file from the stage area",
+        responses={200: "File successfully deleted"},
+    )
     def delete(self, filename):
 
         self.graph = self.get_service_instance("neo4j")

@@ -336,61 +336,29 @@ class ListItems(IMCEndpoint):
     """ List of items in a list. """
 
     labels = ["list_items"]
-    _GET = {
-        "/lists/<list_id>/items/<item_id>": {
-            "summary": "List of items in a list.",
-            "responses": {
-                "200": {"description": "An list of items."},
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List does not exist."},
-            },
-            "description": "Get all the items of a list. The result supports paging.",
-        },
-        "/lists/<list_id>/items": {
-            "summary": "List of items in a list.",
-            "responses": {
-                "200": {"description": "An list of items."},
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List does not exist."},
-            },
-            "description": "Get all the items of a list. The result supports paging.",
-        },
-    }
-    _POST = {
-        "/lists/<list_id>/items": {
-            "summary": "Add an item to a list.",
-            "responses": {
-                "204": {"description": "Item added successfully."},
-                "400": {
-                    "description": "Bad request body or target node does not exist."
-                },
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List does not exist."},
-                "409": {"description": "The item is already connected to that list."},
-            },
-        }
-    }
-    _DELETE = {
-        "/lists/<list_id>/items/<item_id>": {
-            "summary": "Delete an item from a list.",
-            "responses": {
-                "204": {"description": "Item deleted successfully."},
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List or item does not exist."},
-            },
-        }
-    }
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/lists/<list_id>/items/<item_id>",
+        summary="List of items in a list.",
+        description="Get all the items of a list. the result supports paging.",
+        responses={
+            200: "An list of items.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+        },
+    )
+    @decorators.endpoint(
+        path="/lists/<list_id>/items",
+        summary="List of items in a list.",
+        description="Get all the items of a list. the result supports paging.",
+        responses={
+            200: "An list of items.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+        },
+    )
     def get(self, list_id, item_id=None):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
@@ -448,6 +416,17 @@ class ListItems(IMCEndpoint):
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(Target)
+    @decorators.endpoint(
+        path="/lists/<list_id>/items",
+        summary="Add an item to a list.",
+        responses={
+            204: "Item added successfully.",
+            400: "Bad request body or target node does not exist.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+            409: "The item is already connected to that list.",
+        },
+    )
     def post(self, list_id, target):
         """ Add an item to a list. """
         log.debug("Add an item to list {} with target {}", list_id, target)
@@ -497,6 +476,15 @@ class ListItems(IMCEndpoint):
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/lists/<list_id>/items/<item_id>",
+        summary="Delete an item from a list.",
+        responses={
+            204: "Item deleted successfully.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List or item does not exist.",
+        },
+    )
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
         self.graph = self.get_service_instance("neo4j")

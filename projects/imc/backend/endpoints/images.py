@@ -207,16 +207,6 @@ class ImageAnnotations(IMCEndpoint):
     """
 
     labels = ["image_annotations"]
-    _GET = {
-        "/images/<image_id>/annotations": {
-            "summary": "Gets image annotations",
-            "description": "Returns all the annotations targeting the given image item.",
-            "responses": {
-                "200": {"description": "An annotation object."},
-                "404": {"description": "Image does not exist."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -229,6 +219,12 @@ class ImageAnnotations(IMCEndpoint):
             )
         },
         location="query",
+    )
+    @decorators.endpoint(
+        path="/images/<image_id>/annotations",
+        summary="Gets image annotations",
+        description="Returns all the annotations targeting the given image item.",
+        responses={200: "An annotation object", 404: "Image does not exist"},
     )
     def get(self, image_id, anno_type=None):
         log.debug("get annotations for NonAVEntity id: {}", image_id)
@@ -291,15 +287,6 @@ class ImageContent(IMCEndpoint, Downloader):
     """
 
     labels = ["image"]
-    _GET = {
-        "/images/<image_id>/content": {
-            "summary": "Gets the image content",
-            "responses": {
-                "200": {"description": "Image content successfully retrieved"},
-                "404": {"description": "The image content does not exists."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -320,6 +307,14 @@ class ImageContent(IMCEndpoint, Downloader):
         location="query",
     )
     @authz.pre_authorize
+    @decorators.endpoint(
+        path="/images/<image_id>/content",
+        summary="Gets the image content",
+        responses={
+            200: "Image content successfully retrieved",
+            404: "The image content does not exists",
+        },
+    )
     def get(self, image_id, content_type, thumbnail_size=None):
         log.info("get image content for id {}", image_id)
 
@@ -380,22 +375,6 @@ class ImageContent(IMCEndpoint, Downloader):
 class ImageTools(IMCEndpoint):
 
     labels = ["image_tools"]
-    _POST = {
-        "/images/<image_id>/tools": {
-            "summary": "Allow to launch the execution of some image tools.",
-            "responses": {
-                "202": {"description": "Execution task accepted."},
-                "200": {
-                    "description": "Execution completed successfully. Only with delete operation."
-                },
-                "403": {"description": "Request forbidden."},
-                "404": {"description": "Image not found."},
-                "409": {
-                    "description": "Invalid state. E.g. object detection results cannot be imported twice."
-                },
-            },
-        }
-    }
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
@@ -412,6 +391,17 @@ class ImageTools(IMCEndpoint):
                 validate=validate.OneOf(["delete"]),
             ),
         }
+    )
+    @decorators.endpoint(
+        path="/images/<image_id>/tools",
+        summary="Allow to launch the execution of some image tools.",
+        responses={
+            202: "Execution task accepted.",
+            200: "Execution completed successfully. only with delete operation.",
+            403: "Request forbidden.",
+            404: "Image not found.",
+            409: "Invalid state e.g. object detection results cannot be imported twice",
+        },
     )
     def post(self, image_id, tool, operation=None):
 

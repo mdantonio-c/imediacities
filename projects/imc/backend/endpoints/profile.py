@@ -12,6 +12,10 @@ class CustomProfile:
         return data
 
     @staticmethod
+    def get_user_editable_fields(request):
+        return {}
+
+    @staticmethod
     def get_custom_fields(request):
 
         # required = request and request.method == "POST"
