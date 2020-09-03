@@ -26,87 +26,8 @@ __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 class Lists(IMCEndpoint):
 
     labels = ["list"]
-    _GET = {
-        "/lists": {
-            "summary": "Get a list of the researcher",
-            "description": "Returns all the list of a researcher.",
-            "responses": {
-                "200": {
-                    "description": "The list of the researcher.",
-                    "schema": {"$ref": "#/definitions/List"},
-                },
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "The requested list does not exist."},
-            },
-        },
-        "/lists/<list_id>": {
-            "summary": "Get a list of the researcher",
-            "description": "Returns all the list of a researcher.",
-            "responses": {
-                "200": {
-                    "description": "The list of the researcher.",
-                    "schema": {"$ref": "#/definitions/List"},
-                },
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "The requested list does not exist."},
-            },
-        },
-    }
-    _POST = {
-        "/lists": {
-            "summary": "Create a new list",
-            "responses": {
-                "201": {
-                    "description": "List created successfully.",
-                    "schema": {"$ref": "#/definitions/List"},
-                },
-                "400": {
-                    "description": "There is no content present in the request body or the content is not valid for list."
-                },
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "409": {"description": "There is already a list with that name."},
-            },
-        }
-    }
-    _PUT = {
-        "/lists/<list_id>": {
-            "summary": "Update a list",
-            "description": "Update a list of the researcher",
-            "responses": {
-                "200": {"description": "List updated successfully."},
-                "400": {
-                    "description": "There is no content present in the request body or the content is not valid for list."
-                },
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List does not exist."},
-                "409": {
-                    "description": "There is already another list with the same name among your lists."
-                },
-            },
-        }
-    }
-    _DELETE = {
-        "/lists/<list_id>": {
-            "summary": "Delete a list",
-            "description": "Delete a list of the researcher.",
-            "responses": {
-                "204": {"description": "List deleted successfully."},
-                "403": {
-                    "description": "The user is not authorized to perform this operation."
-                },
-                "404": {"description": "List does not exist."},
-            },
-        }
-    }
 
+    # "schema": {"$ref": "#/definitions/List"},
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -124,6 +45,26 @@ class Lists(IMCEndpoint):
             ),
         },
         location="query",
+    )
+    @decorators.endpoint(
+        path="/lists",
+        summary="Get a list of the researcher",
+        description="Returns all the list of a researcher.",
+        responses={
+            200: "The list of the researcher.",
+            403: "The user is not authorized to perform this operation.",
+            404: "The requested list does not exist.",
+        },
+    )
+    @decorators.endpoint(
+        path="/lists/<list_id>",
+        summary="Get a list of the researcher",
+        description="Returns all the list of a researcher.",
+        responses={
+            200: "The list of the researcher.",
+            403: "The user is not authorized to perform this operation.",
+            404: "The requested list does not exist.",
+        },
     )
     def get(self, list_id=None, r_uuid=None, belong_item=None, nb_items=False):
         """ Get all the list of a user or a certain list if an id is provided."""
@@ -222,11 +163,22 @@ class Lists(IMCEndpoint):
         # return self.response(data, meta=meta_response)
         return self.response(data)
 
+    # "schema": {"$ref": "#/definitions/List"},
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
+    )
+    @decorators.endpoint(
+        path="/lists",
+        summary="Create a new list",
+        responses={
+            201: "List created successfully.",
+            400: "There is no content present in the request body or the content is not valid for list.",
+            403: "The user is not authorized to perform this operation.",
+            409: "There is already a list with that name.",
+        },
     )
     def post(self, name, description):
         """
@@ -265,6 +217,18 @@ class Lists(IMCEndpoint):
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
+    )
+    @decorators.endpoint(
+        path="/lists/<list_id>",
+        summary="Update a list",
+        description="Update a list of the researcher",
+        responses={
+            200: "List updated successfully.",
+            400: "There is no content in the request body or the content is not valid",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+            409: "There is already another list with the same name among your lists.",
+        },
     )
     def put(self, list_id, name, description):
         """ Update a list. """
@@ -305,6 +269,16 @@ class Lists(IMCEndpoint):
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/lists/<list_id>",
+        summary="Delete a list",
+        description="Delete a list of the researcher.",
+        responses={
+            204: "List deleted successfully.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+        },
+    )
     def delete(self, list_id):
         """ Delete a list. """
         log.debug("delete list {}", list_id)

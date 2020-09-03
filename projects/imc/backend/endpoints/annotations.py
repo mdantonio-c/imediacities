@@ -45,100 +45,8 @@ class Annotations(IMCEndpoint):
     )
 
     labels = ["annotation"]
-    _GET = {
-        "/annotations": {
-            "summary": "Get a single annotation",
-            "description": "Returns a single annotation for its uuid",
-            "responses": {
-                "200": {
-                    "description": "An annotation",
-                    "schema": {"$ref": "#/definitions/Annotation"},
-                },
-                "404": {"description": "Annotation does not exist."},
-            },
-        },
-        "/annotations/<anno_id>": {
-            "summary": "Get a single annotation",
-            "description": "Returns a single annotation for its uuid",
-            "responses": {
-                "200": {
-                    "description": "An annotation",
-                    "schema": {"$ref": "#/definitions/Annotation"},
-                },
-                "404": {"description": "Annotation does not exist."},
-            },
-        },
-    }
-    _POST = {
-        "/annotations": {
-            "summary": "Create an annotation",
-            "description": "Add a new annotation using WADM-based model to some specified target",
-            "parameters": [
-                {
-                    "name": "annotation",
-                    "in": "body",
-                    "description": "The annotation to create.",
-                    "schema": {"$ref": "#/definitions/Annotation"},
-                }
-            ],
-            "responses": {
-                "201": {"description": "Annotation successfully created."},
-                "400": {"description": "Annotation couldn't have been created."},
-            },
-        }
-    }
-    _PUT = {
-        "/annotations/<anno_id>": {
-            "summary": "Updates an annotation",
-            "description": "Update a single annotation identified via its uuid",
-            "parameters": [
-                {
-                    "name": "annotation",
-                    "in": "body",
-                    "required": True,
-                    "description": "The annotation to update.",
-                    "schema": {"$ref": "#/definitions/Annotation"},
-                }
-            ],
-            "responses": {
-                "204": {"description": "Annotation successfully updated."},
-                "400": {
-                    "description": "Annotation cannot be updated. Operation allowed only for specific use cases."
-                },
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Annotation does not exist."},
-            },
-        }
-    }
-    _PATCH = {
-        "/annotations/<anno_id>": {
-            "summary": "Updates partially an annotation",
-            "description": "Update partially a single annotation identified via its uuid. At the moment, used to update segment list in a segmentation annotation.",
-            "responses": {
-                "204": {"description": "Annotation successfully updated."},
-                "400": {
-                    "description": "Annotation cannot be updated. Operation allowed only for specific use cases."
-                },
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Annotation does not exist."},
-            },
-        }
-    }
-    _DELETE = {
-        "/annotations/<anno_id>": {
-            "summary": "Deletes an annotation",
-            "description": "Delete a single annotation identified via its uuid",
-            "responses": {
-                "204": {"description": "Annotation successfully deleted."},
-                "400": {
-                    "description": "Annotation cannot be deleted. No body found for the given reference."
-                },
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Annotation does not exist."},
-            },
-        }
-    }
 
+    # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -150,6 +58,18 @@ class Annotations(IMCEndpoint):
             )
         },
         location="query",
+    )
+    @decorators.endpoint(
+        path="/annotations",
+        summary="Get a single annotation",
+        description="Returns a single annotation for its uuid",
+        responses={200: "An annotation", 404: "Annotation does not exist."},
+    )
+    @decorators.endpoint(
+        path="/annotations/<anno_id>",
+        summary="Get a single annotation",
+        description="Returns a single annotation for its uuid",
+        responses={200: "An annotation", 404: "Annotation does not exist."},
     )
     def get(self, anno_id=None, anno_type=None):
         """ Get an annotation if its id is passed as an argument. """
@@ -183,9 +103,19 @@ class Annotations(IMCEndpoint):
 
         return self.response(data)
 
+    # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/annotations",
+        summary="Create an annotation",
+        description="Add a new annotation using wadm-based model to some specified target",
+        responses={
+            201: "Annotation successfully created.",
+            400: "Annotation couldn't have been created.",
+        },
+    )
     def post(self):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
@@ -406,6 +336,17 @@ class Annotations(IMCEndpoint):
         },
         location="query",
     )
+    @decorators.endpoint(
+        path="/annotations/<anno_id>",
+        summary="Deletes an annotation",
+        description="Delete a single annotation identified via its uuid",
+        responses={
+            204: "Annotation successfully deleted.",
+            400: "Annotation cannot be deleted. no body found for the given reference.",
+            403: "Operation forbidden.",
+            404: "Annotation does not exist.",
+        },
+    )
     def delete(self, anno_id, body_ref=None):
         """ Deletes an annotation. """
 
@@ -466,9 +407,21 @@ class Annotations(IMCEndpoint):
 
         return self.empty_response()
 
+    # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/annotations/<anno_id>",
+        summary="Updates an annotation",
+        description="Update a single annotation identified via its uuid",
+        responses={
+            204: "Annotation successfully updated.",
+            400: "Annotation cannot be updated. operation allowed only for specific use cases.",
+            403: "Operation forbidden.",
+            404: "Annotation does not exist.",
+        },
+    )
     def put(self, anno_id):
         """
         Update an annotation.
@@ -571,6 +524,17 @@ class Annotations(IMCEndpoint):
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(PatchDocument)
+    @decorators.endpoint(
+        path="/annotations/<anno_id>",
+        summary="Updates partially an annotation",
+        description="Partially update a single annotation identified via its uuid. at the moment, used to update segment list in a segmentation annotation.",
+        responses={
+            204: "Annotation successfully updated.",
+            400: "Annotation cannot be updated. operation allowed only for specific use cases.",
+            403: "Operation forbidden.",
+            404: "Annotation does not exist.",
+        },
+    )
     def patch(self, anno_id, patch_op, path, value):
 
         self.graph = self.get_service_instance("neo4j")

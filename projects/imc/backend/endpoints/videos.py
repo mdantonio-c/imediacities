@@ -34,34 +34,25 @@ class Videos(IMCEndpoint):
 
     labels = ["video"]
 
-    _GET = {
-        "/videos/<video_id>": {
-            "summary": "List of videos",
-            "description": "Returns a list containing all videos. The list supports paging.",
-            "tags": ["videos", "admin"],
-            "responses": {
-                "200": {"description": "List of videos successfully retrieved"},
-                "404": {"description": "The video does not exists."},
-            },
-        },
-        "/videos": {
-            "summary": "List of videos",
-            "description": "Returns a list containing all videos. The list supports paging.",
-            "tags": ["videos", "admin"],
-            "responses": {
-                "200": {"description": "List of videos successfully retrieved"},
-                "404": {"description": "The video does not exists."},
-            },
-        },
-    }
-    _DELETE = {
-        "/videos/<video_id>": {
-            "summary": "Delete a video description",
-            "responses": {"200": {"description": "Video successfully deleted"}},
-        }
-    }
-
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/videos/<video_id>",
+        summary="List of videos",
+        description="Returns a list containing all videos. the list supports paging.",
+        responses={
+            200: "List of videos successfully retrieved",
+            404: "The video does not exists.",
+        },
+    )
+    @decorators.endpoint(
+        path="/videos",
+        summary="List of videos",
+        description="Returns a list containing all videos. the list supports paging.",
+        responses={
+            200: "List of videos successfully retrieved",
+            404: "The video does not exists.",
+        },
+    )
     def get(self, video_id=None):
 
         if video_id is None and not self.verify_admin():
@@ -118,6 +109,11 @@ class Videos(IMCEndpoint):
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.endpoint(
+        path="/videos/<video_id>",
+        summary="Delete a video description",
+        responses={200: "Video successfully deleted"},
+    )
     def delete(self, video_id):
         """
         Delete existing video description.
@@ -142,19 +138,6 @@ class Videos(IMCEndpoint):
 
 
 class VideoItem(IMCEndpoint):
-
-    _PUT = {
-        "/videos/<video_id>/item": {
-            "summary": "Update public access flag for the given video",
-            "responses": {
-                "204": {"description": "Item info successfully updated."},
-                "400": {"description": "Request not valid."},
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Video does not exist."},
-            },
-        }
-    }
-
     @decorators.auth.require_any(Role.ADMIN, "Archive")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
@@ -165,6 +148,16 @@ class VideoItem(IMCEndpoint):
                 description="Whether or not the item is accessible by a public user.",
             )
         }
+    )
+    @decorators.endpoint(
+        path="/videos/<video_id>/item",
+        summary="Update public access flag for the given video",
+        responses={
+            204: "Item info successfully updated.",
+            400: "Request not valid.",
+            403: "Operation forbidden.",
+            404: "Video does not exist.",
+        },
     )
     def put(self, video_id, public_access):
         """
@@ -202,16 +195,6 @@ class VideoAnnotations(IMCEndpoint):
     """
 
     labels = ["video_annotations"]
-    _GET = {
-        "/videos/<video_id>/annotations": {
-            "summary": "Gets video annotations",
-            "description": "Returns all the annotations targeting the given video item.",
-            "responses": {
-                "200": {"description": "An annotation object."},
-                "404": {"description": "Video does not exist."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -229,6 +212,12 @@ class VideoAnnotations(IMCEndpoint):
         location="query",
     )
     @decorators.auth.require()
+    @decorators.endpoint(
+        path="/videos/<video_id>/annotations",
+        summary="Gets video annotations",
+        description="Returns all the annotations targeting the given video item.",
+        responses={200: "An annotation object.", 404: "Video does not exist."},
+    )
     def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
 
@@ -353,16 +342,6 @@ class VideoShots(IMCEndpoint):
     """
 
     labels = ["video_shots"]
-    _GET = {
-        "/videos/<video_id>/shots": {
-            "summary": "Gets video shots",
-            "description": "Returns a list of shots belonging to the given video item.",
-            "responses": {
-                "200": {"description": "An list of shots."},
-                "404": {"description": "Video does not exist."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     def get(self, video_id):
@@ -493,27 +472,21 @@ class VideoSegments(IMCEndpoint):
     """
 
     labels = ["video_segments", "video-segment"]
-    _GET = {
-        "/videos/<video_id>/segments/<segment_id>": {
-            "summary": "Gets all manual segments for a video.",
-            "description": "Returns a list of the manual segments belonging to the given video item.",
-            "responses": {
-                "200": {"description": "An list of manual segments."},
-                "404": {"description": "Video does not exist."},
-            },
-        },
-        "/videos/<video_id>/segments": {
-            "summary": "Gets all manual segments for a video.",
-            "description": "Returns a list of the manual segments belonging to the given video item.",
-            "responses": {
-                "200": {"description": "An list of manual segments."},
-                "404": {"description": "Video does not exist."},
-            },
-        },
-    }
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/videos/<video_id>/segments/<segment_id>",
+        summary="Gets all manual segments for a video.",
+        description="Returns a list of manual segments belonging to the given video item",
+        responses={200: "An list of manual segments.", 404: "Video does not exist."},
+    )
+    @decorators.endpoint(
+        path="/videos/<video_id>/segments",
+        summary="Gets all manual segments for a video.",
+        description="Returns a list of manual segments belonging to the given video item",
+        responses={200: "An list of manual segments.", 404: "Video does not exist."},
+    )
     def get(self, video_id, segment_id):
 
         log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
@@ -574,25 +547,6 @@ class VideoSegments(IMCEndpoint):
 class VideoContent(IMCEndpoint, Downloader):
 
     labels = ["video"]
-    _GET = {
-        "/videos/<video_id>/content": {
-            "summary": "Gets the video content",
-            "tags": ["video"],
-            "responses": {
-                "200": {"description": "Video content successfully retrieved"},
-                "404": {"description": "The video content does not exists."},
-            },
-        }
-    }
-    _HEAD = {
-        "/videos/<video_id>/content": {
-            "summary": "Check for video existence",
-            "responses": {
-                "200": {"description": "The video content exists."},
-                "404": {"description": "The video content does not exists."},
-            },
-        }
-    }
 
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -613,6 +567,14 @@ class VideoContent(IMCEndpoint, Downloader):
         location="query",
     )
     @authz.pre_authorize
+    @decorators.endpoint(
+        path="/videos/<video_id>/content",
+        summary="Gets the video content",
+        responses={
+            200: "Video content successfully retrieved",
+            404: "The video content does not exists.",
+        },
+    )
     def get(self, video_id, content_type, thumbnail_size=None):
         """
         Gets video content such as video strem and thumbnail
@@ -728,6 +690,14 @@ class VideoContent(IMCEndpoint, Downloader):
         },
         location="query",
     )
+    @decorators.endpoint(
+        path="/videos/<video_id>/content",
+        summary="Check for video existence",
+        responses={
+            200: "The video content exists.",
+            404: "The video content does not exists.",
+        },
+    )
     def head(self, video_id, content_type):
         """
         Check for video content existance.
@@ -784,22 +754,6 @@ class VideoContent(IMCEndpoint, Downloader):
 class VideoTools(IMCEndpoint):
 
     labels = ["video_tools"]
-    _POST = {
-        "/videos/<video_id>/tools": {
-            "summary": "Allow to launch the execution of some video tools.",
-            "responses": {
-                "202": {"description": "Execution task accepted."},
-                "200": {
-                    "description": "Execution completed successfully. Only with delete operation."
-                },
-                "403": {"description": "Request forbidden."},
-                "404": {"description": "Video not found."},
-                "409": {
-                    "description": "Invalid state. E.g. object detection results cannot be imported twice."
-                },
-            },
-        }
-    }
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.catch_graph_exceptions
@@ -816,6 +770,17 @@ class VideoTools(IMCEndpoint):
                 validate=validate.OneOf(["delete"]),
             ),
         }
+    )
+    @decorators.endpoint(
+        path="/videos/<video_id>/tools",
+        summary="Allow to launch the execution of some video tools.",
+        responses={
+            202: "Execution task accepted.",
+            200: "Execution completed successfully. only with delete operation.",
+            403: "Request forbidden.",
+            404: "Video not found.",
+            409: "Invalid state. e.g. object detection results cannot be imported twice",
+        },
     )
     def post(self, video_id, tool, operation=None):
 
@@ -893,57 +858,11 @@ class VideoShotRevision(IMCEndpoint):
     """Shot revision endpoint"""
 
     labels = ["video_shot_revision"]
-    _GET = {
-        "/videos-under-revision": {
-            "summary": "List of videos under revision.",
-            "description": "Returns a list containing all videos under revision together with the assignee. The list supports paging.",
-            "responses": {
-                "200": {
-                    "description": "List of videos under revision successfully retrieved",
-                    "schema": {
-                        "type": "array",
-                        "items": {"$ref": "#/definitions/VideoInRevision"},
-                    },
-                }
-            },
-        }
-    }
-    _POST = {
-        "/videos/<video_id>/shot-revision": {
-            "summary": "Launch the execution of the shot revision tool.",
-            "responses": {
-                "201": {"description": "Execution launched."},
-                "403": {"description": "Request forbidden."},
-                "404": {"description": "Video not found."},
-                "409": {"description": "Invalid state for the video."},
-            },
-        }
-    }
-    _PUT = {
-        "/videos/<video_id>/shot-revision": {
-            "summary": "Put a video under revision",
-            "responses": {
-                "204": {"description": "Video under revision successfully."},
-                "400": {"description": "Assignee not valid."},
-                "409": {
-                    "description": "Video is already under revision or it is not ready for revision."
-                },
-                "403": {"description": "Operation forbidden."},
-                "404": {"description": "Video does not exist."},
-            },
-        }
-    }
-    _DELETE = {
-        "/videos/<video_id>/shot-revision": {
-            "summary": "Take off revision from a video.",
-            "responses": {
-                "204": {"description": "Video revision successfully exited."},
-                "403": {"description": "Request forbidden."},
-                "404": {"description": "Video not found."},
-            },
-        }
-    }
 
+    # "schema": {
+    #     "type": "array",
+    #     "items": {"$ref": "#/definitions/VideoInRevision"},
+    # },
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -955,6 +874,12 @@ class VideoShotRevision(IMCEndpoint):
             )
         },
         location="query",
+    )
+    @decorators.endpoint(
+        path="/videos-under-revision",
+        summary="List of videos under revision.",
+        description="Returns a list of all videos under revision and their assignee",
+        responses={200: "List of videos under revision successfully retrieved"},
     )
     def get(self, input_assignee=None):
         """Get all videos under revision"""
@@ -1000,6 +925,17 @@ class VideoShotRevision(IMCEndpoint):
                 data_key="assignee",
             )
         }
+    )
+    @decorators.endpoint(
+        path="/videos/<video_id>/shot-revision",
+        summary="Put a video under revision",
+        responses={
+            204: "Video under revision successfully.",
+            400: "Assignee not valid.",
+            409: "Video is already under revision or it is not ready for revision.",
+            403: "Operation forbidden.",
+            404: "Video does not exist.",
+        },
     )
     def put(self, video_id, assignee_uuid=None):
         """Put a video under revision"""
@@ -1060,6 +996,16 @@ class VideoShotRevision(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(ShotRevision)
+    @decorators.endpoint(
+        path="/videos/<video_id>/shot-revision",
+        summary="Launch the execution of the shot revision tool.",
+        responses={
+            201: "Execution launched.",
+            403: "Request forbidden.",
+            404: "Video not found.",
+            409: "Invalid state for the video.",
+        },
+    )
     def post(self, video_id, shots, exitRevision):
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {0}", video_id)
@@ -1109,6 +1055,15 @@ class VideoShotRevision(IMCEndpoint):
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/videos/<video_id>/shot-revision",
+        summary="Take off revision from a video.",
+        responses={
+            204: "Video revision successfully exited.",
+            403: "Request forbidden.",
+            404: "Video not found.",
+        },
+    )
     def delete(self, video_id):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
