@@ -46,6 +46,54 @@ class Annotations(IMCEndpoint):
 
     labels = ["annotation"]
 
+    # This is the model used as output by get, post and put endpoints.
+    # To be converted with marshmallow
+    """
+    Annotation:
+      motivation:
+        required: True
+        type: string
+        enum:
+          - tagging
+          - commenting
+          - describing
+          - identifying
+          - classifying
+          - replying
+          - segmentation
+      body:
+        required: True
+        NESTED:
+          type:
+            required: True
+            type: string
+            enum:
+              - ResourceBody
+              - TextualBody
+              - TVSBody
+      target:
+        required: True
+        type: string
+        pattern: "(item|shot|anno):[a-z0-9-]+"
+      selector:
+        NESTED:
+          type:
+            required: True
+            type: string
+            enum:
+              - FragmentSelector
+              - AreaSelector
+          value:
+            required: True
+            type: string
+      private:
+        type: boolean
+        default: false
+      embargo:
+        type: string
+        format: date
+    """
+
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
