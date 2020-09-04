@@ -27,7 +27,6 @@ class Lists(IMCEndpoint):
 
     labels = ["list"]
 
-    # "schema": {"$ref": "#/definitions/List"},
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
@@ -163,7 +162,6 @@ class Lists(IMCEndpoint):
         # return self.response(data, meta=meta_response)
         return self.response(data)
 
-    # "schema": {"$ref": "#/definitions/List"},
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions

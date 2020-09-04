@@ -860,9 +860,20 @@ class VideoShotRevision(IMCEndpoint):
     labels = ["video_shot_revision"]
 
     # "schema": {
-    #     "type": "array",
+    #     "type": "array",      -> many=True
     #     "items": {"$ref": "#/definitions/VideoInRevision"},
     # },
+
+    # This is the model semi-translated in marshmallow, to be completed:
+    # since = fields.fields.DateTime(required=True, description="Date of start of a revision.")
+    # video = fields.Nested( ..., required=True, description="Video under revision")
+    #                       uuid = fields.Str(required=True)
+    #                       title = fields.Str(required=True)
+    # progress = fields.Int(required=True, description="Progress of the revision in percentange", validate = min 0 max 100)
+    # state = fields.Str(required=True, description="Revision status", validate = oneOf ["R", "W"]
+    # assignee = fields.Nested( ... , required=True, description="assignee of the revision")
+    #                           uuid = fields.Str(required=True)
+    #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
