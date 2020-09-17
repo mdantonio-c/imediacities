@@ -21,7 +21,7 @@ from imc.models import BulkSchema
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.exceptions import BadRequest, RestApiException
+from restapi.exceptions import BadRequest, NotFound
 from restapi.services.authentication import Role
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -139,9 +139,7 @@ class Bulk(IMCEndpoint):
             guid = action.get("guid")
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
-                raise RestApiException(
-                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound(f"Group ID {guid} not found")
             log.info("Update procedure for Group '{0}'", group.shortname)
             # check if the parameter 'force_reprocessing' has been specified
             force_reprocessing = action.get("force_reprocessing", False)
@@ -153,14 +151,14 @@ class Bulk(IMCEndpoint):
             upload_dir = "/uploads/" + group.uuid
             upload_delta_dir = os.path.join(upload_dir, "upload")
             if not os.path.exists(upload_delta_dir):
-                return self.response(errors=["Upload dir not found"])
+                raise NotFound("Upload dir not found")
 
             # inside the upload_delta_dir I have to look for the sub-dir that corresponds to the most recent date
             upload_latest_dir = self.lookup_latest_dir(upload_delta_dir)
 
             if upload_latest_dir is None:
                 log.debug("Upload dir not found")
-                return self.response(errors=["Upload dir not found"])
+                raise NotFound("Upload dir not found")
 
             log.info("Processing files from dir {}", upload_latest_dir)
 
@@ -471,9 +469,7 @@ class Bulk(IMCEndpoint):
             guid = action.get("guid")
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
-                raise RestApiException(
-                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound(f"Group ID {guid} not found")
             update = action.get("update")
             mode = action.get("mode")
             retry = action.get("retry")
@@ -485,9 +481,7 @@ class Bulk(IMCEndpoint):
             # check group uid
             group = self.graph.Group.nodes.get_or_none(uuid=guid)
             if group is None:
-                raise RestApiException(
-                    f"Group ID {guid} not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound(f"Group ID {guid} not found")
             retry = action.get("retry")
             self._bulk_v2(group, retry)
 
@@ -519,7 +513,7 @@ class Bulk(IMCEndpoint):
         # retrieve XML files from upload dir
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            return self.response(errors=["Upload dir not found"])
+            raise NotFound("Upload dir not found")
 
         files = [f for f in os.listdir(upload_dir) if f.endswith(".xml")]
         total_to_be_imported = len(files)
@@ -587,7 +581,7 @@ class Bulk(IMCEndpoint):
         # retrieve v2_ XML files from upload dir
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            return self.response(errors=["Upload dir not found"])
+            raise NotFound("Upload dir not found")
 
         # v2_ is used for the 'other version' (exclude .xml)
         files = [
@@ -597,10 +591,7 @@ class Bulk(IMCEndpoint):
         ]
         total_available = len(files)
         if total_available == 0:
-            raise RestApiException(
-                f"No v2 content for group {group.shortname}",
-                status_code=hcodes.HTTP_OK_NORESPONSE,
-            )
+            raise NotFound(f"No v2 content for group {group.shortname}")
         log.info("Total v2 files currently available: {}", total_available)
         skipped = 0
         imported = 0
@@ -660,8 +651,5 @@ class Bulk(IMCEndpoint):
                     repo.delete_non_av_entity(non_av_entity)
                     deleted += 1
         else:
-            raise RestApiException(
-                f"Entity {entity} not yet managed for deletion",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+            raise BadRequest(f"Entity {entity} not yet managed for deletion")
         log.debug("Deleted: {} in {}", deleted, len(uuids))

@@ -8,9 +8,8 @@ from mimetypes import MimeTypes
 from flask import make_response, send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import BadRequest, NotFound
 from restapi.services.uploader import Uploader
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 mime = MimeTypes()
@@ -36,9 +35,7 @@ class Upload(Uploader, IMCEndpoint):
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
@@ -60,9 +57,7 @@ class Upload(Uploader, IMCEndpoint):
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
@@ -86,36 +81,27 @@ class Upload(Uploader, IMCEndpoint):
     def get(self, filename):
         log.info("get stage content for filename {}", filename)
         if filename is None:
-            raise RestApiException(
-                "Please specify a stage filename", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Please specify a stage filename")
 
         self.graph = self.get_service_instance("neo4j")
 
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                return self.response(errors=["Upload dir not found"])
+                raise NotFound("Upload dir not found")
 
         staged_file = os.path.join(upload_dir, filename)
         if not os.path.isfile(staged_file):
-            raise RestApiException(
-                "File not found. Please specify a valid staged file",
-                status_code=hcodes.HTTP_BAD_NOTFOUND,
-            )
+            raise NotFound("File not found. Please specify a valid staged file")
 
         mime_type = mime.guess_type(filename)
         log.debug("mime type: {}", mime_type)
