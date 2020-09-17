@@ -41,11 +41,8 @@ export class UploadComponent extends BasePaginationComponent<Data> {
     private uploadService: UploadxService
   ) {
     super(injector);
-    this.init("file");
-
-    this.server_side_pagination = true;
-    this.endpoint = "stage";
-    this.initPaging(50);
+    this.init("file", "stage");
+    this.initPaging(50, true);
     this.list();
   }
 
@@ -128,14 +125,6 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         delete this.upload_progress[item.name];
       }
     });
-  }
-
-  list() {
-    return this.get(this.endpoint);
-  }
-
-  remove(filename: string) {
-    return this.delete("stage", filename);
   }
 
   download(filename) {

@@ -344,6 +344,12 @@ class VideoShots(IMCEndpoint):
     labels = ["video_shots"]
 
     @decorators.catch_graph_exceptions
+    @decorators.endpoint(
+        path="/videos/<video_id>/shots",
+        summary="Gets video shots",
+        description="Returns a list of shots belonging to the given video item.",
+        responses={200: "An list of shots.", 404: "Video does not exist."},
+    )
     def get(self, video_id):
         log.debug("get shots for AVEntity id: {}", video_id)
         if video_id is None:
@@ -566,7 +572,6 @@ class VideoContent(IMCEndpoint, Downloader):
         },
         location="query",
     )
-    @authz.pre_authorize
     @decorators.endpoint(
         path="/videos/<video_id>/content",
         summary="Gets the video content",
@@ -575,6 +580,7 @@ class VideoContent(IMCEndpoint, Downloader):
             404: "The video content does not exists.",
         },
     )
+    @authz.pre_authorize
     def get(self, video_id, content_type, thumbnail_size=None):
         """
         Gets video content such as video strem and thumbnail
@@ -867,12 +873,12 @@ class VideoShotRevision(IMCEndpoint):
     # This is the model semi-translated in marshmallow, to be completed:
     # since = fields.fields.DateTime(required=True, description="Date of start of a revision.")
     # video = fields.Nested( ..., required=True, description="Video under revision")
-    #                       uuid = fields.Str(required=True)
+    #                       uuid = fields.UUID(required=True)
     #                       title = fields.Str(required=True)
     # progress = fields.Int(required=True, description="Progress of the revision in percentange", validate = min 0 max 100)
     # state = fields.Str(required=True, description="Revision status", validate = oneOf ["R", "W"]
     # assignee = fields.Nested( ... , required=True, description="assignee of the revision")
-    #                           uuid = fields.Str(required=True)
+    #                           uuid = fields.UUID(required=True)
     #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
     @decorators.catch_graph_exceptions

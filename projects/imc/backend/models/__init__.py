@@ -1,26 +1,20 @@
 from marshmallow import ValidationError, pre_load
-from restapi.models import (
-    AdvancedList,
-    InputSchema,
-    PartialInputSchema,
-    fields,
-    validate,
-)
+from restapi.models import AdvancedList, PartialSchema, Schema, fields, validate
 
 
-class Spatial(InputSchema):
+class Spatial(Schema):
     latitude = fields.Float(required=True, data_key="lat")
     longitude = fields.Float(required=True, data_key="long")
 
 
-class GeoDistance(InputSchema):
+class GeoDistance(Schema):
     distance = fields.Int(
         required=True, description="Distance in km", validate=validate.Range(min=1)
     )
     location = fields.Nested(Spatial, required=True, description="Pin location")
 
 
-class SearchMatch(InputSchema):
+class SearchMatch(Schema):
     term = fields.Str(required=True)
     fields = AdvancedList(
         fields.Str(
@@ -31,7 +25,7 @@ class SearchMatch(InputSchema):
     )
 
 
-class SearchFilter(InputSchema):
+class SearchFilter(Schema):
 
     type = fields.Str(
         missing="all", validate=validate.OneOf(["all", "video", "image"]),
@@ -68,7 +62,7 @@ class SearchFilter(InputSchema):
     annotated_by = fields.Str(description="User's uuid")
 
 
-class AnnotationSearchFilter(InputSchema):
+class AnnotationSearchFilter(Schema):
 
     type = fields.Str(
         missing="all", validate=validate.OneOf(["all", "video", "image", "text"]),
@@ -102,36 +96,36 @@ class AnnotationSearchFilter(InputSchema):
     geo_distance = fields.Nested(GeoDistance)
 
 
-class AnnotationSearchCriteria(InputSchema):
+class AnnotationSearchCriteria(Schema):
     match = fields.Nested(SearchMatch, required=True)
     filtering = fields.Nested(AnnotationSearchFilter, data_key="filter", required=True)
 
 
 # used by POST /search
-class SearchCriteria(PartialInputSchema):
+class SearchCriteria(PartialSchema):
     match = fields.Nested(SearchMatch, required=True, allow_none=True)
     filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
 
 
 # used by POST /bulk
-class BulkImportSchema(InputSchema):
+class BulkImportSchema(Schema):
     guid = fields.UUID(required=True)
     mode = fields.Str(missing="skip")
     update = fields.Bool(missing=False)
     retry = fields.Bool(missing=False)
 
 
-class BulkUpdateSchema(InputSchema):
+class BulkUpdateSchema(Schema):
     guid = fields.UUID(required=True)
     force_reprocessing = fields.Bool(missing=False)
 
 
-class BulkV2Schema(InputSchema):
+class BulkV2Schema(Schema):
     guid = fields.UUID(required=True)
     retry = fields.Bool(missing=False)
 
 
-class BulkDeleteSchema(InputSchema):
+class BulkDeleteSchema(Schema):
     @pre_load
     def set_uuids(self, data, **kwargs):
         if not data.get("delete_all") and "uuids" not in data:
@@ -145,7 +139,7 @@ class BulkDeleteSchema(InputSchema):
     delete_all = fields.Bool(missing=False)
 
 
-class BulkSchema(InputSchema):
+class BulkSchema(Schema):
     @pre_load
     def init_action(self, data, **kwargs):
 
@@ -163,7 +157,7 @@ class BulkSchema(InputSchema):
 
 
 # used by POST /annotations/search
-class AnnotationSearch(InputSchema):
+class AnnotationSearch(Schema):
     annotation_type = fields.Str(
         data_key="type", required=True, validate=validate.OneOf(["TAG", "VIM", "TVS"])
     )
@@ -172,7 +166,7 @@ class AnnotationSearch(InputSchema):
 
 
 # used by PATCH /annotations/<anno_id>
-class PatchDocument(InputSchema):
+class PatchDocument(Schema):
 
     patch_op = fields.Str(
         required=True,
@@ -194,7 +188,7 @@ class PatchDocument(InputSchema):
 
 
 # used by POST /lists/<list_id>/items
-class Target(InputSchema):
+class Target(Schema):
     target = fields.Nested(
         {
             "id": fields.Str(required=True),
@@ -207,7 +201,7 @@ class Target(InputSchema):
 
 
 # used by POST /search_place
-class SearchPlaceParameters(InputSchema):
+class SearchPlaceParameters(Schema):
     place_list = AdvancedList(
         fields.Nested(
             {
@@ -224,7 +218,7 @@ class SearchPlaceParameters(InputSchema):
 
 # Rapresent the scene cut that is the first frame of the shot.
 # For homogeneity, the first zero cut must also be provided.
-class SceneCut(InputSchema):
+class SceneCut(Schema):
 
     shot_num = fields.Int(required=True, validate=validate.Range(min=0))
     cut = fields.Int(required=True, validate=validate.Range(min=0))
@@ -236,7 +230,7 @@ class SceneCut(InputSchema):
 
 
 # used by POST /videos/<video_id>/shot-revision
-class ShotRevision(InputSchema):
+class ShotRevision(Schema):
     shots = AdvancedList(
         fields.Nested(SceneCut),
         required=True,

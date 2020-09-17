@@ -306,7 +306,6 @@ class ImageContent(IMCEndpoint, Downloader):
         },
         location="query",
     )
-    @authz.pre_authorize
     @decorators.endpoint(
         path="/images/<image_id>/content",
         summary="Gets the image content",
@@ -315,6 +314,7 @@ class ImageContent(IMCEndpoint, Downloader):
             404: "The image content does not exists",
         },
     )
+    @authz.pre_authorize
     def get(self, image_id, content_type, thumbnail_size=None):
         log.info("get image content for id {}", image_id)
 

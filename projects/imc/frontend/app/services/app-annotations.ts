@@ -1,9 +1,8 @@
 import { Injectable, Output, EventEmitter } from "@angular/core";
 import { ApiService } from "@rapydo/services/api";
 import { NotificationService } from "@rapydo/services/notification";
-import { Observable } from "rxjs";
+import { Observable, forkJoin } from "rxjs";
 import { map } from "rxjs/operators";
-import "rxjs/add/observable/forkJoin";
 import { AppShotsService } from "./app-shots";
 
 @Injectable()
@@ -46,7 +45,7 @@ export class AppAnnotationsService {
       )
     );
 
-    Observable.forkJoin(observables).subscribe(
+    forkJoin(observables).subscribe(
       (res) => cb(null, res),
       (err) => cb(err, null)
     );
@@ -69,7 +68,7 @@ export class AppAnnotationsService {
       )
     );
 
-    Observable.forkJoin(observables).subscribe((res) => cb(res));
+    forkJoin(observables).subscribe((res) => cb(res));
   }
   create_link(shots_ids, link, media_type, cb) {
     let observables: Observable<any>[] = [];
@@ -87,7 +86,7 @@ export class AppAnnotationsService {
       )
     );
 
-    Observable.forkJoin(observables).subscribe(
+    forkJoin(observables).subscribe(
       (res) => cb(null, res),
       (err) => cb(err, null)
     );
@@ -109,7 +108,7 @@ export class AppAnnotationsService {
       )
     );
 
-    Observable.forkJoin(observables).subscribe(
+    forkJoin(observables).subscribe(
       (res) => cb(null, res),
       (err) => cb(err, null)
     );

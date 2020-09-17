@@ -10,8 +10,7 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { SearchFilter, CatalogService } from "../../services/catalog.service";
 import { IPRStatuses, Providers } from "../../services/data";
 import { AppVocabularyService } from "../../../services/app-vocabulary";
-import { Observable } from "rxjs";
-import "rxjs/add/observable/combineLatest";
+import { Observable, combineLatest } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 
 const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
@@ -78,7 +77,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     });
     this.searchForm.setValue(this.toForm(this.catalogService.filter));
 
-    Observable.combineLatest(
+    combineLatest(
       this.searchForm.get("productionYearFrom").valueChanges
     ).subscribe(([productionYearFrom = 1890]) => {
       this.setSliderTo(
@@ -86,7 +85,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         this.searchForm.get("productionYearTo").value
       );
     });
-    Observable.combineLatest(
+    combineLatest(
       this.searchForm.get("productionYearTo").valueChanges
     ).subscribe(([productionYearTo = 1999]) => {
       this.setSliderTo(
@@ -377,5 +376,4 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   setSliderTo(from, to) {
     this.rangeValue = [from, to];
   }
-
 }

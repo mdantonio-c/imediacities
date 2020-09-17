@@ -19,7 +19,7 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import fields
+from restapi.models import Schema, fields
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
@@ -30,23 +30,9 @@ SELECTOR_PATTERN = re.compile(r"t=\d+,\d+")
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
-#####################################
-class Annotations(IMCEndpoint):
+class AnnotationModel(Schema):
+    pass
 
-    # the following list is a subset of the annotation_type list in neo4j
-    # module
-    allowed_motivations = (
-        "tagging",
-        "describing",
-        "linking",
-        "commenting",
-        "replying",
-        "segmentation",
-    )
-
-    labels = ["annotation"]
-
-    # This is the model used as output by get, post and put endpoints.
     # To be converted with marshmallow
     """
     Annotation:
@@ -71,6 +57,18 @@ class Annotations(IMCEndpoint):
               - ResourceBody
               - TextualBody
               - TVSBody
+
+      # To be split in target_type and target_id as in lists.py?
+      # should be:
+      target = fields.Nested(
+        {
+            "id": fields.Str(required=True), <- maybe fields.UUID? Also change in models
+            "type": fields.Str(
+                required=True, validate=validate.OneOf(["item", "shot", "anno"])
+            ),
+        },
+        required=True,
+    )
       target:
         required: True
         type: string
@@ -94,6 +92,23 @@ class Annotations(IMCEndpoint):
         format: date
     """
 
+
+#####################################
+class Annotations(IMCEndpoint):
+
+    # the following list is a subset of the annotation_type list in neo4j
+    # module
+    allowed_motivations = (
+        "tagging",
+        "describing",
+        "linking",
+        "commenting",
+        "replying",
+        "segmentation",
+    )
+
+    labels = ["annotation"]
+
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
@@ -107,6 +122,7 @@ class Annotations(IMCEndpoint):
         },
         location="query",
     )
+    @decorators.marshal_with(AnnotationModel(many=True), code=200)
     @decorators.endpoint(
         path="/annotations",
         summary="Get a single annotation",
@@ -155,6 +171,8 @@ class Annotations(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.use_kwargs(AnnotationModel)
+    @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
         path="/annotations",
         summary="Create an annotation",
@@ -459,6 +477,8 @@ class Annotations(IMCEndpoint):
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
+    @decorators.use_kwargs(AnnotationModel)
+    @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
         path="/annotations/<anno_id>",
         summary="Updates an annotation",
@@ -572,6 +592,7 @@ class Annotations(IMCEndpoint):
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(PatchDocument)
+    @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
         path="/annotations/<anno_id>",
         summary="Updates partially an annotation",
