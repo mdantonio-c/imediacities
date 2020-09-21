@@ -132,7 +132,6 @@ const routes: Routes = [
     SharedModule,
     RouterModule.forChild(routes),
     HttpClientJsonpModule,
-    // NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?libraries=places&key='+environment.ALL['GMAP_KEY']}),
     NguiMapModule.forRoot(),
     NgxBootstrapSliderModule,
     //HolderJsModule,

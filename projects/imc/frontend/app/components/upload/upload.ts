@@ -47,7 +47,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
   }
 
   public ngOnInit(): void {
-    this.upload_endpoint = environment.apiUrl + "/upload";
+    this.upload_endpoint = environment.backendURI + "/api/upload";
 
     this.upload_options = {
       endpoint: this.upload_endpoint,
