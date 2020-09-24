@@ -41,7 +41,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
     private uploadService: UploadxService
   ) {
     super(injector);
-    this.init("file", "stage");
+    this.init("file", "stage", null);
     this.initPaging(50, true);
     this.list();
   }

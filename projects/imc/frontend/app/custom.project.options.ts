@@ -1,38 +1,29 @@
 import { Injectable } from "@angular/core";
 import { FormlyFieldConfig } from "@ngx-formly/core";
+import { BaseProjectOptions } from "@rapydo/base.project.options";
 
 @Injectable()
-export class ProjectOptions {
+export class ProjectOptions extends BaseProjectOptions {
   private terms_of_use: string;
   private privacy_policy: string;
   private research_declaration: string;
 
   constructor() {
+    super();
     this.initTemplates();
   }
 
-  public get_option(opt): any {
-    if (opt == "registration") {
-      return this.registration_options();
-    }
-
-    if (opt == "privacy_acceptance") {
-      return this.privacy_acceptance();
-    }
-
-    if (opt == "user_page") {
-      return {
-        group: true,
-        custom: [
-          { name: "Institution", prop: "declared_institution", flexGrow: 0.7 },
-        ],
-      };
-    }
-
-    return null;
+  show_groups(): boolean {
+    return true;
   }
 
-  private privacy_acceptance() {
+  custom_user_data(): any[] {
+    return [
+      { name: "Institution", prop: "declared_institution", flexGrow: 0.7 },
+    ];
+  }
+
+  privacy_statements() {
     return [
       { label: "Terms of Use", text: this.terms_of_use },
       { label: "Privacy Policy", text: this.privacy_policy },
@@ -40,79 +31,36 @@ export class ProjectOptions {
     ];
   }
 
-  private registration_options() {
-    let fields: FormlyFieldConfig[] = [];
-
-    fields.push(
-      {
-        key: "declared_institution",
-        type: "select",
-        templateOptions: {
-          label: "Do you work at one of the following institutions:",
-          required: true,
-          addonLeft: {
-            class: "fa fa-university",
-          },
-          options: [
-            { label: "Archive", value: "archive" },
-            { label: "University", value: "university" },
-            { label: "Research Institution", value: "research_institution" },
-            { label: "None of the above", value: "none" },
-          ],
-        },
-      },
-      {
-        className: "section-label",
-        template:
-          "<hr><div><strong>To protect your privacy we ask you to accept our:</strong></div><br>",
-      },
-      {
-        key: "terms_of_use_optin",
-        type: "terms_of_use",
-        templateOptions: {
-          label: "Terms of Use",
-          terms_of_use: this.terms_of_use,
-        },
-        validators: {
-          fieldMatch: {
-            expression: (control) => control.value,
-          },
-        },
-      },
-      {
-        key: "privacy_policy_optin",
-        type: "terms_of_use",
-        templateOptions: {
-          label: "Privacy Policy",
-          terms_of_use: this.privacy_policy,
-        },
-        validators: {
-          fieldMatch: {
-            expression: (control) => control.value,
-          },
-        },
-      },
-      {
-        key: "research_optin",
-        type: "terms_of_use",
-        templateOptions: {
-          label: "Research declaration",
-          terms_of_use: this.research_declaration,
-        },
-        validators: {
-          fieldMatch: {
-            expression: (control) => control.value,
-          },
-        },
-      }
-    );
-
-    let disclaimer = `
+  registration_disclaimer(): string {
+    return `
 Welcome to the registration page of I-Media-Cities. Registering a personal account is free of charge, in compliance with European law, and will allow you to enjoy a whole list of additional platform functionalities, such as adding your own information to films and photographs.<br>
 <br>
 <strong>In order to explore the I Media Cities platform you have to register yourself with a valid e-mail address. We will send you a confirmation link after the registration.</strong>
 `;
-    return { fields: fields, disclaimer: disclaimer };
+  }
+
+  custom_registration_options(): FormlyFieldConfig[] {
+    let fields: FormlyFieldConfig[] = [];
+
+    fields.push({
+      key: "declared_institution",
+      type: "select",
+      templateOptions: {
+        label: "Do you work at one of the following institutions:",
+        required: true,
+        addonLeft: {
+          class: "fa fa-university",
+        },
+        options: [
+          { label: "Archive", value: "archive" },
+          { label: "University", value: "university" },
+          { label: "Research Institution", value: "research_institution" },
+          { label: "None of the above", value: "none" },
+        ],
+      },
+    });
+
+    return fields;
   }
 
   private initTemplates() {
