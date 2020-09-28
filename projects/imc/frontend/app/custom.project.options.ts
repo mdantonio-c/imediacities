@@ -31,6 +31,16 @@ export class ProjectOptions extends BaseProjectOptions {
     ];
   }
 
+  cookie_law_text(): string {
+    // return null to enable default text
+    return null;
+  }
+
+  cookie_law_button(): string {
+    // return null to enable default text
+    return null;
+  }
+
   registration_disclaimer(): string {
     return `
 Welcome to the registration page of I-Media-Cities. Registering a personal account is free of charge, in compliance with European law, and will allow you to enjoy a whole list of additional platform functionalities, such as adding your own information to films and photographs.<br>

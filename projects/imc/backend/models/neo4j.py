@@ -1,11 +1,3 @@
-"""
-Graph DB abstraction from neo4j server.
-These are custom models!
-
-VERY IMPORTANT!
-Imports and models have to be defined/used AFTER normal Graphdb connection.
-"""
-
 import sys
 from datetime import datetime
 
@@ -25,55 +17,9 @@ from imc.models.neo4j_types import (
     StringProperty,
     StructuredNode,
     StructuredRel,
-    UniqueIdProperty,
 )
 from neomodel import One, OneOrMore, ZeroOrMore, ZeroOrOne
-from neomodel.util import NodeClassRegistry
-from restapi.connectors.neo4j.models import Group as GroupBase
-from restapi.connectors.neo4j.models import User as UserBase
-
-# from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
-
-registry = NodeClassRegistry()
-base_user = frozenset({"User"})
-for c in registry._NODE_CLASS_REGISTRY:
-    if c == base_user:
-        registry._NODE_CLASS_REGISTRY.pop(base_user)
-        break
-
-registry = NodeClassRegistry()
-base_group = frozenset({"Group"})
-for c in registry._NODE_CLASS_REGISTRY:
-    if c == base_group:
-        registry._NODE_CLASS_REGISTRY.pop(base_group)
-        break
-
-
-class IdentifiedNode(StructuredNode):
-
-    """
-        A StructuredNode identified by an uuid
-    """
-
-    __abstract_node__ = True
-
-    uuid = UniqueIdProperty()
-
-
-class TimestampedNode(IdentifiedNode):
-
-    """
-        An IdentifiedNode with creation and modification dates
-    """
-
-    __abstract_node__ = True
-
-    created = DateTimeProperty(default_now=True, show=True)
-    modified = DateTimeProperty(default_now=True, show=True)
-
-    def save(self, *args, **kwargs):
-        self.modified = datetime.now(pytz.utc)
-        return super().save(*args, **kwargs)
+from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
 
 
 class HeritableStructuredNode(StructuredNode):
@@ -147,21 +93,11 @@ class HeritableStructuredNode(StructuredNode):
 # MODELS
 ##############################################################################
 
-# Extension of User model for accounting in API login/logout
+# Extension of core models
 
 
-class RevisionRel(StructuredRel):
-    """
-    Attributes:
-        when  Date of start or approval of a revision.
-        state Revision status: Waiting or Running
-    """
-
-    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
-    state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
-
-
-class User(UserBase):
+class UserCustom(IdentifiedNode):
+    __abstract_node__ = True
 
     declared_institution = StringProperty(required=False, show=True, default="none")
     items = RelationshipFrom("Item", "IS_OWNED_BY", cardinality=ZeroOrMore)
@@ -179,10 +115,23 @@ class User(UserBase):
     )
 
 
-class Group(GroupBase):
+class GroupCustom(IdentifiedNode):
+    __abstract_node__ = True
+
     stage_files = RelationshipFrom(
         "Stage", "IS_OWNED_BY", cardinality=ZeroOrMore, show=False
     )
+
+
+class RevisionRel(StructuredRel):
+    """
+    Attributes:
+        when  Date of start or approval of a revision.
+        state Revision status: Waiting or Running
+    """
+
+    when = DateTimeProperty(default=lambda: datetime.now(pytz.utc), show=True)
+    state = StringProperty(choices=codelists.REVISION_STATUS, show=True)
 
 
 class Stage(TimestampedNode, HeritableStructuredNode):

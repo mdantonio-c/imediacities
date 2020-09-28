@@ -1,12 +1,14 @@
 import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 
+import { User } from "@rapydo/types";
+
 @Component({
   selector: "customlinks",
   templateUrl: "./custom.navbar.links.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomNavbarComponent {
-  @Input() user: any;
+  @Input() user: User;
 
   constructor() {}
 }
