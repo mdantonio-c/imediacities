@@ -104,8 +104,15 @@ class UserCustom(IdentifiedNode):
     annotations = RelationshipFrom(
         "Annotation", "IS_ANNOTATED_BY", cardinality=ZeroOrMore
     )
-    belongs_to = RelationshipTo("Group", "BELONGS_TO", show=True)
-    coordinator = RelationshipTo("Group", "PI_FOR", cardinality=ZeroOrMore, show=True)
+    belongs_to = RelationshipTo(
+        "restapi.connectors.neo4j.models.Group", "BELONGS_TO", show=True
+    )
+    coordinator = RelationshipTo(
+        "restapi.connectors.neo4j.models.Group",
+        "PI_FOR",
+        cardinality=ZeroOrMore,
+        show=True,
+    )
     items_under_revision = RelationshipFrom(
         "Item", "REVISION_BY", cardinality=ZeroOrMore
     )
@@ -143,7 +150,10 @@ class Stage(TimestampedNode, HeritableStructuredNode):
     warnings = ArrayProperty(StringProperty(), show=True)
     task_id = StringProperty(show=True)
     ownership = RelationshipTo(
-        "Group", "IS_OWNED_BY", cardinality=ZeroOrMore, show=True
+        "restapi.connectors.neo4j.models.Group",
+        "IS_OWNED_BY",
+        cardinality=ZeroOrMore,
+        show=True,
     )
 
 
@@ -181,7 +191,9 @@ class List(TimestampedNode):
     name = StringProperty(required=True, show=True)
     description = StringProperty(required=True, show=True)
     items = RelationshipTo("ListItem", "LST_ITEM", cardinality=ZeroOrMore)
-    creator = RelationshipTo("User", "LST_BELONGS_TO", cardinality=One)
+    creator = RelationshipTo(
+        "restapi.connectors.neo4j.models.User", "LST_BELONGS_TO", cardinality=One
+    )
 
 
 class Item(TimestampedNode, AnnotationTarget, ListItem):
@@ -234,7 +246,12 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
         required=True, choices=codelists.CONTENT_TYPES, show=True
     )
     public_access = BooleanProperty(default=False, show=True)
-    ownership = RelationshipTo("Group", "IS_OWNED_BY", cardinality=One, show=True)
+    ownership = RelationshipTo(
+        "restapi.connectors.neo4j.models.Group",
+        "IS_OWNED_BY",
+        cardinality=One,
+        show=True,
+    )
     content_source = RelationshipTo(
         "ContentStage", "CONTENT_SOURCE", cardinality=ZeroOrOne
     )
@@ -248,7 +265,11 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
     )
     shots = RelationshipTo("Shot", "SHOT", cardinality=ZeroOrMore)
     revision = RelationshipTo(
-        "User", "REVISION_BY", cardinality=ZeroOrOne, model=RevisionRel, show=True
+        "restapi.connectors.neo4j.models.User",
+        "REVISION_BY",
+        cardinality=ZeroOrOne,
+        model=RevisionRel,
+        show=True,
     )
     other_version = RelationshipTo(
         "Item", "OTHER_VERSION", cardinality=ZeroOrOne, show=True
@@ -727,7 +748,7 @@ class Annotation(IdentifiedNode, AnnotationTarget):
     embargo = DateProperty(show=True)
     source_item = RelationshipTo("Item", "SOURCE", cardinality=One, show=True)
     creator = RelationshipTo(
-        "User",
+        "restapi.connectors.neo4j.models.User",
         "IS_ANNOTATED_BY",
         cardinality=ZeroOrOne,
         model=AnnotationCreatorRel,
@@ -867,7 +888,10 @@ class Shot(VideoSegment, ListItem):
         "VideoSegment", "WITHIN_SHOT", cardinality=ZeroOrMore
     )
     revised_by = RelationshipTo(
-        "User", "REVISED_BY", cardinality=ZeroOrMore, model=RevisionRel
+        "restapi.connectors.neo4j.models.User",
+        "REVISED_BY",
+        cardinality=ZeroOrMore,
+        model=RevisionRel,
     )
 
 
