@@ -18,11 +18,26 @@ from restapi.exceptions import (
     NotFound,
     RestApiException,
 )
-from restapi.models import fields, validate
+from restapi.models import Schema, fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
+
+
+class VideoContentSchema(Schema):
+    content_type = fields.Str(
+        required=True,
+        data_key="type",
+        description="content type (e.g. video, thumbnail, summary)",
+        validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
+    )
+    thumbnail_size = fields.Str(
+        required=False,
+        data_key="size",
+        description="used to get large thumbnails",
+        validate=validate.OneOf(["large"]),
+    )
 
 
 class Videos(IMCEndpoint):
@@ -555,23 +570,7 @@ class VideoContent(IMCEndpoint, Downloader):
     labels = ["video"]
 
     @decorators.catch_graph_exceptions
-    @decorators.use_kwargs(
-        {
-            "content_type": fields.Str(
-                required=True,
-                data_key="type",
-                description="content type (e.g. video, thumbnail, summary)",
-                validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
-            ),
-            "thumbnail_size": fields.Str(
-                required=False,
-                data_key="size",
-                description="used to get large thumbnails",
-                validate=validate.OneOf(["large"]),
-            ),
-        },
-        location="query",
-    )
+    @decorators.use_kwargs(VideoContentSchema, location="query")
     @decorators.endpoint(
         path="/videos/<video_id>/content",
         summary="Gets the video content",

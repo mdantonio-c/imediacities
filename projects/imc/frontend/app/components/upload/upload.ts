@@ -1,4 +1,5 @@
 import { Component, ViewChild, TemplateRef, Injector } from "@angular/core";
+import { HttpResponse } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { saveAs as importedSaveAs } from "file-saver";
 import { UploadxOptions, UploadState, UploadxService } from "ngx-uploadx";
@@ -134,16 +135,18 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         observe: "response",
       },
     };
-    this.api.get("download", filename, {}, options).subscribe(
-      (response) => {
-        let contentType =
-          response.headers["content-type"] || "application/octet-stream";
-        const blob = new Blob([response.body], { type: contentType });
-        importedSaveAs(blob, filename);
-      },
-      (error) => {
-        this.notify.showError("Unable to download file: " + filename);
-      }
-    );
+    this.api
+      .get<HttpResponse<ArrayBuffer>>("download", filename, {}, options)
+      .subscribe(
+        (response) => {
+          let contentType =
+            response.headers["content-type"] || "application/octet-stream";
+          const blob = new Blob([response.body], { type: contentType });
+          importedSaveAs(blob, filename);
+        },
+        (error) => {
+          this.notify.showError("Unable to download file: " + filename);
+        }
+      );
   }
 }
