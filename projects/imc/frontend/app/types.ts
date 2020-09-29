@@ -9,11 +9,11 @@ export interface File {
   size: number;
   type: string;
   status: string;
-  status_message: string;
+  status_message?: string;
   /** @nullable */
-  task_id: string;
+  task_id?: string;
   /** @nullable */
-  warnings: string;
+  warnings?: string;
 }
 
 export interface Files extends Array<File> {}

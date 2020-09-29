@@ -10,7 +10,7 @@ import { NotificationService } from "@rapydo/services/notification";
   templateUrl: "./archives.list.html",
 })
 export class ArchivesListComponent {
-  public groups: Array<Group> = [];
+  public groups: Group[] = [];
 
   constructor(
     private api: ApiService,
