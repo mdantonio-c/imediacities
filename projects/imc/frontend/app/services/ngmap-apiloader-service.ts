@@ -10,7 +10,7 @@ export class CustomNgMapApiLoader extends NgMapAsyncCallbackApiLoader {
   }
 
   setUrl() {
-    const key = environment.ALL["GMAP_KEY"];
+    const key = environment.CUSTOM.GMAP_KEY;
     const url =
       "https://maps.google.com/maps/api/js?libraries=places&key=" + key;
     this.changeUrl(url);

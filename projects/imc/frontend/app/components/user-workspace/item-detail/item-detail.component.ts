@@ -21,7 +21,7 @@ export interface ItemDetail {
 }
 
 // expected https://{url}?list={listID}&access_token={token}
-const VIRTUAL_GALLERY_URL: string = environment.ALL["VIRTUAL_GALLERY_URL"];
+const VIRTUAL_GALLERY_URL: string = environment.CUSTOM.VIRTUAL_GALLERY_URL;
 
 @Component({
   selector: "item-detail",
