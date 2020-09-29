@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { NgxSpinnerService } from "ngx-spinner";
 
+import { Group } from "@rapydo/types";
 import { ApiService } from "@rapydo/services/api";
 import { NotificationService } from "@rapydo/services/notification";
 
@@ -9,8 +10,7 @@ import { NotificationService } from "@rapydo/services/notification";
   templateUrl: "./archives.list.html",
 })
 export class ArchivesListComponent {
-  // public loading: boolean = false;
-  public groups: Array<any> = [];
+  public groups: Array<Group> = [];
 
   constructor(
     private api: ApiService,
@@ -21,19 +21,18 @@ export class ArchivesListComponent {
   }
 
   list() {
-    // this.loading = true;
     this.spinner.show();
-    this.api.get("admin/groups").subscribe(
-      (response) => {
-        this.groups = response;
-        // this.loading = false;
-        this.spinner.hide();
-      },
-      (error) => {
-        this.notify.showError(error);
-        // this.loading = false;
-        this.spinner.hide();
-      }
-    );
+    this.api
+      .get<Group[]>("admin/groups", "", {}, { validationSchema: "Groups" })
+      .subscribe(
+        (response) => {
+          this.groups = response;
+          this.spinner.hide();
+        },
+        (error) => {
+          this.notify.showError(error);
+          this.spinner.hide();
+        }
+      );
   }
 }
