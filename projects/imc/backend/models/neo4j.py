@@ -17,9 +17,41 @@ from imc.models.neo4j_types import (
     StringProperty,
     StructuredNode,
     StructuredRel,
+    UniqueIdProperty,
 )
 from neomodel import One, OneOrMore, ZeroOrMore, ZeroOrOne
-from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
+
+# Do not use these:
+# from restapi.connectors.neo4j.types import IdentifiedNode, TimestampedNode
+
+# These contains old methods like follow_relationships (still used in IMC)
+
+
+class IdentifiedNode(StructuredNode):
+
+    """
+        A StructuredNode identified by an uuid
+    """
+
+    __abstract_node__ = True
+
+    uuid = UniqueIdProperty()
+
+
+class TimestampedNode(IdentifiedNode):
+
+    """
+        An IdentifiedNode with creation and modification dates
+    """
+
+    __abstract_node__ = True
+
+    created = DateTimeProperty(default_now=True, show=True)
+    modified = DateTimeProperty(default_now=True, show=True)
+
+    def save(self, *args, **kwargs):
+        self.modified = datetime.now(pytz.utc)
+        return super().save(*args, **kwargs)
 
 
 class HeritableStructuredNode(StructuredNode):
