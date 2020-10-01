@@ -17,3 +17,48 @@ export interface File {
 }
 
 export interface Files extends Array<File> {}
+
+export interface Entity {
+  id: string;
+  created: Date;
+  modified: Date;
+  type: string;
+}
+
+export interface UserListEntity extends Entity {
+  name: string;
+  description: string;
+  /** @nullable */
+  nb_items?: number;
+}
+
+export interface SearchResponse {
+  data: any[];
+  meta: MetaSearchResponse;
+}
+
+export interface MetaSearchResponse {
+  totalItems: number;
+  countByProviders: number;
+  countByYears: number;
+}
+
+export interface GeoTag {
+  iri: string;
+  name: string;
+  spatial: [number, number];
+}
+
+export interface GeoDistanceAnnotation extends GeoTag {
+  distance: number;
+  sources: MediaContent[];
+}
+
+export interface MediaContent {
+  uuid: string;
+  external_ids: string[];
+  rights_status: string;
+  title: string;
+  type: string;
+  year: string;
+}

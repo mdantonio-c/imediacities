@@ -11,6 +11,7 @@ from imc.tasks.services.annotation_repository import (
     AnnotationRepository,
     DuplicatedAnnotationError,
 )
+from marshmallow import INCLUDE
 from restapi import decorators
 from restapi.exceptions import (
     BadRequest,
@@ -31,7 +32,8 @@ __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
 class AnnotationModel(Schema):
-    pass
+    class Meta:
+        unknown = INCLUDE
 
     # To be converted with marshmallow
     """
@@ -182,10 +184,10 @@ class Annotations(IMCEndpoint):
             400: "Annotation couldn't have been created.",
         },
     )
-    def post(self):
+    def post(self, **data):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
-        data = self.get_input()
+        # data = self.get_input()
         if len(data) == 0:
             raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
         if "target" not in data:

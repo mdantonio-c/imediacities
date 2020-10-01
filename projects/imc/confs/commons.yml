@@ -14,7 +14,9 @@ services:
       - ${VANILLA_DIR}/data/graphdata:/data
     ports:
       - 7687:7687
-    # environment:
+    #environment:
+    #   NEO4J_unsupported_dbms_tx__log_fail__on__corrupted__log__files: "False"
+    #   NEO4J_dbms_recovery_fail__on__missing__files: "False"
     #   NEO4J_dbms_memory_pagecache_size: 1024M
     #   NEO4J_dbms_memory_heap_maxSize: 2048M
     #   NEO4J_dbms_allowFormatMigration: "true"
