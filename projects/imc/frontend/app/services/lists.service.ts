@@ -1,16 +1,22 @@
 import { Injectable } from "@angular/core";
 import { ApiService } from "@rapydo/services/api";
 import { UserList } from "./lists.model";
-import { Subject } from "rxjs";
+import { Subject, Observable } from "rxjs";
+import { UserListEntity } from "@app/types";
 
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class ListsService {
   private listSelectedSource = new Subject<any>();
   listSelected$ = this.listSelectedSource.asObservable();
 
   constructor(private api: ApiService) {}
 
-  getLists(itemId?: string, includeNumberOfItems?: boolean) {
+  getLists(
+    itemId?: string,
+    includeNumberOfItems?: boolean
+  ): Observable<UserListEntity[]> {
     let params = itemId ? { item: itemId } : {};
     if (includeNumberOfItems) {
       params["includeNumberOfItems"] = true;
@@ -41,7 +47,7 @@ export class ListsService {
     return this.api.delete("lists", listId);
   }
 
-  getListItems(listId: string) {
+  getListItems(listId: string): Observable<any[]> {
     return this.api.get(`lists/${listId}/items`);
   }
 

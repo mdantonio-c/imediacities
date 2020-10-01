@@ -19,7 +19,10 @@
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3826426",
-              "label": "private"
+              "label": {
+                "it": "privato",
+                "en": "private"
+              }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q294440",

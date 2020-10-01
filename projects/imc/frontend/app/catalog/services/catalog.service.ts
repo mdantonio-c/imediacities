@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { ApiService } from "@rapydo/services/api";
 import { Observable, of } from "rxjs";
-import { catchError, map } from "rxjs/operators";
 import { MediaEntity, Providers } from "./data";
 import { LocalStorageService } from "./local-storage.service";
+import { SearchResponse, GeoDistanceAnnotation } from "@app/types";
 
 export interface SearchFilter {
   searchTerm?: string;
@@ -73,7 +73,7 @@ export class CatalogService {
     pageIdx: number,
     pageSize: number,
     cached: boolean = true
-  ) {
+  ): Observable<SearchResponse> {
     let endpoint = "search?page=" + pageIdx + "&size=" + pageSize;
     this._filter = filter;
     let data = {
@@ -106,7 +106,11 @@ export class CatalogService {
    * @param distance
    * @param cFilter
    */
-  getGeoDistanceAnnotations(pin, distance, filter) {
+  getGeoDistanceAnnotations(
+    pin,
+    distance,
+    filter
+  ): Observable<GeoDistanceAnnotation[]> {
     let data = {
       filter: {
         type: "TAG",

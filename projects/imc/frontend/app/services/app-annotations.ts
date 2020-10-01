@@ -56,7 +56,7 @@ export class AppAnnotationsService {
     shots_ids.forEach((shot_id) =>
       observables.push(
         this.api
-          .post("annotations", {
+          .post<any>("annotations", {
             // target:`shot:${shot_id}`,
             target:
               media_type === "video" ? `shot:${shot_id}` : `item:${shot_id}`,
@@ -64,7 +64,7 @@ export class AppAnnotationsService {
             body: AppAnnotationsService.textual_body(note),
             private: note.private,
           })
-          .map((res) => res)
+          .pipe(map((res) => res))
       )
     );
 
@@ -75,14 +75,14 @@ export class AppAnnotationsService {
     shots_ids.forEach((shot_id) =>
       observables.push(
         this.api
-          .post("annotations", {
+          .post<any>("annotations", {
             target:
               media_type === "video" ? `shot:${shot_id}` : `item:${shot_id}`,
             motivation: "linking",
             body: AppAnnotationsService.textual_body(link),
             private: link.private,
           })
-          .map((res) => res)
+          .pipe(map((res) => res))
       )
     );
 
@@ -97,14 +97,14 @@ export class AppAnnotationsService {
     shots_ids.forEach((shot_id) =>
       observables.push(
         this.api
-          .post("annotations", {
+          .post<any>("annotations", {
             target:
               media_type === "video" ? `shot:${shot_id}` : `item:${shot_id}`,
             motivation: "linking",
             body: AppAnnotationsService.bibliographic_reference(reference),
             private: reference.private,
           })
-          .map((res) => res)
+          .pipe(map((res) => res))
       )
     );
 
@@ -146,7 +146,7 @@ export class AppAnnotationsService {
   }
   update_note_private(note, new_private) {
     this.api
-      .put("annotations", `${note.id}`, {
+      .put<any>("annotations", `${note.id}`, {
         body: AppAnnotationsService.textual_body_2(note),
         private: new_private,
       })
@@ -177,7 +177,7 @@ export class AppAnnotationsService {
   }
 
   get(media_id, endpoint) {
-    this.api.get(endpoint, `${media_id}/annotations`).subscribe(
+    this.api.get<any[]>(endpoint, `${media_id}/annotations`).subscribe(
       (response) => {
         this._annotations = response;
         this.update.emit(this._annotations);
