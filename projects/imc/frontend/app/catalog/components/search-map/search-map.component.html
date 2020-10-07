@@ -1,3 +1,13 @@
+<div
+  class="search-map"
+  leaflet
+  (leafletMapReady)="onMapReady($event)"
+  [leafletOptions]="options"
+  [leafletMarkerCluster]="markerClusterData"
+  [leafletMarkerClusterOptions]="markerClusterOptions"
+  (leafletMarkerClusterReady)="markerClusterReady($event)"
+></div>
+<!--
 <ngui-map
   class="search-map"
   center="45, 14"
@@ -94,3 +104,4 @@
     [radius]="radius"
   ></circle>
 </ngui-map>
+-->

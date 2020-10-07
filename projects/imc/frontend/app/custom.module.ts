@@ -11,9 +11,10 @@ import { AuthGuard } from "@rapydo/app.auth.guard";
 
 import { HttpClientJsonpModule } from "@angular/common/http";
 import { NguiMapModule, NgMapApiLoader } from "@ngui/map";
-// import { HolderJsModule } from 'angular2-holderjs/component';
 import { NgxBootstrapSliderModule } from "ngx-bootstrap-slider";
 import { SlickCarouselModule } from "ngx-slick-carousel";
+import { LeafletModule } from "@asymmetrik/ngx-leaflet";
+import { LeafletMarkerClusterModule } from "@asymmetrik/ngx-leaflet-markercluster";
 
 import { ArchiveComponent } from "./components/admin/archive/archive";
 import { ArchivesListComponent } from "./components/admin/archive/archives.list";
@@ -136,6 +137,8 @@ const routes: Routes = [
     NgxBootstrapSliderModule,
     //HolderJsModule,
     SlickCarouselModule,
+    LeafletModule,
+    LeafletMarkerClusterModule,
   ],
   declarations: [
     ArchivesListComponent,

@@ -9,7 +9,8 @@
               "node_modules/slick-carousel/slick/slick.min.js",
               "node_modules/holderjs/holder.js",
               "node_modules/bootstrap-slider/dist/bootstrap-slider.min.js"
-            ]
+            ],
+            "styles": ["node_modules/leaflet/dist/leaflet.css"]
           }
         }
       }

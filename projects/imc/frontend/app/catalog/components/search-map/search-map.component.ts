@@ -11,11 +11,15 @@ import {
   OnChanges,
 } from "@angular/core";
 import { CatalogService, SearchFilter } from "../../services/catalog.service";
-import { GeoCoder, NguiMapComponent } from "@ngui/map";
+// import { GeoCoder, NguiMapComponent } from "@ngui/map";
 import { NotificationService } from "@rapydo/services/notification";
-import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
+// import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
+
+import * as L from "leaflet";
+import "leaflet.markercluster";
 
 const europeCenter = { lat: 45, lng: 14 };
+/*
 const mapStyles = {
   default: null,
   hide: [
@@ -38,6 +42,7 @@ const mapStyles = {
     },
   ],
 };
+*/
 export interface MediaTag {
   annotations: any[];
   source: MediaSource;
@@ -67,8 +72,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   private zoom;
   private center;
   private reloading: boolean = false;
-  /*isLoaded: boolean = false;*/
-  mapStyle = mapStyles.hide;
+  // mapStyle = mapStyles.hide;
   radius: number = 1600 * 1000; // for zoom level 4
   markers: any[] = [];
   markerClusterer;
@@ -76,31 +80,45 @@ export class SearchMapComponent implements OnInit, OnChanges {
   counters = [];
   autocomplete: any;
 
-  @ViewChild(NguiMapComponent, { static: false })
-  private ngMap: NguiMapComponent;
+  // @ViewChild(NguiMapComponent, { static: false })
+  // private ngMap: NguiMapComponent;
   @ViewChild("customControl", { static: false })
   private customControl: ElementRef;
   @ViewChild("placeControl", { static: false })
   private placeControl: ElementRef;
 
-  /*marker: GeoMarker = {
-		iri: null,
-		name: null,
-		address: null,
-		sources: [],
-		position: null
-	};*/
+  // base layer
+  streetMaps = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      detectRetina: true,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }
+  );
+  // Marker cluster stuff
+  markerClusterGroup: L.MarkerClusterGroup;
+  markerClusterData: L.Marker[] = [];
+  markerClusterOptions: L.MarkerClusterGroupOptions;
+  osmap: L.Map;
+
+  // Set the initial set of displayed layers
+  options = {
+    layers: [this.streetMaps],
+    zoom: 4,
+    center: [europeCenter.lat, europeCenter.lng],
+  };
+
   marker: any = {};
 
   constructor(
     private catalogService: CatalogService,
-    private geoCoder: GeoCoder,
+    // private geoCoder: GeoCoder,
     private ref: ChangeDetectorRef,
     private notify: NotificationService,
-    private renderer: Renderer2,
-    private mapApiLoader: CustomNgMapApiLoader
+    private renderer: Renderer2 // private mapApiLoader: CustomNgMapApiLoader
   ) {
-    mapApiLoader.setUrl();
+    // mapApiLoader.setUrl();
   }
 
   initialized(autocomplete: any) {
@@ -117,14 +135,12 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    /*console.log('ngOnInit');*/
     if (!this.filter.provider) {
       this.loadCountByProvider();
     }
   }
 
   ngOnChanges() {
-    /*console.log('ngOnChanges');*/
     // update counters
     if (!this.filter.provider) {
       this.loadCountByProvider();
@@ -136,7 +152,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
     if (this.countByProviders === undefined) {
       return;
     }
-    /*console.log("countByProviders", this.countByProviders);*/
     for (let key of Object.keys(this.countByProviders)) {
       let city = this.catalogService.getProviderCity(key);
       let entry = {
@@ -175,6 +190,10 @@ export class SearchMapComponent implements OnInit, OnChanges {
     this.showMapBoundary = !this.showMapBoundary;
   };
 
+  onMapReady(map: L.Map) {
+    this.osmap = map;
+  }
+  /*
   onMapReady(map) {
     // add custom controls
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
@@ -194,14 +213,14 @@ export class SearchMapComponent implements OnInit, OnChanges {
       lng: this.map.getCenter().lng(),
     };
   }
+   */
+  markerClusterReady(group: L.MarkerClusterGroup) {
+    this.markerClusterGroup = group;
+  }
 
   onIdle(event) {
     console.log("map", event.target);
   }
-
-  /*onMarkerInit(marker) {
-		this.dynMarkers.push(marker);
-	}*/
 
   onZoomChanged(event) {
     if (!this.map) {
