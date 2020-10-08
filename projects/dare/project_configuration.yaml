@@ -1,0 +1,15 @@
+---
+project:
+  title: DARE
+  description: "Da..."
+  version: "0.8"
+  rapydo: "0.8"
+  extends: imc
+  extends-from: projects
+
+variables:
+  env:
+    VIRTUAL_GALLERY_URL:
+  #   FRONTEND_FRAMEWORK: angular
+  #   AUTH_SERVICE: neo4j
+  #   ACTIVATE_NEO4J: 1
