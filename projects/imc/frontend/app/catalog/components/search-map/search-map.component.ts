@@ -68,7 +68,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   @Input() filter: SearchFilter;
   @Output() onMapChange: EventEmitter<any> = new EventEmitter<string>();
 
-  public map;
+  public map; // obsolete - google map
   private zoom;
   private center;
   private reloading: boolean = false;
@@ -165,9 +165,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   centerEurope = function () {
-    let pt = new google.maps.LatLng(europeCenter.lat, europeCenter.lng);
-    this.map.setCenter(pt);
-    this.map.setZoom(4);
+    this.osmap.panTo(new L.LatLng(europeCenter.lat, europeCenter.lng));
+    this.osmap.setZoom(4);
   };
 
   /**
@@ -175,15 +174,16 @@ export class SearchMapComponent implements OnInit, OnChanges {
    * @param city - Archive ID (e.g. CCB)
    */
   centerCity = function (provider) {
-    if (this.map === undefined) {
+    if (this.osmap === undefined) {
       console.warn("The center cannot be set because the map is undefined.");
       return;
     }
+
     let cityPosition = this.catalogService.getProviderPosition(provider);
-    let pt = new google.maps.LatLng(cityPosition[0], cityPosition[1]);
-    this.map.setCenter(pt);
-    this.map.setZoom(14);
+    this.osmap.panTo(new L.LatLng(cityPosition[0], cityPosition[1]));
+    this.osmap.setZoom(14);
     this.center = { lat: cityPosition[0], lng: cityPosition[1] };
+
   };
 
   toggleBoundary = function () {
@@ -192,6 +192,20 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
   onMapReady(map: L.Map) {
     this.osmap = map;
+    let self = this;
+    //
+    this.osmap.on('moveend', function(e) {
+      self.onCenterChanged(e);
+    });    
+    this.zoom = this.osmap.getZoom();
+    this.filter.provider != null
+      ? this.centerCity(this.filter.provider)
+      : this.centerEurope();
+
+    this.center = {
+      lat: this.osmap.getCenter().lat,
+      lng: this.osmap.getCenter().lng
+    }
   }
   /*
   onMapReady(map) {
@@ -254,8 +268,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
   }
 
-  onCenterChanged(event) {
-    if (!this.map) {
+  onCenterChanged = function(event) {
+    if (!this.osmap) {
       return;
     }
     if (!this.reloading) {
@@ -263,21 +277,23 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
 
     // reset the place-name control on the map
+    /*
     let inputPlaceControl = this.placeControl.nativeElement.querySelector(
       "input"
     );
     this.renderer.setProperty(inputPlaceControl, "value", "");
+    */
 
     setTimeout(() => {
-      let latLng = this.map.getCenter();
+      let latLng = this.osmap.getCenter();
       /*console.log('onCenterChanged: reloading geo-tags? ', this.reloading);
 			console.log('moved from: (' + this.center.lat + ', ' + this.center.lng + ') to: ' + latLng);*/
       if (!this.moving()) {
         return;
       }
-      this.center = { lat: latLng.lat(), lng: latLng.lng() };
+      this.center = { lat: latLng.lat, lng: latLng.lng };
       if (this.filter.provider !== null && this.reloading) {
-        let pos = [this.map.getCenter().lat(), this.map.getCenter().lng()];
+        let pos = [latLng.lat, latLng.lng];
         this.loadGeoTags(pos, this.radius);
         this.reloading = false;
       }
@@ -285,11 +301,11 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   private moving() {
-    let latLng = this.map.getCenter();
-    if (latLng.lat() != this.center.lat) {
+    let latLng = this.osmap.getCenter();
+    if (latLng.lat != this.center.lat) {
       return true;
     }
-    if (latLng.lng() != this.center.lng) {
+    if (latLng.lng != this.center.lng) {
       return true;
     }
     return false;
@@ -369,20 +385,25 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   private clearMarkers() {
-    // console.log('clear markers');
+    console.log('clear markers');
+
     for (let m of this.markers) {
-      m.setMap(null);
+      this.osmap.removeLayer(m);
     }
     this.markers = [];
     if (this.markerClusterer !== undefined) {
-      this.markerClusterer.clearMarkers();
+      this.markerClusterer.clearLayers();
     }
   }
 
   private updateClusters() {
+
+    console.warn('TODO redo updateClusters')
+    /*
     this.markerClusterer = new MarkerClusterer(this.map, this.markers, {
       imagePath:
         "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
     });
+    */
   }
 }
