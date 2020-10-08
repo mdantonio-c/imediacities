@@ -196,7 +196,18 @@ export class SearchMapComponent implements OnInit, OnChanges {
     //
     this.osmap.on('moveend', function(e) {
       self.onCenterChanged(e);
-    });    
+    });  
+    //
+    /*
+        // add custom controls
+        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
+          this.customControl.nativeElement
+        );
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(
+          this.placeControl.nativeElement
+        );
+        */
+    //
     this.zoom = this.osmap.getZoom();
     this.filter.provider != null
       ? this.centerCity(this.filter.provider)
@@ -207,27 +218,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
       lng: this.osmap.getCenter().lng
     }
   }
-  /*
-  onMapReady(map) {
-    // add custom controls
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
-      this.customControl.nativeElement
-    );
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push(
-      this.placeControl.nativeElement
-    );
 
-    this.map = map;
-    this.zoom = this.map.getZoom();
-    this.filter.provider != null
-      ? this.centerCity(this.filter.provider)
-      : this.centerEurope();
-    this.center = {
-      lat: this.map.getCenter().lat(),
-      lng: this.map.getCenter().lng(),
-    };
-  }
-   */
   markerClusterReady(group: L.MarkerClusterGroup) {
     this.markerClusterGroup = group;
   }
@@ -322,18 +313,19 @@ export class SearchMapComponent implements OnInit, OnChanges {
           let mapTags = response;
           let relevantCreations = new Map();
           mapTags.forEach((tag) => {
-            let m = new google.maps.Marker({
-              position: {
-                lat: tag.spatial[0],
-                lng: tag.spatial[1],
-              },
-              map: this.map,
-            });
+
+            let m = L.marker([tag.spatial[0], tag.spatial[1]]).addTo(this.osmap);
+            
+            //m.properties = {};
+            
+            console.log('cicciotest 1 ', m);
+            
+            /*
             m.set("iri", tag.iri);
             m.set("name", tag.name);
             m.set("sources", tag.sources);
             m.set("target", this);
-
+            /*
             google.maps.event.addListener(m, "click", function (event) {
               let target = m.get("target");
               target.marker = m;
@@ -360,6 +352,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
                 );
               target.ngMap.infoWindows["tag-iw"].open(m);
             });
+            */
             this.markers.push(m);
 
             // update relavant creations
