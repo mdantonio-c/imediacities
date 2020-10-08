@@ -1,7 +1,25 @@
-<a class="navbar-brand" href="https://imediacities.eu" target="_blank">
+<a
+  class="navbar-brand"
+  href="https://imediacities.eu"
+  target="_blank"
+  *ngIf='project=="imc"'
+>
   <img
     src="/app/custom/assets/images/IMC-Logo-transp.png"
     height="72"
     alt="I-MediaCities logo"
+  />
+</a>
+
+<a
+  class="navbar-brand"
+  href="https://www.ra.cna.it/fileadmin/user_upload/download/news/2020/2020_01_27_DARE_intro.pdf"
+  target="_blank"
+  *ngIf='project=="dare"'
+>
+  <img
+    src="/app/subproject/assets/images/logoUIA.png"
+    height="72"
+    alt="DARE logo"
   />
 </a>

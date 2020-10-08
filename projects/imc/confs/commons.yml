@@ -22,7 +22,7 @@ services:
       - 15672:15672
 
   celery:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${BASE_PROJECT_DIR}/builds/celery
     image: imediacities/celery:${RAPYDO_VERSION}
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
