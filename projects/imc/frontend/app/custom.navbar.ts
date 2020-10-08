@@ -7,6 +7,8 @@ import {
 } from "@angular/core";
 import { User } from "@rapydo/types";
 
+import { environment } from "@rapydo/../environments/environment";
+
 @Component({
   selector: "customlinks",
   templateUrl: "./custom.navbar.links.html",
@@ -29,5 +31,7 @@ export class CustomNavbarComponent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomBrandComponent {
+  public project: string = environment.projectName;
+
   constructor() {}
 }
