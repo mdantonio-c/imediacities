@@ -41,7 +41,7 @@ script:
       travis_retry bash <(curl -s https://codecov.io/bash);
 
       docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}";
-      docker push imc/celery:${RAPYDO_VERSION};
+      docker push imediacities/celery:${RAPYDO_VERSION};
 
     elif [[ "$STAGE" == "FRONTEND" ]]; then
 
