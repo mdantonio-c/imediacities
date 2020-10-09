@@ -1,5 +1,5 @@
 {
-  "created": "2020-10-09 18:08:17.665824",
+  "created": "2020-10-09 20:35:45.223966",
   "terms": [
     {
       "children": [
@@ -1985,7 +1985,7 @@
       ],
       "label": {
         "en": "Buildings & structures",
-        "it": "Edifici e Strutture"
+        "it": "Edifici e strutture"
       }
     },
     {
@@ -3498,7 +3498,7 @@
         }
       ],
       "label": {
-        "de": "Persons (Age)",
+        "de": "Persons (age)",
         "en": "People",
         "it": "Persone"
       }
@@ -4608,7 +4608,7 @@
       ],
       "label": {
         "en": "Signs and symbols",
-        "it": "Segni e Simboli"
+        "it": "Segni e simboli"
       }
     },
     {
@@ -5432,8 +5432,8 @@
         }
       ],
       "label": {
-        "de": "Organization (Type)",
-        "en": "Organisations & Ideologies",
+        "de": "Organization (type)",
+        "en": "Organisations & ideologies",
         "it": "Organizzazioni e ideologie"
       }
     },

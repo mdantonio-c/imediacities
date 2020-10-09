@@ -14,28 +14,19 @@ def generate_iri(term):
     return imc_namespace + reduce(lambda a, kv: a.replace(*kv), replaces, term.strip())
 
 
-def lookup_term_class(start_with="Category"):
-    labels = dict()
-    for row in ws.iter_rows(min_row=1, max_col=13, max_row=1):
-        for c in [cell for cell in row if cell.value.startswith(start_with)]:
-            class_label = ws.cell(row=c.row + 1, column=c.column).value
-            if class_label:
-                labels[c.value.rsplit("_", 1)[1].lower()] = class_label.strip()
-    return labels
-
-
 def lookup_iri(idx, header="URI"):
     for row in ws.iter_rows(min_row=1, max_col=13, max_row=1):
         for c in [cell for cell in row if cell.value == header]:
             term_iri = ws.cell(row=idx, column=c.column).value
-            if term_iri:
-                return term_iri.strip()
+            return term_iri.strip() if term_iri else None
 
 
-def lookup_labels(idx, start_with, capitalize=False):
+def lookup_labels(start_with, idx=None, capitalize=False):
     labels = dict()
     for row in ws.iter_rows(min_row=1, max_col=13, max_row=1):
         for c in [cell for cell in row if cell.value.startswith(start_with)]:
+            if not idx:
+                idx = c.row + 1
             label = ws.cell(row=idx, column=c.column).value
             if label:
                 labels[c.value.rsplit("_", 1)[1].lower()] = (
@@ -62,15 +53,17 @@ for ws in wb.worksheets:
         print(f"WARN: ignore hidden sheet: {ws.title}")
         continue
 
-    vocabulary_class = {"label": lookup_term_class(), "children": []}
-    # print(json.dumps(vocabulary_class, indent=2, sort_keys=True))
+    vocabulary_class = {
+        "label": lookup_labels(start_with="Category", capitalize=True),
+        "children": [],
+    }
 
     group_terms = {}
     idx_count = 0
     for row_index in range(2, ws.max_row + 1):
         idx_count += 1
         # get List_Entry
-        entry_labels = lookup_labels(row_index, "List_Entry")
+        entry_labels = lookup_labels(start_with="List_Entry", idx=row_index)
         if not entry_labels:
             # ignore groups without entry value
             continue
@@ -82,12 +75,14 @@ for ws in wb.worksheets:
         entry = {"id": iri, "label": entry_labels}
 
         # group = ws["I" + str(row_index)].value
-        group_labels = lookup_labels(row_index, "Subgroup", capitalize=True)
+        group_labels = lookup_labels(
+            start_with="Subgroup", idx=row_index, capitalize=True
+        )
         if group_labels:
             g = group_labels.get("en")
             if not g:
                 sys.exit(
-                    f"ERROR: Invalid input file. Missing 'en' term group for class '{vocabulary_class['label']['en']}'."
+                    f"ERROR: Invalid input file. Missing 'en' group term for class '{vocabulary_class['label']['en']}'."
                     f" Current values: {group_labels}"
                 )
             # print("adding entry to group '{}'".format(g))
