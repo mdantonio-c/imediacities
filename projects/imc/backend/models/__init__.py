@@ -62,43 +62,9 @@ class SearchFilter(Schema):
     annotated_by = fields.Str(description="User's uuid")
 
 
-class AnnotationSearchFilter(Schema):
-
-    type = fields.Str(
-        missing="all", validate=validate.OneOf(["all", "video", "image", "text"]),
-    )
-    provider = fields.Str(allow_none=True)
-    # Sent by postman, not used in endpoint?
-    # country = fields.Str(description="production country, codelist iso3166-1")
-    yearfrom = fields.Int(
-        allow_none=True,
-        description="production year range: start year of the range",
-        validate=validate.Range(min=1890, max=2000),
-    )
-    yearto = fields.Int(
-        allow_none=True,
-        description="production year range: end year of the range",
-        validate=validate.Range(min=1890, max=2000),
-    )
-
-    iprstatus = fields.Str(
-        description="IPR status",
-        allow_none=True,
-        validate=validate.OneOf(
-            # Should be extracted from codelist.RIGHTS_STATUS
-            ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
-        ),
-    )
-    terms = fields.List(
-        fields.Nested({"iri": fields.Str(), "label": fields.Str(required=True)})
-    )
-
-    geo_distance = fields.Nested(GeoDistance)
-
-
 class AnnotationSearchCriteria(Schema):
-    match = fields.Nested(SearchMatch, required=True)
-    filtering = fields.Nested(AnnotationSearchFilter, data_key="filter", required=True)
+    match = fields.Nested(SearchMatch, allow_none=True)
+    filtering = fields.Nested(SearchFilter, data_key="filter", required=True)
 
 
 # used by POST /search
