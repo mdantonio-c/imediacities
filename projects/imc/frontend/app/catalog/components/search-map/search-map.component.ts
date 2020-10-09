@@ -10,13 +10,52 @@ import {
   OnInit,
   OnChanges,
 } from "@angular/core";
+
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+
 import { CatalogService, SearchFilter } from "../../services/catalog.service";
 // import { GeoCoder, NguiMapComponent } from "@ngui/map";
+
 import { NotificationService } from "@rapydo/services/notification";
 // import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
 
+
+
 import * as L from "leaflet";
 import "leaflet.markercluster";
+
+// osm nominatim geocoding stuff
+export class NominatimResponse {
+  constructor(
+    public latitude: number,
+    public longitude: number,
+    public displayName: string
+  ) { }
+}
+export const BASE_NOMINATIM_URL: string = 'nominatim.openstreetmap.org';
+export const DEFAULT_VIEW_BOX: string = 'viewbox=-25.0000%2C70.0000%2C50.0000%2C40.0000';
+
+export class NominatimService {
+
+  constructor(private http: HttpClient) {
+  }
+
+  addressLookup(req?: any): Observable<NominatimResponse[]> {
+    let url = `https://${BASE_NOMINATIM_URL}/search?format=json&q=${req}&${DEFAULT_VIEW_BOX}&bounded=1`;
+    return this.http
+      .get(url).pipe(
+        map((data: any[]) => data.map((item: any) => new NominatimResponse(
+          item.lat,
+          item.lon,
+          item.display_name
+          ))
+        )
+      )
+  }
+
+}
 
 const europeCenter = { lat: 45, lng: 14 };
 /*
@@ -101,6 +140,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   markerClusterData: L.Marker[] = [];
   markerClusterOptions: L.MarkerClusterGroupOptions;
   osmap: L.Map;
+  nominatimOsmGeocoder: NominatimService;
 
   // Set the initial set of displayed layers
   options = {
@@ -192,6 +232,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
   onMapReady(map: L.Map) {
     this.osmap = map;
+
+    this.nominatimOsmGeocoder = new NominatimService(new HttpClient());
     let self = this;
     //
     this.osmap.on('moveend', function(e) {
@@ -304,7 +346,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
   private loadGeoTags(position: number[], distance: number) {
     /*console.log('loading annotations on the map from center [' + position[0] + ', ' +
-			position[1] + '] within distance: ' + distance + ' (meters)');*/
+      position[1] + '] within distance: ' + distance + ' (meters)');*/
+    let self = this;  
+
     this.clearMarkers();
     this.catalogService
       .getGeoDistanceAnnotations(position, distance, this.filter)
@@ -315,44 +359,46 @@ export class SearchMapComponent implements OnInit, OnChanges {
           mapTags.forEach((tag) => {
 
             let m = L.marker([tag.spatial[0], tag.spatial[1]]).addTo(this.osmap);
+            // let self = this;
+            m.properties = {
+              "iri" : tag.iri,
+              "name" : tag.name,
+              "sources" : tag.sources,
+              "target" : self
+            };
             
-            //m.properties = {};
             
-            console.log('cicciotest 1 ', m);
-            
-            /*
-            m.set("iri", tag.iri);
-            m.set("name", tag.name);
-            m.set("sources", tag.sources);
-            m.set("target", this);
-            /*
-            google.maps.event.addListener(m, "click", function (event) {
-              let target = m.get("target");
+
+
+            m.on('click', function(e) {
+              let target = m.properties.target;
               target.marker = m;
-              target.geoCoder
-                .geocode({
-                  placeId: m.get("iri"),
-                })
-                .subscribe(
-                  (results) => {
+             
+              console.log('cicciotest 22 ', m);
+
+              self.nominatimOsmGeocoder.addressLookup(m.properties.iri).subscribe(results => {
+
+                  console.log('ciccio test 4444');
                     // look outside in order to enrich details for that given place id
                     if (results[0]) {
-                      target.marker.set(
-                        "address",
-                        results[0].formatted_address
-                      );
+                      target.marker.properties.address = results[0].formatted_address
                     }
                   },
                   (error) => {
                     target.notify.showWarning(
-                      "Unable to get info for place ID: " + m.get("iri")
+                      "Unable to get info for place ID: " + m.properties.iri
                     );
                     target.marker.set("address", "n/a");
                   }
                 );
-              target.ngMap.infoWindows["tag-iw"].open(m);
+              
+                console.log('open info window? [check cicciotest 333]');
+              //  target.ngMap.infoWindows["tag-iw"].open(m);
+
+
+
             });
-            */
+
             this.markers.push(m);
 
             // update relavant creations
