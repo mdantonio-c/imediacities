@@ -41,7 +41,7 @@ script:
       travis_retry bash <(curl -s https://codecov.io/bash);
 
       docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}";
-      docker push imediacities/backend:${RAPYDO_VERSION};
+      docker push imediacities/celery:${RAPYDO_VERSION};
 
     elif [[ "$STAGE" == "FRONTEND" ]]; then
 
@@ -56,10 +56,10 @@ script:
 
     elif [[ "$STAGE" == "CYPRESS" ]]; then
 
-      rapydo shell backend 'restapi wait';
       rapydo shell backend --detach "restapi launch";
       rapydo -s frontend logs;
       rapydo shell frontend "yarn install" || travis_terminate 1;
+      rapydo -s frontend,backend logs;
       rapydo shell frontend "yarn run cypress:start" || travis_terminate 1;
 
     fi
