@@ -111,7 +111,7 @@
               </div>
             </div>
             <ng-template #rt let-r="result" let-t="term">
-              {{ r.name }}
+              {{ r.name[lang] }}
             </ng-template>
           </div>
         </div>
@@ -120,6 +120,7 @@
           <ng-template ngFor let-term [ngForOf]="terms">
             <app-media-annotation
               [annotation]="term"
+              [lang]="lang"
               [can_delete]="true"
               [disable_confirmation]="true"
               (click)="removeTerm(term)"
@@ -134,7 +135,7 @@
             <li *ngFor="let term of vocabulary.terms">
               <h3>
                 <span class="term" (click)="expandTerm(term)">
-                  <span [innerHTML]="term.label"></span>
+                  <span [innerHTML]="term.label[lang] || term.label.en"></span>
                   <i class="material-icons" *ngIf="!term.open"
                     >keyboard_arrow_down</i
                   >
@@ -146,7 +147,9 @@
               <ul class="term-list" [ngClass]="{ 'display-none': !term.open }">
                 <li *ngFor="let child of term.children">
                   <span class="term" (click)="expandTerm(child, term)">
-                    <span [innerHTML]="child.label"></span>
+                    <span
+                      [innerHTML]="child.label[lang] || child.label.en"
+                    ></span>
                     <i class="material-icons" *ngIf="!child.open"
                       >keyboard_arrow_down</i
                     >
@@ -160,7 +163,9 @@
                   >
                     <li *ngFor="let leaf of child.children">
                       <span class="term" (click)="vocabularyLeaf(leaf)">
-                        <span [innerHTML]="leaf.label"></span>
+                        <span
+                          [innerHTML]="leaf.label[lang] || leaf.label.en"
+                        ></span>
                         <i
                           *ngIf="leaf.selected"
                           class="material-icons icon-check-vocabulary"

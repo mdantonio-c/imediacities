@@ -58,7 +58,7 @@ export class AppVocabularyService {
     }
   }
 
-  search(search_key) {
+  search(search_key, lang = "en") {
     let filtro = [];
 
     let ricerca = (terms, search_key) => {
@@ -67,7 +67,7 @@ export class AppVocabularyService {
           ricerca(t.children, search_key);
         } else {
           let search_re = new RegExp(search_key, "ig");
-          if (search_re.test(t.label)) {
+          if (search_re.test(t.label[lang])) {
             filtro.push(this.annotation_create(t));
           }
         }
