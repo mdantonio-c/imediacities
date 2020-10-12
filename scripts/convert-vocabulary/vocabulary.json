@@ -1,5 +1,5 @@
 {
-  "created": "2020-10-09 20:35:45.223966",
+  "created": "2020-10-12 14:13:19.686126",
   "terms": [
     {
       "children": [
@@ -5345,10 +5345,6 @@
       }
     },
     {
-      "children": [],
-      "label": {}
-    },
-    {
       "children": [
         {
           "children": [
@@ -5436,10 +5432,6 @@
         "en": "Organisations & ideologies",
         "it": "Organizzazioni e ideologie"
       }
-    },
-    {
-      "children": [],
-      "label": {}
     }
   ],
   "vocabulary": "IMC controlled vocabulary"
