@@ -57,7 +57,7 @@ script:
     elif [[ "$STAGE" == "CYPRESS" ]]; then
 
       sleep 30;
-      rapydo shell backend "restapi launch";
+      rapydo shell backend --detach "restapi launch";
       rapydo -s frontend logs;
       rapydo shell frontend "yarn install" || travis_terminate 1;
       rapydo shell frontend "yarn run cypress:start" || travis_terminate 1;
