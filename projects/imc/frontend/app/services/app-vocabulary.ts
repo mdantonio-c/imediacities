@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { AppLodService } from "./app-lod";
+import { environment } from "@rapydo/../environments/environment";
 
 enum Flag {
   Deselected = 0,
@@ -10,12 +11,13 @@ enum Flag {
 @Injectable()
 export class AppVocabularyService {
   _vocabolario = null;
+  readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
 
   constructor(private http: HttpClient, private LodService: AppLodService) {}
 
   get(cb) {
     if (!cb || typeof cb !== "function") {
-      console.log("AppVocabularyService", "Callback mancante");
+      console.error("AppVocabularyService", "Callback mancante");
       return;
     }
 
@@ -50,7 +52,8 @@ export class AppVocabularyService {
     if (term.hasOwnProperty("children")) {
       term.children.sort(this._sort_by_label).forEach((c) => {
         c.description =
-          (term.description ? term.description + ", " : "") + term.label;
+          (term.description ? term.description + ", " : "") +
+          (term.label[this.lang] || term.label["en"]);
         c.open = false;
         c.selected = false;
         this._vocabolario_reset(c);
@@ -79,11 +82,13 @@ export class AppVocabularyService {
   }
 
   annotation_create(term, group = "term") {
+    console.log("term", term);
+    console.log("group", group);
     return {
       group: group,
       creator_type: "user",
       description: term.description,
-      name: term.label || term.name,
+      name: term.label[this.lang] || term.label["en"] || term.name,
       iri: term.id || term.iri || null,
       source: "vocabulary",
     };

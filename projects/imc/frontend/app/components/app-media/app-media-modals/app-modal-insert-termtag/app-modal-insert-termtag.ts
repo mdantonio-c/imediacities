@@ -18,6 +18,7 @@ import { HttpClient } from "@angular/common/http";
 import { AppLodService } from "../../../../services/app-lod";
 import { NgbPopover } from "@ng-bootstrap/ng-bootstrap";
 import { infoResult } from "../../../../decorators/app-info";
+import { environment } from "@rapydo/../environments/environment";
 
 @Component({
   selector: "app-modal-insert-termtag",
@@ -55,6 +56,7 @@ export class AppModalInsertTermtagComponent
   };
 
   private subject: Subject<string> = new Subject();
+  readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
 
   @ViewChild("search_field", { static: false }) search_field: ElementRef;
 
@@ -163,9 +165,13 @@ export class AppModalInsertTermtagComponent
       hide_prev: true,
     };
 
-    const vocabolario = this.VocabularyService.search(term);
-    this.results.vocabulary = this.VocabularyService.search(term).slice();
-    return this.LodService.search(term).then(
+    const vocabolario = this.VocabularyService.search(term, this.lang);
+    console.log(vocabolario);
+    this.results.vocabulary = this.VocabularyService.search(
+      term,
+      this.lang
+    ).slice();
+    return this.LodService.search(term, this.lang).then(
       (lodResults) => {
         this.results.lods = [];
         lodResults.search.forEach((l) => {
