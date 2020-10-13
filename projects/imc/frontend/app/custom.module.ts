@@ -83,6 +83,7 @@ import { HolderjsDirective } from "./directives/holderjs.directive";
 
 import { CatalogService } from "./catalog/services/catalog.service";
 import { MediaUtilsService } from "./catalog/services/media-utils.service";
+import { NominatimService } from "./catalog/services/nominatim.service";
 import { LocalStorageService } from "./catalog/services/local-storage.service";
 import { AppAnnotationsService } from "@app/services/app-annotations";
 import { AppShotsService } from "@app/services/app-shots";
@@ -216,6 +217,7 @@ const routes: Routes = [
   providers: [
     CatalogService,
     MediaUtilsService,
+    NominatimService,
     LocalStorageService,
     AppAnnotationsService,
     AppLodService,
@@ -245,6 +247,7 @@ export class CustomModule {
       providers: [
         CatalogService,
         MediaUtilsService,
+        NominatimService,
         LocalStorageService,
         AppAnnotationsService,
         AppLodService,
