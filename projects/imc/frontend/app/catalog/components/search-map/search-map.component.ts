@@ -12,10 +12,10 @@ import {
 } from "@angular/core";
 
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+
 
 import { CatalogService, SearchFilter } from "../../services/catalog.service";
+import { NominatimService } from "../../services/nominatim.service";
 // import { GeoCoder, NguiMapComponent } from "@ngui/map";
 
 import { NotificationService } from "@rapydo/services/notification";
@@ -26,36 +26,7 @@ import { NotificationService } from "@rapydo/services/notification";
 import * as L from "leaflet";
 import "leaflet.markercluster";
 
-// osm nominatim geocoding stuff
-export class NominatimResponse {
-  constructor(
-    public latitude: number,
-    public longitude: number,
-    public displayName: string
-  ) { }
-}
-export const BASE_NOMINATIM_URL: string = 'nominatim.openstreetmap.org';
-export const DEFAULT_VIEW_BOX: string = 'viewbox=-25.0000%2C70.0000%2C50.0000%2C40.0000';
 
-export class NominatimService {
-
-  constructor(private http: HttpClient) {
-  }
-
-  addressLookup(req?: any): Observable<NominatimResponse[]> {
-    let url = `https://${BASE_NOMINATIM_URL}/search?format=json&q=${req}&${DEFAULT_VIEW_BOX}&bounded=1`;
-    return this.http
-      .get(url).pipe(
-        map((data: any[]) => data.map((item: any) => new NominatimResponse(
-          item.lat,
-          item.lon,
-          item.display_name
-          ))
-        )
-      )
-  }
-
-}
 
 const europeCenter = { lat: 45, lng: 14 };
 /*
@@ -140,7 +111,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
   markerClusterData: L.Marker[] = [];
   markerClusterOptions: L.MarkerClusterGroupOptions;
   osmap: L.Map;
-  nominatimOsmGeocoder: NominatimService;
 
   // Set the initial set of displayed layers
   options = {
@@ -153,6 +123,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
   constructor(
     private catalogService: CatalogService,
+    private nominatimOsmGeocoder: NominatimService,
     // private geoCoder: GeoCoder,
     private ref: ChangeDetectorRef,
     private notify: NotificationService,
@@ -220,8 +191,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
 
     let cityPosition = this.catalogService.getProviderPosition(provider);
-    this.osmap.panTo(new L.LatLng(cityPosition[0], cityPosition[1]));
-    this.osmap.setZoom(14);
+    this.osmap.setView(new L.LatLng(cityPosition[0], cityPosition[1]), 14);
     this.center = { lat: cityPosition[0], lng: cityPosition[1] };
 
   };
@@ -233,11 +203,13 @@ export class SearchMapComponent implements OnInit, OnChanges {
   onMapReady(map: L.Map) {
     this.osmap = map;
 
-    this.nominatimOsmGeocoder = new NominatimService(new HttpClient());
     let self = this;
     //
     this.osmap.on('moveend', function(e) {
       self.onCenterChanged(e);
+    });
+    this.osmap.on('zoomend', function(e) {
+      self.onZoomChanged(e);
     });  
     //
     /*
@@ -270,7 +242,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   onZoomChanged(event) {
-    if (!this.map) {
+    if (!this.osmap) {
       return;
     }
     if (!this.reloading) {
@@ -367,19 +339,13 @@ export class SearchMapComponent implements OnInit, OnChanges {
               "target" : self
             };
             
-            
-
-
             m.on('click', function(e) {
               let target = m.properties.target;
               target.marker = m;
              
-              console.log('cicciotest 22 ', m);
-
               self.nominatimOsmGeocoder.addressLookup(m.properties.iri).subscribe(results => {
-
-                  console.log('ciccio test 4444');
                     // look outside in order to enrich details for that given place id
+                    console.log('Checkpoint Nominatim Results:', results);
                     if (results[0]) {
                       target.marker.properties.address = results[0].formatted_address
                     }
@@ -392,8 +358,23 @@ export class SearchMapComponent implements OnInit, OnChanges {
                   }
                 );
               
-                console.log('open info window? [check cicciotest 333]');
+                console.log('open info window? [check cicciotest 333]', m);
               //  target.ngMap.infoWindows["tag-iw"].open(m);
+
+              /*
+               what did these infowindows do?
+              var myPopup = L.DomUtil.create('div', 'infoWindow');
+              myPopup.innerHTML = "<div id='info'><p id='title'>" + users[i].title + "</p><p>" + users[i].addr + "</p></div>";
+      
+                  marker.bindPopup(myPopup);
+      
+              $('#info', myPopup).on('click', function() {
+                  $("#userTitle").html(users[i].title).html();
+                  $("#userAddr").html(users[i].addr).html();
+                  $("#userDesc").html(users[i].desc).html();
+      
+                  $("#userDetails").modal("show");
+                    */
 
 
 
