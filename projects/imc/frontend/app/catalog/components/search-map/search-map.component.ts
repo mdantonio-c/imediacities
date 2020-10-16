@@ -227,7 +227,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
         */
     //
 
-    this.zoom = this.osmap.getZoom();
+    // this.zoom = this.osmap.getZoom();
     this.filter.provider != null
       ? this.centerCity(this.filter.provider)
       : this.centerEurope();
@@ -342,7 +342,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
           let relevantCreations = new Map();
           mapTags.forEach((tag) => {
-            let m = L.marker([tag.spatial[0], tag.spatial[1]]).addTo(this.osmap);
+            let m = L.marker([tag.spatial[0], tag.spatial[1]]); // .addTo(this.osmap);
             // let self = this;
             m.properties = {
               "iri" : tag.iri,
@@ -374,8 +374,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
               
                 console.log('marker clicked', m, target);
               //  target.ngMap.infoWindows["tag-iw"].open(m);
-          
-              var myPopupCode = $('#tag-iw').html();
+                
+              var myPopupCode = "recupera codice da template"
               m.bindPopup(myPopupCode);
 
             });
@@ -411,22 +411,26 @@ export class SearchMapComponent implements OnInit, OnChanges {
       this.osmap.removeLayer(m);
     }
     this.markers = [];
-    if (this.markerClusterer !== undefined) {
-      this.markerClusterer.clearLayers();
+    if (!!this.markerClusterer) {
+      this.osmap.removeLayer( this.markerClusterer);
+      this.markerClusterer = false;
     }
   }
 
   private updateClusters() {
 
-    this.markerClusterer = L.markerClusterGroup();
-    for (let mi = 0; mi < this.markers.length; mi++) {
-      this.markerClusterer.addLayer(this.markers[mi]);
-    }
-  
-  
-    console.log('check updateClusters 7777777 ', this.markers);
+    if(!this.markerClusterer ) {
+      this.markerClusterer = L.markerClusterGroup({
+        chunkedLoading: true,
+        //singleMarkerMode: true,
+        spiderfyOnMaxZoom: false
+      });
+      for (let mi = 0; mi < this.markers.length; mi++) {
+        this.markerClusterer.addLayer(this.markers[mi]);
+      }
 
-    this.osmap.addLayer(this.markerClusterer);
+      this.osmap.addLayer(this.markerClusterer);
+    }
     /*
     this.markerClusterer = new MarkerClusterer(this.map, this.markers, {
       imagePath:
