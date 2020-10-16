@@ -21,6 +21,7 @@ import { NominatimService } from "../../services/nominatim.service";
 import { NotificationService } from "@rapydo/services/notification";
 // import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
 
+import { MapInfowindowComponent } from "../map-infowindow/map-infowindow.component"
 
 
 import * as L from "leaflet";
@@ -67,6 +68,10 @@ export interface MediaSource {
   year: string;
 }
 declare var MarkerClusterer: any;
+
+interface LMarkerPlus extends L.Marker {
+  properties: any;
+}
 
 @Component({
   selector: "search-map",
@@ -119,6 +124,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
     center: [europeCenter.lat, europeCenter.lng],
   };
 
+
+
   marker: any = {};
 
   constructor(
@@ -127,7 +134,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
     // private geoCoder: GeoCoder,
     private ref: ChangeDetectorRef,
     private notify: NotificationService,
-    private renderer: Renderer2 // private mapApiLoader: CustomNgMapApiLoader
+    private renderer: Renderer2, // private mapApiLoader: CustomNgMapApiLoader
+    private infowindow : MapInfowindowComponent,
   ) {
     // mapApiLoader.setUrl();
   }
@@ -338,7 +346,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
           let relevantCreations = new Map();
           mapTags.forEach((tag) => {
-            let m = L.marker([tag.spatial[0], tag.spatial[1]]); // .addTo(this.osmap);
+            let m = L.marker([tag.spatial[0], tag.spatial[1]]) as LMarkerPlus;// .addTo(this.osmap);
             // let self = this;
             m.properties = {
               "iri" : tag.iri,
@@ -368,9 +376,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
                   }
                 );
               
-                console.log('marker clicked', m, target);
+                console.log('marker clicked', m, target, target as HTMLInputElement, this.infowindow, this.infowindow.nativeElement);
               //  target.ngMap.infoWindows["tag-iw"].open(m);
-                
+
               var myPopupCode = "recupera codice da template"
               m.bindPopup(myPopupCode);
 

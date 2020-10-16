@@ -1,0 +1,24 @@
+#infowindow-content .place-info .title {
+	color: #6e7a7f;
+	font-weight: bold;
+	font-size: 14px;
+  }
+  
+  #infowindow-content .place-item-list {
+	border-top: 1px solid rgb(204, 204, 204);
+	margin-top: 9px;
+	padding: 6px;
+	font-size: 13px;
+	max-height: 80px;
+	overflow: auto;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: Roboto, Arial;
+  }
+  
+  #infowindow-content .place-item-list a {
+	cursor: pointer;
+	color: rgb(66, 127, 237);
+	text-decoration: none;
+	padding: 0px 4px;
+  }
