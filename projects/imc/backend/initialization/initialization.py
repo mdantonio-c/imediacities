@@ -276,7 +276,7 @@ class Customizer(BaseCustomizer):
         return {}
 
     @staticmethod
-    def get_custom_fields(request):
+    def get_custom_input_fields(request):
 
         # required = request and request.method == "POST"
         return {
@@ -294,3 +294,9 @@ class Customizer(BaseCustomizer):
                 ),
             )
         }
+
+    @staticmethod
+    def get_custom_output_fields(request):
+        fields = Customizer.get_custom_input_fields(request)
+
+        return fields
