@@ -79,7 +79,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   @Output() onMapChange: EventEmitter<any> = new EventEmitter<string>();
 
   public map; // obsolete - google map
-  private zoom;
+  private zoom : 4;
   private center;
   private reloading: boolean = false;
   // mapStyle = mapStyles.hide;
@@ -222,6 +222,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
         );
         */
     //
+
     this.zoom = this.osmap.getZoom();
     this.filter.provider != null
       ? this.centerCity(this.filter.provider)
@@ -249,18 +250,22 @@ export class SearchMapComponent implements OnInit, OnChanges {
       this.reloading = true;
     }
 
-    let oldZoom = this.zoom;
-    let newZoom = event.target.zoom;
-    if (newZoom !== oldZoom) {
+
       // zoom changed
       /*console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);*/
-      // fit the circle radius properly
-      this.radius = Math.pow(2, oldZoom - newZoom) * this.radius;
-      // console.log('new radius: ' + sc.radius + ' meters');
-      this.zoom = newZoom;
+
+      let ne = this.osmap.getBounds().getNorthEast();
+      let sw = this.osmap.getBounds().getSouthWest();
+      let distance = ne.distanceTo(sw);
+      this.radius = distance / 2;
+
+      console.log('onZoomChanged check ',  ne, sw, distance, this.radius);
+
+
       /*console.log('onZoomChanged: reloading geo-tags? ', this.reloading);*/
       if (this.filter.provider !== null && this.reloading) {
-        let pos = [this.map.getCenter().lat(), this.map.getCenter().lng()];
+        let latLng = this.osmap.getCenter();
+        let pos = [latLng.lat, latLng.lng];
         this.loadGeoTags(pos, this.radius);
         this.reloading = false;
       }
@@ -270,7 +275,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
           "Select a city from the filter on the left in order to get geo-tags on the map"
         );
       }
-    }
+    
   }
 
   onCenterChanged = function(event) {
@@ -317,8 +322,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   private loadGeoTags(position: number[], distance: number) {
-    /*console.log('loading annotations on the map from center [' + position[0] + ', ' +
-      position[1] + '] within distance: ' + distance + ' (meters)');*/
+    console.log('loading annotations on the map from center [' + position[0] + ', ' +
+      position[1] + '] within distance: ' + distance + ' (meters) - oh and of course filter', this.filter);
+
     let self = this;  
 
     this.clearMarkers();
@@ -327,9 +333,11 @@ export class SearchMapComponent implements OnInit, OnChanges {
       .subscribe(
         (response) => {
           let mapTags = response;
+
+          console.log('mapTags = ', mapTags);
+
           let relevantCreations = new Map();
           mapTags.forEach((tag) => {
-
             let m = L.marker([tag.spatial[0], tag.spatial[1]]).addTo(this.osmap);
             // let self = this;
             m.properties = {
@@ -340,15 +348,17 @@ export class SearchMapComponent implements OnInit, OnChanges {
             };
             
             m.on('click', function(e) {
+
+
               let target = m.properties.target;
               target.marker = m;
              
-              self.nominatimOsmGeocoder.addressLookup(m.properties.iri).subscribe(results => {
+              self.nominatimOsmGeocoder.addressLookup(m.properties.name).subscribe(results => {
                     // look outside in order to enrich details for that given place id
                     console.log('Checkpoint Nominatim Results:', results);
-                    if (results[0]) {
-                      target.marker.properties.address = results[0].formatted_address
-                    }
+                    //if (results[0]) {
+                    //  target.marker.properties.address = results[0].formatted_address
+                    //}
                   },
                   (error) => {
                     target.notify.showWarning(
@@ -358,25 +368,11 @@ export class SearchMapComponent implements OnInit, OnChanges {
                   }
                 );
               
-                console.log('open info window? [check cicciotest 333]', m);
+                console.log('marker clicked', m, target);
               //  target.ngMap.infoWindows["tag-iw"].open(m);
-
-              /*
-               what did these infowindows do?
-              var myPopup = L.DomUtil.create('div', 'infoWindow');
-              myPopup.innerHTML = "<div id='info'><p id='title'>" + users[i].title + "</p><p>" + users[i].addr + "</p></div>";
-      
-                  marker.bindPopup(myPopup);
-      
-              $('#info', myPopup).on('click', function() {
-                  $("#userTitle").html(users[i].title).html();
-                  $("#userAddr").html(users[i].addr).html();
-                  $("#userDesc").html(users[i].desc).html();
-      
-                  $("#userDetails").modal("show");
-                    */
-
-
+          
+              var myPopupCode = $('#tag-iw').html();
+              m.bindPopup(myPopupCode);
 
             });
 
@@ -418,7 +414,15 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
   private updateClusters() {
 
-    console.warn('TODO redo updateClusters')
+    this.markerClusterer = L.markerClusterGroup();
+    for (let mi = 0; mi < this.markers.length; mi++) {
+      this.markerClusterer.addLayer(this.markers[mi]);
+    }
+  
+  
+    console.log('check updateClusters 7777777 ', this.markers);
+
+    this.osmap.addLayer(this.markerClusterer);
     /*
     this.markerClusterer = new MarkerClusterer(this.map, this.markers, {
       imagePath:
