@@ -1,3 +1,5 @@
+from restapi.customizer import BaseCustomizer
+from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
@@ -238,22 +240,57 @@ class Initializer:
             log.info("Provider MNC successfully created")
 
 
-class Customizer:
-    def custom_user_properties(self, properties):
-        return properties
+class Customizer(BaseCustomizer):
+    @staticmethod
+    def custom_user_properties_pre(properties):
+        extra_properties = {}
+        # if 'myfield' in properties:
+        #     extra_properties['myfield'] = properties['myfield']
+        return properties, extra_properties
 
-    def custom_post_handle_user_input(self, auth, user_node, properties):
+    @staticmethod
+    def custom_user_properties_post(user, properties, extra_properties, db):
 
         try:
-            group = auth.db.Group.nodes.get(shortname="default")
-        except auth.db.Group.DoesNotExist:
+            group = db.Group.nodes.get(shortname="default")
+        except db.Group.DoesNotExist:
             log.warning("Unable to find default group, creating")
-            group = auth.db.Group()
+            group = db.Group()
             group.fullname = "Default user group"
             group.shortname = "default"
             group.save()
 
-        log.info("Link {} to group {}", user_node.email, group.shortname)
-        user_node.belongs_to.connect(group)
+        log.info("Link {} to group {}", user.email, group.shortname)
+        user.belongs_to.connect(group)
 
         return True
+
+    @staticmethod
+    def manipulate_profile(ref, user, data):
+        data["declared_institution"] = user.declared_institution
+
+        return data
+
+    @staticmethod
+    def get_user_editable_fields(request):
+        return {}
+
+    @staticmethod
+    def get_custom_fields(request):
+
+        # required = request and request.method == "POST"
+        return {
+            "declared_institution": fields.Str(
+                required=False,
+                default="none",
+                validate=validate.OneOf(
+                    choices=["archive", "university", "research_institution", "none"],
+                    labels=[
+                        "Archive",
+                        "University",
+                        "Research Institution",
+                        "None of the above",
+                    ],
+                ),
+            )
+        }
