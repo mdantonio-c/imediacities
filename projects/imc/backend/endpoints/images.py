@@ -50,15 +50,14 @@ class Images(IMCEndpoint):
         description="Returns a list containing all images. the list supports paging.",
         responses={
             200: "List of images successfully retrieved",
-            404: "The image does not exists.",
+            403: "Operation not authorized",
+            404: "The image does not exists",
         },
     )
     def get(self, image_id=None):
 
         if image_id is None and not self.verify_admin():
-            raise RestApiException(
-                "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
-            )
+            raise Forbidden("You are not authorized")
 
         log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = self.get_service_instance("neo4j")
