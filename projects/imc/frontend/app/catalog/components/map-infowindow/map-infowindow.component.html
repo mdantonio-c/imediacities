@@ -4,19 +4,19 @@
 <div id="tag-iw">
 	<div id="infowindow-content">
 	  <div class="place-info">
-		<span id="place-name" class="title">{{ marker.name }}</span>
+		<span id="place-name" class="title">{{ properties.name }}</span>
 		<br />
-		<span *ngIf="!marker.address">
+		<span *ngIf="!properties.address">
 		  <i
 			class="fa fa-spinner fa-spin"
 			aria-hidden="true"
 			style="font-size: 12px;"
 		  ></i>
 		</span>
-		<span id="place-address">{{ marker?.address }}</span>
+		<span id="place-address">{{ properties?.address }}</span>
 	  </div>
 	  <div class="place-item-list">
-		<div *ngFor="let source of marker.sources" style="display: list-item;">
+		<div *ngFor="let source of properties.sources" style="display: list-item;">
 		  <i
 			class="icon-only imc-icon fa fa-video grey bigger-110"
 			[ngClass]="{
@@ -26,15 +26,15 @@
 		  ></i>
 		  <a
 			[routerLink]="['images', source.uuid]"
-			*ngIf="source.type === 'Image'"
-			>{{ source?.title || "n/a" }}</a
+			*ngIf="properties.type === 'Image'"
+			>{{ properties?.title || "n/a" }}</a
 		  >
 		  <a
 			[routerLink]="['videos', source.uuid]"
 			*ngIf="source.type === 'Video'"
-			>{{ source?.title || "n/a" }}</a
+			>{{ properties?.title || "n/a" }}</a
 		  >
-		  <i *ngIf="source.year">({{ source?.year | slice: 0:4 }})</i>
+		  <i *ngIf="source.year">({{ properties?.year | slice: 0:4 }})</i>
 		</div>
 	  </div>
 	</div>

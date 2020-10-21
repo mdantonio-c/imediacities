@@ -27,6 +27,8 @@ import { MapInfowindowComponent } from "../map-infowindow/map-infowindow.compone
 import * as L from "leaflet";
 import "leaflet.markercluster";
 
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+
 
 
 const europeCenter = { lat: 45, lng: 14 };
@@ -135,7 +137,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
     private ref: ChangeDetectorRef,
     private notify: NotificationService,
     private renderer: Renderer2, // private mapApiLoader: CustomNgMapApiLoader
-    private infowindow : MapInfowindowComponent,
+    private modalService: NgbModal
   ) {
     // mapApiLoader.setUrl();
   }
@@ -354,9 +356,10 @@ export class SearchMapComponent implements OnInit, OnChanges {
               "sources" : tag.sources,
               "target" : self
             };
-            
-            m.on('click', function(e) {
 
+            m.on("click", self.openInfoWindow.bind(self, m.properties));
+/*
+            m.on('click', function(e) {
 
               let target = m.properties.target;
               target.marker = m;
@@ -376,13 +379,9 @@ export class SearchMapComponent implements OnInit, OnChanges {
                   }
                 );
               
-                console.log('marker clicked', m, target, target as HTMLInputElement, this.infowindow, this.infowindow.nativeElement);
-              //  target.ngMap.infoWindows["tag-iw"].open(m);
-
-              var myPopupCode = "recupera codice da template"
-              m.bindPopup(myPopupCode);
-
-            });
+              // m.bindPopup(myPopupCode);
+              m.on("click", self.openInfoWindow.bind(self, m.properties));
+            });*/
 
             this.markers.push(m);
 
@@ -407,6 +406,42 @@ export class SearchMapComponent implements OnInit, OnChanges {
         }
       );
   }
+
+  private openInfoWindow(props: {}) {
+
+    console.log('openInfoWindow', props);
+    const modalRef = this.modalService.open(MapInfowindowComponent, {
+      size: "xl",
+      centered: true,
+    });
+    modalRef.componentInstance.properties = props;
+
+
+/*
+    //
+
+    let target = props.target;
+   
+    this.nominatimOsmGeocoder.addressLookup(props.name).subscribe(results => {
+          // look outside in order to enrich details for that given place id
+          console.log('Checkpoint Nominatim Results:', results);
+          //if (results[0]) {
+          //  target.marker.properties.address = results[0].formatted_address
+          //}
+        },
+        (error) => {
+          target.notify.showWarning(
+            "Unable to get info for place ID: " + props.iri
+          );
+          target.marker.set("address", "n/a");
+        }
+      );
+*/    
+    
+    // need to trigger resize event
+    window.dispatchEvent(new Event("resize"));
+  }
+
 
   private clearMarkers() {
     console.log('clear markers');
