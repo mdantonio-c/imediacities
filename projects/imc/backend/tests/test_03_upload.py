@@ -25,15 +25,13 @@ class TestApp(BaseTests):
 
         log.info("*** Cerco il gruppo di test")
         group_id = None
-        group_shortname = None
         resp = client.get("/api/admin/groups", headers=headers)
         assert resp.status_code == hcodes.HTTP_OK_BASIC
         groups = json.loads(resp.data.decode("utf-8"))
         for g in groups:
             if g.get("shortname") != "default":
                 continue
-            group_id = g.get("id")
-            group_shortname = g.get("shortname")
+            group_id = g.get("uuid")
         # deve esistere il gruppo di test
         assert group_id is not None
 
@@ -62,9 +60,8 @@ class TestApp(BaseTests):
             {"description": "automatic", "name": "normal_user"},
             {"description": "automatic", "name": "staff_user"},
         ]
-        group_data = {"id": group_id, "shortname": group_shortname}
         put_data = {
-            "group": group_data,
+            "group": group_id,
             "email": "user@nomail.org",
             "name": "Default",
             "password": "test",
