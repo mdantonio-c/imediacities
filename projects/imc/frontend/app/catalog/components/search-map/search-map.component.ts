@@ -407,24 +407,27 @@ export class SearchMapComponent implements OnInit, OnChanges {
       );
   }
 
-  private openInfoWindow(props: {}) {
+  private openInfoWindow(props) {
 
     console.log('openInfoWindow', props);
     const modalRef = this.modalService.open(MapInfowindowComponent, {
-      size: "xl",
+      size: "l",
       centered: true,
     });
     modalRef.componentInstance.properties = props;
 
-
-/*
     //
 
     let target = props.target;
    
     this.nominatimOsmGeocoder.addressLookup(props.name).subscribe(results => {
           // look outside in order to enrich details for that given place id
-          console.log('Checkpoint Nominatim Results:', results);
+          // console.log('Checkpoint Nominatim Results:', results);
+          if(results.length > 0 ) {
+            console.log('Checkpoint Nominatim Results ----- ', results[results.length-1], modalRef);
+            modalRef.componentInstance.address = results[results.length-1].displayName;
+          }
+          
           //if (results[0]) {
           //  target.marker.properties.address = results[0].formatted_address
           //}
@@ -436,7 +439,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
           target.marker.set("address", "n/a");
         }
       );
-*/    
+ 
     
     // need to trigger resize event
     window.dispatchEvent(new Event("resize"));

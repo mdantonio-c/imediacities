@@ -6,14 +6,14 @@
 	  <div class="place-info">
 		<span id="place-name" class="title">{{ properties.name }}</span>
 		<br />
-		<span *ngIf="!properties.address">
+		<span *ngIf="!address">
 		  <i
 			class="fa fa-spinner fa-spin"
 			aria-hidden="true"
 			style="font-size: 12px;"
 		  ></i>
 		</span>
-		<span id="place-address">{{ properties?.address }}</span>
+		<span id="place-address">{{address}}</span>
 	  </div>
 	  <div class="place-item-list">
 		<div *ngFor="let source of properties.sources" style="display: list-item;">
@@ -26,15 +26,15 @@
 		  ></i>
 		  <a
 			[routerLink]="['images', source.uuid]"
-			*ngIf="properties.type === 'Image'"
-			>{{ properties?.title || "n/a" }}</a
+			*ngIf="source.type === 'Image'"
+			>{{ source?.title || "n/a" }}</a
 		  >
 		  <a
 			[routerLink]="['videos', source.uuid]"
 			*ngIf="source.type === 'Video'"
-			>{{ properties?.title || "n/a" }}</a
+			>{{ source?.title || "n/a" }}</a
 		  >
-		  <i *ngIf="source.year">({{ properties?.year | slice: 0:4 }})</i>
+		  <i *ngIf="source.year">({{ source?.year | slice: 0:4 }})</i>
 		</div>
 	  </div>
 	</div>
