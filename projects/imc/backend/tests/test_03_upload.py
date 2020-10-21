@@ -26,15 +26,14 @@ class TestApp(BaseTests):
         log.info("*** Cerco il gruppo di test")
         group_id = None
         group_shortname = None
-        res_group = client.get("/api/group/test", headers=headers)
-        assert res_group.status_code == hcodes.HTTP_OK_BASIC
-        contents_group = json.loads(res_group.data.decode("utf-8"))
-        if contents_group is not None:
-            datas_group = contents_group.get("Response", {}).get("data", {})
-            if datas_group is not None and datas_group[0] is not None:
-                # datas e' una lista
-                group_id = datas_group[0].get("id")
-                group_shortname = datas_group[0].get("shortname")
+        resp = client.get("/api/admin/groups", headers=headers)
+        assert resp.status_code == hcodes.HTTP_OK_BASIC
+        groups = json.loads(resp.data.decode("utf-8"))
+        for g in groups:
+            if g.get("shortname") != "default":
+                continue
+            group_id = g.get("id")
+            group_shortname = g.get("shortname")
         # deve esistere il gruppo di test
         assert group_id is not None
 

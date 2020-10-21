@@ -44,29 +44,24 @@ class TestApp(BaseTests):
 
         log.info("*** Search for the test group")
         group_id = None
-        res = client.get("/api/group/test", headers=headers)
-        assert res.status_code == hcodes.HTTP_OK_BASIC
-        contents = json.loads(res.data.decode("utf-8"))
-        if contents is not None:
-            datas = contents.get("Response", {}).get("data", {})
-            if datas is not None and datas[0] is not None:
-                # datas e' una lista
-                group_id = datas[0].get("id")
-                # log.debug("*** group: " + json.dumps(datas[0]))
-                # deve esistere il gruppo di test
-                assert group_id is not None
+        resp = client.get("/api/admin/groups", headers=headers)
+        assert resp.status_code == hcodes.HTTP_OK_BASIC
+        groups = json.loads(resp.data.decode("utf-8"))
+        for g in groups:
+            if g.get("shortname") != "default":
+                continue
+            group_id = g.get("id")
+        # deve esistere il gruppo di test
+        assert group_id is not None
 
         filename = None
         # GET all stage files by group
         res2 = client.get("/api/stage/" + group_id, headers=headers)
         assert res2.status_code == hcodes.HTTP_OK_BASIC
         stage_content2 = json.loads(res2.data.decode("utf-8"))
-        # log.debug("*** Response of GET stage with group id: "+json.dumps(stage_content2))
         if stage_content2 is not None:
             element_list2 = stage_content2.get("Response", {}).get("data", {})
             if element_list2 is not None:
-                # log.debug("*** Number of stage elements of the test group: " + str(len(element_list2)))
-                # log.debug("*** Stage elements of the test group: " + json.dumps(element_list2))
                 # devo cercare un file di metadati per usarlo nella POST successiva
                 for x in element_list2:
                     if x.get("type") == "metadata" and x.get("name").startswith("test"):
@@ -82,14 +77,10 @@ class TestApp(BaseTests):
             post_data = {"filename": filename, "mode": "clean"}
             res = client.post("/api/stage", headers=headers, data=json.dumps(post_data))
             assert res.status_code == hcodes.HTTP_OK_BASIC
-            contents = json.loads(res.data.decode("utf-8"))
             # log.debug("*** Response of post stage: "+json.dumps(contents))
-            if contents is not None:
-                datas = contents.get("Response", {}).get("data", {})
         log.debug(
             "*** Start a pause of 20 sec to give time to the import task to finish..."
         )
-        # metto una pausa per permettere all'import di terminare altrimenti i test successivi
         # non trovano i dati di cui hanno bisogno
         time.sleep(20)  # 20 sec
         log.debug("*** End of pause of 20 sec")
