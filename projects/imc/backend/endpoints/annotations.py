@@ -187,7 +187,6 @@ class Annotations(IMCEndpoint):
     def post(self, **data):
         """ Create a new annotation. """
         # TODO access control (annotation cannot be created by general user if not in public domain)
-        # data = self.get_input()
         if len(data) == 0:
             raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
         if "target" not in data:
@@ -492,7 +491,7 @@ class Annotations(IMCEndpoint):
             404: "Annotation does not exist.",
         },
     )
-    def put(self, anno_id):
+    def put(self, anno_id, **data):
         """
         Update an annotation.
 
@@ -531,7 +530,6 @@ class Annotations(IMCEndpoint):
                 status_code=hcodes.HTTP_BAD_REQUEST,
             )
 
-        data = self.get_input()
         if anno.annotation_type == "DSC":
             if "body" not in data:
                 raise RestApiException(

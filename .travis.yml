@@ -23,7 +23,7 @@ script:
   - export COMMIT_INFO_TIMESTAMP="$(git show -s --pretty=%ct)"
   - export COMMIT_INFO_REMOTE="$(git config --get remote.origin.url)"
   - export CYPRESS_GROUP="$(git show -s --pretty=%H)"
-  - TESTING=1 rapydo init
+  - rapydo --testing init
   - sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/imc/project_configuration.yaml
   - >
     if [[ "$STAGE" != "FRONTEND" ]]; then
@@ -36,12 +36,12 @@ script:
   - >
     if [[ "$STAGE" == "BACKEND" ]]; then
 
-      rapydo shell backend 'restapi tests --wait';
+      rapydo shell backend 'restapi tests --wait' || travis_terminate 1;
       docker cp imc_backend_1:/code/coverage.xml coverage.xml;
       travis_retry bash <(curl -s https://codecov.io/bash);
 
       docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}";
-      docker push imediacities/backend:${RAPYDO_VERSION};
+      docker push imediacities/celery:${RAPYDO_VERSION};
 
     elif [[ "$STAGE" == "FRONTEND" ]]; then
 
@@ -56,7 +56,7 @@ script:
 
     elif [[ "$STAGE" == "CYPRESS" ]]; then
 
-      rapydo shell backend 'restapi wait';
+      sleep 30;
       rapydo shell backend --detach "restapi launch";
       rapydo -s frontend logs;
       rapydo shell frontend "yarn install" || travis_terminate 1;
