@@ -9,10 +9,13 @@ import { Component, ElementRef, OnInit, Input } from '@angular/core';
 export class MapInfowindowComponent {
 
   elRef: ElementRef;
+  properties: any;
+  address: string;
   marker: any;
 
   constructor(elRef: ElementRef) {
     this.elRef = elRef;
+    this.address = "";
   }
 
   ngOnInit() {
