@@ -34,10 +34,3 @@ class TestApp(BaseTests):
         )
 
         assert res.status_code == hcodes.HTTP_OK_BASIC
-        # response = json.loads(res.data.decode("utf-8"))
-        # log.debug("*** Response of search: "+json.dumps(response))
-
-        # if response is not None:
-        #     videos_data = response.get("Response", {}).get("data", {})
-        #     # if videos_data is not None:
-        #     #     log.debug("*** Number of videos found: " + str(len(videos_data)))

@@ -35,12 +35,6 @@ class TestApp(BaseTests):
         res = client.get("/api/stage", headers=headers)
         assert res.status_code == hcodes.HTTP_OK_BASIC
         # stage_content = json.loads(res.data.decode("utf-8"))
-        # log.debug("*** Response of GET stage: "+json.dumps(stage_content))
-        # if stage_content is not None:
-        #     element_list = stage_content.get("Response", {}).get("data", {})
-        #     # if element_list is not None:
-        #     # log.debug("*** Number of stage elements: " + str(len(element_list)))
-        #     # log.debug("*** Stage elements: " + json.dumps(element_list))
 
         log.info("*** Search for the test group")
         group_id = None
@@ -60,14 +54,12 @@ class TestApp(BaseTests):
         assert res2.status_code == hcodes.HTTP_OK_BASIC
         stage_content2 = json.loads(res2.data.decode("utf-8"))
         if stage_content2 is not None:
-            element_list2 = stage_content2.get("Response", {}).get("data", {})
-            if element_list2 is not None:
-                # devo cercare un file di metadati per usarlo nella POST successiva
-                for x in element_list2:
-                    if x.get("type") == "metadata" and x.get("name").startswith("test"):
-                        filename = x.get("name")
-                        # log.debug("*** Metadata filename: "+json.dumps(filename))
-                        break
+            # devo cercare un file di metadati per usarlo nella POST successiva
+            for x in stage_content2:
+                if x.get("type") == "metadata" and x.get("name").startswith("test"):
+                    filename = x.get("name")
+                    # log.debug("*** Metadata filename: "+json.dumps(filename))
+                    break
 
         # il POST corrisponde all'import
         if filename is not None:

@@ -42,15 +42,12 @@ class TestApp(BaseTests):
         log.info("*** Faccio get del profile")
         res_profile = client.get("/auth/profile", headers=headers)
         assert res_profile.status_code == hcodes.HTTP_OK_BASIC
-        contents_profile = json.loads(res_profile.data.decode("utf-8"))
-        if contents_profile is not None:
-            # log.debug("*** Response of get profile: "+json.dumps(contents_profile))
-            data_profile = contents_profile.get("Response", {}).get("data", {})
-            if data_profile is not None:
-                # log.debug("*** Data of get profile: "+json.dumps(data_profile))
-                if data_profile.get("uuid") is not None:
-                    user_id = data_profile.get("uuid")
-                    # log.debug("*** user_id: "+json.dumps(user_id))
+        data_profile = json.loads(res_profile.data.decode("utf-8"))
+        if data_profile is not None:
+            # log.debug("*** Data of get profile: "+json.dumps(data_profile))
+            if data_profile.get("uuid") is not None:
+                user_id = data_profile.get("uuid")
+                # log.debug("*** user_id: "+json.dumps(user_id))
         # il mio user_id deve esistere
         assert user_id is not None
 
