@@ -66,7 +66,7 @@ class Videos(IMCEndpoint):
         responses={
             200: "List of videos successfully retrieved",
             403: "Operation not authorized",
-            404: "The video does not exists.",
+            404: "The video does not exists",
         },
     )
     def get(self, video_id=None):
@@ -855,7 +855,7 @@ class VideoTools(IMCEndpoint):
         celery = self.get_service_instance("celery")
         task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
-        return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response(task.id, code=202)
 
 
 class VideoShotRevision(IMCEndpoint):
@@ -1064,7 +1064,7 @@ class VideoShotRevision(IMCEndpoint):
             rel.state = "R"
             rel.save()
             # 202: OK_ACCEPTED
-            return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+            return self.response(task.id, code=202)
         except BaseException as e:
             raise e
 

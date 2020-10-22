@@ -107,7 +107,7 @@ class Images(IMCEndpoint):
     @decorators.endpoint(
         path="/images",
         summary="Create a new image description",
-        description="Simple method to attach descriptive metadata to a previously uploaded image (item).",
+        description="Simple method to attach descriptive metadata to an image item",
         responses={200: "Image description successfully created"},
     )
     def post(self):
@@ -471,4 +471,4 @@ class ImageTools(IMCEndpoint):
         celery = self.get_service_instance("celery")
         task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
-        return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response(task.id, code=202)
