@@ -34,7 +34,7 @@ class TestApp(BaseTests):
         # try without log in
         res = client.get("/api/annotations")
         # This endpoint requires a valid authorization token
-        assert res.status_code == 200
+        assert res.status_code == 401
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
@@ -84,7 +84,7 @@ class TestApp(BaseTests):
         post_data = {"target": target_data, "body": body_data}
         # POST: try without log in
         res = client.post("/api/annotations", headers=None, data=json.dumps(post_data))
-        assert res.status_code == 200
+        assert res.status_code == 401
         # POST: create a new annotation
         res = client.post(
             "/api/annotations", headers=headers, data=json.dumps(post_data)
