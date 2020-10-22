@@ -25,7 +25,7 @@ class TestApp(BaseTests):
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
         res = client.get("/api/videos", headers=headers)
-        assert res.status_code == hcodes.HTTP_OK_BASIC
+        assert res.status_code == 200
         datas = json.loads(res.data.decode("utf-8"))
         if datas is not None and datas[0] is not None:
             video_id = datas[0].get("id")
@@ -34,7 +34,7 @@ class TestApp(BaseTests):
             # log.debug("*** videos[0] id: " + video_id)
             # GET shots
             res = client.get("/api/videos/" + video_id + "/shots", headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
             shots_list = json.loads(res.data.decode("utf-8"))
             if shots_list is not None:
                 # log.debug("*** number of shots: " + str(len(shots_list)))
@@ -49,9 +49,8 @@ class TestApp(BaseTests):
             # GET a shot with a specific id
             # at the moment authorization token not required for GET shot
             res = client.get("/api/shots/" + shot_id)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
             log.info("*** Testing GET shot thumbnail")
             # GET shot thumbnail
             res = client.get("/api/shots/" + shot_id + "?content=thumbnail")
-            assert res.status_code == hcodes.HTTP_OK_BASIC
-            # log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
+            assert res.status_code == 200

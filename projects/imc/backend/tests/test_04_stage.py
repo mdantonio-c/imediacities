@@ -26,32 +26,31 @@ class TestApp(BaseTests):
         # try without log in
         res = client.get("/api/stage")
         # This endpoint requires a valid authorization token
-        assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-        # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        assert res.status_code == 401
         # log in
         log.debug("*** Do login")
         headers, _ = self.do_login(client, None, None)
         # GET all stage files
         res = client.get("/api/stage", headers=headers)
-        assert res.status_code == hcodes.HTTP_OK_BASIC
+        assert res.status_code == 200
         # stage_content = json.loads(res.data.decode("utf-8"))
 
         log.info("*** Search for the test group")
         group_id = None
         resp = client.get("/api/admin/groups", headers=headers)
-        assert resp.status_code == hcodes.HTTP_OK_BASIC
+        assert resp.status_code == 200
         groups = json.loads(resp.data.decode("utf-8"))
         for g in groups:
             if g.get("shortname") != "default":
                 continue
-            group_id = g.get("id")
+            group_id = g.get("uuid")
         # deve esistere il gruppo di test
         assert group_id is not None
 
         filename = None
         # GET all stage files by group
         res2 = client.get("/api/stage/" + group_id, headers=headers)
-        assert res2.status_code == hcodes.HTTP_OK_BASIC
+        assert res2.status_code == 200
         stage_content2 = json.loads(res2.data.decode("utf-8"))
         if stage_content2 is not None:
             # devo cercare un file di metadati per usarlo nella POST successiva
@@ -68,7 +67,7 @@ class TestApp(BaseTests):
             # lancio import con mode=clean così elabora il video e crea gli shot
             post_data = {"filename": filename, "mode": "clean"}
             res = client.post("/api/stage", headers=headers, data=json.dumps(post_data))
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
             # log.debug("*** Response of post stage: "+json.dumps(contents))
         log.debug(
             "*** Start a pause of 20 sec to give time to the import task to finish..."
@@ -85,5 +84,5 @@ class TestApp(BaseTests):
             res5 = client.delete(
                 "/api/stage", headers=headers, data=json.dumps(post_data_delete)
             )
-            assert res5.status_code == hcodes.HTTP_OK_NORESPONSE
+            assert res5.status_code == 204
             # log.debug("*** Deleted file: to_del.txt")

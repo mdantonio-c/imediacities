@@ -499,7 +499,7 @@ class Bulk(IMCEndpoint):
         else:
             raise BadRequest("Unexpected action request")
 
-        return self.response("Bulk request accepted", code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response("Bulk request accepted", code=202)
 
     def _bulk_import(self, group, mode, update, retry):
         log.info(

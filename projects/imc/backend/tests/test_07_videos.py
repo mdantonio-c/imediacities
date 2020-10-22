@@ -25,8 +25,7 @@ class TestApp(BaseTests):
         # try without log in
         res = client.get("/api/videos")
         # This endpoint requires a valid authorization token
-        assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-        # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        assert res.status_code == 401
 
         # log in
         log.debug("*** Do login")
@@ -34,7 +33,7 @@ class TestApp(BaseTests):
 
         # GET videos without a specific id, get all videos
         res = client.get("/api/videos", headers=headers)
-        assert res.status_code == hcodes.HTTP_OK_BASIC
+        assert res.status_code == 200
         datas = json.loads(res.data.decode("utf-8"))
 
         video_id = None
@@ -46,37 +45,34 @@ class TestApp(BaseTests):
         # GET a video with a specific id
         if video_id is not None:
             res = client.get("/api/videos/" + video_id, headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
 
         log.info("*** Testing GET video shots")
         if video_id is not None:
             # try without log in
             res = client.get("/api/videos/" + video_id + "/shots")
             # This endpoint requires a valid authorization token
-            assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-            # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+            assert res.status_code == 401
             # GET shots
             res = client.get("/api/videos/" + video_id + "/shots", headers=headers)
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
 
         log.info("*** Testing GET video annotations")
         if video_id is not None:
             # try without log in
             res = client.get("/api/videos/" + video_id + "/annotations")
             assert (
-                res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
+                res.status_code == 401
             )  # This endpoint requires a valid authorization token
-            # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
             # GET annotations
             res = client.get(
                 "/api/videos/" + video_id + "/annotations", headers=headers
             )
-            assert res.status_code == hcodes.HTTP_OK_BASIC
+            assert res.status_code == 200
 
         log.info("*** Testing GET video content")
         if video_id is not None:
             # GET content thumbnail
             # at the moment authorization token not required
             res = client.get("/api/videos/" + video_id + "/content?type=thumbnail")
-            assert res.status_code == hcodes.HTTP_OK_BASIC
-            # log.debug("*** Got http status " + str(hcodes.HTTP_OK_BASIC))
+            assert res.status_code == 200

@@ -26,7 +26,7 @@ class TestApp(BaseTests):
         log.info("*** Cerco il gruppo di test")
         group_id = None
         resp = client.get("/api/admin/groups", headers=headers)
-        assert resp.status_code == hcodes.HTTP_OK_BASIC
+        assert resp.status_code == 200
         groups = json.loads(resp.data.decode("utf-8"))
         for g in groups:
             if g.get("shortname") != "default":
@@ -39,7 +39,7 @@ class TestApp(BaseTests):
         user_id = None
         log.info("*** Faccio get del profile")
         res_profile = client.get("/auth/profile", headers=headers)
-        assert res_profile.status_code == hcodes.HTTP_OK_BASIC
+        assert res_profile.status_code == 200
         data_profile = json.loads(res_profile.data.decode("utf-8"))
         if data_profile is not None:
             # log.debug("*** Data of get profile: "+json.dumps(data_profile))
@@ -71,57 +71,57 @@ class TestApp(BaseTests):
         res_put = client.put(
             "/api/admin/users/" + user_id, headers=headers, data=json.dumps(put_data)
         )
-        assert res_put.status_code == hcodes.HTTP_OK_NORESPONSE
+        assert res_put.status_code == 204
 
-        log.info("*** Testing post /api/upload/")
+        # log.info("*** Testing post /api/upload/")
 
-        post_md_data = {
-            "file": ("tests/custom/testdata/test_md_1234.xml", "test_md_1234.xml"),
-            "flowChunkNumber": 1,
-            "flowFilename": "test_md_1234.xml",
-            "flowTotalChunks": 1,
-            "flowChunkSize": 1,
-        }
-        res = client.post(
-            "/api/upload",
-            headers=headers,
-            content_type="multipart/form-data",
-            data=post_md_data,
-        )
-        assert res.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res.data.decode("utf-8"))
+        # post_md_data = {
+        #     "file": ("tests/custom/testdata/test_md_1234.xml", "test_md_1234.xml"),
+        #     "flowChunkNumber": 1,
+        #     "flowFilename": "test_md_1234.xml",
+        #     "flowTotalChunks": 1,
+        #     "flowChunkSize": 1,
+        # }
+        # res = client.post(
+        #     "/api/upload",
+        #     headers=headers,
+        #     content_type="multipart/form-data",
+        #     data=post_md_data,
+        # )
+        # assert res.status_code == 202
+        # json.loads(res.data.decode("utf-8"))
 
-        post_video_data = {
-            "file": (
-                "tests/custom/testdata/test_video_1234.mp4",
-                "test_video_1234.mp4",
-            ),
-            "flowChunkNumber": 1,
-            "flowFilename": "test_video_1234.mp4",
-            "flowTotalChunks": 1,
-            "flowChunkSize": 1,
-        }
-        res2 = client.post(
-            "/api/upload",
-            headers=headers,
-            content_type="multipart/form-data",
-            data=post_video_data,
-        )
-        assert res2.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res2.data.decode("utf-8"))
+        # post_video_data = {
+        #     "file": (
+        #         "tests/custom/testdata/test_video_1234.mp4",
+        #         "test_video_1234.mp4",
+        #     ),
+        #     "flowChunkNumber": 1,
+        #     "flowFilename": "test_video_1234.mp4",
+        #     "flowTotalChunks": 1,
+        #     "flowChunkSize": 1,
+        # }
+        # res2 = client.post(
+        #     "/api/upload",
+        #     headers=headers,
+        #     content_type="multipart/form-data",
+        #     data=post_video_data,
+        # )
+        # assert res2.status_code == 202
+        # json.loads(res2.data.decode("utf-8"))
 
-        post_filetodel_data = {
-            "file": ("tests/custom/testdata/to_del.txt", "to_del.txt"),
-            "flowChunkNumber": 1,
-            "flowFilename": "to_del.txt",
-            "flowTotalChunks": 1,
-            "flowChunkSize": 1,
-        }
-        res3 = client.post(
-            "/api/upload",
-            headers=headers,
-            content_type="multipart/form-data",
-            data=post_filetodel_data,
-        )
-        assert res3.status_code == hcodes.HTTP_OK_ACCEPTED
-        json.loads(res3.data.decode("utf-8"))
+        # post_filetodel_data = {
+        #     "file": ("tests/custom/testdata/to_del.txt", "to_del.txt"),
+        #     "flowChunkNumber": 1,
+        #     "flowFilename": "to_del.txt",
+        #     "flowTotalChunks": 1,
+        #     "flowChunkSize": 1,
+        # }
+        # res3 = client.post(
+        #     "/api/upload",
+        #     headers=headers,
+        #     content_type="multipart/form-data",
+        #     data=post_filetodel_data,
+        # )
+        # assert res3.status_code == 202
+        # json.loads(res3.data.decode("utf-8"))
