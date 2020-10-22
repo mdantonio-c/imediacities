@@ -20,8 +20,7 @@ class TestApp(BaseTests):
         # try without log in
         res = client.post("/api/search")
         # This endpoint requires a valid authorization token
-        assert res.status_code == hcodes.HTTP_BAD_UNAUTHORIZED
-        # log.debug("*** Got http status " + str(hcodes.HTTP_BAD_UNAUTHORIZED))
+        assert res.status_code == 401
 
         # log in
         log.debug("*** Do login")
@@ -33,11 +32,4 @@ class TestApp(BaseTests):
             "/api/search?size=10&page=1", headers=headers, data=json.dumps(post_data)
         )
 
-        assert res.status_code == hcodes.HTTP_OK_BASIC
-        # response = json.loads(res.data.decode("utf-8"))
-        # log.debug("*** Response of search: "+json.dumps(response))
-
-        # if response is not None:
-        #     videos_data = response.get("Response", {}).get("data", {})
-        #     # if videos_data is not None:
-        #     #     log.debug("*** Number of videos found: " + str(len(videos_data)))
+        assert res.status_code == 200

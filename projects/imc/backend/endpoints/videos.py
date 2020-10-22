@@ -65,15 +65,14 @@ class Videos(IMCEndpoint):
         description="Returns a list containing all videos. the list supports paging.",
         responses={
             200: "List of videos successfully retrieved",
+            403: "Operation not authorized",
             404: "The video does not exists.",
         },
     )
     def get(self, video_id=None):
 
         if video_id is None and not self.verify_admin():
-            raise RestApiException(
-                "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
-            )
+            raise Forbidden("You are not authorized")
 
         log.debug("getting AVEntity id: {}", video_id)
         self.graph = self.get_service_instance("neo4j")
