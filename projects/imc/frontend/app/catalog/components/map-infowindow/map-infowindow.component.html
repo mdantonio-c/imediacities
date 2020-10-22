@@ -4,19 +4,19 @@
 <div id="tag-iw">
 	<div id="infowindow-content">
 	  <div class="place-info">
-		<span id="place-name" class="title">{{ marker.name }}</span>
+		<span id="place-name" class="title">{{ properties.name }}</span>
 		<br />
-		<span *ngIf="!marker.address">
+		<span *ngIf="!address">
 		  <i
 			class="fa fa-spinner fa-spin"
 			aria-hidden="true"
 			style="font-size: 12px;"
 		  ></i>
 		</span>
-		<span id="place-address">{{ marker?.address }}</span>
+		<span id="place-address">{{address}}</span>
 	  </div>
 	  <div class="place-item-list">
-		<div *ngFor="let source of marker.sources" style="display: list-item;">
+		<div *ngFor="let source of properties.sources" style="display: list-item;">
 		  <i
 			class="icon-only imc-icon fa fa-video grey bigger-110"
 			[ngClass]="{

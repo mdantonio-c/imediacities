@@ -1,3 +1,7 @@
+.map-infowindow {
+	padding: 20px;
+}
+
 #infowindow-content .place-info .title {
 	color: #6e7a7f;
 	font-weight: bold;
