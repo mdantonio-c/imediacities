@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { AppLodService } from "./app-lod";
+import { environment } from "@rapydo/../environments/environment";
+import { Annotation } from "../types";
 
 enum Flag {
   Deselected = 0,
@@ -10,12 +12,13 @@ enum Flag {
 @Injectable()
 export class AppVocabularyService {
   _vocabolario = null;
+  readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
 
   constructor(private http: HttpClient, private LodService: AppLodService) {}
 
   get(cb) {
     if (!cb || typeof cb !== "function") {
-      console.log("AppVocabularyService", "Callback mancante");
+      console.error("AppVocabularyService", "Callback mancante");
       return;
     }
 
@@ -50,7 +53,8 @@ export class AppVocabularyService {
     if (term.hasOwnProperty("children")) {
       term.children.sort(this._sort_by_label).forEach((c) => {
         c.description =
-          (term.description ? term.description + ", " : "") + term.label;
+          (term.description ? term.description + ", " : "") +
+          (term.label[this.lang] || term.label["en"]);
         c.open = false;
         c.selected = false;
         this._vocabolario_reset(c);
@@ -58,7 +62,7 @@ export class AppVocabularyService {
     }
   }
 
-  search(search_key) {
+  search(search_key, lang = "en") {
     let filtro = [];
 
     let ricerca = (terms, search_key) => {
@@ -67,7 +71,7 @@ export class AppVocabularyService {
           ricerca(t.children, search_key);
         } else {
           let search_re = new RegExp(search_key, "ig");
-          if (search_re.test(t.label)) {
+          if (search_re.test(t.label[lang])) {
             filtro.push(this.annotation_create(t));
           }
         }
@@ -78,12 +82,15 @@ export class AppVocabularyService {
     return filtro;
   }
 
-  annotation_create(term, group = "term") {
+  annotation_create(term: Annotation, group = "term") {
+    const label = term.label
+      ? term.label[this.lang] || term.label["en"]
+      : undefined;
     return {
       group: group,
       creator_type: "user",
       description: term.description,
-      name: term.label || term.name,
+      name: label || term.name,
       iri: term.id || term.iri || null,
       source: "vocabulary",
     };

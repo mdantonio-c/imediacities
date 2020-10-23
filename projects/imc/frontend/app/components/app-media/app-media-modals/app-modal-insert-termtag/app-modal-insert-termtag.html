@@ -8,7 +8,7 @@
         <li *ngFor="let term of vocabolario.terms">
           <h3>
             <span class="term" (click)="vocabolario_term(term)">
-              <span [innerHTML]="term.label"></span>
+              <span [innerHTML]="term.label[lang] || term.label.en"></span>
               <i class="material-icons" *ngIf="!term.open"
                 >keyboard_arrow_down</i
               >
@@ -18,7 +18,7 @@
           <ul class="term-list" [ngClass]="{'display-none': !term.open}">
             <li *ngFor="let child of term.children">
               <span class="term" (click)="vocabolario_term(child, term)">
-                <span [innerHTML]="child.label"></span>
+                <span [innerHTML]="child.label[lang] || child.label.en"></span>
                 <i class="material-icons" *ngIf="!child.open"
                   >keyboard_arrow_down</i
                 >
@@ -29,7 +29,9 @@
               <ul class="child-list" [ngClass]="{'display-none': !child.open}">
                 <li *ngFor="let leaf of child.children">
                   <span class="term leaf" (click)="vocabolario_leaf(leaf)">
-                    <span [innerHTML]="leaf.label"></span>
+                    <span
+                      [innerHTML]="leaf.label[lang] || leaf.label.en"
+                    ></span>
                     <i
                       *ngIf="leaf.selected"
                       class="material-icons icon-check-vocabulary"
@@ -69,7 +71,7 @@
         <span
           [ngbPopover]="popContent"
           #p="ngbPopover"
-          data-placement="bottom"
+          placement="bottom"
           triggers="manual"
           [autoClose]="'outside'"
         ></span>

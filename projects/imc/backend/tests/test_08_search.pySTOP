@@ -1,7 +1,6 @@
 import json
 
 from restapi.tests import BaseTests
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 

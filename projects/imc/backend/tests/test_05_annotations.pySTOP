@@ -53,9 +53,8 @@ class TestApp(BaseTests):
         #     assert res.status_code == 200
 
         # POST creation of a new annotation on a video
-        #  Prima devo fare una ricerca sui video esistenti
-        # per avere l'id dell'item di un video
-        #    a cui associare la annotazione
+        # Prima devo fare una ricerca sui video esistenti
+        # per avere l'id dell'item di un video a cui associare la annotazione
         video_id = None
         item_id = None
         res = client.get("/api/videos", headers=headers)

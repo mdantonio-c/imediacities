@@ -12,6 +12,7 @@ export class AppMediaAnnotationComponent implements OnInit {
   @Input() delete_fn;
   @Input() disable_confirmation = false;
   @Input() tag = false;
+  @Input() lang = "en";
 
   public popover;
 

@@ -1,5 +1,7 @@
 <span class="badge" [ngClass]="{'click-event': clickable}">
-  <span [innerHTML]="annotation.name"></span>
+  <span
+    [innerHTML]="annotation.name[lang] || annotation.name['en'] || annotation.name"
+  ></span>
   <span *ngIf="tag && annotation.count>1">&nbsp;({{annotation.count}})</span>
   <i
     *ngIf="can_delete"

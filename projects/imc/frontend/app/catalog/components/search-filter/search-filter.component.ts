@@ -12,6 +12,7 @@ import { IPRStatuses, Providers } from "../../services/data";
 import { AppVocabularyService } from "../../../services/app-vocabulary";
 import { Observable, combineLatest } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
+import { environment } from "@rapydo/../environments/environment";
 
 const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
 
@@ -35,6 +36,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   disableProdDateText: string = "Disable Production Date";
   missingDateParam: boolean = true;
   prodDateTooltip: string = this.enableProdDateText;
+  readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<
     SearchFilter
@@ -323,7 +325,9 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     text$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      map((term) => (term === "" ? [] : this.vocabularyService.search(term)))
+      map((term) =>
+        term === "" ? [] : this.vocabularyService.search(term, this.lang)
+      )
     );
 
   /**
