@@ -34,6 +34,8 @@ variables:
     SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
     SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
 
+    FRONTEND_LANG: "en"
+
   backend:
     credentials:
       roles:
