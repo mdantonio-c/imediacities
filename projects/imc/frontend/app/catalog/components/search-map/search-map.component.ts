@@ -139,6 +139,10 @@ export class SearchMapComponent implements OnInit, OnChanges {
     /*console.log("countByProviders", this.countByProviders);*/
     for (let key of Object.keys(this.countByProviders)) {
       let city = this.catalogService.getProviderCity(key);
+      if (!city) {
+        console.warn(`Undefined city for provider ID ${key}`);
+        continue;
+      }
       let entry = {
         name: city.name,
         position: city.position,
