@@ -50,15 +50,14 @@ class Images(IMCEndpoint):
         description="Returns a list containing all images. the list supports paging.",
         responses={
             200: "List of images successfully retrieved",
-            404: "The image does not exists.",
+            403: "Operation not authorized",
+            404: "The image does not exists",
         },
     )
     def get(self, image_id=None):
 
         if image_id is None and not self.verify_admin():
-            raise RestApiException(
-                "You are not authorized", status_code=hcodes.HTTP_BAD_FORBIDDEN
-            )
+            raise Forbidden("You are not authorized")
 
         log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = self.get_service_instance("neo4j")
@@ -108,7 +107,7 @@ class Images(IMCEndpoint):
     @decorators.endpoint(
         path="/images",
         summary="Create a new image description",
-        description="Simple method to attach descriptive metadata to a previously uploaded image (item).",
+        description="Simple method to attach descriptive metadata to an image item",
         responses={200: "Image description successfully created"},
     )
     def post(self):
@@ -472,4 +471,4 @@ class ImageTools(IMCEndpoint):
         celery = self.get_service_instance("celery")
         task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
-        return self.response(task.id, code=hcodes.HTTP_OK_ACCEPTED)
+        return self.response(task.id, code=202)

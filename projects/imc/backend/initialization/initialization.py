@@ -10,11 +10,11 @@ class Initializer:
         neo4j = services["neo4j"]
 
         try:
-            neo4j.Role.nodes.get(name=Role.LOCAL_ADMIN)
+            neo4j.Role.nodes.get(name=Role.LOCAL_ADMIN.value)
             log.debug("Coordinator neo4j.Role already exists")
         except neo4j.Role.DoesNotExist:
             local_admin = neo4j.Role()
-            local_admin.name = Role.LOCAL_ADMIN
+            local_admin.name = Role.LOCAL_ADMIN.value
             local_admin.description = "Coordinator"
             local_admin.save()
             log.info("Coordinator neo4j.Role successfully created")

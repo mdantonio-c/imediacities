@@ -31,7 +31,6 @@ variables:
 
     CELERY_BACKEND: MONGODB
 
-    SET_UNSAFE_EVAL: "unsafe-eval"
     SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
     SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
 
