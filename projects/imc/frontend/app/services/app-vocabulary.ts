@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { AppLodService } from "./app-lod";
 import { environment } from "@rapydo/../environments/environment";
+import { Annotation } from "../types";
 
 enum Flag {
   Deselected = 0,
@@ -81,14 +82,15 @@ export class AppVocabularyService {
     return filtro;
   }
 
-  annotation_create(term, group = "term") {
-    console.log("term", term);
-    console.log("group", group);
+  annotation_create(term: Annotation, group = "term") {
+    const label = term.label
+      ? term.label[this.lang] || term.label["en"]
+      : undefined;
     return {
       group: group,
       creator_type: "user",
       description: term.description,
-      name: term.label[this.lang] || term.label["en"] || term.name,
+      name: label || term.name,
       iri: term.id || term.iri || null,
       source: "vocabulary",
     };

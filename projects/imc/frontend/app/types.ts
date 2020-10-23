@@ -62,3 +62,21 @@ export interface MediaContent {
   type: string;
   year: string;
 }
+
+export interface Annotation {
+  creator_type: string;
+  description: string;
+  group: string;
+  iri?: string;
+  id?: string;
+  name?: string;
+  label?: MultiLanguageLabel;
+  source: string;
+}
+
+export interface MultiLanguageLabel {
+  // mandatory lang
+  en: string;
+  // any other lang
+  [key: string]: string;
+}
