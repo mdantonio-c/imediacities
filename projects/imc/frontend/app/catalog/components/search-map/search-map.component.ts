@@ -85,7 +85,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
   @Input() filter: SearchFilter;
   @Output() onMapChange: EventEmitter<any> = new EventEmitter<string>();
 
-  public map; // obsolete - google map
   private zoom : 4;
   private center;
   private reloading: boolean = false;
@@ -150,8 +149,10 @@ export class SearchMapComponent implements OnInit, OnChanges {
     if (!place || !place.geometry) {
       return;
     }
-    this.map.setCenter(place.geometry.location);
-    this.map.fitBounds(place.geometry.viewport);
+    
+    console.warn('check placeChanged');
+    this.osmap.setView(new L.LatLng(place.geometry.location.lat, place.geometry.location.lng), 14);
+
     this.ref.detectChanges();
   }
 
