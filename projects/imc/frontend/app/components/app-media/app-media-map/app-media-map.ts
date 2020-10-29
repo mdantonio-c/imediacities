@@ -7,7 +7,9 @@ import {
   OnDestroy,
 } from "@angular/core";
 import { AppMediaService } from "../../../services/app-media";
-import { GeoCoder, NguiMapComponent } from "@ngui/map";
+
+import { NominatimService } from "../../../catalog/services/nominatim.service";
+
 import { AppAnnotationsService } from "../../../services/app-annotations";
 import { AppShotsService } from "../../../services/app-shots";
 import { AuthService } from "@rapydo/services/auth";
@@ -16,11 +18,17 @@ import { AuthzService, Permission } from "../../../services/authz.service";
 import { ApiService } from "@rapydo/services/api";
 import { ProviderToCityPipe } from "../../../pipes/ProviderToCity";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
-import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
+
+import * as L from "leaflet";
+
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+
+import { CatalogService } from "../../../catalog/services/catalog.service";
 
 @Component({
   selector: "app-media-map",
   templateUrl: "app-media-map.html",
+  styleUrls: ["./app-media-map.css"],
   providers: [AuthzService],
 })
 export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
@@ -31,7 +39,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() clickable_markers;
   @Input() media_type;
 
-  @ViewChild(NguiMapComponent, { static: false }) ngMap: NguiMapComponent;
+  //@ViewChild(NguiMapComponent, { static: false }) ngMap: NguiMapComponent;
 
   @is_annotation_owner() is_annotation_owner;
 
@@ -41,13 +49,14 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     private AuthzService: AuthzService,
     private AnnotationsService: AppAnnotationsService,
     private ShotsService: AppShotsService,
-    private geoCoder: GeoCoder,
+    private nominatimOsmGeocoder: NominatimService,
     private ProviderToCity: ProviderToCityPipe,
     private MediaService: AppMediaService,
     private VideoService: AppVideoService,
-    private mapApiLoader: CustomNgMapApiLoader
+    private catalogService: CatalogService,
+    // private mapApiLoader: CustomNgMapApiLoader
   ) {
-    mapApiLoader.setUrl();
+    //mapApiLoader.setUrl();
   }
 
   private _subscription;
@@ -60,15 +69,38 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   private _current_user = null;
 
   public _markers = [];
-  /**
-   * Istanza della mappa
-   * Viene assegnato dall'evento ready della mappa
-   */
-  public map;
+
   /**
    * Stili della mappa
    * @type {{featureType: string; stylers: {visibility: string}[]}[]}
    */
+  // base layer
+  streetMaps = L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      detectRetina: true,
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }
+  );
+  // Marker cluster stuff
+  markerClusterGroup: L.MarkerClusterGroup;
+  markerClusterData: L.Marker[] = [];
+  markerClusterOptions: L.MarkerClusterGroupOptions;
+  osmap: L.Map;
+
+  // Set the initial set of displayed layers
+  options = {
+    layers: [this.streetMaps],
+    zoom: 4,
+    center: [0 ,0],
+  };
+
+
+
+
+
+
   public map_styles = [
     {
       featureType: "poi.business",
@@ -177,17 +209,21 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       return alert("No shot selected");
     }
 
-    const geocode = this.geoCoder
-      .geocode({
-        location: event.latLng,
-      })
-      .subscribe((result) => {
-        if (result && result.length) {
-          this.marker_new_set(event, result[0], shots_idx);
-        }
-      }, null);
+
+    const geocode =  this.nominatimOsmGeocoder.reverse(event.latlng).subscribe(results => {
+
+      if (error) {
+        return;
+      }
+
+      if (result && result.address) {
+        this.marker_new_set(event, result.address.Match_addr, shots_idx);
+      }
+   
+    });
     this._subscription.add(geocode);
   }
+
 
   /**
    * Visulizza la InfoWindow al click su un marker
@@ -321,6 +357,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     if (this.marker_edit.marker && this.marker_edit.state !== "saved") {
       this.marker_edit.marker.setMap(null);
     }
+    /*TODO TODO TODO 
     let m = new google.maps.Marker({
       position: {
         lat: event.latLng.lat(),
@@ -366,6 +403,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         this.ngMap.openInfoWindow("edit", m);
       }
     );
+    */
   }
 
   /**
@@ -381,6 +419,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Aggiorna la posizione del marker attribuendo un nuovo titolo ottenuto dal servizio di geocoding
    */
   marker_position_update() {
+    /* TODO TODO TODO
     new google.maps.Geocoder().geocode(
       { location: this.marker_active.position.updated },
       (results, status) => {
@@ -409,6 +448,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         this.marker_active_unset();
       }
     );
+    */
   }
 
   /**
@@ -429,6 +469,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param marker
    */
   marker_update(annotation, marker) {
+
+/* TODO TODO TODO 
+
     this.marker_edit = {
       marker: marker,
       address: annotation.name,
@@ -447,6 +490,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
     this.ngMap.infoWindows.iw.close();
     this.ngMap.infoWindows.edit.open(marker);
+    */
   }
 
   /**
@@ -482,12 +526,29 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Imposta la mappa in modo da visualizzare tutti i marker
    */
   fit_bounds() {
-    if (this.map) {
+
+    console.log('Checkpoint fit_bounds');
+
+    if (this.osmap) {
       if (this._markers.length) {
+        var mks = [];
+        this._markers.forEach((l) => {
+          let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap);
+          mks.push(m);
+          console.log('Checkpoint marker' , l);
+        });
+        var mkGroup = new L.featureGroup(mks);
+        this.osmap.fitBounds(mkGroup.getBounds().pad(0.5));
+
+
+        /*    TODO TODO TODO 
         let bounds = new google.maps.LatLngBounds();
         this._markers.forEach((l) =>
           bounds.extend({ lat: l.spatial[0], lng: l.spatial[1] })
         );
+
+
+
         this.map.fitBounds(bounds);
         this.map.panToBounds(bounds);
       } else {
@@ -498,7 +559,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
           const currentCenter = this.map.getCenter();
           if (currentCenter)
             if (currentCenter.lat() !== 0 && currentCenter.lng() !== 0) return;
-        }
+        }*/
       }
     }
   }
@@ -508,8 +569,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * imposta this.map
    * @param map
    */
-  onMapReady(map) {
-    this.map = map;
+  onMapReady(map: L.Map) {
+
+    console.log("Checkpoint  onMapReady ", map);
+
+    this.osmap = map;
 
     this.set_center_from_owner();
 
@@ -519,8 +583,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   set_center_from_owner() {
     const _media_owner = this.MediaService.owner();
 
-    if (_media_owner && _media_owner.shortname) {
-      /*
+    if (_media_owner  /* && _media_owner.shortname */ ) {
+
+      let location_to_find = _media_owner.shortname;
+      if(!location_to_find) {
+            /*
             //  NSI: aggiunto il codice sottostante perchè l'immagine
             //        di prova aveva "test" come owner
             let location_to_find = null;
@@ -530,28 +597,57 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
                 location_to_find = 'ccb';
             }
             */
-      let location_to_find = _media_owner.shortname;
+        location_to_find = 'ccb';
+      }
+
+
+           
       if (location_to_find) {
-        //console.log("set_center_from_owner location_to_find: ",  location_to_find);
-        const geocode = this.geoCoder
-          .geocode({ address: this.ProviderToCity.transform(location_to_find) })
-          .subscribe(
-            (results) => {
+        this.centerCity(location_to_find.toUpperCase());
+/*
+
+        console.log('check stuff', location_to_find);
+
+        var geocode = this.nominatimOsmGeocoder.addressLookup(location_to_find)
+          .subscribe(results => {
+            // look outside in order to enrich details for that given place id
+            // console.log('Checkpoint Nominatim Results:', results);
+            if(results.length > 0 ) {
+              console.log("where the heck is center? " , results)
               this.center = {
-                lat: results[0].geometry.location.lat(),
-                lng: results[0].geometry.location.lng(),
+                lat: 0, // results[0].geometry.location.lat(),
+                lng: 0  //results[0].geometry.location.lng(),
               };
 
-              this.fit_bounds();
-            },
-            (err) => {
-              console.log("set_center_from_owner err: ", err);
-            }
-          );
+              this.fit_bounds();}
+            
+            //if (results[0]) {
+            //  target.marker.properties.address = results[0].formatted_address
+            //}
+          },
+          (error) => { console.error("GEOCODING ERROR ", error)}
+        );
         this._subscription.add(geocode);
+        */
       }
     }
   }
+
+    /**
+   * Center the map on a given city.
+   * @param city - Archive ID (e.g. CCB)
+   */
+  centerCity = function (provider) {
+    if (this.osmap === undefined) {
+      console.warn("The center cannot be set because the map is undefined.");
+      return;
+    }
+
+    let cityPosition = this.catalogService.getProviderPosition(provider);
+    this.osmap.setView(new L.LatLng(cityPosition[0], cityPosition[1]), 14);
+    this.center = { lat: cityPosition[0], lng: cityPosition[1] };
+
+  };
 
   ngOnInit() {
     this.popover = this.AnnotationsService.popover();

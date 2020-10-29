@@ -11,9 +11,6 @@ import {
   OnChanges,
 } from "@angular/core";
 
-import {HttpClient} from '@angular/common/http';
-
-
 import { CatalogService, SearchFilter } from "../../services/catalog.service";
 import { NominatimService } from "../../services/nominatim.service";
 // import { GeoCoder, NguiMapComponent } from "@ngui/map";
@@ -429,7 +426,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
           // look outside in order to enrich details for that given place id
           // console.log('Checkpoint Nominatim Results:', results);
           if(results.length > 0 ) {
-            console.log('Checkpoint Nominatim Results ----- ', results[results.length-1], modalRef);
+            console.log('Checkpoint Nominatim Results ----- ', results); // , modalRef);
             modalRef.componentInstance.address = results[results.length-1].displayName;
           }
           
