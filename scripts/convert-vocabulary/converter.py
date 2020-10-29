@@ -1,4 +1,5 @@
 #!.venv/bin/python3
+import argparse
 import json
 import sys
 from datetime import datetime
@@ -8,6 +9,15 @@ from openpyxl import load_workbook
 
 imc_namespace = "https://imediacities.eu/resource/"
 replaces = (" ", "_"), ("/", "_")
+missing_labels = 0
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--check-lang", help="check for missing labels for specific language"
+)
+args = parser.parse_args()
+if args.check_lang:
+    print(f"Check for missing labels: '{args.check_lang}'")
 
 
 def generate_iri(term):
@@ -34,6 +44,12 @@ def lookup_labels(start_with, idx=None, capitalize=False):
                     if not capitalize
                     else str(label).strip().capitalize()
                 )
+    if labels and args.check_lang and args.check_lang not in labels:
+        global missing_labels
+        missing_labels += 1
+        print(
+            f"missing '{args.check_lang}' in labels[{ws.title}][{start_with}] on line {idx}: {labels}"
+        )
     return labels
 
 
@@ -103,5 +119,7 @@ for ws in wb.worksheets:
 # json_data = json.dumps(vocabulary, indent=2)
 # print(json_data)
 
+if args.check_lang:
+    print(f"Total missing labels: {missing_labels}")
 with open("vocabulary.json", "w") as f:
     json.dump(vocabulary, f, sort_keys=True, indent=2, ensure_ascii=False)
