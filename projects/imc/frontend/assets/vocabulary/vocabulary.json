@@ -1,5 +1,5 @@
 {
-  "created": "2020-10-12 14:13:19.686126",
+  "created": "2020-10-28 16:33:21.056817",
   "terms": [
     {
       "children": [
@@ -259,7 +259,8 @@
           ],
           "label": {
             "de": "Zustand",
-            "en": "State"
+            "en": "State",
+            "it": "Stato"
           }
         },
         {
@@ -358,7 +359,8 @@
           ],
           "label": {
             "de": "Region",
-            "en": "Type"
+            "en": "Type",
+            "it": "Tipo"
           }
         }
       ],
@@ -573,7 +575,8 @@
             {
               "id": "https://www.wikidata.org/wiki/Q1788409",
               "label": {
-                "en": "Nordic Classicism"
+                "en": "Nordic Classicism",
+                "it": "classicismo nordico"
               }
             },
             {
@@ -675,7 +678,7 @@
               "id": "https://www.wikidata.org/wiki/Q170477",
               "label": {
                 "en": "chimney",
-                "it": "ciminiera (non è meglio comignolo?)"
+                "it": "ciminiera"
               }
             },
             {
@@ -734,21 +737,21 @@
               "id": "https://www.wikidata.org/wiki/Q185600",
               "label": {
                 "en": "portico",
-                "it": "portico"
+                "it": "porticato"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1081213",
               "label": {
                 "en": "rooftop",
-                "it": "terrazza sul tetto"
+                "it": "tetto a terrazza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q21061279",
               "label": {
                 "en": "stained glass window",
-                "it": "finestra istoriata"
+                "it": "vetrate a piombo"
               }
             },
             {
@@ -837,7 +840,8 @@
               "id": "https://www.wikidata.org/wiki/Q1198413",
               "label": {
                 "de": "Lager",
-                "en": "camp"
+                "en": "camp",
+                "it": "accampamento"
               }
             },
             {
@@ -941,7 +945,7 @@
               "label": {
                 "de": "Gallerie",
                 "en": "gallery",
-                "it": "galleria (Passage?)"
+                "it": "galleria"
               }
             },
             {
@@ -1051,7 +1055,7 @@
               "id": "https://en.wikipedia.org/wiki/Terrace_(building)",
               "label": {
                 "en": "(restaurant) terrace",
-                "it": "terrazza"
+                "it": "ristorante a terrazza"
               }
             },
             {
@@ -1090,7 +1094,7 @@
               "label": {
                 "de": "Casino",
                 "en": "casino",
-                "it": "casa da gioco (non sarebbe meglio casinò?)"
+                "it": "casa da gioco"
               }
             },
             {
@@ -1130,12 +1134,13 @@
               "label": {
                 "de": "Street-, Fast-food",
                 "en": "street food, fast food",
-                "it": "cibo di strada, fast food"
+                "it": "cibo da strada, fast food"
               }
             }
           ],
           "label": {
-            "en": "Gastronomy & nightlife"
+            "en": "Gastronomy & nightlife",
+            "it": "Gastronomia e vita notturna"
           }
         },
         {
@@ -1228,7 +1233,7 @@
               "id": "https://www.wikidata.org/wiki/Q1202402",
               "label": {
                 "en": "townhouse",
-                "it": "villino?"
+                "it": "casa di città"
               }
             },
             {
@@ -1241,7 +1246,8 @@
             }
           ],
           "label": {
-            "en": "Habitations"
+            "en": "Habitations",
+            "it": "Abitazioni"
           }
         },
         {
@@ -1283,7 +1289,8 @@
             }
           ],
           "label": {
-            "en": "Interior"
+            "en": "Interior",
+            "it": "Interni"
           }
         },
         {
@@ -1356,7 +1363,8 @@
             }
           ],
           "label": {
-            "en": "Military, police & judiciary"
+            "en": "Military, police & judiciary",
+            "it": "Militare, polizia e magistratura"
           }
         },
         {
@@ -1439,7 +1447,8 @@
             }
           ],
           "label": {
-            "en": "Religion"
+            "en": "Religion",
+            "it": "Religione"
           }
         },
         {
@@ -1487,99 +1496,114 @@
               "id": "https://en.wikipedia.org/wiki/Highway",
               "label": {
                 "de": "Hauptstraße (Einfallstraße)",
-                "en": "main road"
+                "en": "main road",
+                "it": "strada principale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q46622",
               "label": {
                 "de": "Autobahn",
-                "en": "motorway"
+                "en": "motorway",
+                "it": "autostrada"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1433633",
               "label": {
                 "de": "Parkplatz",
-                "en": "parking space"
+                "en": "parking space",
+                "it": "stallo di sosta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q369730",
               "label": {
                 "de": "Fußgängerzone",
-                "en": "pedestrian zone"
+                "en": "pedestrian zone",
+                "it": "isola pedonale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q633423",
               "label": {
-                "en": "rails"
+                "en": "rails",
+                "it": "rotaie"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q674950",
               "label": {
                 "de": "Wohnstraße",
-                "en": "residential street"
+                "en": "residential street",
+                "it": "area residenziale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q16968135",
               "label": {
                 "de": "Seilbahn",
-                "en": "ropeway"
+                "en": "ropeway",
+                "it": "teleferica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q21000333",
               "label": {
                 "de": "Einkaufs- und Geschäftsstraße",
-                "en": "shopping street"
+                "en": "shopping street",
+                "it": "strada commerciale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q177749",
               "label": {
-                "en": "sidewalk/pavement"
+                "en": "sidewalk/pavement",
+                "it": "marciapiede"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q174782",
               "label": {
                 "de": "Platz",
-                "en": "square"
+                "en": "square",
+                "it": "piazza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q79007",
               "label": {
                 "de": "Straße",
-                "en": "street"
+                "en": "street",
+                "it": "strada urbana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q628179",
               "label": {
                 "de": "Weg (befestigt, unbefestigt)",
-                "en": "trail"
+                "en": "trail",
+                "it": "sentiero"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q44377",
               "label": {
-                "en": "tunnel"
+                "en": "tunnel",
+                "it": "tunnel"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13634881",
               "label": {
-                "en": "walkway"
+                "en": "walkway",
+                "it": "passaggio"
               }
             }
           ],
           "label": {
-            "en": "Roads and squares"
+            "en": "Roads and squares",
+            "it": "Strade e piazze"
           }
         },
         {
@@ -1588,54 +1612,62 @@
               "id": "https://www.wikidata.org/wiki/Q216107",
               "label": {
                 "de": "Kaufhaus",
-                "en": "department store"
+                "en": "department store",
+                "it": "grande magazzino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2080521",
               "label": {
                 "de": "Markthalle (überdacht)",
-                "en": "indoor market"
+                "en": "indoor market",
+                "it": "mercato coperto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q330284",
               "label": {
                 "de": "Markt (offen)",
-                "en": "open air market"
+                "en": "open air market",
+                "it": "mercato all'aperto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11315",
               "label": {
                 "de": "Shopping mall",
-                "en": "shopping mall"
+                "en": "shopping mall",
+                "it": "centro commerciale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q693369",
               "label": {
-                "en": "stall / kiosk"
+                "en": "stall / kiosk",
+                "it": "chiosco"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q213441",
               "label": {
                 "de": "Geschäftslokal (Handel)",
-                "en": "store /shop"
+                "en": "store /shop",
+                "it": "negozio"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Strip_mall",
               "label": {
                 "de": "Strip mall",
-                "en": "strip mall"
+                "en": "strip mall",
+                "it": "centro commerciale in linea"
               }
             }
           ],
           "label": {
             "de": "Shop/market",
-            "en": "Shopping"
+            "en": "Shopping",
+            "it": "Shopping"
           }
         },
         {
@@ -1644,88 +1676,102 @@
               "id": "https://www.wikidata.org/wiki/Q194195",
               "label": {
                 "de": "Vergnügungspark",
-                "en": "amusement park"
+                "en": "amusement park",
+                "it": "parco di divertimento"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2290113",
               "label": {
-                "en": "boxing ring"
+                "en": "boxing ring",
+                "it": "ring"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1193438",
               "label": {
-                "en": "bullring"
+                "en": "bullring",
+                "it": "arena"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q47928",
               "label": {
-                "en": "circus"
+                "en": "circus",
+                "it": "circo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13607440",
               "label": {
                 "de": "Spielplatz",
-                "en": "playground"
+                "en": "playground",
+                "it": "parco giochi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7361066",
               "label": {
-                "en": "roller-skating rink"
+                "en": "roller-skating rink",
+                "it": "pista di pattinaggio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q39463060",
               "label": {
-                "en": "soccer field"
+                "en": "soccer field",
+                "it": "campo da calcio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1202618",
               "label": {
                 "de": "Sportplatz",
-                "en": "sports ground / sports venue"
+                "en": "sports ground / sports venue",
+                "it": "campo sportivo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q483110",
               "label": {
-                "en": "stadium"
+                "en": "stadium",
+                "it": "stadio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13586493",
               "label": {
                 "de": "Freibad",
-                "en": "swimming pool"
+                "en": "swimming pool",
+                "it": "piscina"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q741118",
               "label": {
-                "en": "tennis court"
+                "en": "tennis court",
+                "it": "campo da tennis"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q830528",
               "label": {
-                "en": "velodrome"
+                "en": "velodrome",
+                "it": "velodromo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q43501",
               "label": {
-                "en": "zoo"
+                "en": "zoo",
+                "it": "giardino zoologico"
               }
             }
           ],
           "label": {
             "de": "Sport/recreation",
-            "en": "Sport & leisure"
+            "en": "Sport & leisure",
+            "it": "Sport e tempo libero"
           }
         },
         {
@@ -1733,72 +1779,83 @@
             {
               "id": "https://www.wikidata.org/wiki/Q12323",
               "label": {
-                "en": "dam"
+                "en": "dam",
+                "it": "diga"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q181623",
               "label": {
-                "en": "depot/warehouse"
+                "en": "depot/warehouse",
+                "it": "magazzino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q114768",
               "label": {
                 "de": "Getreidespeicher",
-                "en": "granary"
+                "en": "granary",
+                "it": "granaio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13416228",
               "label": {
                 "de": "Müllverbrennungsanlage",
-                "en": "incineration plant"
+                "en": "incineration plant",
+                "it": "inceneritore"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q152810",
               "label": {
                 "de": "Müllhalde",
-                "en": "landfill"
+                "en": "landfill",
+                "it": "discarica di rifiuti"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q159719",
               "label": {
                 "de": "Kraftwerk (Öl, Kohle, Müll, Wasser, Wind, Atom ,…)",
-                "en": "power plant"
+                "en": "power plant",
+                "it": "centrale elettrica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q156849",
               "label": {
-                "en": "sewer"
+                "en": "sewer",
+                "it": "fognatura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q385557",
               "label": {
                 "de": "Schlachthof",
-                "en": "slaughterhouse"
+                "en": "slaughterhouse",
+                "it": "mattatoio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15242449",
               "label": {
                 "de": "Kläranlage",
-                "en": "treatment plant"
+                "en": "treatment plant",
+                "it": "impianto di depurazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q6501028",
               "label": {
-                "en": "water tower"
+                "en": "water tower",
+                "it": "serbatoio idrico a torre"
               }
             }
           ],
           "label": {
-            "en": "Supply/disposal"
+            "en": "Supply/disposal",
+            "it": "Fornitura/smaltimento"
           }
         },
         {
@@ -1807,90 +1864,104 @@
               "id": "https://www.wikidata.org/wiki/Q1248784",
               "label": {
                 "de": "Flughafen",
-                "en": "airport"
+                "en": "airport",
+                "it": "aeroporto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1777951",
               "label": {
-                "en": "boathouse"
+                "en": "boathouse",
+                "it": "casa galleggiante"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q494829",
               "label": {
                 "de": "Bus-Station",
-                "en": "bus station"
+                "en": "bus station",
+                "it": "autostazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q953806",
               "label": {
-                "en": "bus stop"
+                "en": "bus stop",
+                "it": "fermata di autobus"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q12284",
               "label": {
-                "en": "canal"
+                "en": "canal",
+                "it": "canale artificiale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q22733",
               "label": {
-                "en": "garage"
+                "en": "garage",
+                "it": "garage"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q205495",
               "label": {
-                "en": "gas station"
+                "en": "gas station",
+                "it": "stazione di servizio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q105731",
               "label": {
-                "en": "lock"
+                "en": "lock",
+                "it": "chiusa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q928830",
               "label": {
                 "de": "U-Bahn Station",
-                "en": "metro station"
+                "en": "metro station",
+                "it": "fermata della metropolitana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q44782",
               "label": {
                 "de": "Hafen",
-                "en": "port"
+                "en": "port",
+                "it": "porto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1395196",
               "label": {
-                "en": "taxi rank"
+                "en": "taxi rank",
+                "it": "fermata dei taxi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q55488",
               "label": {
                 "de": "Bahnhof",
-                "en": "train station"
+                "en": "train station",
+                "it": "stazione ferroviaria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2175765",
               "label": {
                 "de": "Straßenbahn- Station",
-                "en": "tram stop"
+                "en": "tram stop",
+                "it": "fermata del tram"
               }
             }
           ],
           "label": {
             "de": "Traffic area",
-            "en": "Transport"
+            "en": "Transport",
+            "it": "Trasporto"
           }
         },
         {
@@ -1899,53 +1970,61 @@
               "id": "https://www.wikidata.org/wiki/Q16917",
               "label": {
                 "de": "Kankenhaus",
-                "en": "hospital"
+                "en": "hospital",
+                "it": "ospedale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q12055245",
               "label": {
                 "de": "Institut der Armenfürsorge",
-                "en": "institute for social welfare"
+                "en": "institute for social welfare",
+                "it": "servizi sociali"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q718966",
               "label": {
-                "en": "medical practice"
+                "en": "medical practice",
+                "it": "ambulatorio medico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q160645",
               "label": {
                 "de": "Waisenhaus",
-                "en": "orphanage"
+                "en": "orphanage",
+                "it": "orfanotrofio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q22908",
               "label": {
                 "de": "Altenheim",
-                "en": "retirement home"
+                "en": "retirement home",
+                "it": "residenza per anziani"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q46124",
               "label": {
-                "en": "sanatorium"
+                "en": "sanatorium",
+                "it": "sanatorio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1451763",
               "label": {
                 "de": "Frauenhaus",
-                "en": "woman’s shelter"
+                "en": "woman’s shelter",
+                "it": "centro antiviolenza"
               }
             }
           ],
           "label": {
             "de": "Welfare/health",
-            "en": "Welfare/health"
+            "en": "Welfare/health",
+            "it": "Benessere / salute"
           }
         },
         {
@@ -1953,33 +2032,38 @@
             {
               "id": "https://www.wikidata.org/wiki/Q22687",
               "label": {
-                "en": "bank"
+                "en": "bank",
+                "it": "banca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q83405",
               "label": {
                 "de": "Fabrik",
-                "en": "factory"
+                "en": "factory",
+                "it": "fabbrica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1021645",
               "label": {
                 "de": "Büro (Dienstleistung, Verwaltung, …)",
-                "en": "office"
+                "en": "office",
+                "it": "edificio per uffici"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q656720",
               "label": {
                 "de": "Werkstatt",
-                "en": "workshop"
+                "en": "workshop",
+                "it": "officina"
               }
             }
           ],
           "label": {
-            "en": "Work"
+            "en": "Work",
+            "it": "Lavoro"
           }
         }
       ],
@@ -1995,90 +2079,104 @@
             {
               "id": "https://www.wikidata.org/wiki/Q336181",
               "label": {
-                "en": "cabaret / variety"
+                "en": "cabaret / variety",
+                "it": "cabaret / varietà"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q4618",
               "label": {
-                "en": "carnival"
+                "en": "carnival",
+                "it": "carnevale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q182832",
               "label": {
-                "en": "concert"
+                "en": "concert",
+                "it": "concerto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q184485",
               "label": {
                 "de": "Darstellende Kunst",
-                "en": "dramatic arts"
+                "en": "dramatic arts",
+                "it": "arti performative"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q464980",
               "label": {
-                "en": "exhibition"
+                "en": "exhibition",
+                "it": "mostra"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q132241",
               "label": {
                 "de": "Festival",
-                "en": "festival"
+                "en": "festival",
+                "it": "festival"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11424",
               "label": {
                 "de": "Film",
-                "en": "film screening"
+                "en": "film screening",
+                "it": "film"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q219625",
               "label": {
                 "de": "Bildende Kunst",
-                "en": "fine arts"
+                "en": "fine arts",
+                "it": "belle arti"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q17135873",
               "label": {
-                "en": "folk fête"
+                "en": "folk fête",
+                "it": "festa paesana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8242",
               "label": {
                 "de": "Literatur",
-                "en": "literature"
+                "en": "literature",
+                "it": "letteratura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q35140",
               "label": {
-                "en": "performance"
+                "en": "performance",
+                "it": "performance"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q506294",
               "label": {
-                "en": "picnic"
+                "en": "picnic",
+                "it": "picnic"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q288514",
               "label": {
-                "en": "trade fair"
+                "en": "trade fair",
+                "it": "fiera"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/world_Fair",
+              "id": "https://www.wikidata.org/wiki/Q172754",
               "label": {
-                "en": "world Fair"
+                "en": "World's Fair",
+                "it": "Esposizione universale"
               }
             }
           ],
@@ -2092,19 +2190,22 @@
             {
               "id": "https://www.wikidata.org/wiki/Q7944",
               "label": {
-                "en": "earthquake"
+                "en": "earthquake",
+                "it": "terremoto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q168983",
               "label": {
-                "en": "fire"
+                "en": "fire",
+                "it": "incendio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8068",
               "label": {
-                "en": "flood"
+                "en": "flood",
+                "it": "inondazione"
               }
             }
           ],
@@ -2118,19 +2219,22 @@
             {
               "id": "https://www.wikidata.org/wiki/Q178651",
               "label": {
-                "en": "interview"
+                "en": "interview",
+                "it": "intervista"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q603773",
               "label": {
-                "en": "lecture"
+                "en": "lecture",
+                "it": "lezione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2761147",
               "label": {
-                "en": "meeting"
+                "en": "meeting",
+                "it": "riunione"
               }
             }
           ],
@@ -2145,63 +2249,72 @@
               "id": "https://imediacities.eu/resource/bike_ride",
               "label": {
                 "de": "Fahradfahrt",
-                "en": "bike ride"
+                "en": "bike ride",
+                "it": "giro in bici"
               }
             },
             {
               "id": "https://imediacities.eu/resource/boat_trip",
               "label": {
                 "de": "Schifffahrt",
-                "en": "boat trip"
+                "en": "boat trip",
+                "it": "giro in barca"
               }
             },
             {
               "id": "https://imediacities.eu/resource/bus_ride",
               "label": {
                 "de": "Busfahrt",
-                "en": "bus ride"
+                "en": "bus ride",
+                "it": "giro in autobus"
               }
             },
             {
               "id": "https://imediacities.eu/resource/car_ride",
               "label": {
                 "de": "Autofahrt",
-                "en": "car ride"
+                "en": "car ride",
+                "it": "giro in automobile"
               }
             },
             {
               "id": "https://imediacities.eu/resource/metro_ride",
               "label": {
                 "de": "U-Bahnfahrt",
-                "en": "metro ride"
+                "en": "metro ride",
+                "it": "giro in metropolitana"
               }
             },
             {
               "id": "https://imediacities.eu/resource/motorcycle_ride",
               "label": {
                 "de": "Motorradfahrt",
-                "en": "motorcycle ride"
+                "en": "motorcycle ride",
+                "it": "giro in moto"
               }
             },
             {
               "id": "https://imediacities.eu/resource/plane_ride",
               "label": {
                 "de": "Flug",
-                "en": "plane ride"
+                "en": "plane ride",
+                "it": "giro in aereo"
               }
             },
             {
               "id": "https://imediacities.eu/resource/train_ride",
               "label": {
                 "de": "Zugfahrt",
-                "en": "train ride"
+                "en": "train ride",
+                "it": "giro in treno"
               }
             },
             {
               "id": "https://imediacities.eu/resource/tram_ride",
               "label": {
                 "de": "Straßenbahnfahrt",
-                "en": "tram ride"
+                "en": "tram ride",
+                "it": "giro in tram"
               }
             }
           ],
@@ -2217,45 +2330,52 @@
               "id": "https://www.wikidata.org/wiki/Q200538",
               "label": {
                 "de": "Fest",
-                "en": "celebration"
+                "en": "celebration",
+                "it": "festa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q525356",
               "label": {
-                "en": "commemoration"
+                "en": "commemoration",
+                "it": "commemorazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q201676",
               "label": {
-                "en": "funeral"
+                "en": "funeral",
+                "it": "rito funerale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1417098",
               "label": {
-                "en": "opening"
+                "en": "opening",
+                "it": "inaugurazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q657449",
               "label": {
                 "de": "Parade",
-                "en": "parade"
+                "en": "parade",
+                "it": "parata"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1783115",
               "label": {
                 "de": "Warteschlange",
-                "en": "queue"
+                "en": "queue",
+                "it": "fila"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q49836",
               "label": {
-                "en": "wedding"
+                "en": "wedding",
+                "it": "nozze"
               }
             }
           ],
@@ -2270,49 +2390,57 @@
             {
               "id": "https://www.wikidata.org/wiki/Q18812548",
               "label": {
-                "en": "campaign"
+                "en": "campaign",
+                "it": "campagna"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q175331",
               "label": {
                 "de": "Versammlung",
-                "en": "demonstration / rally"
+                "en": "demonstration / rally",
+                "it": "manifestazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q40231",
               "label": {
-                "en": "election"
+                "en": "election",
+                "it": "elezione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2324916",
               "label": {
-                "en": "official visit"
+                "en": "official visit",
+                "it": "visita ufficiale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1752346",
               "label": {
-                "en": "political assembly"
+                "en": "political assembly",
+                "it": "assemblea"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q861911",
               "label": {
                 "de": "Ansprache",
-                "en": "speech"
+                "en": "speech",
+                "it": "discorso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q49776",
               "label": {
-                "en": "strike"
+                "en": "strike",
+                "it": "sciopero"
               }
             }
           ],
           "label": {
+            "de": "Politica",
             "en": "Politics",
             "it": "Cultura/eventi per il tempo libero"
           }
@@ -2322,29 +2450,34 @@
             {
               "id": "https://www.wikidata.org/wiki/Q35856",
               "label": {
-                "en": "baptism"
+                "en": "baptism",
+                "it": "battesimo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1539016",
               "label": {
-                "en": "church service"
+                "en": "church service",
+                "it": "funzione religiosa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1362402",
               "label": {
-                "en": "First communion"
+                "en": "First communion",
+                "it": "prima comunione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q898830",
               "label": {
-                "en": "Procession"
+                "en": "Procession",
+                "it": "processione"
               }
             }
           ],
           "label": {
+            "de": "Evento religioso",
             "en": "Religious event",
             "it": "Cultura/eventi per il tempo libero"
           }
@@ -2354,35 +2487,41 @@
             {
               "id": "https://www.wikidata.org/wiki/Q184940",
               "label": {
-                "en": "bullfight"
+                "en": "bullfight",
+                "it": "tauromachia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13406554",
               "label": {
-                "en": "match"
+                "en": "match",
+                "it": "partita"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q878123",
               "label": {
-                "en": "race"
+                "en": "race",
+                "it": "corsa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15091377",
               "label": {
-                "en": "bicycle race"
+                "en": "bicycle race",
+                "it": "corsa ciclistica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q24050099",
               "label": {
-                "en": "car race"
+                "en": "car race",
+                "it": "corsa automobilistica"
               }
             }
           ],
           "label": {
+            "de": "Sport e ricreazione",
             "en": "Sport/recreation",
             "it": "Cultura/eventi per il tempo libero"
           }
@@ -2401,48 +2540,55 @@
               "id": "https://imediacities.eu/resource/carrying",
               "label": {
                 "de": "Tragen",
-                "en": "carrying"
+                "en": "carrying",
+                "it": "portare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q22857",
               "label": {
                 "de": "Klettern",
-                "en": "climbing"
+                "en": "climbing",
+                "it": "arrampicata"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1427203",
               "label": {
                 "de": "Krabbeln",
-                "en": "crawling"
+                "en": "crawling",
+                "it": "strisciare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1151752",
               "label": {
                 "de": "Springen",
-                "en": "jumping"
+                "en": "jumping",
+                "it": "salto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q105674",
               "label": {
                 "de": "Laufen",
-                "en": "running"
+                "en": "running",
+                "it": "corsa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q6537379",
               "label": {
                 "de": "Gehen",
-                "en": "walking"
+                "en": "walking",
+                "it": "camminare"
               }
             }
           ],
           "label": {
             "de": "Other",
-            "en": "Body movement"
+            "en": "Body movement",
+            "it": "Movimento del corpo"
           }
         },
         {
@@ -2451,41 +2597,47 @@
               "id": "https://www.wikidata.org/wiki/Q1455871",
               "label": {
                 "de": "Kinderfürsorge",
-                "en": "child care"
+                "en": "child care",
+                "it": "assistenza all'infanzia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q437458",
               "label": {
                 "de": "Altenfürsorge",
-                "en": "elderly care"
+                "en": "elderly care",
+                "it": "assistenza agli anziani"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Health_care",
               "label": {
                 "de": "Krankenbetreuung",
-                "en": "healthcare"
+                "en": "healthcare",
+                "it": "assistenza sanitaria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q686264",
               "label": {
                 "de": "Armefürsorge",
-                "en": "poor relief"
+                "en": "poor relief",
+                "it": "sostegno ai poveri"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q28545",
               "label": {
                 "de": "Schulunterricht",
-                "en": "teaching"
+                "en": "teaching",
+                "it": "insegnamento"
               }
             }
           ],
           "label": {
             "de": "Welfare/health",
-            "en": "Care & education"
+            "en": "Care & education",
+            "it": "Cura ed educazione"
           }
         },
         {
@@ -2493,106 +2645,122 @@
             {
               "id": "https://www.wikidata.org/wiki/Q222749",
               "label": {
-                "en": "acting"
+                "en": "acting",
+                "it": "recitazione / arte drammatica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q131186",
               "label": {
-                "en": "choir singing"
+                "en": "choir singing",
+                "it": "coro"
               }
             },
             {
               "id": "https://en.wiktionary.org/wiki/dancing",
               "label": {
                 "de": "Tanzen",
-                "en": "dancing"
+                "en": "dancing",
+                "it": "danza"
               }
             },
             {
               "id": "https://en.wiktionary.org/wiki/decorating",
               "label": {
                 "de": "Schmücken",
-                "en": "decorating"
+                "en": "decorating",
+                "it": "decorazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2921001",
               "label": {
                 "de": "Zeichnen",
-                "en": "drawing"
+                "en": "drawing",
+                "it": "disegno"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/filming",
+              "id": "https://www.wikidata.org/wiki/Q99756489",
               "label": {
                 "de": "Filmen",
-                "en": "filming"
+                "en": "filming",
+                "it": "filmare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11629",
               "label": {
-                "en": "painting"
+                "en": "painting",
+                "it": "pittura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11633",
               "label": {
                 "de": "Fotografieren",
-                "en": "photographing"
+                "en": "photographing",
+                "it": "fotografia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1150958",
               "label": {
                 "de": "Spielen",
-                "en": "playing"
+                "en": "playing",
+                "it": "gioco"
               }
             },
             {
               "id": "https://imediacities.eu/resource/playing_music",
               "label": {
-                "en": "playing music"
+                "en": "playing music",
+                "it": "suonare musica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q199657",
               "label": {
                 "de": "Lesen",
-                "en": "reading"
+                "en": "reading",
+                "it": "lettura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11634",
               "label": {
-                "en": "sculpting"
+                "en": "sculpting",
+                "it": "scultura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q830036",
               "label": {
                 "de": "Shopping",
-                "en": "shopping"
+                "en": "shopping",
+                "it": "shopping"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q27939",
               "label": {
                 "de": "Singen",
-                "en": "singing"
+                "en": "singing",
+                "it": "canto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q37260",
               "label": {
                 "de": "Schreiben",
-                "en": "writing"
+                "en": "writing",
+                "it": "scrittura"
               }
             }
           ],
           "label": {
-            "en": "Culture/leisure activity"
+            "en": "Culture/leisure activity",
+            "it": "Cultura/tempo libero"
           }
         },
         {
@@ -2600,32 +2768,37 @@
             {
               "id": "https://www.wikidata.org/wiki/Q174876",
               "label": {
-                "en": "breastfeeding"
+                "en": "breastfeeding",
+                "it": "allattamento"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q876776",
               "label": {
                 "de": "Trinken",
-                "en": "drinking"
+                "en": "drinking",
+                "it": "bere"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q213449",
               "label": {
                 "de": "Essen",
-                "en": "eating"
+                "en": "eating",
+                "it": "alimentazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2836947",
               "label": {
-                "en": "feeding"
+                "en": "feeding",
+                "it": "nutrire"
               }
             }
           ],
           "label": {
-            "en": "Eating & drinking"
+            "en": "Eating & drinking",
+            "it": "Mangiare e bere"
           }
         },
         {
@@ -2634,55 +2807,63 @@
               "id": "https://en.wikipedia.org/wiki/Celebrate",
               "label": {
                 "de": "Feiern",
-                "en": "celebrating"
+                "en": "celebrating",
+                "it": "festeggiare"
               }
             },
             {
               "id": "https://en.wiktionary.org/wiki/cheering",
               "label": {
                 "de": "Jubeln",
-                "en": "cheering"
+                "en": "cheering",
+                "it": "tifo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q152247",
               "label": {
                 "de": "Weinen",
-                "en": "crying"
+                "en": "crying",
+                "it": "pianto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q170579",
               "label": {
                 "de": "Lachen",
-                "en": "laughing"
+                "en": "laughing",
+                "it": "risata"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q858893",
               "label": {
                 "de": "Grüßen",
-                "en": "saluting"
+                "en": "saluting",
+                "it": "saluto militare"
               }
             },
             {
               "id": "https://en.wiktionary.org/wiki/talking",
               "label": {
                 "de": "Sprechen",
-                "en": "talking"
+                "en": "talking",
+                "it": "parlare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1164603",
               "label": {
                 "de": "Winken",
-                "en": "waving"
+                "en": "waving",
+                "it": "agitare la mano"
               }
             }
           ],
           "label": {
             "de": "Articulation/interaction",
-            "en": "Expression"
+            "en": "Expression",
+            "it": "Espressione"
           }
         },
         {
@@ -2691,74 +2872,85 @@
               "id": "https://www.wikidata.org/wiki/Q7307",
               "label": {
                 "de": "Küssen",
-                "en": "kissing"
+                "en": "kissing",
+                "it": "bacio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q814696",
               "label": {
-                "en": "applauding"
+                "en": "applauding",
+                "it": "applauso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q24488",
               "label": {
-                "en": "high five"
+                "en": "high five",
+                "it": "dare il cinque"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q14467155",
               "label": {
-                "en": "gazer (looking straight into the camera)"
+                "en": "gazer (looking straight into the camera)",
+                "it": "sguardo in camera"
               }
             }
           ],
           "label": {
             "de": "Articulation/interaction",
-            "en": "Interaction"
+            "en": "Interaction",
+            "it": "Espressione"
           }
         },
         {
           "children": [
             {
-              "id": "https://imediacities.eu/resource/dressing",
+              "id": "https://www.wikidata.org/wiki/Q11460",
               "label": {
                 "de": "Ankleiden",
-                "en": "dressing"
+                "en": "dressing",
+                "it": "vestirsi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1542314",
               "label": {
                 "de": "Sightseeing",
-                "en": "sightseeing"
+                "en": "sightseeing",
+                "it": "visita turistica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q662860",
               "label": {
                 "de": "Rauchen",
-                "en": "smoking"
+                "en": "smoking",
+                "it": "fumare"
               }
             },
             {
               "id": "https://imediacities.eu/resource/undressing",
               "label": {
                 "de": "Entkleiden",
-                "en": "undressing"
+                "en": "undressing",
+                "it": "svestirsi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1362683",
               "label": {
                 "de": "Warten",
-                "en": "waiting"
+                "en": "waiting",
+                "it": "attesa"
               }
             }
           ],
           "label": {
             "de": "Other",
-            "en": "Other"
+            "en": "Other",
+            "it": "Altro"
           }
         },
         {
@@ -2767,20 +2959,23 @@
               "id": "https://en.wikipedia.org/wiki/Listening",
               "label": {
                 "de": "Zuhören",
-                "en": "listening"
+                "en": "listening",
+                "it": "ascolto"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/watching",
+              "id": "https://www.wikidata.org/wiki/Q20688477",
               "label": {
                 "de": "Schauen",
-                "en": "watching"
+                "en": "watching",
+                "it": "guardare"
               }
             }
           ],
           "label": {
             "de": "Other",
-            "en": "Perception"
+            "en": "Perception",
+            "it": "Percezione"
           }
         },
         {
@@ -2788,18 +2983,21 @@
             {
               "id": "https://www.wikidata.org/wiki/Q153271",
               "label": {
-                "en": "fascist greeting"
+                "en": "fascist greeting",
+                "it": "saluto fascista"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2543966",
               "label": {
-                "en": "raised fist"
+                "en": "raised fist",
+                "it": "pugno alzato"
               }
             }
           ],
           "label": {
-            "en": "Politics"
+            "en": "Politics",
+            "it": "Politica"
           }
         },
         {
@@ -2807,46 +3005,52 @@
             {
               "id": "https://imediacities.eu/resource/all-fours",
               "label": {
-                "en": "all-fours"
+                "en": "all-fours",
+                "it": "carponi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8866546",
               "label": {
                 "de": "knien",
-                "en": "kneeling"
+                "en": "kneeling",
+                "it": "in ginocchio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2268776",
               "label": {
                 "de": "Liegen",
-                "en": "lying"
+                "en": "lying",
+                "it": "decubito"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1144593",
               "label": {
-                "de": "Sitzen",
-                "en": "sitting"
+                "en": "sitting",
+                "it": "posizione seduta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2540134",
               "label": {
-                "en": "squatting"
+                "en": "squatting",
+                "it": "posizione accovacciata"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1986098",
               "label": {
                 "de": "Stehen",
-                "en": "standing"
+                "en": "standing",
+                "it": "posizione eretta"
               }
             }
           ],
           "label": {
-            "en": "Posture / position"
+            "en": "Posture / position",
+            "it": "Postura/posizione"
           }
         },
         {
@@ -2855,20 +3059,23 @@
               "id": "https://www.wikidata.org/wiki/Q3315513",
               "label": {
                 "de": "Ausruhen",
-                "en": "resting"
+                "en": "resting",
+                "it": "posizione di riposo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q35831",
               "label": {
                 "de": "Schlafen",
-                "en": "sleeping"
+                "en": "sleeping",
+                "it": "sonno"
               }
             }
           ],
           "label": {
             "de": "Other",
-            "en": "Relaxation"
+            "en": "Relaxation",
+            "it": "Rilassamento"
           }
         },
         {
@@ -2877,189 +3084,217 @@
               "id": "https://www.wikidata.org/wiki/Q5372",
               "label": {
                 "de": "Basketball",
-                "en": "basketball"
+                "en": "basketball",
+                "it": "pallacanestro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q327651",
               "label": {
-                "en": "bathing"
+                "en": "bathing",
+                "it": "bagno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q32112",
               "label": {
-                "en": "boxing"
+                "en": "boxing",
+                "it": "pugilato"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q455550",
               "label": {
-                "en": "camping"
+                "en": "camping",
+                "it": "campeggio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1509934",
               "label": {
-                "en": "children's game"
+                "en": "children's game",
+                "it": "gioco per bambini"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q12100",
               "label": {
-                "en": "fencing"
+                "en": "fencing",
+                "it": "scherma"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q14373",
               "label": {
                 "de": "Angeln",
-                "en": "fishing"
+                "en": "fishing",
+                "it": "pesca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5377",
               "label": {
                 "de": "Golf",
-                "en": "golf"
+                "en": "golf",
+                "it": "golf"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q43450",
               "label": {
                 "de": "Turnen",
-                "en": "gymnastics"
+                "en": "gymnastics",
+                "it": "ginnastica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q12014035",
               "label": {
                 "de": "Wandern",
-                "en": "hiking"
+                "en": "hiking",
+                "it": "escursionismo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q17010909",
               "label": {
                 "de": "Reiten",
-                "en": "horse-riding"
+                "en": "horse-riding",
+                "it": "equitazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q779272",
               "label": {
                 "de": "Eislaufen",
-                "en": "ice-skating"
+                "en": "ice-skating",
+                "it": "pattinaggio su ghiaccio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q816261",
               "label": {
                 "de": "Jogging",
-                "en": "jogging"
+                "en": "jogging",
+                "it": "jogging"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q754796",
               "label": {
                 "de": "Minigolf",
-                "en": "minigolf"
+                "en": "minigolf",
+                "it": "minigolf"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1063937",
               "label": {
                 "de": "Werfen",
-                "en": "pitching"
+                "en": "pitching",
+                "it": "lancio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1707432",
               "label": {
                 "de": "Rollschuhfahren",
-                "en": "roller-skating"
+                "en": "roller-skating",
+                "it": "pattinaggio a rotelle"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q159354",
               "label": {
                 "de": "Rudern",
-                "en": "rowing"
+                "en": "rowing",
+                "it": "canottaggio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5378",
               "label": {
-                "en": "rugby"
+                "en": "rugby",
+                "it": "rugby"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q842284",
               "label": {
                 "de": "Skatebordfahren",
-                "en": "skateboarding"
+                "en": "skateboarding",
+                "it": "skateboard"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q130949",
               "label": {
                 "de": "Skifahren",
-                "en": "skiing"
+                "en": "skiing",
+                "it": "sci"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3266340",
               "label": {
                 "de": "Schlittenfahren",
-                "en": "sledding"
+                "en": "sledding",
+                "it": "slittino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2736",
               "label": {
                 "de": "Fussball",
-                "en": "soccer"
+                "en": "soccer",
+                "it": "calcio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q321458",
               "label": {
                 "de": "Sonnenbaden",
-                "en": "sunbathing"
+                "en": "sunbathing",
+                "it": "abbronzatura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q6388",
               "label": {
                 "de": "Schwimmen",
-                "en": "swimming"
+                "en": "swimming",
+                "it": "nuoto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q10674720",
               "label": {
                 "de": "Gesellschaftsspiel",
-                "en": "table game"
+                "en": "table game",
+                "it": "gioco da tavolo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q847",
               "label": {
                 "de": "Tennis",
-                "en": "tennis"
+                "en": "tennis",
+                "it": "tennis"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1734",
               "label": {
                 "de": "Volleyball",
-                "en": "volleyball"
+                "en": "volleyball",
+                "it": "pallavolo"
               }
             }
           ],
           "label": {
             "de": "Sport/recreation",
-            "en": "Sport/recreation"
+            "en": "Sport/recreation",
+            "it": "Sport/ricreazione"
           }
         },
         {
@@ -3068,38 +3303,44 @@
               "id": "https://www.wikidata.org/wiki/Q1403016",
               "label": {
                 "de": "Verhaften",
-                "en": "arresting"
+                "en": "arresting",
+                "it": "arresto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3242199",
               "label": {
                 "de": "Schlagen",
-                "en": "beating"
+                "en": "beating",
+                "it": "pestaggio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q891854",
               "label": {
-                "en": "bombing, bombardment"
+                "en": "bombing, bombardment",
+                "it": "bombardamento"
               }
             },
             {
               "id": "https://imediacities.eu/resource/food_dispensation",
               "label": {
-                "en": "food dispensation"
+                "en": "food dispensation",
+                "it": "distribuzione di cibo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2252077",
               "label": {
-                "en": "shooting"
+                "en": "shooting",
+                "it": "sparatoria"
               }
             }
           ],
           "label": {
             "de": "Other",
-            "en": "War & conflict"
+            "en": "War & conflict",
+            "it": "Guerra e conflitto"
           }
         },
         {
@@ -3108,103 +3349,119 @@
               "id": "https://www.wikidata.org/wiki/Q11451",
               "label": {
                 "de": "Landwirtschaft",
-                "en": "agriculture"
+                "en": "agriculture",
+                "it": "agricoltura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q17200001",
               "label": {
-                "en": "cleaning"
+                "en": "cleaning",
+                "it": "pulizia"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Commerce",
               "label": {
                 "de": "Handel",
-                "en": "commerce"
+                "en": "commerce",
+                "it": "commercio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q329637",
               "label": {
-                "en": "construction work"
+                "en": "construction work",
+                "it": "costruzione edilizia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q38695",
               "label": {
                 "de": "Kochen",
-                "en": "cooking"
+                "en": "cooking",
+                "it": "cucinare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2207288",
               "label": {
                 "de": "Handwerk",
-                "en": "craft"
+                "en": "craft",
+                "it": "artigianato"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q4232202",
               "label": {
                 "de": "Graben",
-                "en": "digging"
+                "en": "digging",
+                "it": "scavare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1458465",
               "label": {
-                "en": "fruit picking"
+                "en": "fruit picking",
+                "it": "frutticoltura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q124946",
               "label": {
-                "en": "gardening"
+                "en": "gardening",
+                "it": "giardinaggio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8148",
               "label": {
                 "de": "Industrie",
-                "en": "industry"
+                "en": "industry",
+                "it": "industria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11034",
               "label": {
-                "en": "printing"
+                "en": "printing",
+                "it": "stampa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q36633",
               "label": {
-                "en": "prostitution"
+                "en": "prostitution",
+                "it": "prostituzione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7406919",
               "label": {
                 "de": "Dienstleistung",
-                "en": "service"
+                "en": "service",
+                "it": "servizio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1517909",
               "label": {
-                "en": "shoe-shining"
+                "en": "shoe-shining",
+                "it": "lustrascarpe"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q814214",
               "label": {
-                "en": "unloading"
+                "en": "unloading",
+                "it": "scarico"
               }
             }
           ],
           "label": {
             "de": "Production/work",
-            "en": "Work activity"
+            "en": "Work activity",
+            "it": "Attività lavorativa"
           }
         }
       ],
@@ -3221,21 +3478,24 @@
               "id": "https://www.wikidata.org/wiki/Q80994",
               "label": {
                 "de": "Erwachsene",
-                "en": "adult"
+                "en": "adult",
+                "it": "adulto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7569",
               "label": {
                 "de": "Kinder",
-                "en": "child"
+                "en": "child",
+                "it": "bambino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2191986",
               "label": {
                 "de": "Alte",
-                "en": "elderly"
+                "en": "elderly",
+                "it": "anziano"
               }
             }
           ],
@@ -3250,19 +3510,22 @@
               "id": "https://www.wikidata.org/wiki/Q6581072",
               "label": {
                 "de": "weiblich",
-                "en": "female"
+                "en": "female",
+                "it": "femmina"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q6581097",
               "label": {
                 "de": "männlich",
-                "en": "male"
+                "en": "male",
+                "it": "maschio"
               }
             }
           ],
           "label": {
-            "en": "Gender"
+            "en": "Gender",
+            "it": "Genere"
           }
         },
         {
@@ -3271,47 +3534,54 @@
               "id": "https://www.wikidata.org/wiki/Q13430821",
               "label": {
                 "de": "Masse",
-                "en": "crowd"
+                "en": "crowd",
+                "it": "folla"
               }
             },
             {
               "id": "https://imediacities.eu/resource/dispersed_groups",
               "label": {
                 "de": "Verstreute Gruppen",
-                "en": "dispersed groups"
+                "en": "dispersed groups",
+                "it": "gruppi sparsi"
               }
             },
             {
               "id": "https://imediacities.eu/resource/dispersed_individuals",
               "label": {
                 "de": "Verstreute Einzelpersonen",
-                "en": "dispersed individuals"
+                "en": "dispersed individuals",
+                "it": "individui sparsi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15618652",
               "label": {
                 "de": "Paar",
-                "en": "pair"
+                "en": "pair",
+                "it": "paio / coppia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5",
               "label": {
                 "de": "Einzelperson",
-                "en": "single person"
+                "en": "single person",
+                "it": "persona singola"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q16334295",
               "label": {
                 "de": "Kleingruppe",
-                "en": "small group"
+                "en": "small group",
+                "it": "piccolo gruppo"
               }
             }
           ],
           "label": {
-            "en": "Number"
+            "en": "Number",
+            "it": "Numero"
           }
         },
         {
@@ -3319,144 +3589,168 @@
             {
               "id": "https://www.wikidata.org/wiki/Q139627",
               "label": {
-                "en": "altar boy"
+                "en": "altar boy",
+                "it": "chierichetto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q273283",
               "label": {
-                "en": "beggar"
+                "en": "beggar",
+                "it": "mendicante"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q353673",
               "label": {
-                "en": "bride"
+                "en": "bride",
+                "it": "sposa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3419806",
               "label": {
-                "en": "bullfighter"
+                "en": "bullfighter",
+                "it": "torero"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1076502",
               "label": {
-                "en": "choirmaster"
+                "en": "choirmaster",
+                "it": "maestro del coro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7358",
               "label": {
-                "en": "clown"
+                "en": "clown",
+                "it": "clown"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q811122",
               "label": {
-                "en": "construction worker"
+                "en": "construction worker",
+                "it": "operario edile"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q848466",
               "label": {
-                "en": "delivery person"
+                "en": "delivery person",
+                "it": "corriere espresso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q331432",
               "label": {
-                "en": "fisherman"
+                "en": "fisherman",
+                "it": "pescatore"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1391360",
               "label": {
-                "en": "garbage collector"
+                "en": "garbage collector",
+                "it": "netturbino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q854830",
               "label": {
-                "en": "groom"
+                "en": "groom",
+                "it": "sposo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q680928",
               "label": {
-                "en": "guard"
+                "en": "guard",
+                "it": "guardia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q833860",
               "label": {
-                "en": "maid"
+                "en": "maid",
+                "it": "cameriera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q733786",
               "label": {
-                "en": "monk"
+                "en": "monk",
+                "it": "monaco"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q191808",
               "label": {
-                "en": "nun"
+                "en": "nun",
+                "it": "monaca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q186360",
               "label": {
-                "en": "nurse"
+                "en": "nurse",
+                "it": "infermiere"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2191547",
               "label": {
-                "en": "picador"
+                "en": "picador",
+                "it": "picador"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q384593",
               "label": {
-                "en": "police officer"
+                "en": "police officer",
+                "it": "poliziotto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q42603",
               "label": {
-                "en": "priest"
+                "en": "priest",
+                "it": "prete"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q202648",
               "label": {
-                "en": "referee"
+                "en": "referee",
+                "it": "arbitro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q45199",
               "label": {
-                "en": "sailor"
+                "en": "sailor",
+                "it": "marinaio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q4991371",
               "label": {
-                "en": "soldier"
+                "en": "soldier",
+                "it": "soldato"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q211198",
               "label": {
-                "en": "spectator"
+                "en": "spectator",
+                "it": "spettatore"
               }
             }
           ],
           "label": {
-            "en": "Role"
+            "en": "Role",
+            "it": "Ruolo"
           }
         },
         {
@@ -3464,36 +3758,42 @@
             {
               "id": "https://www.wikidata.org/wiki/Q10874",
               "label": {
-                "en": "blind"
+                "en": "blind",
+                "it": "persona cieca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q48422",
               "label": {
-                "en": "corpse"
+                "en": "corpse",
+                "it": "cadavere"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15978181",
               "label": {
-                "en": "disabled person"
+                "en": "disabled person",
+                "it": "persona con disabilità"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11995",
               "label": {
-                "en": "pregnant"
+                "en": "pregnant",
+                "it": "incinta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q184753",
               "label": {
-                "en": "wounded"
+                "en": "wounded",
+                "it": "persona ferita"
               }
             }
           ],
           "label": {
-            "en": "State"
+            "en": "State",
+            "it": "Stato"
           }
         }
       ],
@@ -3511,36 +3811,42 @@
               "id": "https://www.wikidata.org/wiki/Q197",
               "label": {
                 "de": "Flugzeug",
-                "en": "airplane"
+                "en": "airplane",
+                "it": "aereo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q133585",
               "label": {
-                "en": "airship"
+                "en": "airship",
+                "it": "dirigibile"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q34486",
               "label": {
-                "en": "helicopter"
+                "en": "helicopter",
+                "it": "elicottero"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1551574",
               "label": {
-                "en": "hot-air balloon"
+                "en": "hot-air balloon",
+                "it": "mongolfiera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11436",
               "label": {
-                "en": "small aircraft"
+                "en": "small aircraft",
+                "it": "piccolo aeromobile"
               }
             }
           ],
           "label": {
-            "en": "Aircrafts"
+            "en": "Aircrafts",
+            "it": "Aeromobile"
           }
         },
         {
@@ -3548,50 +3854,58 @@
             {
               "id": "https://www.wikidata.org/wiki/Q35872",
               "label": {
-                "en": "boat"
+                "en": "boat",
+                "it": "barca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q39804",
               "label": {
-                "en": "cruiseship"
+                "en": "cruiseship",
+                "it": "nave da crociera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2529255",
               "label": {
-                "en": "float"
+                "en": "float",
+                "it": "carri allegorici"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q170483",
               "label": {
                 "de": "Segelschiff",
-                "en": "sailing ship"
+                "en": "sailing ship",
+                "it": "veliero"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11446",
               "label": {
                 "de": "Schiff, Boot",
-                "en": "ship"
+                "en": "ship",
+                "it": "nave"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q178193",
               "label": {
-                "en": "steamboat"
+                "en": "steamboat",
+                "it": "piroscafo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q191826",
               "label": {
-                "en": "tugboat"
+                "en": "tugboat",
+                "it": "rimorchiatore"
               }
             }
           ],
           "label": {
-            "en": "Boats"
+            "en": "Boats",
+            "it": "Imbarcazione"
           }
         },
         {
@@ -3599,7 +3913,8 @@
             {
               "id": "https://www.wikidata.org/wiki/Q180481",
               "label": {
-                "en": "ambulance"
+                "en": "ambulance",
+                "it": "ambulanza"
               }
             },
             {
@@ -3607,34 +3922,38 @@
               "label": {
                 "de": "Gepanzertes Fahrzeug",
                 "en": "armored vehicle",
-                "it": "3"
+                "it": "veicolo blindato"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11442",
               "label": {
                 "de": "Fahhrrad",
-                "en": "bicycle"
+                "en": "bicycle",
+                "it": "bicicletta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5638",
               "label": {
                 "de": "Autobus",
-                "en": "bus, omnibus"
+                "en": "bus, omnibus",
+                "it": "bus"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q498002",
               "label": {
-                "en": "cable car"
+                "en": "cable car",
+                "it": "funivia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1420",
               "label": {
                 "de": "Automobil",
-                "en": "car"
+                "en": "car",
+                "it": "autovettura"
               }
             },
             {
@@ -3642,20 +3961,22 @@
               "label": {
                 "de": "Kutsche",
                 "en": "carriage",
-                "it": "3"
+                "it": "carrozza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q234668",
               "label": {
                 "de": "Wagen",
-                "en": "cart"
+                "en": "cart",
+                "it": "carretto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q142031",
               "label": {
-                "en": "funicular railway"
+                "en": "funicular railway",
+                "it": "funicolare"
               }
             },
             {
@@ -3663,91 +3984,104 @@
               "label": {
                 "de": "Pferdebahn",
                 "en": "horsecar",
-                "it": "3"
+                "it": "tram a cavalli"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5503",
               "label": {
                 "de": "U-Bahn",
-                "en": "metro"
+                "en": "metro",
+                "it": "metropolitana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q201783",
               "label": {
                 "de": "Kleinkraftrad",
-                "en": "moped"
+                "en": "moped",
+                "it": "motorino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q34493",
               "label": {
                 "de": "Motorrad",
-                "en": "motorcycle"
+                "en": "motorcycle",
+                "it": "motocicletta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1051405",
               "label": {
-                "en": "sidecar"
+                "en": "sidecar",
+                "it": "motocarrozzella"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q181388",
               "label": {
-                "en": "sled"
+                "en": "sled",
+                "it": "slitta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q82650",
               "label": {
                 "de": "Taxi",
-                "en": "taxi"
+                "en": "taxi",
+                "it": "taxi"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q39495",
               "label": {
-                "en": "tractor"
+                "en": "tractor",
+                "it": "trattore"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q870",
               "label": {
                 "de": "Zug",
-                "en": "train"
+                "en": "train",
+                "it": "treno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5641",
               "label": {
                 "de": "Strassenbahn",
-                "en": "tram"
+                "en": "tram",
+                "it": "tram"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q536135",
               "label": {
-                "en": "tricycle"
+                "en": "tricycle",
+                "it": "triciclo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q43193",
               "label": {
                 "de": "Lastkraftwagen",
-                "en": "truck / lorry"
+                "en": "truck / lorry",
+                "it": "autocarro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q193468",
               "label": {
-                "en": "van"
+                "en": "van",
+                "it": "furgone"
               }
             }
           ],
           "label": {
-            "en": "Vehicules"
+            "en": "Vehicules",
+            "it": "Veicoli"
           }
         }
       ],
@@ -3763,25 +4097,29 @@
             {
               "id": "https://www.wikidata.org/wiki/Q5843",
               "label": {
-                "en": "backpack"
+                "en": "backpack",
+                "it": "zaino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q467505",
               "label": {
-                "en": "handbag"
+                "en": "handbag",
+                "it": "borsetta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q44416",
               "label": {
-                "en": "tie"
+                "en": "tie",
+                "it": "cravatta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q41607",
               "label": {
-                "en": "umbrella"
+                "en": "umbrella",
+                "it": "ombrello"
               }
             }
           ],
@@ -3796,91 +4134,105 @@
               "id": "https://www.wikidata.org/wiki/Q1352349",
               "label": {
                 "de": "Architektonisches Modell",
-                "en": "architectural model"
+                "en": "architectural model",
+                "it": "plastico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1485994",
               "label": {
-                "en": "camera"
+                "en": "camera",
+                "it": "macchina fotografica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q93184",
               "label": {
-                "en": "drawing"
+                "en": "drawing",
+                "it": "disegno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q161524",
               "label": {
-                "en": "mask"
+                "en": "mask",
+                "it": "maschera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q133067",
               "label": {
-                "en": "mosaic"
+                "en": "mosaic",
+                "it": "mosaico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q335095",
               "label": {
-                "en": "movie camera"
+                "en": "movie camera",
+                "it": "cinepresa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q34379",
               "label": {
-                "en": "musical instrument"
+                "en": "musical instrument",
+                "it": "strumenti musicali"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3305213",
               "label": {
-                "en": "painting"
+                "en": "painting",
+                "it": "dipinto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q125191",
               "label": {
-                "en": "photo"
+                "en": "photo",
+                "it": "fotografia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1913135",
               "label": {
-                "en": "puppet"
+                "en": "puppet",
+                "it": "burattino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q23662753",
               "label": {
-                "en": "relief"
+                "en": "relief",
+                "it": "rilievo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q860861",
               "label": {
-                "en": "sculpture / statue"
+                "en": "sculpture / statue",
+                "it": "scultura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q471835",
               "label": {
-                "en": "sgraffito"
+                "en": "sgraffito",
+                "it": "sgraffito"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q184296",
               "label": {
-                "en": "tapestry"
+                "en": "tapestry",
+                "it": "arazzo"
               }
             }
           ],
           "label": {
-            "de": "Other",
-            "en": "Arts"
+            "en": "Arts",
+            "it": "Arti"
           }
         },
         {
@@ -3888,54 +4240,63 @@
             {
               "id": "https://www.wikidata.org/wiki/Q39397",
               "label": {
-                "en": "axe"
+                "en": "axe",
+                "it": "scure"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q178692",
               "label": {
-                "en": "construction crane"
+                "en": "construction crane",
+                "it": "gru"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11019",
               "label": {
-                "en": "construction vehicle"
+                "en": "construction vehicle",
+                "it": "macchina edile"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q25294",
               "label": {
-                "en": "hammer"
+                "en": "hammer",
+                "it": "martello"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q168639",
               "label": {
-                "en": "ladder"
+                "en": "ladder",
+                "it": "scala"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q200822",
               "label": {
-                "en": "rake"
+                "en": "rake",
+                "it": "rastrello"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q233320",
               "label": {
-                "en": "scaffold"
+                "en": "scaffold",
+                "it": "impalcatura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q216642",
               "label": {
-                "en": "shovel"
+                "en": "shovel",
+                "it": "pala"
               }
             }
           ],
           "label": {
-            "en": "Construction & tools"
+            "en": "Construction & tools",
+            "it": "Costruzione e strumenti"
           }
         },
         {
@@ -3943,42 +4304,49 @@
             {
               "id": "https://www.wikidata.org/wiki/Q42177",
               "label": {
-                "en": "bed"
+                "en": "bed",
+                "it": "letto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15026",
               "label": {
-                "en": "chair"
+                "en": "chair",
+                "it": "sedia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q36539",
               "label": {
-                "en": "oven"
+                "en": "oven",
+                "it": "forno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q131514",
               "label": {
-                "en": "sofa"
+                "en": "sofa",
+                "it": "divano"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q14748",
               "label": {
-                "en": "table"
+                "en": "table",
+                "it": "tavolo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7857",
               "label": {
-                "en": "toilet"
+                "en": "toilet",
+                "it": "water"
               }
             }
           ],
           "label": {
-            "en": "Furniture"
+            "en": "Furniture",
+            "it": "Mobili"
           }
         },
         {
@@ -3986,36 +4354,42 @@
             {
               "id": "https://www.wikidata.org/wiki/Q571",
               "label": {
-                "en": "book"
+                "en": "book",
+                "it": "libro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q41298",
               "label": {
-                "en": "magazine"
+                "en": "magazine",
+                "it": "rivista"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11032",
               "label": {
-                "en": "newspaper"
+                "en": "newspaper",
+                "it": "giornale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q273623",
               "label": {
-                "en": "radio"
+                "en": "radio",
+                "it": "radio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q289",
               "label": {
-                "en": "television"
+                "en": "television",
+                "it": "televisione"
               }
             }
           ],
           "label": {
-            "en": "Media"
+            "en": "Media",
+            "it": "Media"
           }
         },
         {
@@ -4023,309 +4397,360 @@
             {
               "id": "https://www.wikidata.org/wiki/Q190399",
               "label": {
-                "en": "political pamphlet"
+                "en": "political pamphlet",
+                "it": "pamphlet politico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q64418",
               "label": {
-                "en": "artillery"
+                "en": "artillery",
+                "it": "artiglieria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q18545",
               "label": {
-                "en": "ball"
+                "en": "ball",
+                "it": "palla"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q9706",
               "label": {
-                "en": "balloon"
+                "en": "balloon",
+                "it": "pallone"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q809910",
               "label": {
-                "en": "baseball bat"
+                "en": "baseball bat",
+                "it": "mazza da baseball"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q809894",
               "label": {
-                "en": "baseball glove"
+                "en": "baseball glove",
+                "it": "guanto da baseball"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q127197",
               "label": {
-                "en": "bomb"
+                "en": "bomb",
+                "it": "ordigno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q80228",
               "label": {
-                "en": "bottle"
+                "en": "bottle",
+                "it": "bottiglia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q79746",
               "label": {
-                "en": "candle"
+                "en": "candle",
+                "it": "candela"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q17517",
               "label": {
-                "en": "cell phone"
+                "en": "cell phone",
+                "it": "cellulare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q184418",
               "label": {
-                "en": "coffin"
+                "en": "coffin",
+                "it": "bara"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7987",
               "label": {
-                "en": "computer mouse"
+                "en": "computer mouse",
+                "it": "mouse"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q412770",
               "label": {
-                "en": "crib / cradle"
+                "en": "crib / cradle",
+                "it": "lettino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q637703",
               "label": {
-                "en": "debris"
+                "en": "debris",
+                "it": "relitto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q168658",
               "label": {
-                "en": "doll"
+                "en": "doll",
+                "it": "bambola"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q271598",
               "label": {
-                "en": "fishing net"
+                "en": "fishing net",
+                "it": "rete da pesca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q37152",
               "label": {
-                "en": "fishing rod"
+                "en": "fishing rod",
+                "it": "canna da pesca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q131689",
               "label": {
-                "en": "frisbee"
+                "en": "frisbee",
+                "it": "frisbee"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15004",
               "label": {
-                "en": "hair drier"
+                "en": "hair drier",
+                "it": "asciugacapelli"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q250",
               "label": {
-                "en": "keyboard"
+                "en": "keyboard",
+                "it": "tastiera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q42861",
               "label": {
-                "en": "kite"
+                "en": "kite",
+                "it": "aquilone"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3962",
               "label": {
-                "en": "laptop"
+                "en": "laptop",
+                "it": "computer portatile"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q133492",
               "label": {
-                "en": "letter"
+                "en": "letter",
+                "it": "lettera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q4006",
               "label": {
                 "de": "Plan",
-                "en": "map"
+                "en": "map",
+                "it": "mappa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q127956",
               "label": {
-                "en": "microwave"
+                "en": "microwave",
+                "it": "forno a microonde"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q35197",
               "label": {
-                "en": "mirror"
+                "en": "mirror",
+                "it": "specchio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1368",
               "label": {
-                "en": "money"
+                "en": "money",
+                "it": "denaro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q192425",
               "label": {
-                "en": "postcard"
+                "en": "postcard",
+                "it": "cartolina postale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q507141",
               "label": {
                 "de": "Kinderwagen",
-                "en": "pram"
+                "en": "pram",
+                "it": "passeggino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q941399",
               "label": {
-                "en": "ration book, ration ticket"
+                "en": "ration book, ration ticket",
+                "it": "tessera annonaria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q37828",
               "label": {
-                "en": "refrigerator"
+                "en": "refrigerator",
+                "it": "frigorifero"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q185091",
               "label": {
-                "en": "remote"
+                "en": "remote",
+                "it": "telecomando"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q40847",
               "label": {
-                "en": "scissors"
+                "en": "scissors",
+                "it": "forbici"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q140565",
               "label": {
-                "en": "sink"
+                "en": "sink",
+                "it": "lavabo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15783",
               "label": {
-                "en": "skateboard"
+                "en": "skateboard",
+                "it": "skate"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q172226",
               "label": {
-                "en": "skis"
+                "en": "skis",
+                "it": "sci"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2000617",
               "label": {
-                "en": "snowboard"
+                "en": "snowboard",
+                "it": "tavola da snowboard"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q200814",
               "label": {
-                "en": "suitcase"
+                "en": "suitcase",
+                "it": "valigia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q457689",
               "label": {
-                "en": "surfboard"
+                "en": "surfboard",
+                "it": "tavola da surf"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q188688",
               "label": {
-                "en": "swing"
+                "en": "swing",
+                "it": "altalena"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q213477",
               "label": {
-                "en": "teddy bear"
+                "en": "teddy bear",
+                "it": "orsacchiotto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11035",
               "label": {
-                "en": "telephone"
+                "en": "telephone",
+                "it": "telefono"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q14890",
               "label": {
-                "en": "toaster"
+                "en": "toaster",
+                "it": "tostapane"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q134205",
               "label": {
-                "en": "toothbrush"
+                "en": "toothbrush",
+                "it": "spazzolino da denti"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q46335",
               "label": {
-                "en": "typewriter"
+                "en": "typewriter",
+                "it": "macchina da scrivere"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q11083119",
               "label": {
-                "en": "urn"
+                "en": "urn",
+                "it": "urna"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q191851",
               "label": {
-                "en": "vase"
+                "en": "vase",
+                "it": "vaso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q45701",
               "label": {
-                "en": "waste / garbage"
+                "en": "waste / garbage",
+                "it": "rifiuti"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q728",
               "label": {
-                "en": "weapon, armament"
+                "en": "weapon, armament",
+                "it": "arma"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q191931",
               "label": {
                 "de": "Rollstuhl",
-                "en": "wheelchair"
+                "en": "wheelchair",
+                "it": "sedia a rotelle"
               }
             }
           ],
           "label": {
-            "en": "Other"
+            "en": "Other",
+            "it": "Altro"
           }
         },
         {
@@ -4334,131 +4759,150 @@
               "id": "https://www.wikidata.org/wiki/Q204776",
               "label": {
                 "de": "Sitzbank",
-                "en": "bench"
+                "en": "bench",
+                "it": "panchina"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q623149",
               "label": {
-                "en": "billboards"
+                "en": "billboards",
+                "it": "poster"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1589116",
               "label": {
-                "en": "canopy"
+                "en": "canopy",
+                "it": "canapa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q376",
               "label": {
                 "de": "Uhr",
-                "en": "clock"
+                "en": "clock",
+                "it": "orologio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1630622",
               "label": {
                 "de": "Trinkbrunnen",
-                "en": "drinking fountain"
+                "en": "drinking fountain",
+                "it": "fontanella"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q634299",
               "label": {
                 "de": "Hydrant",
-                "en": "fire hydrant"
+                "en": "fire hydrant",
+                "it": "idrante"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q483453",
               "label": {
                 "de": "Zierbrunnen",
-                "en": "fountain"
+                "en": "fountain",
+                "it": "fontana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q17514",
               "label": {
-                "en": "graffitti"
+                "en": "graffiti",
+                "it": "graffiti"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5003624",
               "label": {
-                "en": "memorial"
+                "en": "memorial",
+                "it": "monumento alla memoria"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q4989906",
               "label": {
-                "en": "monument"
+                "en": "monument",
+                "it": "monumento"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q170980",
               "label": {
-                "en": "obelisk"
+                "en": "obelisk",
+                "it": "obelisco"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q953960",
               "label": {
                 "de": "Parkuhr",
-                "en": "parking meter"
+                "en": "parking meter",
+                "it": "parchimetro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1143785",
               "label": {
                 "de": "Telefon(Zelle)",
-                "en": "phone box"
+                "en": "phone box",
+                "it": "cabina telefonica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q49844",
               "label": {
                 "de": "Briefkasten",
-                "en": "post box"
+                "en": "post box",
+                "it": "cassetta postale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q152285",
               "label": {
-                "en": "public toilets"
+                "en": "public toilets",
+                "it": "toilet pubblica"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q503958",
               "label": {
                 "de": "Straßenlaterne",
-                "en": "streetlamp, streetlight"
+                "en": "streetlamp, streetlight",
+                "it": "lampione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8004",
               "label": {
                 "de": "Ampel",
-                "en": "traffic light"
+                "en": "traffic light",
+                "it": "semaforo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q170285",
               "label": {
-                "en": "traffic sign"
+                "en": "traffic sign",
+                "it": "segnale stradale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q216530",
               "label": {
                 "de": "Mistkübel",
-                "en": "trash can"
+                "en": "trash can",
+                "it": "bidone dei rifiuti"
               }
             }
           ],
           "label": {
-            "de": "Street furniture",
-            "en": "Street furniture"
+            "en": "Street furniture",
+            "it": "Arredo urbano"
           }
         },
         {
@@ -4466,42 +4910,49 @@
             {
               "id": "https://www.wikidata.org/wiki/Q153988",
               "label": {
-                "en": "bowl"
+                "en": "bowl",
+                "it": "ciotola"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2100893",
               "label": {
-                "en": "cup"
+                "en": "cup",
+                "it": "tazza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q81881",
               "label": {
-                "en": "fork"
+                "en": "fork",
+                "it": "forchetta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q32489",
               "label": {
-                "en": "knife"
+                "en": "knife",
+                "it": "coltello"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q81895",
               "label": {
-                "en": "spoon"
+                "en": "spoon",
+                "it": "cucchiaio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q81727",
               "label": {
-                "en": "wine glass"
+                "en": "wine glass",
+                "it": "calice"
               }
             }
           ],
           "label": {
-            "en": "Tableware"
+            "en": "Tableware",
+            "it": "Stoviglie"
           }
         }
       ],
@@ -4516,93 +4967,107 @@
           "id": "https://www.wikidata.org/wiki/Q806880",
           "label": {
             "de": "Transparent",
-            "en": "banner"
+            "en": "banner",
+            "it": "striscione"
           }
         },
         {
           "id": "https://en.wikipedia.org/wiki/Boundary_marker",
           "label": {
             "de": "Ortstafel",
-            "en": "boundary sign"
+            "en": "boundary sign",
+            "it": "segno di confine"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q721747",
           "label": {
-            "en": "commemorative plaque"
+            "en": "commemorative plaque",
+            "it": "placca commemorativa"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q20460",
           "label": {
-            "en": "crucifix"
+            "en": "crucifix",
+            "it": "crocifisso"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q14660",
           "label": {
             "de": "Fahne",
-            "en": "flag"
+            "en": "flag",
+            "it": "bandiera"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q22706",
           "label": {
             "de": "Nummerntafel",
-            "en": "license plate"
+            "en": "license plate",
+            "it": "targa d'immatricolazione"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q1886349",
           "label": {
             "de": "Logo",
-            "en": "logo"
+            "en": "logo",
+            "it": "logo"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q11170170",
           "label": {
-            "en": "marquee / shop sign"
+            "en": "marquee / shop sign",
+            "it": "insegna"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q6006",
           "label": {
             "de": "Leuchtschrift",
-            "en": "neon/light sign"
+            "en": "neon/light sign",
+            "it": "insegna al neon"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q429785",
           "label": {
             "de": "Plakat",
-            "en": "poster"
+            "en": "poster",
+            "it": "manifesto"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q188675",
           "label": {
-            "en": "signature"
+            "en": "signature",
+            "it": "firma"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Property:P670",
           "label": {
-            "en": "street number"
+            "en": "street number",
+            "it": "numero civico"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q1969455",
           "label": {
             "de": "Straßenschild",
-            "en": "street sign"
+            "en": "street sign",
+            "it": "cartello stradale"
           }
         },
         {
           "id": "https://www.wikidata.org/wiki/Q45513",
           "label": {
             "de": "Hakenkreuz",
-            "en": "swastika"
+            "en": "swastika",
+            "it": "svastica"
           }
         }
       ],
@@ -4618,135 +5083,156 @@
             {
               "id": "https://www.wikidata.org/wiki/Q1019010",
               "label": {
-                "en": "bear"
+                "en": "bear",
+                "it": "orso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q5113",
               "label": {
                 "de": "Vogel",
-                "en": "bird"
+                "en": "bird",
+                "it": "uccello"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q693690",
               "label": {
-                "en": "bull"
+                "en": "bull",
+                "it": "toro"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7375",
               "label": {
-                "en": "camel"
+                "en": "camel",
+                "it": "cammello"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q146",
               "label": {
                 "de": "Katze",
-                "en": "cat"
+                "en": "cat",
+                "it": "gatto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q830",
               "label": {
                 "de": "Rind",
-                "en": "cow"
+                "en": "cow",
+                "it": "mucca"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q685795",
               "label": {
                 "de": "Rotwild",
-                "en": "deer"
+                "en": "deer",
+                "it": "cervo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q144",
               "label": {
                 "de": "Hund",
-                "en": "dog"
+                "en": "dog",
+                "it": "cane"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q19707",
               "label": {
-                "en": "donkey"
+                "en": "donkey",
+                "it": "asino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7378",
               "label": {
-                "en": "elephant"
+                "en": "elephant",
+                "it": "elefante"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q152",
               "label": {
-                "en": "fish"
+                "en": "fish",
+                "it": "pesce"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q15083",
               "label": {
-                "en": "giraffe"
+                "en": "giraffe",
+                "it": "giraffa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q726",
               "label": {
                 "de": "Pferd",
-                "en": "horse"
+                "en": "horse",
+                "it": "cavallo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1367",
               "label": {
-                "en": "monkey"
+                "en": "monkey",
+                "it": "scimmia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q83310",
               "label": {
-                "en": "mouse"
+                "en": "mouse",
+                "it": "topo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q787",
               "label": {
-                "en": "pig"
+                "en": "pig",
+                "it": "maiale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q36396",
               "label": {
                 "de": "Ratte",
-                "en": "rat"
+                "en": "rat",
+                "it": "ratto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7368",
               "label": {
                 "de": "Schaf",
-                "en": "sheep"
+                "en": "sheep",
+                "it": "pecora"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q9482",
               "label": {
                 "de": "Eichörnchen",
-                "en": "squirrel"
+                "en": "squirrel",
+                "it": "scoiattolo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q32789",
               "label": {
-                "en": "zebra"
+                "en": "zebra",
+                "it": "zebra"
               }
             }
           ],
           "label": {
-            "en": "Animals"
+            "en": "Animals",
+            "it": "Animali"
           }
         },
         {
@@ -4755,54 +5241,62 @@
               "id": "https://www.wikidata.org/wiki/Q37602",
               "label": {
                 "de": "Hagel",
-                "en": "hail"
+                "en": "hail",
+                "it": "grandine"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q192196",
               "label": {
                 "de": "Nebel",
-                "en": "mist"
+                "en": "mist",
+                "it": "bruma"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7925",
               "label": {
                 "de": "Regen",
-                "en": "rain"
+                "en": "rain",
+                "it": "pioggia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1052",
               "label": {
                 "de": "Regenbogen",
-                "en": "rainbow"
+                "en": "rainbow",
+                "it": "arcobaleno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7561",
               "label": {
                 "de": "Schnee",
-                "en": "snow"
+                "en": "snow",
+                "it": "neve"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q81054",
               "label": {
                 "de": "Sturm",
-                "en": "storm"
+                "en": "storm",
+                "it": "tempesta"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8094",
               "label": {
                 "de": "Wind",
-                "en": "wind"
+                "en": "wind",
+                "it": "vento"
               }
             }
           ],
           "label": {
-            "en": "Elements"
+            "en": "Elements",
+            "it": "Elementi"
           }
         },
         {
@@ -4810,36 +5304,42 @@
             {
               "id": "https://www.wikidata.org/wiki/Q89",
               "label": {
-                "en": "apple"
+                "en": "apple",
+                "it": "mela"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q503",
               "label": {
-                "en": "banana"
+                "en": "banana",
+                "it": "banana"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q47722",
               "label": {
-                "en": "broccoli"
+                "en": "broccoli",
+                "it": "broccoli"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q81",
               "label": {
-                "en": "carrot"
+                "en": "carrot",
+                "it": "carota"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q13191",
               "label": {
-                "en": "orange"
+                "en": "orange",
+                "it": "arancia"
               }
             }
           ],
           "label": {
-            "en": "Fruit & vegetables"
+            "en": "Fruit & vegetables",
+            "it": "Frutti e vegetali"
           }
         },
         {
@@ -4848,48 +5348,55 @@
               "id": "https://www.wikidata.org/wiki/Q42295",
               "label": {
                 "de": "Strauch",
-                "en": "bush"
+                "en": "bush",
+                "it": "arbusto"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q235352",
               "label": {
                 "de": "Nutzpflanze",
-                "en": "crop plant"
+                "en": "crop plant",
+                "it": "coltura"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1369438",
               "label": {
                 "de": "Zierpflanze",
-                "en": "decorative plant"
+                "en": "decorative plant",
+                "it": "pianta decorativa"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8564039",
               "label": {
                 "de": "Blume",
-                "en": "flowerbed"
+                "en": "flowerbed",
+                "it": "aiuola"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q869381",
               "label": {
                 "de": "Blumentopf",
-                "en": "potted plant"
+                "en": "potted plant",
+                "it": "pianta in vaso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q10884",
               "label": {
                 "de": "Baum",
-                "en": "tree"
+                "en": "tree",
+                "it": "albero"
               }
             }
           ],
           "label": {
             "de": "Plant",
-            "en": "Plants and trees"
+            "en": "Plants and trees",
+            "it": "Piante e alberi"
           }
         }
       ],
@@ -4906,42 +5413,48 @@
               "id": "https://www.wikidata.org/wiki/Q52643",
               "label": {
                 "de": "Tag",
-                "en": "daytime"
+                "en": "daytime",
+                "it": "giorno"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7725",
               "label": {
                 "de": "Abend",
-                "en": "evening"
+                "en": "evening",
+                "it": "sera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7722",
               "label": {
                 "de": "Morgen",
-                "en": "morning"
+                "en": "morning",
+                "it": "mattino"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q575",
               "label": {
                 "de": "Nacht",
-                "en": "night"
+                "en": "night",
+                "it": "notte"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q193294",
               "label": {
                 "de": "Sonnenaufgang",
-                "en": "sunrise"
+                "en": "sunrise",
+                "it": "alba"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q166564",
               "label": {
                 "de": "Sonnenuntergang",
-                "en": "sunset"
+                "en": "sunset",
+                "it": "tramonto"
               }
             }
           ],
@@ -4965,68 +5478,78 @@
               "id": "https://www.wikidata.org/wiki/Q217199",
               "label": {
                 "de": "Musik instrumental nachvertont",
-                "en": "added instrumental music"
+                "en": "added instrumental music",
+                "it": "accompagnamento di musica strumentale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q217199",
               "label": {
                 "de": "Musik vokal nachvertont",
-                "en": "added vocal music"
+                "en": "added vocal music",
+                "it": "accompagnamento di musica vocale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q52943",
               "label": {
                 "de": "Konversation",
-                "en": "conversation"
+                "en": "conversation",
+                "it": "conversazione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q639197",
               "label": {
                 "de": "Musik instrumental",
-                "en": "instrumental music"
+                "en": "instrumental music",
+                "it": "musica strumentale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q178651",
               "label": {
                 "de": "Interview",
-                "en": "interview"
+                "en": "interview",
+                "it": "intervista"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q217199",
               "label": {
-                "en": "soundtrack"
+                "en": "soundtrack",
+                "it": "colonna sonora"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q861911",
               "label": {
                 "de": "Ansprache",
-                "en": "speech"
+                "en": "speech",
+                "it": "discorso"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q685884",
               "label": {
                 "de": "Musik vokal",
-                "en": "vocal music"
+                "en": "vocal music",
+                "it": "musica vocale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q1146822",
               "label": {
                 "de": "Voice Over",
-                "en": "voice over"
+                "en": "voice over",
+                "it": "voce fuori campo"
               }
             }
           ],
           "label": {
+            "de": "Audio",
             "en": "Audio",
-            "it": "Music"
+            "it": "Audio"
           }
         },
         {
@@ -5035,34 +5558,39 @@
               "id": "https://www.wikidata.org/wiki/Q4688031",
               "label": {
                 "de": "Luftaufnahme",
-                "en": "aerial shot"
+                "en": "aerial shot",
+                "it": "scena aerea"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/high_angle",
+              "id": "https://www.wikidata.org/wiki/Q3392548",
               "label": {
                 "de": "high angle",
-                "en": "high angle"
+                "en": "high angle",
+                "it": "ripresa dall'alto"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/low_angle",
+              "id": "https://www.wikidata.org/wiki/Q2141207",
               "label": {
                 "de": "low angle",
-                "en": "low angle"
+                "en": "low angle",
+                "it": "ripresa dal basso"
               }
             },
             {
               "id": "https://imediacities.eu/resource/straight_on_angle",
               "label": {
                 "de": "straight on angle",
-                "en": "straight on angle"
+                "en": "straight on angle",
+                "it": "ripresa frontale"
               }
             }
           ],
           "label": {
+            "de": "Kamerawinkel",
             "en": "Camera angle",
-            "it": "Kamerawinkel"
+            "it": "Angolazioni camera"
           }
         },
         {
@@ -5071,60 +5599,69 @@
               "id": "https://imediacities.eu/resource/cross_fade",
               "label": {
                 "de": "cross fade",
-                "en": "cross fade"
+                "en": "cross fade",
+                "it": "dissolvenza incrociata"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/black_frame",
+              "id": "https://www.wikidata.org/wiki/Q2253536",
               "label": {
                 "de": "black frame",
-                "en": "black frame"
+                "en": "black frame",
+                "it": "campo nero"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/dissolve",
+              "id": "https://www.wikidata.org/wiki/Q331408",
               "label": {
-                "en": "dissolve"
+                "en": "dissolve",
+                "it": "dissolvenza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q245069",
               "label": {
                 "de": "Zwischentitel",
-                "en": "intertitle"
+                "en": "intertitle",
+                "it": "intertitolo"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/iris_shot",
+              "id": "https://en.wikipedia.org/wiki/Iris_shot",
               "label": {
-                "en": "iris shot"
+                "en": "iris shot",
+                "it": "iris (transizione)"
               }
             },
             {
               "id": "https://imediacities.eu/resource/stop",
               "label": {
                 "de": "Kamerastopp",
-                "en": "stop"
+                "en": "stop",
+                "it": "stop"
               }
             },
             {
               "id": "https://imediacities.eu/resource/white_frame",
               "label": {
                 "de": "white frame",
-                "en": "white frame"
+                "en": "white frame",
+                "it": "campo bianco"
               }
             },
             {
               "id": "https://imediacities.eu/resource/wipe",
               "label": {
                 "de": "Trickblende",
-                "en": "wipe"
+                "en": "wipe",
+                "it": "transizione ad effetti geometrici"
               }
             }
           ],
           "label": {
+            "de": "Kamerabewegung",
             "en": "Transition",
-            "it": "Kamerabewegung"
+            "it": "Transizione"
           }
         },
         {
@@ -5132,47 +5669,54 @@
             {
               "id": "https://www.wikidata.org/wiki/Q5647097",
               "label": {
-                "en": "hand held camera"
+                "en": "hand held camera",
+                "it": "camera a mano"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/panning_shot",
+              "id": "https://en.wikipedia.org/wiki/Panning_(camera)",
               "label": {
                 "de": "Panoramaschwenk",
-                "en": "panning shot"
+                "en": "panning shot",
+                "it": "movimento camera orizzontale"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/phantom-ride",
+              "id": "https://en.wikipedia.org/wiki/Phantom_ride",
               "label": {
                 "de": "Pantom-ride",
-                "en": "phantom-ride"
+                "en": "phantom-ride",
+                "it": "corsa fantasma (ripresa)"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q2919140",
               "label": {
                 "de": "Schwenk",
-                "en": "tilt"
+                "en": "tilt",
+                "it": "movimento camera verticale"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/tracking___travelling",
+              "id": "https://www.wikidata.org/wiki/Q1528025",
               "label": {
                 "de": "Kamerafahrt",
-                "en": "tracking / travelling"
+                "en": "tracking / travelling",
+                "it": "carrellata"
               }
             },
             {
               "id": "http://dbpedia.org/resource/Zooming_(filmmaking)",
               "label": {
                 "de": "Zoom",
-                "en": "zoom"
+                "en": "zoom",
+                "it": "zoom"
               }
             }
           ],
           "label": {
-            "en": "Camera movement"
+            "en": "Camera movement",
+            "it": "Movimenti camera"
           }
         },
         {
@@ -5181,19 +5725,22 @@
               "id": "https://www.wikidata.org/wiki/Q6008603",
               "label": {
                 "de": "Kameraschnitt",
-                "en": "in-camera editing"
+                "en": "in-camera editing",
+                "it": "montaggio in camera"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q648877",
               "label": {
                 "de": "Nachträglicher Schnitt",
-                "en": "post-production editing"
+                "en": "post-production editing",
+                "it": "post produzione"
               }
             }
           ],
           "label": {
-            "en": "Editing"
+            "en": "Editing",
+            "it": "Montaggio"
           }
         },
         {
@@ -5202,26 +5749,30 @@
               "id": "https://www.wikidata.org/wiki/Q11425",
               "label": {
                 "de": "Animation",
-                "en": "animation"
+                "en": "animation",
+                "it": "animazione"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Photographic_filter",
               "label": {
                 "de": "Effektfilter",
-                "en": "effect filter"
+                "en": "effect filter",
+                "it": "filtro fotografico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q381243",
               "label": {
                 "de": "Spezialeffekt",
-                "en": "special effects"
+                "en": "special effects",
+                "it": "effetti speciali"
               }
             }
           ],
           "label": {
-            "en": "Effects"
+            "en": "Effects",
+            "it": "Effetti"
           }
         },
         {
@@ -5229,18 +5780,21 @@
             {
               "id": "https://www.wikidata.org/wiki/Q455595",
               "label": {
-                "en": "amateur film"
+                "en": "amateur film",
+                "it": "film  amatoriali"
               }
             },
             {
               "id": "https://imediacities.eu/resource/professional_production",
               "label": {
-                "en": "professional production"
+                "en": "professional production",
+                "it": "produzione professionale"
               }
             }
           ],
           "label": {
-            "en": "Production type"
+            "en": "Production type",
+            "it": "Tipo di produzione"
           }
         },
         {
@@ -5249,93 +5803,107 @@
               "id": "https://www.wikidata.org/wiki/Q3391185",
               "label": {
                 "de": "American Shot",
-                "en": "american shot"
+                "en": "american shot",
+                "it": "Piano Americano"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q296001",
               "label": {
                 "de": "close-up (CU)",
-                "en": "close-up (CU)"
+                "en": "close-up (CU)",
+                "it": "primo piano"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/extreme_close-up_(ECU)",
+              "id": "https://www.wikidata.org/wiki/Q61786017",
               "label": {
                 "de": "extreme close-up (ECU)",
-                "en": "extreme close-up (ECU)"
+                "en": "extreme close-up (ECU)",
+                "it": "primissimo piano"
               }
             },
             {
               "id": "https://imediacities.eu/resource/extreme_long_shot_(ELS)",
               "label": {
                 "de": "extreme long shot (ELS)",
-                "en": "extreme long shot (ELS)"
+                "en": "extreme long shot (ELS)",
+                "it": "campo lunghissimo"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q3294287",
               "label": {
                 "de": "Long Shot (LS)",
-                "en": "long shot (LS)"
+                "en": "long shot (LS)",
+                "it": "campo lungo"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Medium_shot",
               "label": {
                 "de": "medium close shot (MCS)",
-                "en": "medium close shot (MCS)"
+                "en": "medium close shot (MCS)",
+                "it": "mezzo busto"
               }
             },
             {
               "id": "https://imediacities.eu/resource/medium_full_shot_(MFS)",
               "label": {
                 "de": "medium full shot (MFS)",
-                "en": "medium full shot (MFS)"
+                "en": "medium full shot (MFS)",
+                "it": "figura intera"
               }
             },
             {
               "id": "https://imediacities.eu/resource/medium_long_shot_(MLS)",
               "label": {
-                "en": "medium long shot (MLS)"
+                "en": "medium long shot (MLS)",
+                "it": "campo medio"
               }
             },
             {
-              "id": "https://imediacities.eu/resource/medium_shot_(MS)",
+              "id": "https://www.wikidata.org/wiki/Q4117826",
               "label": {
                 "de": "Medium Shot (MS)",
-                "en": "medium shot (MS)"
+                "en": "medium shot (MS)",
+                "it": "piano medio"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q41363",
               "label": {
-                "en": "panorama"
+                "en": "panorama",
+                "it": "panoramica"
               }
             }
           ],
           "label": {
+            "de": "Einstellungsgröße",
             "en": "Shot size",
-            "it": "Einstellungsgröße"
+            "it": "Dimensione della scena"
           }
         },
         {
           "children": [
             {
-              "id": "https://imediacities.eu/resource/scratches",
+              "id": "https://www.wikidata.org/wiki/Q348005",
               "label": {
-                "en": "scratches"
+                "en": "scratches",
+                "it": "graffi"
               }
             },
             {
               "id": "https://en.wikipedia.org/wiki/Film_splicer",
               "label": {
-                "en": "splice"
+                "en": "splice",
+                "it": "giunzione"
               }
             }
           ],
           "label": {
-            "en": "State"
+            "en": "State",
+            "it": "Stato"
           }
         }
       ],
@@ -5352,78 +5920,90 @@
               "id": "https://www.wikidata.org/wiki/Q860447",
               "label": {
                 "de": "Rettungsdienst",
-                "en": "ambulance service"
+                "en": "ambulance service",
+                "it": "servizio medico di emergenza"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q6498663",
               "label": {
                 "de": "Feuerwehr",
-                "en": "fire service"
+                "en": "fire service",
+                "it": "vigili del fuoco"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q8473",
               "label": {
                 "de": "Militär",
-                "en": "military"
+                "en": "military",
+                "it": "forze armate"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q207320",
               "label": {
                 "de": "Paramilitär",
-                "en": "paramilitary"
+                "en": "paramilitary",
+                "it": "organizzazione paramilitare"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q7278",
               "label": {
                 "de": "Partei",
-                "en": "party"
+                "en": "party",
+                "it": "partito politico"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q35535",
               "label": {
                 "de": "Polizei",
-                "en": "police"
+                "en": "police",
+                "it": "polizia"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q49845",
               "label": {
-                "en": "postal service"
+                "en": "postal service",
+                "it": "servizio postale"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q9174",
               "label": {
-                "en": "religion"
+                "en": "religion",
+                "it": "religione"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q16605260",
               "label": {
-                "en": "social services"
+                "en": "social services",
+                "it": "servizi sociali"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q152478",
               "label": {
-                "en": "sports organisation"
+                "en": "sports organisation",
+                "it": "organizzazione sportiva"
               }
             },
             {
               "id": "https://www.wikidata.org/wiki/Q178790",
               "label": {
                 "de": "Gewerkschaft",
-                "en": "union"
+                "en": "union",
+                "it": "sindacato"
               }
             }
           ],
           "label": {
-            "en": "Organisation type"
+            "en": "Organisation type",
+            "it": "Tipo di organizzazione"
           }
         }
       ],
