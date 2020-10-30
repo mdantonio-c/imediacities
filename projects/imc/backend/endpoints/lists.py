@@ -6,7 +6,7 @@ import re
 from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
-from restapi.confs import get_backend_url
+from restapi.config import get_backend_url
 from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields
 from restapi.utilities.logs import log

@@ -7,7 +7,7 @@ Search endpoint
 from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
 from restapi import decorators
-from restapi.confs import get_backend_url
+from restapi.config import get_backend_url
 from restapi.exceptions import BadRequest, Forbidden, NotFound, ServerError
 from restapi.utilities.logs import log
 

@@ -7,7 +7,7 @@ Search endpoint for places
 from imc.endpoints import IMCEndpoint
 from imc.models import SearchPlaceParameters
 from restapi import decorators
-from restapi.confs import get_backend_url
+from restapi.config import get_backend_url
 from restapi.utilities.logs import log
 
 

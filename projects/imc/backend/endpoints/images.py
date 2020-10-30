@@ -9,7 +9,7 @@ from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
-from restapi.confs import get_backend_url
+from restapi.config import get_backend_url
 from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
