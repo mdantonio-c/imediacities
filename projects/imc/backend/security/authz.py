@@ -5,9 +5,8 @@
 
 """
 from imc.tasks.services.creation_repository import CreationRepository
-from restapi.exceptions import RestApiException
+from restapi.exceptions import Forbidden
 from restapi.services.authentication import Role
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -70,10 +69,7 @@ def pre_authorize(func):
         # log.debug("Logged in user: {}", user)
         # log.debug("Has permission to access entity[{}]?", entity_id)
         if not _has_public_access(self, user, entity_id):
-            raise RestApiException(
-                "User is not authorized to access content",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
+            raise Forbidden("User is not authorized to access content")
 
         return func(self, **kwargs)
 

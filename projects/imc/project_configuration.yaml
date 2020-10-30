@@ -1,8 +1,8 @@
 project:
   title: "iMediaCities Repository"
   description: "..."
-  version: "1.8.0"
-  rapydo: "0.8"
+  version: "1.9.0"
+  rapydo: "0.9"
 
 variables:
   env:

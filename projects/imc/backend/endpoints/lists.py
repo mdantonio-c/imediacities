@@ -7,15 +7,8 @@ from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.exceptions import (
-    BadRequest,
-    Conflict,
-    Forbidden,
-    NotFound,
-    RestApiException,
-)
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
@@ -96,9 +89,8 @@ class Lists(IMCEndpoint):
 
             creator = res.creator.single()
             if not iamadmin and researcher.uuid != creator.uuid:
-                raise RestApiException(
+                raise Forbidden(
                     "You are not allowed to get a list that does not belong to you",
-                    status_code=hcodes.HTTP_BAD_FORBIDDEN,
                 )
             user_list = self.getJsonResponse(res)
             if iamadmin and researcher is None:
@@ -206,9 +198,7 @@ class Lists(IMCEndpoint):
         # connect the creator
         created_list.creator.connect(user)
         log.debug("List created successfully. UUID {}", created_list.uuid)
-        return self.response(
-            self.getJsonResponse(created_list), code=hcodes.HTTP_OK_CREATED
-        )
+        return self.response(self.getJsonResponse(created_list), code=201)
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
@@ -260,9 +250,7 @@ class Lists(IMCEndpoint):
         user_list.description = description.strip()
         updated_list = user_list.save()
         log.debug("List successfully updated. UUID {}", updated_list.uuid)
-        return self.response(
-            self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
-        )
+        return self.response(self.getJsonResponse(updated_list))
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
@@ -339,17 +327,14 @@ class ListItems(IMCEndpoint):
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
         # am I the owner of the list? (allowed also to admin)
         user = self.get_user()
         iamadmin = self.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
-            raise RestApiException(
+            raise Forbidden(
                 "You are not allowed to get a list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )
         if item_id is not None:
             log.debug(
@@ -367,11 +352,10 @@ class ListItems(IMCEndpoint):
             )
             res = [self.graph.ListItem.inflate(row[0]) for row in results]
             if not res:
-                raise RestApiException(
+                raise NotFound(
                     "Item <{}> is not connected to the list <{}, {}>".format(
                         item_id, user_list.uuid, user_list.name
-                    ),
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                    )
                 )
             return self.response(self.get_list_item_response(res[0]))
 

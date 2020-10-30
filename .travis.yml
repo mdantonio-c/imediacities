@@ -11,7 +11,7 @@ env:
   - STAGE=CYPRESS
 
 script:
-  - export RAPYDO_VERSION=0.8
+  - export RAPYDO_VERSION=0.9
   - pip install --upgrade git+https://github.com/rapydo/do.git@${RAPYDO_VERSION}
   - export COMMIT_INFO_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
   - export COMMIT_INFO_MESSAGE="$(git show -s --pretty=%B)"
@@ -50,6 +50,7 @@ script:
       sleep 5;
       rapydo -s frontend logs;
       rapydo shell frontend "yarn install" || travis_terminate 1;
+      rapydo shell frontend "reload-types" || travis_terminate 1;
       rapydo shell frontend "yarn run test:single" || travis_terminate 1;
       cp data/imc/karma/lcov.info .;
       travis_retry bash <(curl -s https://codecov.io/bash);
@@ -60,6 +61,7 @@ script:
       rapydo shell backend --detach "restapi launch";
       rapydo -s frontend logs;
       rapydo shell frontend "yarn install" || travis_terminate 1;
+      rapydo shell frontend "reload-types" || travis_terminate 1;
       rapydo shell frontend "yarn run cypress:start" || travis_terminate 1;
 
     fi

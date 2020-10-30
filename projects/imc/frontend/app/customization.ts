@@ -13,10 +13,6 @@ export class ProjectOptions extends BaseProjectOptions {
     this.initTemplates();
   }
 
-  show_groups(): boolean {
-    return true;
-  }
-
   custom_user_data(): any[] {
     return [
       { name: "Institution", prop: "declared_institution", flexGrow: 0.7 },

@@ -8,8 +8,7 @@ from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
 from restapi import decorators
 from restapi.confs import get_backend_url
-from restapi.exceptions import RestApiException
-from restapi.utilities.htmlcodes import hcodes
+from restapi.exceptions import BadRequest, Forbidden, NotFound, ServerError
 from restapi.utilities.logs import log
 
 
@@ -66,9 +65,7 @@ class Search(IMCEndpoint):
                 entity = "NonAVEntity"
             else:
                 # should never be reached
-                raise RestApiException(
-                    "Unexpected item type", status_code=hcodes.HTTP_SERVER_ERROR
-                )
+                raise ServerError("Unexpected item type")
             # PROVIDER
             provider = filtering.get("provider")
             log.debug("provider {0}", provider)
@@ -89,7 +86,7 @@ class Search(IMCEndpoint):
             if country is not None:
                 country = country.strip().upper()
                 if codelists.fromCode(country, codelists.COUNTRY) is None:
-                    raise RestApiException("Invalid country code for: " + country)
+                    raise NotFound(f"Invalid country code for: {country}")
                 filters.append(
                     "MATCH (n)-[:COUNTRY_OF_REFERENCE]->(c:Country) WHERE c.code='{country_ref}'".format(
                         country_ref=country
@@ -98,7 +95,7 @@ class Search(IMCEndpoint):
             # IPR STATUS
             if iprstatus := filtering.get("iprstatus"):
                 if codelists.fromCode(iprstatus, codelists.RIGHTS_STATUS) is None:
-                    raise RestApiException("Invalid IPR status code for: " + iprstatus)
+                    raise NotFound(f"Invalid IPR status code for: {iprstatus}")
                 filters.append(
                     "MATCH (n) WHERE n.rights_status = '{iprstatus}'".format(
                         iprstatus=iprstatus
@@ -164,15 +161,11 @@ class Search(IMCEndpoint):
                 # only annotated *BY ME* is autorized (except for the admin)
                 anno_user_id = annotated_by.get("user", None)
                 if anno_user_id is None:
-                    raise RestApiException(
-                        "Missing user in annotated_by filter",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Missing user in annotated_by filter")
                 iamadmin = self.verify_admin()
                 if user.uuid != anno_user_id and not iamadmin:
-                    raise RestApiException(
+                    raise Forbidden(
                         "You are not allowed to search for item that are not annotated by you",
-                        status_code=hcodes.HTTP_BAD_FORBIDDEN,
                     )
                 if iamadmin:
                     # check if 'user' in annotated_by filter exists
@@ -180,17 +173,14 @@ class Search(IMCEndpoint):
                         v = self.graph.User.nodes.get(uuid=anno_user_id)
                     except self.graph.User.DoesNotExist:
                         log.debug("User with uuid {} does not exist", anno_user_id)
-                        raise RestApiException(
-                            "Please specify a valid user id in annotated_by filter",
-                            status_code=hcodes.HTTP_BAD_NOTFOUND,
+                        raise NotFound(
+                            "Please specify a valid user id in annotated_by filter"
                         )
                 anno_type = annotated_by.get("type", "TAG")
-                if anno_type not in self.__class__.allowed_anno_types:
-                    raise RestApiException(
-                        "Bad annotation type in annotated_by filter: expected one of {}".format(
-                            self.__class__.allowed_anno_types
-                        ),
-                        status_code=hcodes.HTTP_BAD_REQUEST,
+                _allowed_types = self.__class__.allowed_anno_types
+                if anno_type not in _allowed_types:
+                    raise BadRequest(
+                        f"Unknown type in annotated_by filter: expected one of {_allowed_types}"
                     )
                 filters.append(
                     "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'{type}'}})"
@@ -264,7 +254,7 @@ class Search(IMCEndpoint):
             numels = [row[0] for row in self.graph.cypher(countv)][0]
         except BaseException as e:
             log.error(e)
-            raise RestApiException("Invalid query parameters")
+            raise BadRequest("Invalid query parameters")
 
         log.debug("Number of elements retrieved: {0}", numels)
 
@@ -281,9 +271,7 @@ class Search(IMCEndpoint):
                 v = self.graph.NonAVEntity.inflate(row[0])
             else:
                 # should never be reached
-                raise RestApiException(
-                    "Unexpected item type", status_code=hcodes.HTTP_SERVER_ERROR
-                )
+                raise ServerError("Unexpected item type")
 
             item = v.item.single()
 

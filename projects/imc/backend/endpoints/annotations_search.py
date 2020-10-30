@@ -5,9 +5,8 @@ Search endpoint for annotations
 from imc.endpoints import IMCEndpoint
 from imc.models import AnnotationSearch, codelists
 from restapi import decorators
-from restapi.exceptions import BadRequest, RestApiException
+from restapi.exceptions import BadRequest, NotFound, ServerError
 from restapi.models import fields
-from restapi.utilities.htmlcodes import hcodes
 
 
 class SearchAnnotations(IMCEndpoint):
@@ -119,10 +118,7 @@ class SearchAnnotations(IMCEndpoint):
                             )
                         else:
                             # should never be reached
-                            raise RestApiException(
-                                "Unexpected field type",
-                                status_code=hcodes.HTTP_SERVER_ERROR,
-                            )
+                            raise ServerError("Unexpected field type")
                     if len(multi_match) > 0:
                         multi_match_query = (
                             " ".join(multi_match)
@@ -157,9 +153,7 @@ class SearchAnnotations(IMCEndpoint):
                 # IPR STATUS
                 if c_iprstatus := c_filter.get("iprstatus"):
                     if codelists.fromCode(c_iprstatus, codelists.RIGHTS_STATUS) is None:
-                        raise RestApiException(
-                            "Invalid IPR status code for: " + c_iprstatus
-                        )
+                        raise NotFound(f"Invalid IPR status code for: {c_iprstatus}")
                     filters.append(
                         "MATCH (creation) WHERE creation.rights_status = '{iprstatus}'".format(
                             iprstatus=c_iprstatus

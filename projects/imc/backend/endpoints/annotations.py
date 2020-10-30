@@ -18,10 +18,10 @@ from restapi.exceptions import (
     Conflict,
     Forbidden,
     NotFound,
-    RestApiException,
+    ServerError,
+    Unauthorized,
 )
 from restapi.models import Schema, fields
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
@@ -142,20 +142,14 @@ class Annotations(IMCEndpoint):
         self.graph = self.get_service_instance("neo4j")
 
         if anno_id is None and not self.verify_admin():
-            raise RestApiException(
-                "You are not authorized: missing privileges",
-                status_code=hcodes.HTTP_BAD_UNAUTHORIZED,
-            )
+            raise Unauthorized("You are not authorized: missing privileges")
 
         if anno_id:
             # check if the video exists
             anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
             if not anno:
                 log.debug("Annotation with uuid {} does not exist", anno_id)
-                raise RestApiException(
-                    "Please specify a valid annotation id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
-                )
+                raise NotFound("Please specify a valid annotation id")
             annotations = [anno]
         elif anno_type:
             annotations = self.graph.Annotation.nodes.filter(annotation_type=anno_type)
@@ -186,28 +180,21 @@ class Annotations(IMCEndpoint):
     )
     def post(self, **data):
         """ Create a new annotation. """
-        # TODO access control (annotation cannot be created by general user if not in public domain)
+        # TODO access control
+        # annotation cannot be created by general user if not in public domain
         if len(data) == 0:
-            raise RestApiException("Empty input", status_code=hcodes.HTTP_BAD_REQUEST)
+            raise BadRequest("Empty input")
         if "target" not in data:
-            raise RestApiException(
-                "Target is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Target is mandatory")
         if "body" not in data:
-            raise RestApiException(
-                "Body is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Body is mandatory")
         if "motivation" not in data:
-            raise RestApiException(
-                "Motivation is mandatory", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Motivation is mandatory")
         motivation = data["motivation"]
-        if motivation not in self.__class__.allowed_motivations:
-            raise RestApiException(
-                "Bad motivation parameter: expected one of {}".format(
-                    self.__class__.allowed_motivations
-                ),
-                status_code=hcodes.HTTP_BAD_REQUEST,
+        _allowed_motivations = self.__class__.allowed_motivations
+        if motivation not in _allowed_motivations:
+            raise BadRequest(
+                f"Bad motivation parameter: expected one of {_allowed_motivations}"
             )
         # check for private and embargo date
         is_private = True if ("private" in data and data["private"] is True) else False
@@ -218,23 +205,17 @@ class Annotations(IMCEndpoint):
                     data["embargo"], "%Y-%m-%d"
                 ).date()
             except ValueError:
-                raise RestApiException(
-                    "Incorrect embargo date format, should be YYYY-MM-DD",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+                raise BadRequest("Incorrect embargo date format, should be YYYY-MM-DD")
         if embargo_date is not None and not is_private:
-            raise RestApiException(
+            raise BadRequest(
                 "Embargo date is not allowed for public annotations. "
-                "Explicitly set the 'private' parameter to true",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+                "Explicitly set the 'private' parameter to true"
             )
         # check the target
         target = data["target"]
         log.debug("Annotate target: {}", target)
         if not TARGET_PATTERN.match(target):
-            raise RestApiException(
-                "Invalid Target format", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Invalid Target format")
         target_type, tid = target.split(":")
         log.debug("target type: {}, target id: {}", target_type, tid)
 
@@ -243,7 +224,7 @@ class Annotations(IMCEndpoint):
         # check user
         user = self.get_user()
         if user is None:
-            raise RestApiException("Invalid user", status_code=hcodes.HTTP_BAD_REQUEST)
+            raise BadRequest("Invalid user")
 
         targetNode = None
         if target_type == "item":
@@ -254,31 +235,20 @@ class Annotations(IMCEndpoint):
             targetNode = self.graph.Annotation.nodes.get_or_none(uuid=tid)
         else:
             # this should never be reached
-            raise RestApiException(
-                "Invalid target type", status_code=hcodes.HTTP_SERVER_ERROR
-            )
+            raise ServerError("Invalid target type")
 
         if targetNode is None:
-            raise RestApiException(
-                "Target [" + target_type + "][" + tid + "] does not exist",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+            raise BadRequest(f"Target [{target_type}][{tid}] does not exist")
 
         # check the selector
         selector = data.get("selector", None)
         log.debug("selector: {}", selector)
         if selector is not None:
             if selector["type"] != "FragmentSelector":
-                raise RestApiException(
-                    "Invalid selector type for: {}".format(selector["type"]),
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+                raise BadRequest(f"Invalid selector type for: {selector['type']}")
             s_val = selector["value"]
             if s_val is None or not SELECTOR_PATTERN.match(s_val):
-                raise RestApiException(
-                    "Invalid selector value for: " + s_val,
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+                raise BadRequest(f"Invalid selector value for: {s_val}")
 
         # check bodies
         bodies = data["body"]
@@ -289,58 +259,36 @@ class Annotations(IMCEndpoint):
             if b_type == "ResourceBody":
                 source = body.get("source")
                 if source is None:
-                    raise RestApiException(
-                        "Missing Source in the ResourceBody",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Missing Source in the ResourceBody")
                 # here we expect the source as an IRI or a structured object
                 # 1) just the IRI
                 if isinstance(source, str):
                     pass
                 # 2) structured object
                 elif "iri" not in source or "name" not in source:
-                    raise RestApiException(
-                        "Invalid ResourceBody", status_code=hcodes.HTTP_BAD_REQUEST
-                    )
+                    raise BadRequest("Invalid ResourceBody")
             elif b_type == "TextualBody":
                 if "value" not in body:  # or 'language' not in body:
-                    raise RestApiException(
-                        "Invalid TextualBody", status_code=hcodes.HTTP_BAD_REQUEST
-                    )
+                    raise BadRequest("Invalid TextualBody")
             elif b_type == "TVSBody":
                 segments = body.get("segments")
                 if segments is None or type(segments) is not list or len(segments) == 0:
-                    raise RestApiException(
-                        "Invalid TVSBody: invalid or missing segments",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Invalid TVSBody: invalid or missing segments")
                 for s_val in segments:
                     if s_val is None or not SELECTOR_PATTERN.match(s_val):
-                        raise RestApiException(
-                            "Invalid selector value for: " + s_val,
-                            status_code=hcodes.HTTP_BAD_REQUEST,
-                        )
+                        raise BadRequest(f"Invalid selector value for: {s_val}")
             elif b_type == "BibliographicReference":
                 # validate reference body
                 if "value" not in body:
-                    raise RestApiException(
-                        "Invalid BibliographicReference",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Invalid BibliographicReference")
                 value = body.get("value")
                 if "title" not in value:
-                    raise RestApiException(
-                        "Invalid BibliographicReference: missing title",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Invalid BibliographicReference: missing title")
                 authors = value.get("authors")
                 if authors is None or len(authors) == 0:
-                    raise RestApiException(
-                        "Invalid BibliographicReference: missing authors",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
-                    )
+                    raise BadRequest("Invalid BibliographicReference: missing authors")
             else:
-                raise RestApiException(f"Invalid body type for: {b_type}")
+                raise BadRequest(f"Invalid body type for: {b_type}")
 
         # create manual annotation
         repo = AnnotationRepository(self.graph)
@@ -350,47 +298,34 @@ class Annotations(IMCEndpoint):
             )
         elif motivation == "segmentation":
             if b_type != "TVSBody":
-                raise RestApiException(
+                raise BadRequest(
                     f"Invalid body [{b_type}] for segmentation request. "
-                    "Expected TVSBody.",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
+                    "Expected TVSBody."
                 )
             if target_type != "item":
-                raise RestApiException(
-                    "Invalid target. Only item allowed.",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+                raise BadRequest("Invalid target. Only item allowed.")
             try:
                 created_anno = repo.create_tvs_manual_annotation(
                     user, bodies, targetNode, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
-                raise RestApiException(
-                    error.args[0], status_code=hcodes.HTTP_BAD_CONFLICT
-                )
+                raise Conflict(error.args[0])
         elif motivation == "linking":
             try:
                 created_anno = repo.create_link_annotation(
                     user, bodies, targetNode, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
-                raise RestApiException(
-                    error.args[0], status_code=hcodes.HTTP_BAD_CONFLICT
-                )
+                raise Conflict(error.args[0])
         else:
             try:
                 created_anno = repo.create_tag_annotation(
                     user, bodies, targetNode, selector, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
-                raise RestApiException(
-                    error.args[0] + " " + "; ".join(error.args[1]),
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
-                )
+                raise Conflict(error.args[0] + " " + "; ".join(error.args[1]))
 
-        return self.response(
-            self.get_annotation_response(created_anno), code=hcodes.HTTP_OK_CREATED
-        )
+        return self.response(self.get_annotation_response(created_anno), code=201)
 
     @decorators.auth.require()
     @decorators.catch_graph_exceptions
@@ -421,9 +356,7 @@ class Annotations(IMCEndpoint):
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
-            raise RestApiException(
-                "Annotation not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Annotation not found")
 
         user = self.get_user()
 
@@ -439,22 +372,18 @@ class Annotations(IMCEndpoint):
                 "Invalid state: manual annotation [{id}] MUST have a creator",
                 id=anno.uuid,
             )
-            raise RestApiException(
-                "Annotation with no creator", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Annotation with no creator")
         if is_manual and user.uuid != creator.uuid and not iamadmin:
-            raise RestApiException(
-                "You cannot delete an annotation that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                "You cannot delete an annotation that does not belong to you"
             )
 
         body_type = None
         bid = None
         if body_ref:
             if not BODY_PATTERN.match(body_ref):
-                raise RestApiException(
-                    "Invalid Body format: textual:your_term or resource:your_iri",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
+                raise BadRequest(
+                    "Invalid Body format: textual:your_term or resource:your_iri"
                 )
             body_type, bid = body_ref.split(":", 1)
             log.debug("[body type]: {0}, [body id]: {1}", body_type, bid)
@@ -470,7 +399,7 @@ class Annotations(IMCEndpoint):
             else:
                 raise ValueError(f"Cannot delete anno {anno.uuid}")
         except ReferenceError as error:
-            raise RestApiException(error.args[0], status_code=hcodes.HTTP_BAD_REQUEST)
+            raise BadRequest(error.args[0])
 
         return self.empty_response()
 
@@ -499,48 +428,35 @@ class Annotations(IMCEndpoint):
         at the moment, only annotations for notes can be updated.
         """
         if anno_id is None:
-            raise RestApiException(
-                "Please specify an annotation id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Please specify an annotation id")
 
         self.graph = self.get_service_instance("neo4j")
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
-            raise RestApiException(
-                "Annotation not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Annotation not found")
 
         user = self.get_user()
 
         creator = anno.creator.single()
         if creator is None:
-            raise RestApiException(
-                "Annotation with no creator", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Annotation with no creator")
         if user.uuid != creator.uuid:
-            raise RestApiException(
-                "You cannot update an annotation that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                "You cannot update an annotation that does not belong to you"
             )
 
         if anno.annotation_type not in ("DSC", "COM", "RPL"):
-            raise RestApiException(
-                f"Operation not allowed for annotation {anno.annotation_type}",
-                status_code=hcodes.HTTP_BAD_REQUEST,
+            raise BadRequest(
+                f"Operation not allowed for annotation {anno.annotation_type}"
             )
 
         if anno.annotation_type == "DSC":
             if "body" not in data:
-                raise RestApiException(
-                    "Cannot update annotation without body",
-                    status_code=hcodes.HTTP_BAD_REQUEST,
-                )
+                raise BadRequest("Cannot update annotation without body")
             if "private" in data:
                 if not isinstance(data["private"], bool):
-                    raise RestApiException(
-                        "Invalid private", status_code=hcodes.HTTP_BAD_REQUEST
-                    )
+                    raise BadRequest("Invalid private")
                 anno.private = data["private"]
                 if not anno.private:
                     # force embargo deletion
@@ -552,25 +468,20 @@ class Annotations(IMCEndpoint):
                         data["embargo"], "%Y-%m-%d"
                     ).date()
                 except ValueError:
-                    raise RestApiException(
-                        "Incorrect embargo date format," " should be YYYY-MM-DD",
-                        status_code=hcodes.HTTP_BAD_REQUEST,
+                    raise BadRequest(
+                        "Incorrect embargo date format," " should be YYYY-MM-DD"
                     )
             # update the body
             body = data["body"]
             if isinstance(body, list):
-                raise RestApiException(
-                    "Expected single body", status_code=hcodes.HTTP_BAD_REQUEST
-                )
+                raise BadRequest("Expected single body")
             b_type = body.get("type")
             if b_type != "TextualBody":
-                raise RestApiException(
+                raise BadRequest(
                     f"Invalid body type for: {b_type}. Expected TextualBody."
                 )
             if "value" not in body:
-                raise RestApiException(
-                    "Invalid TextualBody", status_code=hcodes.HTTP_BAD_REQUEST
-                )
+                raise BadRequest("Invalid TextualBody")
             # expected single body for DSC annotations
             anno_body = anno.bodies.single()
             textual_body = anno_body.downcast()
@@ -580,9 +491,7 @@ class Annotations(IMCEndpoint):
             textual_body.save()
             anno.save()
         else:
-            raise RestApiException(
-                "Not yet implemented", status_code=hcodes.HTTP_NOT_IMPLEMENTED
-            )
+            raise BadRequest("Unknown annotation_type")
 
         updated_anno = self.get_annotation_response(anno)
 

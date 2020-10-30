@@ -6,9 +6,8 @@ import os
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import BadRequest, Conflict, ServerError
 from restapi.models import fields, validate
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -96,15 +95,13 @@ class Stage(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                raise RestApiException("Upload dir not found")
+                raise ServerError("Upload dir not found")
 
         dirs = os.listdir(upload_dir)
 
@@ -207,11 +204,11 @@ class Stage(IMCEndpoint):
         """
         Start IMPORT
         1) estraggo il source id dal file dei metadati
-            se non lo trovo -> RestApiException
+            se non lo trovo -> exception
         2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID e appartenente al gruppo
-            se ne trovo più di uno -> RestApiException
+            se ne trovo più di uno -> exception
             se ne trovo uno -> updating metadata
-                se il nome del file dei metadati è diverso da quello in db -> RestApiException
+                se il nome del file dei metadati è diverso da quello in db -> exception
                 cerco se c'è un content stage associato a quel meta stage
                     se esiste e se ha status COMPLETED -> mode=skip
             se ne trovo zero -> creating new element
@@ -228,32 +225,22 @@ class Stage(IMCEndpoint):
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            raise RestApiException(
-                "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Upload dir not found")
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            raise RestApiException(
-                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest(f"File not found: {filename}")
 
         # 1) estraggo il source id dal file dei metadati
         log.debug("Extracting source id from metadata file {}", filename)
         source_id = self.extract_creation_ref(path)
         if source_id is None:
             log.debug("No source ID found in metadata file {}", path)
-            raise RestApiException(
-                "No source ID found in metadata file: {}",
-                filename,
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict(f"No source ID found in metadata file: {filename}")
         log.debug("Source id {} found in metadata file", source_id)
 
         # 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
@@ -277,9 +264,8 @@ class Stage(IMCEndpoint):
                     "Database incoherence: there are more than one MetaStage related to the same source id {}",
                     source_id,
                 )
-                raise RestApiException(
-                    "System incoherent state: it is not possible to perform the import",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise ServerError(
+                    "System incoherent state: it is not possible to perform the import"
                 )
             if len(c) == 1:
                 # Source id already exists in database: updating metadata
@@ -289,14 +275,14 @@ class Stage(IMCEndpoint):
                     dbFilename = meta_stage.filename
                     log.debug("dbFilename={}", dbFilename)
                     if filename != dbFilename:
-                        raise RestApiException(
-                            "Source id {} already esists in database but with different filename {}: cannot proceed with import!".format(
-                                source_id, dbFilename
-                            ),
-                            status_code=hcodes.HTTP_BAD_CONFLICT,
+                        raise Conflict(
+                            f"Source id {source_id} already esists in database "
+                            f"but with different filename {dbFilename}: "
+                            "cannot proceed with import!"
                         )
 
-                    # cerco se c'è un content stage associato a quel meta stage per vedere se status COMPLETED
+                    # cerco se c'è un content stage associato a quel meta stage
+                    # per vedere se status COMPLETED
                     query2 = (
                         "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) "
                         "MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) "
@@ -319,9 +305,8 @@ class Stage(IMCEndpoint):
                             mode = "skip"
                 else:
                     log.debug("meta_stage is null")
-                    raise RestApiException(
-                        "System incoherence error: it is not possible to perform the import",
-                        status_code=hcodes.HTTP_BAD_CONFLICT,
+                    raise ServerError(
+                        "System incoherence error: cannot perform the import"
                     )
             if len(c) == 0:
                 # Source id does not exist in database: creating new element
@@ -347,10 +332,7 @@ class Stage(IMCEndpoint):
                         log.debug(
                             "Error in renaming file {} to {}: ", path, standard_path
                         )
-                        raise RestApiException(
-                            f"System error: cannot rename file {path}",
-                            status_code=hcodes.HTTP_BAD_CONFLICT,
-                        )
+                        raise Conflict(f"System error: cannot rename file {path}")
 
                     path = standard_path
 
@@ -408,21 +390,15 @@ class Stage(IMCEndpoint):
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            raise RestApiException(
-                "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Upload dir not found")
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            raise RestApiException(
-                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest(f"File not found: {filename}")
 
         os.remove(path)
         return self.empty_response()

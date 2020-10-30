@@ -23,7 +23,6 @@ from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.exceptions import BadRequest, NotFound
 from restapi.services.authentication import Role
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 

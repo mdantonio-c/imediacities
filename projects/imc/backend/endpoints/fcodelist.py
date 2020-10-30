@@ -5,9 +5,8 @@ import json
 
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import NotFound
 from restapi.models import fields
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -32,15 +31,13 @@ class Fcodelist(IMCEndpoint):
     )
     def get(self, codelist, lang):
         """Get the codelists."""
-        log.debug("load the codelist: " + codelist)
+        log.debug("load the codelist: {}", codelist)
         filename = codelist + ".json"
         filepath = "imc/fcodelist/" + lang + "/" + filename
-        log.debug("filepath: " + filepath)
+        log.debug("filepath: {}", filepath)
         try:
             data = json.load(open(filepath))
             return self.response(data)
         except FileNotFoundError:
-            log.warning("Codelist file not found: " + filepath)
-            raise RestApiException(
-                "Warning: codelist not available", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            log.warning("Codelist file not found: {}", filepath)
+            raise NotFound("Codelist not available")
