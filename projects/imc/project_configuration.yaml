@@ -36,18 +36,20 @@ variables:
 
     FRONTEND_LANG: "en"
 
-  backend:
-    credentials:
-      roles:
-        user: "normal_user"
-        internal: "staff_user"
-        admin: "admin_root"
-        default: "normal_user"
-    allowed_roles:
-      - Researcher
-      - Archive
-      - Reviser
-      - normal_user
+  roles:
+    normal_user: User
+    staff_user: Staff
+    # group_coordinator: Coordinator
+    admin_root: Admin
+    Archive: Archive
+    Reviser: Reviser
+    Researcher: Researcher
+    # default: normal_user
+    # allowed_roles:
+    #   - Researcher
+    #   - Archive
+    #   - Reviser
+    #   - normal_user
 
 tags:
   file: "All endpoints to handle files"

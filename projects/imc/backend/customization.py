@@ -35,17 +35,19 @@ class Customizer(BaseCustomizer):
         return data
 
     @staticmethod
-    def get_user_editable_fields(request):
-        return {}
-
-    @staticmethod
-    def get_custom_input_fields(request):
+    def get_custom_input_fields(request, scope):
 
         # required = request and request.method == "POST"
+        # It is defined for all scopes (ADMIN, PROFILE and REGISTRATION)
+        if scope == BaseCustomizer.ADMIN:
+            label = "Working institution"
+        else:
+            label = "Do you work at one of the following institutions:"
         return {
             "declared_institution": fields.Str(
-                required=False,
-                default="none",
+                required=True,
+                description="",
+                label=label,
                 validate=validate.OneOf(
                     choices=["archive", "university", "research_institution", "none"],
                     labels=[
@@ -60,6 +62,6 @@ class Customizer(BaseCustomizer):
 
     @staticmethod
     def get_custom_output_fields(request):
-        fields = Customizer.get_custom_input_fields(request)
+        fields = Customizer.get_custom_input_fields(request, scope=BaseCustomizer.ADMIN)
 
         return fields

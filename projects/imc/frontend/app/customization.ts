@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { FormlyFieldConfig } from "@ngx-formly/core";
 import { BaseProjectOptions } from "@rapydo/base.project.options";
 
 @Injectable()
@@ -43,30 +42,6 @@ Welcome to the registration page of I-Media-Cities. Registering a personal accou
 <br>
 <strong>In order to explore the I Media Cities platform you have to register yourself with a valid e-mail address. We will send you a confirmation link after the registration.</strong>
 `;
-  }
-
-  custom_registration_options(): FormlyFieldConfig[] {
-    let fields: FormlyFieldConfig[] = [];
-
-    fields.push({
-      key: "declared_institution",
-      type: "select",
-      templateOptions: {
-        label: "Do you work at one of the following institutions:",
-        required: true,
-        addonLeft: {
-          class: "fa fa-university",
-        },
-        options: [
-          { label: "Archive", value: "archive" },
-          { label: "University", value: "university" },
-          { label: "Research Institution", value: "research_institution" },
-          { label: "None of the above", value: "none" },
-        ],
-      },
-    });
-
-    return fields;
   }
 
   private initTemplates() {
