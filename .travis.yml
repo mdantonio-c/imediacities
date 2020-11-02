@@ -29,6 +29,7 @@ script:
     if [[ "$STAGE" != "FRONTEND" ]]; then
       rapydo pull;
       rapydo build --force;
+      rapydo add task test_task;
       rapydo start;
       rapydo shell backend 'restapi wait';
     fi
