@@ -37,7 +37,7 @@ class Customizer(BaseCustomizer):
     @staticmethod
     def get_custom_input_fields(request, scope):
 
-        # required = request and request.method == "POST"
+        required = request and request.method == "POST"
         # It is defined for all scopes (ADMIN, PROFILE and REGISTRATION)
         if scope == BaseCustomizer.ADMIN:
             label = "Working institution"
@@ -45,7 +45,7 @@ class Customizer(BaseCustomizer):
             label = "Do you work at one of the following institutions:"
         return {
             "declared_institution": fields.Str(
-                required=True,
+                required=required,
                 description="",
                 label=label,
                 validate=validate.OneOf(
