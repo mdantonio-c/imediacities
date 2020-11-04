@@ -156,7 +156,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
   stage(filename) {
     this.stageService.stage(filename).subscribe(
       (resp) => {
-        console.log(resp.response);
+        console.log(resp);
         this.notify.showSuccess("File staged successfully");
       },
       (error) => {
