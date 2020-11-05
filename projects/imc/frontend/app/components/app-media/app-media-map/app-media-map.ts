@@ -88,6 +88,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   markerClusterData: L.Marker[] = [];
   markerClusterOptions: L.MarkerClusterGroupOptions;
   osmap: L.Map;
+  lastMouseLat: any;
+  lastMouseLng: any;
+
+
 
   // Set the initial set of displayed layers
   options = {
@@ -183,7 +187,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param event
    */
   marker_add(event) {
-    if (event instanceof MouseEvent) return;
+
+    // why??????
+    // if (event instanceof MouseEvent) return;
+
     if (
       !this.AuthzService.hasPermission(
         this._current_user,
@@ -208,18 +215,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     if (this.media_type === "video" && !shots_idx.length) {
       return alert("No shot selected");
     }
-
-
-    const geocode =  this.nominatimOsmGeocoder.reverse(event.latlng).subscribe(results => {
-
-      if (error) {
-        return;
+    const geocode =  this.nominatimOsmGeocoder.reverse(this.lastMouseLat, this.lastMouseLng).subscribe(result => {
+      if (result && result.display_name) {
+        this.marker_new_set(event, result, shots_idx);
       }
-
-      if (result && result.address) {
-        this.marker_new_set(event, result.address.Match_addr, shots_idx);
-      }
-   
     });
     this._subscription.add(geocode);
   }
@@ -350,27 +349,35 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       }
     );
   }
+  
+  
+  
+
 
   marker_new_set(event, result, shots_idx) {
+
+    let greenIcon = L.icon({
+      iconUrl: '/app/custom/assets/images/marker-icon-green.png',
+      // shadowUrl: 'leaf-shadow.png',
+
+      iconSize:     [25, 41], // size of the icon
+      //shadowSize:   [x, x], // size of the shadow
+      iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+      // shadowAnchor: [4, 62],  // the same for the shadow
+      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
     //  Verifico se esiste un marker precedente
     //  ed eventualmente lo rimuovo
     if (this.marker_edit.marker && this.marker_edit.state !== "saved") {
       this.marker_edit.marker.setMap(null);
     }
-    /*TODO TODO TODO 
-    let m = new google.maps.Marker({
-      position: {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng(),
-      },
-      icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-      map: this.map,
-    });
-    this._markers.push(m);
+
+    let m = L.marker([this.lastMouseLat, this.lastMouseLng], {icon: greenIcon}).addTo(this.osmap);
     this.marker_edit = {
       marker: m,
-      address: result.formatted_address,
-      description: result.formatted_address,
+      address: result.display_name,
+      description: result.display_name,
       iri: result.place_id,
       location: {
         lat: event.latLng.lat(),
@@ -379,6 +386,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       shots_idx: shots_idx,
       state: "saving",
     };
+
+    /*
     // mi serve il place name di google da salvare dentro description
     //  dentro result non c'è, faccio una richiesta a google
     const placeDetails = new google.maps.places.PlacesService(
@@ -537,7 +546,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
           mks.push(m);
           console.log('Checkpoint marker' , l);
         });
-        var mkGroup = new L.featureGroup(mks);
+
+        
+        var mkGroup = L.featureGroup(mks);
         this.osmap.fitBounds(mkGroup.getBounds().pad(0.5));
 
 
@@ -574,6 +585,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     console.log("Checkpoint  onMapReady ", map);
 
     this.osmap = map;
+    var componentRef = this;
+    this.osmap.addEventListener('mousemove', function(ev) {
+      componentRef.lastMouseLat = ev.latlng.lat;
+      componentRef.lastMouseLng = ev.latlng.lng;
+   });
 
     this.set_center_from_owner();
 
