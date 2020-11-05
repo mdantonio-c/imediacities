@@ -421,13 +421,16 @@ export class SearchMapComponent implements OnInit, OnChanges {
     //
 
     let target = props.target;
-   
-    this.nominatimOsmGeocoder.addressLookup(props.name).subscribe(results => {
+    let box = this.osmap.getBounds();
+
+    let boxStr =  box.getNorthEast().lng + ',' + box.getNorthEast().lat+ ',' + box.getSouthWest().lng + ',' + box.getSouthWest().lat;
+
+    this.nominatimOsmGeocoder.addressLookup(props.name, boxStr).subscribe(results => {
           // look outside in order to enrich details for that given place id
           // console.log('Checkpoint Nominatim Results:', results);
           if(results.length > 0 ) {
             console.log('Checkpoint Nominatim Results ----- ', results); // , modalRef);
-            modalRef.componentInstance.address = results[results.length-1].displayName;
+            modalRef.componentInstance.address = results[0].displayName;
           }
           
           //if (results[0]) {
