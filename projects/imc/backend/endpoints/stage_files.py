@@ -277,8 +277,7 @@ class Stage(IMCEndpoint):
         if source_id is None:
             log.debug("No source ID found in metadata file {}", path)
             raise RestApiException(
-                "No source ID found in metadata file: {}",
-                filename,
+                f"No source ID found in metadata file: {filename}",
                 status_code=hcodes.HTTP_BAD_CONFLICT,
             )
         log.debug("Source id {} found in metadata file", source_id)
@@ -310,16 +309,15 @@ class Stage(IMCEndpoint):
                 )
             if len(c) == 1:
                 # Source id already exists in database: updating metadata
-                log.debug("Source id {} already exists in database", source_id)
+                log.debug("Source ID {} already exists in the database", source_id)
                 meta_stage = c[0]
                 if meta_stage is not None:
                     dbFilename = meta_stage.filename
                     log.debug("dbFilename={}", dbFilename)
                     if filename != dbFilename:
                         raise RestApiException(
-                            "Source id {} already esists in database but with different filename {}: cannot proceed with import!".format(
-                                source_id, dbFilename
-                            ),
+                            f"Source ID {source_id} already exists in the database but with different filename "
+                            f"{dbFilename}: unable to proceed with import",
                             status_code=hcodes.HTTP_BAD_CONFLICT,
                         )
 
@@ -351,12 +349,12 @@ class Stage(IMCEndpoint):
                         status_code=hcodes.HTTP_BAD_CONFLICT,
                     )
             if len(c) == 0:
-                # Source id does not exist in database: creating new element
+                # Source id does not exist in the database: creating new element
                 log.debug(
-                    "Source id {} does not exist in database: creating new element",
+                    "Source ID {} does not exist in the database: creating new element",
                     source_id,
                 )
-                # forziamo la convenzione del filename '<archive code>_<source id>.xml'
+                # force filename convention '<archive code>_<source id>.xml'
                 standard_filename = group.shortname + "_" + source_id + ".xml"
                 if filename != standard_filename:
                     log.debug(
@@ -365,7 +363,7 @@ class Stage(IMCEndpoint):
                         standard_filename,
                     )
                     standard_path = os.path.join(upload_dir, standard_filename)
-                    # rinomino il file nel filesystem
+                    # rename the file in the filesystem
                     try:
                         # cambio il nome al file dell'utente
                         # TODO come faccio ad avvisarlo????
@@ -382,9 +380,7 @@ class Stage(IMCEndpoint):
                     path = standard_path
 
                 # cerco se esiste già un metastage con quel filename altrimenti lo creo
-                properties = {}
-                properties["filename"] = standard_filename
-                properties["path"] = path
+                properties = {"filename": standard_filename, "path": path}
                 try:
                     meta_stage = self.graph.MetaStage.nodes.get(**properties)
                     log.debug(
