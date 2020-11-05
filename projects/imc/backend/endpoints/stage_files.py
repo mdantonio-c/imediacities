@@ -6,7 +6,7 @@ import os
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.exceptions import RestApiException
+from restapi.exceptions import BadRequest, RestApiException
 from restapi.models import fields, validate
 from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
@@ -17,7 +17,8 @@ class Stage(IMCEndpoint):
 
     labels = ["file"]
 
-    def getType(self, filename):
+    @staticmethod
+    def getType(filename):
         name, file_extension = os.path.splitext(filename)
 
         if file_extension is None:
@@ -108,8 +109,33 @@ class Stage(IMCEndpoint):
 
         dirs = os.listdir(upload_dir)
 
+        if input_filter:
+            filtered_dirs = []
+            for f in dirs:
+                if input_filter in f.lower():
+                    filtered_dirs.append(f)
+
+            dirs = filtered_dirs
+
         if get_total:
             return {"total": len(dirs)}
+
+        if sort_by:
+
+            if sort_by == "name":
+                sort_fn = SortFunctions.sort_by_name
+            elif sort_by == "type":
+                sort_fn = SortFunctions.sort_by_type
+            # elif sort_by == "size":
+            #     sort_fn = SortFunctions.sort_by_size
+            # elif sort_by == "creation":
+            #     sort_fn = SortFunctions.sort_by_creation
+            # elif sort_by == "status":
+            #     sort_fn = SortFunctions.sort_by_status
+            else:
+                raise BadRequest(f"Unknown sort request: {sort_by}")
+
+            dirs = sorted(dirs, key=sort_fn, reverse=sort_order == "desc")
 
         offset = (page - 1) * size
 
@@ -120,6 +146,7 @@ class Stage(IMCEndpoint):
             path = os.path.join(upload_dir, f)
             if not os.path.isfile(path):
                 continue
+
             if f[0] == ".":
                 continue
 
@@ -426,3 +453,28 @@ class Stage(IMCEndpoint):
 
         os.remove(path)
         return self.empty_response()
+
+
+class SortFunctions:
+    @staticmethod
+    def sort_by_name(t):
+        return t
+
+    @staticmethod
+    def sort_by_type(t):
+        return Stage.getType(t)
+
+    @staticmethod
+    def sort_by_size(t):
+        log.warning("Sort by size is not implemented")
+        return t
+
+    @staticmethod
+    def sort_by_creation(t):
+        log.warning("Sort by creation is not implemented")
+        return t
+
+    @staticmethod
+    def sort_by_status(t):
+        log.warning("Sort by status is not implemented")
+        return t
