@@ -57,11 +57,6 @@ class IMCEndpoint(EndpointResource):
                 if e.startswith(f"{relationship_name}."):
                     rel_name_len = len(relationship_name) + 1
                     expansion_rel = e[rel_name_len:]
-                    log.verbose(
-                        "Expanding {} relationship with {}",
-                        relationship_name,
-                        expansion_rel,
-                    )
                     relationships.append(expansion_rel)
 
         for relationship in relationships:

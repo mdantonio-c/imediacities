@@ -1040,7 +1040,6 @@ def extract_br_annotations(self, item, analyze_dir_path):
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
-            log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
@@ -1183,7 +1182,6 @@ def extract_od_annotations(self, item, analyze_dir_path):
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
-            log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
