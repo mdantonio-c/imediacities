@@ -55,6 +55,17 @@
 
           <div class="card-block">
             <div class="table-responsive">
+              <div class="row">
+                <div class="col-6">
+                  <input
+                    type="text"
+                    class="form-control data-filter"
+                    placeholder="Type to filter files"
+                    (keyup)="updateFilter($event)"
+                  />
+                </div>
+              </div>
+
               <div class="table-wrapper" #tableWrapper>
                 <ngx-spinner [fullScreen]="false"></ngx-spinner>
                 <ngx-datatable
@@ -69,6 +80,7 @@
                   [limit]="paging.itemsPerPage"
                   [offset]="paging.page"
                   (page)="serverSidePagination($event)"
+                  (sort)="updateSort($event)"
                   [rowHeight]="'auto'"
                 >
                 </ngx-datatable>

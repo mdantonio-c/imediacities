@@ -86,18 +86,21 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         prop: "size",
         flexGrow: 0.5,
         cellTemplate: this.dataSize,
+        sortable: false,
       },
       {
         name: "Upload",
         prop: "creation",
         flexGrow: 0.5,
         cellTemplate: this.dataUploadData,
+        sortable: false,
       },
       {
         name: "Status",
         prop: "status",
         flexGrow: 0.5,
         cellTemplate: this.dataStatus,
+        sortable: false,
       },
       {
         name: "controls",
@@ -105,6 +108,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         cellTemplate: this.controlsCell,
         headerTemplate: this.emptyHeader,
         flexGrow: 0.4,
+        sortable: false,
       },
     ];
   }
