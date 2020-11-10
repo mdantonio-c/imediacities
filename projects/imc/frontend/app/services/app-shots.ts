@@ -45,7 +45,8 @@ export class AppShotsService {
       return;
     }
 
-    this.api.get(endpoint || "videos", `${media_id}/shots`).subscribe(
+    let e = endpoint || "videos";
+    this.api.get(`${e}/${media_id}/shots`).subscribe(
       (response) => {
         this._media_id = media_id;
         this._shots_parse(response, "video");
