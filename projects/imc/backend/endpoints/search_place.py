@@ -8,6 +8,7 @@ from imc.endpoints import IMCEndpoint
 from imc.models import SearchPlaceParameters
 from restapi import decorators
 from restapi.config import get_backend_url
+from restapi.connectors import neo4j
 from restapi.utilities.logs import log
 
 
@@ -23,7 +24,7 @@ class SearchPlace(IMCEndpoint):
     )
     def post(self, place_list):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         data = []
         api_url = get_backend_url()

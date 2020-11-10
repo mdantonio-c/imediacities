@@ -21,6 +21,7 @@ from imc.models import BulkSchema
 from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
+from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, NotFound
 from restapi.services.authentication import Role
 from restapi.utilities.logs import log
@@ -130,8 +131,8 @@ class Bulk(IMCEndpoint):
     def post(self, **req_action):
         log.debug("Start bulk procedure...")
 
-        self.graph = self.get_service_instance("neo4j")
-        self.celery = self.get_service_instance("celery")
+        self.graph = neo4j.get_instance()
+        self.celery = celery.get_instance()
 
         if action := req_action.get("update"):
             # check group uid

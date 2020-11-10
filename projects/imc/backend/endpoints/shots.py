@@ -5,6 +5,7 @@ from flask import send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.config import get_backend_url
+from restapi.connectors import neo4j
 from restapi.exceptions import NotFound
 from restapi.models import fields, validate
 from restapi.utilities.logs import log
@@ -41,7 +42,7 @@ class Shots(IMCEndpoint):
         """
         log.debug("getting Shot id: {}", shot_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         # check if the shot exists
         node = None
@@ -97,7 +98,7 @@ class ShotAnnotations(IMCEndpoint):
     def get(self, shot_id, anno_type=None):
         log.info("get annotations for Shot id: {}", shot_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         shot = self.graph.Shot.nodes.get_or_none(uuid=shot_id)
 

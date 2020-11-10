@@ -5,6 +5,7 @@
 
 """
 from imc.tasks.services.creation_repository import CreationRepository
+from restapi.connectors import neo4j
 from restapi.exceptions import Forbidden
 from restapi.services.authentication import Role
 from restapi.utilities.logs import log
@@ -37,7 +38,7 @@ def pre_authorize(func):
         """
         Look at right status
         """
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         repo = CreationRepository(self.graph)
         rs = repo.get_right_status(entity_id)
         log.debug("right status = {}", rs)
@@ -49,7 +50,7 @@ def pre_authorize(func):
         """
         if not _is_general_public(user):
             return True
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         repo = CreationRepository(self.graph)
         return repo.publicly_accessible(entity_id)
 

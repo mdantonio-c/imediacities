@@ -13,6 +13,7 @@ from imc.tasks.services.annotation_repository import (
 )
 from marshmallow import INCLUDE
 from restapi import decorators
+from restapi.connectors import neo4j
 from restapi.exceptions import (
     BadRequest,
     Conflict,
@@ -139,7 +140,7 @@ class Annotations(IMCEndpoint):
     )
     def get(self, anno_id=None, anno_type=None):
         """ Get an annotation if its id is passed as an argument. """
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if anno_id is None and not self.verify_admin():
             raise Unauthorized("You are not authorized: missing privileges")
@@ -219,7 +220,7 @@ class Annotations(IMCEndpoint):
         target_type, tid = target.split(":")
         log.debug("target type: {}, target id: {}", target_type, tid)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         # check user
         user = self.get_user()
@@ -352,7 +353,7 @@ class Annotations(IMCEndpoint):
     def delete(self, anno_id, body_ref=None):
         """ Deletes an annotation. """
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
@@ -430,7 +431,7 @@ class Annotations(IMCEndpoint):
         if anno_id is None:
             raise BadRequest("Please specify an annotation id")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
@@ -515,7 +516,7 @@ class Annotations(IMCEndpoint):
     )
     def patch(self, anno_id, patch_op, path, value):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:

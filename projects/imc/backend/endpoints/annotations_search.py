@@ -5,6 +5,7 @@ Search endpoint for annotations
 from imc.endpoints import IMCEndpoint
 from imc.models import AnnotationSearch, codelists
 from restapi import decorators
+from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, NotFound, ServerError
 from restapi.models import fields
 
@@ -23,7 +24,7 @@ class SearchAnnotations(IMCEndpoint):
     )
     def post(self, filtering=None):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         filters = []
         starters = []

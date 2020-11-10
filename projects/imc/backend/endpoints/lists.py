@@ -7,6 +7,7 @@ from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
 from restapi.config import get_backend_url
+from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields
 from restapi.utilities.logs import log
@@ -60,7 +61,7 @@ class Lists(IMCEndpoint):
     )
     def get(self, list_id=None, r_uuid=None, belong_item=None, nb_items=False):
         """ Get all the list of a user or a certain list if an id is provided."""
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         iamadmin = self.verify_admin()
         researcher = self.get_user() if not iamadmin else None
@@ -179,7 +180,7 @@ class Lists(IMCEndpoint):
         """
         log.debug("create a new list")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user = self.get_user()
         # check if there is already a list with the same name belonging to the user.
         results = self.graph.cypher(
@@ -221,7 +222,7 @@ class Lists(IMCEndpoint):
     def put(self, list_id, name, description):
         """ Update a list. """
         log.debug("Update list with uuid: {}", list_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -269,7 +270,7 @@ class Lists(IMCEndpoint):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -322,7 +323,7 @@ class ListItems(IMCEndpoint):
     def get(self, list_id, item_id=None):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
@@ -387,7 +388,7 @@ class ListItems(IMCEndpoint):
         """ Add an item to a list. """
         log.debug("Add an item to list {} with target {}", list_id, target)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -443,7 +444,7 @@ class ListItems(IMCEndpoint):
     )
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:

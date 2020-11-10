@@ -6,6 +6,7 @@ import os
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
+from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, Conflict, ServerError
 from restapi.models import fields, validate
 from restapi.utilities.logs import log
@@ -84,7 +85,7 @@ class Stage(IMCEndpoint):
         responses={200: "List of files and directories successfully retrieved"},
     )
     def get(self, get_total, page, size, sort_by, sort_order, input_filter, group=None):
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not self.verify_admin():
             # Only admins can specify a different group to be inspected
@@ -246,8 +247,8 @@ class Stage(IMCEndpoint):
         3) faccio partire l'import con parametri: path, meta_stage.uuid, mode, metadata_update
         """
 
-        self.graph = self.get_service_instance("neo4j")
-        celery = self.get_service_instance("celery")
+        self.graph = neo4j.get_instance()
+        celery_app = celery.get_instance()
 
         group = self.get_user().belongs_to.single()
 
@@ -391,7 +392,7 @@ class Stage(IMCEndpoint):
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
-        task = celery.import_file.apply_async(
+        task = celery_app.import_file.apply_async(
             args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
@@ -410,7 +411,7 @@ class Stage(IMCEndpoint):
     )
     def delete(self, filename):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         group = self.get_user().belongs_to.single()
 

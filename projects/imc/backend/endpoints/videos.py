@@ -11,6 +11,7 @@ from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
+from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import Schema, fields, validate
 from restapi.services.authentication import Role
@@ -68,7 +69,7 @@ class Videos(IMCEndpoint):
             raise Forbidden("You are not authorized")
 
         log.debug("getting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         if video_id is not None:
@@ -123,7 +124,7 @@ class Videos(IMCEndpoint):
         Delete existing video description.
         """
         log.debug("deleting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if video_id is None:
             raise BadRequest("Please specify a valid video id")
@@ -165,7 +166,7 @@ class VideoItem(IMCEndpoint):
         """
         log.debug("Update Item for AVEntity uuid: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
@@ -221,7 +222,7 @@ class VideoAnnotations(IMCEndpoint):
     def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         video = None
@@ -353,7 +354,7 @@ class VideoShots(IMCEndpoint):
         if video_id is None:
             raise BadRequest("Please specify a video id")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         video = None
@@ -491,7 +492,7 @@ class VideoSegments(IMCEndpoint):
 
         log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         video = self.graph.AVEntity.nodes.get_or_None(uuid=video_id)
         if not video:
@@ -530,7 +531,7 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("get video content for id {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -638,7 +639,7 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("check for video content existence with id {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
@@ -707,7 +708,7 @@ class VideoTools(IMCEndpoint):
 
         log.debug("launch automatic tool for video id: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
@@ -766,8 +767,8 @@ class VideoTools(IMCEndpoint):
                     "Building recognition CANNOT be import twice for the same video"
                 )
 
-        celery = self.get_service_instance("celery")
-        task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        celery_app = celery.get_instance()
+        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
         return self.response(task.id, code=202)
 
@@ -813,7 +814,7 @@ class VideoShotRevision(IMCEndpoint):
     def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         # naive solution for getting VideoInRevision
@@ -870,7 +871,7 @@ class VideoShotRevision(IMCEndpoint):
         """Put a video under revision"""
         log.debug("Put video {} under revision", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
@@ -939,7 +940,7 @@ class VideoShotRevision(IMCEndpoint):
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {0}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
@@ -969,8 +970,8 @@ class VideoShotRevision(IMCEndpoint):
 
         # launch async task
         try:
-            celery = self.get_service_instance("celery")
-            task = celery.shot_revision.apply_async(
+            celery_app = celery.get_instance()
+            task = celery_app.shot_revision.apply_async(
                 args=[revision, item.uuid], countdown=10, priority=5
             )
             assignee = item.revision.single()
@@ -997,7 +998,7 @@ class VideoShotRevision(IMCEndpoint):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)

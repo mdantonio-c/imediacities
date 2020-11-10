@@ -8,11 +8,11 @@ from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
 from restapi import decorators
 from restapi.config import get_backend_url
+from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, Forbidden, NotFound, ServerError
 from restapi.utilities.logs import log
 
 
-#####################################
 class Search(IMCEndpoint):
 
     labels = ["file"]
@@ -33,7 +33,7 @@ class Search(IMCEndpoint):
         self, match, filtering, get_total, page, size, sort_by, sort_order, input_filter
     ):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         user = self.get_user_if_logged()
         page -= 1
