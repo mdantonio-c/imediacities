@@ -15,16 +15,6 @@
     </a>
   </li>
   <li class="nav-item" *ngIf="user && user.isAdmin">
-    <a class="nav-link" routerLink="/app/admin/users" (click)="collapse()">
-      Users
-    </a>
-  </li>
-  <li class="nav-item" *ngIf="user && user.isAdmin">
-    <a class="nav-link" routerLink="/app/admin/groups" (click)="collapse()">
-      Groups
-    </a>
-  </li>
-  <li class="nav-item" *ngIf="user && user.isAdmin">
     <a class="nav-link" routerLink="/app/admin/archives" (click)="collapse()">
       Archive
     </a>
