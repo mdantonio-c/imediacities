@@ -1,5 +1,10 @@
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
-
+import {
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { User } from "@rapydo/types";
 
 @Component({
@@ -9,8 +14,13 @@ import { User } from "@rapydo/types";
 })
 export class CustomNavbarComponent {
   @Input() user: User;
+  @Output() onClick: EventEmitter<null> = new EventEmitter<null>();
 
   constructor() {}
+
+  public collapse() {
+    this.onClick.emit();
+  }
 }
 
 @Component({
