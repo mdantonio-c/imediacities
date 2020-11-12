@@ -34,10 +34,20 @@ export class NominatimService {
       )
   }
 
-  reverse(lat:any, lng:any): Observable<NominatimResponse[]> {
+  reverse(lat:any, lng:any): Observable<any> {
     let url = `https://${BASE_NOMINATIM_URL}/reverse?format=json&lat=${lat}&lon=${lng}`;
-    return this.http
-      .get(url)
+    let ret = this.http
+    .get(url)
+    return ret;
+    /*.pipe(
+      map((data: any[]) => data.map((item: any) => new NominatimResponse(
+        item.lat,
+        item.lon,
+        item.display_name
+        ))
+      )
+    )
+    */
   }
 
 }
