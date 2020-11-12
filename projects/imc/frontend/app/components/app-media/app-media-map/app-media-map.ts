@@ -24,6 +24,7 @@ import * as L from "leaflet";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
 import { CatalogService } from "../../../catalog/services/catalog.service";
+import { AppMediaMapInfowindowComponent } from "../app-media-map-infowindow/app-media-map-infowindow";
 
 @Component({
   selector: "app-media-map",
@@ -54,6 +55,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     private MediaService: AppMediaService,
     private VideoService: AppVideoService,
     private catalogService: CatalogService,
+    private modalService: NgbModal
     // private mapApiLoader: CustomNgMapApiLoader
   ) {
     //mapApiLoader.setUrl();
@@ -386,6 +388,20 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       shots_idx: shots_idx,
       state: "saving",
     };
+
+    let props = {
+      marker_edit : {
+        description : "aaaaaaaaaaaaaaaaaa",
+        address : "bbbbbbbbbbbb"
+      }
+    };
+
+    console.log('openInfoWindow', props);
+    const modalRef = this.modalService.open(AppMediaMapInfowindowComponent, {
+      size: "l",
+      centered: true,
+    });
+    modalRef.componentInstance.properties = props;
 
     /*
     // mi serve il place name di google da salvare dentro description
