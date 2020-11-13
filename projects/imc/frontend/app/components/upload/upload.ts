@@ -13,6 +13,7 @@ import { FormlyService } from "@rapydo/services/formly";
 import { BasePaginationComponent } from "@rapydo/components/base.pagination.component";
 
 import { environment } from "@rapydo/../environments/environment";
+import { StageService } from "../../services/stage.service";
 
 export interface Data {}
 
@@ -39,7 +40,8 @@ export class UploadComponent extends BasePaginationComponent<Data> {
 
   constructor(
     protected injector: Injector,
-    private uploadService: UploadxService
+    private uploadService: UploadxService,
+    private stageService: StageService
   ) {
     super(injector);
     this.init("file", "stage", null);
@@ -53,8 +55,8 @@ export class UploadComponent extends BasePaginationComponent<Data> {
     this.upload_options = {
       endpoint: this.upload_endpoint,
       token: this.auth.getToken(),
-      allowedTypes:
-        "application/x-zip-compressed,application/x-compressed,application/zip,multipart/x-zip",
+      // allowedTypes: 'image/*',
+      // "application/x-zip-compressed,application/x-compressed,application/zip,multipart/x-zip",
       multiple2: true,
       autoUpload: true,
     };
@@ -77,6 +79,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
       }
     });
   }
+
   public ngAfterViewInit(): void {
     this.columns = [
       { name: "Filename", prop: "name", flexGrow: 2 },
@@ -86,25 +89,29 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         prop: "size",
         flexGrow: 0.5,
         cellTemplate: this.dataSize,
+        sortable: false,
       },
       {
         name: "Upload",
         prop: "creation",
         flexGrow: 0.5,
         cellTemplate: this.dataUploadData,
+        sortable: false,
       },
       {
         name: "Status",
         prop: "status",
         flexGrow: 0.5,
         cellTemplate: this.dataStatus,
+        sortable: false,
       },
       {
         name: "controls",
         prop: "controls",
         cellTemplate: this.controlsCell,
         headerTemplate: this.emptyHeader,
-        flexGrow: 0.2,
+        flexGrow: 0.4,
+        sortable: false,
       },
     ];
   }
@@ -148,5 +155,17 @@ export class UploadComponent extends BasePaginationComponent<Data> {
           this.notify.showError("Unable to download file: " + filename);
         }
       );
+  }
+
+  stage(filename) {
+    this.stageService.stage(filename).subscribe(
+      (resp) => {
+        console.log(resp);
+        this.notify.showSuccess("File staged successfully");
+      },
+      (error) => {
+        this.notify.showCritical(error, `Unable to stage file ${filename}`);
+      }
+    );
   }
 }

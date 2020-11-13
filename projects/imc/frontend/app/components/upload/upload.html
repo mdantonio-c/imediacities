@@ -23,7 +23,7 @@
               <div *ngFor="let item of upload_progress | keyvalue">
                 <div class="row">
                   <div class="col-6">
-                    {{item.key}}
+                    {{ item.key }}
                   </div>
                   <div class="col-6">
                     <ngb-progressbar
@@ -55,6 +55,17 @@
 
           <div class="card-block">
             <div class="table-responsive">
+              <div class="row">
+                <div class="col-6">
+                  <input
+                    type="text"
+                    class="form-control data-filter"
+                    placeholder="Type to filter files"
+                    (keyup)="updateFilter($event)"
+                  />
+                </div>
+              </div>
+
               <div class="table-wrapper" #tableWrapper>
                 <ngx-spinner [fullScreen]="false"></ngx-spinner>
                 <ngx-datatable
@@ -69,6 +80,7 @@
                   [limit]="paging.itemsPerPage"
                   [offset]="paging.page"
                   (page)="serverSidePagination($event)"
+                  (sort)="updateSort($event)"
                   [rowHeight]="'auto'"
                 >
                 </ngx-datatable>
@@ -80,7 +92,7 @@
               let-value="value"
               let-i="index"
             >
-              {{value | bytes}}
+              {{ value | bytes }}
             </ng-template>
 
             <ng-template
@@ -89,8 +101,10 @@
               let-value="value"
               let-i="index"
             >
-              <span ngbTooltip="{{1000*value | date : 'yyyy MMM dd HH:mm:ss'}}">
-                {{value | amFromUnix | amTimeAgo:false }}
+              <span
+                ngbTooltip="{{ 1000*value | date : 'yyyy MMM dd HH:mm:ss'}}"
+              >
+                {{ value | amFromUnix | amTimeAgo:false }}
               </span>
             </ng-template>
 
@@ -108,16 +122,16 @@
 	            'badge-danger': row.status == 'ERROR',
 	            'badge-info': row.status == 'IMPORTING'
 	        }"
-                ngbTooltip="{{row.status_message}}"
+                ngbTooltip="{{ row.status_message }}"
               >
-                {{value}}
+                {{ value }}
                 <span class="badge badge-warning" *ngIf="row.warnings">
                   <i class="imc-icon fa fa-exclamation-triangle"></i>
                 </span>
               </span>
 
               <ng-template #noStatus>
-                {{value}}
+                {{ value }}
               </ng-template>
             </ng-template>
 
@@ -131,25 +145,39 @@
               let-value="value"
               let-i="index"
             >
-              <i class="fa fa-download fa-lg" (click)="download(row.name)"></i>
+              <div class="btn-toolbar justify-content-end" role="toolbar">
+                <div class="btn-group mr-1" role="group">
+                  <button
+                    class="btn p-0 mr-1"
+                    *ngIf="row.type === 'metadata' && row.status != 'COMPLETED'"
+                    (click)="stage(row.name)"
+                  >
+                    <i class="fas fa-cogs"></i>
+                  </button>
+                  <button class="btn p-0 mr-1" (click)="download(row.name)">
+                    <i class="fa fa-download"></i>
+                  </button>
 
-              <i
-                class="fa fa-trash fa-lg red"
-                *ngIf="row.status != 'IMPORTING'; else disableDelete"
-                mwlConfirmationPopover
-                [popoverTitle]="deleteConfirmation.title"
-                [popoverMessage]="deleteConfirmation.message"
-                placement="left"
-                (confirm)="remove(row.name)"
-              ></i>
-
-              <ng-template #disableDelete>
-                <i
-                  class="fa fa-trash fa-lg"
-                  ngbTooltip="Disabled during the import"
-                >
-                </i>
-              </ng-template>
+                  <button
+                    class="btn p-0"
+                    *ngIf="row.status != 'IMPORTING'; else disableDelete"
+                    mwlConfirmationPopover
+                    [popoverTitle]="deleteConfirmation.title"
+                    [popoverMessage]="deleteConfirmation.message"
+                    placement="left"
+                    (confirm)="remove(row.name)"
+                  >
+                    <i class="fa fa-trash red"></i>
+                  </button>
+                  <ng-template #disableDelete>
+                    <i
+                      class="fa fa-trash fa-lg"
+                      ngbTooltip="Disabled during the import"
+                    >
+                    </i>
+                  </ng-template>
+                </div>
+              </div>
             </ng-template>
           </div>
         </div>
