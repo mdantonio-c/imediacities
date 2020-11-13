@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, Input } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
 
 @Component({
   selector: 'app-media-map-infowindow',
