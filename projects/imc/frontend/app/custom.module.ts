@@ -94,6 +94,7 @@ import { AppVideoControlsFastPlayService } from "@app/services/app-video-control
 import { AppVideoService } from "@app/services/app-video";
 import { AppLodService } from "@app/services/app-lod";
 import { ShotRevisionService } from "@app/services/shot-revision.service";
+import { StageService } from "@app/services/stage.service";
 import { ListsService } from "@app/services/lists.service";
 import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
 
@@ -214,6 +215,7 @@ const routes: Routes = [
     AppAnnotationsService,
     AppLodService,
     ShotRevisionService,
+    StageService,
     ListsService,
     AppMediaService,
     AppModaleService,

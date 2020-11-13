@@ -1,5 +1,5 @@
 {
-  "created": "2020-10-28 16:33:21.056817",
+  "created": "2020-10-29 13:08:45.516953",
   "terms": [
     {
       "children": [
@@ -2211,7 +2211,7 @@
           ],
           "label": {
             "en": "Disasters",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Disastri"
           }
         },
         {
@@ -2240,7 +2240,7 @@
           ],
           "label": {
             "en": "Interaction",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Interazione"
           }
         },
         {
@@ -2321,7 +2321,7 @@
           "label": {
             "de": "Locomotion",
             "en": "Locomotion",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Movimenti"
           }
         },
         {
@@ -2382,7 +2382,7 @@
           "label": {
             "de": "Crowd",
             "en": "Other",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Altro"
           }
         },
         {
@@ -2440,9 +2440,8 @@
             }
           ],
           "label": {
-            "de": "Politica",
             "en": "Politics",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Politica"
           }
         },
         {
@@ -2477,9 +2476,8 @@
             }
           ],
           "label": {
-            "de": "Evento religioso",
             "en": "Religious event",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Evento religioso"
           }
         },
         {
@@ -2521,9 +2519,8 @@
             }
           ],
           "label": {
-            "de": "Sport e ricreazione",
             "en": "Sport/recreation",
-            "it": "Cultura/eventi per il tempo libero"
+            "it": "Sport e ricreazione"
           }
         }
       ],
