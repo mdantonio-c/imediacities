@@ -12,6 +12,8 @@ export class AppMediaMapInfowindowComponent {
   properties: any;
   address: string;
   marker: any;
+  marker_edit: any;
+  media_type: any;
 
   constructor(elRef: ElementRef) {
     this.elRef = elRef;
@@ -24,6 +26,14 @@ export class AppMediaMapInfowindowComponent {
   getHtmlContent() {
     //This will return '<p> Text </p>' as a string
     return this.elRef.nativeElement.innerHTML;
+  }
+
+  marker_edit_save() {
+
+  }
+
+  marker_edit_close() {
+
   }
   
 }
