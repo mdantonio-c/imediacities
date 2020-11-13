@@ -8,6 +8,7 @@ from mimetypes import MimeTypes
 from flask import make_response, send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
+from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, NotFound
 from restapi.services.uploader import Uploader
 from restapi.utilities.logs import log
@@ -30,7 +31,7 @@ class Upload(Uploader, IMCEndpoint):
     )
     def post(self, name, **kwargs):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         group = self.get_user().belongs_to.single()
 
@@ -53,7 +54,7 @@ class Upload(Uploader, IMCEndpoint):
     )
     def put(self, filename):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         group = self.get_user().belongs_to.single()
 
         if group is None:
@@ -83,7 +84,7 @@ class Upload(Uploader, IMCEndpoint):
         if filename is None:
             raise BadRequest("Please specify a stage filename")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         group = self.get_user().belongs_to.single()
 

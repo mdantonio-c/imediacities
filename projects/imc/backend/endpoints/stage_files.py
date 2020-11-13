@@ -6,9 +6,9 @@ import os
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.exceptions import BadRequest, RestApiException
+from restapi.connectors import celery, neo4j
+from restapi.exceptions import BadRequest, Conflict, ServerError
 from restapi.models import fields, validate
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -85,7 +85,7 @@ class Stage(IMCEndpoint):
         responses={200: "List of files and directories successfully retrieved"},
     )
     def get(self, get_total, page, size, sort_by, sort_order, input_filter, group=None):
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not self.verify_admin():
             # Only admins can specify a different group to be inspected
@@ -97,15 +97,13 @@ class Stage(IMCEndpoint):
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
             if not os.path.exists(upload_dir):
-                raise RestApiException("Upload dir not found")
+                raise ServerError("Upload dir not found")
 
         dirs = os.listdir(upload_dir)
 
@@ -234,11 +232,11 @@ class Stage(IMCEndpoint):
         """
         Start IMPORT
         1) estraggo il source id dal file dei metadati
-            se non lo trovo -> RestApiException
+            se non lo trovo -> exception
         2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID e appartenente al gruppo
-            se ne trovo più di uno -> RestApiException
+            se ne trovo più di uno -> exception
             se ne trovo uno -> updating metadata
-                se il nome del file dei metadati è diverso da quello in db -> RestApiException
+                se il nome del file dei metadati è diverso da quello in db -> exception
                 cerco se c'è un content stage associato a quel meta stage
                     se esiste e se ha status COMPLETED -> mode=skip
             se ne trovo zero -> creating new element
@@ -249,37 +247,28 @@ class Stage(IMCEndpoint):
         3) faccio partire l'import con parametri: path, meta_stage.uuid, mode, metadata_update
         """
 
-        self.graph = self.get_service_instance("neo4j")
-        celery = self.get_service_instance("celery")
+        self.graph = neo4j.get_instance()
+        celery_app = celery.get_instance()
 
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            raise RestApiException(
-                "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Upload dir not found")
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            raise RestApiException(
-                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest(f"File not found: {filename}")
 
         # 1) estraggo il source id dal file dei metadati
         log.debug("Extracting source id from metadata file {}", filename)
         source_id = self.extract_creation_ref(path)
         if source_id is None:
             log.debug("No source ID found in metadata file {}", path)
-            raise RestApiException(
-                f"No source ID found in metadata file: {filename}",
-                status_code=hcodes.HTTP_BAD_CONFLICT,
-            )
+            raise Conflict(f"No source ID found in metadata file: {filename}")
         log.debug("Source id {} found in metadata file", source_id)
 
         # 2) cerco nel database se esiste già un META_STAGE collegato a quel SOURCE_ID
@@ -303,9 +292,8 @@ class Stage(IMCEndpoint):
                     "Database incoherence: there are more than one MetaStage related to the same source id {}",
                     source_id,
                 )
-                raise RestApiException(
-                    "System incoherent state: it is not possible to perform the import",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise ServerError(
+                    "System incoherent state: it is not possible to perform the import"
                 )
             if len(c) == 1:
                 # Source id already exists in database: updating metadata
@@ -315,13 +303,14 @@ class Stage(IMCEndpoint):
                     dbFilename = meta_stage.filename
                     log.debug("dbFilename={}", dbFilename)
                     if filename != dbFilename:
-                        raise RestApiException(
-                            f"Source ID {source_id} already exists in the database but with different filename "
-                            f"{dbFilename}: unable to proceed with import",
-                            status_code=hcodes.HTTP_BAD_CONFLICT,
+                        raise Conflict(
+                            f"Source ID {source_id} already exists in the database "
+                            f"but with different filename {dbFilename}: "
+                            "unable to proceed with import",
                         )
 
-                    # cerco se c'è un content stage associato a quel meta stage per vedere se status COMPLETED
+                    # cerco se c'è un content stage associato a quel meta stage
+                    # per vedere se status COMPLETED
                     query2 = (
                         "MATCH (cs:ContentStage)<-[r1:CONTENT_SOURCE]-(i:Item) "
                         "MATCH (i)-[r2:META_SOURCE]-> (ms:MetaStage) "
@@ -344,9 +333,8 @@ class Stage(IMCEndpoint):
                             mode = "skip"
                 else:
                     log.debug("meta_stage is null")
-                    raise RestApiException(
-                        "System incoherence error: it is not possible to perform the import",
-                        status_code=hcodes.HTTP_BAD_CONFLICT,
+                    raise ServerError(
+                        "System incoherence error: cannot perform the import"
                     )
             if len(c) == 0:
                 # Source id does not exist in the database: creating new element
@@ -372,10 +360,7 @@ class Stage(IMCEndpoint):
                         log.debug(
                             "Error in renaming file {} to {}: ", path, standard_path
                         )
-                        raise RestApiException(
-                            f"System error: cannot rename file {path}",
-                            status_code=hcodes.HTTP_BAD_CONFLICT,
-                        )
+                        raise Conflict(f"System error: cannot rename file {path}")
 
                     path = standard_path
 
@@ -407,7 +392,7 @@ class Stage(IMCEndpoint):
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
-        task = celery.import_file.apply_async(
+        task = celery_app.import_file.apply_async(
             args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
@@ -426,26 +411,20 @@ class Stage(IMCEndpoint):
     )
     def delete(self, filename):
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         group = self.get_user().belongs_to.single()
 
         if group is None:
-            raise RestApiException(
-                "No group defined for this user", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("No group defined for this user")
 
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
-            raise RestApiException(
-                "Upload dir not found", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Upload dir not found")
 
         path = os.path.join(upload_dir, filename)
         if not os.path.isfile(path):
-            raise RestApiException(
-                f"File not found: {filename}", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest(f"File not found: {filename}")
 
         os.remove(path)
         return self.empty_response()

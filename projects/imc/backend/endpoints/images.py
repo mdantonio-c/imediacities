@@ -9,18 +9,12 @@ from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
-from restapi.confs import get_backend_url
-from restapi.exceptions import (
-    BadRequest,
-    Conflict,
-    Forbidden,
-    NotFound,
-    RestApiException,
-)
+from restapi.config import get_backend_url
+from restapi.connectors import celery, neo4j
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -60,7 +54,7 @@ class Images(IMCEndpoint):
             raise Forbidden("You are not authorized")
 
         log.debug("getting NonAVEntity id: {}", image_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         if image_id is not None:
@@ -69,10 +63,7 @@ class Images(IMCEndpoint):
                 v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             except self.graph.NonAVEntity.DoesNotExist:
                 log.debug("NonAVEntity with uuid {} does not exist", image_id)
-                raise RestApiException(
-                    "Please specify a valid image id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
-                )
+                raise NotFound("Please specify a valid image id")
             images = [v]
         else:
             images = self.graph.NonAVEntity.nodes.all()
@@ -111,7 +102,7 @@ class Images(IMCEndpoint):
         responses={200: "Image description successfully created"},
     )
     def post(self):
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         return self.empty_response()
 
@@ -128,12 +119,11 @@ class Images(IMCEndpoint):
         Delete existing image description.
         """
         log.debug("deliting NonAVEntity id: {}", image_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if image_id is None:
-            raise RestApiException(
-                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Please specify a valid image id")
+
         try:
             v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
             repo = CreationRepository(self.graph)
@@ -141,9 +131,7 @@ class Images(IMCEndpoint):
             return self.empty_response()
         except self.graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
-            raise RestApiException(
-                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid image id")
 
 
 class ImageItem(IMCEndpoint):
@@ -174,7 +162,7 @@ class ImageItem(IMCEndpoint):
         """
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (image := self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
@@ -228,15 +216,13 @@ class ImageAnnotations(IMCEndpoint):
     def get(self, image_id, anno_type=None):
         log.debug("get annotations for NonAVEntity id: {}", image_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         image = self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)
         if not image:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
-            raise RestApiException(
-                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid image id")
 
         user = self.get_user()
 
@@ -317,15 +303,13 @@ class ImageContent(IMCEndpoint, Downloader):
     def get(self, image_id, content_type, thumbnail_size=None):
         log.info("get image content for id {}", image_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         image = None
         try:
             image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
         except self.graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
-            raise RestApiException(
-                "Please specify a valid image id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid image id")
 
         item = image.item.single()
         log.debug("item data: " + format(item))
@@ -338,9 +322,7 @@ class ImageContent(IMCEndpoint, Downloader):
                 image_uri = other_version.uri
             log.debug("image content uri: {}", image_uri)
             if image_uri is None:
-                raise RestApiException(
-                    "Image not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Image not found")
             filename = os.path.basename(image_uri)
             folder = os.path.dirname(image_uri)
 
@@ -359,16 +341,11 @@ class ImageContent(IMCEndpoint, Downloader):
                 thumbnail_uri = item.uri
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
             if thumbnail_uri is None:
-                raise RestApiException(
-                    "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Thumbnail not found")
             return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         # it should never be reached
-        raise RestApiException(
-            f"Invalid content type: {content_type}",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-        )
+        raise BadRequest(f"Invalid content type: {content_type}",)
 
 
 class ImageTools(IMCEndpoint):
@@ -406,7 +383,7 @@ class ImageTools(IMCEndpoint):
 
         log.debug("launch automatic tool for image id: {}", image_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (image := self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
@@ -449,26 +426,23 @@ class ImageTools(IMCEndpoint):
             return self.response(
                 f"There are no more automatic {tool} tags for image {image_id}."
                 f"Deleted {deleted}",
-                code=hcodes.HTTP_OK_BASIC,
             )
 
         if OBJ_DETECTION:
 
             # DO NOT re-import object detection twice for the same image!
             if repo.check_automatic_od(item.uuid):
-                raise RestApiException(
-                    "Object detection CANNOT be import twice for the same image.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise Conflict(
+                    "Object detection CANNOT be import twice for the same image"
                 )
         elif BUILDING_RECOGNITION:
 
             # DO NOT re-import building recognition twice for the same image!
             if repo.check_automatic_br(item.uuid):
-                raise RestApiException(
-                    "Building recognition CANNOT be import twice for the same image.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise Conflict(
+                    "Building recognition CANNOT be import twice for the same image"
                 )
-        celery = self.get_service_instance("celery")
-        task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        celery_app = celery.get_instance()
+        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
         return self.response(task.id, code=202)

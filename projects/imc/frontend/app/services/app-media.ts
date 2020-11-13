@@ -21,7 +21,7 @@ export class AppMediaService {
       return;
     }
 
-    this.api.get(endpoint, media_id).subscribe(
+    this.api.get(endpoint + "/" + media_id).subscribe(
       (response) => {
         this._media = response[0];
         this._media_id = media_id;

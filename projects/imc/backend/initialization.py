@@ -1,6 +1,3 @@
-from restapi.customizer import BaseCustomizer
-from restapi.models import fields, validate
-from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
 
@@ -8,70 +5,6 @@ class Initializer:
     def __init__(self, services, app=None):
 
         neo4j = services["neo4j"]
-
-        try:
-            neo4j.Role.nodes.get(name=Role.LOCAL_ADMIN.value)
-            log.debug("Coordinator neo4j.Role already exists")
-        except neo4j.Role.DoesNotExist:
-            local_admin = neo4j.Role()
-            local_admin.name = Role.LOCAL_ADMIN.value
-            local_admin.description = "Coordinator"
-            local_admin.save()
-            log.info("Coordinator neo4j.Role successfully created")
-
-        try:
-            neo4j.Role.nodes.get(name="Archive")
-            log.debug("Archive neo4j.Role already exists")
-        except neo4j.Role.DoesNotExist:
-            archiver = neo4j.Role()
-            archiver.name = "Archive"
-            archiver.description = "Archive"
-            archiver.save()
-            log.info("Archive neo4j.Role successfully created")
-
-        try:
-            neo4j.Role.nodes.get(name="Researcher")
-            log.debug("Researcher neo4j.Role already exists")
-        except neo4j.Role.DoesNotExist:
-            researcher = neo4j.Role()
-            researcher.name = "Researcher"
-            researcher.description = "Researcher"
-            researcher.save()
-            log.info("Researcher neo4j.Role successfully created")
-
-        try:
-            neo4j.Role.nodes.get(name="Reviser")
-            log.debug("Reviser neo4j.Role already exists")
-        except neo4j.Role.DoesNotExist:
-            reviser = neo4j.Role()
-            reviser.name = "Reviser"
-            reviser.description = "Reviser"
-            reviser.save()
-            log.info("Reviser neo4j.Role successfully created")
-
-        try:
-            admin = neo4j.Role.nodes.get(name="admin_root")
-            admin.description = "Admin"
-            admin.save()
-            log.info("Admin neo4j.Role successfully updated")
-        except neo4j.Role.DoesNotExist:
-            log.warning("Admin neo4j.Role does not exist")
-
-        if len(neo4j.Group.nodes) > 0:
-            log.info("Found one or more already defined groups")
-        else:
-            log.warning("No group defined")
-            group = neo4j.Group()
-            group.fullname = "test"
-            group.shortname = "test"
-            group.save()
-
-            group = neo4j.Group()
-            group.fullname = "Default user group"
-            group.shortname = "default"
-            group.save()
-
-            log.info("Groups successfully created")
 
         # Providers
         try:
@@ -238,65 +171,3 @@ class Initializer:
             mnc.website = "http://www.museocinema.it"
             mnc.save()
             log.info("Provider MNC successfully created")
-
-
-class Customizer(BaseCustomizer):
-    @staticmethod
-    def custom_user_properties_pre(properties):
-        extra_properties = {}
-        # if 'myfield' in properties:
-        #     extra_properties['myfield'] = properties['myfield']
-        return properties, extra_properties
-
-    @staticmethod
-    def custom_user_properties_post(user, properties, extra_properties, db):
-
-        try:
-            group = db.Group.nodes.get(shortname="default")
-        except db.Group.DoesNotExist:
-            log.warning("Unable to find default group, creating")
-            group = db.Group()
-            group.fullname = "Default user group"
-            group.shortname = "default"
-            group.save()
-
-        log.info("Link {} to group {}", user.email, group.shortname)
-        user.belongs_to.connect(group)
-
-        return True
-
-    @staticmethod
-    def manipulate_profile(ref, user, data):
-        data["declared_institution"] = user.declared_institution
-
-        return data
-
-    @staticmethod
-    def get_user_editable_fields(request):
-        return {}
-
-    @staticmethod
-    def get_custom_input_fields(request):
-
-        # required = request and request.method == "POST"
-        return {
-            "declared_institution": fields.Str(
-                required=False,
-                default="none",
-                validate=validate.OneOf(
-                    choices=["archive", "university", "research_institution", "none"],
-                    labels=[
-                        "Archive",
-                        "University",
-                        "Research Institution",
-                        "None of the above",
-                    ],
-                ),
-            )
-        }
-
-    @staticmethod
-    def get_custom_output_fields(request):
-        fields = Customizer.get_custom_input_fields(request)
-
-        return fields

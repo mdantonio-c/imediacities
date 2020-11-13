@@ -11,6 +11,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
+from restapi.connectors import neo4j, smtp
 from restapi.connectors.celery import CeleryExt, send_errors_by_email
 from restapi.utilities.logs import log
 from restapi.utilities.templates import get_html_template
@@ -52,7 +53,8 @@ def update_metadata(self, path, resource_id):
 
         log.debug("Starting task update_metadata for resource_id {}", resource_id)
         progress(self, "Starting update metadata", path)
-        self.graph = celery_app.get_service("neo4j")
+        self.graph = neo4j.get_instance()
+
         xml_resource = None
         try:
             metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
@@ -77,7 +79,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
         progress(self, "Starting import", path)
 
-        self.graph = celery_app.get_service("neo4j")
+        self.graph = neo4j.get_instance()
 
         xml_resource = None
         try:
@@ -345,7 +347,7 @@ def launch_tool(self, tool_name, item_id):
         if tool_name not in ["object-detection", "building-recognition"]:
             raise ValueError(f"Unexpected tool for: {tool_name}")
 
-        self.graph = celery_app.get_service("neo4j")
+        self.graph = neo4j.get_instance()
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
             content_source = item.content_source.single()
@@ -379,7 +381,7 @@ def load_v2(self, other_version, item_id, retry=False):
     with celery_app.app.app_context():
         log.debug("load v2 {0} for item {1}", other_version, item_id)
 
-        self.graph = celery_app.get_service("neo4j")
+        self.graph = neo4j.get_instance()
         try:
             item = self.graph.Item.nodes.get(uuid=item_id)
             content_source = item.content_source.single()
@@ -485,7 +487,7 @@ def load_v2(self, other_version, item_id, retry=False):
 @send_errors_by_email
 def shot_revision(self, revision, item_id):
     log.info("Start shot revision task for video item [{0}]", item_id)
-    self.graph = celery_app.get_service("neo4j")
+    self.graph = neo4j.get_instance()
     # get reviser
     reviser = self.graph.User.nodes.get_or_none(uuid=revision["reviser"])
     exitRevision = (
@@ -1040,7 +1042,6 @@ def extract_br_annotations(self, item, analyze_dir_path):
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
-            log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
@@ -1183,7 +1184,6 @@ def extract_od_annotations(self, item, analyze_dir_path):
             repo.create_tag_annotation(None, bodies, item, selector, False, None, True)
             transaction.commit()
         except Exception as e:
-            log.verbose("Neomodel transaction ROLLBACK")
             try:
                 transaction.rollback()
             except Exception as rollback_exp:
@@ -1210,12 +1210,12 @@ def send_notification(
     """
     body = get_html_template(template, replaces)
     plain = f"Sorry User, your job ID {task_id} is failed"
-    smtp = celery_app.get_service("smtp")
-    smtp.send(body, subject, recipient, plain_body=plain)
+    smtp_client = smtp.get_instance()
+    smtp_client.send(body, subject, recipient, plain_body=plain)
 
     if failure is not None:
         replaces["task_id"] = task_id
         replaces["failure"] = failure
         body = get_html_template(template, replaces)
         plain = f"Job ID {task_id} is failed"
-        smtp.send(body, subject, plain_body=plain)
+        smtp_client.send(body, subject, plain_body=plain)

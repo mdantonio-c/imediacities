@@ -5,9 +5,9 @@
 
 """
 from imc.tasks.services.creation_repository import CreationRepository
-from restapi.exceptions import RestApiException
+from restapi.connectors import neo4j
+from restapi.exceptions import Forbidden
 from restapi.services.authentication import Role
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -38,7 +38,7 @@ def pre_authorize(func):
         """
         Look at right status
         """
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         repo = CreationRepository(self.graph)
         rs = repo.get_right_status(entity_id)
         log.debug("right status = {}", rs)
@@ -50,7 +50,7 @@ def pre_authorize(func):
         """
         if not _is_general_public(user):
             return True
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         repo = CreationRepository(self.graph)
         return repo.publicly_accessible(entity_id)
 
@@ -70,10 +70,7 @@ def pre_authorize(func):
         # log.debug("Logged in user: {}", user)
         # log.debug("Has permission to access entity[{}]?", entity_id)
         if not _has_public_access(self, user, entity_id):
-            raise RestApiException(
-                "User is not authorized to access content",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
-            )
+            raise Forbidden("User is not authorized to access content")
 
         return func(self, **kwargs)
 

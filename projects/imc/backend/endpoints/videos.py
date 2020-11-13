@@ -10,18 +10,12 @@ from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
-from restapi.confs import get_backend_url
-from restapi.exceptions import (
-    BadRequest,
-    Conflict,
-    Forbidden,
-    NotFound,
-    RestApiException,
-)
+from restapi.config import get_backend_url
+from restapi.connectors import celery, neo4j
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import Schema, fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -75,7 +69,7 @@ class Videos(IMCEndpoint):
             raise Forbidden("You are not authorized")
 
         log.debug("getting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         if video_id is not None:
@@ -84,10 +78,7 @@ class Videos(IMCEndpoint):
                 v = self.graph.AVEntity.nodes.get(uuid=video_id)
             except self.graph.AVEntity.DoesNotExist:
                 log.debug("AVEntity with uuid {} does not exist", video_id)
-                raise RestApiException(
-                    "Please specify a valid video id",
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
-                )
+                raise NotFound("Please specify a valid video id")
             videos = [v]
         else:
             videos = self.graph.AVEntity.nodes.all()
@@ -133,12 +124,10 @@ class Videos(IMCEndpoint):
         Delete existing video description.
         """
         log.debug("deleting AVEntity id: {}", video_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if video_id is None:
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Please specify a valid video id")
         try:
             v = self.graph.AVEntity.nodes.get(uuid=video_id)
             repo = CreationRepository(self.graph)
@@ -146,9 +135,7 @@ class Videos(IMCEndpoint):
             return self.empty_response()
         except self.graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
 
 class VideoItem(IMCEndpoint):
@@ -179,7 +166,7 @@ class VideoItem(IMCEndpoint):
         """
         log.debug("Update Item for AVEntity uuid: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
@@ -235,7 +222,7 @@ class VideoAnnotations(IMCEndpoint):
     def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         video = None
@@ -243,9 +230,7 @@ class VideoAnnotations(IMCEndpoint):
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         user = self.get_user()
 
@@ -367,11 +352,9 @@ class VideoShots(IMCEndpoint):
     def get(self, video_id):
         log.debug("get shots for AVEntity id: {}", video_id)
         if video_id is None:
-            raise RestApiException(
-                "Please specify a video id", status_code=hcodes.HTTP_BAD_REQUEST
-            )
+            raise BadRequest("Please specify a video id")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         video = None
@@ -379,9 +362,7 @@ class VideoShots(IMCEndpoint):
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         user = self.get_user_if_logged()
 
@@ -511,14 +492,12 @@ class VideoSegments(IMCEndpoint):
 
         log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         video = self.graph.AVEntity.nodes.get_or_None(uuid=video_id)
         if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         # user = self.get_user()
 
@@ -529,39 +508,6 @@ class VideoSegments(IMCEndpoint):
         # TODO
 
         return self.response(data)
-
-    # "/videos/<video_id>/segments/<segment_id>"
-    # "summary": "Delete a video segment.",
-    # @decorators.auth.require()
-    # @decorators.catch_graph_exceptions
-    # def delete(self, video_id, segment_id):
-    #     log.debug(
-    #         "delete manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
-    #         vid=video_id,
-    #         sid=segment_id,
-    #     )
-    #     raise RestApiException(
-    #         "Delete operation not yet implemented",
-    #         status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-    #     )
-
-    # "/videos/<video_id>/segments/<segment_id>"
-    # "summary": "Updates a manual video segment"
-    # "description": "Update a manual video segment identified by uuid"
-    # "start_frame_idx": fields.Int(required=True)
-    # "end_frame_idx": fields.Int(required=True)
-    # @decorators.auth.require()
-    # @decorators.catch_graph_exceptions
-    # def put(self, video_id, segment_id):
-    #     log.debug(
-    #         "update manual segment [uuid:{sid}] for AVEntity " "[uuid:{vid}]",
-    #         vid=video_id,
-    #         sid=segment_id,
-    #     )
-    #     raise RestApiException(
-    #         "Update operation not yet implemented",
-    #         status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-    #     )
 
 
 class VideoContent(IMCEndpoint, Downloader):
@@ -585,15 +531,13 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("get video content for id {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         item = video.item.single()
         if content_type == "video":
@@ -605,9 +549,7 @@ class VideoContent(IMCEndpoint, Downloader):
                 video_uri = other_version.uri
             log.debug("video content uri: {}", video_uri)
             if video_uri is None:
-                raise RestApiException(
-                    "Video not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Video not found")
             # all videos are converted to mp4
 
             filename = os.path.basename(video_uri)
@@ -618,18 +560,14 @@ class VideoContent(IMCEndpoint, Downloader):
         if content_type == "orf":
             # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
-                raise RestApiException(
-                    "Video ORF not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Video ORF not found")
 
             folder = os.path.dirname(item.uri)
             filename = "orf.mp4"
             # orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
             # if orf_uri is None or not os.path.exists(orf_uri):
             if not os.path.exists(os.path.join(folder, filename)):
-                raise RestApiException(
-                    "Video ORF not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Video ORF not found")
 
             # return self.send_file_partial(orf_uri, mime)
             return self.download(filename=filename, subfolder=folder, mime="video/mp4")
@@ -661,25 +599,18 @@ class VideoContent(IMCEndpoint, Downloader):
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
 
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
-                raise RestApiException(
-                    "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Thumbnail not found")
             return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         if content_type == "summary":
             summary_uri = item.summary
             log.debug("summary content uri: {}", summary_uri)
             if summary_uri is None:
-                raise RestApiException(
-                    "Summary not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Summary not found")
             return send_file(summary_uri, mimetype="image/jpeg")
 
         # it should never be reached
-        raise RestApiException(
-            f"Invalid content type: {content_type}",
-            status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-        )
+        raise BadRequest(f"Invalid content type: {content_type}")
 
     @decorators.catch_graph_exceptions
     @decorators.graph_transactions
@@ -708,50 +639,37 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("check for video content existence with id {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = None
         try:
             video = self.graph.AVEntity.nodes.get(uuid=video_id)
         except self.graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         item = video.item.single()
         headers = {}
         if content_type == "video":
             if item.uri is None or not os.path.exists(item.uri):
-                raise RestApiException(
-                    "Video not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Video not found")
             headers["Content-Type"] = "video/mp4"
         elif content_type == "orf":
             orf_uri = os.path.dirname(item.uri) + "/orf.mp4"
             log.debug(orf_uri)
             if item.uri is None or not os.path.exists(orf_uri):
-                raise RestApiException(
-                    "Video ORF not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Video ORF not found")
             headers["Content-Type"] = "video/mp4"
         elif content_type == "thumbnail":
             if item.thumbnail is None or not os.path.exists(item.thumbnail):
-                raise RestApiException(
-                    "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Thumbnail not found")
             headers["Content-Type"] = "image/jpeg"
         elif content_type == "summary":
             if item.summary is None or not os.path.exists(item.summary):
-                raise RestApiException(
-                    "Summary not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Summary not found")
             headers["Content-Type"] = "image/jpeg"
         else:
             # it should never be reached
-            raise RestApiException(
-                f"Invalid content type: {content_type}",
-                status_code=hcodes.HTTP_NOT_IMPLEMENTED,
-            )
+            raise BadRequest(f"Invalid content type: {content_type}")
         return self.response([], headers=headers)
 
 
@@ -790,7 +708,7 @@ class VideoTools(IMCEndpoint):
 
         log.debug("launch automatic tool for video id: {}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
@@ -832,28 +750,25 @@ class VideoTools(IMCEndpoint):
 
             return self.response(
                 f"There are no more automatic {tool} tags for video {video_id}."
-                f"Deleted {deleted}",
-                code=hcodes.HTTP_OK_BASIC,
+                f"Deleted {deleted}"
             )
 
         if OBJ_DETECTION:
             # DO NOT re-import object detection twice for the same video!
             if repo.check_automatic_od(item.uuid):
-                raise RestApiException(
-                    "Object detection CANNOT be import twice for the same video.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise Conflict(
+                    "Object detection CANNOT be import twice for the same video"
                 )
         elif BUILDING_RECOGNITION:
 
             # DO NOT re-import building recognition twice for the same video!
             if repo.check_automatic_br(item.uuid):
-                raise RestApiException(
-                    "Building recognition CANNOT be import twice for the same video.",
-                    status_code=hcodes.HTTP_BAD_CONFLICT,
+                raise Conflict(
+                    "Building recognition CANNOT be import twice for the same video"
                 )
 
-        celery = self.get_service_instance("celery")
-        task = celery.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        celery_app = celery.get_instance()
+        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
 
         return self.response(task.id, code=202)
 
@@ -899,7 +814,7 @@ class VideoShotRevision(IMCEndpoint):
     def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         data = []
 
         # naive solution for getting VideoInRevision
@@ -956,7 +871,7 @@ class VideoShotRevision(IMCEndpoint):
         """Put a video under revision"""
         log.debug("Put video {} under revision", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
@@ -1025,7 +940,7 @@ class VideoShotRevision(IMCEndpoint):
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {0}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
@@ -1055,8 +970,8 @@ class VideoShotRevision(IMCEndpoint):
 
         # launch async task
         try:
-            celery = self.get_service_instance("celery")
-            task = celery.shot_revision.apply_async(
+            celery_app = celery.get_instance()
+            task = celery_app.shot_revision.apply_async(
                 args=[revision, item.uuid], countdown=10, priority=5
             )
             assignee = item.revision.single()
@@ -1083,13 +998,11 @@ class VideoShotRevision(IMCEndpoint):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise RestApiException(
-                "Please specify a valid video id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid video id")
 
         if not (item := video.item.single()):
             # 409: Video is not ready for revision. (should never be reached)
@@ -1098,18 +1011,14 @@ class VideoShotRevision(IMCEndpoint):
         repo = CreationRepository(self.graph)
         if not repo.is_video_under_revision(item):
             # 409: Video is already under revision.
-            raise RestApiException(
-                f"Video [{video.uuid}] is not under revision",
-                status_code=hcodes.HTTP_BAD_REQUEST,
-            )
+            raise BadRequest(f"Video [{video.uuid}] is not under revision")
         # ONLY the reviser and the administrator can exit revision
         user = self.get_user()
         iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
-            raise RestApiException(
-                "User [{}, {} {}] cannot exit revision for video that is "
-                "not assigned to him/her".format(user.uuid, user.name, user.surname),
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
+            raise Forbidden(
+                f"User [{user.uuid}, {user.name} {user.surname}] cannot exit"
+                " revision for video that is not assigned to him/her",
             )
 
         repo.exit_video_under_revision(item)

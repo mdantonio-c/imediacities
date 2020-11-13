@@ -4,10 +4,10 @@ Handle your video metadata
 from flask import send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
-from restapi.confs import get_backend_url
-from restapi.exceptions import RestApiException
+from restapi.config import get_backend_url
+from restapi.connectors import neo4j
+from restapi.exceptions import NotFound
 from restapi.models import fields, validate
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 
@@ -42,7 +42,7 @@ class Shots(IMCEndpoint):
         """
         log.debug("getting Shot id: {}", shot_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         # check if the shot exists
         node = None
@@ -50,17 +50,13 @@ class Shots(IMCEndpoint):
             node = self.graph.Shot.nodes.get(uuid=shot_id)
         except self.graph.Shot.DoesNotExist:
             log.debug("Shot with id {} does not exist", shot_id)
-            raise RestApiException(
-                "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid shot id")
 
         if content_type is not None:
             thumbnail_uri = node.thumbnail_uri
             log.debug("thumbnail content uri: {}", thumbnail_uri)
             if thumbnail_uri is None:
-                raise RestApiException(
-                    "Thumbnail not found", status_code=hcodes.HTTP_BAD_NOTFOUND
-                )
+                raise NotFound("Thumbnail not found")
             return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         api_url = get_backend_url()
@@ -102,15 +98,13 @@ class ShotAnnotations(IMCEndpoint):
     def get(self, shot_id, anno_type=None):
         log.info("get annotations for Shot id: {}", shot_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         shot = self.graph.Shot.nodes.get_or_none(uuid=shot_id)
 
         if not shot:
             log.debug("Shot with uuid {} does not exist", shot_id)
-            raise RestApiException(
-                "Please specify a valid shot id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid shot id")
 
         user = self.get_user()
 

@@ -6,16 +6,10 @@ import re
 from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
-from restapi.confs import get_backend_url
-from restapi.exceptions import (
-    BadRequest,
-    Conflict,
-    Forbidden,
-    NotFound,
-    RestApiException,
-)
+from restapi.config import get_backend_url
+from restapi.connectors import neo4j
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields
-from restapi.utilities.htmlcodes import hcodes
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
@@ -67,7 +61,7 @@ class Lists(IMCEndpoint):
     )
     def get(self, list_id=None, r_uuid=None, belong_item=None, nb_items=False):
         """ Get all the list of a user or a certain list if an id is provided."""
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         iamadmin = self.verify_admin()
         researcher = self.get_user() if not iamadmin else None
@@ -96,9 +90,8 @@ class Lists(IMCEndpoint):
 
             creator = res.creator.single()
             if not iamadmin and researcher.uuid != creator.uuid:
-                raise RestApiException(
+                raise Forbidden(
                     "You are not allowed to get a list that does not belong to you",
-                    status_code=hcodes.HTTP_BAD_FORBIDDEN,
                 )
             user_list = self.getJsonResponse(res)
             if iamadmin and researcher is None:
@@ -187,7 +180,7 @@ class Lists(IMCEndpoint):
         """
         log.debug("create a new list")
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user = self.get_user()
         # check if there is already a list with the same name belonging to the user.
         results = self.graph.cypher(
@@ -206,9 +199,7 @@ class Lists(IMCEndpoint):
         # connect the creator
         created_list.creator.connect(user)
         log.debug("List created successfully. UUID {}", created_list.uuid)
-        return self.response(
-            self.getJsonResponse(created_list), code=hcodes.HTTP_OK_CREATED
-        )
+        return self.response(self.getJsonResponse(created_list), code=201)
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
@@ -231,7 +222,7 @@ class Lists(IMCEndpoint):
     def put(self, list_id, name, description):
         """ Update a list. """
         log.debug("Update list with uuid: {}", list_id)
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -260,9 +251,7 @@ class Lists(IMCEndpoint):
         user_list.description = description.strip()
         updated_list = user_list.save()
         log.debug("List successfully updated. UUID {}", updated_list.uuid)
-        return self.response(
-            self.getJsonResponse(updated_list), code=hcodes.HTTP_OK_BASIC
-        )
+        return self.response(self.getJsonResponse(updated_list))
 
     @decorators.auth.require_all("Researcher")
     @decorators.catch_graph_exceptions
@@ -281,7 +270,7 @@ class Lists(IMCEndpoint):
         """ Delete a list. """
         log.debug("delete list {}", list_id)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -334,22 +323,19 @@ class ListItems(IMCEndpoint):
     def get(self, list_id, item_id=None):
         """ Get all the items of a list or a certain item of that list if an
         item id is provided."""
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
             log.debug("List with uuid {} does not exist", list_id)
-            raise RestApiException(
-                "Please specify a valid list id", status_code=hcodes.HTTP_BAD_NOTFOUND
-            )
+            raise NotFound("Please specify a valid list id")
         # am I the owner of the list? (allowed also to admin)
         user = self.get_user()
         iamadmin = self.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
-            raise RestApiException(
+            raise Forbidden(
                 "You are not allowed to get a list that does not belong to you",
-                status_code=hcodes.HTTP_BAD_FORBIDDEN,
             )
         if item_id is not None:
             log.debug(
@@ -367,11 +353,10 @@ class ListItems(IMCEndpoint):
             )
             res = [self.graph.ListItem.inflate(row[0]) for row in results]
             if not res:
-                raise RestApiException(
+                raise NotFound(
                     "Item <{}> is not connected to the list <{}, {}>".format(
                         item_id, user_list.uuid, user_list.name
-                    ),
-                    status_code=hcodes.HTTP_BAD_NOTFOUND,
+                    )
                 )
             return self.response(self.get_list_item_response(res[0]))
 
@@ -403,7 +388,7 @@ class ListItems(IMCEndpoint):
         """ Add an item to a list. """
         log.debug("Add an item to list {} with target {}", list_id, target)
 
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -459,7 +444,7 @@ class ListItems(IMCEndpoint):
     )
     def delete(self, list_id, item_id):
         """ Delete an item from a list. """
-        self.graph = self.get_service_instance("neo4j")
+        self.graph = neo4j.get_instance()
 
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:

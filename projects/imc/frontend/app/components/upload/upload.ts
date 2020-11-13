@@ -1,6 +1,5 @@
 import { Component, ViewChild, TemplateRef, Injector } from "@angular/core";
 import { HttpResponse } from "@angular/common/http";
-import { Observable } from "rxjs";
 import { saveAs as importedSaveAs } from "file-saver";
 import { UploadxOptions, UploadState, UploadxService } from "ngx-uploadx";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -67,10 +66,8 @@ export class UploadComponent extends BasePaginationComponent<Data> {
         let resp = response[response.length - 1];
         if (resp.response) {
           if (resp.responseStatus == 200) {
-            console.log(resp.response);
             this.notify.showSuccess(
-              // "Upload completed: " + resp.response.filename
-              "Upload completed: " + resp.response
+              "Upload completed: " + resp.response.filename
             );
           } else {
             this.notify.showError(resp.response);
@@ -116,23 +113,21 @@ export class UploadComponent extends BasePaginationComponent<Data> {
     ];
   }
 
-  onUpload(state: Observable<UploadState>) {
-    state.subscribe((item: UploadState) => {
-      if (item.progress > 0) {
-        this.upload_progress[item.name] = item.progress;
-      } else {
-        // set 0 also in case of null and undefined
-        this.upload_progress[item.name] = 0;
-      }
-      if (
-        item.progress == 100 &&
-        item.remaining == 0 &&
-        item.status == "complete"
-      ) {
-        this.list();
-        delete this.upload_progress[item.name];
-      }
-    });
+  onUpload(item: UploadState) {
+    if (item.progress > 0) {
+      this.upload_progress[item.name] = item.progress;
+    } else {
+      // set 0 also in case of null and undefined
+      this.upload_progress[item.name] = 0;
+    }
+    if (
+      item.progress == 100 &&
+      item.remaining == 0 &&
+      item.status == "complete"
+    ) {
+      this.list();
+      delete this.upload_progress[item.name];
+    }
   }
 
   download(filename) {
