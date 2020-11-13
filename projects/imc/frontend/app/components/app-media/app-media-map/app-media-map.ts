@@ -20,6 +20,7 @@ import { ProviderToCityPipe } from "../../../pipes/ProviderToCity";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
 
 import * as L from "leaflet";
+import { LeafletEvent} from "leaflet";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
@@ -603,8 +604,17 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     this.osmap = map;
     var componentRef = this;
     this.osmap.addEventListener('mousemove', function(ev) {
-      componentRef.lastMouseLat = ev.latlng.lat;
-      componentRef.lastMouseLng = ev.latlng.lng;
+      if(ev as LeafletEvent) {
+        console.log('leafletevent has no latlng props');
+      } else {
+        const evx : any = ev;
+        if('latlng' in evx) {
+          componentRef.lastMouseLat = evx.latlng.lat;
+          componentRef.lastMouseLng = evx.latlng.lng;
+        } else {
+          console.log('[checkpoint Bulbasaur]');
+        }
+      }
    });
 
     this.set_center_from_owner();

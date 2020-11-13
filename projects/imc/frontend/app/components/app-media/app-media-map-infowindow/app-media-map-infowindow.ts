@@ -2,8 +2,8 @@ import { Component, ElementRef, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-media-map-infowindow',
-  templateUrl: './app-media-map-infowindow.component.html',
-  styleUrls: ['./app-media-map-infowindow.component.css'],
+  templateUrl: './app-media-map-infowindow.html',
+  styleUrls: ['./app-media-map-infowindow.css'],
   providers: []
 })
 export class AppMediaMapInfowindowComponent {

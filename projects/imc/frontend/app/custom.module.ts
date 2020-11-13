@@ -31,7 +31,8 @@ import { SearchThumbnailComponent } from "./catalog/components/search-thumbnail/
 import { SearchMediaComponent } from "./catalog/components/search-media/search-media.component";
 import { SearchMapComponent } from "./catalog/components/search-map/search-map.component";
 import { MapInfowindowComponent } from "./catalog/components/map-infowindow/map-infowindow.component";
-import { AppMediaMapInfowindowComponent } from "./components/app-media/app-media-map-infowindow/app-media-map-infowindow.component";
+import { AppMediaMapInfowindowComponent } from "./components/app-media/app-media-map-infowindow/app-media-map-infowindow";
+
 import { SearchTimelineComponent } from "./catalog/components/search-timeline/search-timeline.component";
 import { SearchMediaTagComponent } from "./catalog/components/search-media-tag/search-media-tag.component";
 
@@ -157,6 +158,7 @@ const routes: Routes = [
     SearchThumbnailComponent,
     SearchMediaComponent,
     SearchMapComponent,
+    AppMediaMapInfowindowComponent,
     MapInfowindowComponent,
     SearchTimelineComponent,
     SearchMediaTagComponent,
