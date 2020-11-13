@@ -359,6 +359,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
   marker_new_set(event, result, shots_idx) {
 
+    let self = this;
     let greenIcon = L.icon({
       iconUrl: '/app/custom/assets/images/marker-icon-green.png',
       // shadowUrl: 'leaf-shadow.png',
@@ -383,26 +384,24 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       description: result.display_name,
       iri: result.place_id,
       location: {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng(),
+        lat: self.lastMouseLat,
+        lng: self.lastMouseLng,
       },
       shots_idx: shots_idx,
       state: "saving",
     };
-
-    let props = {
-      marker_edit : {
+/*
+    let mked = {
         description : "aaaaaaaaaaaaaaaaaa",
         address : "bbbbbbbbbbbb"
-      }
     };
-
-    console.log('openInfoWindow', props);
+*/
+    
     const modalRef = this.modalService.open(AppMediaMapInfowindowComponent, {
       size: "l",
       centered: true,
     });
-    modalRef.componentInstance.properties = props;
+    modalRef.componentInstance.marker_edit = this.marker_edit;
 
     /*
     // mi serve il place name di google da salvare dentro description
@@ -604,9 +603,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     this.osmap = map;
     var componentRef = this;
     this.osmap.addEventListener('mousemove', function(ev) {
-      if(ev as LeafletEvent) {
-        console.log('leafletevent has no latlng props');
-      } else {
+      //if(ev as LeafletEvent) {
+      //  console.log('leafletevent has no latlng props', ev);
+      //} else {
         const evx : any = ev;
         if('latlng' in evx) {
           componentRef.lastMouseLat = evx.latlng.lat;
@@ -614,7 +613,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         } else {
           console.log('[checkpoint Bulbasaur]');
         }
-      }
+      //}
    });
 
     this.set_center_from_owner();
