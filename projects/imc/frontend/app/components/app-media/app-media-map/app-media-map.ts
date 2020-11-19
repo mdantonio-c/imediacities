@@ -27,6 +27,11 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { CatalogService } from "../../../catalog/services/catalog.service";
 import { AppMediaMapInfowindowComponent } from "../app-media-map-infowindow/app-media-map-infowindow";
 
+interface LMarkerPlus extends L.Marker {
+  properties: any;
+}
+
+
 @Component({
   selector: "app-media-map",
   templateUrl: "app-media-map.html",
@@ -189,13 +194,16 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Aggiunge un marker sul click
    * @param event
    */
-  marker_add(event) {
+  marker_add(event, self) {
 
+    console.log('[Checkpoint marker_add] ', this, self, event);
     // why??????
     // if (event instanceof MouseEvent) return;
 
+    
+
     if (
-      !this.AuthzService.hasPermission(
+      this.AuthzService && !this.AuthzService.hasPermission(
         this._current_user,
         this.MediaService.media(),
         Permission.CREATE_ANNOTATION
@@ -232,23 +240,40 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param event
    * @param pos
    */
-  marker_click(event, pos) {
-    if (!this.clickable_markers) {
+  marker_click(event, pos_old, self) {
+
+    if (!self.clickable_markers) {
       return;
     }
-    this.info_window_data = {
+
+    let mkplus = event.target as LMarkerPlus;
+    let pos = mkplus.properties;
+
+    console.log('[Checkpoint marker_click 2] - ', mkplus, self._markers);
+    self.info_window_data = {
       annotations: [pos],
       shots: pos.shots_idx.reduce((acc, s) => {
-        if (this.shots.length > s) {
-          acc.push(this.shots[s]);
+        if (self.shots.length > s) {
+          acc.push(self.shots[s]);
         }
         return acc;
       }, []),
-      marker: event.target,
-      owner: this.is_annotation_owner(this._current_user, pos.creator),
+      marker: mkplus,
+      owner: self.is_annotation_owner(self._current_user, pos.creator),
     };
 
-    event.target.nguiMapComponent.openInfoWindow("iw", event.target);
+    const modalRef = self.modalService.open(AppMediaMapInfowindowComponent, {
+      size: "l",
+      centered: true,
+    });
+    modalRef.componentInstance.appMediaMapComponentRef = self;
+    modalRef.componentInstance.iw = true;
+    modalRef.componentInstance.iw_add = false;
+    modalRef.componentInstance.popover = self.popover;
+    modalRef.componentInstance.marker_edit = self.marker_edit;
+    modalRef.componentInstance.info_window_data = self.info_window_data;
+
+    //event.target.nguiMapComponent.openInfoWindow("iw", event.target);
   }
 
   /**
@@ -374,10 +399,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     //  Verifico se esiste un marker precedente
     //  ed eventualmente lo rimuovo
     if (this.marker_edit.marker && this.marker_edit.state !== "saved") {
-      this.marker_edit.marker.setMap(null);
+      this.osmap.removeLayer(this.marker_edit.marker);
     }
 
-    let m = L.marker([this.lastMouseLat, this.lastMouseLng], {icon: greenIcon}).addTo(this.osmap);
+    let m = L.marker([this.lastMouseLat, this.lastMouseLng], {icon: greenIcon}).addTo(this.osmap) as LMarkerPlus; // .on('click', ???);
     this.marker_edit = {
       marker: m,
       address: result.display_name,
@@ -494,6 +519,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param marker
    */
   marker_update(annotation, marker) {
+    console.log('[Checkpoint marker_update]');
 
 /* TODO TODO TODO 
 
@@ -547,18 +573,21 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     return shots_idx;
   }
 
+
   /**
    * Imposta la mappa in modo da visualizzare tutti i marker
    */
   fit_bounds() {
 
     console.log('Checkpoint fit_bounds');
+    var componentRef = this;
 
     if (this.osmap) {
       if (this._markers.length) {
         var mks = [];
         this._markers.forEach((l) => {
-          let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap);
+          let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
+          m.properties = l;
           mks.push(m);
           console.log('Checkpoint marker' , l);
         });
@@ -615,6 +644,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         }
       //}
    });
+
+   this.osmap.addEventListener('click', function(ev) {componentRef.marker_add(ev, componentRef)});
 
     this.set_center_from_owner();
 
