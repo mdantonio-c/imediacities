@@ -14,6 +14,7 @@ import { NguiMapModule, NgMapApiLoader } from "@ngui/map";
 // import { HolderJsModule } from 'angular2-holderjs/component';
 import { NgxBootstrapSliderModule } from "ngx-bootstrap-slider";
 import { SlickCarouselModule } from "ngx-slick-carousel";
+import { ConfirmationPopoverModule } from "angular-confirmation-popover";
 
 import { ArchiveComponent } from "./components/admin/archive/archive";
 import { ArchivesListComponent } from "./components/admin/archive/archives.list";
@@ -137,6 +138,13 @@ const routes: Routes = [
     NgxBootstrapSliderModule,
     //HolderJsModule,
     SlickCarouselModule,
+    ConfirmationPopoverModule.forRoot(
+      // set defaults here
+      {
+        confirmButtonType: "danger",
+        appendToBody: true,
+      }
+    ),
   ],
   declarations: [
     ArchivesListComponent,
