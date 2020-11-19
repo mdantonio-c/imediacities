@@ -17,6 +17,7 @@
     "@asymmetrik/ngx-leaflet": "7.0.1",
     "@asymmetrik/ngx-leaflet-markercluster": "4.0.0",
     "@ngui/map": "^0.30.3",
-    "@types/googlemaps": "^3.30.16"
+    "@types/googlemaps": "^3.30.16",
+    "angular-confirmation-popover": "6.0.0"
   }
 }

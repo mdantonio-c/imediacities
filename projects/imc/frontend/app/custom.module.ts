@@ -15,6 +15,7 @@ import { NgxBootstrapSliderModule } from "ngx-bootstrap-slider";
 import { SlickCarouselModule } from "ngx-slick-carousel";
 import { LeafletModule } from "@asymmetrik/ngx-leaflet";
 import { LeafletMarkerClusterModule } from "@asymmetrik/ngx-leaflet-markercluster";
+import { ConfirmationPopoverModule } from "angular-confirmation-popover";
 
 import { ArchiveComponent } from "./components/admin/archive/archive";
 import { ArchivesListComponent } from "./components/admin/archive/archives.list";
@@ -144,6 +145,13 @@ const routes: Routes = [
     SlickCarouselModule,
     LeafletModule,
     LeafletMarkerClusterModule,
+    ConfirmationPopoverModule.forRoot(
+      // set defaults here
+      {
+        confirmButtonType: "danger",
+        appendToBody: true,
+      }
+    ),
   ],
   declarations: [
     ArchivesListComponent,
