@@ -12,13 +12,23 @@ export class AppMediaMapInfowindowComponent {
   elRef: ElementRef;
   properties: any;
   address: string;
+  popover: any;
   marker: any;
   marker_edit: any;
   media_type: any;
+  iw: boolean;
+  iw_add: boolean;
+  info_window_data : any;
+
+  appMediaMapComponentRef : any;
 
   constructor(elRef: ElementRef) {
     this.elRef = elRef;
     this.address = "";
+    this.iw = false;
+    this.iw_add = true;
+    this.popover = {};
+    this.info_window_data = {};
   }
 
   ngOnInit() {
@@ -30,7 +40,10 @@ export class AppMediaMapInfowindowComponent {
   }
 
   marker_edit_save() {
+  }
 
+  marker_delete(wat: any) {
+    this.appMediaMapComponentRef.marker_delete(wat);
   }
 
   marker_edit_close() {

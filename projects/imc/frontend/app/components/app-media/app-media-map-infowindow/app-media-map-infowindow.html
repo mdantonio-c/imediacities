@@ -1,6 +1,6 @@
 <div
   class="appmediamap-infowindow"
->
+><div *ngIf="iw_add" >
     <div>
       <div><h6>Geotag</h6></div>
       <div style="width: 95%; padding: 5px; margin: 5px;">
@@ -33,4 +33,34 @@
         <span class="btn btn-accent" (click)="marker_edit_save()">Save</span>
       </div>
     </div>
+  </div>
+  <div *ngIf="iw" >
+    wwwwwwwwwwwwwww
+      <div>
+        <app-modal-lista-shots
+          class="imc--modal col-12 row no-gutter"
+          [data]="info_window_data"
+          [modal]="true"
+          [show_title]="true"
+        ></app-modal-lista-shots>
+        <div style="text-align: right;" *ngIf="info_window_data && info_window_data.owner">
+          <span
+            class="material-icons click-event"
+            mwlConfirmationPopover
+            [popoverTitle]="popover.popoverTitle + ' \'' + info_window_data.annotations[0].name + '\'?'"
+            [popoverMessage]="popover.popoverMessage"
+            [appendToBody]="popover.appendToBody"
+            (confirm)="marker_delete(info_window_data.annotations[0])"
+            >delete</span
+          >
+          <!--
+                      <span class="material-icons click-event" (click)="marker_update(info_window_data.annotations[0], info_window_data.marker)">edit</span>
+                      -->
+        </div>
+        
+
+
+
+
+  </div>
 </div>
