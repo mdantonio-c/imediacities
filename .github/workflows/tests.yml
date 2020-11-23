@@ -43,7 +43,7 @@ jobs:
           rapydo shell --no-tty backend 'restapi wait';
 
           rapydo shell --no-tty backend 'restapi tests --wait'
-          docker cp mistral_backend_1:/code/coverage.xml coverage.xml
+          docker cp imc_backend_1:/code/coverage.xml coverage.xml
           bash <(curl -s https://codecov.io/bash)
 
       - name: Run Karma
