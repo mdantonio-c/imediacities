@@ -31,8 +31,6 @@ jobs:
 
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/imc/project_configuration.yaml
 
-      - name: Install backend and datasets
-
       - name: Run Karma
         if: ${{ matrix.stage == 'BACKEND' }}
         run: |
