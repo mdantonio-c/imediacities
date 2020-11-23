@@ -86,13 +86,11 @@ jobs:
           rapydo start;
           rapydo shell --no-tty backend 'restapi wait';
 
-          rapydo shell --no-tty backend --detach "restapi launch"
+          # rapydo shell --no-tty backend --detach "restapi launch"
+          rapydo shell --no-tty backend "restapi launch"
           rapydo -s frontend logs
           rapydo shell --no-tty frontend "yarn install"
           rapydo shell --no-tty frontend "reload-types"
-
-          # Debug code
-          wget --quiet http GET localhost:8080/api/status -O -
 
           rapydo shell --no-tty frontend "yarn run cypress:start"
 
