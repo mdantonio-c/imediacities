@@ -89,6 +89,7 @@ jobs:
           rapydo shell --no-tty backend --detach "restapi launch"
           rapydo -s frontend logs
           rapydo shell --no-tty frontend "yarn install"
+          rapydo shell --no-tty frontend "reload-types"
           rapydo shell --no-tty frontend "yarn run cypress:start"
 
           cp data/prj/karma/lcov.info .
