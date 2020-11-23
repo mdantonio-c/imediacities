@@ -109,4 +109,4 @@ jobs:
 
       - name: Docker Push
         if: ${{ matrix.stage == 'BACKEND' }}
-        run: docker push rapydo/${{ matrix.service }}:${{ env.RAPYDO_VERSION }}
+        run: docker push imediacities/celery:${{ env.RAPYDO_VERSION }}
