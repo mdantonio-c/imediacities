@@ -31,7 +31,7 @@ jobs:
 
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/imc/project_configuration.yaml
 
-      - name: Run Karma
+      - name: Run Pytest
         if: ${{ matrix.stage == 'BACKEND' }}
         run: |
 
@@ -53,13 +53,13 @@ jobs:
           rapydo -s frontend start
           sleep 5
           rapydo -s frontend logs
-          rapydo shell --no-ttl frontend "yarn install"
-          rapydo shell --no-ttl frontend "reload-types"
-          rapydo shell --no-ttl frontend "yarn run test:single"
+          rapydo shell --no-tty frontend "yarn install"
+          rapydo shell --no-tty frontend "reload-types"
+          rapydo shell --no-tty frontend "yarn run test:single"
           cp data/imc/karma/lcov.info .
           bash <(curl -s https://codecov.io/bash)
 
-      - name: Run Karma
+      - name: Run Cypress
         if: ${{ matrix.stage == 'CYPRESS' }}
         env:
           CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
