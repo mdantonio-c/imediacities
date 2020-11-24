@@ -1,13 +1,12 @@
 <div class="container-fluid">
   <div class="row justify-content-md-center">
     <div class="col-12">
-      <div class="card">
+      <div class="card mb-5">
         <div class="card-header">
           <h4 class="panel-title">
             <i class="fa fa-cloud-upload-alt"></i> Upload new content
           </h4>
         </div>
-
         <div class="card-block">
           <div class="row">
             <div class="col-md-12">
@@ -43,143 +42,134 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <br />
+      <div class="card mb-2">
+        <div class="card-header">
+          <h4 class="panel-title d-inline">
+            <i class="fa fa-file"></i> Your files
+          </h4>
+          <div class="btn-group btn-group-sm float-right" role="group">
+            <button
+              class="btn btn-secondary btn-sm float-right"
+              (click)="list()"
+            >
+              <i class="fa fa-sync"></i>
+            </button>
+          </div>
+        </div>
 
-        <div class="card">
-          <div class="card-header">
-            <h4 class="panel-title d-inline">
-              <i class="fa fa-file"></i> Your files
-            </h4>
-            <div class="btn-group btn-group-sm float-right" role="group">
-              <button
-                class="btn btn-secondary btn-sm float-right"
-                (click)="list()"
+        <div class="card-block">
+          <div class="table-responsive">
+            <div class="row no-gutters">
+              <div class="col-6">
+                <input
+                  type="text"
+                  class="form-control data-filter"
+                  placeholder="Type to filter files"
+                  (keyup)="updateFilter($event)"
+                />
+              </div>
+            </div>
+
+            <div class="table-wrapper" #tableWrapper>
+              <ngx-spinner [fullScreen]="false"></ngx-spinner>
+              <ngx-datatable
+                class="bootstrap"
+                [rows]="data"
+                [columns]="columns"
+                [columnMode]="ColumnMode.flex"
+                [headerHeight]="40"
+                [footerHeight]="40"
+                [externalPaging]="true"
+                [count]="paging.dataLength"
+                [limit]="paging.itemsPerPage"
+                [offset]="paging.page"
+                (page)="serverSidePagination($event)"
+                (sort)="updateSort($event)"
+                [rowHeight]="'auto'"
               >
-                <i class="fa fa-sync"></i>
-              </button>
+              </ngx-datatable>
             </div>
           </div>
+          <ng-template #dataSize let-row="row" let-value="value" let-i="index">
+            {{ value | bytes }}
+          </ng-template>
 
-          <div class="card-block">
-            <div class="table-responsive">
-              <div class="row">
-                <div class="col-6">
-                  <input
-                    type="text"
-                    class="form-control data-filter"
-                    placeholder="Type to filter files"
-                    (keyup)="updateFilter($event)"
-                  />
-                </div>
-              </div>
+          <ng-template
+            #dataUploadData
+            let-row="row"
+            let-value="value"
+            let-i="index"
+          >
+            <span ngbTooltip="{{ 1000*value | date : 'yyyy MMM dd HH:mm:ss'}}">
+              {{ value | amFromUnix | amTimeAgo:false }}
+            </span>
+          </ng-template>
 
-              <div class="table-wrapper" #tableWrapper>
-                <ngx-spinner [fullScreen]="false"></ngx-spinner>
-                <ngx-datatable
-                  class="bootstrap"
-                  [rows]="data"
-                  [columns]="columns"
-                  [columnMode]="ColumnMode.flex"
-                  [headerHeight]="40"
-                  [footerHeight]="40"
-                  [externalPaging]="true"
-                  [count]="paging.dataLength"
-                  [limit]="paging.itemsPerPage"
-                  [offset]="paging.page"
-                  (page)="serverSidePagination($event)"
-                  (sort)="updateSort($event)"
-                  [rowHeight]="'auto'"
-                >
-                </ngx-datatable>
-              </div>
-            </div>
-            <ng-template
-              #dataSize
-              let-row="row"
-              let-value="value"
-              let-i="index"
-            >
-              {{ value | bytes }}
-            </ng-template>
-
-            <ng-template
-              #dataUploadData
-              let-row="row"
-              let-value="value"
-              let-i="index"
-            >
-              <span
-                ngbTooltip="{{ 1000*value | date : 'yyyy MMM dd HH:mm:ss'}}"
-              >
-                {{ value | amFromUnix | amTimeAgo:false }}
-              </span>
-            </ng-template>
-
-            <ng-template
-              #dataStatus
-              let-row="row"
-              let-value="value"
-              let-i="index"
-            >
-              <span
-                *ngIf="row.status_message; else noStatus"
-                class="badge badge-secondary"
-                [ngClass]="{
+          <ng-template
+            #dataStatus
+            let-row="row"
+            let-value="value"
+            let-i="index"
+          >
+            <span
+              *ngIf="row.status_message; else noStatus"
+              class="badge badge-secondary"
+              [ngClass]="{
 	            'badge-success': row.status == 'COMPLETED',
 	            'badge-danger': row.status == 'ERROR',
 	            'badge-info': row.status == 'IMPORTING'
 	        }"
-                ngbTooltip="{{ row.status_message }}"
-              >
-                {{ value }}
-                <span class="badge badge-warning" *ngIf="row.warnings">
-                  <i class="imc-icon fa fa-exclamation-triangle"></i>
-                </span>
-              </span>
-
-              <ng-template #noStatus> {{ value }} </ng-template>
-            </ng-template>
-
-            <ng-template #emptyHeader let-column="column"> &nbsp; </ng-template>
-
-            <ng-template
-              #controlsCell
-              let-row="row"
-              let-value="value"
-              let-i="index"
+              ngbTooltip="{{ row.status_message }}"
             >
-              <div class="btn-toolbar justify-content-end" role="toolbar">
-                <div class="btn-group mr-1" role="group">
-                  <button
-                    class="btn p-0 mr-1"
-                    *ngIf="row.type === 'metadata' && row.status != 'COMPLETED'"
-                    (click)="stage(row.name)"
-                  >
-                    <i class="fas fa-cogs"></i>
-                  </button>
-                  <button class="btn p-0 mr-1" (click)="download(row.name)">
-                    <i class="fa fa-download"></i>
-                  </button>
+              {{ value }}
+              <span class="badge badge-warning" *ngIf="row.warnings">
+                <i class="imc-icon fa fa-exclamation-triangle"></i>
+              </span>
+            </span>
 
-                  <button
-                    class="btn p-0"
-                    *ngIf="row.status != 'IMPORTING'; else disableDelete"
-                    (click)="delete(row.name)"
+            <ng-template #noStatus> {{ value }} </ng-template>
+          </ng-template>
+
+          <ng-template #emptyHeader let-column="column"> &nbsp; </ng-template>
+
+          <ng-template
+            #controlsCell
+            let-row="row"
+            let-value="value"
+            let-i="index"
+          >
+            <div class="btn-toolbar justify-content-end" role="toolbar">
+              <div class="btn-group mr-1" role="group">
+                <button
+                  class="btn p-0 mr-1"
+                  *ngIf="row.type === 'metadata' && row.status != 'COMPLETED'"
+                  (click)="stage(row.name)"
+                >
+                  <i class="fas fa-cogs"></i>
+                </button>
+                <button class="btn p-0 mr-1" (click)="download(row.name)">
+                  <i class="fa fa-download"></i>
+                </button>
+
+                <button
+                  class="btn p-0"
+                  *ngIf="row.status != 'IMPORTING'; else disableDelete"
+                  (click)="delete(row.name)"
+                >
+                  <i class="fa fa-trash red"></i>
+                </button>
+                <ng-template #disableDelete>
+                  <i
+                    class="fa fa-trash fa-lg"
+                    ngbTooltip="Disabled during the import"
                   >
-                    <i class="fa fa-trash red"></i>
-                  </button>
-                  <ng-template #disableDelete>
-                    <i
-                      class="fa fa-trash fa-lg"
-                      ngbTooltip="Disabled during the import"
-                    >
-                    </i>
-                  </ng-template>
-                </div>
+                  </i>
+                </ng-template>
               </div>
-            </ng-template>
-          </div>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
