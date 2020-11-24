@@ -86,8 +86,7 @@ jobs:
           rapydo start;
           rapydo shell --no-tty backend 'restapi wait';
 
-          # restapi launch may fail because initialization is still in progres... let's wait a bit...
-          sleep 15
+          sleep 20
           rapydo logs
 
           rapydo shell --no-tty backend --detach "restapi launch"
@@ -96,9 +95,6 @@ jobs:
           rapydo shell --no-tty frontend "reload-types"
 
           rapydo shell --no-tty frontend "yarn run cypress:start"
-
-          cp data/prj/karma/lcov.info .
-          bash <(curl -s https://codecov.io/bash)
 
       - name: Login to DockerHub
         if: ${{ matrix.stage == 'BACKEND' }}
