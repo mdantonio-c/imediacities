@@ -22,9 +22,7 @@
 
               <div *ngFor="let item of upload_progress | keyvalue">
                 <div class="row">
-                  <div class="col-6">
-                    {{ item.key }}
-                  </div>
+                  <div class="col-6">{{ item.key }}</div>
                   <div class="col-6">
                     <ngb-progressbar
                       *ngIf="item.value > 0"
@@ -50,7 +48,17 @@
 
         <div class="card">
           <div class="card-header">
-            <h4 class="panel-title"><i class="fa fa-file"></i> Your files</h4>
+            <h4 class="panel-title d-inline">
+              <i class="fa fa-file"></i> Your files
+            </h4>
+            <div class="btn-group btn-group-sm float-right" role="group">
+              <button
+                class="btn btn-secondary btn-sm float-right"
+                (click)="list()"
+              >
+                <i class="fa fa-sync"></i>
+              </button>
+            </div>
           </div>
 
           <div class="card-block">
@@ -130,14 +138,10 @@
                 </span>
               </span>
 
-              <ng-template #noStatus>
-                {{ value }}
-              </ng-template>
+              <ng-template #noStatus> {{ value }} </ng-template>
             </ng-template>
 
-            <ng-template #emptyHeader let-column="column">
-              &nbsp;
-            </ng-template>
+            <ng-template #emptyHeader let-column="column"> &nbsp; </ng-template>
 
             <ng-template
               #controlsCell
