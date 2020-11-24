@@ -115,7 +115,7 @@
           >
             <span
               *ngIf="row.status_message; else noStatus"
-              class="badge badge-secondary"
+              class="badge badge-secondary imc--badge"
               [ngClass]="{
 	            'badge-success': row.status == 'COMPLETED',
 	            'badge-danger': row.status == 'ERROR',
