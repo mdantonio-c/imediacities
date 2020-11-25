@@ -29,6 +29,8 @@ jobs:
       - name: Run Cypress
         run: |
 
+          sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
+
           rapydo pull;
           rapydo build --force;
           rapydo start;
