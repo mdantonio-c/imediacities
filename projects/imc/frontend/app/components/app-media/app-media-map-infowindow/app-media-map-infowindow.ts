@@ -40,6 +40,7 @@ export class AppMediaMapInfowindowComponent {
   }
 
   marker_edit_save() {
+    this.appMediaMapComponentRef.marker_edit_save();
   }
 
   marker_delete(wat: any) {
@@ -47,7 +48,7 @@ export class AppMediaMapInfowindowComponent {
   }
 
   marker_edit_close() {
-
+    this.appMediaMapComponentRef.marker_edit_close();
   }
   
 }

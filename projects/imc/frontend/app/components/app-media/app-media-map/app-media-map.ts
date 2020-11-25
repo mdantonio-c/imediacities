@@ -306,7 +306,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Chiude l'infowindow per la modifica / creazione del marker
    */
   marker_edit_close(remove_marker_from_map = true) {
-    this.marker_edit.iw.close();
+    this.modalService.close();
     this.marker_edit_closeclick();
   }
 
@@ -426,7 +426,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       size: "l",
       centered: true,
     });
-    modalRef.componentInstance.marker_edit = this.marker_edit;
+    modalRef.componentInstance.appMediaMapComponentRef = self;
+    modalRef.componentInstance.popover = self.popover;
+    modalRef.componentInstance.marker_edit = self.marker_edit;
+    modalRef.componentInstance.info_window_data = self.info_window_data;
 
     /*
     // mi serve il place name di google da salvare dentro description
