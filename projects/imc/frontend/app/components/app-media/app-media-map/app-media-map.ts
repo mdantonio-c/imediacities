@@ -319,7 +319,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       this.marker_edit.state !== "saved" &&
       this.marker_edit.state !== "updating"
     ) {
-      this.marker_edit.marker.setMap(null);
+      this.osmap.removeLayer(this.marker_edit.marker);
     }
   }
 
