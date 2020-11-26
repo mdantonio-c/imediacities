@@ -306,7 +306,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Chiude l'infowindow per la modifica / creazione del marker
    */
   marker_edit_close(remove_marker_from_map = true) {
-    this.modalService.close();
+    this.modalService.dismissAll();
     this.marker_edit_closeclick();
   }
 
