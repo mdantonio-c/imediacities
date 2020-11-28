@@ -2,14 +2,17 @@ name: Cypress
 
 on:
   push:
-  schedule:
-    - cron: "0 5 * * *"
+  # schedule:
+  #   - cron: "0 4 * * *"
+  workflow_dispatch:
+
 env:
   PROJECT: imc
 
 jobs:
   integration-tests:
     runs-on: ubuntu-20.04
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v2
