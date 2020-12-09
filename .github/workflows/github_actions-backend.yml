@@ -1,0 +1,41 @@
+name: Backend
+
+on:
+  push:
+  # schedule:
+  #   - cron: "0 4 * * *"
+  workflow_dispatch:
+
+env:
+  PROJECT: imc
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - uses: rapydo/actions/install@v1
+        with:
+          project: ${PROJECT}
+
+      - name: Run Pytest
+        run: |
+
+          sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
+
+          rapydo pull;
+          rapydo build --force;
+          rapydo add task test_task;
+
+          rapydo start;
+          rapydo shell --no-tty backend 'restapi wait';
+
+          rapydo shell --no-tty backend 'restapi tests --wait'
+          docker cp ${PROJECT}_backend_1:/code/coverage.xml coverage.xml
+          bash <(curl -s https://codecov.io/bash)
