@@ -38,7 +38,7 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 ---
 
-- [ ] **title**\* (1..N)
+- [x] **title**\* (1..N)
 
 ```
  <title lang="it">
@@ -59,7 +59,7 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 ---
 
-- [ ] **identifyingTitle** (1)
+- [x] **identifyingTitle** (1)
 
 ```
  <identifyingTitle>Viaggio in Emilia Romagna</identifyingTitle>
@@ -107,7 +107,7 @@ Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **keywords** (0..N) \*
+- [x] **keywords** (0..N) \*
 
 ```
  <keywords lang="en" scheme="Cineteca di Bologna" type="Form">
@@ -118,21 +118,21 @@ Occorrenze multiple separate dal ";"
  </keywords>
 ```
 
-| keywords_Form  | keywords_Project |
-| -------------- | ---------------- |
-| Documentary:en | IMediaCities:en  |
+| keywords_Form_en | keywords_Project_en |
+| ---------------- | ------------------- |
+| Documentary      | IMediaCities        |
 
 Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **description** (0..N) \*
+- [x] **description** (0..N) \*
   - _type_ (0..1)
   - _lang_ (1)
 
 ```
- <description lang="it" type="Synopsis">....</description>
- <description lang="en" type="Synopsis">....</description>
+ <description lang="it">....</description>
+ <description lang="en">....</description>
 ```
 
 | description_it    | description_en  |
@@ -235,11 +235,17 @@ Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **dimension** (0..N)
+- [x] **duration** (0..1)
 
----
+```
+<duration>00:02:25</duration>
+```
 
-- [ ] **duration** (0..1)
+| duration |
+| -------- |
+| 00:02:25 |
+
+Il formato della celle deve essere "Time" (i.e. hh:mm:ss).
 
 ---
 
@@ -274,7 +280,28 @@ Valori possibili per un booleano:
 
 ---
 
-- [ ] **rightsStatus** (0..N)
+- [x] **rightsStatus** (0..N)
+
+```
+<rightsStatus>No Copyright - Non-Commercial Use Only</rightsStatus>
+```
+
+| rightsStatus                           |
+| -------------------------------------- |
+| No Copyright - Non-Commercial Use Only |
+
+Valori consentiti:
+
+- "In copyright"
+- "EU Orphan Work"
+- "In copyright - Educational use permitted"
+- "In copyright - Non-commercial use permitted"
+- "Public Domain"
+- "No Copyright - Contractual Restrictions"
+- "No Copyright - Non-Commercial Use Only"
+- "No Copyright - Other Known Legal Restrictions"
+- "No Copyright - United States"
+- "Copyright Undetermined"
 
 ---
 
