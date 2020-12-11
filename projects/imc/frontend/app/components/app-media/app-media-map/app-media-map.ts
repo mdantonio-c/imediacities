@@ -276,7 +276,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     modalRef.componentInstance.popover = self.popover;
     modalRef.componentInstance.marker_edit = self.marker_edit;
     modalRef.componentInstance.info_window_data = self.info_window_data;
-
+    window.dispatchEvent(new Event('resize')); // this seems necessary since sometimes the popup does not show
+    
     //event.target.nguiMapComponent.openInfoWindow("iw", event.target);
   }
 
@@ -434,7 +435,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     modalRef.componentInstance.popover = self.popover;
     modalRef.componentInstance.marker_edit = self.marker_edit;
     modalRef.componentInstance.info_window_data = self.info_window_data;
-
+    window.dispatchEvent(new Event('resize')); // this seems necessary since sometimes the popup does not show
     /*
     // mi serve il place name di google da salvare dentro description
     //  dentro result non c'è, faccio una richiesta a google
