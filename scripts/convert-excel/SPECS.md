@@ -197,12 +197,25 @@ Stesso modello di `relPerson`.
 
 ---
 
-- [ ] **relCollection**\* (0..N)
+- [x] **relCollection**\* (0..N)
 - identifier (1)
 - name (1)
 - type (0..1)
 
-Solo il primo elemento in IMC.
+```
+<relCollection>
+  <identifier scheme="CP_CATEGORY_ID">CCB_collection_007e9ed5e771959710d7242484e3e8b0</identifier>
+  <title>Cineteca di Bologna Film Collection</title>
+  <type>is part of</type>
+</relCollection>
+```
+
+| relCorporate                                                                                   |
+| ---------------------------------------------------------------------------------------------- |
+| CCB_collection_007e9ed5e771959710d7242484e3e8b0:Cineteca di Bologna Film Collection:is part of |
+
+In IMC può essere caricato SOLO il primo elemento, anche se più occorrenze sono consentite e mappate nel record XML.  
+Stesso modello di `relPerson` e `relCorporate`.
 
 ---
 
@@ -283,7 +296,7 @@ Valori possibili per un booleano:
 
 ---
 
-- [ ] **rightsHolder** (0..N)
+- [x] **rightsHolder** (0..N)
 
 ```
 <rightsHolder URL="http://www.cinetecadibologna.it/">Cineteca di Bologna</rightsHolder>

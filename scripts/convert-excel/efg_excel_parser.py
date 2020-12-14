@@ -79,7 +79,7 @@ def lookup_fields(row_idx, start_with, next_col=None):
     return res
 
 
-def parse_agent(row_idx, el_name, parent):
+def parse_related_entities(row_idx, el_name, parent):
     agents = ws.cell(row=row_idx, column=headers[el_name]).value
     if agents is None:
         return
@@ -271,13 +271,13 @@ def create_record():
         ET.SubElement(item, "isShownAt").text = is_shown_at.strip()
     # relPerson (0-N)
     if headers.get("relPerson"):
-        parse_agent(row_idx, "relPerson", av_creation)
+        parse_related_entities(row_idx, "relPerson", av_creation)
     # relCorporate (0-N)
     if headers.get("relCorporate"):
-        parse_agent(row_idx, "relCorporate", av_creation)
-    # TODO relCollection (0-N)
+        parse_related_entities(row_idx, "relCorporate", av_creation)
+    # relCollection (0-N)
     if headers.get("relCollection"):
-        pass
+        parse_related_entities(row_idx, "relCollection", av_creation)
 
     indent(efg_entity)
 
