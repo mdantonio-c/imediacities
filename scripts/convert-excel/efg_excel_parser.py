@@ -79,6 +79,35 @@ def lookup_fields(row_idx, start_with, next_col=None):
     return res
 
 
+def parse_agent(row_idx, el_name, parent):
+    agents = ws.cell(row=row_idx, column=headers[el_name]).value
+    if agents is None:
+        return
+    for agent in agents.split(sep=";"):
+        if is_blank(agent):
+            continue
+        agent = agent.strip()
+        rel_agent = ET.SubElement(parent, el_name)
+        agent_id, agent_name, agent_type = None, None, None
+        try:
+            tokens = agent.strip().split(":", 2)
+            agent_id = tokens[0]
+            agent_name = tokens[1]
+            agent_type = tokens[2]
+        except IndexError:
+            pass
+        ET.SubElement(rel_agent, "identifier").text = agent_id.strip()
+        if not agent_name:
+            rel_agent = None
+            print(
+                f"Warning: expected name in form of 'identifier:name:?type'. Invalid value for '{agent}'"
+            )
+            continue
+        ET.SubElement(rel_agent, "name").text = agent_name.strip()
+        if agent_type:
+            ET.SubElement(rel_agent, "type").text = agent_type.strip()
+
+
 def create_record():
     efg_entity = ET.Element(f"{{{EFG_NAMESPACE}}}efgEntity")
     av_creation = ET.SubElement(efg_entity, "avcreation")
@@ -168,7 +197,7 @@ def create_record():
         description_el.set("lang", key)
         description_el.text = val[0]
 
-    # FIXME avManifestation (1-N)
+    # avManifestation (1-N)
     av_manifestation = ET.SubElement(av_creation, "avManifestation")
     # identifier
     av_manifestation.append(copy.deepcopy(identifier))
@@ -240,9 +269,15 @@ def create_record():
     if not is_blank(is_shown_at):
         item = ET.SubElement(av_manifestation, "item")
         ET.SubElement(item, "isShownAt").text = is_shown_at.strip()
-    # TODO relPerson (0-N)
-
-    # TODO relCorporate (0-N)
+    # relPerson (0-N)
+    if headers.get("relPerson"):
+        parse_agent(row_idx, "relPerson", av_creation)
+    # relCorporate (0-N)
+    if headers.get("relCorporate"):
+        parse_agent(row_idx, "relCorporate", av_creation)
+    # TODO relCollection (0-N)
+    if headers.get("relCollection"):
+        pass
 
     indent(efg_entity)
 

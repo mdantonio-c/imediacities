@@ -152,7 +152,7 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
 
 ---
 
-- [ ] **relPerson** (0..N)
+- [x] **relPerson** (0..N)
   - identifier (1)
   - name (1)
   - type (0..1)
@@ -171,7 +171,7 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
 
 Occorrenze multiple separate dal ";".  
 Il valore è composto da tre parti separate da ":"
-`identifier:name:type`
+`identifier:name:type` in cui SOLO type è opzionale.
 
 ---
 
@@ -192,7 +192,8 @@ Il valore è composto da tre parti separate da ":"
 | -------------------------------------------------------------------------------------------------------------------- |
 | CCB_corporate_f0dc0710e8a804a2e05118c0596a8ca5:Ufficio Stampa della Giunta Regione Emilia Romagna:Production company |
 
-nota: occorrenze multiple separate dal ";"
+Occorrenze multiple separate dal ";".  
+Stesso modello di `relPerson`.
 
 ---
 
