@@ -1,5 +1,6 @@
 #!.venv/bin/python3
 import argparse
+import copy
 import datetime
 import sys
 from distutils.util import strtobool
@@ -169,9 +170,14 @@ def create_record():
 
     # FIXME avManifestation (1-N)
     av_manifestation = ET.SubElement(av_creation, "avManifestation")
-    # TODO identifier
-    # TODO recordSource
-    # TODO title
+    # identifier
+    av_manifestation.append(copy.deepcopy(identifier))
+    # recordSource
+    av_manifestation.append(copy.deepcopy(record_source))
+    # title
+    title_node = av_creation.find("./title[1]")
+    if title_node:
+        av_manifestation.append(copy.deepcopy(title_node))
     # language (0-N)
     languages = ws.cell(row=row_idx, column=headers["language"]).value
     for lang in languages.split(sep=";"):
@@ -208,7 +214,14 @@ def create_record():
             sound_el = ET.SubElement(av_format, "sound")
             sound_el.text = "With sound" if bool(has_sound) else "Without sound"
             sound_el.set("hasSound", "true" if bool(has_sound) else "false")
-    # TODO rightHolder (0-N)
+    # rightsHolder (0-N)
+    if headers.get("rightsHolder"):
+        rights_holders = ws.cell(row=row_idx, column=headers["rightsHolder"]).value
+        for rh in rights_holders.split(sep=";"):
+            if is_blank(rh):
+                continue
+            rights_holder = ET.SubElement(av_manifestation, "rightsHolder")
+            rights_holder.text = rh.strip()
     # rightsStatus (0-N)
     rights_statuses = ws.cell(row=row_idx, column=headers["rightsStatus"]).value
     if rights_statuses is not None:
@@ -227,7 +240,6 @@ def create_record():
     if not is_blank(is_shown_at):
         item = ET.SubElement(av_manifestation, "item")
         ET.SubElement(item, "isShownAt").text = is_shown_at.strip()
-
     # TODO relPerson (0-N)
 
     # TODO relCorporate (0-N)

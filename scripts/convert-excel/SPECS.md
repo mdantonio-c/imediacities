@@ -157,8 +157,6 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
   - name (1)
   - type (0..1)
 
-XML
-
 ```
  <relPerson>
   <identifier scheme="CP_CATEGORY_ID">CCB_person_5f9930a5fcd55e80af478e2811c61f33</identifier>
@@ -171,7 +169,9 @@ XML
 | -------------------------------------------------------------------- |
 | CCB_person_5f9930a5fcd55e80af478e2811c61f33:Mingozzi, Primo:Director |
 
-nota: occorrenze multiple separate dal ";"
+Occorrenze multiple separate dal ";".  
+Il valore è composto da tre parti separate da ":"
+`identifier:name:type`
 
 ---
 
@@ -209,15 +209,21 @@ Solo il primo elemento in IMC.
 
 ---
 
-- [ ] **identifier** (1)
+- [x] **identifier** (1)
+
+Stesso `identifier` del livello parent.
 
 ---
 
-- [ ] **recordSource** (1..N)
+- [x] **recordSource** (1..N)
+
+Stesso `recordSource` del livello parent.
 
 ---
 
-- [ ] **title** (0..N)
+- [x] **title** (0..N)
+
+Viene utilizzata una copia del primo `title` a livello parent.
 
 ---
 
@@ -277,6 +283,16 @@ Valori possibili per un booleano:
 ---
 
 - [ ] **rightsHolder** (0..N)
+
+```
+<rightsHolder URL="http://www.cinetecadibologna.it/">Cineteca di Bologna</rightsHolder>
+```
+
+| rightsHolder        |
+| ------------------- |
+| Cineteca di Bologna |
+
+Occorrenze multiple separate dal ";"
 
 ---
 
