@@ -38,7 +38,7 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 ---
 
-- [ ] **title**\* (1..N)
+- [x] **title**\* (1..N)
 
 ```
  <title lang="it">
@@ -59,7 +59,7 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 ---
 
-- [ ] **identifyingTitle** (1)
+- [x] **identifyingTitle** (1)
 
 ```
  <identifyingTitle>Viaggio in Emilia Romagna</identifyingTitle>
@@ -107,7 +107,7 @@ Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **keywords** (0..N) \*
+- [x] **keywords** (0..N) \*
 
 ```
  <keywords lang="en" scheme="Cineteca di Bologna" type="Form">
@@ -118,21 +118,21 @@ Occorrenze multiple separate dal ";"
  </keywords>
 ```
 
-| keywords_Form  | keywords_Project |
-| -------------- | ---------------- |
-| Documentary:en | IMediaCities:en  |
+| keywords_Form_en | keywords_Project_en |
+| ---------------- | ------------------- |
+| Documentary      | IMediaCities        |
 
 Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **description** (0..N) \*
+- [x] **description** (0..N) \*
   - _type_ (0..1)
   - _lang_ (1)
 
 ```
- <description lang="it" type="Synopsis">....</description>
- <description lang="en" type="Synopsis">....</description>
+ <description lang="it">....</description>
+ <description lang="en">....</description>
 ```
 
 | description_it    | description_en  |
@@ -152,12 +152,10 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
 
 ---
 
-- [ ] **relPerson** (0..N)
+- [x] **relPerson** (0..N)
   - identifier (1)
   - name (1)
   - type (0..1)
-
-XML
 
 ```
  <relPerson>
@@ -171,7 +169,9 @@ XML
 | -------------------------------------------------------------------- |
 | CCB_person_5f9930a5fcd55e80af478e2811c61f33:Mingozzi, Primo:Director |
 
-nota: occorrenze multiple separate dal ";"
+Occorrenze multiple separate dal ";".  
+Il valore è composto da tre parti separate da ":"
+`identifier:name:type` in cui SOLO type è opzionale.
 
 ---
 
@@ -192,16 +192,30 @@ nota: occorrenze multiple separate dal ";"
 | -------------------------------------------------------------------------------------------------------------------- |
 | CCB_corporate_f0dc0710e8a804a2e05118c0596a8ca5:Ufficio Stampa della Giunta Regione Emilia Romagna:Production company |
 
-nota: occorrenze multiple separate dal ";"
+Occorrenze multiple separate dal ";".  
+Stesso modello di `relPerson`.
 
 ---
 
-- [ ] **relCollection**\* (0..N)
+- [x] **relCollection**\* (0..N)
 - identifier (1)
 - name (1)
 - type (0..1)
 
-Solo il primo elemento in IMC.
+```
+<relCollection>
+  <identifier scheme="CP_CATEGORY_ID">CCB_collection_007e9ed5e771959710d7242484e3e8b0</identifier>
+  <title>Cineteca di Bologna Film Collection</title>
+  <type>is part of</type>
+</relCollection>
+```
+
+| relCorporate                                                                                   |
+| ---------------------------------------------------------------------------------------------- |
+| CCB_collection_007e9ed5e771959710d7242484e3e8b0:Cineteca di Bologna Film Collection:is part of |
+
+In IMC può essere caricato SOLO il primo elemento, anche se più occorrenze sono consentite e mappate nel record XML.  
+Stesso modello di `relPerson` e `relCorporate`.
 
 ---
 
@@ -209,15 +223,21 @@ Solo il primo elemento in IMC.
 
 ---
 
-- [ ] **identifier** (1)
+- [x] **identifier** (1)
+
+Stesso `identifier` del livello parent.
 
 ---
 
-- [ ] **recordSource** (1..N)
+- [x] **recordSource** (1..N)
+
+Stesso `recordSource` del livello parent.
 
 ---
 
-- [ ] **title** (0..N)
+- [x] **title** (0..N)
+
+Viene utilizzata una copia del primo `title` a livello parent.
 
 ---
 
@@ -235,11 +255,17 @@ Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **dimension** (0..N)
+- [x] **duration** (0..1)
 
----
+```
+<duration>00:02:25</duration>
+```
 
-- [ ] **duration** (0..1)
+| duration |
+| -------- |
+| 00:02:25 |
+
+Il formato della celle deve essere "Time" (i.e. hh:mm:ss).
 
 ---
 
@@ -270,11 +296,42 @@ Valori possibili per un booleano:
 
 ---
 
-- [ ] **rightsHolder** (0..N)
+- [x] **rightsHolder** (0..N)
+
+```
+<rightsHolder URL="http://www.cinetecadibologna.it/">Cineteca di Bologna</rightsHolder>
+```
+
+| rightsHolder        |
+| ------------------- |
+| Cineteca di Bologna |
+
+Occorrenze multiple separate dal ";"
 
 ---
 
-- [ ] **rightsStatus** (0..N)
+- [x] **rightsStatus** (0..N)
+
+```
+<rightsStatus>No Copyright - Non-Commercial Use Only</rightsStatus>
+```
+
+| rightsStatus                           |
+| -------------------------------------- |
+| No Copyright - Non-Commercial Use Only |
+
+Valori consentiti:
+
+- "In copyright"
+- "EU Orphan Work"
+- "In copyright - Educational use permitted"
+- "In copyright - Non-commercial use permitted"
+- "Public Domain"
+- "No Copyright - Contractual Restrictions"
+- "No Copyright - Non-Commercial Use Only"
+- "No Copyright - Other Known Legal Restrictions"
+- "No Copyright - United States"
+- "Copyright Undetermined"
 
 ---
 

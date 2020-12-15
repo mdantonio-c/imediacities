@@ -1,5 +1,6 @@
 #!.venv/bin/python3
 import argparse
+import copy
 import datetime
 import sys
 from distutils.util import strtobool
@@ -56,11 +57,55 @@ def is_blank(my_string):
 #             return val.strip() if val else None
 
 
-def lookup_field(row_idx, header):
-    for row in ws.iter_rows(min_row=1, max_row=1):
-        for c in [cell for cell in row if cell.value == header]:
+def lookup_fields(row_idx, start_with, next_col=None):
+    res = {}
+    for header_row in ws.iter_rows(min_row=1, max_row=1):
+        for c in [
+            x
+            for x in header_row
+            if x.value is not None and x.value.startswith(start_with)
+        ]:
+            header_val = c.value.strip()
+            # print(f"header: {header_val}")
+            key = header_val[len(start_with) + 1 :]
             val = ws.cell(row=row_idx, column=c.column).value
-            return val.strip() if val else None
+            next_val = None
+            if next_col and ws.cell(row=c.row, column=c.column + 1).value == next_col:
+                next_val = ws.cell(row=row_idx, column=c.column + 1).value
+            res[key] = (
+                val.strip() if val else None,
+                next_val.strip() if next_val else None,
+            )
+    return res
+
+
+def parse_related_entities(row_idx, el_name, parent):
+    agents = ws.cell(row=row_idx, column=headers[el_name]).value
+    if agents is None:
+        return
+    for agent in agents.split(sep=";"):
+        if is_blank(agent):
+            continue
+        agent = agent.strip()
+        rel_agent = ET.SubElement(parent, el_name)
+        agent_id, agent_name, agent_type = None, None, None
+        try:
+            tokens = agent.strip().split(":", 2)
+            agent_id = tokens[0]
+            agent_name = tokens[1]
+            agent_type = tokens[2]
+        except IndexError:
+            pass
+        ET.SubElement(rel_agent, "identifier").text = agent_id.strip()
+        if not agent_name:
+            rel_agent = None
+            print(
+                f"Warning: expected name in form of 'identifier:name:?type'. Invalid value for '{agent}'"
+            )
+            continue
+        ET.SubElement(rel_agent, "name").text = agent_name.strip()
+        if agent_type:
+            ET.SubElement(rel_agent, "type").text = agent_type.strip()
 
 
 def create_record():
@@ -81,12 +126,14 @@ def create_record():
     </recordSource>
     """
     record_source = ET.SubElement(av_creation, "recordSource")
-    source_id = lookup_field(row_idx, "sourceID")
+    # source_id = lookup_field(row_idx, "sourceID")
+    source_id = ws.cell(row=row_idx, column=headers["sourceID"]).value.strip()
     ET.SubElement(record_source, "sourceID").text = source_id
-    provider_id = lookup_field(row_idx, "provider_id")
+    # provider_id = lookup_field(row_idx, "provider_id")
+    provider_id = ws.cell(row=row_idx, column=headers["provider_id"]).value
     ET.SubElement(
         record_source, "provider", schemeID="Institution acronym", id=provider_id
-    ).text = lookup_field(row_idx, "provider")
+    ).text = ws.cell(row=row_idx, column=headers["provider"]).value
 
     # title (1-N)
     """
@@ -95,14 +142,22 @@ def create_record():
       <relation>Original title</relation>
     </title>
     """
-    ET.SubElement(av_creation, "title")
-    # TODO
+    # title
+    titles = lookup_fields(row_idx, start_with="title_text", next_col="title_relation")
+    for key, val in titles.items():
+        title_el = ET.SubElement(av_creation, "title")
+        title_el.set("lang", key)
+        ET.SubElement(title_el, "text").text = val[0]
+        if val[1]:
+            ET.SubElement(title_el, "relation").text = val[1]
 
     # identifyingTitle (1)
     identifying_title = ET.SubElement(av_creation, "identifyingTitle")
-    identifying_title.text = ws.cell(
-        row=row_idx, column=headers["identifyingTitle"]
-    ).value
+    identifying_title.text = (
+        ws.cell(row=row_idx, column=headers["identifyingTitle"]).value
+        if headers.get("identifyingTitle")
+        else list(titles.values())[0][0]
+    )
 
     # countryOfReference (1-N)
     countries = ws.cell(row=row_idx, column=headers["countryOfReference"]).value
@@ -121,12 +176,37 @@ def create_record():
         production_year.text = y.strip()
 
     # keywords (0-N)
-    # TODO
-
+    keywords = lookup_fields(row_idx, start_with="keywords")
+    for key, val in keywords.items():
+        # expected key is as follows: Subject_it, Place_it
+        if len(key.split("_")) != 2:
+            print(f"Warning: invalid keywords definition for <{key}>")
+            continue
+        k_type, lang = key.split("_")
+        keywords_el = ET.SubElement(av_creation, "keywords")
+        keywords_el.set("lang", lang)
+        keywords_el.set("type", k_type)
+        for term in val[0].split(";"):
+            if is_blank(term):
+                continue
+            ET.SubElement(keywords_el, "term").text = term.strip()
     # description (0-N)
+    descriptions = lookup_fields(row_idx, start_with="description")
+    for key, val in descriptions.items():
+        description_el = ET.SubElement(av_creation, "description")
+        description_el.set("lang", key)
+        description_el.text = val[0]
 
     # avManifestation (1-N)
     av_manifestation = ET.SubElement(av_creation, "avManifestation")
+    # identifier
+    av_manifestation.append(copy.deepcopy(identifier))
+    # recordSource
+    av_manifestation.append(copy.deepcopy(record_source))
+    # title
+    title_node = av_creation.find("./title[1]")
+    if title_node:
+        av_manifestation.append(copy.deepcopy(title_node))
     # language (0-N)
     languages = ws.cell(row=row_idx, column=headers["language"]).value
     for lang in languages.split(sep=";"):
@@ -134,13 +214,10 @@ def create_record():
             continue
         language = ET.SubElement(av_manifestation, "language")
         language.text = lang.strip()
-
-    # thumbnail (1)
-    thumbnail = ET.SubElement(av_manifestation, "thumbnail")
-    thumbnail_url = ws.cell(row=row_idx, column=headers["thumbnail"]).value
-    if is_blank(thumbnail_url):
-        raise ValueError("Missing thumbnail")
-    thumbnail.text = thumbnail_url.strip()
+    # duration (0-1)
+    duration = ws.cell(row=row_idx, column=headers["duration"]).value
+    if duration:
+        ET.SubElement(av_manifestation, "duration").text = f"{duration}"
     # format (0-1)
     av_format = ET.SubElement(av_manifestation, "format")
     # gauge (0-1)
@@ -166,20 +243,41 @@ def create_record():
             sound_el = ET.SubElement(av_format, "sound")
             sound_el.text = "With sound" if bool(has_sound) else "Without sound"
             sound_el.set("hasSound", "true" if bool(has_sound) else "false")
-    # TODO
-    # digital (0-1)
-    # TODO
+    # rightsHolder (0-N)
+    if headers.get("rightsHolder"):
+        rights_holders = ws.cell(row=row_idx, column=headers["rightsHolder"]).value
+        for rh in rights_holders.split(sep=";"):
+            if is_blank(rh):
+                continue
+            rights_holder = ET.SubElement(av_manifestation, "rightsHolder")
+            rights_holder.text = rh.strip()
+    # rightsStatus (0-N)
+    rights_statuses = ws.cell(row=row_idx, column=headers["rightsStatus"]).value
+    if rights_statuses is not None:
+        for rs in rights_statuses.split(sep=";"):
+            if is_blank(rs):
+                continue
+            ET.SubElement(av_manifestation, "rightsStatus").text = rs.strip()
+    # thumbnail (1)
+    thumbnail = ET.SubElement(av_manifestation, "thumbnail")
+    thumbnail_url = ws.cell(row=row_idx, column=headers["thumbnail"]).value
+    if is_blank(thumbnail_url):
+        raise ValueError("Missing thumbnail")
+    thumbnail.text = thumbnail_url.strip()
     # item/isShownAt (0-1)
     is_shown_at = ws.cell(row=row_idx, column=headers["isShownAt"]).value
     if not is_blank(is_shown_at):
         item = ET.SubElement(av_manifestation, "item")
         ET.SubElement(item, "isShownAt").text = is_shown_at.strip()
-
     # relPerson (0-N)
-    # TODO
-
+    if headers.get("relPerson"):
+        parse_related_entities(row_idx, "relPerson", av_creation)
     # relCorporate (0-N)
-    # TODO
+    if headers.get("relCorporate"):
+        parse_related_entities(row_idx, "relCorporate", av_creation)
+    # relCollection (0-N)
+    if headers.get("relCollection"):
+        parse_related_entities(row_idx, "relCollection", av_creation)
 
     indent(efg_entity)
 
