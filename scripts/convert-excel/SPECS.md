@@ -9,9 +9,9 @@ efgEntity
 
 ---
 
-- [x] **identifier**\* (1)
+- [x] **identifier** (1)
 
-```
+```xml
  <identifier scheme="CP_CATEGORY_ID">CCB_avCreation_23463</identifier>
 ```
 
@@ -21,9 +21,9 @@ efgEntity
 
 ---
 
-- [x] **recordSource**\* (1..N)
+- [x] **recordSource** (1..N)
 
-```
+```xml
  <recordSource>
   <sourceID>23463</sourceID>
   <provider id="CCB" schemeID="Institution acronym">Cineteca di Bologna</provider>
@@ -38,13 +38,16 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 ---
 
-- [x] **title**\* (1..N)
+- [x] **title** (1..N)
 
-```
+```xml
  <title lang="it">
   <text>Viaggio in Emilia Romagna</text>
   <relation>Original title</relation>
  </title>
+```
+
+```xml
  <title lang="en">
   <text>Travel to Emilia Romagna</text>
   <relation>Translated title</relation>
@@ -61,7 +64,7 @@ In IMC viene mappata e gestita SOLO la prima occorrenza del composite `recordSou
 
 - [x] **identifyingTitle** (1)
 
-```
+```xml
  <identifyingTitle>Viaggio in Emilia Romagna</identifyingTitle>
 ```
 
@@ -73,7 +76,7 @@ Questo elemento può essere omesso e compilato con il primo `title_text`.
 
 ---
 
-- [x] **language**\* (0..N)
+- [x] **language** (0..N)
 
 Vengono mappati i valori in `avManifastation` o `nonAVManifestation`
 
@@ -81,7 +84,7 @@ Vengono mappati i valori in `avManifastation` o `nonAVManifestation`
 
 - [x] **countryOfReference** (1..N)
 
-```
+```xml
  <countryOfReference>IT</countryOfReference>
 ```
 
@@ -95,7 +98,7 @@ Occorrenze multiple separate dal ";" (e.g. IT;EN)
 
 - [x] **productionYear** (1..N)
 
-```
+```xml
  <productionYear>1972</productionYear>
 ```
 
@@ -109,10 +112,13 @@ Occorrenze multiple separate dal ";"
 
 - [x] **keywords** (0..N) \*
 
-```
+```xml
  <keywords lang="en" scheme="Cineteca di Bologna" type="Form">
   <term>Documentary</term>
  </keywords>
+```
+
+```xml
  <keywords lang="en" type="Project">
   <term>IMediaCities</term>
  </keywords>
@@ -130,9 +136,12 @@ Occorrenze multiple separate dal ";"
   - _type_ (0..1)
   - _lang_ (1)
 
+```xml
+<description lang="it">....</description>
 ```
- <description lang="it">....</description>
- <description lang="en">....</description>
+
+```xml
+<description lang="en">....</description>
 ```
 
 | description_it    | description_en  |
@@ -146,7 +155,7 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
 
 - [ ] **avManifestation** (1..N) [1]
 
-```
+```xml
  <avManifestation>...</avManifestation>
 ```
 
@@ -157,7 +166,7 @@ L'attributo type non è al momento gestito. Viene ignorato e non mappato.
   - name (1)
   - type (0..1)
 
-```
+```xml
  <relPerson>
   <identifier scheme="CP_CATEGORY_ID">CCB_person_5f9930a5fcd55e80af478e2811c61f33</identifier>
   <name>Mingozzi, Primo</name>
@@ -180,7 +189,7 @@ Il valore è composto da tre parti separate da ":"
   - name (1)
   - type (0..1)
 
-```
+```xml
  <relCorporate>
   <identifier scheme="CP_CATEGORY_ID">CCB_corporate_f0dc0710e8a804a2e05118c0596a8ca5</identifier>
   <name>Ufficio Stampa della Giunta Regione Emilia Romagna</name>
@@ -202,7 +211,7 @@ Stesso modello di `relPerson`.
 - name (1)
 - type (0..1)
 
-```
+```xml
 <relCollection>
   <identifier scheme="CP_CATEGORY_ID">CCB_collection_007e9ed5e771959710d7242484e3e8b0</identifier>
   <title>Cineteca di Bologna Film Collection</title>
@@ -243,7 +252,7 @@ Viene utilizzata una copia del primo `title` a livello parent.
 
 - [x] **language** (0..N)
 
-```
+```xml
  <language>it</language>
 ```
 
@@ -257,7 +266,7 @@ Occorrenze multiple separate dal ";"
 
 - [x] **duration** (0..1)
 
-```
+```xml
 <duration>00:02:25</duration>
 ```
 
@@ -275,7 +284,7 @@ Il formato della celle deve essere "Time" (i.e. hh:mm:ss).
   - colour (0..1)
   - sound (0..1)
 
-```
+```xml
  <format>
   <gauge>8 mm</gauge>
   <aspectRatio>1:1,33</aspectRatio>
@@ -298,7 +307,7 @@ Valori possibili per un booleano:
 
 - [x] **rightsHolder** (0..N)
 
-```
+```xml
 <rightsHolder URL="http://www.cinetecadibologna.it/">Cineteca di Bologna</rightsHolder>
 ```
 
@@ -312,7 +321,7 @@ Occorrenze multiple separate dal ";"
 
 - [x] **rightsStatus** (0..N)
 
-```
+```xml
 <rightsStatus>No Copyright - Non-Commercial Use Only</rightsStatus>
 ```
 
@@ -337,7 +346,7 @@ Valori consentiti:
 
 - [x] **thumbnail** (1)
 
-```
+```xml
  <thumbnail>https://...</thumbnail>
 ```
 
@@ -350,7 +359,7 @@ Valori consentiti:
 - [x] item (0..N)
   - isShownAt (1)
 
-```
+```xml
  <item>
    <isShownAt>https://ms-emilia-romagna.homemovies.it/it/clip/78</isShownAt>
  </item>
@@ -365,3 +374,86 @@ L'unico in `item` elemento gestito in IMC è `isShownAt`
 ---
 
 ### nonavcreation
+
+I seguenti elementi sono in comune con `avcreation`.
+
+- **identifier** (1)
+- **recordSource** (1..N)
+- **title** (0..N)
+- **keywords** (0..N)
+- **description** (0..N)
+
+Da notare che il `title` è in questo caso opzionale.
+
+---
+
+- [x] **dateCreated** (1)
+
+```xml
+<dateCreated>1916</dateCreated>
+```
+
+| dateCreated |
+| ----------- |
+| 1916        |
+
+---
+
+- [x] **type** (1)
+
+```xml
+<type>image</type>
+```
+
+E' determinato dal titolo del worksheet che raccoglie tutti i record dello stesso tipo.
+In questo caso `Image`.
+
+---
+
+- [x] **specificType** (1)
+
+```xml
+<specificType>Photo</specificType>
+```
+
+| specificType |
+| ------------ |
+| Photo        |
+
+---
+
+- [x] **physicalFormat** (0..1)
+
+```xml
+<physicalFormat>60X60</physicalFormat>
+```
+
+| physicalFormat |
+| -------------- |
+| 60X60          |
+
+---
+
+- [x] **colour** (0..1)
+
+```xml
+<colour>Black &amp; White</colour>
+```
+
+| colour        |
+| ------------- |
+| Black & White |
+
+Allowed values are:
+
+- "Black & White"
+- "Colour"
+- "B/W & Colour"
+- "Tinted"
+- "Colour & B/W"
+- "Black and white (tinted)"
+- "Black and white (toned)"
+- "Black and white (tinted and toned)"
+- "Sepia"
+- "Black & White (partly stencil coloured)"
+- "Black & White (partly tinted)"
