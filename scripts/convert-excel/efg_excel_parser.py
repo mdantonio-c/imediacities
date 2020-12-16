@@ -31,8 +31,8 @@ parser.add_argument("input", help="input excel file")
 parser.add_argument(
     "-t", "--target-directory", help="put all generated files into TARGET DIRECTORY"
 )
+parser.add_argument("-p", "--prefix", help="set a prefix to output filename")
 args = parser.parse_args()
-
 input_filename = args.input
 # check target directory
 target_dir = args.target_directory
@@ -318,8 +318,11 @@ def create_record():
     global target_dir
     if target_dir is None:
         target_dir = ""
+    prefix = ""
+    if args.prefix:
+        prefix = f"{args.prefix}_"
     tree.write(
-        os.path.join(target_dir, f"test_{source_id}.xml"),
+        os.path.join(target_dir, f"{prefix}{source_id}.xml"),
         xml_declaration=True,
         encoding="utf-8",
         method="xml",
