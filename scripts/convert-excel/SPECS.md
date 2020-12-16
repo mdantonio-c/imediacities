@@ -379,11 +379,13 @@ I seguenti elementi sono in comune con `avcreation`.
 
 - **identifier** (1)
 - **recordSource** (1..N)
-- **title** (0..N)
+- **title** (1..N)
 - **keywords** (0..N)
 - **description** (0..N)
-
-Da notare che il `title` è in questo caso opzionale.
+- **language** (0..N)
+- **rightsHolder** (0..N)
+- **rightsStatus** (0..N)
+- **thumbnail** (1)
 
 ---
 
