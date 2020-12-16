@@ -286,7 +286,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param marker
    */
   marker_delete(marker) {
+    this.osmap.removeLayer(marker);
     this.AnnotationsService.delete_tag(marker, this.media_type);
+    this.marker_edit_close();
   }
 
   /**
@@ -320,10 +322,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Controllo se il marker è stato salvato diversamente lo rimuovo dalla mappa
    */
   marker_edit_closeclick() {
-    if (
-      this.marker_edit.state !== "saved" &&
-      this.marker_edit.state !== "updating"
+    if (this.marker_edit 
+     /* && this.marker_edit.state !== "saved" &&
+      this.marker_edit.state !== "updating" */
     ) {
+      console.log('check marker_edit_closeclick', this.marker_edit, this.marker_edit.marker);
       this.osmap.removeLayer(this.marker_edit.marker);
     }
   }
@@ -355,7 +358,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       );
     }
 
-    this.AnnotationsService.create_tag(
+    console.log("marker_edit_save - saving stuff with iri=", this.marker_edit.iri);
+
+    let ret = this.AnnotationsService.create_tag(
       shots_idx.map((s) => s.id),
       [
         {
@@ -381,6 +386,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         this.marker_edit_close(false);
       }
     );
+
+    console.log('this.AnnotationsService.create_tag returned this: ', ret);
   }
   
   
@@ -407,11 +414,28 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       this.osmap.removeLayer(this.marker_edit.marker);
     }
 
+    // 
     let m = L.marker([this.lastMouseLat, this.lastMouseLng], {icon: greenIcon}).addTo(this.osmap) as LMarkerPlus; // .on('click', ???);
+
+    let formattedName = "";
+    if(result.address && result.address.amenity) {
+      formattedName = result.address.amenity;
+      console.log('marker_new_set - using amenity name' , formattedName)
+    } else if(result.address.road) {
+        formattedName = result.address.road;
+        if(result.address && result.address.house_number) {
+          formattedName += " " + result.address.house_number;
+        }
+    } else {
+      formattedName = result.display_name;
+    }
+
+    console.log('marker_new_set' , formattedName)
+
     this.marker_edit = {
       marker: m,
       address: result.display_name,
-      description: result.display_name,
+      description: formattedName,
       iri: result.place_id,
       location: {
         lat: self.lastMouseLat,
