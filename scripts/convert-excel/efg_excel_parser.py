@@ -17,13 +17,13 @@ XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema"
 ET.register_namespace("", EFG_NAMESPACE)
 
 generated_on = str(datetime.datetime.now())
-ALLOWED_ITEM_TYPES = ("Image", "Video")
+ALLOWED_ITEM_TYPES = ("IMAGE", "VIDEO")
 COMMON_MANDATORY_COLS = [
     "identifier",
     "sourceID",
     "provider",
     "provider_id",
-    "thumbnail",
+    "rightsStatus",
 ]
 
 parser = argparse.ArgumentParser()
@@ -128,13 +128,22 @@ def create_record():
     # recordSource (1-N)
     record_source = ET.SubElement(creation, "recordSource")
     # source_id = lookup_field(row_idx, "sourceID")
-    source_id = ws.cell(row=row_idx, column=headers["sourceID"]).value.strip()
+    source_id = ws.cell(row=row_idx, column=headers["sourceID"]).value
+    if is_blank(source_id):
+        raise ValueError("missing sourceID")
+    source_id = source_id.strip()
     ET.SubElement(record_source, "sourceID").text = source_id
-    # provider_id = lookup_field(row_idx, "provider_id")
     provider_id = ws.cell(row=row_idx, column=headers["provider_id"]).value
+    if is_blank(provider_id):
+        raise ValueError("missing provider_id")
+    provider_id = provider_id.strip()
+    provider = ws.cell(row=row_idx, column=headers["provider"]).value
+    if is_blank(provider):
+        raise ValueError("missing provider")
+    provider = provider.strip()
     ET.SubElement(
         record_source, "provider", schemeID="Institution acronym", id=provider_id
-    ).text = ws.cell(row=row_idx, column=headers["provider"]).value
+    ).text = provider
 
     # title (1-N)
     titles = lookup_fields(row_idx, start_with="title_text", next_col="title_relation")
@@ -280,19 +289,16 @@ def create_record():
                 continue
             rights_holder = ET.SubElement(manifestation, "rightsHolder")
             rights_holder.text = rh.strip()
-    # rightsStatus (0-N)
-    rights_statuses = ws.cell(row=row_idx, column=headers["rightsStatus"]).value
-    if rights_statuses is not None:
-        for rs in rights_statuses.split(sep=";"):
-            if is_blank(rs):
-                continue
-            ET.SubElement(manifestation, "rightsStatus").text = rs.strip()
-    # thumbnail (1)
-    thumbnail = ET.SubElement(manifestation, "thumbnail")
-    thumbnail_url = ws.cell(row=row_idx, column=headers["thumbnail"]).value
-    if is_blank(thumbnail_url):
-        raise ValueError("Missing thumbnail")
-    thumbnail.text = thumbnail_url.strip()
+    # rightsStatus (1)
+    rights_status = ws.cell(row=row_idx, column=headers["rightsStatus"]).value
+    if is_blank(rights_status):
+        raise ValueError("Missing rightsStatus")
+    ET.SubElement(manifestation, "rightsStatus").text = rights_status.strip()
+    # thumbnail (0-1)
+    if headers.get("thumbnail"):
+        thumbnail_url = ws.cell(row=row_idx, column=headers["thumbnail"]).value
+        if not is_blank(thumbnail_url):
+            ET.SubElement(manifestation, "thumbnail").text = thumbnail_url.strip()
     if m_tag == "avManifestation" and "isShownAt" in headers:
         # item/isShownAt (0-1)
         is_shown_at = ws.cell(row=row_idx, column=headers["isShownAt"]).value
@@ -346,7 +352,7 @@ def check_mandatory_columns():
 
 
 # iterate over worksheets
-for ws in [a for a in wb.worksheets if a.title in ALLOWED_ITEM_TYPES]:
+for ws in [a for a in wb.worksheets if a.title.strip().upper() in ALLOWED_ITEM_TYPES]:
     print(f"Worksheet {ws.title}")
     headers = {}
     for row in ws.iter_rows(min_row=1, max_row=1):
@@ -355,7 +361,7 @@ for ws in [a for a in wb.worksheets if a.title in ALLOWED_ITEM_TYPES]:
     try:
         check_mandatory_columns()
     except ValueError as err:
-        print(f"ERROR - Worksheet {ws.title} cannot be parsed. Reason: {err}")
+        print(f"ERROR\t- Worksheet {ws.title} cannot be parsed. Reason: {err}")
         continue
     counter = 0
     err_counter = 0
@@ -364,9 +370,10 @@ for ws in [a for a in wb.worksheets if a.title in ALLOWED_ITEM_TYPES]:
             counter += 1
             try:
                 create_record()
+                print(f"SUCCESS\t- Record[idx={row[0].row}] created")
             except ValueError as err:
                 err_counter += 1
-                print(f"ERROR - Record[{row[0].row}] cannot be parsed: {err}")
+                print(f"ERROR\t- Record[idx={row[0].row}] cannot be parsed: {err}")
 
     print(
         f"Total {ws.title} items: {counter} [SUCCESS:{counter-err_counter}, FAILURE:{err_counter}]"

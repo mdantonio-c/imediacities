@@ -319,7 +319,7 @@ Occorrenze multiple separate dal ";"
 
 ---
 
-- [x] **rightsStatus** (0..N)
+- [x] **rightsStatus** (1)
 
 ```xml
 <rightsStatus>No Copyright - Non-Commercial Use Only</rightsStatus>
@@ -342,9 +342,11 @@ Valori consentiti:
 - "No Copyright - United States"
 - "Copyright Undetermined"
 
+Il `rightsStatus` in IMC è obbligatorio e non ripetibile diversamente dallo schema EFG per cui invece è opzionale e ripetibile.
+
 ---
 
-- [x] **thumbnail** (1)
+- [x] **thumbnail** (0..1)
 
 ```xml
  <thumbnail>https://...</thumbnail>
@@ -353,6 +355,8 @@ Valori consentiti:
 | thumbnail   |
 | ----------- |
 | https://... |
+
+L'elemento `thumbnail` è opzionale in IMC perché generato a partire dal content mentre nello schema EFG è obbligatorio.
 
 ---
 
@@ -384,8 +388,8 @@ I seguenti elementi sono in comune con `avcreation`.
 - **description** (0..N)
 - **language** (0..N)
 - **rightsHolder** (0..N)
-- **rightsStatus** (0..N)
-- **thumbnail** (1)
+- **rightsStatus** (1)
+- **thumbnail** (0..1)
 
 ---
 
