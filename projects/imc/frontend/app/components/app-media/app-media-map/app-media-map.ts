@@ -683,8 +683,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         if('latlng' in evx) {
           componentRef.lastMouseLat = evx.latlng.lat;
           componentRef.lastMouseLng = evx.latlng.lng;
-        } else {
-          console.log('[checkpoint Bulbasaur]');
         }
       //}
    });
