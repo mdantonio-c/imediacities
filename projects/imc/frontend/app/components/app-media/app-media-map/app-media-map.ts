@@ -267,7 +267,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     };
 
     const modalRef = self.modalService.open(AppMediaMapInfowindowComponent, {
-      size: "l",
+      size: "lg",
       centered: true,
     });
     modalRef.componentInstance.appMediaMapComponentRef = self;
@@ -452,7 +452,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 */
     
     const modalRef = this.modalService.open(AppMediaMapInfowindowComponent, {
-      size: "l",
+      size: "lg",
       centered: true,
     });
     modalRef.componentInstance.appMediaMapComponentRef = self;
@@ -618,10 +618,22 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       if (this._markers.length) {
         var mks = [];
         this._markers.forEach((l) => {
-          let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
-          m.properties = l;
-          mks.push(m);
-          console.log('Checkpoint marker' , l);
+          //check if mks already has a marker for this iri
+          let found = false;
+          let thisIri = l.iri;
+          for (var mi=0; mi<mks.length; mi++) {
+            if(mks[mi].properties.iri == thisIri) {
+              mks[mi].properties.shots_idx = mks[mi].properties.shots_idx.concat(l.shots_idx);
+              found = true;
+              break;
+            }
+          }
+          if(!found) { 
+            let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
+            m.properties = l;
+            mks.push(m);
+            console.log('Checkpoint marker' , l);
+          }
         });
 
         
