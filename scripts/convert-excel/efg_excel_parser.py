@@ -186,7 +186,9 @@ def create_record():
         ):
             raise ValueError("Missing dateCreated")
         ET.SubElement(creation, "date_created").text = (
-            date_created.strip() if isinstance(date_created, str) else date_created
+            date_created.strip()
+            if isinstance(date_created, str)
+            else date_created.strftime("%Y-%m-%d")
         )
 
     # keywords (0-N)
@@ -195,6 +197,9 @@ def create_record():
         # expected key is as follows: Subject_it, Place_it
         if len(key.split("_")) != 2:
             # ignore invalid keywords definitions
+            continue
+        if is_blank(val[0]):
+            # no keywords for this type_lang column
             continue
         k_type, lang = key.split("_")
         keywords_el = ET.SubElement(creation, "keywords")
