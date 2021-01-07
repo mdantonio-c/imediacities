@@ -198,6 +198,9 @@ def create_record():
         if len(key.split("_")) != 2:
             # ignore invalid keywords definitions
             continue
+        if is_blank(val[0]):
+            # no keywords for this type_lang column
+            continue
         k_type, lang = key.split("_")
         keywords_el = ET.SubElement(creation, "keywords")
         keywords_el.set("lang", lang)
