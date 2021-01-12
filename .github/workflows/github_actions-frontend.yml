@@ -29,7 +29,7 @@ jobs:
 
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
 
-          rapydo -s frontend pull
+          rapydo -s frontend pull --quiet
           rapydo -s frontend start
           sleep 5
           rapydo -s frontend logs

@@ -34,7 +34,7 @@ jobs:
 
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
 
-          rapydo pull;
+          rapydo pull --quiet;
           rapydo build --force;
           rapydo start;
           rapydo shell --no-tty backend 'restapi wait';

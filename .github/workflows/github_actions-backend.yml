@@ -29,7 +29,7 @@ jobs:
 
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
 
-          rapydo pull;
+          rapydo pull --quiet;
           rapydo build --force;
           rapydo add task test_task;
 
@@ -39,3 +39,12 @@ jobs:
           rapydo shell --no-tty backend 'restapi tests --wait'
           docker cp ${PROJECT}_backend_1:/code/coverage.xml coverage.xml
           bash <(curl -s https://codecov.io/bash)
+
+      - name: Print Logs
+        if: failure()
+        run: tail -100 data/logs/backend-server.log
+
+      - name: Docker Logs
+        if: failure()
+        run: |
+          rapydo logs
