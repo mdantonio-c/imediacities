@@ -21,7 +21,7 @@ export class ListsService {
     if (includeNumberOfItems) {
       params["includeNumberOfItems"] = true;
     }
-    return this.api.get("lists", "", params);
+    return this.api.get("lists", params);
   }
 
   parseLists(lists: any[]): UserList[] {
