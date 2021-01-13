@@ -1,17 +1,18 @@
+from restapi.connectors import neo4j
 from restapi.utilities.logs import log
 
 
 class Initializer:
-    def __init__(self, services, app=None):
+    def __init__(self, app=None):
 
-        neo4j = services["neo4j"]
+        graph = neo4j.get_instance()
 
         # Providers
         try:
-            neo4j.Provider.nodes.get(identifier="CCB")
+            graph.Provider.nodes.get(identifier="CCB")
             log.debug("Provider CCB already exists")
-        except neo4j.Provider.DoesNotExist:
-            ccb = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            ccb = graph.Provider()
             ccb.identifier = "CCB"
             ccb.scheme = "ACRO"
             ccb.name = "Fondazione Cineteca di Bologna"
@@ -25,10 +26,10 @@ class Initializer:
             log.info("Provider CCB successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="TTE")
+            graph.Provider.nodes.get(identifier="TTE")
             log.debug("Provider TTE already exists")
-        except neo4j.Provider.DoesNotExist:
-            tte = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            tte = graph.Provider()
             tte.identifier = "TTE"
             tte.scheme = "ACRO"
             tte.name = "Tainiothiki tis Ellados"
@@ -42,10 +43,10 @@ class Initializer:
             log.info("Provider TTE successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="CRB")
+            graph.Provider.nodes.get(identifier="CRB")
             log.debug("Provider CRB already exists")
-        except neo4j.Provider.DoesNotExist:
-            crb = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            crb = graph.Provider()
             crb.identifier = "CRB"
             crb.scheme = "ACRO"
             crb.name = "Cinémathèque Royale de Belgique"
@@ -59,10 +60,10 @@ class Initializer:
             log.info("Provider CRB successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="SFI")
+            graph.Provider.nodes.get(identifier="SFI")
             log.debug("Provider SFI already exists")
-        except neo4j.Provider.DoesNotExist:
-            sfi = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            sfi = graph.Provider()
             sfi.identifier = "SFI"
             sfi.scheme = "ACRO"
             sfi.name = "Svenska Filminstitutet"
@@ -75,10 +76,10 @@ class Initializer:
             log.info("Provider SFI successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="DFI")
+            graph.Provider.nodes.get(identifier="DFI")
             log.debug("Provider DFI already exists")
-        except neo4j.Provider.DoesNotExist:
-            dfi = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            dfi = graph.Provider()
             dfi.identifier = "DFI"
             dfi.scheme = "ACRO"
             dfi.name = "Det Danske Filminstitut"
@@ -92,10 +93,10 @@ class Initializer:
             log.info("Provider DFI successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="DIF")
+            graph.Provider.nodes.get(identifier="DIF")
             log.debug("Provider DIF already exists")
-        except neo4j.Provider.DoesNotExist:
-            dif = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            dif = graph.Provider()
             dif.identifier = "DIF"
             dif.scheme = "ACRO"
             dif.name = "Deutsches Filminstitut"
@@ -109,10 +110,10 @@ class Initializer:
             log.info("Provider DIF successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="OFM")
+            graph.Provider.nodes.get(identifier="OFM")
             log.debug("Provider OFM already exists")
-        except neo4j.Provider.DoesNotExist:
-            ofm = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            ofm = graph.Provider()
             ofm.identifier = "OFM"
             ofm.scheme = "ACRO"
             ofm.name = "Österreichisches Filmmuseum"
@@ -125,10 +126,10 @@ class Initializer:
             log.info("Provider OFM successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="WSTLA")
+            graph.Provider.nodes.get(identifier="WSTLA")
             log.debug("Provider WSTLA already exists")
-        except neo4j.Provider.DoesNotExist:
-            ofm = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            ofm = graph.Provider()
             ofm.identifier = "WSTLA"
             ofm.scheme = "ACRO"
             ofm.name = "Wiener Stadt- und Landesarchiv"
@@ -141,10 +142,10 @@ class Initializer:
             log.info("Provider OFM successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="FDC")
+            graph.Provider.nodes.get(identifier="FDC")
             log.debug("Provider FDC already exists")
-        except neo4j.Provider.DoesNotExist:
-            fdc = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            fdc = graph.Provider()
             fdc.identifier = "FDC"
             fdc.scheme = "ACRO"
             fdc.name = "Filmoteca de Catalunya"
@@ -156,10 +157,10 @@ class Initializer:
             log.info("Provider FDC successfully created")
 
         try:
-            neo4j.Provider.nodes.get(identifier="MNC")
+            graph.Provider.nodes.get(identifier="MNC")
             log.debug("Provider MNC already exists")
-        except neo4j.Provider.DoesNotExist:
-            mnc = neo4j.Provider()
+        except graph.Provider.DoesNotExist:
+            mnc = graph.Provider()
             mnc.identifier = "MNC"
             mnc.scheme = "ACRO"
             mnc.name = "Museo Nazionale del Cinema"
