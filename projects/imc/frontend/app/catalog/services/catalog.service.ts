@@ -74,7 +74,7 @@ export class CatalogService {
     pageSize: number,
     cached: boolean = true
   ): Observable<SearchResponse> {
-    let endpoint = "search?page=" + pageIdx + "&size=" + pageSize;
+    // let endpoint = "search?page=" + pageIdx + "&size=" + pageSize;
     this._filter = filter;
     let data = {
       match: null,
@@ -88,6 +88,8 @@ export class CatalogService {
         terms: filter.terms,
         missingDate: filter.missingDate,
       },
+      page: pageIdx,
+      size: pageSize,
     };
     // FIXME: the following filter has no effect without an authentication token
     if (filter.annotated_by) {
@@ -97,7 +99,7 @@ export class CatalogService {
       data.match = { term: filter.searchTerm, fields: matchFields };
     }
     if (cached) this.cacheValues();
-    return this.api.post(endpoint, data);
+    return this.api.post("search", data);
   }
 
   /**
