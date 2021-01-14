@@ -88,7 +88,7 @@ export class CatalogService {
         terms: filter.terms,
         missingDate: filter.missingDate,
       },
-      page: pageId,
+      page: pageIdx,
       size: pageSize,
     };
     // FIXME: the following filter has no effect without an authentication token
