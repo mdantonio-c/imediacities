@@ -760,6 +760,10 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     with open(tech_info_path, encoding="utf-8", errors="ignore") as data_file:
         data = json.load(data_file)
 
+    # get metadata dict
+    if isinstance(data, list):
+        data = data[0]
+
     item.digital_format = [None for _ in range(4)]
     if item.item_type == "Video":
         # get the thumbnail assigned to a given AV digital object
