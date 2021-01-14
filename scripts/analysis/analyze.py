@@ -124,7 +124,6 @@ def init_child_proc():
 
 # -----------------------------------------------------
 def run(cmd, out_folder, out_name, err_name, cmd_name=None):
-
     if cmd_name:
         cmd_filename = os.path.join(out_folder, cmd_name)
         cmd_file = open(cmd_filename, "w")
@@ -157,7 +156,6 @@ def run(cmd, out_folder, out_name, err_name, cmd_name=None):
 
 # -----------------------------------------------------
 def get_framerate(filename):
-
     out_file = open(filename)
     if out_file is None:
         log("cant open " + filename)
@@ -182,11 +180,10 @@ def get_framerate(filename):
 def origin_tech_info(filename, out_folder):
     global TRANSCODED_FRAMERATE
 
-    cmd_list = []
-    cmd_list.append(
-        "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams"
-    )
-    cmd_list.append(filename)
+    cmd_list = [
+        "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams",
+        filename,
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
 
     res = run(cmd, out_folder, "origin_info.json", "origin_info.err", "origin_info.sh")
@@ -201,11 +198,11 @@ def origin_tech_info(filename, out_folder):
 
 # -----------------------------------------------------
 def image_origin_tech_info(filename, out_folder):
-
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    cmd_list.append(os.path.join(out_folder, "origin_info.json"))
+    cmd_list = [
+        "/usr/bin/convert",
+        filename,
+        os.path.join(out_folder, "origin_info.json"),
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
 
     res = run(cmd, out_folder, "origin_info.out", "origin_info.err", "origin_info.sh")
@@ -214,12 +211,10 @@ def image_origin_tech_info(filename, out_folder):
 
 # -----------------------------------------------------
 def transcoded_tech_info(filename, out_folder, v2=""):
-
-    cmd_list = []
-    cmd_list.append(
-        "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams"
-    )
-    cmd_list.append(filename)
+    cmd_list = [
+        "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams",
+        filename,
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
 
     res = run(
@@ -234,11 +229,11 @@ def transcoded_tech_info(filename, out_folder, v2=""):
 
 # -----------------------------------------------------
 def image_transcoded_tech_info(filename, out_folder, v2=""):
-
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    cmd_list.append(os.path.join(out_folder, v2 + "transcoded_info.json"))
+    cmd_list = [
+        "/usr/bin/convert",
+        filename,
+        os.path.join(out_folder, v2 + "transcoded_info.json"),
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
 
     res = run(
@@ -318,15 +313,9 @@ def transcode(filename, out_folder, fps, prefix=""):
 # -----------------------------------------------------
 def v2_image_transcode(filename, out_folder):
     out_filename = os.path.join(out_folder, "v2_transcoded.jpg")
-
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    # cmd_list.append('-resize')
-    # cmd_list.append('800x600\>')
-    cmd_list.append("-quality")
-    cmd_list.append("95")
-    cmd_list.append(out_filename)
+    if filename.lower().endswith((".tif",)):
+        filename += "[0]"
+    cmd_list = ["/usr/bin/convert", filename, "-quality", "95", out_filename]
     cmd = " \\\n".join(cmd_list) + "\n"
 
     if not run(
@@ -337,9 +326,9 @@ def v2_image_transcode(filename, out_folder):
 
 # -----------------------------------------------------
 def image_transcode(filename, out_folder, watermark):
-    """ transcode an image to jpg, with a compression quality of 95
-        rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
-        also save a full resolution version as transcoded_fullres.jpg
+    """transcode an image to jpg, with a compression quality of 95
+    rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
+    also save a full resolution version as transcoded_fullres.jpg
     """
 
     out_filename = os.path.join(out_folder, "transcoded.jpg")
@@ -349,28 +338,26 @@ def image_transcode(filename, out_folder, watermark):
     out_filename_logo_fullres = os.path.join(
         out_folder, "transcoded_with_logo_fullres.jpg"
     )
+    if filename.lower().endswith((".tif",)):
+        filename += "[0]"
 
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    cmd_list.append("-resize")
-    cmd_list.append(r"800x600\>")
-    cmd_list.append("-quality")
-    cmd_list.append("95")
-    cmd_list.append(out_filename)
+    # transcoded.jpg
+    cmd_list = [
+        "/usr/bin/convert",
+        filename,
+        "-resize",
+        r"800x600\>",
+        "-quality",
+        "95",
+        out_filename,
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
-
     if not run(cmd, out_folder, "transcode.log", "transcode.err", "transcode.sh"):
         return False
 
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    cmd_list.append("-quality")
-    cmd_list.append("95")
-    cmd_list.append(out_filename_fullres)
+    # transcoded_fullres.jpg
+    cmd_list = ["/usr/bin/convert", filename, "-quality", "95", out_filename_fullres]
     cmd = " \\\n".join(cmd_list) + "\n"
-
     if not run(
         cmd,
         out_folder,
@@ -380,18 +367,19 @@ def image_transcode(filename, out_folder, watermark):
     ):
         return False
 
-    cmd_list = []
-    cmd_list.append("/usr/bin/convert")
-    cmd_list.append(filename)
-    cmd_list.append("-resize")
-    cmd_list.append("80x80^")
-    cmd_list.append("-gravity")
-    cmd_list.append("center")
-    cmd_list.append("-quality")
-    cmd_list.append("95")
-    cmd_list.append(out_filename_small)
+    # transcoded_small.jpg
+    cmd_list = [
+        "/usr/bin/convert",
+        filename,
+        "-resize",
+        "80x80^",
+        "-gravity",
+        "center",
+        "-quality",
+        "95",
+        out_filename_small,
+    ]
     cmd = " \\\n".join(cmd_list) + "\n"
-
     if not run(
         cmd,
         out_folder,
@@ -402,21 +390,21 @@ def image_transcode(filename, out_folder, watermark):
         return False
 
     if watermark:
-
-        cmd_list = []
-        cmd_list.append("/usr/bin/convert")
-        cmd_list.append(out_filename)
-        cmd_list.append(watermark)
-        cmd_list.append("-geometry")
-        cmd_list.append("+10+10")
-        cmd_list.append("-gravity")
-        cmd_list.append("SouthWest")
-        cmd_list.append("-composite")
-        cmd_list.append("-quality")
-        cmd_list.append("95")
-        cmd_list.append(out_filename_logo)
+        log("transcoding with watermark...")
+        cmd_list = [
+            "/usr/bin/convert",
+            out_filename,
+            watermark,
+            "-geometry",
+            "+10+10",
+            "-gravity",
+            "SouthWest",
+            "-composite",
+            "-quality",
+            "95",
+            out_filename_logo,
+        ]
         cmd = " \\\n".join(cmd_list) + "\n"
-
         if not run(
             cmd,
             out_folder,
@@ -426,20 +414,20 @@ def image_transcode(filename, out_folder, watermark):
         ):
             return False
 
-        cmd_list = []
-        cmd_list.append("/usr/bin/convert")
-        cmd_list.append(out_filename_fullres)
-        cmd_list.append(watermark)
-        cmd_list.append("-geometry")
-        cmd_list.append("+10+10")
-        cmd_list.append("-gravity")
-        cmd_list.append("SouthWest")
-        cmd_list.append("-composite")
-        cmd_list.append("-quality")
-        cmd_list.append("95")
-        cmd_list.append(out_filename_logo_fullres)
+        cmd_list = [
+            "/usr/bin/convert",
+            out_filename_fullres,
+            watermark,
+            "-geometry",
+            "+10+10",
+            "-gravity",
+            "SouthWest",
+            "-composite",
+            "-quality",
+            "95",
+            out_filename_logo_fullres,
+        ]
         cmd = " \\\n".join(cmd_list) + "\n"
-
         if not run(
             cmd,
             out_folder,
