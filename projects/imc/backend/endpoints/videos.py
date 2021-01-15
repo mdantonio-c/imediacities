@@ -192,7 +192,7 @@ class VideoItem(IMCEndpoint):
 
 class VideoAnnotations(IMCEndpoint):
     """
-        Get all video annotations for a given video.
+    Get all video annotations for a given video.
     """
 
     labels = ["video_annotations"]
@@ -337,11 +337,12 @@ class VideoAnnotations(IMCEndpoint):
 
 class VideoShots(IMCEndpoint):
     """
-        Get the list of shots for a given video.
+    Get the list of shots for a given video.
     """
 
     labels = ["video_shots"]
 
+    @decorators.auth.optional()
     @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/shots",
@@ -364,7 +365,7 @@ class VideoShots(IMCEndpoint):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
-        user = self.get_user_if_logged()
+        user = self.get_user()
 
         item = video.item.single()
         api_url = get_backend_url()
@@ -469,7 +470,7 @@ class VideoShots(IMCEndpoint):
 
 class VideoSegments(IMCEndpoint):
     """
-        Get the list of manual segments for a given video.
+    Get the list of manual segments for a given video.
     """
 
     labels = ["video_segments", "video-segment"]
@@ -514,6 +515,7 @@ class VideoContent(IMCEndpoint, Downloader):
 
     labels = ["video"]
 
+    @decorators.auth.optional()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(VideoContentSchema, location="query")
     @decorators.endpoint(
@@ -949,12 +951,16 @@ class VideoShotRevision(IMCEndpoint):
 
         if not (item := video.item.single()):
             # 409: Video is not ready for revision. (should never be reached)
-            raise Conflict("AVEntity not correctly imported: not ready for revision!",)
+            raise Conflict(
+                "AVEntity not correctly imported: not ready for revision!",
+            )
 
         repo = CreationRepository(self.graph)
         # be sure video is under revision
         if not repo.is_video_under_revision(item):
-            raise Conflict(f"This video [{video_id}] is not under revision!",)
+            raise Conflict(
+                f"This video [{video_id}] is not under revision!",
+            )
 
         # ONLY the reviser and the administrator can provide a new list of cuts
         user = self.get_user()

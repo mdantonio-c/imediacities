@@ -190,7 +190,7 @@ class ImageItem(IMCEndpoint):
 
 class ImageAnnotations(IMCEndpoint):
     """
-        Get all image annotations for a given image.
+    Get all image annotations for a given image.
     """
 
     labels = ["image_annotations"]
@@ -273,6 +273,7 @@ class ImageContent(IMCEndpoint, Downloader):
 
     labels = ["image"]
 
+    @decorators.auth.optional()
     @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
@@ -345,7 +346,9 @@ class ImageContent(IMCEndpoint, Downloader):
             return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         # it should never be reached
-        raise BadRequest(f"Invalid content type: {content_type}",)
+        raise BadRequest(
+            f"Invalid content type: {content_type}",
+        )
 
 
 class ImageTools(IMCEndpoint):
