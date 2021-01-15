@@ -31,8 +31,9 @@ variables:
 
     CELERY_BACKEND: MONGODB
 
-    SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
-    SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
+    # SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
+    SET_CSP_SCRIPT_SRC: "https://www.wikidata.org"
+    SET_CSP_IMG_SRC: "https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org"
 
     FRONTEND_LANG: "en"
 
