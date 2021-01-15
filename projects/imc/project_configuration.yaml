@@ -7,6 +7,8 @@ project:
 variables:
   env:
     FRONTEND_FRAMEWORK: angular
+    ENABLE_FOOTER: 0
+    CORS_ALLOWED_ORIGIN: "*"
 
     AUTH_SERVICE: neo4j
 
