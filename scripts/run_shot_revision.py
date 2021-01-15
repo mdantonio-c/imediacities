@@ -1,8 +1,6 @@
-from imc.tasks.imc_tasks import shot_revision
-from restapi.connectors import get_debug_instance
-from restapi.connectors.celery import CeleryExt
+from restapi.connectors import celery
 
-obj = get_debug_instance(CeleryExt)
+obj = celery.get_instance()
 
 
 # parameters as in projects/imc/backend/apis/videos.py:1028
@@ -13,5 +11,5 @@ reviser = (
 )
 revision = {"shots": shots, "exitRevision": True, "reviser": reviser}
 args = [revision, item_id]
-task_id = shot_revision.apply_async(args=args, countdown=10)
+task_id = obj.celery_app.send_task("shot_revision", args=args, countdown=10)
 print("Task submitted: %s" % task_id)

@@ -445,7 +445,9 @@ class ImageTools(IMCEndpoint):
                 raise Conflict(
                     "Building recognition CANNOT be import twice for the same image"
                 )
-        celery_app = celery.get_instance()
-        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        c = celery.get_instance()
+        task = c.celery_app.send_task(
+            "launch_tool", args=[tool, item.uuid], countdown=10
+        )
 
         return self.response(task.id, code=202)

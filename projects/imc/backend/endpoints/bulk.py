@@ -132,7 +132,7 @@ class Bulk(IMCEndpoint):
         log.debug("Start bulk procedure...")
 
         self.graph = neo4j.get_instance()
-        self.celery = celery.get_instance()
+        c = celery.get_instance()
 
         if action := req_action.get("update"):
             # check group uid
@@ -310,7 +310,8 @@ class Bulk(IMCEndpoint):
                             if force_reprocessing:
                                 mode = "clean"
                                 metadata_update = True
-                                task = self.celery.import_file.apply_async(
+                                task = c.celery_app.send_task(
+                                    "import_file",
                                     args=[
                                         standard_path,
                                         resource.uuid,
@@ -327,8 +328,10 @@ class Bulk(IMCEndpoint):
                                 resource.save()
                                 updatedAndReprocessing += 1
                             else:
-                                task = self.celery.update_metadata.apply_async(
-                                    args=[standard_path, resource.uuid], countdown=10
+                                task = c.celery_app.send_task(
+                                    "update_metadata",
+                                    args=[standard_path, resource.uuid],
+                                    countdown=10,
                                 )
                                 log.debug("Task id={}", task.id)
                                 resource.status = "UPDATING METADATA"
@@ -343,7 +346,8 @@ class Bulk(IMCEndpoint):
                             meta_stage.ownership.connect(group)
                             log.debug("MetaStage created for source_id {}", source_id)
                             mode = "clean"
-                            task = self.celery.import_file.apply_async(
+                            task = c.celery_app.send_task(
+                                "import_file",
                                 args=[standard_path, meta_stage.uuid, mode],
                                 countdown=10,
                             )
@@ -416,7 +420,8 @@ class Bulk(IMCEndpoint):
                             )
                             mode = "clean"
                             metadata_update = True
-                            task = self.celery.import_file.apply_async(
+                            task = c.celery_app.send_task(
+                                "import_file",
                                 args=[
                                     standard_path,
                                     meta_stage.uuid,
@@ -436,8 +441,10 @@ class Bulk(IMCEndpoint):
                                 "Starting task update_metadata for meta_stage.uuid {}",
                                 meta_stage.uuid,
                             )
-                            task = self.celery.update_metadata.apply_async(
-                                args=[standard_path, meta_stage.uuid], countdown=10
+                            task = c.celery_app.send_task(
+                                "update_metadata",
+                                args=[standard_path, meta_stage.uuid],
+                                countdown=10,
                             )
                             log.info("Task id={}", task.id)
                             meta_stage.status = "UPDATING METADATA"
@@ -560,8 +567,8 @@ class Bulk(IMCEndpoint):
                 resource.ownership.connect(group)
                 log.debug("Metadata Resource created for {}", path)
 
-            task = self.celery.import_file.apply_async(
-                args=[path, resource.uuid, mode], countdown=10
+            task = c.celery_app.send_task(
+                "import_file", args=[path, resource.uuid, mode], countdown=10
             )
 
             resource.status = "IMPORTING"
@@ -622,8 +629,8 @@ class Bulk(IMCEndpoint):
                     continue
                 # launch here async task
                 path = os.path.join(upload_dir, f)
-                self.celery.load_v2.apply_async(
-                    args=[path, item.uuid, retry], countdown=10
+                c.celery_app.send_task(
+                    "load_v2", args=[path, item.uuid, retry], countdown=10
                 )
                 imported += 1
 

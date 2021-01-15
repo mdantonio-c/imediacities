@@ -769,8 +769,10 @@ class VideoTools(IMCEndpoint):
                     "Building recognition CANNOT be import twice for the same video"
                 )
 
-        celery_app = celery.get_instance()
-        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        c = celery.get_instance()
+        task = c.celery_app.send_task(
+            "launch_tool", args=[tool, item.uuid], countdown=10
+        )
 
         return self.response(task.id, code=202)
 
@@ -976,9 +978,9 @@ class VideoShotRevision(IMCEndpoint):
 
         # launch async task
         try:
-            celery_app = celery.get_instance()
-            task = celery_app.shot_revision.apply_async(
-                args=[revision, item.uuid], countdown=10, priority=5
+            c = celery.get_instance()
+            task = c.celery_app.send_task(
+                "shot_revision", args=[revision, item.uuid], countdown=10, priority=5
             )
             assignee = item.revision.single()
             rel = item.revision.relationship(assignee)
