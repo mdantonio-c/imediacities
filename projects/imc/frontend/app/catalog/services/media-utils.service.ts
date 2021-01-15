@@ -1,20 +1,23 @@
 import { Injectable } from "@angular/core";
+import { environment } from "@rapydo/../environments/environment";
+
+export const LANG = environment.CUSTOM.FRONTEND_LANG || "en";
 
 @Injectable()
 export class MediaUtilsService {
-  static getIdentifyingTitle(media: any): string {
+  static getIdentifyingTitle(media: any, lang = LANG): string {
     let identifyingTitle: string;
     let entityType: string = media.type;
     if (entityType === "aventity") {
       // aventity: metadata comes with identitying_title
       identifyingTitle = media.identifying_title;
     } else {
-      // nonaventity: first choice in english
+      // nonaventity: first choice in the given lang (default english)
       for (let t of media._titles) {
         if (
           t.hasOwnProperty("language") &&
           t.language &&
-          t.language.key === "en"
+          t.language.key === lang
         ) {
           identifyingTitle = t.text;
           break;
@@ -28,7 +31,7 @@ export class MediaUtilsService {
     return identifyingTitle;
   }
 
-  static getDescription(media: any, lang: string = "en"): string {
+  static getDescription(media: any, lang = LANG): string {
     let description: string;
     let first: boolean = true;
     if (!media._descriptions) return null;
