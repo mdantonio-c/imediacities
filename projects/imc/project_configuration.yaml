@@ -36,6 +36,7 @@ variables:
     SET_CSP_IMG_SRC: "https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org"
 
     FRONTEND_LANG: "en"
+    FRONTEND_DISABLED_FILTERS: ""
 
   roles:
     normal_user: User
