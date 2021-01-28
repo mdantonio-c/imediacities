@@ -185,7 +185,7 @@ def create_record():
             isinstance(date_created, str) and is_blank(date_created)
         ):
             raise ValueError("Missing dateCreated")
-        ET.SubElement(creation, "date_created").text = (
+        ET.SubElement(creation, "dateCreated").text = (
             date_created.strip()
             if isinstance(date_created, str)
             else date_created.strftime("%Y-%m-%d")
