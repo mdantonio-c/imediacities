@@ -40,11 +40,11 @@ export class ListsService {
   }
 
   updateList(listId: string, data: any) {
-    return this.api.put("lists", listId, data);
+    return this.api.put(`lists/${listId}`, data);
   }
 
   removeList(listId: string) {
-    return this.api.delete("lists", listId);
+    return this.api.delete(`lists/${listId}`);
   }
 
   getListItems(listId: string): Observable<any[]> {
@@ -61,11 +61,11 @@ export class ListsService {
   }
 
   removeItemfromList(itemId: string, listId: string) {
-    return this.api.delete(`lists/${listId}/items`, itemId);
+    return this.api.delete(`lists/${listId}/items/${itemId}`);
   }
 
   create(list: UserList) {
-    return this.api.post("lists", list);
+    return this.api.post("lists", list as any);
   }
 
   selectList(list) {

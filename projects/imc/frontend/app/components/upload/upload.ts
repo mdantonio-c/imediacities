@@ -138,7 +138,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
       },
     };
     this.api
-      .get<HttpResponse<ArrayBuffer>>(`download/${filename}`, "", {}, options)
+      .get<HttpResponse<ArrayBuffer>>(`download/${filename}`, {}, options)
       .subscribe(
         (response) => {
           let contentType =

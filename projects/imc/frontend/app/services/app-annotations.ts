@@ -129,8 +129,7 @@ export class AppAnnotationsService {
       : `textual:${annotation.name}`;
     this.api
       .delete(
-        "annotations",
-        `${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
+        `annotations/${annotation.id}?body_ref=${encodeURIComponent(bodyRef)}`
       )
       .subscribe(
         (response) => {
@@ -146,7 +145,7 @@ export class AppAnnotationsService {
   }
   update_note_private(note, new_private) {
     this.api
-      .put<any>("annotations", `${note.id}`, {
+      .put<any>(`annotations/${note.id}`, {
         body: AppAnnotationsService.textual_body_2(note),
         private: new_private,
       })
@@ -161,7 +160,7 @@ export class AppAnnotationsService {
       );
   }
   delete_anno(annotation, media_type) {
-    this.api.delete("annotations", `${annotation.id}`).subscribe(
+    this.api.delete(`annotations/${annotation.id}`).subscribe(
       (response) => {
         console.log("media_type", media_type);
         if (media_type === "video") {
@@ -177,7 +176,7 @@ export class AppAnnotationsService {
   }
 
   get(media_id, endpoint) {
-    this.api.get<any[]>(endpoint, `${media_id}/annotations`).subscribe(
+    this.api.get<any[]>(`${endpoint}/${media_id}/annotations`).subscribe(
       (response) => {
         this._annotations = response;
         this.update.emit(this._annotations);

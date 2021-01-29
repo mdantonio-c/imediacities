@@ -23,7 +23,7 @@ export class ArchivesListComponent {
   list() {
     this.spinner.show();
     this.api
-      .get<Group[]>("admin/groups", "", {}, { validationSchema: "Groups" })
+      .get<Group[]>("admin/groups", {}, { validationSchema: "Groups" })
       .subscribe(
         (response) => {
           this.groups = response;

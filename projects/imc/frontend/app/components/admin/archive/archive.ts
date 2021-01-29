@@ -67,7 +67,7 @@ export class ArchiveComponent implements OnInit {
       size: 100,
     };
     this.api
-      .get<File[]>("stage/" + this.group.uuid, "", data, {
+      .get<File[]>(`stage/${this.group.uuid}`, data, {
         validationSchema: "Files",
       })
       .subscribe(
