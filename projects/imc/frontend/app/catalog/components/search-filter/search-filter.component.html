@@ -1,9 +1,7 @@
 <div class="search-filter card">
   <div class="search-filter-header">
     <i class="material-icons bigger-130 d-inline">tune</i>
-    <h5 class="smaller no-margin-bottom">
-      &nbsp; Refine your Search
-    </h5>
+    <h5 class="smaller no-margin-bottom">&nbsp; Refine your Search</h5>
   </div>
   <div class="card-body p-2">
     <div class="space-8"></div>
@@ -17,7 +15,7 @@
               name="searchTerm"
               formControlName="searchTerm"
               placeholder="Search in title, keyword, description"
-              style="width: 80%;"
+              style="width: 80%"
             />
             <div class="input-group-append">
               <ng-template #tipContent>
@@ -38,7 +36,7 @@
               >
                 <i
                   class="material-icons"
-                  style="width: 1.2rem; height: 1rem; cursor: pointer;"
+                  style="width: 1.2rem; height: 1rem; cursor: pointer"
                   >info</i
                 >
               </button>
@@ -48,229 +46,245 @@
       </div>
 
       <div class="hr hr-dotted"></div>
-      <h4 class="smaller">
-        <i class="fa fa-filter bigger-110"></i>
-        Content type
-      </h4>
-      <div class="row">
-        <div class="col col-sm-11 col-md-10">
-          <div class="btn-group btn-group-toggle">
-            <label
-              class="btn-basic imc-search-filter"
-              ngbButtonLabel
-              (click)="verifyItemType('video')"
-            >
-              <input type="checkbox" formControlName="videoType" ngbButton />
-              <i class="material-icons button-filter">videocam</i>
-            </label>
-            <label
-              class="btn-basic imc-search-filter"
-              ngbButtonLabel
-              (click)="verifyItemType('image')"
-            >
-              <input type="checkbox" formControlName="imageType" ngbButton />
-              <i class="material-icons button-filter">photo_camera</i>
-            </label>
+      <ng-container *ngIf="!disabled_filters.includes('content_type')">
+        <h4 class="smaller">
+          <i class="fa fa-filter bigger-110"></i>
+          Content type
+        </h4>
+        <div class="row">
+          <div class="col col-sm-11 col-md-10">
+            <div class="btn-group btn-group-toggle">
+              <label
+                class="btn-basic imc-search-filter"
+                ngbButtonLabel
+                (click)="verifyItemType('video')"
+              >
+                <input type="checkbox" formControlName="videoType" ngbButton />
+                <i class="material-icons button-filter">videocam</i>
+              </label>
+              <label
+                class="btn-basic imc-search-filter"
+                ngbButtonLabel
+                (click)="verifyItemType('image')"
+              >
+                <input type="checkbox" formControlName="imageType" ngbButton />
+                <i class="material-icons button-filter">photo_camera</i>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="hr hr-dotted"></div>
-      <h4 class="smaller">
-        <i class="fa fa-tags"></i>
-        Terms
-      </h4>
-      <div class="row no-gutters imc--flex--vertical-end">
-        <div class="col-12">
-          <div class="form-group">
-            <div class="input-group">
-              <input
-                type="text"
-                class="imc--input"
-                placeholder="Search by term"
-                aria-label="Tag"
-                formControlName="term"
-                [ngbTypeahead]="searchByTerm"
-                [inputFormatter]="formatter"
-                [resultTemplate]="rt"
-                (selectItem)="selectTerm($event)"
-                (keydown.enter)="$event.preventDefault()"
-                style="width: 80%;"
-              />
-              <div class="input-group-append">
-                <button
-                  class="btn-reset"
-                  type="button"
-                  (click)="addTerm(searchForm.get('term').value)"
-                >
-                  <i
-                    class="material-icons"
-                    style="width: 1.2rem; height: 1rem; cursor: pointer;"
-                    >add_box</i
+        <div class="hr hr-dotted"></div>
+      </ng-container>
+      <ng-container *ngIf="!disabled_filters.includes('terms')">
+        <h4 class="smaller">
+          <i class="fa fa-tags"></i>
+          Terms
+        </h4>
+        <div class="row no-gutters imc--flex--vertical-end">
+          <div class="col-12">
+            <div class="form-group">
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="imc--input"
+                  placeholder="Search by term"
+                  aria-label="Tag"
+                  formControlName="term"
+                  [ngbTypeahead]="searchByTerm"
+                  [inputFormatter]="formatter"
+                  [resultTemplate]="rt"
+                  (selectItem)="selectTerm($event)"
+                  (keydown.enter)="$event.preventDefault()"
+                  style="width: 80%"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn-reset"
+                    type="button"
+                    (click)="addTerm(searchForm.get('term').value)"
                   >
-                </button>
+                    <i
+                      class="material-icons"
+                      style="width: 1.2rem; height: 1rem; cursor: pointer"
+                      >add_box</i
+                    >
+                  </button>
+                </div>
               </div>
+              <ng-template #rt let-r="result" let-t="term">
+                {{ r.name }}
+              </ng-template>
             </div>
-            <ng-template #rt let-r="result" let-t="term">
-              {{ r.name }}
+          </div>
+          <!-- just inserted tags -->
+          <div class="col-12 new-badge mb-2">
+            <ng-template ngFor let-term [ngForOf]="terms">
+              <app-media-annotation
+                [annotation]="term"
+                [lang]="lang"
+                [can_delete]="true"
+                [disable_confirmation]="true"
+                (click)="removeTerm(term)"
+              ></app-media-annotation>
             </ng-template>
           </div>
-        </div>
-        <!-- just inserted tags -->
-        <div class="col-12 new-badge mb-2">
-          <ng-template ngFor let-term [ngForOf]="terms">
-            <app-media-annotation
-              [annotation]="term"
-              [lang]="lang"
-              [can_delete]="true"
-              [disable_confirmation]="true"
-              (click)="removeTerm(term)"
-            ></app-media-annotation>
-          </ng-template>
-        </div>
-        <div
-          class="imc--container-tree"
-          style="max-height: 250px; overflow-y: auto;"
-        >
-          <ul *ngIf="vocabulary">
-            <li *ngFor="let term of vocabulary.terms">
-              <h3>
-                <span class="term" (click)="expandTerm(term)">
-                  <span [innerHTML]="term.label[lang] || term.label.en"></span>
-                  <i class="material-icons" *ngIf="!term.open"
-                    >keyboard_arrow_down</i
-                  >
-                  <i class="material-icons" *ngIf="term.open"
-                    >keyboard_arrow_up</i
-                  >
-                </span>
-              </h3>
-              <ul class="term-list" [ngClass]="{ 'display-none': !term.open }">
-                <li *ngFor="let child of term.children">
-                  <span class="term" (click)="expandTerm(child, term)">
+          <div
+            class="imc--container-tree"
+            style="max-height: 250px; overflow-y: auto"
+          >
+            <ul *ngIf="vocabulary">
+              <li *ngFor="let term of vocabulary.terms">
+                <h3>
+                  <span class="term" (click)="expandTerm(term)">
                     <span
-                      [innerHTML]="child.label[lang] || child.label.en"
+                      [innerHTML]="term.label[lang] || term.label.en"
                     ></span>
-                    <i class="material-icons" *ngIf="!child.open"
+                    <i class="material-icons" *ngIf="!term.open"
                       >keyboard_arrow_down</i
                     >
-                    <i class="material-icons" *ngIf="child.open"
+                    <i class="material-icons" *ngIf="term.open"
                       >keyboard_arrow_up</i
                     >
                   </span>
-                  <ul
-                    class="child-list"
-                    [ngClass]="{ 'display-none': !child.open }"
-                  >
-                    <li *ngFor="let leaf of child.children">
-                      <span class="term" (click)="vocabularyLeaf(leaf)">
-                        <span
-                          [innerHTML]="leaf.label[lang] || leaf.label.en"
-                        ></span>
-                        <i
-                          *ngIf="leaf.selected"
-                          class="material-icons icon-check-vocabulary"
-                          >check</i
-                        >
-                      </span>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="hr hr-dotted"></div>
-      <h4 class="smaller">
-        <i class="fa fa-map-marker light-orange bigger-110"></i>
-        City
-      </h4>
-      <div>
-        <select formControlName="city" class="form-control">
-          <option value=""></option>
-          <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
-        </select>
-      </div>
-      <div class="hr hr-dotted"></div>
-      <h4 class="smaller">
-        <button
-          type="button"
-          id="missingDateButtonId"
-          class="btn btn-icon-invisible"
-          (click)="changeMissingDate()"
-          placement="right"
-          ngbTooltip="{{ prodDateTooltip }}"
-        >
-          <span *ngIf="missingDateParam" class="fa-stack">
-            <i class="fa fa-calendar fa-stack-1x"></i>
-            <i class="fa fa-ban fa-stack-2x text-danger"></i>
-          </span>
-          <i *ngIf="!missingDateParam" class="fa fa-calendar fa-stack"></i>
-        </button>
-        Production Date
-      </h4>
-      <div
-        id="divDateSliderId"
-        class="search-filter-element"
-        [ngClass]="{ 'date-div-disabled': missingDateParam }"
-      >
-        <div class="form-group">
-          <div class="input-group date-range">
-            <div class="input-group-prepend">
-              <span class="input-group-text">Year range</span>
-            </div>
-            <div class="input-wrapper">
-              <input
-                type="number"
-                class="form-control"
-                formControlName="productionYearFrom"
-                name="productionYearFrom"
-                [min]="minProductionYear"
-                [max]="maxProductionYear"
-              />
-              <input
-                type="number"
-                class="form-control"
-                formControlName="productionYearTo"
-                name="productionYearTo"
-                [min]="minProductionYear"
-                [max]="maxProductionYear"
-              />
-            </div>
-          </div>
-          <div class="space-4"></div>
-          <div class="mx-2 mt-4">
-            <mv-slider
-              #rangeSlider
-              id="imc-slider"
-              [range]="true"
-              [(value)]="rangeValue"
-              [min]="minProductionYear"
-              [max]="maxProductionYear"
-              [step]="1"
-              [ticks]="sliderTicks"
-              [ticksLabels]="sliderTicks"
-              (change)="updateSlider($event.newValue)"
-            ></mv-slider>
+                </h3>
+                <ul
+                  class="term-list"
+                  [ngClass]="{ 'display-none': !term.open }"
+                >
+                  <li *ngFor="let child of term.children">
+                    <span class="term" (click)="expandTerm(child, term)">
+                      <span
+                        [innerHTML]="child.label[lang] || child.label.en"
+                      ></span>
+                      <i class="material-icons" *ngIf="!child.open"
+                        >keyboard_arrow_down</i
+                      >
+                      <i class="material-icons" *ngIf="child.open"
+                        >keyboard_arrow_up</i
+                      >
+                    </span>
+                    <ul
+                      class="child-list"
+                      [ngClass]="{ 'display-none': !child.open }"
+                    >
+                      <li *ngFor="let leaf of child.children">
+                        <span class="term" (click)="vocabularyLeaf(leaf)">
+                          <span
+                            [innerHTML]="leaf.label[lang] || leaf.label.en"
+                          ></span>
+                          <i
+                            *ngIf="leaf.selected"
+                            class="material-icons icon-check-vocabulary"
+                            >check</i
+                          >
+                        </span>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
-      <div class="hr hr-dotted"></div>
-      <h4 class="smaller">
-        <i class="fa fa-copyright light-grey bigger-110"></i>
-        Rights Status
-      </h4>
-      <div>
-        <select formControlName="iprstatus" class="form-control down-arrow">
-          <option value=""></option>
-          <option
-            *ngFor="let iprstatus of iprstatuses"
-            [ngValue]="iprstatus.code"
-            >{{ iprstatus.name }}</option
+        <div class="hr hr-dotted"></div>
+      </ng-container>
+      <ng-container *ngIf="!disabled_filters.includes('city')">
+        <h4 class="smaller">
+          <i class="fa fa-map-marker light-orange bigger-110"></i>
+          City
+        </h4>
+        <div>
+          <select formControlName="city" class="form-control">
+            <option value=""></option>
+            <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="hr hr-dotted"></div>
+      </ng-container>
+      <ng-container *ngIf="!disabled_filters.includes('production_date')">
+        <h4 class="smaller">
+          <button
+            type="button"
+            id="missingDateButtonId"
+            class="btn btn-icon-invisible"
+            (click)="changeMissingDate()"
+            placement="right"
+            ngbTooltip="{{ prodDateTooltip }}"
           >
-        </select>
-      </div>
-      <div class="hr hr-dotted hr-24"></div>
+            <span *ngIf="missingDateParam" class="fa-stack">
+              <i class="fa fa-calendar fa-stack-1x"></i>
+              <i class="fa fa-ban fa-stack-2x text-danger"></i>
+            </span>
+            <i *ngIf="!missingDateParam" class="fa fa-calendar fa-stack"></i>
+          </button>
+          Production Date
+        </h4>
+        <div
+          id="divDateSliderId"
+          class="search-filter-element"
+          [ngClass]="{ 'date-div-disabled': missingDateParam }"
+        >
+          <div class="form-group">
+            <div class="input-group date-range">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Year range</span>
+              </div>
+              <div class="input-wrapper">
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="productionYearFrom"
+                  name="productionYearFrom"
+                  [min]="minProductionYear"
+                  [max]="maxProductionYear"
+                />
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="productionYearTo"
+                  name="productionYearTo"
+                  [min]="minProductionYear"
+                  [max]="maxProductionYear"
+                />
+              </div>
+            </div>
+            <div class="space-4"></div>
+            <div class="mx-2 mt-4">
+              <mv-slider
+                #rangeSlider
+                id="imc-slider"
+                [range]="true"
+                [(value)]="rangeValue"
+                [min]="minProductionYear"
+                [max]="maxProductionYear"
+                [step]="1"
+                [ticks]="sliderTicks"
+                [ticksLabels]="sliderTicks"
+                (change)="updateSlider($event.newValue)"
+              ></mv-slider>
+            </div>
+          </div>
+        </div>
+        <div class="hr hr-dotted"></div>
+      </ng-container>
+      <ng-container *ngIf="!disabled_filters.includes('rights_status')">
+        <h4 class="smaller">
+          <i class="fa fa-copyright light-grey bigger-110"></i>
+          Rights Status
+        </h4>
+        <div>
+          <select formControlName="iprstatus" class="form-control down-arrow">
+            <option value=""></option>
+            <option
+              *ngFor="let iprstatus of iprstatuses"
+              [ngValue]="iprstatus.code"
+            >
+              {{ iprstatus.name }}
+            </option>
+          </select>
+        </div>
+        <div class="hr hr-dotted hr-24"></div>
+      </ng-container>
       <div class="text-center">
         <button
           type="button"

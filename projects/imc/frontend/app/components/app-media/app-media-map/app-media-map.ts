@@ -614,6 +614,15 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     console.log('Checkpoint fit_bounds');
     var componentRef = this;
 
+
+    let mIcon = L.icon({
+      iconUrl: '/app/custom/assets/images/marker-icon.png',
+      iconSize:     [25, 41], // size of the icon
+      iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+
     if (this.osmap) {
       if (this._markers.length) {
         var mks = [];
@@ -629,7 +638,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
             }
           }
           if(!found) { 
-            let m = L.marker([l.spatial[0], l.spatial[1]]).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
+            let m = L.marker([l.spatial[0], l.spatial[1]], {icon: mIcon}).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
             m.properties = l;
             mks.push(m);
             console.log('Checkpoint marker' , l);
@@ -714,8 +723,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         location_to_find = 'ccb';
       }
 
+      // SPECIFICO PER DARE RAVENNA
+      this.centerCoords(44.420620, 12.209512);
 
-           
+
+    /*       
       if (location_to_find) {
         this.centerCity(location_to_find.toUpperCase());
 /*
@@ -742,9 +754,22 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
           (error) => { console.error("GEOCODING ERROR ", error)}
         );
         this._subscription.add(geocode);
-        */
+        * /
       }
+
+      */
     }
+  }
+
+  /**
+   *  Center the map on the given coordinates
+   * 
+   * @param llat guess what is it
+   * @param llng guess also this
+   */
+  centerCoords = function(llat, llng) {
+    this.osmap.setView(new L.LatLng(llat, llng), 14);
+    this.center = { lat: llat, lng: llng };
   }
 
     /**

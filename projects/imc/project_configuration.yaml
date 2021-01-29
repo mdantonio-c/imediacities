@@ -36,6 +36,7 @@ variables:
     SET_CSP_CONNECT_SRC: "https://nominatim.openstreetmap.org"
 
     FRONTEND_LANG: "en"
+    FRONTEND_DISABLED_FILTERS: ""
 
   roles:
     normal_user: User

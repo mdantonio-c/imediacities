@@ -37,6 +37,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   missingDateParam: boolean = true;
   prodDateTooltip: string = this.enableProdDateText;
   readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
+  readonly disabled_filters = [];
 
   @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<
     SearchFilter
@@ -57,6 +58,11 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       productionYearTo: [1999],
       iprstatus: [null],
     });
+    if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
+      this.disabled_filters = environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(
+        ","
+      );
+    }
   }
 
   ngOnInit() {
