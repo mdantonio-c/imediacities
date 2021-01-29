@@ -37,6 +37,7 @@ variables:
     SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
 
     FRONTEND_LANG: "en"
+    FRONTEND_DISABLED_FILTERS: ""
 
   roles:
     normal_user: User

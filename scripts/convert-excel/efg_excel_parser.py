@@ -180,16 +180,18 @@ def create_record():
             production_year.text = y.strip()
     else:
         # dateCreated
-        date_created = ws.cell(row=row_idx, column=headers["dateCreated"]).value
-        if not date_created or (
-            isinstance(date_created, str) and is_blank(date_created)
-        ):
-            raise ValueError("Missing dateCreated")
-        ET.SubElement(creation, "date_created").text = (
-            date_created.strip()
-            if isinstance(date_created, str)
-            else date_created.strftime("%Y-%m-%d")
-        )
+        if "dateCreated" in headers:
+            date_created = ws.cell(row=row_idx, column=headers["dateCreated"]).value
+            if date_created and (
+                not isinstance(date_created, str) or not is_blank(date_created)
+            ):
+                if isinstance(date_created, int):
+                    date_created = str(date_created)
+                ET.SubElement(creation, "dateCreated").text = (
+                    date_created.strip()
+                    if isinstance(date_created, str)
+                    else date_created.strftime("%Y-%m-%d")
+                )
 
     # keywords (0-N)
     keywords = lookup_fields(row_idx, start_with="keywords")
@@ -351,7 +353,7 @@ def check_mandatory_columns():
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")
     elif ws.title == "Image":
-        for col in ["dateCreated", "specificType"]:
+        for col in ["specificType"]:
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")
 
