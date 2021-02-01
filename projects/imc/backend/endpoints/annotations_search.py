@@ -12,7 +12,6 @@ from restapi.models import fields
 
 class SearchAnnotations(IMCEndpoint):
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {"filtering": fields.Nested(AnnotationSearch, data_key="filter")}
     )

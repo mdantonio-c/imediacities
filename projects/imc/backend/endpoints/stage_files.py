@@ -72,7 +72,6 @@ class Stage(IMCEndpoint):
         return parser.get_creation_ref(path)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.endpoint(
         path="/stage",
@@ -200,7 +199,6 @@ class Stage(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "filename": fields.Str(
@@ -405,7 +403,6 @@ class Stage(IMCEndpoint):
         return self.response(task.id)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/stage/<filename>",
         summary="Delete a file from the stage area",

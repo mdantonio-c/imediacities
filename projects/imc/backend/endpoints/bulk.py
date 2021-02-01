@@ -67,7 +67,6 @@ class Bulk(IMCEndpoint):
         return os.path.join(path, found_dir)
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(BulkSchema)
     @decorators.endpoint(
         path="/bulk",

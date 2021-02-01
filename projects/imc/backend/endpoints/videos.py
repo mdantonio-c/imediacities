@@ -43,7 +43,6 @@ class Videos(IMCEndpoint):
 
     labels = ["video"]
 
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>",
         summary="List of videos",
@@ -112,7 +111,6 @@ class Videos(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/videos/<video_id>",
@@ -140,7 +138,6 @@ class Videos(IMCEndpoint):
 
 class VideoItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -197,7 +194,6 @@ class VideoAnnotations(IMCEndpoint):
 
     labels = ["video_annotations"]
 
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -343,7 +339,6 @@ class VideoShots(IMCEndpoint):
     labels = ["video_shots"]
 
     @decorators.auth.optional()
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/shots",
         summary="Gets video shots",
@@ -476,7 +471,6 @@ class VideoSegments(IMCEndpoint):
     labels = ["video_segments", "video-segment"]
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/segments/<segment_id>",
         summary="Gets all manual segments for a video.",
@@ -516,7 +510,6 @@ class VideoContent(IMCEndpoint, Downloader):
     labels = ["video"]
 
     @decorators.auth.optional()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(VideoContentSchema, location="query")
     @decorators.endpoint(
         path="/videos/<video_id>/content",
@@ -614,7 +607,6 @@ class VideoContent(IMCEndpoint, Downloader):
         # it should never be reached
         raise BadRequest(f"Invalid content type: {content_type}")
 
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -680,7 +672,6 @@ class VideoTools(IMCEndpoint):
     labels = ["video_tools"]
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "tool": fields.String(
@@ -798,7 +789,6 @@ class VideoShotRevision(IMCEndpoint):
     #                           uuid = fields.UUID(required=True)
     #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "input_assignee": fields.Str(
@@ -849,7 +839,6 @@ class VideoShotRevision(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -928,7 +917,6 @@ class VideoShotRevision(IMCEndpoint):
         return self.empty_response()
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(ShotRevision)
     @decorators.endpoint(
         path="/videos/<video_id>/shot-revision",
@@ -992,7 +980,6 @@ class VideoShotRevision(IMCEndpoint):
             raise e
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/shot-revision",
         summary="Take off revision from a video.",

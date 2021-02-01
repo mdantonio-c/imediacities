@@ -21,7 +21,6 @@ class Search(IMCEndpoint):
     allowed_anno_types = ("TAG", "DSC", "LNK")
 
     @decorators.auth.optional()
-    @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.use_kwargs(SearchCriteria)
     @decorators.endpoint(

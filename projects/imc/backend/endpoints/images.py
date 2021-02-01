@@ -28,7 +28,6 @@ class Images(IMCEndpoint):
 
     labels = ["image"]
 
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/images/<image_id>",
         summary="List of images",
@@ -93,7 +92,6 @@ class Images(IMCEndpoint):
     """
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/images",
@@ -107,7 +105,6 @@ class Images(IMCEndpoint):
         return self.empty_response()
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/images/<image_id>",
@@ -136,7 +133,6 @@ class Images(IMCEndpoint):
 
 class ImageItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -195,7 +191,6 @@ class ImageAnnotations(IMCEndpoint):
 
     labels = ["image_annotations"]
 
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -274,7 +269,6 @@ class ImageContent(IMCEndpoint, Downloader):
     labels = ["image"]
 
     @decorators.auth.optional()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
@@ -356,7 +350,6 @@ class ImageTools(IMCEndpoint):
     labels = ["image_tools"]
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "tool": fields.String(

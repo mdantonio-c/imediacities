@@ -22,11 +22,12 @@ class Lists(IMCEndpoint):
     labels = ["list"]
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "r_uuid": fields.Str(
-                required=False, data_key="researcher", description="Researcher uuid",
+                required=False,
+                data_key="researcher",
+                description="Researcher uuid",
             ),
             "belong_item": fields.Str(
                 required=False,
@@ -34,7 +35,9 @@ class Lists(IMCEndpoint):
                 description="Item uuid (used to check whether the item belongs to the list or not)",
             ),
             "nb_items": fields.Bool(
-                required=False, missing=False, data_key="includeNumberOfItems",
+                required=False,
+                missing=False,
+                data_key="includeNumberOfItems",
             ),
         },
         location="query",
@@ -74,8 +77,10 @@ class Lists(IMCEndpoint):
         user_match = ""
         optional_match = ""
         if researcher:
-            user_match = "MATCH (n)-[:LST_BELONGS_TO]->(:User {{uuid:'{user}'}})".format(
-                user=researcher.uuid
+            user_match = (
+                "MATCH (n)-[:LST_BELONGS_TO]->(:User {{uuid:'{user}'}})".format(
+                    user=researcher.uuid
+                )
             )
             log.debug("researcher: {} {}", researcher.name, researcher.surname)
 
@@ -156,7 +161,6 @@ class Lists(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
@@ -202,7 +206,6 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(created_list), code=201)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
@@ -240,7 +243,9 @@ class Lists(IMCEndpoint):
             "MATCH (l:List) WHERE l.uuid <> '{uuid}'"
             " MATCH (l)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
             " WHERE l.name =~ '(?i){name}' return l".format(
-                uuid=list_id, user=user.uuid, name=self.graph.sanitize_input(name),
+                uuid=list_id,
+                user=user.uuid,
+                name=self.graph.sanitize_input(name),
             )
         )
         duplicate = [self.graph.List.inflate(row[0]) for row in results]
@@ -254,7 +259,6 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(updated_list))
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/lists/<list_id>",
@@ -299,7 +303,6 @@ class ListItems(IMCEndpoint):
     labels = ["list_items"]
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/lists/<list_id>/items/<item_id>",
         summary="List of items in a list.",
@@ -321,7 +324,7 @@ class ListItems(IMCEndpoint):
         },
     )
     def get(self, list_id, item_id=None):
-        """ Get all the items of a list or a certain item of that list if an
+        """Get all the items of a list or a certain item of that list if an
         item id is provided."""
         self.graph = neo4j.get_instance()
         try:
@@ -370,7 +373,6 @@ class ListItems(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(Target)
     @decorators.endpoint(
@@ -431,7 +433,6 @@ class ListItems(IMCEndpoint):
         self.empty_response()
 
     @decorators.auth.require_all("Researcher")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/lists/<list_id>/items/<item_id>",

@@ -16,7 +16,6 @@ class Shots(IMCEndpoint):
 
     labels = ["shot"]
 
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
@@ -71,13 +70,12 @@ class Shots(IMCEndpoint):
 
 class ShotAnnotations(IMCEndpoint):
     """
-        Get all shot annotations for a given shot.
+    Get all shot annotations for a given shot.
     """
 
     labels = ["shot_annotations"]
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
