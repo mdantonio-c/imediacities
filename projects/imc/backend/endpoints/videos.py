@@ -43,7 +43,6 @@ class Videos(IMCEndpoint):
 
     labels = ["video"]
 
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>",
         summary="List of videos",
@@ -112,7 +111,6 @@ class Videos(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/videos/<video_id>",
@@ -140,7 +138,6 @@ class Videos(IMCEndpoint):
 
 class VideoItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -192,12 +189,11 @@ class VideoItem(IMCEndpoint):
 
 class VideoAnnotations(IMCEndpoint):
     """
-        Get all video annotations for a given video.
+    Get all video annotations for a given video.
     """
 
     labels = ["video_annotations"]
 
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -337,12 +333,12 @@ class VideoAnnotations(IMCEndpoint):
 
 class VideoShots(IMCEndpoint):
     """
-        Get the list of shots for a given video.
+    Get the list of shots for a given video.
     """
 
     labels = ["video_shots"]
 
-    @decorators.catch_graph_exceptions
+    @decorators.auth.optional()
     @decorators.endpoint(
         path="/videos/<video_id>/shots",
         summary="Gets video shots",
@@ -364,7 +360,7 @@ class VideoShots(IMCEndpoint):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
-        user = self.get_user_if_logged()
+        user = self.get_user()
 
         item = video.item.single()
         api_url = get_backend_url()
@@ -469,13 +465,12 @@ class VideoShots(IMCEndpoint):
 
 class VideoSegments(IMCEndpoint):
     """
-        Get the list of manual segments for a given video.
+    Get the list of manual segments for a given video.
     """
 
     labels = ["video_segments", "video-segment"]
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/segments/<segment_id>",
         summary="Gets all manual segments for a video.",
@@ -514,7 +509,7 @@ class VideoContent(IMCEndpoint, Downloader):
 
     labels = ["video"]
 
-    @decorators.catch_graph_exceptions
+    @decorators.auth.optional()
     @decorators.use_kwargs(VideoContentSchema, location="query")
     @decorators.endpoint(
         path="/videos/<video_id>/content",
@@ -612,7 +607,6 @@ class VideoContent(IMCEndpoint, Downloader):
         # it should never be reached
         raise BadRequest(f"Invalid content type: {content_type}")
 
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -678,7 +672,6 @@ class VideoTools(IMCEndpoint):
     labels = ["video_tools"]
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "tool": fields.String(
@@ -767,8 +760,10 @@ class VideoTools(IMCEndpoint):
                     "Building recognition CANNOT be import twice for the same video"
                 )
 
-        celery_app = celery.get_instance()
-        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        c = celery.get_instance()
+        task = c.celery_app.send_task(
+            "launch_tool", args=[tool, item.uuid], countdown=10
+        )
 
         return self.response(task.id, code=202)
 
@@ -794,7 +789,6 @@ class VideoShotRevision(IMCEndpoint):
     #                           uuid = fields.UUID(required=True)
     #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "input_assignee": fields.Str(
@@ -845,7 +839,6 @@ class VideoShotRevision(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -924,7 +917,6 @@ class VideoShotRevision(IMCEndpoint):
         return self.empty_response()
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(ShotRevision)
     @decorators.endpoint(
         path="/videos/<video_id>/shot-revision",
@@ -949,12 +941,16 @@ class VideoShotRevision(IMCEndpoint):
 
         if not (item := video.item.single()):
             # 409: Video is not ready for revision. (should never be reached)
-            raise Conflict("AVEntity not correctly imported: not ready for revision!",)
+            raise Conflict(
+                "AVEntity not correctly imported: not ready for revision!",
+            )
 
         repo = CreationRepository(self.graph)
         # be sure video is under revision
         if not repo.is_video_under_revision(item):
-            raise Conflict(f"This video [{video_id}] is not under revision!",)
+            raise Conflict(
+                f"This video [{video_id}] is not under revision!",
+            )
 
         # ONLY the reviser and the administrator can provide a new list of cuts
         user = self.get_user()
@@ -970,9 +966,9 @@ class VideoShotRevision(IMCEndpoint):
 
         # launch async task
         try:
-            celery_app = celery.get_instance()
-            task = celery_app.shot_revision.apply_async(
-                args=[revision, item.uuid], countdown=10, priority=5
+            c = celery.get_instance()
+            task = c.celery_app.send_task(
+                "shot_revision", args=[revision, item.uuid], countdown=10, priority=5
             )
             assignee = item.revision.single()
             rel = item.revision.relationship(assignee)
@@ -984,7 +980,6 @@ class VideoShotRevision(IMCEndpoint):
             raise e
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/videos/<video_id>/shot-revision",
         summary="Take off revision from a video.",

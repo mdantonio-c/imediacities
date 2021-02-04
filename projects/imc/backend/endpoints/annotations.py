@@ -114,7 +114,6 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -166,7 +165,6 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
@@ -329,7 +327,6 @@ class Annotations(IMCEndpoint):
         return self.response(self.get_annotation_response(created_anno), code=201)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "body_ref": fields.Str(
@@ -406,7 +403,6 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
@@ -499,7 +495,6 @@ class Annotations(IMCEndpoint):
         return self.response(updated_anno)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(PatchDocument)
     @decorators.marshal_with(AnnotationModel, code=200)

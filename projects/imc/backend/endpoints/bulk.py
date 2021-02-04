@@ -14,7 +14,6 @@ POST api/bulk
 import os
 import re
 from datetime import datetime
-from shutil import copyfile
 
 from imc.endpoints import IMCEndpoint
 from imc.models import BulkSchema
@@ -68,7 +67,6 @@ class Bulk(IMCEndpoint):
         return os.path.join(path, found_dir)
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(BulkSchema)
     @decorators.endpoint(
         path="/bulk",
@@ -79,7 +77,7 @@ class Bulk(IMCEndpoint):
     def post(self, **req_action):
 
         self.graph = neo4j.get_instance()
-        self.celery = celery.get_instance()
+        c = celery.get_instance()
 
         if action := req_action.get("update"):
             log.debug("Start bulk procedure...")
@@ -101,14 +99,16 @@ class Bulk(IMCEndpoint):
             if not os.path.exists(upload_delta_dir):
                 raise NotFound("Upload dir not found")
 
-            # inside the upload_delta_dir I have to look for the sub-dir that corresponds to the most recent date
+            # inside the upload_delta_dir I have to look for the sub-dir that
+            # corresponds to the most recent date
             upload_latest_dir = self.lookup_latest_dir(upload_delta_dir)
 
             if upload_latest_dir is None:
                 log.debug("Upload dir not found")
                 raise NotFound("Upload dir not found")
 
-            task = self.celery.bulk_update.apply_async(
+            task = c.celery_app.send_task(
+                "bulk_update",
                 args=[guid, upload_latest_dir, force_reprocessing],
                 countdown=10,
             )
@@ -211,8 +211,8 @@ class Bulk(IMCEndpoint):
                 resource.ownership.connect(group)
                 log.debug("Metadata Resource created for {}", path)
 
-            task = self.celery.import_file.apply_async(
-                args=[path, resource.uuid, mode], countdown=10
+            task = c.celery_app.send_task(
+                "import_file", args=[path, resource.uuid, mode], countdown=10
             )
 
             resource.status = "IMPORTING"
@@ -273,8 +273,8 @@ class Bulk(IMCEndpoint):
                     continue
                 # launch here async task
                 path = os.path.join(upload_dir, f)
-                self.celery.load_v2.apply_async(
-                    args=[path, item.uuid, retry], countdown=10
+                c.celery_app.send_task(
+                    "load_v2", args=[path, item.uuid, retry], countdown=10
                 )
                 imported += 1
 

@@ -28,7 +28,6 @@ class Images(IMCEndpoint):
 
     labels = ["image"]
 
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/images/<image_id>",
         summary="List of images",
@@ -93,7 +92,6 @@ class Images(IMCEndpoint):
     """
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/images",
@@ -107,7 +105,6 @@ class Images(IMCEndpoint):
         return self.empty_response()
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/images/<image_id>",
@@ -136,7 +133,6 @@ class Images(IMCEndpoint):
 
 class ImageItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.use_kwargs(
         {
@@ -190,12 +186,11 @@ class ImageItem(IMCEndpoint):
 
 class ImageAnnotations(IMCEndpoint):
     """
-        Get all image annotations for a given image.
+    Get all image annotations for a given image.
     """
 
     labels = ["image_annotations"]
 
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "anno_type": fields.Str(
@@ -273,7 +268,7 @@ class ImageContent(IMCEndpoint, Downloader):
 
     labels = ["image"]
 
-    @decorators.catch_graph_exceptions
+    @decorators.auth.optional()
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
@@ -345,7 +340,9 @@ class ImageContent(IMCEndpoint, Downloader):
             return send_file(thumbnail_uri, mimetype="image/jpeg")
 
         # it should never be reached
-        raise BadRequest(f"Invalid content type: {content_type}",)
+        raise BadRequest(
+            f"Invalid content type: {content_type}",
+        )
 
 
 class ImageTools(IMCEndpoint):
@@ -353,7 +350,6 @@ class ImageTools(IMCEndpoint):
     labels = ["image_tools"]
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "tool": fields.String(
@@ -442,7 +438,9 @@ class ImageTools(IMCEndpoint):
                 raise Conflict(
                     "Building recognition CANNOT be import twice for the same image"
                 )
-        celery_app = celery.get_instance()
-        task = celery_app.launch_tool.apply_async(args=[tool, item.uuid], countdown=10)
+        c = celery.get_instance()
+        task = c.celery_app.send_task(
+            "launch_tool", args=[tool, item.uuid], countdown=10
+        )
 
         return self.response(task.id, code=202)

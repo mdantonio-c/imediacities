@@ -21,7 +21,6 @@ class Upload(Uploader, IMCEndpoint):
     labels = ["file"]
 
     @decorators.auth.require_all("Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.init_chunk_upload
     @decorators.endpoint(
@@ -45,7 +44,6 @@ class Upload(Uploader, IMCEndpoint):
         return self.init_chunk_upload(upload_dir, name, force=True)
 
     @decorators.auth.require_all("Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/upload/<filename>",
@@ -69,7 +67,6 @@ class Upload(Uploader, IMCEndpoint):
         return upload_response
 
     @decorators.auth.require_all("Archive")
-    @decorators.catch_graph_exceptions
     @decorators.graph_transactions
     @decorators.endpoint(
         path="/download/<filename>",

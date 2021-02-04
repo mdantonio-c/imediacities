@@ -66,7 +66,7 @@ def pre_authorize(func):
         if ct is None or (ct != "image" and ct != "video"):
             # do not yet raise the exception but ignore it
             return func(self, **kwargs)
-        user = self.get_user_if_logged()
+        user = self.get_user()
         # log.debug("Logged in user: {}", user)
         # log.debug("Has permission to access entity[{}]?", entity_id)
         if not _has_public_access(self, user, entity_id):

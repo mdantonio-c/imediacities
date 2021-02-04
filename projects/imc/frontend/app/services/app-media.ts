@@ -60,7 +60,7 @@ export class AppMediaService {
 
   updatePublicAccess(newVal: boolean) {
     this.api
-      .put(this.type() + "s/" + this.media_id() + "/item", "", {
+      .put(this.type() + "s/" + this.media_id() + "/item", {
         public_access: newVal,
       })
       .subscribe(

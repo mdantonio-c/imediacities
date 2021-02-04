@@ -14,7 +14,6 @@ from restapi.utilities.logs import log
 
 class SearchPlace(IMCEndpoint):
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(SearchPlaceParameters)
     @decorators.endpoint(
         path="/search_place",

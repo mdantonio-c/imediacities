@@ -2,13 +2,10 @@ import os
 import re
 from shutil import copyfile
 
-from imc.tasks.imc_tasks import update_metadata
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
-from restapi.connectors import celery, neo4j, smtp
+from restapi.connectors import neo4j
 from restapi.connectors.celery import CeleryExt, send_errors_by_email
 from restapi.utilities.logs import log
-
-celery_app = CeleryExt.celery_app
 
 
 def extract_item_type(path):
@@ -53,13 +50,12 @@ def check_item_type_coherence(resource, standard_path):
     return item_node, coherent
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="bulk_update")
 @send_errors_by_email
 def bulk_update(self, guid, upload_dir, force_reprocessing=False):
     log.info(f"Bulk update: processing files from dir {upload_dir}")
 
     graph = neo4j.get_instance()
-    _celery = celery.get_instance()
 
     group = graph.Group.nodes.get_or_none(uuid=guid)
     if group is None:
@@ -208,7 +204,8 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                     if force_reprocessing:
                         mode = "clean"
                         metadata_update = True
-                        task = _celery.import_file.apply_async(
+                        task = CeleryExt.celery_app.send_task(
+                            "import_file",
                             args=[
                                 standard_path,
                                 resource.uuid,
@@ -223,8 +220,10 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                         resource.save()
                         updatedAndReprocessing += 1
                     else:
-                        task = _celery.update_metadata.apply_async(
-                            args=[standard_path, resource.uuid], countdown=10
+                        task = CeleryExt.celery_app.send_task(
+                            "update_metadata",
+                            args=[standard_path, resource.uuid],
+                            countdown=10,
                         )
                         log.debug("Task id={}", task.id)
                         resource.status = "UPDATING METADATA"
@@ -239,7 +238,8 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                     meta_stage.ownership.connect(group)
                     log.debug("MetaStage created for source_id {}", source_id)
                     mode = "clean"
-                    task = _celery.import_file.apply_async(
+                    task = CeleryExt.celery_app.send_task(
+                        "import_file",
                         args=[standard_path, meta_stage.uuid, mode],
                         countdown=10,
                     )
@@ -309,7 +309,8 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                     )
                     mode = "clean"
                     metadata_update = True
-                    task = _celery.import_file.apply_async(
+                    task = CeleryExt.celery_app.send_task(
+                        "import_file",
                         args=[
                             standard_path,
                             meta_stage.uuid,
@@ -329,8 +330,10 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                         "Starting task update_metadata for meta_stage.uuid {}",
                         meta_stage.uuid,
                     )
-                    task = _celery.update_metadata.apply_async(
-                        args=[standard_path, meta_stage.uuid], countdown=10
+                    task = CeleryExt.celery_app.send_task(
+                        "update_metadata",
+                        args=[standard_path, meta_stage.uuid],
+                        countdown=10,
                     )
                     log.info("Task id={}", task.id)
                     meta_stage.status = "UPDATING METADATA"

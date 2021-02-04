@@ -20,7 +20,7 @@ class Search(IMCEndpoint):
     allowed_term_fields = ("title", "description", "keyword", "contributor")
     allowed_anno_types = ("TAG", "DSC", "LNK")
 
-    @decorators.catch_graph_exceptions
+    @decorators.auth.optional()
     @decorators.get_pagination
     @decorators.use_kwargs(SearchCriteria)
     @decorators.endpoint(
@@ -35,7 +35,7 @@ class Search(IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        user = self.get_user_if_logged()
+        user = self.get_user()
         page -= 1
         log.debug("paging: offset {}, limit {}", page, size)
 

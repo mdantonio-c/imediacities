@@ -16,8 +16,6 @@ from restapi.connectors.celery import CeleryExt, send_errors_by_email
 from restapi.utilities.logs import log
 from restapi.utilities.templates import get_html_template
 
-celery_app = CeleryExt.celery_app
-
 if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
     try:
         from scripts.analysis.analyze import (
@@ -46,10 +44,10 @@ def progress(self, state, info):
     self.update_state(state=state)
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="update_metadata")
 @send_errors_by_email
 def update_metadata(self, path, resource_id):
-    with celery_app.app.app_context():
+    with CeleryExt.app.app_context():
 
         log.debug("Starting task update_metadata for resource_id {}", resource_id)
         progress(self, "Starting update metadata", path)
@@ -72,10 +70,10 @@ def update_metadata(self, path, resource_id):
         return 1
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="import_file")
 @send_errors_by_email
 def import_file(self, path, resource_id, mode, metadata_update=True):
-    with celery_app.app.app_context():
+    with CeleryExt.app.app_context():
 
         progress(self, "Starting import", path)
 
@@ -339,10 +337,10 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
         log.debug("-----------------------------------------------------")
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="launch_tool")
 @send_errors_by_email
 def launch_tool(self, tool_name, item_id):
-    with celery_app.app.app_context():
+    with CeleryExt.app.app_context():
         log.debug("launch tool {0} for item {1}", tool_name, item_id)
         if tool_name not in ["object-detection", "building-recognition"]:
             raise ValueError(f"Unexpected tool for: {tool_name}")
@@ -375,10 +373,10 @@ def launch_tool(self, tool_name, item_id):
         return 1
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="load_v2")
 @send_errors_by_email
 def load_v2(self, other_version, item_id, retry=False):
-    with celery_app.app.app_context():
+    with CeleryExt.app.app_context():
         log.debug("load v2 {0} for item {1}", other_version, item_id)
 
         self.graph = neo4j.get_instance()
@@ -483,7 +481,7 @@ def load_v2(self, other_version, item_id, retry=False):
         return 1
 
 
-@celery_app.task(bind=True)
+@CeleryExt.celery_app.task(bind=True, name="shot_revision")
 @send_errors_by_email
 def shot_revision(self, revision, item_id):
     log.info("Start shot revision task for video item [{0}]", item_id)

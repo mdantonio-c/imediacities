@@ -72,7 +72,6 @@ class Stage(IMCEndpoint):
         return parser.get_creation_ref(path)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.get_pagination
     @decorators.endpoint(
         path="/stage",
@@ -200,11 +199,11 @@ class Stage(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.use_kwargs(
         {
             "filename": fields.Str(
-                required=True, description="The metadata file to be imported",
+                required=True,
+                description="The metadata file to be imported",
             ),
             "mode": fields.Str(
                 missing="fast",
@@ -212,7 +211,8 @@ class Stage(IMCEndpoint):
                 validate=validate.OneOf(["fast", "clean", "skip"]),
             ),
             "update": fields.Bool(
-                missing=True, description="only for metadata update",
+                missing=True,
+                description="only for metadata update",
             ),
             "force_reprocessing": fields.Bool(
                 missing=False,
@@ -248,7 +248,7 @@ class Stage(IMCEndpoint):
         """
 
         self.graph = neo4j.get_instance()
-        celery_app = celery.get_instance()
+        c = celery.get_instance()
 
         group = self.get_user().belongs_to.single()
 
@@ -392,8 +392,8 @@ class Stage(IMCEndpoint):
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
-        task = celery_app.import_file.apply_async(
-            args=[path, meta_stage.uuid, mode, update], countdown=10
+        task = c.celery_app.send_task(
+            "import_file", args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
         meta_stage.status = "IMPORTING"
@@ -403,7 +403,6 @@ class Stage(IMCEndpoint):
         return self.response(task.id)
 
     @decorators.auth.require()
-    @decorators.catch_graph_exceptions
     @decorators.endpoint(
         path="/stage/<filename>",
         summary="Delete a file from the stage area",

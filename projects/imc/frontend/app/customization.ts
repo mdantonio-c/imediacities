@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BaseProjectOptions } from "@rapydo/base.project.options";
+import { AdminMenu, User } from "@rapydo/types";
 
 @Injectable()
 export class ProjectOptions extends BaseProjectOptions {
@@ -16,6 +17,10 @@ export class ProjectOptions extends BaseProjectOptions {
     return [
       { name: "Institution", prop: "declared_institution", flexGrow: 0.7 },
     ];
+  }
+
+  admin_menu_entries(user: User): AdminMenu[] {
+    return [];
   }
 
   privacy_statements() {
