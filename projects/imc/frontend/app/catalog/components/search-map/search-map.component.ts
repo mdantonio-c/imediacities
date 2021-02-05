@@ -430,7 +430,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
           // console.log('Checkpoint Nominatim Results:', results);
           if(results.length > 0 ) {
             console.log('Checkpoint Nominatim Results ----- ', results); // , modalRef);
-            modalRef.componentInstance.address = results[0].displayName;
+            modalRef.componentInstance.address = results[0].display_name;
           }
           
           //if (results[0]) {
