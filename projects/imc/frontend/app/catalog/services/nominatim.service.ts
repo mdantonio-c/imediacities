@@ -21,17 +21,11 @@ export class NominatimService {
   constructor(private http: HttpClient) {
   }
 
-  addressLookup(req?: any, box?: any): Observable<NominatimResponse[]> {
+  addressLookup(req?: any, box?: any): Observable<any> {
     let url = `https://${BASE_NOMINATIM_URL}/search?format=json&q=${req}&viewbox=${box}&bounded=1`;
-    return this.http
-      .get(url).pipe(
-        map((data: any[]) => data.map((item: any) => new NominatimResponse(
-          item.lat,
-          item.lon,
-          item.display_name
-          ))
-        )
-      )
+    let ret = this.http
+    .get(url)
+    return ret;
   }
 
   reverse(lat:any, lng:any): Observable<any> {
