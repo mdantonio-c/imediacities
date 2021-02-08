@@ -43,19 +43,20 @@ class Videos(IMCEndpoint):
 
     labels = ["video"]
 
+    @decorators.auth.optional()
     @decorators.endpoint(
         path="/videos/<video_id>",
         summary="List of videos",
-        description="Returns a list containing all videos. the list supports paging.",
+        description="Returns the requested video",
         responses={
-            200: "List of videos successfully retrieved",
+            200: "Video successfully retrieved",
             404: "The video does not exists.",
         },
     )
     @decorators.endpoint(
         path="/videos",
         summary="List of videos",
-        description="Returns a list containing all videos. the list supports paging.",
+        description="Returns a list containing all videos",
         responses={
             200: "List of videos successfully retrieved",
             403: "Operation not authorized",

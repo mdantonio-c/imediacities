@@ -28,6 +28,7 @@ class Images(IMCEndpoint):
 
     labels = ["image"]
 
+    @decorators.auth.optional()
     @decorators.endpoint(
         path="/images/<image_id>",
         summary="List of images",
