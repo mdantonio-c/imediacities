@@ -77,7 +77,7 @@ class Bulk(IMCEndpoint):
     def post(self, **req_action):
 
         self.graph = neo4j.get_instance()
-        c = celery.get_instance()
+        self.celery_ext = celery.get_instance()
 
         if action := req_action.get("update"):
             log.debug("Start bulk procedure...")
@@ -107,7 +107,7 @@ class Bulk(IMCEndpoint):
                 log.debug("Upload dir not found")
                 raise NotFound("Upload dir not found")
 
-            task = c.celery_app.send_task(
+            task = self.celery_ext.celery_app.send_task(
                 "bulk_update",
                 args=[guid, upload_latest_dir, force_reprocessing],
                 countdown=10,
@@ -211,7 +211,7 @@ class Bulk(IMCEndpoint):
                 resource.ownership.connect(group)
                 log.debug("Metadata Resource created for {}", path)
 
-            task = c.celery_app.send_task(
+            task = self.celery_ext.celery_app.send_task(
                 "import_file", args=[path, resource.uuid, mode], countdown=10
             )
 
@@ -273,7 +273,7 @@ class Bulk(IMCEndpoint):
                     continue
                 # launch here async task
                 path = os.path.join(upload_dir, f)
-                c.celery_app.send_task(
+                self.celery_ext.celery_app.send_task(
                     "load_v2", args=[path, item.uuid, retry], countdown=10
                 )
                 imported += 1
