@@ -21,7 +21,7 @@ class Upload(Uploader, IMCEndpoint):
     labels = ["file"]
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.init_chunk_upload
     @decorators.endpoint(
         path="/upload",
@@ -44,7 +44,7 @@ class Upload(Uploader, IMCEndpoint):
         return self.init_chunk_upload(upload_dir, name, force=True)
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/upload/<filename>",
         summary="Upload a file into the stage area",
@@ -67,7 +67,7 @@ class Upload(Uploader, IMCEndpoint):
         return upload_response
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/download/<filename>",
         summary="Download an uploaded file",

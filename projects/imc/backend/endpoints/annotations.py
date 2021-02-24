@@ -165,7 +165,7 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
@@ -403,7 +403,7 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
@@ -495,7 +495,7 @@ class Annotations(IMCEndpoint):
         return self.response(updated_anno)
 
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(PatchDocument)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(

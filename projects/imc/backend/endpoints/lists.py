@@ -161,7 +161,7 @@ class Lists(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -206,7 +206,7 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(created_list), code=201)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -259,7 +259,7 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(updated_list))
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/lists/<list_id>",
         summary="Delete a list",
@@ -373,7 +373,7 @@ class ListItems(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(Target)
     @decorators.endpoint(
         path="/lists/<list_id>/items",
@@ -433,7 +433,7 @@ class ListItems(IMCEndpoint):
         self.empty_response()
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/lists/<list_id>/items/<item_id>",
         summary="Delete an item from a list.",

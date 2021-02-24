@@ -112,7 +112,7 @@ class Videos(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/videos/<video_id>",
         summary="Delete a video description",
@@ -139,7 +139,7 @@ class Videos(IMCEndpoint):
 
 class VideoItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {
             "public_access": fields.Bool(
@@ -608,7 +608,7 @@ class VideoContent(IMCEndpoint, Downloader):
         # it should never be reached
         raise BadRequest(f"Invalid content type: {content_type}")
 
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
@@ -840,7 +840,7 @@ class VideoShotRevision(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {
             "assignee_uuid": fields.Str(

@@ -12,7 +12,7 @@ class CreationRepository:
     def __init__(self, graph):
         self.graph = graph
 
-    @decorators.graph_transactions
+    @decorators.database_transaction
     def create_entity(self, properties, item, relationships, av=True):
         """
         Used to create both audio visual and NON audio visual entity.
