@@ -13,8 +13,8 @@ from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from restapi.connectors import neo4j, smtp
 from restapi.connectors.celery import CeleryExt, send_errors_by_email
+from restapi.connectors.smtp.notifications import get_html_template
 from restapi.utilities.logs import log
-from restapi.utilities.templates import get_html_template
 
 if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
     try:
@@ -1210,14 +1210,12 @@ def send_notification(
     an email is also sent to the system administrator with some more details
     about failure.
     """
-    body = get_html_template(template, replaces)
-    plain = f"Sorry User, your job ID {task_id} is failed"
+    body, plain = get_html_template(template, replaces)
     smtp_client = smtp.get_instance()
     smtp_client.send(body, subject, recipient, plain_body=plain)
 
     if failure is not None:
         replaces["task_id"] = task_id
         replaces["failure"] = failure
-        body = get_html_template(template, replaces)
-        plain = f"Job ID {task_id} is failed"
+        body, plain = get_html_template(template, replaces)
         smtp_client.send(body, subject, plain_body=plain)
