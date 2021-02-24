@@ -172,3 +172,7 @@ class Initializer:
             mnc.website = "http://www.museocinema.it"
             mnc.save()
             log.info("Provider MNC successfully created")
+
+    # This method is called after normal initialization if TESTING mode is enabled
+    def initialize_testing_environment(self):
+        pass
