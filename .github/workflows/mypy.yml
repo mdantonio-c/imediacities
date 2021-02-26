@@ -27,3 +27,8 @@ jobs:
           project: ${PROJECT}
           # install: ...
           ignore: neomodel pymodm
+      - name: Save Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: mypy-report
+          path: report
