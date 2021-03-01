@@ -8,7 +8,7 @@ from imc.models import Target
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
 from restapi.models import fields
 from restapi.utilities.logs import log
 
@@ -186,6 +186,10 @@ class Lists(IMCEndpoint):
 
         self.graph = neo4j.get_instance()
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         # check if there is already a list with the same name belonging to the user.
         results = self.graph.cypher(
             "MATCH (l:List)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
@@ -232,6 +236,10 @@ class Lists(IMCEndpoint):
             raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         creator = user_list.creator.single()
         if not user or user.uuid != creator.uuid:
             raise Forbidden(
