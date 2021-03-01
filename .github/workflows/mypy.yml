@@ -25,6 +25,7 @@ jobs:
       - uses: rapydo/actions/mypy@v1
         with:
           project: ${PROJECT}
+          allow_untyped_defs: true
           # install: ...
           ignore: neomodel pymodm
       - name: Save Report
