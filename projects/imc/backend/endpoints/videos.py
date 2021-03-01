@@ -12,7 +12,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
 from restapi.models import Schema, fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
@@ -174,6 +174,10 @@ class VideoItem(IMCEndpoint):
             raise NotFound("AVEntity not correctly imported: item info not found")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             log.error("User {} not allowed to edit video {}", user.email, video_id)
@@ -230,6 +234,9 @@ class VideoAnnotations(IMCEndpoint):
             raise NotFound("Please specify a valid video id")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
         item = video.item.single()
         for a in item.targeting_annotations:
@@ -877,6 +884,7 @@ class VideoShotRevision(IMCEndpoint):
             )
 
         user = self.get_user()
+
         iamadmin = self.verify_admin()
 
         log.debug(
@@ -955,6 +963,10 @@ class VideoShotRevision(IMCEndpoint):
 
         # ONLY the reviser and the administrator can provide a new list of cuts
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden("You cannot revise a video that is not owned by you")
@@ -1010,6 +1022,10 @@ class VideoShotRevision(IMCEndpoint):
             raise BadRequest(f"Video [{video.uuid}] is not under revision")
         # ONLY the reviser and the administrator can exit revision
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         iamadmin = self.verify_admin()
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden(

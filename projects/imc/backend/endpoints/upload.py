@@ -32,7 +32,11 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
@@ -53,7 +57,12 @@ class Upload(Uploader, IMCEndpoint):
     def put(self, filename):
 
         self.graph = neo4j.get_instance()
-        group = self.get_user().belongs_to.single()
+
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
@@ -83,7 +92,11 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")

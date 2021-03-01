@@ -233,7 +233,7 @@ class Lists(IMCEndpoint):
 
         user = self.get_user()
         creator = user_list.creator.single()
-        if user.uuid != creator.uuid:
+        if not user or user.uuid != creator.uuid:
             raise Forbidden(
                 "You cannot update an user list that does not belong to you"
             )

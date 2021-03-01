@@ -92,7 +92,11 @@ class Stage(IMCEndpoint):
             group = None
 
         if group is None:
-            group = self.get_user().belongs_to.single()
+            user = self.get_user()
+            if user is None:  # pragma: no cover
+                raise BadRequest("No user defined")
+
+            group = user.belongs_to.single()
         else:
             group = self.graph.Group.nodes.get_or_none(uuid=group)
 
@@ -249,9 +253,13 @@ class Stage(IMCEndpoint):
         """
 
         self.graph = neo4j.get_instance()
-        c = celery.get_instance()
+        celery_ext = celery.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
@@ -289,7 +297,7 @@ class Stage(IMCEndpoint):
             c = [self.graph.MetaStage.inflate(row[0]) for row in results]
             if len(c) > 1:
                 # there are more than one MetaStage related to the same source id: Database incoherence!
-                log.errors(
+                log.error(
                     "Database incoherence: there are more than one MetaStage related to the same source id {}",
                     source_id,
                 )
@@ -393,7 +401,7 @@ class Stage(IMCEndpoint):
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
-        task = c.celery_app.send_task(
+        task = celery_ext.celery_app.send_task(
             "import_file", args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
@@ -413,7 +421,11 @@ class Stage(IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
