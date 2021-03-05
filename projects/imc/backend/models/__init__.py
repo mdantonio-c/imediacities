@@ -1,5 +1,5 @@
 from marshmallow import ValidationError, pre_load
-from restapi.models import AdvancedList, PartialSchema, Schema, fields, validate
+from restapi.models import PartialSchema, Schema, fields, validate
 
 
 class Spatial(Schema):
@@ -16,7 +16,7 @@ class GeoDistance(Schema):
 
 class SearchMatch(Schema):
     term = fields.Str(required=True)
-    fields = AdvancedList(
+    fields = fields.List(
         fields.Str(
             validate=validate.OneOf(["title", "contributor", "keyword", "description"])
         ),
@@ -28,7 +28,8 @@ class SearchMatch(Schema):
 class SearchFilter(Schema):
 
     type = fields.Str(
-        missing="all", validate=validate.OneOf(["all", "video", "image"]),
+        missing="all",
+        validate=validate.OneOf(["all", "video", "image"]),
     )
     provider = fields.Str(allow_none=True)
     city = fields.Str(allow_none=True)
@@ -101,7 +102,7 @@ class BulkDeleteSchema(Schema):
     entity = fields.Str(
         required=True, validate=validate.OneOf(["AVEntity", "NonAVEntity"])
     )
-    uuids = AdvancedList(fields.UUID(), min_items=1)
+    uuids = fields.List(fields.UUID(), min_items=1)
     delete_all = fields.Bool(missing=False)
 
 
@@ -168,11 +169,11 @@ class Target(Schema):
 
 # used by POST /search_place
 class SearchPlaceParameters(Schema):
-    place_list = AdvancedList(
+    place_list = fields.List(
         fields.Nested(
             {
                 "creation-id": fields.Str(required=True),
-                "place-ids": AdvancedList(fields.Str(), required=True, min_items=1),
+                "place-ids": fields.List(fields.Str(), required=True, min_items=1),
             },
         ),
         description="Criteria for the search",
@@ -190,14 +191,14 @@ class SceneCut(Schema):
     cut = fields.Int(required=True, validate=validate.Range(min=0))
     confirmed = fields.Bool(missing=False)
     double_check = fields.Bool(missing=False)
-    annotations = AdvancedList(
+    annotations = fields.List(
         fields.Str(), required=True, unique=True, description="Annotation's uuid"
     )
 
 
 # used by POST /videos/<video_id>/shot-revision
 class ShotRevision(Schema):
-    shots = AdvancedList(
+    shots = fields.List(
         fields.Nested(SceneCut),
         required=True,
         min_items=1,
