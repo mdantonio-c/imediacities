@@ -1,6 +1,6 @@
 import { Component, ViewChild, TemplateRef, Injector } from "@angular/core";
 import { HttpResponse } from "@angular/common/http";
-import { saveAs as importedSaveAs } from "file-saver";
+import { saveAs as importedSaveAs } from "file-saver-es";
 import { UploadxOptions, UploadState, UploadxService } from "ngx-uploadx";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
