@@ -33,7 +33,7 @@ variables:
     SMTP_NOREPLY: "**PLACEHOLDER**"
     SMTP_HOST: "**PLACEHOLDER**"
 
-    CELERY_BACKEND: MONGODB
+    CELERY_BACKEND: REDIS
 
     SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
     SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
