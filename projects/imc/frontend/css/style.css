@@ -5,7 +5,7 @@
 
 /* Include slick css */
 @import url("slick-carousel/slick/slick.css");
-@import url("slick-carousel/slick/slick-theme.css");
+@import url("/app/app/custom/css/slick-carousel/slick-theme.css");
 
 @import url("/app/app/custom/css/scss/style.css");
 @import url("/app/app/custom/css/app-video-player.css");
