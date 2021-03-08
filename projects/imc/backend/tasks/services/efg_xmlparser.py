@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, List
 from xml.dom import minidom
 from xml.etree import ElementTree as ET
 
@@ -301,7 +301,7 @@ class EFG_XMLParser:
         inpath = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
         coverages = []
         for node in record.findall("./" + inpath + "/efg:coverage", self.ns):
-            c = {
+            c: Dict[str, List[Any]] = {
                 "spatial": [],
                 "temporal": [],
             }
@@ -485,11 +485,11 @@ class EFG_XMLParser:
                     activities.append(rel_agent_type.text.strip())
 
             if agent_node.tag == "relPerson" or agent_node.tag == "efg:relPerson":
-                props["agent_type"] = "P"
+                props["agent_type"] = "P"  # type: ignore
             elif (
                 agent_node.tag == "relCorporate" or agent_node.tag == "efg:relCorporate"
             ):
-                props["agent_type"] = "C"
+                props["agent_type"] = "C"  # type: ignore
             else:
                 # should never be reached
                 raise ValueError(f"Invalid tag name for: {agent_node.tag}")
@@ -651,6 +651,6 @@ class EFG_XMLParser:
 
     def prettify(elem):
         """Return a pretty-printed XML string for the Element."""
-        rough_string = ET.tostring(elem, "utf-8")
+        rough_string = ET.tostring(elem, "utf-8")  # type: ignore
         reparsed = minidom.parseString(rough_string)
         return reparsed.toprettyxml(indent="  ")
