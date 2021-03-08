@@ -18,14 +18,14 @@ class ORF_XMLParser:
             labels[int(lid)] = name
 
         frames: Dict[int, List[Any]] = {}
-        xml_frames = xml_root.find("frames")  # type: ignore
-        for n in xml_frames:
-            timestamp = int(n.get("timestamp"))
+        xml_frames = xml_root.find("frames")
+        for n in xml_frames:  # type: ignore
+            timestamp = int(n.get("timestamp"))  # type: ignore
             frames[timestamp] = []
 
             xml_mappings = n.find("mappings")
             mappings = {}  # type: ignore
-            for m in xml_mappings:
+            for m in xml_mappings:  # type: ignore
                 oref = m.attrib["object_ref"]
                 lref = int(m.attrib["label_ref"])
                 conf = float(m.attrib["confidence"])
@@ -34,16 +34,16 @@ class ORF_XMLParser:
                     mappings[oref] = (labels[lref], conf)
 
             xml_objects = n.find("objects")
-            for o in xml_objects.findall("object"):
+            for o in xml_objects.findall("object"):  # type: ignore
 
                 xml_region = o.find("region")
                 oid = o.attrib["uid"]
                 rect = [None, None, None, None]
-                for p in xml_region.findall("point"):
+                for p in xml_region.findall("point"):  # type: ignore
                     x = float(p.attrib["posX"])
                     y = float(p.attrib["posY"])
                     i = int(p.attrib["orderIdx"])
-                    rect[i] = (x, y)
+                    rect[i] = (x, y)  # type: ignore
                 # regions are not always present (e.g. for buildings)
                 lab, conf = mappings[oid]
                 frames[timestamp].append((oid, lab, conf, rect))
