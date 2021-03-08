@@ -484,9 +484,11 @@ class EFG_XMLParser:
                 else:
                     activities.append(rel_agent_type.text.strip())
 
-            if agent_node.tag == "relPerson" or "efg:relPerson":
+            if agent_node.tag == "relPerson" or agent_node.tag == "efg:relPerson":
                 props["agent_type"] = "P"
-            elif agent_node.tag == "relCorporate" or "efg:relCorporate":
+            elif (
+                agent_node.tag == "relCorporate" or agent_node.tag == "efg:relCorporate"
+            ):
                 props["agent_type"] = "C"
             else:
                 # should never be reached
