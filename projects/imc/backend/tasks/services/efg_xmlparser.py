@@ -1,3 +1,4 @@
+from typing import Any
 from xml.dom import minidom
 from xml.etree import ElementTree as ET
 
@@ -23,13 +24,13 @@ class EFG_XMLParser:
             nodes = record.findall("./efg:recordSource/efg:sourceID", self.ns)
             if len(nodes) <= 0:
                 return None
-            return nodes[0].text.strip()
+            return nodes[0].text.strip()  # type: ignore
         record = root.find("efg:nonavcreation", self.ns)
         if record is not None:
             nodes = record.findall("./efg:recordSource/efg:sourceID", self.ns)
             if len(nodes) <= 0:
                 return None
-            return nodes[0].text.strip()
+            return nodes[0].text.strip()  # type: ignore
 
     def get_creation_type(self, filepath):
         """
@@ -300,9 +301,10 @@ class EFG_XMLParser:
         inpath = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
         coverages = []
         for node in record.findall("./" + inpath + "/efg:coverage", self.ns):
-            c = {}
-            c["spatial"] = []
-            c["temporal"] = []
+            c = {
+                "spatial": [],
+                "temporal": [],
+            }
             for s in node.findall("efg:spatial", self.ns):
                 log.debug("spatial: {}", s.text.strip())
                 c["spatial"].append(s.text.strip())
@@ -465,7 +467,7 @@ class EFG_XMLParser:
         if len(corporates) > 0:
             nodes.extend(corporates)
 
-        agents = []
+        agents: Any = []
         for agent_node in nodes:
             props = {}
             props["names"] = [agent_node.find("efg:name", self.ns).text.strip()]

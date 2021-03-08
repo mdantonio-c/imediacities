@@ -11,7 +11,7 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
 from restapi.models import fields, validate
 from restapi.services.authentication import Role
 from restapi.services.download import Downloader
@@ -169,6 +169,11 @@ class ImageItem(IMCEndpoint):
             raise NotFound("NonAVEntity not correctly imported: item info not found")
 
         user = self.get_user()
+
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
             log.error("User {} not allowed to edit image {}", user.email, image_id)
