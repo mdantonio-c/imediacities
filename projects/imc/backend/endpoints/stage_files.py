@@ -2,6 +2,7 @@
 List content from upload dir and import of data and metadata
 """
 import os
+from typing import Any, Dict
 
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
@@ -157,7 +158,7 @@ class Stage(IMCEndpoint):
 
             stat = os.stat(path)
 
-            row = {}
+            row: Dict[str, Any] = {}
             row["name"] = f
             row["size"] = stat.st_size
             row["creation"] = stat.st_ctime
