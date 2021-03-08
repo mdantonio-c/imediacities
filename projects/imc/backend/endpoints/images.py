@@ -93,7 +93,7 @@ class Images(IMCEndpoint):
     """
 
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/images",
         summary="Create a new image description",
@@ -106,7 +106,7 @@ class Images(IMCEndpoint):
         return self.empty_response()
 
     @decorators.auth.require_all(Role.ADMIN)
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/images/<image_id>",
         summary="Delete a image description",
@@ -134,7 +134,7 @@ class Images(IMCEndpoint):
 
 class ImageItem(IMCEndpoint):
     @decorators.auth.require_any(Role.ADMIN, "Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {
             "public_access": fields.Bool(

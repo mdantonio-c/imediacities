@@ -165,7 +165,7 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
@@ -222,8 +222,9 @@ class Annotations(IMCEndpoint):
 
         # check user
         user = self.get_user()
-        if user is None:
-            raise BadRequest("Invalid user")
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
         targetNode = None
         if target_type == "item":
@@ -357,6 +358,9 @@ class Annotations(IMCEndpoint):
             raise NotFound("Annotation not found")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
         log.debug("current user: {email} - {uuid}", email=user.email, uuid=user.uuid)
         iamadmin = self.verify_admin()
@@ -403,7 +407,7 @@ class Annotations(IMCEndpoint):
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
@@ -434,6 +438,9 @@ class Annotations(IMCEndpoint):
             raise NotFound("Annotation not found")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
         creator = anno.creator.single()
         if creator is None:
@@ -495,7 +502,7 @@ class Annotations(IMCEndpoint):
         return self.response(updated_anno)
 
     @decorators.auth.require()
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(PatchDocument)
     @decorators.marshal_with(AnnotationModel, code=200)
     @decorators.endpoint(
@@ -521,6 +528,10 @@ class Annotations(IMCEndpoint):
             raise NotFound("Annotation with no creator")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         if user.uuid != creator.uuid:
             raise Forbidden(
                 "You cannot update an annotation that does not belong to you",

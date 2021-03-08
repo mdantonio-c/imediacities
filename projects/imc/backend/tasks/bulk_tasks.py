@@ -4,7 +4,7 @@ from shutil import copyfile
 
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi.connectors import neo4j
-from restapi.connectors.celery import CeleryExt, send_errors_by_email
+from restapi.connectors.celery import CeleryExt
 from restapi.utilities.logs import log
 
 
@@ -50,8 +50,7 @@ def check_item_type_coherence(resource, standard_path):
     return item_node, coherent
 
 
-@CeleryExt.celery_app.task(bind=True, name="bulk_update")
-@send_errors_by_email
+@CeleryExt.task()
 def bulk_update(self, guid, upload_dir, force_reprocessing=False):
     log.info(f"Bulk update: processing files from dir {upload_dir}")
 

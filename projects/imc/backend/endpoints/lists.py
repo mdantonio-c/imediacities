@@ -8,7 +8,7 @@ from imc.models import Target
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
 from restapi.models import fields
 from restapi.utilities.logs import log
 
@@ -161,7 +161,7 @@ class Lists(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -186,6 +186,10 @@ class Lists(IMCEndpoint):
 
         self.graph = neo4j.get_instance()
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         # check if there is already a list with the same name belonging to the user.
         results = self.graph.cypher(
             "MATCH (l:List)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
@@ -206,7 +210,7 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(created_list), code=201)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(
         {"name": fields.Str(required=True), "description": fields.Str(required=True)}
     )
@@ -232,8 +236,12 @@ class Lists(IMCEndpoint):
             raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         creator = user_list.creator.single()
-        if user.uuid != creator.uuid:
+        if not user or user.uuid != creator.uuid:
             raise Forbidden(
                 "You cannot update an user list that does not belong to you"
             )
@@ -259,7 +267,7 @@ class Lists(IMCEndpoint):
         return self.response(self.getJsonResponse(updated_list))
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/lists/<list_id>",
         summary="Delete a list",
@@ -373,7 +381,7 @@ class ListItems(IMCEndpoint):
         return self.response(data)
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.use_kwargs(Target)
     @decorators.endpoint(
         path="/lists/<list_id>/items",
@@ -433,7 +441,7 @@ class ListItems(IMCEndpoint):
         self.empty_response()
 
     @decorators.auth.require_all("Researcher")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/lists/<list_id>/items/<item_id>",
         summary="Delete an item from a list.",

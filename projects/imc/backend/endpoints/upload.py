@@ -21,7 +21,7 @@ class Upload(Uploader, IMCEndpoint):
     labels = ["file"]
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.init_chunk_upload
     @decorators.endpoint(
         path="/upload",
@@ -32,7 +32,11 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
@@ -44,7 +48,7 @@ class Upload(Uploader, IMCEndpoint):
         return self.init_chunk_upload(upload_dir, name, force=True)
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/upload/<filename>",
         summary="Upload a file into the stage area",
@@ -53,7 +57,12 @@ class Upload(Uploader, IMCEndpoint):
     def put(self, filename):
 
         self.graph = neo4j.get_instance()
-        group = self.get_user().belongs_to.single()
+
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
@@ -67,7 +76,7 @@ class Upload(Uploader, IMCEndpoint):
         return upload_response
 
     @decorators.auth.require_all("Archive")
-    @decorators.graph_transactions
+    @decorators.database_transaction
     @decorators.endpoint(
         path="/download/<filename>",
         summary="Download an uploaded file",
@@ -83,7 +92,11 @@ class Upload(Uploader, IMCEndpoint):
 
         self.graph = neo4j.get_instance()
 
-        group = self.get_user().belongs_to.single()
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+
+        group = user.belongs_to.single()
 
         if group is None:
             raise BadRequest("No group defined for this user")
