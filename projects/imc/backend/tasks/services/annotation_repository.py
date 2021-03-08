@@ -295,11 +295,7 @@ class AnnotationRepository:
         log.debug("body list size after deletion: {}", body_list_size_after)
         if single_body and not body_found:
             raise ReferenceError(
-                "Annotation ID:{anno_id} cannot be deleted."
-                " No body found for {btype}:{bid}",
-                anno_id=anno.uuid,
-                btype=btype,
-                bid=bid,
+                f"Can't delete {anno.uuid}: no body found for {btype}:{bid}",
             )
         if body_list_size_after == 0:
             # delete any orphan video segments (NOT SHOT!)

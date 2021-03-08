@@ -289,6 +289,11 @@ class Lists(IMCEndpoint):
             raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
+
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         log.debug("current user: {} - {}", user.email, user.uuid)
         iamadmin = self.verify_admin()
         log.debug("current user is admin? {0}", iamadmin)

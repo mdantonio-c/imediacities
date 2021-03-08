@@ -884,8 +884,11 @@ class VideoShotRevision(IMCEndpoint):
             )
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
-        iamadmin = self.verify_admin()
+        iamadmin = self.auth.is_admin(user)
 
         log.debug(
             "Request for revision from user [{}, {} {}]",
@@ -898,17 +901,13 @@ class VideoShotRevision(IMCEndpoint):
         # allow admin to pass the assignee
         if iamadmin and assignee_uuid:
             assignee = self.graph.User.nodes.get_or_none(uuid=assignee_uuid)
-            if not assignee:
-                raise NotFound(
-                    f"Invalid candidate. User [{assignee_uuid}] does not exist"
-                )
-
-            assignee_is_admin = self.auth.verify_roles(
-                assignee, [Role.ADMIN], warnings=False
-            )
         else:
             assignee = user
-            assignee_is_admin = iamadmin
+
+        if not assignee:
+            raise NotFound(f"Invalid candidate. User [{assignee_uuid}] does not exist")
+
+        assignee_is_admin = self.auth.is_admin(assignee)
 
         log.debug("Assignee is admin? {}", assignee_is_admin)
 

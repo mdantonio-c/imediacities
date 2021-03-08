@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 from xml.etree import ElementTree as ET
 
 from restapi.utilities.logs import log
@@ -11,19 +12,19 @@ class ORF_XMLParser:
         xml_root = xml_tree.getroot()
         xml_labels = xml_root.find("labels")
         labels = {}
-        for label in xml_labels:
-            lid = int(label.get("uid"))
+        for label in xml_labels:  # type: ignore
+            lid = int(label.get("uid"))  # type: ignore
             name = label.get("name")
             labels[int(lid)] = name
 
-        frames = {}
-        xml_frames = xml_root.find("frames")
+        frames: Dict[int, List[Any]] = {}
+        xml_frames = xml_root.find("frames")  # type: ignore
         for n in xml_frames:
             timestamp = int(n.get("timestamp"))
             frames[timestamp] = []
 
             xml_mappings = n.find("mappings")
-            mappings = {}
+            mappings = {}  # type: ignore
             for m in xml_mappings:
                 oref = m.attrib["object_ref"]
                 lref = int(m.attrib["label_ref"])
