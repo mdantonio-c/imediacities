@@ -10,10 +10,10 @@ POST api/bulk
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-
 import os
 import re
 from datetime import datetime
+from typing import Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import BulkSchema
@@ -45,7 +45,7 @@ class Bulk(IMCEndpoint):
         found_dir = None
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for d in dirs:
-            parsed_date = None
+            parsed_date: Optional[datetime] = None
             for format in POSSIBLE_FORMATS:
                 try:
                     parsed_date = datetime.strptime(d, format)
@@ -64,6 +64,10 @@ class Bulk(IMCEndpoint):
                     found_dir = d
             else:
                 log.warning("cannot parse dir = {}", d)
+
+        if not found_dir:
+            return None
+
         return os.path.join(path, found_dir)
 
     @decorators.auth.require_all(Role.ADMIN)

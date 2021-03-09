@@ -3,6 +3,7 @@ import os
 import random
 import re
 from operator import itemgetter
+from typing import Any, Dict, Set
 
 from imc.models import codelists
 from imc.tasks.services.annotation_repository import AnnotationRepository
@@ -14,7 +15,7 @@ from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from restapi.connectors import neo4j, smtp
 from restapi.connectors.celery import CeleryExt
 from restapi.connectors.smtp.notifications import get_html_template
-from restapi.exceptions import NotFound
+from restapi.exceptions import NotFound, ServiceUnavailable
 from restapi.utilities.logs import log
 
 if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
@@ -479,7 +480,7 @@ def shot_revision(self, revision, item_id):
         item = self.graph.Item.nodes.get_or_none(uuid=item_id)
 
         if not item:
-            raise NotFound(f"Item {item_id} not foun")
+            raise NotFound(f"Item {item_id} not found")
 
         content_source = item.content_source.single()
         group = item.ownership.single()
@@ -907,7 +908,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
     # get the shot list of the item
     shots = item.shots.all()
-    shot_list = {}
+    shot_list: Dict[str, Set[Any]] = {}
     for s in shots:
         shot_list[s.shot_num] = set()
     if item.item_type == "Image":
@@ -915,8 +916,8 @@ def extract_br_annotations(self, item, analyze_dir_path):
         shot_list[0] = set()
     object_ids = set()
     concepts = set()
-    report = {}
-    obj_cat_report = {}
+    report: Dict[str, int] = {}
+    obj_cat_report: Dict[Any, Any] = {}
     for timestamp, bf_list in frames.items():
         """
         A frame is a <dict> with timestamp<int> as key and a <list> as value.
@@ -1061,7 +1062,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
 
     # get the shot list of the item
     shots = item.shots.all()
-    shot_list = {}
+    shot_list: Dict[str, Set[Any]] = {}
     for s in shots:
         shot_list[s.shot_num] = set()
     if item.item_type == "Image":
@@ -1069,8 +1070,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
         shot_list[0] = set()
     object_ids = set()
     concepts = set()
-    report = {}
-    obj_cat_report = {}
+    report: Dict[str, int] = {}
+    obj_cat_report: Dict[Any, Any] = {}
     for timestamp, od_list in frames.items():
         """
         A frame is a <dict> with timestamp<int> as key and a <list> as value.
@@ -1198,6 +1199,10 @@ def send_notification(
     about failure.
     """
     body, plain = get_html_template(template, replaces)
+
+    if body is None:
+        raise ServiceUnavailable(f"Missing template {template}")
+
     smtp_client = smtp.get_instance()
     smtp_client.send(body, subject, recipient, plain_body=plain)
 
@@ -1205,4 +1210,7 @@ def send_notification(
         replaces["task_id"] = task_id
         replaces["failure"] = failure
         body, plain = get_html_template(template, replaces)
+        if body is None:
+            raise ServiceUnavailable(f"Missing template {template}")
+
         smtp_client.send(body, subject, plain_body=plain)

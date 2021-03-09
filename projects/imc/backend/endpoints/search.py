@@ -3,7 +3,7 @@ Search endpoint
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-from typing import Dict
+from typing import Any, Dict, Union
 
 from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
@@ -249,7 +249,7 @@ class Search(IMCEndpoint):
             )
 
         data = []
-        meta_response: Dict[str, int] = {
+        meta_response: Dict[str, Union[int, Dict[Any, Any]]] = {
             "totalItems": 0,
             "countByProviders": 0,
             "countByYears": 0,
