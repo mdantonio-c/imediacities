@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 from restapi.rest.definition import EndpointResource
 from restapi.utilities.logs import log
@@ -29,16 +30,13 @@ class IMCEndpoint(EndpointResource):
         Very important: this method only works with customized neo4j models
         """
 
-        # Get id
-        verify_attribute = hasattr
-        if isinstance(instance, dict):
-            verify_attribute = dict.get
-        if verify_attribute(instance, "uuid"):
+        verify_attribute = dict.get if isinstance(instance, dict) else hasattr
+
+        res_id: Optional[str] = None
+        if verify_attribute(instance, "uuid"):  # type: ignore
             res_id = str(instance.uuid)
-        elif verify_attribute(instance, "id"):
+        elif verify_attribute(instance, "id"):  # type: ignore
             res_id = str(instance.id)
-        else:
-            res_id = None
 
         data = self.get_show_fields(instance)
         data["id"] = res_id
@@ -117,18 +115,15 @@ class IMCEndpoint(EndpointResource):
         elif hasattr(obj, "show_fields"):
             fields = obj.show_fields()
 
-        verify_attribute = hasattr
-        if isinstance(obj, dict):
-            verify_attribute = dict.get
+        verify_attribute = dict.get if isinstance(obj, dict) else hasattr
 
-        attributes = {}
+        attributes: Dict[str, Optional[Any]] = {}
         for key in fields:
-            if verify_attribute(obj, key):
-                get_attribute = getattr
-                if isinstance(obj, dict):
-                    get_attribute = dict.get
+            if verify_attribute(obj, key):  # type: ignore
 
-                attribute = get_attribute(obj, key)
+                get_attribute = dict.get if isinstance(obj, dict) else getattr
+
+                attribute = get_attribute(obj, key)  # type: ignore
                 # datetime is not json serializable,
                 # converting it to string
                 # FIXME: use flask.jsonify

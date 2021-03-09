@@ -6,7 +6,7 @@ from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
-from restapi.exceptions import NotFound
+from restapi.exceptions import NotFound, ServerError
 from restapi.models import fields, validate
 from restapi.utilities.logs import log
 
@@ -105,6 +105,9 @@ class ShotAnnotations(IMCEndpoint):
             raise NotFound("Please specify a valid shot id")
 
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
 
         data = []
         for a in shot.annotation:

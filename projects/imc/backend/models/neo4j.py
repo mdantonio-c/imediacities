@@ -30,7 +30,7 @@ from neomodel import One, OneOrMore, ZeroOrMore, ZeroOrOne
 class IdentifiedNode(StructuredNode):
 
     """
-        A StructuredNode identified by an uuid
+    A StructuredNode identified by an uuid
     """
 
     __abstract_node__ = True
@@ -41,7 +41,7 @@ class IdentifiedNode(StructuredNode):
 class TimestampedNode(IdentifiedNode):
 
     """
-        An IdentifiedNode with creation and modification dates
+    An IdentifiedNode with creation and modification dates
     """
 
     __abstract_node__ = True
@@ -50,7 +50,7 @@ class TimestampedNode(IdentifiedNode):
     modified = DateTimeProperty(default_now=True, show=True)
 
     def save(self, *args, **kwargs):
-        self.modified = datetime.now(pytz.utc)
+        self.modified = datetime.now(pytz.utc)  # type: ignore
         return super().save(*args, **kwargs)
 
 
@@ -320,7 +320,7 @@ class ContributionRel(StructuredRel):
 
 class LanguageRel(StructuredRel):
     """This indicates the usage relationship between the language and the
-       creation."""
+    creation."""
 
     usage = StringProperty(choices=codelists.LANGUAGE_USAGES, show=True)
 
@@ -515,7 +515,7 @@ class Coverage(StructuredNode):
 
 
 class Rightholder(IdentifiedNode):
-    """ Rightholder.
+    """Rightholder.
 
     Attributes:
         name    Name of the copyright holder.
@@ -564,7 +564,7 @@ class Agent(IdentifiedNode):
 
 
 class RecordSource(StructuredNode):
-    """ A reference to the IMC content provider and their local ID.
+    """A reference to the IMC content provider and their local ID.
 
     Attributes:
         source_id       The local identifier of the record. If this does not
@@ -704,8 +704,10 @@ class VideoFormat(StructuredNode):
     creation = RelationshipFrom("AVEntity", "VIDEO_FORMAT", cardinality=One, show=True)
 
     def __str__(self):
-        return "VideoFormat: [gauge: {}, aspect_ratio: {}, sound: {}; colour {}]".format(
-            self.gauge, self.aspect_ratio, self.sound, self.colour
+        return (
+            "VideoFormat: [gauge: {}, aspect_ratio: {}, sound: {}; colour {}]".format(
+                self.gauge, self.aspect_ratio, self.sound, self.colour
+            )
         )
 
 

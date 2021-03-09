@@ -10,7 +10,7 @@ class Customizer(BaseCustomizer):
     def custom_user_properties_pre(
         properties: Props,
     ) -> Tuple[Props, Props]:
-        extra_properties = {}
+        extra_properties: Props = {}
         # if 'myfield' in properties:
         #     extra_properties['myfield'] = properties['myfield']
         return properties, extra_properties

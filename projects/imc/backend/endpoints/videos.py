@@ -2,6 +2,7 @@
 Handle your video entity
 """
 import os
+from typing import Any, Dict, List
 
 from flask import send_file
 from imc.endpoints import IMCEndpoint
@@ -276,7 +277,7 @@ class VideoAnnotations(IMCEndpoint):
                         json_segment["annotations"] = []
                         json_segment["tags"] = []
                         # <dict(iri, name)>{iri, name, spatial, auto, hits}
-                        tags = {}
+                        tags: Dict[Any, Any] = {}
                         for anno in segment.annotation.all():
                             if anno.private:
                                 if creator is None:
@@ -373,7 +374,7 @@ class VideoShots(IMCEndpoint):
         item = video.item.single()
         api_url = get_backend_url()
 
-        annotations = {}
+        annotations: Dict[str, List[Any]] = {}
 
         annotations_query = (
             """
@@ -507,10 +508,8 @@ class VideoSegments(IMCEndpoint):
         item = video.item.single()
         log.debug("get manual segments for Item [{}]", item.uuid)
 
-        data = []
         # TODO
-
-        return self.response(data)
+        return self.response([])
 
 
 class VideoContent(IMCEndpoint, Downloader):

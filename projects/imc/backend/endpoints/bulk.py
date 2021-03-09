@@ -10,10 +10,10 @@ POST api/bulk
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-
 import os
 import re
 from datetime import datetime
+from typing import Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import BulkSchema
@@ -41,11 +41,11 @@ class Bulk(IMCEndpoint):
 
         POSSIBLE_FORMATS = ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S.%fZ"]
 
-        found_date = None
-        found_dir = None
+        found_date: Optional[datetime] = None
+        found_dir: Optional[str] = None
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for d in dirs:
-            parsed_date = None
+            parsed_date: Optional[datetime] = None
             for format in POSSIBLE_FORMATS:
                 try:
                     parsed_date = datetime.strptime(d, format)
@@ -64,6 +64,10 @@ class Bulk(IMCEndpoint):
                     found_dir = d
             else:
                 log.warning("cannot parse dir = {}", d)
+
+        if not found_dir:
+            return None
+
         return os.path.join(path, found_dir)
 
     @decorators.auth.require_all(Role.ADMIN)
@@ -109,7 +113,7 @@ class Bulk(IMCEndpoint):
 
             task = self.celery_ext.celery_app.send_task(
                 "bulk_update",
-                args=[guid, upload_latest_dir, force_reprocessing],
+                args=[guid, upload_latest_dir, upload_dir, force_reprocessing],
                 countdown=10,
             )
             log.debug("Task id={}", task.id)
@@ -173,9 +177,7 @@ class Bulk(IMCEndpoint):
         for f in files:
             path = os.path.join(upload_dir, f)
             filename = f
-            properties = {}
-            properties["filename"] = filename
-            properties["path"] = path
+            properties = {"filename": filename, "path": path}
 
             # ignore previous failures
             if not retry:
