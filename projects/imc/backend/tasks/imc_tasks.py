@@ -14,6 +14,7 @@ from imc.tasks.services.orf_xmlparser import ORF_XMLParser
 from restapi.connectors import neo4j, smtp
 from restapi.connectors.celery import CeleryExt
 from restapi.connectors.smtp.notifications import get_html_template
+from restapi.exceptions import NotFound
 from restapi.utilities.logs import log
 
 if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
@@ -475,7 +476,11 @@ def shot_revision(self, revision, item_id):
     )
     item = None
     try:
-        item = self.graph.Item.nodes.get(uuid=item_id)
+        item = self.graph.Item.nodes.get_or_none(uuid=item_id)
+
+        if not item:
+            raise NotFound(f"Item {item_id} not foun")
+
         content_source = item.content_source.single()
         group = item.ownership.single()
         movie = content_source.filename

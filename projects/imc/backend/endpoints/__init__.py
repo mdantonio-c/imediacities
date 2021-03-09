@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from restapi.rest.definition import EndpointResource
 from restapi.utilities.logs import log
@@ -33,9 +33,9 @@ class IMCEndpoint(EndpointResource):
         verify_attribute = dict.get if isinstance(instance, dict) else hasattr
 
         res_id: Optional[str] = None
-        if verify_attribute(instance, "uuid"):
+        if verify_attribute(instance, "uuid"):  # type: ignore
             res_id = str(instance.uuid)
-        elif verify_attribute(instance, "id"):
+        elif verify_attribute(instance, "id"):  # type: ignore
             res_id = str(instance.id)
 
         data = self.get_show_fields(instance)
@@ -117,14 +117,9 @@ class IMCEndpoint(EndpointResource):
 
         verify_attribute = dict.get if isinstance(obj, dict) else hasattr
 
-        if isinstance(obj, dict):
-            verify_attribute = dict.get
-        else:
-            verify_attribute = hasattr
-
-        attributes = {}
+        attributes: Dict[str, Optional[Any]] = {}
         for key in fields:
-            if verify_attribute(obj, key):
+            if verify_attribute(obj, key):  # type: ignore
                 get_attribute = getattr
                 if isinstance(obj, dict):
                     get_attribute = dict.get

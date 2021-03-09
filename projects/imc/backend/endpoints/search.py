@@ -3,6 +3,7 @@ Search endpoint
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
+from typing import Dict
 
 from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, codelists
@@ -248,7 +249,11 @@ class Search(IMCEndpoint):
             )
 
         data = []
-        meta_response = {"totalItems": 0, "countByProviders": 0, "countByYears": 0}
+        meta_response: Dict[str, int] = {
+            "totalItems": 0,
+            "countByProviders": 0,
+            "countByYears": 0,
+        }
         # get total number of elements
         try:
             numels = [row[0] for row in self.graph.cypher(countv)][0]
