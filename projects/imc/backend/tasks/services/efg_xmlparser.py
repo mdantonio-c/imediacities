@@ -469,8 +469,7 @@ class EFG_XMLParser:
 
         agents: Any = []
         for agent_node in nodes:
-            props = {}
-            props["names"] = [agent_node.find("efg:name", self.ns).text.strip()]
+            props = {"names": [agent_node.find("efg:name", self.ns).text.strip()]}
             activities = []
             rel_agent_type = agent_node.find("efg:type", self.ns)
             if rel_agent_type is not None and rel_agent_type.text.lower() != "n/a":
@@ -484,15 +483,14 @@ class EFG_XMLParser:
                 else:
                     activities.append(rel_agent_type.text.strip())
 
-            if agent_node.tag == "relPerson" or agent_node.tag == "efg:relPerson":
+            agent_tag = agent_node.tag.split("}")[1][0:]
+            if agent_tag == "relPerson":
                 props["agent_type"] = "P"  # type: ignore
-            elif (
-                agent_node.tag == "relCorporate" or agent_node.tag == "efg:relCorporate"
-            ):
+            elif agent_tag == "relCorporate":
                 props["agent_type"] = "C"  # type: ignore
             else:
                 # should never be reached
-                raise ValueError(f"Invalid tag name for: {agent_node.tag}")
+                raise ValueError(f"Invalid tag name for: '{agent_tag}'")
 
             agent = None
             # de-duplicate agents
