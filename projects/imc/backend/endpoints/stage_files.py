@@ -249,7 +249,7 @@ class Stage(IMCEndpoint):
         """
 
         self.graph = neo4j.get_instance()
-        c = celery.get_instance()
+        celery_ext = celery.get_instance()
 
         group = self.get_user().belongs_to.single()
 
@@ -393,7 +393,7 @@ class Stage(IMCEndpoint):
             log.debug("MetaStage not exist for source id {}", source_id)
 
         # 3) starting import
-        task = c.celery_app.send_task(
+        task = celery_ext.celery_app.send_task(
             "import_file", args=[path, meta_stage.uuid, mode, update], countdown=10
         )
 
