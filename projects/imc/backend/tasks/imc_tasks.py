@@ -81,7 +81,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
     xml_resource = None
     try:
-        metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
+        metadata_update = True  # I just want to do the metadata update!
         xml_resource, group, source_id, item_type, item_node = update_meta_stage(
             self, resource_id, path, metadata_update
         )
@@ -112,9 +112,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
         if content_path is not None:
             # Create content resource
-            properties = {}
-            properties["filename"] = content_filename
-            properties["path"] = content_path
+            properties = {"filename": content_filename, "path": content_path}
 
             try:
                 # This is a task restart? What to do in this case?
@@ -641,8 +639,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             # check for existing item
             item_node = xml_resource.item.single()
             if item_node is None:
-                item_properties = {}
-                item_properties["item_type"] = item_type
+                item_properties = {"item_type": item_type}
                 item_node = self.graph.Item(**item_properties).save()
                 item_node.ownership.connect(group)
                 item_node.meta_source.connect(xml_resource)

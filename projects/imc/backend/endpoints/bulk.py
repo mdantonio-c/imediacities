@@ -177,9 +177,7 @@ class Bulk(IMCEndpoint):
         for f in files:
             path = os.path.join(upload_dir, f)
             filename = f
-            properties = {}
-            properties["filename"] = filename
-            properties["path"] = path
+            properties = {"filename": filename, "path": path}
 
             # ignore previous failures
             if not retry:

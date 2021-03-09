@@ -65,7 +65,7 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
     total_to_be_imported = len(files)
     skipped = 0
     updated = 0
-    updatedAndReprocessing = 0
+    updated_and_reprocessing = 0
     created = 0
     failed = 0
     for f in files:
@@ -217,7 +217,7 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                         resource.status = "UPDATING METADATA + FORCE REPROCESSING"
                         resource.task_id = task.id
                         resource.save()
-                        updatedAndReprocessing += 1
+                        updated_and_reprocessing += 1
                     else:
                         task = CeleryExt.celery_app.send_task(
                             "update_metadata",
@@ -322,7 +322,7 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
                     meta_stage.status = "UPDATING METADATA + FORCE REPROCESSING"
                     meta_stage.task_id = task.id
                     meta_stage.save()
-                    updatedAndReprocessing += 1
+                    updated_and_reprocessing += 1
                 else:
                     # metadata update ONLY
                     log.info(
@@ -352,7 +352,7 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
     log.info("------------------------------------")
     log.info(f"total records: {total_to_be_imported}")
     log.info(f"updating: {updated}")
-    log.info(f"updating and reprocessing: {updatedAndReprocessing}")
+    log.info(f"updating and reprocessing: {updated_and_reprocessing}")
     log.info(f"creating: {created}")
     log.info(f"skipped: {skipped}")
     log.info(f"failed: {failed}")
