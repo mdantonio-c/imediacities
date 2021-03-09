@@ -696,7 +696,7 @@ def update_meta_stage(self, resource_id, path, metadata_update):
             log.warning("Not found MetaStage for resource_id={}", resource_id)
 
     except Exception as e:
-        log.error("Failed update of resource_id {}, Error: {}", (resource_id, e))
+        log.error("Failed update of resource_id {}, Error: {}", resource_id, e)
         if xml_resource is not None:
             xml_resource.status = "ERROR"
             xml_resource.status_message = str(e)
