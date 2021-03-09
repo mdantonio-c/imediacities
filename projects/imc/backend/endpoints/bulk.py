@@ -41,8 +41,8 @@ class Bulk(IMCEndpoint):
 
         POSSIBLE_FORMATS = ["%Y-%m-%d", "%Y-%m-%dT%H:%M:%S.%fZ"]
 
-        found_date = None
-        found_dir = None
+        found_date: Optional[datetime] = None
+        found_dir: Optional[str] = None
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for d in dirs:
             parsed_date: Optional[datetime] = None

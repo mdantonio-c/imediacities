@@ -908,7 +908,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
     # get the shot list of the item
     shots = item.shots.all()
-    shot_list: Dict[str, Set[Any]] = {}
+    shot_list: Dict[int, Set[Any]] = {}
     for s in shots:
         shot_list[s.shot_num] = set()
     if item.item_type == "Image":
@@ -1062,7 +1062,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
 
     # get the shot list of the item
     shots = item.shots.all()
-    shot_list: Dict[str, Set[Any]] = {}
+    shot_list: Dict[int, Set[Any]] = {}
     for s in shots:
         shot_list[s.shot_num] = set()
     if item.item_type == "Image":
