@@ -774,7 +774,7 @@ class AnnotationRepository:
         s_start = segment.start_frame_idx
         s_end = segment.end_frame_idx
         shots = []
-        for s in sorted(item.shots, key=lambda k: k.start_frame_idx):
+        for s in sorted(item.shots, key=lambda k: k.start_frame_idx):  # type: ignore
             if (
                 (s_start >= s.start_frame_idx and s_start <= s.end_frame_idx)
                 or (s_end >= s.start_frame_idx and s_end <= s.end_frame_idx)

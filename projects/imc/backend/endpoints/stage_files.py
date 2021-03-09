@@ -8,7 +8,7 @@ from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, ServerError
+from restapi.exceptions import BadRequest, Conflict, NotFound, ServerError
 from restapi.models import fields, validate
 from restapi.utilities.logs import log
 
@@ -393,12 +393,18 @@ class Stage(IMCEndpoint):
                     )
 
             log.debug("Starting import of file path={}", path)
-            log.debug("with meta_stage.uuid={}", meta_stage.uuid)
+            if meta_stage:
+                log.debug("with meta_stage.uuid={}", meta_stage.uuid)
+            else:
+                log.debug("with meta_stage = None!")
             log.debug("with mode={}", mode)
             log.debug("with metadata_update={}", update)
 
         except self.graph.MetaStage.DoesNotExist:
             log.debug("MetaStage not exist for source id {}", source_id)
+
+        if not meta_stage:
+            raise NotFound(f"MetaStage not exist for source id {source_id}")
 
         # 3) starting import
         task = celery_ext.celery_app.send_task(

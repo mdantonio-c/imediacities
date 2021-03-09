@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from restapi.rest.definition import EndpointResource
 from restapi.utilities.logs import log
@@ -29,16 +30,13 @@ class IMCEndpoint(EndpointResource):
         Very important: this method only works with customized neo4j models
         """
 
-        # Get id
-        verify_attribute = hasattr
-        if isinstance(instance, dict):
-            verify_attribute = dict.get
+        verify_attribute = dict.get if isinstance(instance, dict) else hasattr
+
+        res_id: Optional[str] = None
         if verify_attribute(instance, "uuid"):
             res_id = str(instance.uuid)
         elif verify_attribute(instance, "id"):
             res_id = str(instance.id)
-        else:
-            res_id = None
 
         data = self.get_show_fields(instance)
         data["id"] = res_id
@@ -117,9 +115,12 @@ class IMCEndpoint(EndpointResource):
         elif hasattr(obj, "show_fields"):
             fields = obj.show_fields()
 
-        verify_attribute = hasattr
+        verify_attribute = dict.get if isinstance(obj, dict) else hasattr
+
         if isinstance(obj, dict):
             verify_attribute = dict.get
+        else:
+            verify_attribute = hasattr
 
         attributes = {}
         for key in fields:

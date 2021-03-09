@@ -18,7 +18,9 @@ from restapi.utilities.logs import log
 
 if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
     try:
-        from scripts.analysis.analyze import (
+        # mypy: Cannot find implementation or library stub for
+        # module named 'scripts.analysis.analyze'
+        from scripts.analysis.analyze import (  # type: ignore
             analize,
             get_framerate,
             image_transcoded_tech_info,

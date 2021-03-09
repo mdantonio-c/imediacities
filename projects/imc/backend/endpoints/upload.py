@@ -8,6 +8,7 @@ from mimetypes import MimeTypes
 from flask import make_response, send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
+from restapi.config import UPLOAD_PATH
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, NotFound
 from restapi.services.uploader import Uploader
@@ -41,9 +42,9 @@ class Upload(Uploader, IMCEndpoint):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = os.path.join("/uploads", group.uuid)
-        if not os.path.exists(upload_dir):
-            os.mkdir(upload_dir)
+        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        if not upload_dir.exists():
+            upload_dir.mkdir()
 
         return self.init_chunk_upload(upload_dir, name, force=True)
 
@@ -67,9 +68,9 @@ class Upload(Uploader, IMCEndpoint):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = os.path.join("/uploads", group.uuid)
-        if not os.path.exists(upload_dir):
-            os.mkdir(upload_dir)
+        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        if not upload_dir.exists():
+            upload_dir.mkdir()
 
         completed, upload_response = self.chunk_upload(upload_dir, filename)
 

@@ -347,6 +347,10 @@ class ListItems(IMCEndpoint):
             raise NotFound("Please specify a valid list id")
         # am I the owner of the list? (allowed also to admin)
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         iamadmin = self.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
@@ -411,6 +415,10 @@ class ListItems(IMCEndpoint):
 
         # am I the creator of the list?
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
             raise Forbidden(
@@ -473,6 +481,10 @@ class ListItems(IMCEndpoint):
         )
         # am I the creator of the list? (always allowed to admin)
         user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
         iamadmin = self.verify_admin()
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
