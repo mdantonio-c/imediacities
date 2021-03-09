@@ -113,7 +113,7 @@ class Bulk(IMCEndpoint):
 
             task = self.celery_ext.celery_app.send_task(
                 "bulk_update",
-                args=[guid, upload_latest_dir, force_reprocessing],
+                args=[guid, upload_latest_dir, upload_dir, force_reprocessing],
                 countdown=10,
             )
             log.debug("Task id={}", task.id)
