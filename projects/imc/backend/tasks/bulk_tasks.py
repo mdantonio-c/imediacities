@@ -52,7 +52,7 @@ def check_item_type_coherence(resource, standard_path):
 
 @CeleryExt.celery_app.task(bind=True, name="bulk_update")
 @send_errors_by_email
-def bulk_update(self, guid, upload_dir, force_reprocessing=False):
+def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
     log.info(f"Bulk update: processing files from dir {upload_dir}")
 
     graph = neo4j.get_instance()
@@ -97,7 +97,7 @@ def bulk_update(self, guid, upload_dir, force_reprocessing=False):
         source_id_clean = re.sub(r"[\W_]+", "-", source_id.strip())
 
         standard_filename = group.shortname + "_" + source_id_clean + ".xml"
-        standard_path = os.path.join(upload_dir, standard_filename)
+        standard_path = os.path.join(target_dir, standard_filename)
         try:
             copyfile(file_path, standard_path)
             log.info(f"Copied file {file_path} to file {standard_path}")
