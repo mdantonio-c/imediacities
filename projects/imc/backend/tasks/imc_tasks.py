@@ -342,12 +342,7 @@ def launch_tool(self, tool_name, item_id):
     self.graph = neo4j.get_instance()
 
     item = self.graph.Item.nodes.get(uuid=item_id)
-    content_source = item.content_source.single()
-    group = item.ownership.single()
-    movie = content_source.filename
-    m_name = os.path.splitext(os.path.basename(movie))[0]
-    analyze_path = "/uploads/Analize/" + group.uuid + "/" + m_name + "/"
-    log.debug("analyze path: {0}", analyze_path)
+    analyze_path = get_analyze_path(item)
     # call analyze for object detection ONLY
     # if detect_objects(movie, analyze_path):
     #     log.info('Object detection executed')
@@ -364,21 +359,8 @@ def launch_tool(self, tool_name, item_id):
     return 1
 
 
-@CeleryExt.task()
-def load_v2(self, other_version, item_id, retry=False):
-    log.debug("load v2 {0} for item {1}", other_version, item_id)
-
-    self.graph = neo4j.get_instance()
-    item = self.graph.Item.nodes.get(uuid=item_id)
-    content_source = item.content_source.single()
-    group = item.ownership.single()
-    source_filename = content_source.filename
-    m_name = os.path.splitext(os.path.basename(source_filename))[0]
-    analyze_path = "/uploads/Analize/" + group.uuid + "/" + m_name + "/"
-    log.debug("analyze path: {0}", analyze_path)
-
-    # create symbolic link
-    v2_link_name = os.path.join(analyze_path, "v2")
+def create_symbolic_link(target_path, other_version):
+    v2_link_name = os.path.join(target_path, "v2")
     v2_link_target = other_version.replace(stage_area, "../../..")
 
     if os.path.exists(v2_link_name):
@@ -387,6 +369,18 @@ def load_v2(self, other_version, item_id, retry=False):
         os.symlink(v2_link_target, v2_link_name)
     except BaseException:
         print("failed to create v2 link")
+
+
+@CeleryExt.task()
+def load_v2(self, other_version, item_id, retry=False):
+    log.debug("load v2 {0} for item {1}", other_version, item_id)
+
+    self.graph = neo4j.get_instance()
+    item = self.graph.Item.nodes.get(uuid=item_id)
+    analyze_path = get_analyze_path(item)
+
+    # create symbolic link
+    create_symbolic_link(analyze_path, other_version)
 
     ext = "mp4"
     if item.item_type == "Video":
@@ -464,6 +458,16 @@ def load_v2(self, other_version, item_id, retry=False):
     return 1
 
 
+def get_analyze_path(item):
+    content_source = item.content_source.single()
+    group = item.ownership.single()
+    movie = content_source.filename
+    m_name = os.path.splitext(os.path.basename(movie))[0]
+    analyze_path = "/uploads/Analize/" + group.uuid + "/" + m_name + "/"
+    log.debug("analyze path: {0}", analyze_path)
+    return analyze_path
+
+
 @CeleryExt.task()
 def shot_revision(self, revision, item_id):
     log.info("Start shot revision task for video item [{0}]", item_id)
@@ -473,20 +477,11 @@ def shot_revision(self, revision, item_id):
     exitRevision = (
         True if "exitRevision" in revision and revision["exitRevision"] else False
     )
-    item = None
+    item = self.graph.Item.nodes.get_or_none(uuid=item_id)
+    if not item:
+        raise NotFound(f"Item {item_id} not found")
     try:
-        item = self.graph.Item.nodes.get_or_none(uuid=item_id)
-
-        if not item:
-            raise NotFound(f"Item {item_id} not found")
-
-        content_source = item.content_source.single()
-        group = item.ownership.single()
-        movie = content_source.filename
-        m_name = os.path.splitext(os.path.basename(movie))[0]
-        analyze_path = "/uploads/Analize/" + group.uuid + "/" + m_name + "/"
-        log.debug("analyze path: {0}", analyze_path)
-
+        analyze_path = get_analyze_path(item)
         revised_cuts = []
         for s in sorted(revision["shots"], key=itemgetter("shot_num"))[1:]:
             revised_cuts.append(s["cut"])
