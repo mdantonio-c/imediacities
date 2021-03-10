@@ -20,6 +20,7 @@ import {
   SceneCut,
 } from "../../services/shot-revision.service";
 import { NotificationService } from "@rapydo/services/notification";
+import { MediaUtilsService } from "../../catalog/services/media-utils.service";
 /**
  * Componente per la visualizzazione del media
  */
@@ -418,9 +419,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         mediaEntity.production_years = mediaEntity.date_created;
       }
       // titolo principale
-      if (mediaEntity._titles.length) {
-        mediaEntity.identifying_title = mediaEntity._titles[0].text;
-      }
+      mediaEntity.identifying_title = MediaUtilsService.getIdentifyingTitle(
+        mediaEntity
+      );
       this.locations = [];
     }
 
