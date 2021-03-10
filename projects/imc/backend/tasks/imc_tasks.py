@@ -586,8 +586,7 @@ def lookup_content(self, path, source_id):
     source_id_encoded = re.sub(r"[\W_]+", "-", source_id)
     log.debug("source_id_encoded: " + source_id_encoded)
 
-    content_path = None
-    content_filename = []
+    content_filenames = []
     files = [f for f in os.listdir(path) if not f.endswith(".xml")]
     for f in files:
         # discard filename that stats with v2_ (case insensitive)
@@ -598,15 +597,20 @@ def lookup_content(self, path, source_id):
         if len(tokens) == 0:
             continue
         if tokens[-1] == source_id_encoded:
-            content_filename.append(f)
-    if not content_filename:
-        content_filename = None
-    elif len(content_filename) > 1:
-        raise Exception(f"Multiple content FOUND: {content_filename}")
-    else:
-        content_filename = content_filename[0]
-        content_path = os.path.join(path, content_filename)
-        log.info("Content file FOUND: {}", content_filename)
+            content_filenames.append(f)
+
+    # No content found
+    if not content_filenames:
+        return None, None
+
+    # Multiple contents found => error
+    if len(content_filenames) > 1:
+        raise Exception(f"Multiple content FOUND: {content_filenames}")
+
+    # Normal condition: a single content found
+    content_filename = content_filenames[0]
+    content_path = os.path.join(path, content_filename)
+    log.info("Content file FOUND: {}", content_filename)
     return content_path, content_filename
 
 
