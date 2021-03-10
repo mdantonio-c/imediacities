@@ -16,7 +16,7 @@ class GeoDistance(Schema):
 
 class SearchMatch(Schema):
     term = fields.Str(required=True)
-    fields = fields.List(
+    fields = fields.List(  # type: ignore
         fields.Str(
             validate=validate.OneOf(["title", "contributor", "keyword", "description"])
         ),
