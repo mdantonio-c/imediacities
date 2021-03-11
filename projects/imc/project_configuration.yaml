@@ -49,6 +49,7 @@ variables:
     Archive: Archive
     Reviser: Reviser
     Researcher: Researcher
+    read_only: ReadOnly
     # default: normal_user
     # allowed_roles:
     #   - Researcher
