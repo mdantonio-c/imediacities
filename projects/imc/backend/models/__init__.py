@@ -1,7 +1,7 @@
 from marshmallow import ValidationError, pre_load
 from restapi.models import PartialSchema, Schema, fields, validate
 
-allowed_term_fields = ("title", "description", "keyword", "contributor")
+allowed_term_fields = ("title", "description", "keyword")
 allowed_anno_types = ("TAG", "DSC", "LNK")
 allowed_item_types = ("all", "video", "image")
 

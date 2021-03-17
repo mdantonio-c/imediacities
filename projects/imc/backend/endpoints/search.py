@@ -184,12 +184,14 @@ class Search(IMCEndpoint):
                 )
 
         fulltext = None
-        if match is not None:
-
-            term = match.get("term")
-            if term is not None:
-                # term = self.graph.sanitize_input(term)
-                term = self.graph.fuzzy_tokenize(term)
+        if (
+            match is not None
+            and (term := self.graph.sanitize_input(match.get("term"))) != ""
+        ):
+            term = self.graph.fuzzy_tokenize(term)
+            fields = match.get("fields", ["Title"])
+            term_fields = "|".join(list(map((lambda x: f"has_{x}"), fields))).upper()
+            log.debug("full-text search in fields {}. Term: {}", fields, term)
 
             # Create with:
             # CALL db.index.fulltext.createNodeIndex("titles",["Title", "Description", "Keyword"],["text", "term"])
@@ -198,9 +200,9 @@ class Search(IMCEndpoint):
                 CALL db.index.fulltext.queryNodes("titles", '{term}')
                 YIELD node, score
                 WITH node, score
-                MATCH (n:{entity})-[:HAS_TITLE|HAS_DESCRIPTION|HAS_KEYWORD]->(node)
+                MATCH (n:{entity})-[:{fields}]->(node)
             """.format(
-                term=term, entity=entity
+                term=term, entity=entity, fields=term_fields
             )
             # RETURN node, n, score
 
