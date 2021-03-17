@@ -18,8 +18,8 @@ class Search(IMCEndpoint):
 
     labels = ["file"]
 
-    allowed_term_fields = ("title", "description", "keyword", "contributor")
-    allowed_anno_types = ("TAG", "DSC", "LNK")
+    # allowed_term_fields = ("title", "description", "keyword", "contributor")
+    # allowed_anno_types = ("TAG", "DSC", "LNK")
 
     @decorators.auth.optional()
     @decorators.get_pagination
@@ -160,9 +160,7 @@ class Search(IMCEndpoint):
             # if no user ignore this filter
             if user and annotated_by:
                 # only annotated *BY ME* is autorized (except for the admin)
-                anno_user_id = annotated_by.get("user", None)
-                if anno_user_id is None:
-                    raise BadRequest("Missing user in annotated_by filter")
+                anno_user_id = annotated_by.get("user")
                 iamadmin = self.verify_admin()
                 if user.uuid != anno_user_id and not iamadmin:
                     raise Forbidden(
@@ -178,11 +176,6 @@ class Search(IMCEndpoint):
                             "Please specify a valid user id in annotated_by filter"
                         )
                 anno_type = annotated_by.get("type", "TAG")
-                _allowed_types = self.__class__.allowed_anno_types
-                if anno_type not in _allowed_types:
-                    raise BadRequest(
-                        f"Unknown type in annotated_by filter: expected one of {_allowed_types}"
-                    )
                 filters.append(
                     "MATCH (n)<-[:CREATION]-(i:Item)<-[:SOURCE]-(tag:Annotation {{annotation_type:'{type}'}})"
                     "-[IS_ANNOTATED_BY]->(:User {{uuid:'{user}'}})".format(
@@ -195,7 +188,7 @@ class Search(IMCEndpoint):
 
             term = match.get("term")
             if term is not None:
-                term = self.graph.sanitize_input(term)
+                # term = self.graph.sanitize_input(term)
                 term = self.graph.fuzzy_tokenize(term)
 
             # Create with:

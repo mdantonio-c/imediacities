@@ -1,6 +1,10 @@
 from marshmallow import ValidationError, pre_load
 from restapi.models import PartialSchema, Schema, fields, validate
 
+allowed_term_fields = ("title", "description", "keyword", "contributor")
+allowed_anno_types = ("TAG", "DSC", "LNK")
+allowed_item_types = ("all", "video", "image")
+
 
 class Spatial(Schema):
     latitude = fields.Float(required=True, data_key="lat")
@@ -17,11 +21,17 @@ class GeoDistance(Schema):
 class SearchMatch(Schema):
     term = fields.Str(required=True)
     fields = fields.List(  # type: ignore
-        fields.Str(
-            validate=validate.OneOf(["title", "contributor", "keyword", "description"])
-        ),
+        fields.Str(validate=validate.OneOf(allowed_term_fields)),
         required=True,
         min_items=1,
+    )
+
+
+class AnnotatedByCriteria(Schema):
+    user = fields.Str(required=True, description="User's uuid")
+    type = fields.Str(
+        missing="TAG",
+        validate=validate.OneOf(allowed_anno_types),
     )
 
 
@@ -29,7 +39,7 @@ class SearchFilter(Schema):
 
     type = fields.Str(
         missing="all",
-        validate=validate.OneOf(["all", "video", "image"]),
+        validate=validate.OneOf(allowed_item_types),
     )
     provider = fields.Str(allow_none=True)
     city = fields.Str(allow_none=True)
@@ -60,7 +70,7 @@ class SearchFilter(Schema):
     )
 
     # geo_distance = fields.Nested(GeoDistance)
-    annotated_by = fields.Str(description="User's uuid")
+    annotated_by = fields.Nested(AnnotatedByCriteria, allow_none=True)
 
 
 class AnnotationSearchCriteria(Schema):
