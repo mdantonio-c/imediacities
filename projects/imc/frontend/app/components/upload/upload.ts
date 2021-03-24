@@ -56,7 +56,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
       token: this.auth.getToken(),
       // allowedTypes: 'image/*',
       // "application/x-zip-compressed,application/x-compressed,application/zip,multipart/x-zip",
-      multiple2: true,
+      multiple: true,
       autoUpload: true,
     };
 
