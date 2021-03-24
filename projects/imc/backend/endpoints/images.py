@@ -92,7 +92,9 @@ class Images(IMCEndpoint):
     Create a new image description.
     """
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.database_transaction
     @decorators.endpoint(
         path="/images",

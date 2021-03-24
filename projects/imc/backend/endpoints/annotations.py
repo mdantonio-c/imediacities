@@ -23,6 +23,7 @@ from restapi.exceptions import (
     Unauthorized,
 )
 from restapi.models import Schema, fields
+from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
@@ -164,7 +165,9 @@ class Annotations(IMCEndpoint):
         return self.response(data)
 
     # "schema": {"$ref": "#/definitions/Annotation"},
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
@@ -327,7 +330,9 @@ class Annotations(IMCEndpoint):
 
         return self.response(self.get_annotation_response(created_anno), code=201)
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.use_kwargs(
         {
             "body_ref": fields.Str(
@@ -406,7 +411,9 @@ class Annotations(IMCEndpoint):
         return self.empty_response()
 
     # "schema": {"$ref": "#/definitions/Annotation"},
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.database_transaction
     @decorators.use_kwargs(AnnotationModel)
     @decorators.marshal_with(AnnotationModel, code=200)
@@ -501,7 +508,9 @@ class Annotations(IMCEndpoint):
 
         return self.response(updated_anno)
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.database_transaction
     @decorators.use_kwargs(PatchDocument)
     @decorators.marshal_with(AnnotationModel, code=200)

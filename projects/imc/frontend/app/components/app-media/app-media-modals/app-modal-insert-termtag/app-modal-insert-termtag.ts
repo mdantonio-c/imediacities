@@ -65,7 +65,7 @@ export class AppModalInsertTermtagComponent
   constructor(
     private http: HttpClient,
     private LodService: AppLodService,
-    private VocabularyService: AppVocabularyService,
+    private vocabularyService: AppVocabularyService,
     private AnnotationsService: AppAnnotationsService,
     private ref: ChangeDetectorRef
   ) {}
@@ -106,23 +106,18 @@ export class AppModalInsertTermtagComponent
     term.open = valore_da_assegnare;
   }
   /**
-   * Gesitione del click sulle foglie (elementi senza children) del vocabolario
+   * Manage the click on the leaves (elements without children) of the vocabulary.
    * @param term
    */
   vocabolario_leaf(term) {
     term.selected = !term.selected;
-
     if (term.selected) {
-      if (
-        this.terms.filter(
-          (t) => t.name.toLowerCase() === term.label.toLowerCase()
-        ).length === 0
-      ) {
-        this.terms.push(this.VocabularyService.annotation_create(term));
+      if (this.terms.filter((t) => t.iri === term.id).length === 0) {
+        this.terms.push(this.vocabularyService.annotation_create(term));
       }
     } else {
-      //  rimuovo da elenco terms
-      this.terms = this.terms.filter((t) => t.name !== term.label);
+      //  remove from the terms list
+      this.terms = this.terms.filter((t) => t.iri !== term.id);
     }
   }
 
@@ -131,7 +126,7 @@ export class AppModalInsertTermtagComponent
   }
 
   /**
-   * ricerca il termine nel vocabolario e su wikidata
+   * Search for the term in the dictionary and on wikidata
    * @param term
    * @returns {any}
    */
@@ -165,12 +160,11 @@ export class AppModalInsertTermtagComponent
       hide_prev: true,
     };
 
-    const vocabolario = this.VocabularyService.search(term, this.lang);
+    const vocabolario = this.vocabularyService.search(term, this.lang);
     console.log(vocabolario);
-    this.results.vocabulary = this.VocabularyService.search(
-      term,
-      this.lang
-    ).slice();
+    this.results.vocabulary = this.vocabularyService
+      .search(term, this.lang)
+      .slice();
     return this.LodService.search(term, this.lang).then(
       (lodResults) => {
         this.results.lods = [];
@@ -244,7 +238,7 @@ export class AppModalInsertTermtagComponent
   term_add(event) {
     let close_results = false;
     if (event.source === "vocabulary") {
-      this.VocabularyService.toggle_term(event);
+      this.vocabularyService.toggle_term(event);
     }
     if (typeof event === "string") {
       event = { name: event };
@@ -264,7 +258,7 @@ export class AppModalInsertTermtagComponent
         this.add_tag.show("info", "This tag has already been added");
       } else {
         this.add_tag.hide();
-        this.terms.push(this.VocabularyService.annotation_create(event));
+        this.terms.push(this.vocabularyService.annotation_create(event));
         // reset input field
         this.ricerca_model = "";
       }
@@ -279,7 +273,7 @@ export class AppModalInsertTermtagComponent
    */
   term_remove(term) {
     this.terms = this.terms.filter((t) => t.name !== term.name);
-    this.VocabularyService.deselect_term(term);
+    this.vocabularyService.deselect_term(term);
   }
 
   /**
@@ -358,7 +352,7 @@ export class AppModalInsertTermtagComponent
   ngOnChanges() {
     this.terms_all = this.AnnotationsService.merge(this.data.shots, "tags");
 
-    this.VocabularyService.get((vocabolario) => {
+    this.vocabularyService.get((vocabolario) => {
       this.vocabolario = vocabolario;
     });
     this.ricerca_model = "";

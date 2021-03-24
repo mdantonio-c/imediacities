@@ -31,7 +31,7 @@
               <div class="col">
                 <div
                   *ngIf="currentView == 'Grid'"
-                  style="display: flex; flex-direction: row; flex-wrap: wrap;"
+                  style="display: flex; flex-direction: row; flex-wrap: wrap"
                 >
                   <search-thumbnail
                     *ngFor="let mediaEntity of results"
@@ -45,8 +45,8 @@
                     [media]="mediaEntity"
                   >
                   </search-media>
+                  <div class="space-8"></div>
                 </div>
-                <div class="space-8"></div>
                 <!-- pagination -->
                 <div
                   class="search-pager row card pt-3"

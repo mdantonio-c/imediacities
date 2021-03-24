@@ -10,6 +10,7 @@ from restapi import decorators
 from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, Conflict, NotFound, ServerError
 from restapi.models import fields, validate
+from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
 
@@ -72,7 +73,9 @@ class Stage(IMCEndpoint):
         parser = EFG_XMLParser()
         return parser.get_creation_ref(path)
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.get_pagination
     @decorators.endpoint(
         path="/stage",
@@ -203,7 +206,9 @@ class Stage(IMCEndpoint):
 
         return self.response(data)
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.use_kwargs(
         {
             "filename": fields.Str(
@@ -417,7 +422,9 @@ class Stage(IMCEndpoint):
 
         return self.response(task.id)
 
-    @decorators.auth.require()
+    @decorators.auth.require_any(
+        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
+    )
     @decorators.endpoint(
         path="/stage/<filename>",
         summary="Delete a file from the stage area",
