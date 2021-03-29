@@ -56,7 +56,6 @@ class SearchFilter(Schema):
         description="production year range: end year of the range",
         validate=validate.Range(min=1890, max=2000),
     )
-
     iprstatus = fields.Str(
         description="IPR status",
         allow_none=True,
@@ -66,9 +65,10 @@ class SearchFilter(Schema):
         ),
     )
     terms = fields.List(
-        fields.Nested({"iri": fields.Str(), "label": fields.Str(required=True)})
+        fields.Nested(
+            {"iri": fields.Str(allow_none=True), "label": fields.Str(required=True)}
+        )
     )
-
     # geo_distance = fields.Nested(GeoDistance)
     annotated_by = fields.Nested(AnnotatedByCriteria, allow_none=True)
 
