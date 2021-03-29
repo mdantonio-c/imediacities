@@ -5,6 +5,7 @@ import re
 
 from imc.endpoints import IMCEndpoint
 from imc.models import Target
+from passlib.handlers.md5_crypt import apr_md5_crypt
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
@@ -351,7 +352,7 @@ class ListItems(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.verify_admin()
+        iamadmin = self.auth.is_admin(user)
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not iamadmin:
             raise Forbidden(
@@ -527,51 +528,33 @@ class ListItems(IMCEndpoint):
         creation = item.creation.single()
         if creation is None:
             raise ValueError(f"Very strange. Item <{item.uuid}> with no metadata")
-
         creation = creation.downcast()
 
         res = self.getJsonResponse(mdo, max_relationship_depth=0)
-
         api_url = get_backend_url()
+        res["links"] = {}
         if isinstance(mdo, self.graph.Item):
             # always consider v2 properties if exists
             v2 = item.other_version.single()
             content_type = "videos" if item.item_type == "Video" else "images"
-            res["links"]["content"] = (
-                api_url
-                + "/api/"
-                + content_type
-                + "/"
-                + creation.uuid
-                + "/content?type="
-                + content_type[:-1]
-            )
+            res["links"][
+                "content"
+            ] = f"{api_url}/api/{content_type}/{creation.uuid}/content?type={content_type[:-1]}"
             res["links"]["thumbnail"] = (
-                api_url
-                + "/api/"
-                + content_type
-                + "/"
-                + creation.uuid
-                + "/content?type=thumbnail&size=large"
+                f"{api_url}/api/{content_type}/{creation.uuid}/content?type=thumbnail&size=large"
                 if item.item_type == "Video" or v2 is None
-                else api_url
-                + "/api/"
-                + content_type
-                + "/"
-                + creation.uuid
-                + "/content?type="
-                + content_type[:-1]
+                else f"{api_url}/api/{content_type}/{creation.uuid}/content?type={content_type[:-1]}"
             )
         else:
             # SHOT
-            res["links"]["content"] = (
-                api_url + "/api/videos/" + creation.uuid + "/content?type=video"
-            )
+            res["links"][
+                "content"
+            ] = f"{api_url}/api/videos/{creation.uuid}/content?type=video"
             # THIS IS WRONG. SHOULD BE get_frontend_url
-            res["links"]["webpage"] = api_url + "/app/catalog/videos/" + creation.uuid
-            res["links"]["thumbnail"] = (
-                api_url + "/api/shots/" + mdo.uuid + "?content=thumbnail"
-            )
+            res["links"]["webpage"] = f"{api_url}/app/catalog/videos/{creation.uuid}"
+            res["links"][
+                "thumbnail"
+            ] = f"{api_url}/api/shots/{mdo.uuid}?content=thumbnail"
             # add some video item attributes
             res["item"] = {
                 "digital_format": item.digital_format,
