@@ -5,7 +5,6 @@ import re
 
 from imc.endpoints import IMCEndpoint
 from imc.models import Target
-from passlib.handlers.md5_crypt import apr_md5_crypt
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
