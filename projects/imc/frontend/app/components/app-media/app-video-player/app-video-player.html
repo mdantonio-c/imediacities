@@ -1,5 +1,6 @@
 <!-- Container del video player e dei controlli -->
 <div class="main-container-video row no-gutters">
+  <ngx-spinner [fullScreen]="false"></ngx-spinner>
   <div class="video_container col-12" *ngIf="data">
     <div class="video_wrapper">
       <div class="video-box">
@@ -141,7 +142,6 @@
       </div>
     </div>
   </div>
-
   <!-- Barre sotto al player degli shot -->
   <div class="video_tag-container col-12">
     <app-video-tag

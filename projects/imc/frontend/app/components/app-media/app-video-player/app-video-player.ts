@@ -13,6 +13,7 @@ import {
 import { rangePlayer } from "../../../decorators/app-range";
 import { ShotRevisionService } from "../../../services/shot-revision.service";
 import { AuthService } from "@rapydo/services/auth";
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: "app-video-player",
@@ -45,7 +46,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
   shot_current = -1;
 
   /**
-   * Memorizza il punto da cui ripartire nel caso di un range in loop
+   * Stores the point from which to restart in the case of a range in loop
    * @type {number}
    */
   restart_time = null;
@@ -54,7 +55,8 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     private cdRef: ChangeDetectorRef,
     private elRef: ElementRef,
     private shotRevisionService: ShotRevisionService,
-    private auth: AuthService
+    private auth: AuthService,
+    private spinner: NgxSpinnerService
   ) {}
 
   @rangePlayer() range;
@@ -62,7 +64,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
   _frame_set(f) {
     let fr = f.split("/");
     if (fr.length == 1) {
-      console.log("Cannot determine frame rate from " + f);
+      console.log(`Cannot determine frame rate from ${f}`);
       // This is my default in case of problems...
       this.fps = 25;
     } else {
@@ -112,7 +114,12 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     };
 
     this.video.onloadstart = (e) => {
+      this.spinner.show();
       this._emetti("onloadstart", e);
+    };
+
+    this.video.oncanplay = (e) => {
+      this.spinner.hide();
     };
 
     this.video.onpause = (e) => {
