@@ -1,7 +1,11 @@
 <!-- Container del video player e dei controlli -->
 <div class="main-container-video row no-gutters">
   <div class="video_container col-12" *ngIf="data">
-    <ngx-spinner [fullScreen]="false" [name]="layout"></ngx-spinner>
+    <ngx-spinner
+      [fullScreen]="false"
+      [name]="layout"
+      [zIndex]="zIndex"
+    ></ngx-spinner>
     <div class="video_wrapper">
       <div class="video-box">
         <video

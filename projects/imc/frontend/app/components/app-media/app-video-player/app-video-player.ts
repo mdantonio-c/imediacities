@@ -44,6 +44,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
   spinner_prevent = false;
   shot_current = -1;
+  zIndex = 1000;
 
   /**
    * Stores the point from which to restart in the case of a range in loop
@@ -386,6 +387,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this._frame_set(this.data._item[0].framerate);
+    this.zIndex = this.layout === "modal" ? 2000 : 1000;
   }
 
   ngAfterViewInit() {
