@@ -114,12 +114,12 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     };
 
     this.video.onloadstart = (e) => {
-      this.spinner.show();
+      this.spinner.show(this.layout);
       this._emetti("onloadstart", e);
     };
 
     this.video.oncanplay = (e) => {
-      this.spinner.hide();
+      this.spinner.hide(this.layout);
     };
 
     this.video.onpause = (e) => {
