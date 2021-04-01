@@ -13,7 +13,7 @@
 /* top navbar: force bg-white */
 .navbar {
   background-color: #f8f8f8 !important;
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
   padding-bottom: 0px;
   padding-top: 0px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);

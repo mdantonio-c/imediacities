@@ -11,6 +11,7 @@ import { ListsService } from "../../services/lists.service";
 import { NgbDropdown } from "@ng-bootstrap/ng-bootstrap";
 import { MultiItemCarouselComponent } from "./multi-item-carousel/multi-item-carousel.component";
 import { ItemDetail } from "./item-detail/item-detail.component";
+import { environment } from "@rapydo/../environments/environment";
 
 @Component({
   selector: "user-workspace",
@@ -37,6 +38,7 @@ export class UserWorkspaceComponent implements OnInit {
   listForm: FormGroup;
   selectedList: ItemDetail;
   private user: any;
+  readonly cityFilterDisabled = false;
   /**
    * Reference to NgbDropdown component for creating a new user list
    */
@@ -67,6 +69,12 @@ export class UserWorkspaceComponent implements OnInit {
       this.selectedList = list;
       this.counters.LIST_ITEMS = undefined;
     });
+    if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
+      const disabledFilters = environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(
+        ","
+      );
+      this.cityFilterDisabled = disabledFilters.includes("city");
+    }
   }
 
   onCityChange(newValue) {

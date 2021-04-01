@@ -1,5 +1,5 @@
 project:
-  title: "iMediaCities Repository"
+  title: "I-Media-Cities"
   description: "..."
   version: "1.9.2"
   rapydo: "1.1"
@@ -41,6 +41,8 @@ variables:
 
     FRONTEND_LANG: "en"
     FRONTEND_DISABLED_FILTERS: ""
+    CATALOG_TIME_RANGE_FROM: "1890"
+    CATALOG_TIME_RANGE_TO: "1999"
 
   roles:
     normal_user: User

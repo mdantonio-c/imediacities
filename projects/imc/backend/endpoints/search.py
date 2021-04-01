@@ -81,7 +81,7 @@ class Search(IMCEndpoint):
                     "MATCH (n)-[:RECORD_SOURCE]->(:RecordSource)-[:PROVIDED_BY]->(p:Provider)"
                     + f" WHERE p.city='{city.strip()}'"
                 )
-            log.debug("city {0}", city)
+            log.debug("city {}", city)
             # COUNTRY
             country = filtering.get("country")
             if country is not None:
@@ -103,8 +103,8 @@ class Search(IMCEndpoint):
                     )
                 )
             # PRODUCTION YEAR RANGE
-            missingDate = filtering.get("missingDate")
-            if not missingDate:
+            missing_date = filtering.get("missingDate")
+            if not missing_date:
                 year_from = filtering.get("yearfrom")
                 year_to = filtering.get("yearto")
                 if year_from is not None or year_to is not None:
@@ -161,7 +161,7 @@ class Search(IMCEndpoint):
             if user and annotated_by:
                 # only annotated *BY ME* is autorized (except for the admin)
                 anno_user_id = annotated_by.get("user")
-                iamadmin = self.verify_admin()
+                iamadmin = self.auth.is_admin(user)
                 if user.uuid != anno_user_id and not iamadmin:
                     raise Forbidden(
                         "You are not allowed to search for item that are not annotated by you",
@@ -256,7 +256,7 @@ class Search(IMCEndpoint):
             log.error(e)
             raise BadRequest("Invalid query parameters")
 
-        log.debug("Number of elements retrieved: {0}", numels)
+        log.debug("Number of elements retrieved: {}", numels)
 
         # return also the total number of elements
         meta_response["totalItems"] = numels
