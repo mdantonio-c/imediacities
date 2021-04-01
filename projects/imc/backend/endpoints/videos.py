@@ -529,7 +529,7 @@ class VideoContent(IMCEndpoint, Downloader):
     @authz.pre_authorize
     def get(self, video_id, content_type, thumbnail_size=None):
         """
-        Gets video content such as video strem and thumbnail
+        Gets video content such as video stream and thumbnail
         """
         log.debug("get video content for id {}", video_id)
 

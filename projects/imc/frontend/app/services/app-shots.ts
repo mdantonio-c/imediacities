@@ -380,7 +380,7 @@ export class AppShotsService {
       source_uuid: this._media_id,
       reference:
         annotation_body.type === "bibliographicreference"
-          ? annotation_body.attributes
+          ? annotation_body
           : null,
     };
   }

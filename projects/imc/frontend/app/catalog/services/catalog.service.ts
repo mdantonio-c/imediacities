@@ -4,6 +4,39 @@ import { Observable, of } from "rxjs";
 import { MediaEntity, Providers } from "./data";
 import { LocalStorageService } from "./local-storage.service";
 import { SearchResponse, GeoDistanceAnnotation } from "@app/types";
+import { environment } from "@rapydo/../environments/environment";
+
+export const YEAR_FROM =
+  parseInt(environment.CUSTOM.CATALOG_TIME_RANGE_FROM) || 1890;
+export const YEAR_TO =
+  parseInt(environment.CUSTOM.CATALOG_TIME_RANGE_TO) || 1999;
+
+export const chunkBy = (start: number, end: number, parts = 4) => {
+  const offset = Math.floor((end - start) / parts);
+  let arr = [];
+  let i = start;
+  while (i < end) {
+    if (i + offset >= end) {
+      i = end;
+    }
+    arr.push(i);
+    i += offset;
+  }
+  return arr;
+};
+
+const round = (n, to) => n - (n % to);
+
+export const decades = (from: number = YEAR_FROM, to: number = YEAR_TO) => {
+  let res = [];
+  let start = round(from, 10);
+  let i = start;
+  while (i < to + 10) {
+    res.push(i);
+    i += 10;
+  }
+  return res;
+};
 
 export interface SearchFilter {
   searchTerm?: string;
@@ -55,8 +88,8 @@ export class CatalogService {
       provider: null,
       city: null,
       country: null,
-      productionYearFrom: 1890,
-      productionYearTo: 1999,
+      productionYearFrom: YEAR_FROM,
+      productionYearTo: YEAR_TO,
       iprstatus: null,
       missingDate: true,
     });
@@ -224,8 +257,8 @@ export class CatalogService {
       provider: provider || null,
       city: city,
       country: null,
-      productionYearFrom: 1890,
-      productionYearTo: 1999,
+      productionYearFrom: YEAR_FROM,
+      productionYearTo: YEAR_TO,
       iprstatus: null,
       missingDate: true,
     };

@@ -7,14 +7,21 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { SearchFilter, CatalogService } from "../../services/catalog.service";
+import {
+  SearchFilter,
+  CatalogService,
+  YEAR_FROM,
+  YEAR_TO,
+  chunkBy,
+} from "../../services/catalog.service";
 import { IPRStatuses, Providers } from "../../services/data";
 import { AppVocabularyService } from "../../../services/app-vocabulary";
 import { Observable, combineLatest } from "rxjs";
 import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
 import { environment } from "@rapydo/../environments/environment";
 
-const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
+// const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
+const SLIDER_TICKS = chunkBy(YEAR_FROM, YEAR_TO);
 
 @Component({
   selector: "search-filter",
@@ -28,8 +35,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   terms = [];
   iprstatuses: any[] = IPRStatuses;
   cities: string[] = [];
-  minProductionYear: number = 1890;
-  maxProductionYear: number = 1999;
+  minProductionYear: number = YEAR_FROM;
+  maxProductionYear: number = YEAR_TO;
   sliderTicks = SLIDER_TICKS;
   rangeValue = [this.minProductionYear, this.maxProductionYear];
   enableProdDateText: string = "Enable Production Date";
@@ -54,8 +61,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       imageType: [true],
       term: [""],
       city: [""],
-      productionYearFrom: [1890],
-      productionYearTo: [1999],
+      productionYearFrom: [YEAR_FROM],
+      productionYearTo: [YEAR_TO],
       iprstatus: [null],
     });
     if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
@@ -63,6 +70,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         ","
       );
     }
+    console.log(environment.CUSTOM.CATALOG_TIME_RANGE_TO);
   }
 
   ngOnInit() {
@@ -87,7 +95,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
     combineLatest(
       this.searchForm.get("productionYearFrom").valueChanges
-    ).subscribe(([productionYearFrom = 1890]) => {
+    ).subscribe(([productionYearFrom = YEAR_FROM]) => {
       this.setSliderTo(
         productionYearFrom,
         this.searchForm.get("productionYearTo").value
@@ -95,7 +103,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     });
     combineLatest(
       this.searchForm.get("productionYearTo").valueChanges
-    ).subscribe(([productionYearTo = 1999]) => {
+    ).subscribe(([productionYearTo = YEAR_TO]) => {
       this.setSliderTo(
         this.searchForm.get("productionYearFrom").value,
         productionYearTo

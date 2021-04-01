@@ -1,9 +1,12 @@
 from marshmallow import ValidationError, pre_load
+from restapi.env import Env
 from restapi.models import PartialSchema, Schema, fields, validate
 
 allowed_term_fields = ("title", "description", "keyword")
 allowed_anno_types = ("TAG", "DSC", "LNK")
 allowed_item_types = ("all", "video", "image")
+DEFAULT_TIME_RANGE_FROM = Env.get_int("CATALOG_TIME_RANGE_FROM", 1890)
+DEFAULT_TIME_RANGE_TO = Env.get_int("CATALOG_TIME_RANGE_TO", 1999)
 
 
 class Spatial(Schema):
@@ -49,12 +52,12 @@ class SearchFilter(Schema):
     yearfrom = fields.Int(
         allow_none=True,
         description="production year range: start year of the range",
-        validate=validate.Range(min=1890, max=2000),
+        validate=validate.Range(min=DEFAULT_TIME_RANGE_FROM, max=DEFAULT_TIME_RANGE_TO),
     )
     yearto = fields.Int(
         allow_none=True,
         description="production year range: end year of the range",
-        validate=validate.Range(min=1890, max=2000),
+        validate=validate.Range(min=DEFAULT_TIME_RANGE_FROM, max=DEFAULT_TIME_RANGE_TO),
     )
     iprstatus = fields.Str(
         description="IPR status",
