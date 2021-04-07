@@ -92,8 +92,10 @@ export class AppPictureComponent implements AfterViewInit {
   }
 
   _picture_source_add(source_url) {
-    let token = this.auth.getToken();
-    this._picture.src = source_url + "&access_token=" + token;
+    const token = this.auth.getToken();
+    this._picture.src = token
+      ? `${source_url}&access_token=${token}`
+      : source_url;
   }
 
   ngAfterViewInit() {
