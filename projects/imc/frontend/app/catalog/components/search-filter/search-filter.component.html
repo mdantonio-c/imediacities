@@ -128,62 +128,12 @@
               ></app-media-annotation>
             </ng-template>
           </div>
-          <div
-            class="imc--container-tree"
-            style="max-height: 250px; overflow-y: auto"
-          >
-            <ul *ngIf="vocabulary">
-              <li *ngFor="let term of vocabulary.terms">
-                <h3>
-                  <span class="term" (click)="expandTerm(term)">
-                    <span
-                      [innerHTML]="term.label[lang] || term.label.en"
-                    ></span>
-                    <i class="material-icons" *ngIf="!term.open"
-                      >keyboard_arrow_down</i
-                    >
-                    <i class="material-icons" *ngIf="term.open"
-                      >keyboard_arrow_up</i
-                    >
-                  </span>
-                </h3>
-                <ul
-                  class="term-list"
-                  [ngClass]="{ 'display-none': !term.open }"
-                >
-                  <li *ngFor="let child of term.children">
-                    <span class="term" (click)="expandTerm(child, term)">
-                      <span
-                        [innerHTML]="child.label[lang] || child.label.en"
-                      ></span>
-                      <i class="material-icons" *ngIf="!child.open"
-                        >keyboard_arrow_down</i
-                      >
-                      <i class="material-icons" *ngIf="child.open"
-                        >keyboard_arrow_up</i
-                      >
-                    </span>
-                    <ul
-                      class="child-list"
-                      [ngClass]="{ 'display-none': !child.open }"
-                    >
-                      <li *ngFor="let leaf of child.children">
-                        <span class="term" (click)="vocabularyLeaf(leaf)">
-                          <span
-                            [innerHTML]="leaf.label[lang] || leaf.label.en"
-                          ></span>
-                          <i
-                            *ngIf="leaf.selected"
-                            class="material-icons icon-check-vocabulary"
-                            >check</i
-                          >
-                        </span>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-            </ul>
+          <div class="search-tree-view">
+            <app-tree-view
+              [lang]="lang"
+              [terms]="terms"
+              (updateTerms)="terms = $event"
+            ></app-tree-view>
           </div>
         </div>
         <div class="hr hr-dotted"></div>

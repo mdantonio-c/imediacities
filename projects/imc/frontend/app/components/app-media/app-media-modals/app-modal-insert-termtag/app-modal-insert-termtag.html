@@ -2,49 +2,12 @@
   <!-- VOCABULARY -->
   <div class="col-12 col-sm-4 col-lg-3 space-paragraph-xs-20" modal-col>
     <h5>Vocabulary</h5>
-
-    <div class="imc--container-tree">
-      <ul *ngIf="vocabolario && vocabolario_visualizza">
-        <li *ngFor="let term of vocabolario.terms">
-          <h3>
-            <span class="term" (click)="vocabolario_term(term)">
-              <span [innerHTML]="term.label[lang] || term.label.en"></span>
-              <i class="material-icons" *ngIf="!term.open"
-                >keyboard_arrow_down</i
-              >
-              <i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
-            </span>
-          </h3>
-          <ul class="term-list" [ngClass]="{'display-none': !term.open}">
-            <li *ngFor="let child of term.children">
-              <span class="term" (click)="vocabolario_term(child, term)">
-                <span [innerHTML]="child.label[lang] || child.label.en"></span>
-                <i class="material-icons" *ngIf="!child.open"
-                  >keyboard_arrow_down</i
-                >
-                <i class="material-icons" *ngIf="child.open"
-                  >keyboard_arrow_up</i
-                >
-              </span>
-              <ul class="child-list" [ngClass]="{'display-none': !child.open}">
-                <li *ngFor="let leaf of child.children">
-                  <span class="term leaf" (click)="vocabolario_leaf(leaf)">
-                    <span
-                      [innerHTML]="leaf.label[lang] || leaf.label.en"
-                    ></span>
-                    <i
-                      *ngIf="leaf.selected"
-                      class="material-icons icon-check-vocabulary"
-                      >check</i
-                    >
-                  </span>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+    <app-tree-view
+      [lang]="lang"
+      [terms]="terms"
+      (updateTerms)="terms=$event"
+      (updateVocabulary)="vocabolario=$event"
+    ></app-tree-view>
   </div>
 
   <!-- RICERCA MANUALE DEI TAG -->
@@ -52,10 +15,7 @@
     class="col-12 col-sm-3 col-lg-4 row no-gutters space-paragraph-xs-20 popover-no-arrow popover-left"
     modal-col
   >
-    <div
-      class="row no-gutters imc--flex--vertical-end"
-      *ngIf="vocabolario && vocabolario_visualizza"
-    >
+    <div class="row no-gutters imc--flex--vertical-end" *ngIf="vocabolario">
       <span class="col-12 col-lg-7">
         <!--<input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag"
                        (keyup)="search_vocabulary_and_lods($event)" [(ngModel)]="ricerca_model"
@@ -91,7 +51,7 @@
     </div>
 
     <!--Tag duplicati-->
-    <div class="col-12" *ngIf="add_tag.visible">
+    <div class="col-12 mt-2" *ngIf="add_tag.visible">
       <app-info
         [message]="add_tag.message"
         [result]="add_tag.status"
@@ -151,7 +111,7 @@
               >
                 <i
                   class="material-icons"
-                  style="width: 1.2rem; height: 1rem; cursor: pointer;"
+                  style="width: 1.2rem; height: 1rem; cursor: pointer"
                   >today</i
                 >
               </button>

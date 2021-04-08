@@ -80,3 +80,18 @@ export interface MultiLanguageLabel {
   // any other lang
   [key: string]: string;
 }
+
+export interface Vocabulary {
+  terms: VocabularyTerm[];
+  created?: string;
+  vocabulary: string;
+}
+
+export interface VocabularyTerm {
+  id?: string;
+  description?: string;
+  label: MultiLanguageLabel;
+  children?: VocabularyTerm[];
+  open?: boolean;
+  selected?: boolean;
+}

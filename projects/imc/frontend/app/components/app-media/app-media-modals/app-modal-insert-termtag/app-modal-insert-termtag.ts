@@ -12,13 +12,13 @@ import {
 } from "@angular/core";
 import { AppVocabularyService } from "../../../../services/app-vocabulary";
 import { AppAnnotationsService } from "../../../../services/app-annotations";
-import { Observable, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import { debounceTime, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { AppLodService } from "../../../../services/app-lod";
-import { NgbPopover } from "@ng-bootstrap/ng-bootstrap";
 import { infoResult } from "../../../../decorators/app-info";
 import { environment } from "@rapydo/../environments/environment";
+import { Annotation } from "../../../../types";
 
 @Component({
   selector: "app-modal-insert-termtag",
@@ -71,7 +71,7 @@ export class AppModalInsertTermtagComponent
   ) {}
 
   vocabolario = null;
-  vocabolario_visualizza = false;
+  // vocabolario_visualizza = false;
 
   embargo_enable = false;
   embargo_model;
@@ -82,44 +82,8 @@ export class AppModalInsertTermtagComponent
   };
   ricerca_nomatch = false;
 
-  terms = [];
+  terms: Annotation[] = [];
   terms_all = [];
-
-  /**
-   * Gestione della visibilità delle termini (elementi con children) del vocabolario sul click
-   * @param term
-   * @param parent
-   */
-  vocabolario_term(term, parent = null) {
-    let valore_da_assegnare = !term.open;
-    this.vocabolario.terms.forEach((t) => {
-      t.open = false;
-    });
-    if (parent) {
-      parent.open = true;
-      if (parent.hasOwnProperty("children")) {
-        parent.children.forEach((c) => {
-          c.open = false;
-        });
-      }
-    }
-    term.open = valore_da_assegnare;
-  }
-  /**
-   * Manage the click on the leaves (elements without children) of the vocabulary.
-   * @param term
-   */
-  vocabolario_leaf(term) {
-    term.selected = !term.selected;
-    if (term.selected) {
-      if (this.terms.filter((t) => t.iri === term.id).length === 0) {
-        this.terms.push(this.vocabularyService.annotation_create(term));
-      }
-    } else {
-      //  remove from the terms list
-      this.terms = this.terms.filter((t) => t.iri !== term.id);
-    }
-  }
 
   onKeyup(event) {
     this.subject.next(event);
@@ -211,17 +175,21 @@ export class AppModalInsertTermtagComponent
       }
     );
   }
+
   show_results(flag) {
     this.results.show = flag;
   }
+
   /**
-   * formattatore dei risultati typeahead
+   * typeahead result formatter
    * @param {{name: string}} result
    * @returns {string}
    */
   formatter = (result: { name: string }) => result.name;
 
-  //  se tra i tag trovati esiste un termine uguale al termine di ricerca disabilita il pulsante
+  /**
+   * Disable the button if there is a term equal to the search term among the tags found.
+   */
   term_add_disable() {
     return (
       this.ricerca_key &&
@@ -231,32 +199,33 @@ export class AppModalInsertTermtagComponent
       ).length
     );
   }
+
   /**
-   * Aggiunge il termine all'elenco dei termini da salvare
+   * Adds the term to the list of terms to save
    * @param event
    */
   term_add(event) {
     let close_results = false;
-    if (event.source === "vocabulary") {
-      this.vocabularyService.toggle_term(event);
-    }
     if (typeof event === "string") {
       event = { name: event };
       close_results = true;
     }
     if (event && event.name) {
-      //  prevengo duplicazioni
-      let esistente = this.terms.some((t) => {
+      //  prevent duplication
+      let existing = this.terms.some((t) => {
         return t.name.toLowerCase() === event.name.toLowerCase();
       });
-      esistente =
-        esistente ||
+      existing =
+        existing ||
         this.terms_all.some((t) => {
           return t.name.toLowerCase() === event.name.toLowerCase();
         });
-      if (esistente) {
+      if (existing) {
         this.add_tag.show("info", "This tag has already been added");
       } else {
+        if (event.source === "vocabulary") {
+          this.vocabularyService.toggle_term(event);
+        }
         this.add_tag.hide();
         this.terms.push(this.vocabularyService.annotation_create(event));
         // reset input field
@@ -267,8 +236,9 @@ export class AppModalInsertTermtagComponent
       }
     }
   }
+
   /**
-   * rimuove term dall'elenco dei termini
+   * Removes a term from the term list.
    * @param term
    */
   term_remove(term) {
@@ -284,6 +254,7 @@ export class AppModalInsertTermtagComponent
     this.term_add(term);
     this.p.close();
   }
+
   /**
    * esegue il salvataggio
    */
@@ -308,9 +279,11 @@ export class AppModalInsertTermtagComponent
       }
     );
   }
+
   hide_app_info() {
     this.save_result.visible = false;
   }
+
   nav_next(obj) {
     const results = this.results[obj];
     const nav = this.results[`${obj}_nav`];
@@ -352,9 +325,9 @@ export class AppModalInsertTermtagComponent
   ngOnChanges() {
     this.terms_all = this.AnnotationsService.merge(this.data.shots, "tags");
 
-    this.vocabularyService.get((vocabolario) => {
+    /*this.vocabularyService.get((vocabolario) => {
       this.vocabolario = vocabolario;
-    });
+    });*/
     this.ricerca_model = "";
     this.terms = [];
     this.ricerca_risultati = [];
@@ -364,7 +337,7 @@ export class AppModalInsertTermtagComponent
   }
 
   ngAfterViewInit() {
-    this.vocabolario_visualizza = true;
+    // this.vocabolario_visualizza = true;
     this.ref.detectChanges();
   }
 
