@@ -47,6 +47,7 @@ import { AppVideoShotComponent } from "./components/app-media/app-video-shot/app
 import { AppMediaMapComponent } from "./components/app-media/app-media-map/app-media-map";
 import { AppMediaInfoComponent } from "./components/app-media/app-media-info/app-media-info";
 import { AppMediaTagsComponent } from "./components/app-media/app-media-tags/app-media-tags";
+import { AppTreeViewComponent } from "./components/app-media/app-tree-view/app-tree-view";
 
 import { AppVideoPlayerComponent } from "./components/app-media/app-video-player/app-video-player";
 import { AppVideoControlComponent } from "@app/components/app-media/app-video-controls/app-video-control";
@@ -192,6 +193,7 @@ const routes: Routes = [
     AppModalListaShotsComponent,
     AppMediaInfoComponent,
     AppMediaTagsComponent,
+    AppTreeViewComponent,
     AppNoteComponent,
     AppReferenceComponent,
     AppLinkComponent,

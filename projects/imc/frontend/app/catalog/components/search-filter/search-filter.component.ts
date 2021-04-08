@@ -303,33 +303,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
   }
 
-  expandTerm(term, parent = null) {
-    let val = !term.open;
-    this.vocabulary.terms.forEach((t) => {
-      t.open = false;
-    });
-    if (parent) {
-      parent.open = true;
-      if (parent.hasOwnProperty("children")) {
-        parent.children.forEach((c) => {
-          c.open = false;
-        });
-      }
-    }
-    term.open = val;
-  }
-
-  vocabularyLeaf(term) {
-    term.selected = !term.selected;
-
-    if (term.selected) {
-      this.terms.push(this.vocabularyService.annotation_create(term));
-    } else {
-      //  remove the term from the list
-      this.terms = this.terms.filter((t) => t.name !== term.label);
-    }
-  }
-
   /**
    * Search terms from the vocabulary.
    * @param {<string>} text$
