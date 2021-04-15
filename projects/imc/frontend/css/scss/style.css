@@ -1649,21 +1649,22 @@ input[type="radio"] {
 .page-type-image .imc--container-tree .term .icon-check-vocabulary {
   color: #e43432;
 }
-.imc--container-tree .term-list li {
+.imc--container-tree .term-list li,
+.imc--container-tree .child-list li {
   display: table;
   background: #f7f7f7;
   font-size: 14px;
   cursor: pointer;
   padding: 0 5px;
   width: 100%;
-  /* i, .term {
-       display: table-cell;
-     }*/
+}
+.imc--container-tree .term-list li .term,
+.imc--container-tree .child-list li .term {
+  padding: 3px 10px 3px 20px;
 }
 .imc--container-tree .term-list li .term {
   border-bottom: 1px solid #eee;
   font-weight: 500;
-  padding: 3px 10px 3px 20px;
 }
 .imc--container-tree .child-list {
   display: table-row;

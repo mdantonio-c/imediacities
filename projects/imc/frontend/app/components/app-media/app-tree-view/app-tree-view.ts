@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { Vocabulary, Annotation } from "../../../types";
 import { AppVocabularyService } from "../../../services/app-vocabulary";
-import { SearchFilter } from "../../../catalog/services/catalog.service";
 
 @Component({
   selector: "app-tree-view",
@@ -64,5 +63,14 @@ export class AppTreeViewComponent implements OnInit {
       this.terms = this.terms.filter((t) => t.iri !== term.id);
     }
     this.updateTerms.emit(this.terms);
+  }
+
+  /**
+   * Naive solution to check if a category has a sub-category.
+   * As ONLY leaf terms have an id, check this on the first node of the list.
+   * @param category
+   */
+  hasSubCategory(category): boolean {
+    return category.children[0].hasOwnProperty("id") ? false : true;
   }
 }

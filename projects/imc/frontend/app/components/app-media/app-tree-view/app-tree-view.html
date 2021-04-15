@@ -1,36 +1,49 @@
 <div class="imc--container-tree">
   <ul *ngIf="vocabulary">
-    <li *ngFor="let term of vocabulary.terms">
+    <li *ngFor="let category of vocabulary.terms">
+      <!-- MAIN CATEGORY -->
       <h3>
-        <span class="term" (click)="toggleCategory(term)">
-          <span [innerHTML]="term.label[lang] || term.label.en"></span>
-          <i class="material-icons" *ngIf="!term.open">keyboard_arrow_down</i>
-          <i class="material-icons" *ngIf="term.open">keyboard_arrow_up</i>
+        <span class="term" (click)="toggleCategory(category)">
+          <span [innerHTML]="category.label[lang] || category.label.en"></span>
+          <i class="material-icons" *ngIf="!category.open"
+            >keyboard_arrow_down</i
+          >
+          <i class="material-icons" *ngIf="category.open">keyboard_arrow_up</i>
         </span>
       </h3>
-      <ul class="term-list" [ngClass]="{'display-none': !term.open}">
-        <li *ngFor="let child of term.children">
-          <span class="term" (click)="toggleCategory(child, term)">
-            <span [innerHTML]="child.label[lang] || child.label.en"></span>
-            <i class="material-icons" *ngIf="!child.open"
-              >keyboard_arrow_down</i
-            >
-            <i class="material-icons" *ngIf="child.open">keyboard_arrow_up</i>
-          </span>
-          <ul class="child-list" [ngClass]="{'display-none': !child.open}">
-            <li *ngFor="let leaf of child.children">
-              <span class="term leaf" (click)="toggleTerm(leaf)">
-                <span [innerHTML]="leaf.label[lang] || leaf.label.en"></span>
-                <i
-                  *ngIf="leaf.selected"
-                  class="material-icons icon-check-vocabulary"
-                  >check</i
-                >
-              </span>
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <ng-container
+        *ngTemplateOutlet="hasSubCategory(category) ?
+        subCategoryList : termList; context: { node: category }"
+      ></ng-container>
     </li>
   </ul>
+
+  <!-- SUB-CATEGORY -->
+  <ng-template #subCategoryList let-category="node">
+    <ul class="term-list" [ngClass]="{'display-none': !category.open}">
+      <li *ngFor="let child of category.children">
+        <span class="term" (click)="toggleCategory(child, category)">
+          <span [innerHTML]="child.label[lang] || child.label.en"></span>
+          <i class="material-icons" *ngIf="!child.open">keyboard_arrow_down</i>
+          <i class="material-icons" *ngIf="child.open">keyboard_arrow_up</i>
+        </span>
+        <ng-container *ngTemplateOutlet="termList; context: {node: child}">
+        </ng-container>
+      </li>
+    </ul>
+  </ng-template>
+
+  <!-- TERMS -->
+  <ng-template #termList let-category="node">
+    <ul class="child-list d-block" [ngClass]="{'display-none': !category.open}">
+      <li *ngFor="let term of category.children">
+        <span class="term leaf" (click)="toggleTerm(term)">
+          <span [innerHTML]="term.label[lang] || term.label.en"></span>
+          <i *ngIf="term.selected" class="material-icons icon-check-vocabulary"
+            >check</i
+          >
+        </span>
+      </li>
+    </ul>
+  </ng-template>
 </div>
