@@ -1,8 +1,8 @@
 project:
   title: "I-Media-Cities"
   description: "Innovative e-Environment for Research on Cities and the Media"
-  version: "1.9.2"
-  rapydo: "1.1"
+  version: "1.9.3"
+  rapydo: "1.2"
 
 variables:
   env:
