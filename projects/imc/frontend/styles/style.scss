@@ -1,7 +1,7 @@
 /* add the bootstrap-slider style css */
 @import "bootstrap-slider/dist/css/bootstrap-slider.min";
 @import "material-icons/iconfont/material-icons";
-@import "custom-slider";
+@import "./custom-slider";
 
 /* Include slick css */
 @import "slick-carousel/slick/slick";
@@ -11,13 +11,13 @@
 @import "./app-video-player";
 
 /* top navbar: force bg-white */
-.navbar {
-  background-color: #f8f8f8 !important;
-  /*margin-bottom: 10px;*/
-  padding-bottom: 0px;
-  padding-top: 0px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
+// .navbar {
+//   background-color: #f8f8f8 !important;
+//   // margin-bottom: 10px;
+//   padding-bottom: 0px;
+//   padding-top: 0px;
+//   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+// }
 
 .no-padding {
   padding: 0 !important;
