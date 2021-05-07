@@ -1,6 +1,4 @@
-@import "vars";
-
-// Titoli
+// Titles
 .imc--title-bold {
   color: $text-dark-color;
   display: block;
@@ -196,7 +194,7 @@ textarea {
 }
 
 .imc--input-search {
-  background: url("../../assets/svg/search.svg") no-repeat;
+  background: url("../../../assets/svg/search.svg") no-repeat;
   padding-left: 30px;
   width: 100%;
 }
