@@ -200,7 +200,8 @@ textarea {
 }
 
 .imc--input-search:focus,
-.imc--input:focus {
+.imc--input:focus,
+.imc--input--dropdown button:focus {
   outline: none;
 }
 
@@ -380,7 +381,7 @@ input[type="radio"] {
 .switch {
   display: inline-block;
   position: relative;
-  margin: 0 0 10px;
+  /*margin: 0 0 10px;*/
   font-size: 16px;
   line-height: 24px;
 

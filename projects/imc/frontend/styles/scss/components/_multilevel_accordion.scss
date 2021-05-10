@@ -80,7 +80,8 @@
 
   // Lista secondaria
 
-  .term-list {
+  .term-list,
+  .child-list {
     li {
       display: table;
       background: $bg-light-grey;
