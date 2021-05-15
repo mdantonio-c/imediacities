@@ -28,9 +28,7 @@
                 aria-controls="description_content"
               >
                 <div class="row">
-                  <div class="col-8 col-sm-7">
-                    Description
-                  </div>
+                  <div class="col-8 col-sm-7">Description</div>
                   <div
                     class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs"
                   >
@@ -40,8 +38,7 @@
                       *ngIf="description_languages.size > 1"
                       #description_languages_selector
                       id="description-language-select"
-                    >
-                    </select>
+                    ></select>
                   </div>
                   <div class="col-4 col-sm-2 imc--flex--horizontal-end">
                     <i *ngIf="isCollapsed.description" class="material-icons"
@@ -92,9 +89,7 @@
                 aria-controls="keyword_content"
               >
                 <div class="row">
-                  <div class="col-8 col-sm-7">
-                    Keywords
-                  </div>
+                  <div class="col-8 col-sm-7">Keywords</div>
                   <div
                     class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs"
                   >
@@ -104,8 +99,7 @@
                       *ngIf="keyword_languages.size > 1"
                       #keyword_languages_selector
                       id="keyword-language-select"
-                    >
-                    </select>
+                    ></select>
                   </div>
                   <div class="col-4 col-sm-2 imc--flex--horizontal-end">
                     <i *ngIf="isCollapsed.keyword" class="material-icons"
@@ -219,7 +213,7 @@
               </li>
               <li *ngIf="info._record_sources[0]._provider[0].website">
                 <a
-                  href="//{{ info._record_sources[0]._provider[0].website }}"
+                  href="{{ info._record_sources[0]._provider[0].website }}"
                   target="_blank"
                   >{{ info._record_sources[0]._provider[0].website }}</a
                 >
