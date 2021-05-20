@@ -15,7 +15,12 @@ def fromCode(descr, codelist):
     return res[0] if res else None
 
 
-CONTENT_TYPES = (("Video", "Video"), ("Image", "Image"), ("Text", "Text"))
+CONTENT_TYPES = (
+    ("Video", "Video"),
+    ("Image", "Image"),
+    ("Text", "Text"),
+    ("3D-Model", "3D-Model"),
+)
 
 SOURCE_TYPES = (("Metadata", "Metadata"), ("Content", "Content"))
 

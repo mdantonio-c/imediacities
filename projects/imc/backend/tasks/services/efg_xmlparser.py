@@ -121,8 +121,7 @@ class EFG_XMLParser:
         record_sources = []
         bind_url = False
         for node in record.findall("./efg:recordSource", self.ns):
-            rs = {}
-            rs["source_id"] = node.find("efg:sourceID", self.ns).text.strip()
+            rs = {"source_id": node.find("efg:sourceID", self.ns).text.strip()}
             log.debug("record source [ID]: {}", rs["source_id"])
 
             # record provider
@@ -349,9 +348,7 @@ class EFG_XMLParser:
                     else:
                         usage = code_el[0]
             lang_usage = [lang, usage]
-            log.debug(
-                "lang code: {}, usage code: {}".format(lang_usage[0], lang_usage[1])
-            )
+            log.debug(f"lang code: {lang_usage[0]}, usage code: {lang_usage[1]}")
             languages.append(lang_usage)
         return languages
 
@@ -551,7 +548,7 @@ class EFG_XMLParser:
             node.text.strip(), codelists.NON_AV_SPECIFIC_TYPES
         )
         if code_el is None:
-            raise ValueError("Invalid Non-AV spefic type for: " + node.text.strip())
+            raise ValueError("Invalid Non-AV specific type for: " + node.text.strip())
         return code_el[0]
 
     def get_physical_format_size(self, record):
@@ -580,27 +577,27 @@ class EFG_XMLParser:
             self.warnings.append("Invalid format colour for: " + node.text.strip())
 
     def __parse_creation(self, record, audio_visual=False):
-        properties = {}
-        properties["external_ids"] = self.parse_identifiers(record)
-        properties["rights_status"] = self.get_rights_status(record, audio_visual)
-        properties["collection_title"] = self.get_collection_title(record)
+        properties = {
+            "external_ids": self.parse_identifiers(record),
+            "rights_status": self.get_rights_status(record, audio_visual),
+            "collection_title": self.get_collection_title(record),
+        }
         # provenance is determined by the group from IS_OWNED_BY relationship,
         # ignore it!
         # properties['provenance'] = self.get_provenance(record, audio_visual)
 
-        relationships = {}
-        relationships["record_sources"] = self.parse_record_sources(
-            record, audio_visual
-        )
-        relationships["titles"] = self.parse_titles(record, avcreation=audio_visual)
-        relationships["keywords"] = self.parse_keywords(record)
-        relationships["descriptions"] = self.parse_descriptions(record)
-        relationships["languages"] = self.parse_languages(record, audio_visual)
-        relationships["coverages"] = self.parse_coverages(record, audio_visual)
-        relationships["rightholders"] = self.parse_rightholders(record, audio_visual)
+        relationships = {
+            "record_sources": self.parse_record_sources(record, audio_visual),
+            "titles": self.parse_titles(record, avcreation=audio_visual),
+            "keywords": self.parse_keywords(record),
+            "descriptions": self.parse_descriptions(record),
+            "languages": self.parse_languages(record, audio_visual),
+            "coverages": self.parse_coverages(record, audio_visual),
+            "rightholders": self.parse_rightholders(record, audio_visual),
+            "agents": self.parse_related_agents(record),
+        }
 
         # agents
-        relationships["agents"] = self.parse_related_agents(record)
 
         return properties, relationships
 
@@ -650,5 +647,5 @@ class EFG_XMLParser:
     def prettify(elem):
         """Return a pretty-printed XML string for the Element."""
         rough_string = ET.tostring(elem, "utf-8")  # type: ignore
-        reparsed = minidom.parseString(rough_string)
-        return reparsed.toprettyxml(indent="  ")
+        re_parsed = minidom.parseString(rough_string)
+        return re_parsed.toprettyxml(indent="  ")

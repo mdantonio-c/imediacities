@@ -17,7 +17,7 @@ XSD_NAMESPACE = "http://www.w3.org/2001/XMLSchema"
 ET.register_namespace("", EFG_NAMESPACE)
 
 generated_on = str(datetime.datetime.now())
-ALLOWED_ITEM_TYPES = ("IMAGE", "VIDEO")
+ALLOWED_ITEM_TYPES = ("IMAGE", "VIDEO", "3D-MODEL")
 COMMON_MANDATORY_COLS = [
     "identifier",
     "sourceID",
@@ -148,6 +148,8 @@ def create_record():
     # title (1-N)
     titles = lookup_fields(row_idx, start_with="title_text", next_col="title_relation")
     for key, val in titles.items():
+        if is_blank(val[0]):
+            continue
         title_el = ET.SubElement(creation, "title")
         title_el.set("lang", key)
         ET.SubElement(title_el, "text").text = val[0]
@@ -192,6 +194,20 @@ def create_record():
                     if isinstance(date_created, str)
                     else date_created.strftime("%Y-%m-%d")
                 )
+        if "dateIssued" in headers:
+            date_issued = ws.cell(row=row_idx, column=headers["dateIssued"]).value
+            if date_issued and (
+                not isinstance(date_issued, str) or not is_blank(date_issued)
+            ):
+                if isinstance(date_created, int):
+                    date_issued = str(date_issued)
+                date_el = ET.SubElement(creation, "date")
+                date_el.text = (
+                    date_issued.strip()
+                    if isinstance(date_issued, str)
+                    else date_issued.strftime("%Y-%m-%d")
+                )
+                date_el.set("type", "issued")
 
     # keywords (0-N)
     keywords = lookup_fields(row_idx, start_with="keywords")
@@ -215,6 +231,8 @@ def create_record():
     # description (0-N)
     descriptions = lookup_fields(row_idx, start_with="description")
     for key, val in descriptions.items():
+        if is_blank(val[0]):
+            continue
         description_el = ET.SubElement(creation, "description")
         description_el.set("lang", key)
         description_el.text = val[0]
@@ -271,7 +289,7 @@ def create_record():
                 sound_el.text = "With sound" if bool(has_sound) else "Without sound"
                 sound_el.set("hasSound", "true" if bool(has_sound) else "false")
     if m_tag == "nonAVManifestation":
-        ET.SubElement(manifestation, "type").text = "image"
+        ET.SubElement(manifestation, "type").text = ws.title.lower()
         specific_type = ws.cell(row=row_idx, column=headers["specificType"]).value
         if is_blank(specific_type):
             raise ValueError("Missing SpecificType")
@@ -289,8 +307,9 @@ def create_record():
         ):
             ET.SubElement(manifestation, "colour").text = colour.strip()
     # rightsHolder (0-N)
-    if headers.get("rightsHolder"):
-        rights_holders = ws.cell(row=row_idx, column=headers["rightsHolder"]).value
+    if headers.get("rightsHolder") and not is_blank(
+        rights_holders := ws.cell(row=row_idx, column=headers["rightsHolder"]).value
+    ):
         for rh in rights_holders.split(sep=";"):
             if is_blank(rh):
                 continue
@@ -352,7 +371,7 @@ def check_mandatory_columns():
         for col in ["countryOfReference", "productionYear"]:
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")
-    elif ws.title == "Image":
+    elif ws.title == "Image" or ws.title == "3D-Model":
         for col in ["specificType"]:
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")
