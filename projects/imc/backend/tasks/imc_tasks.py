@@ -711,7 +711,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     if item_type == "Video":
         # parse AV_Entity
         creation = parser.parse_av_creation(record)
-    elif item_type == "Image":
+    elif item_type == "Image" or item_type == "3D-Model":
         # parse NON AV_Entity
         creation = parser.parse_non_av_creation(record)
     else:

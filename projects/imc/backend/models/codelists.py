@@ -111,6 +111,9 @@ AGENT_TYPES = (("P", "person"), ("C", "corporate"))
 
 SEXES = (("M", "Male"), ("F", "Female"))
 
+# COVERAGE_TYPES = {'S': 'Spatial', 'T': 'Temporal'}
+SPATIAL_TYPES = {"latlng": "LatLng", "altitude": "Altitude"}
+
 TYPE_OF_ACTIVITY = (
     ("001", "Actor"),
     ("002", "Actress"),
@@ -328,7 +331,7 @@ IDENTIFIER_SCHEMES = (
 
 VIDEO_SOUND = (("NO_SOUND", "Without sound"), ("WITH_SOUND", "With sound"))
 
-NON_AV_TYPES = (("image", "image"), ("text", "text"))
+NON_AV_TYPES = (("image", "image"), ("text", "text"), ("3d-model", "3d-model"))
 
 RIGHTS_STATUS = (
     ("01", "In copyright"),
