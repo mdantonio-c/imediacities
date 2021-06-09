@@ -342,19 +342,22 @@ class EFG_XMLParser:
 
     def parse_coverages(self, record, audio_visual=False):
         in_path = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
-        coverages = []
+        coverages: Dict[str, List[Any]] = {
+            "spatial": [],
+            "temporal": [],
+        }
         if coverage := record.find(f"./{in_path}/efg:coverage", self.ns):
             for s in coverage.findall("efg:spatial", self.ns):
                 spatial = {
                     "spatial_type": s.get("type", None),
-                    "spatial": s.text.strip(),
+                    "value": s.text.strip(),
                 }
                 log.debug("spatial: {}", spatial)
-                coverages.append(spatial)
+                coverages["spatial"].append(spatial)
             for t in coverage.findall("efg:temporal", self.ns):
-                temporal = t.text.strip()
+                temporal = {"value": t.text.strip()}
                 log.debug("temporal: {}", temporal)
-                coverages.append({"temporal": temporal})
+                coverages["temporal"].append(temporal)
         return coverages
 
     def parse_production_contries(self, record):
@@ -506,7 +509,7 @@ class EFG_XMLParser:
             if agent is None:
                 agents.append([props, activities])
 
-        log.debug(agent.names[0] for agent in agents)
+        # log.debug(agent.names[0] for agent in agents)
         return agents
 
     def parse_identifiers(self, record):

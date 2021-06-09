@@ -39,7 +39,7 @@ class CreationRepository:
         # connect to item
         item.creation.connect(entity)
 
-        # add relatioships
+        # add relationships
         for r in relationships.keys():
             if r == "record_sources":
                 # connect to record sources
@@ -77,10 +77,22 @@ class CreationRepository:
                         lang = self.graph.Language(code=lang_usage[0]).save()
                     entity.languages.connect(lang, {"usage": lang_usage[1]})
             elif r == "coverages":
-                for props in relationships[r]:
+                for key, values in relationships[r].items():
                     # connect to coverages
-                    coverage = self.graph.Coverage(**props).save()
-                    entity.coverages.connect(coverage)
+                    if key == "temporal":
+                        for props in values:
+                            temporal_coverage = self.graph.TemporalCoverage(
+                                **props
+                            ).save()
+                            entity.temporal_coverages.connect(temporal_coverage)
+                    elif key == "spatial":
+                        for props in values:
+                            spatial_coverage = self.graph.SpatialCoverage(
+                                **props
+                            ).save()
+                            entity.spatial_coverages.connect(spatial_coverage)
+                    else:
+                        log.warning(f"Coverage type <{key}> not managed")
             elif av and r == "production_countries":
                 for country_reference in relationships[r]:
                     country = self.graph.Country.nodes.get_or_none(
@@ -137,7 +149,9 @@ class CreationRepository:
             pass
         for keyword in node.keywords.all():
             keyword.delete()
-        for coverage in node.coverages:
+        for coverage in node.spatial_coverages:
+            coverage.delete()
+        for coverage in node.temporal_coverages:
             coverage.delete()
 
     def delete_av_entity(self, node):

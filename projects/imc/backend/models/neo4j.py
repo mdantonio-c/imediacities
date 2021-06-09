@@ -342,7 +342,9 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         descriptions        Textual descriptions.
         languages           The languages of the spoken, sung or written
                             content.
-        coverages           The spatial or temporal topics of the creation
+        spatial_coverages   The spatial topics of the creation
+                            object.
+        temporal_coverages  The temporal topics of the creation
                             object.
         rights_status       Specifies the copyright status of the digital item.
         rightholders        Right holders.
@@ -366,8 +368,11 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     languages = RelationshipTo(
         "Language", "HAS_LANGUAGE", cardinality=ZeroOrMore, model=LanguageRel, show=True
     )
-    coverages = RelationshipTo(
-        "Coverage", "HAS_COVERAGE", cardinality=ZeroOrMore, show=True
+    spatial_coverages = RelationshipTo(
+        "SpatialCoverage", "HAS_SPATIAL_COVERAGE", cardinality=ZeroOrMore, show=True
+    )
+    temporal_coverages = RelationshipTo(
+        "TemporalCoverage", "HAS_TEMPORAL_COVERAGE", cardinality=ZeroOrMore, show=True
     )
     rights_status = StringProperty(
         choices=codelists.RIGHTS_STATUS, required=True, show=True
@@ -500,20 +505,41 @@ class Language(StructuredNode):
 
 class Coverage(StructuredNode):
     """
-    The spatial or temporal topic of the creation object.
+    Any coverage topic of the creation object.
+    This can be specialized by temporal or spatial coverage
 
     Attributes:
-        spatial         This may be a named place, a location, a spatial
-                        coordinate, a named administrative entity or an URI to a
-                        LOD-service.
-        spatial_type    Type of the spatial coverage.
-        temporal        This may be a period, date or range date.
+        value   The value of the coverage. This can be any string.
     """
 
-    spatial = StringProperty(show=True)
+    __abstract_node__ = True
+    value = StringProperty(show=True)
+
+
+class SpatialCoverage(Coverage):
+    """
+    The spatial topic of the creation object.
+
+    Attributes:
+        value   This may be a named place, a location, a spatial
+                coordinate, a named administrative entity or an URI to a
+                LOD-service.
+        spatial_type    Type of the spatial coverage.
+    """
+
     spatial_type = StringProperty(choices=codelists.SPATIAL_TYPES, show=True)
-    temporal = StringProperty(show=True)
-    creation = RelationshipFrom("Creation", "HAS_COVERAGE", cardinality=One)
+    creation = RelationshipFrom("Creation", "HAS_SPATIAL_COVERAGE", cardinality=One)
+
+
+class TemporalCoverage(Coverage):
+    """
+    The temporal topic of the creation object.
+
+    Attributes:
+        value   his may be a period, date or range date.
+    """
+
+    creation = RelationshipFrom("Creation", "HAS_TEMPORAL_COVERAGE", cardinality=One)
 
 
 class Rightholder(IdentifiedNode):
