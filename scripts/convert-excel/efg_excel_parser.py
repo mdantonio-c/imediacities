@@ -41,7 +41,7 @@ if target_dir and not os.path.isdir(target_dir):
 
 wb = None
 try:
-    wb = load_workbook(filename=input_filename, read_only=True, data_only=True)
+    wb = load_workbook(filename=input_filename, read_only=False, data_only=True)
 except (InvalidFileException, FileNotFoundError) as e:
     sys.exit(f"ERROR - {e}")
 
@@ -81,8 +81,8 @@ def lookup_fields(row_idx, start_with, next_col=None):
             if next_col and ws.cell(row=c.row, column=c.column + 1).value == next_col:
                 next_val = ws.cell(row=row_idx, column=c.column + 1).value
             res[key] = (
-                val.strip() if val else None,
-                next_val.strip() if next_val else None,
+                str(val).strip() if val else None,
+                str(next_val).strip() if next_val else None,
             )
     return res
 
@@ -113,6 +113,74 @@ def parse_related_entities(row_idx, el_name, parent):
         ET.SubElement(rel_agent, "name").text = agent_name.strip()
         if agent_type:
             ET.SubElement(rel_agent, "type").text = agent_type.strip()
+
+
+def add_coverage(row_idx, manifestation):
+    coverage = lookup_fields(row_idx, start_with="coverage")
+    coverage_el = ET.SubElement(manifestation, "coverage")
+    for key, val in coverage.items():
+        # expected key as follows:
+        # - coverage_spatial_latlng
+        # - coverage_spatial_altitude
+        # - coverage_temporal
+        if is_blank(val[0]):
+            continue
+        if key.startswith("spatial"):
+            if len(key.split("_")) != 2:
+                # ignore invalid coverage definitions for spatial
+                continue
+            spatial_type = key.split("_")[1]
+            if spatial_type not in ["latlng", "altitude"]:
+                continue
+            spatial_el = ET.SubElement(coverage_el, "spatial")
+            spatial_el.text = val[0]
+            spatial_el.set("type", "latlng")
+        elif key == "temporal" and not is_blank(val[0]):
+            ET.SubElement(coverage_el, "temporal").text = val[0]
+    # eventually remove empty coverage element
+    if coverage_el.find("spatial") is None and coverage_el.find("temporal") is None:
+        manifestation.remove(coverage_el)
+
+
+def add_rights_holder(row_idx, manifestation):
+    if headers.get("rightsHolder") and not is_blank(
+        rights_holders := ws.cell(row=row_idx, column=headers["rightsHolder"]).value
+    ):
+        for rh in rights_holders.split(sep=";"):
+            if is_blank(rh):
+                continue
+            rights_holder = ET.SubElement(manifestation, "rightsHolder")
+            rights_holder.text = rh.strip()
+
+
+def add_keywords(row_idx, creation):
+    keywords = lookup_fields(row_idx, start_with="keywords")
+    for key, val in keywords.items():
+        # expected key is as follows: Subject_it, Place_it
+        if len(key.split("_")) != 2:
+            # ignore invalid keywords definitions
+            continue
+        if is_blank(val[0]):
+            # no keywords for this type_lang column
+            continue
+        k_type, lang = key.split("_")
+        keywords_el = ET.SubElement(creation, "keywords")
+        keywords_el.set("lang", lang)
+        keywords_el.set("type", k_type)
+        for term in val[0].split(";"):
+            if is_blank(term):
+                continue
+            ET.SubElement(keywords_el, "term").text = term.strip()
+
+
+def add_descriptions(row_idx, creation):
+    descriptions = lookup_fields(row_idx, start_with="description")
+    for key, val in descriptions.items():
+        if is_blank(val[0]):
+            continue
+        description_el = ET.SubElement(creation, "description")
+        description_el.set("lang", key)
+        description_el.text = val[0]
 
 
 def create_record():
@@ -210,33 +278,9 @@ def create_record():
                 date_el.set("type", "issued")
 
     # keywords (0-N)
-    keywords = lookup_fields(row_idx, start_with="keywords")
-    for key, val in keywords.items():
-        # expected key is as follows: Subject_it, Place_it
-        if len(key.split("_")) != 2:
-            # ignore invalid keywords definitions
-            continue
-        if is_blank(val[0]):
-            # no keywords for this type_lang column
-            continue
-        k_type, lang = key.split("_")
-        keywords_el = ET.SubElement(creation, "keywords")
-        keywords_el.set("lang", lang)
-        keywords_el.set("type", k_type)
-        for term in val[0].split(";"):
-            if is_blank(term):
-                continue
-            ET.SubElement(keywords_el, "term").text = term.strip()
-
+    add_keywords(row_idx, creation)
     # description (0-N)
-    descriptions = lookup_fields(row_idx, start_with="description")
-    for key, val in descriptions.items():
-        if is_blank(val[0]):
-            continue
-        description_el = ET.SubElement(creation, "description")
-        description_el.set("lang", key)
-        description_el.text = val[0]
-
+    add_descriptions(row_idx, creation)
     # avManifestation (1-N)
     m_tag = "avManifestation" if ws.title == "Video" else "nonAVManifestation"
     manifestation = ET.SubElement(creation, m_tag)
@@ -289,11 +333,13 @@ def create_record():
                 sound_el.text = "With sound" if bool(has_sound) else "Without sound"
                 sound_el.set("hasSound", "true" if bool(has_sound) else "false")
     if m_tag == "nonAVManifestation":
-        ET.SubElement(manifestation, "type").text = ws.title.lower()
-        specific_type = ws.cell(row=row_idx, column=headers["specificType"]).value
-        if is_blank(specific_type):
-            raise ValueError("Missing SpecificType")
-        ET.SubElement(manifestation, "specificType").text = specific_type.strip()
+        non_av_type = ws.title.lower()
+        ET.SubElement(manifestation, "type").text = non_av_type
+        if non_av_type != "3d-model":
+            specific_type = ws.cell(row=row_idx, column=headers["specificType"]).value
+            if is_blank(specific_type):
+                raise ValueError(f"Missing SpecificType for type {non_av_type}")
+            ET.SubElement(manifestation, "specificType").text = specific_type.strip()
         if "physicalFormat" in headers and not is_blank(
             physical_format := ws.cell(
                 row=row_idx, column=headers["physicalFormat"]
@@ -306,15 +352,10 @@ def create_record():
             colour := ws.cell(row=row_idx, column=headers["colour"]).value
         ):
             ET.SubElement(manifestation, "colour").text = colour.strip()
+    # coverage (0-1)
+    add_coverage(row_idx, manifestation)
     # rightsHolder (0-N)
-    if headers.get("rightsHolder") and not is_blank(
-        rights_holders := ws.cell(row=row_idx, column=headers["rightsHolder"]).value
-    ):
-        for rh in rights_holders.split(sep=";"):
-            if is_blank(rh):
-                continue
-            rights_holder = ET.SubElement(manifestation, "rightsHolder")
-            rights_holder.text = rh.strip()
+    add_rights_holder(row_idx, manifestation)
     # rightsStatus (1)
     rights_status = ws.cell(row=row_idx, column=headers["rightsStatus"]).value
     if is_blank(rights_status):
@@ -371,7 +412,7 @@ def check_mandatory_columns():
         for col in ["countryOfReference", "productionYear"]:
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")
-    elif ws.title == "Image" or ws.title == "3D-Model":
+    elif ws.title == "Image":
         for col in ["specificType"]:
             if col not in headers:
                 raise ValueError(f"Missing mandatory column <{col}>")

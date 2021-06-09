@@ -503,15 +503,17 @@ class Coverage(StructuredNode):
     The spatial or temporal topic of the creation object.
 
     Attributes:
-        spatial     This may be a named place, a location, a spatial
-                    coordinate, a named administrative entity or an URI to a
-                    LOD-service.
-        temporal    This may be a period, date or range date.
+        spatial         This may be a named place, a location, a spatial
+                        coordinate, a named administrative entity or an URI to a
+                        LOD-service.
+        spatial_type    Type of the spatial coverage.
+        temporal        This may be a period, date or range date.
     """
 
-    spatial = ArrayProperty(StringProperty(), required=True, show=True)
-    temporal = ArrayProperty(StringProperty(), show=True)
-    creation = RelationshipFrom("Creation", "HAS_COVERAGE", cardinality=One, show=True)
+    spatial = StringProperty(show=True)
+    spatial_type = StringProperty(choices=codelists.SPATIAL_TYPES, show=True)
+    temporal = StringProperty(show=True)
+    creation = RelationshipFrom("Creation", "HAS_COVERAGE", cardinality=One)
 
 
 class Rightholder(IdentifiedNode):
@@ -741,9 +743,7 @@ class NonAVEntity(Creation):
     non_av_type = StringProperty(
         required=True, choices=codelists.NON_AV_TYPES, show=True
     )
-    specific_type = StringProperty(
-        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES, show=True
-    )
+    specific_type = StringProperty(choices=codelists.NON_AV_SPECIFIC_TYPES, show=True)
     phisical_format_size = ArrayProperty(StringProperty(), show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
 

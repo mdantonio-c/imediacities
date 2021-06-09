@@ -482,9 +482,16 @@ The top level structure of the EFG Entity
 	</xs:complexType>
 	<xs:complexType name="CoverageType">
 		<xs:choice maxOccurs="unbounded">
-			<xs:element name="spatial" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="spatial" type="efg:SpatialType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="temporal" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="SpatialType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type" type="efg:spatialAttribute" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 	<xs:complexType name="RightsHolderType">
 		<xs:simpleContent>
@@ -733,4 +740,10 @@ The top level structure of the EFG Entity
 	<xs:attributeGroup name="LinguisticAttribute">
 		<xs:attribute name="lang" type="xs:string" use="required"/>
 	</xs:attributeGroup>
+	<xs:simpleType name="spatialAttribute">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="latlng"/>
+			<xs:enumeration value="altitude"/>
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>

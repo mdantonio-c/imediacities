@@ -39,8 +39,13 @@ class EFG_XMLParser:
         root = ET.parse(filepath)
         if root.find("efg:avcreation", self.ns) is not None:
             return dict(codelists.CONTENT_TYPES)["Video"]
-        if root.find("efg:nonavcreation", self.ns) is not None:
-            return dict(codelists.CONTENT_TYPES)["Image"]
+        if (
+            type_el := root.find(
+                "./efg:nonavcreation/efg:nonAVManifestation/efg:type", self.ns
+            )
+        ) is not None:
+            creation_type = type_el.text.strip().title()
+            return dict(codelists.CONTENT_TYPES)[creation_type]
 
     def get_av_creations(self, filepath):
         root = ET.parse(filepath)
@@ -60,7 +65,7 @@ class EFG_XMLParser:
         root = ET.parse(filepath)
         if item_type == "Video":
             return root.find("efg:avcreation", self.ns)
-        elif item_type == "Image":
+        elif item_type == "Image" or item_type == "3D-Model":
             return root.find("efg:nonavcreation", self.ns)
         else:
             raise ValueError("Invalid item type for " + item_type)
@@ -296,23 +301,6 @@ class EFG_XMLParser:
         #    raise ValueError('Description is missing')
         return descriptions
 
-    def parse_coverages(self, record, audio_visual=False):
-        inpath = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
-        coverages = []
-        for node in record.findall("./" + inpath + "/efg:coverage", self.ns):
-            c: Dict[str, List[Any]] = {
-                "spatial": [],
-                "temporal": [],
-            }
-            for s in node.findall("efg:spatial", self.ns):
-                log.debug("spatial: {}", s.text.strip())
-                c["spatial"].append(s.text.strip())
-            for t in node.findall("efg:temporal", self.ns):
-                log.debug("temporal: {}", t.text.strip())
-                c["temporal"].append(t.text.strip())
-            coverages.append(c)
-        return coverages
-
     def parse_languages(self, record, audio_visual=False):
         """
         Extract language and usage if any. It returns an array of arrays as in
@@ -351,6 +339,23 @@ class EFG_XMLParser:
             log.debug(f"lang code: {lang_usage[0]}, usage code: {lang_usage[1]}")
             languages.append(lang_usage)
         return languages
+
+    def parse_coverages(self, record, audio_visual=False):
+        in_path = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
+        coverages = []
+        if coverage := record.find(f"./{in_path}/efg:coverage", self.ns):
+            for s in coverage.findall("efg:spatial", self.ns):
+                spatial = {
+                    "spatial_type": s.get("type", None),
+                    "spatial": s.text.strip(),
+                }
+                log.debug("spatial: {}", spatial)
+                coverages.append(spatial)
+            for t in coverage.findall("efg:temporal", self.ns):
+                temporal = t.text.strip()
+                log.debug("temporal: {}", temporal)
+                coverages.append({"temporal": temporal})
+        return coverages
 
     def parse_production_contries(self, record):
         """
@@ -541,15 +546,15 @@ class EFG_XMLParser:
         return code_el[0]
 
     def get_non_av_specific_type(self, record):
-        node = record.find("./efg:nonAVManifestation/efg:specificType", self.ns)
-        if node is None:
-            raise ValueError("Non-AV specific type is missing")
-        code_el = codelists.fromDescription(
-            node.text.strip(), codelists.NON_AV_SPECIFIC_TYPES
-        )
-        if code_el is None:
-            raise ValueError("Invalid Non-AV specific type for: " + node.text.strip())
-        return code_el[0]
+        if node := record.find("./efg:nonAVManifestation/efg:specificType", self.ns):
+            code_el = codelists.fromDescription(
+                node.text.strip(), codelists.NON_AV_SPECIFIC_TYPES
+            )
+            if code_el is None:
+                raise ValueError(
+                    "Invalid Non-AV specific type for: " + node.text.strip()
+                )
+            return code_el[0]
 
     def get_physical_format_size(self, record):
         """
@@ -567,14 +572,6 @@ class EFG_XMLParser:
         for date in record.findall("efg:dateCreated", self.ns):
             dates.append(date.text.strip())
         return dates
-
-    def get_colour(self, record):
-        node = record.find("./efg:nonAVManifestation/efg:colour", self.ns)
-        if node is not None:
-            code_el = codelists.fromDescription(node.text.strip(), codelists.COLOUR)
-            if code_el is not None:
-                return code_el[0]
-            self.warnings.append("Invalid format colour for: " + node.text.strip())
 
     def __parse_creation(self, record, audio_visual=False):
         properties = {
@@ -623,6 +620,14 @@ class EFG_XMLParser:
         if len(self.warnings) > 0:
             log.warning("Creation parsed with {} warning(s)", len(self.warnings))
         return av_creation
+
+    def get_colour(self, record):
+        node = record.find("./efg:nonAVManifestation/efg:colour", self.ns)
+        if node is not None:
+            code_el = codelists.fromDescription(node.text.strip(), codelists.COLOUR)
+            if code_el is not None:
+                return code_el[0]
+            self.warnings.append("Invalid format colour for: " + node.text.strip())
 
     def parse_non_av_creation(self, record):
         log.debug("--- parsing NON AV Entity ---")
