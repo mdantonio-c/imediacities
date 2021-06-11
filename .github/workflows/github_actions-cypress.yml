@@ -36,9 +36,8 @@ jobs:
 
           rapydo pull --quiet;
           rapydo build --force;
-          rapydo start;
-          rapydo shell --no-tty backend 'restapi wait';
 
+          rapydo -e API_AUTOSTART=1 start;
           sleep 20
           rapydo logs
 
