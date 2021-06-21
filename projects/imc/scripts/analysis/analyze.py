@@ -936,7 +936,7 @@ def analize_image(filename, out_folder, muuid, fast=False):
 
 # -----------------------------------------------------
 def analize(filename, uuid, item_type, out_folder, fast=False):
-    """ Item type: "Video" or "Image". """
+    """Item type: "Video" or "Image"."""
 
     if item_type == "Video":
         return analize_movie(filename, out_folder, uuid, fast)

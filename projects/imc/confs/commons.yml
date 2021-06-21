@@ -1,11 +1,10 @@
-# Customize this file to include compose configurations common to bluprints
-version: "3"
+version: "3.8"
 
 services:
   backend:
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
-      - ${VANILLA_DIR}/scripts:/code/scripts
+      - ${DATA_DIR}/imediastuff:/uploads
+      - ${PROJECT_DIR}/scripts:/code/scripts
     networks:
       ftp_net:
     environment:
@@ -14,7 +13,7 @@ services:
 
   neo4j:
     volumes:
-      - ${VANILLA_DIR}/data/graphdata:/data
+      - ${DATA_DIR}/graphdata:/data
     ports:
       - 7687:7687
       - 9090:${NEO4J_WEB_INTERFACE_PORT}
@@ -26,14 +25,14 @@ services:
       - 15672:15672
 
   celery:
-    build: ${VANILLA_DIR}/projects/${COMPOSE_PROJECT_NAME}/builds/celery
+    build: ${PROJECT_DIR}/builds/celery
     image: imediacities/celery:${RAPYDO_VERSION}
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${DATA_DIR}/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
       - /opt/idmt:/opt/idmt
-      - ${VANILLA_DIR}/scripts:/code/scripts
-      - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
+      - ${PROJECT_DIR}/scripts:/code/scripts
+      - ${DATA_DIR}/ssh:/home/developer/.ssh
 
     environment:
       # Used to manage analysis script on both prod and pre-prod
@@ -41,17 +40,17 @@ services:
 
   flower:
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
-      - ${VANILLA_DIR}/scripts:/code/scripts
-      - ${VANILLA_DIR}/data/flower_db:${CELERYUI_DBDIR}
+      - ${DATA_DIR}/imediastuff:/uploads
+      - ${PROJECT_DIR}/scripts:/code/scripts
+      - ${DATA_DIR}/flower_db:${CELERYUI_DBDIR}
 
   ftp:
     ports:
       - "21:21"
       - "30000-30019:30000-30019"
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
-      - ${VANILLA_DIR}/data/ftp:/etc/pure-ftpd/passwd
+      - ${DATA_DIR}/imediastuff:/home/ftpusers/
+      - ${DATA_DIR}/ftp:/etc/pure-ftpd/passwd
 
   frontend:
     environment:

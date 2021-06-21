@@ -55,6 +55,4 @@ class Customizer(BaseCustomizer):
 
     @staticmethod
     def get_custom_output_fields(request: FlaskRequest) -> Props:
-        fields = Customizer.get_custom_input_fields(request, scope=BaseCustomizer.ADMIN)
-
-        return fields
+        return {"declared_institution": fields.Str()}
