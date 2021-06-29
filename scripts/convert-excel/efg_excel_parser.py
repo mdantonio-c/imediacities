@@ -134,7 +134,7 @@ def add_coverage(row_idx, manifestation):
                 continue
             spatial_el = ET.SubElement(coverage_el, "spatial")
             spatial_el.text = val[0]
-            spatial_el.set("type", "latlng")
+            spatial_el.set("type", spatial_type)
         elif key == "temporal" and not is_blank(val[0]):
             ET.SubElement(coverage_el, "temporal").text = val[0]
     # eventually remove empty coverage element
