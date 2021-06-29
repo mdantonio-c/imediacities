@@ -176,11 +176,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if out_folder == "":
             raise Exception("Failed to create out_folder")
 
-        log.info("Analize " + content_item)
+        log.info("Analyze " + content_item)
         if analize(content_item, creation.uuid, item_type, out_folder, fast):
-            log.info("Analize executed")
+            log.info("Analyze executed")
         else:
-            raise Exception("Analize terminated with errors")
+            raise Exception("Analyze terminated with errors")
 
         # analyze_path = '/uploads/Analize/' + \
         #     group.uuid + '/' + content_filename.split('.')[0] + '/'

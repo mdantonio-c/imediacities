@@ -38,6 +38,13 @@ class CreationRepository:
         )
         # connect to item
         item.creation.connect(entity)
+        # create/update digital_format in the item
+        item.digital_format = item.dimension = None
+        if digital_format := properties.get("digital_format"):
+            item.digital_format = [None for _ in range(4)]
+            item.digital_format[0] = digital_format.get("value")
+            item.dimension = digital_format.get("size")
+        item.save()
 
         # add relationships
         for r in relationships.keys():

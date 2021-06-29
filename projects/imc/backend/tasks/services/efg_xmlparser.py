@@ -559,6 +559,12 @@ class EFG_XMLParser:
                 )
             return code_el[0]
 
+    def get_digital_format(self, record):
+        """Get digital format"""
+        node = record.find("./efg:nonAVManifestation/efg:digitalFormat", self.ns)
+        if node is not None:
+            return {"value": node.text.strip(), "size": node.get("size")}
+
     def get_physical_format_size(self, record):
         """
         Return an array with 2 element as follow:
@@ -641,6 +647,7 @@ class EFG_XMLParser:
         # manage non_av properties
         properties["non_av_type"] = self.get_non_av_type(record)
         properties["specific_type"] = self.get_non_av_specific_type(record)
+        properties["digital_format"] = self.get_digital_format(record)
         properties["phisical_format_size"] = self.get_physical_format_size(record)
         properties["date_created"] = self.get_date_created(record)
         properties["colour"] = self.get_colour(record)

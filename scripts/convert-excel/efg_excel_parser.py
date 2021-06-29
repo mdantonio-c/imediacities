@@ -142,6 +142,22 @@ def add_coverage(row_idx, manifestation):
         manifestation.remove(coverage_el)
 
 
+def add_digital_format(row_idx, manifestation):
+    if headers.get("digitalFormat") and not is_blank(
+        digital_format := ws.cell(row=row_idx, column=headers["digitalFormat"]).value
+    ):
+        digital_format_el = ET.SubElement(manifestation, "digitalFormat")
+        digital_format_el.text = digital_format.strip()
+        if headers.get("digitalSize"):
+            digital_size = ws.cell(row=row_idx, column=headers["digitalSize"]).value
+            if not isinstance(digital_size, int):
+                print(
+                    f"WARNING - Digital size MUST be a valid number. Actual value: '{digital_size}'"
+                )
+                return
+            digital_format_el.set("size", str(digital_size))
+
+
 def add_rights_holder(row_idx, manifestation):
     if headers.get("rightsHolder") and not is_blank(
         rights_holders := ws.cell(row=row_idx, column=headers["rightsHolder"]).value
@@ -340,6 +356,8 @@ def create_record():
             if is_blank(specific_type):
                 raise ValueError(f"Missing SpecificType for type {non_av_type}")
             ET.SubElement(manifestation, "specificType").text = specific_type.strip()
+        # digitalFormat (0-1)
+        add_digital_format(row_idx, manifestation)
         if "physicalFormat" in headers and not is_blank(
             physical_format := ws.cell(
                 row=row_idx, column=headers["physicalFormat"]
