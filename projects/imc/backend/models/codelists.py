@@ -308,6 +308,8 @@ TYPE_OF_ACTIVITY = (
     ("191", "Visual effects"),
     ("192", "Wardrobe supervisor"),
     ("193", "Wrangler"),
+    ("194", "Artistic validator"),
+    ("195", "Scientific validator"),
 )
 
 PROVIDER_SCHEMES = (("ISIL", "ISIL code"), ("ACRO", "Institution acronym"))
