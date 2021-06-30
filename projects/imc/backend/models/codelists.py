@@ -73,6 +73,8 @@ DESCRIPTION_TYPES = (
     ("05", "Review snippet"),
     ("06", "Intertitles"),
     ("07", "Broadcast commentary"),
+    ("08", "Scope"),
+    ("09", "Documentation"),
 )
 
 LANGUAGE_USAGES = (

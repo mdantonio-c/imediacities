@@ -25,6 +25,17 @@ COMMON_MANDATORY_COLS = [
     "provider_id",
     "rightsStatus",
 ]
+DESCRIPTION_TYPES = {
+    "01": "Synopsis",
+    "02": "Content description",
+    "03": "Shotlist",
+    "04": "Dialogue",
+    "05": "Review snippet",
+    "06": "Intertitles",
+    "07": "Broadcast commentary",
+    "08": "Scope",
+    "09": "Documentation",
+}
 
 parser = argparse.ArgumentParser()
 parser.add_argument("input", help="input excel file")
@@ -194,8 +205,16 @@ def add_descriptions(row_idx, creation):
     for key, val in descriptions.items():
         if is_blank(val[0]):
             continue
+        # expected key is as follows:  type_lang (e.g. "Scope_it") or just lang (e.g. "it")
+        d_lang = key
+        d_type = None
+        if len(key.split("_")) == 2:
+            d_type_code, d_lang = key.split("_")
+            d_type = DESCRIPTION_TYPES.get(d_type_code)
         description_el = ET.SubElement(creation, "description")
-        description_el.set("lang", key)
+        description_el.set("lang", d_lang)
+        if d_type:
+            description_el.set("type", d_type)
         description_el.text = val[0]
 
 
