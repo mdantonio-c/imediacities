@@ -655,6 +655,12 @@ class EFG_XMLParser:
 
         # manage non_av relationships
         non_av_creation["relationships"] = relationships
+        if properties["non_av_type"] == "3d-model":
+            # add 3D Format in the item as relationship
+            three_dim_format = self.parse_3d_format(record)
+            if three_dim_format is None:
+                ValueError("3D format is missing")
+            non_av_creation["relationships"]["3d-format"] = three_dim_format
         if len(self.warnings) > 0:
             log.warning("Creation parsed with {} warning(s)", len(self.warnings))
         return non_av_creation
@@ -664,3 +670,31 @@ class EFG_XMLParser:
         rough_string = ET.tostring(elem, "utf-8")  # type: ignore
         re_parsed = minidom.parseString(rough_string)
         return re_parsed.toprettyxml(indent="  ")
+
+    def parse_3d_format(self, record):
+        """Extract 3D format info from 3d models."""
+        three_dim_format: Dict[str, Any] = None
+        if _3d_format := record.find(
+            "./efg:nonAVManifestation/efg:item/efg:_3DFormat", self.ns
+        ):
+            three_dim_format = {"software_used": []}
+            level_of_details = _3d_format.find("efg:levelOfDetails", self.ns)
+            if level_of_details is not None:
+                upper = level_of_details.get("upper", "")
+                three_dim_format[
+                    "level_of_details"
+                ] = f"{level_of_details.text.strip()}:{upper}"
+            resolution = _3d_format.find("efg:resolution", self.ns)
+            if resolution is not None:
+                three_dim_format["resolution"] = int(resolution.text.strip())
+                three_dim_format["resolution_type"] = resolution.get("type")
+            for sfw in _3d_format.findall("efg:softwareUsed", self.ns):
+                three_dim_format["software_used"].append(sfw.text.strip())
+            if len(three_dim_format["software_used"]) == 0:
+                raise ValueError("Missing software used in 3D format")
+            materials = _3d_format.find("efg:materials", self.ns)
+            if materials is None:
+                raise ValueError("3D Format Materials is missing")
+            three_dim_format["materials"] = bool(materials.text.strip())
+            log.debug(three_dim_format)
+        return three_dim_format

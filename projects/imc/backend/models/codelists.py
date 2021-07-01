@@ -77,6 +77,8 @@ DESCRIPTION_TYPES = (
     ("09", "Documentation"),
 )
 
+RESOLUTION_3D_TYPES = {"polygons": "polygons", "vertexes": "vertexes"}
+
 LANGUAGE_USAGES = (
     ("01", "Additional dubbed language"),
     ("02", "Additional original language"),

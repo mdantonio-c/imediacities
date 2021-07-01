@@ -50,15 +50,15 @@ class CreationRepository:
         for r in relationships.keys():
             if r == "record_sources":
                 # connect to record sources
-                for item in relationships[r]:
-                    record_source = self.graph.RecordSource(**item[0]).save()
+                for rec_item in relationships[r]:
+                    record_source = self.graph.RecordSource(**rec_item[0]).save()
                     entity.record_sources.connect(record_source)
                     # look for existing content provider
                     provider = self.find_provider_by_identifier(
-                        item[1]["identifier"], item[1]["scheme"]
+                        rec_item[1]["identifier"], rec_item[1]["scheme"]
                     )
                     if provider is None:
-                        provider = self.graph.Provider(**item[1]).save()
+                        provider = self.graph.Provider(**rec_item[1]).save()
                     record_source.provider.connect(provider)
             elif r == "titles":
                 # connect to titles
@@ -113,6 +113,9 @@ class CreationRepository:
             elif av and r == "video_format" and relationships[r] is not None:
                 video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
+            elif not av and r == "3d-format" and relationships[r] is not None:
+                three_dim_format = self.graph.ThreeDimFormat(**relationships[r]).save()
+                item.three_dim_format.connect(three_dim_format)
             elif r == "agents":
                 for agent_activities in relationships[r]:
                     # look for existing agents

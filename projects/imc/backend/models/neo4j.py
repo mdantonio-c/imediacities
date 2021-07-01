@@ -258,6 +258,8 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
                         - format: RFC 2049 MIME types, e.g. "image/jpg", etc.
                         - resolution: The degree of sharpness of the digital
                                      object expressed in lines or pixel
+        3d_format       The description of the 3D model format with information such as:
+                        level of details, number of polygons/vertexes, software used, etc
         uri             An unambiguous URI to the resource within the IMC
                         context.
         item_type       "Text", "Image",  "Video", "3D-Model"
@@ -306,6 +308,20 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
     other_version = RelationshipTo(
         "Item", "OTHER_VERSION", cardinality=ZeroOrOne, show=True
     )
+    three_dim_format = RelationshipTo(
+        "ThreeDimFormat", "3D_FORMAT", cardinality=ZeroOrOne, show=True
+    )
+
+
+class ThreeDimFormat(StructuredNode):
+    """Technical information for 3D format (ONLY for 3d-model types)"""
+
+    level_of_details = StringProperty(show=True)
+    resolution = IntegerProperty(show=True)
+    resolution_type = StringProperty(choices=codelists.RESOLUTION_3D_TYPES, show=True)
+    software_used = ArrayProperty(StringProperty(), show=True)
+    materials = BooleanProperty(required=True, show=True)
+    item = RelationshipFrom("Item", "3D_FORMAT", cardinality=One)
 
 
 class ContributionRel(StructuredRel):

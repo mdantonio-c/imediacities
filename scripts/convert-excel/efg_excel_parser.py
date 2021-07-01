@@ -180,6 +180,35 @@ def add_rights_holder(row_idx, manifestation):
             rights_holder.text = rh.strip()
 
 
+def add_3d_format(row_idx, item):
+    format_fields = lookup_fields(row_idx, start_with="3DFormat")
+    _3d_format_el = ET.SubElement(item, "_3DFormat")
+    for key, val in format_fields.items():
+        if is_blank(val[0]):
+            # no format info for this key
+            continue
+        if key in ["level", "resolution", "software", "materials"]:
+            # print(f"<{key}> {val[0]}")
+            if key == "level":
+                level_of_details = ET.SubElement(_3d_format_el, "levelOfDetails")
+                level, upper = val[0].split(":")
+                level_of_details.text = level
+                level_of_details.set("upper", upper)
+            elif key == "resolution":
+                res = ET.SubElement(_3d_format_el, "resolution")
+                count, type = val[0].split(":")
+                res.text = count
+                res.set("type", type)
+            elif key == "software":
+                for sfw in val[0].split(sep=";"):
+                    if is_blank(sfw):
+                        continue
+                    sfw_el = ET.SubElement(_3d_format_el, "softwareUsed")
+                    sfw_el.text = sfw.strip()
+            elif key == "materials":
+                ET.SubElement(_3d_format_el, "materials").text = val[0].lower()
+
+
 def add_keywords(row_idx, creation):
     keywords = lookup_fields(row_idx, start_with="keywords")
     for key, val in keywords.items():
@@ -389,6 +418,11 @@ def create_record():
             colour := ws.cell(row=row_idx, column=headers["colour"]).value
         ):
             ET.SubElement(manifestation, "colour").text = colour.strip()
+        if non_av_type == "3d-model":
+            item = ET.SubElement(manifestation, "item")
+            add_3d_format(row_idx, item)
+            if item.find("_3DFormat") is None:
+                raise ValueError(f"Missing _3DFormat element for {non_av_type} type")
     # coverage (0-1)
     add_coverage(row_idx, manifestation)
     # rightsHolder (0-N)

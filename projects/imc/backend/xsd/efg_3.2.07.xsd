@@ -278,9 +278,7 @@ The top level structure of the EFG Entity
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="rightsHolder" type="efg:RightsHolderType" minOccurs="0" maxOccurs="unbounded"/>
-							<!-- START FIX (michele) -->
 							<xs:element name="rightsStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-							<!-- END FIX (michele) -->
 							<xs:element name="thumbnail" type="xs:string"/>
 							<xs:element name="provenance" type="xs:string" minOccurs="0"/>
 							<xs:element name="note" type="efg:NoteType" minOccurs="0" maxOccurs="unbounded"/>
@@ -354,10 +352,6 @@ The top level structure of the EFG Entity
 							<xs:element name="geographicScope" type="efg:GeoType" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="coverage" type="efg:CoverageType" minOccurs="0"/>
 							<xs:element name="rightsHolder" type="efg:RightsHolderType" minOccurs="0" maxOccurs="unbounded"/>
-							<!-- START FIX (michele) 
-							<xs:element name="rightsStatus" type="efg:RightsStatusType"
-								minOccurs="0" maxOccurs="unbounded"/>
-							 END FIX (michele) -->
 							<xs:element name="rightsStatus" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="provenance" type="xs:string" minOccurs="0"/>
 							<xs:element name="thumbnail" type="xs:string"/>
@@ -369,6 +363,7 @@ The top level structure of the EFG Entity
 										<xs:element name="isShownBy" type="xs:string"/>
 										<xs:element name="isShownAt" type="xs:string"/>
 										<xs:element name="fileFormat" type="xs:string"/>
+										<xs:element name="_3DFormat" type="efg:Dig3DFormatType" minOccurs="0"/>
 										<xs:element name="provider" type="xs:string"/>
 										<xs:element name="aggregator" type="xs:string"/>
 										<xs:element name="uri" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -500,20 +495,17 @@ The top level structure of the EFG Entity
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
-	<!-- START FIX (michele) -->
+
 	<xs:simpleType name="RightsStatusType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="Copyright protected"/>
 			<xs:enumeration value="Not Copyright protected"/>
 			<xs:enumeration value="Public Domain"/>
-			<xs:enumeration value="No known copyright / Orphan Work"/>	
-			<!--START FIX (Miriam) -->
+			<xs:enumeration value="No known copyright / Orphan Work"/>
 			<xs:enumeration value="In Copyright"/>
 			<xs:enumeration value="In Copyright - EU Orphan Work"/>
-			<!-- End FIX (Miriam) -->
 		</xs:restriction>
 	</xs:simpleType>
-	<!-- END FIX -->
 
 	<xs:complexType name="SoundType">
 		<xs:simpleContent>
@@ -575,6 +567,39 @@ The top level structure of the EFG Entity
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
+
+	<xs:complexType name="Dig3DFormatType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="levelOfDetails" type="efg:LevelOfDetailsType" minOccurs="0" />
+			<xs:element name="resolution" type="efg:ResolutionType" minOccurs="0"/>
+			<xs:element name="softwareUsed" type="xs:string" maxOccurs="unbounded"/>
+			<xs:element name="materials" type="xs:boolean" />
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="LevelOfDetailsType">
+		<xs:simpleContent>
+			<xs:extension base="xs:integer">
+				<xs:attribute name="upper" type="xs:integer" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="ResolutionType">
+		<xs:simpleContent>
+			<xs:extension base="xs:integer">
+				<xs:attribute name="type" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="polygons"/>
+							<xs:enumeration value="vertexes"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
 	<xs:complexType name="PhFormatType">
 		<xs:simpleContent>
 			<xs:extension base="xs:string">
