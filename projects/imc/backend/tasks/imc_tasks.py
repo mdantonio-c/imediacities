@@ -813,7 +813,15 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
             + "x"
             + str(data["image"]["geometry"]["height"])
         )
-
+    elif item.item_type == "3D-Model":
+        item.uri = data["image"]["name"]
+        thumbnail_filename = "transcoded_small.jpg"
+        thumbnail_uri = os.path.join(
+            os.path.dirname(analyze_dir_path), thumbnail_filename
+        )
+        item.thumbnail = (
+            thumbnail_uri if os.path.exists(thumbnail_uri) else data["image"]["name"]
+        )
     else:
         log.warning(
             "Invalid type. Technical info CANNOT be extracted for "

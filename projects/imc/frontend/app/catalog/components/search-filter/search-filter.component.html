@@ -70,6 +70,18 @@
                 <input type="checkbox" formControlName="imageType" ngbButton />
                 <i class="material-icons button-filter">photo_camera</i>
               </label>
+              <label
+                class="btn-basic imc-search-filter"
+                ngbButtonLabel
+                (click)="verifyItemType('3d-model')"
+              >
+                <input
+                  type="checkbox"
+                  formControlName="model3DType"
+                  ngbButton
+                />
+                <i class="material-icons button-filter">view_in_ar</i>
+              </label>
             </div>
           </div>
         </div>

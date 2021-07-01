@@ -62,8 +62,9 @@ class Search(IMCEndpoint):
                 entity = "Creation"
             elif item_type == "video":
                 entity = "AVEntity"
-            elif item_type == "image":
+            elif item_type in ["image", "3d-model"]:
                 entity = "NonAVEntity"
+                filters.append(f"MATCH (n) WHERE n.non_av_type = '{item_type}'")
             else:
                 # should never be reached
                 raise ServerError("Unexpected item type")

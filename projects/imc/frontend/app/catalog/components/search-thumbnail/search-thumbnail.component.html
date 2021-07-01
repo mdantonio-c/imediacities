@@ -2,7 +2,7 @@
   <div
     class="media-image-wrapper click-event"
     (click)="route(media.id, media.type)"
-    style="outline: none;"
+    style="outline: none"
   >
     <span class="badge badge-warning revision" *ngIf="underRevision()">
       revision
@@ -11,10 +11,11 @@
       <span class="fa-stack">
         <i class="fa fa-circle fa-stack-2x"></i>
         <i
-          class="fa fa-stack-1x light-blue"
+          class="fas fa-stack-1x light-blue"
           [ngClass]="{
             'fa-video': media._item[0].item_type.key === 'Video',
             'fa-camera': media._item[0].item_type.key === 'Image',
+            'fa-cube': media._item[0].item_type.key === '3D-Model',
             'fa-align-left': media._item[0].item_type.key === 'Text'
           }"
         ></i>
@@ -24,13 +25,15 @@
       holderjs
       [attr.data-src]="'holder.js/100px200?text=NO THUMBNAIL&?auto=yes'"
       *ngIf="!media.links['thumbnail']"
+      alt="no thumbnail"
     />
     <img
       (contextmenu)="disableSaveAs($event)"
       src="{{ media.links['thumbnail'] + '&size=large' }}"
       *ngIf="media.links['thumbnail']"
-      style="height: 200px; /*width: 100%;*/ display: block;"
+      style="height: 200px; /*width: 100%;*/ display: block"
       class="img-fluid"
+      alt="thumbnail"
     />
     <span
       *ngIf="media.type == 'aventity'"
