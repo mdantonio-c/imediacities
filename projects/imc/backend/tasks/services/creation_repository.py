@@ -178,6 +178,10 @@ class CreationRepository:
         self.__delete_entity(node)
         non_av_entity = node.downcast()
         uuid = non_av_entity.uuid
+        item = non_av_entity.item.single()
+        three_dim_format = item.three_dim_format.single()
+        if three_dim_format is not None:
+            three_dim_format.delete()
         non_av_entity.delete()
         log.debug("Delete NonAVEntity with uuid {}", uuid)
 
