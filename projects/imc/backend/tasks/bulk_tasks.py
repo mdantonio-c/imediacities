@@ -9,7 +9,7 @@ from restapi.utilities.logs import log
 
 
 def extract_item_type(path):
-    """ Extract the creation type from the incoming XML file."""
+    """Extract the creation type from the incoming XML file."""
     parser = EFG_XMLParser()
     return parser.get_creation_type(path)
 
@@ -205,12 +205,12 @@ def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
                         metadata_update = True
                         task = CeleryExt.celery_app.send_task(
                             "import_file",
-                            args=[
+                            args=(
                                 standard_path,
                                 resource.uuid,
                                 mode,
                                 metadata_update,
-                            ],
+                            ),
                             countdown=10,
                         )
                         log.debug("Task id={}", task.id)
@@ -221,7 +221,10 @@ def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
                     else:
                         task = CeleryExt.celery_app.send_task(
                             "update_metadata",
-                            args=[standard_path, resource.uuid],
+                            args=(
+                                standard_path,
+                                resource.uuid,
+                            ),
                             countdown=10,
                         )
                         log.debug("Task id={}", task.id)
@@ -239,7 +242,11 @@ def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
                     mode = "clean"
                     task = CeleryExt.celery_app.send_task(
                         "import_file",
-                        args=[standard_path, meta_stage.uuid, mode],
+                        args=(
+                            standard_path,
+                            meta_stage.uuid,
+                            mode,
+                        ),
                         countdown=10,
                     )
                     meta_stage.status = "IMPORTING"
@@ -310,12 +317,12 @@ def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
                     metadata_update = True
                     task = CeleryExt.celery_app.send_task(
                         "import_file",
-                        args=[
+                        args=(
                             standard_path,
                             meta_stage.uuid,
                             mode,
                             metadata_update,
-                        ],
+                        ),
                         countdown=10,
                     )
                     log.debug("Task id={}", task.id)
@@ -331,7 +338,10 @@ def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
                     )
                     task = CeleryExt.celery_app.send_task(
                         "update_metadata",
-                        args=[standard_path, meta_stage.uuid],
+                        args=(
+                            standard_path,
+                            meta_stage.uuid,
+                        ),
                         countdown=10,
                     )
                     log.info("Task id={}", task.id)

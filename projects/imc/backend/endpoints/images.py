@@ -448,7 +448,12 @@ class ImageTools(IMCEndpoint):
                 )
         c = celery.get_instance()
         task = c.celery_app.send_task(
-            "launch_tool", args=[tool, item.uuid], countdown=10
+            "launch_tool",
+            args=(
+                tool,
+                item.uuid,
+            ),
+            countdown=10,
         )
 
         return self.response(task.id, code=202)

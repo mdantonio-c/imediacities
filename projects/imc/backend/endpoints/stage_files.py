@@ -413,7 +413,14 @@ class Stage(IMCEndpoint):
 
         # 3) starting import
         task = celery_ext.celery_app.send_task(
-            "import_file", args=[path, meta_stage.uuid, mode, update], countdown=10
+            "import_file",
+            args=(
+                path,
+                meta_stage.uuid,
+                mode,
+                update,
+            ),
+            countdown=10,
         )
 
         meta_stage.status = "IMPORTING"
