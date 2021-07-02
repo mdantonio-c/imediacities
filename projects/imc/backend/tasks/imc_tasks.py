@@ -537,7 +537,7 @@ def shot_revision(self, revision, item_id):
             "Error in shot revision",
             "shot_revision_failure.html",
             replaces,
-            self.request.id,  # type: ignore
+            self.request.id,
         )
         raise
     finally:
