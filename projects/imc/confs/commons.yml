@@ -19,10 +19,8 @@ services:
       - 9090:${NEO4J_WEB_INTERFACE_PORT}
 
   rabbit:
-    expose:
-      - "15672"
     ports:
-      - 15672:15672
+      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
 
   celery:
     build: ${PROJECT_DIR}/builds/celery

@@ -316,7 +316,7 @@ class ImageContent(IMCEndpoint, Downloader):
 
         item = image.item.single()
         log.debug("item data: " + format(item))
-        if content_type == "image":
+        if content_type in ["image", "3d-model"]:
             # TODO manage here content access (see issue 190)
             # always return the other version if available
             image_uri = item.uri

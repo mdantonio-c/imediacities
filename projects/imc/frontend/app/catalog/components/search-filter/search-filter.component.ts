@@ -46,9 +46,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
   readonly disabled_filters = [];
 
-  @Output() onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<
-    SearchFilter
-  >();
+  @Output()
+  onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -59,6 +58,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       searchTerm: [""],
       videoType: [true],
       imageType: [true],
+      model3DType: [true],
       term: [""],
       city: [""],
       productionYearFrom: [YEAR_FROM],
@@ -126,6 +126,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         filter.itemType === "all" || filter.itemType === "video" ? true : false,
       imageType:
         filter.itemType === "all" || filter.itemType === "image" ? true : false,
+      model3DType:
+        filter.itemType === "all" || filter.itemType === "3d-model"
+          ? true
+          : false,
       term: "",
       city: SearchFilterComponent.providerToCity(filter.provider),
       productionYearFrom: filter.productionYearFrom,
@@ -141,23 +145,24 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   verifyItemType(type) {
-    //console.log('verifyItemType: type=' + type);
-    let form = this.searchForm.value;
-    var newVideoType: boolean = form.videoType;
-    var newImageType: boolean = form.imageType;
-
+    // console.log(`verifyItemType: type=${type}`);
+    const form = this.searchForm.value;
+    let newVideoType: boolean = form.videoType;
+    let newImageType: boolean = form.imageType;
+    let newModel3DType: boolean = form.model3DType;
     if (type == "image") {
       newImageType = !newImageType;
     }
     if (type == "video") {
       newVideoType = !newVideoType;
     }
-    //console.log('newVideoType=' + newVideoType);
-    //console.log('newImageType=' + newImageType);
-    if (!newVideoType && !newImageType) {
-      return false;
+    if (type == "3d-model") {
+      newModel3DType = !newModel3DType;
     }
-    return true;
+    // console.log('newVideoType=' + newVideoType);
+    // console.log('newImageType=' + newImageType);
+    // console.log('new3DModelType=' + newModel3DType);
+    return !newVideoType && !newImageType && !newModel3DType ? false : true;
   }
 
   applyFilter() {
@@ -179,12 +184,14 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       filter.searchTerm = form.searchTerm;
     }
     // item type
-    if (form.videoType && form.imageType) {
+    if (form.videoType && form.imageType && form.model3DType) {
       filter.itemType = "all";
     } else if (form.videoType) {
       filter.itemType = "video";
     } else if (form.imageType) {
       filter.itemType = "image";
+    } else if (form.model3DType) {
+      filter.itemType = "3d-model";
     }
     for (let t of this.terms) {
       filter.terms.push({ iri: t.iri, label: t.name });

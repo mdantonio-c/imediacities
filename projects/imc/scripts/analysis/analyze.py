@@ -941,7 +941,7 @@ def analize(filename, uuid, item_type, out_folder, fast=False):
     if item_type == "Video":
         return analize_movie(filename, out_folder, uuid, fast)
 
-    if item_type == "Image":
+    if item_type in ["Image", "3D-Model"]:
         return analize_image(filename, out_folder, uuid, fast)
 
     print("analize error: bad item_type :", item_type)
