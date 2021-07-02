@@ -73,7 +73,11 @@ DESCRIPTION_TYPES = (
     ("05", "Review snippet"),
     ("06", "Intertitles"),
     ("07", "Broadcast commentary"),
+    ("08", "Scope"),
+    ("09", "Documentation"),
 )
+
+RESOLUTION_3D_TYPES = {"polygons": "polygons", "vertexes": "vertexes"}
 
 LANGUAGE_USAGES = (
     ("01", "Additional dubbed language"),
@@ -110,6 +114,9 @@ LANGUAGE_USAGES = (
 AGENT_TYPES = (("P", "person"), ("C", "corporate"))
 
 SEXES = (("M", "Male"), ("F", "Female"))
+
+# COVERAGE_TYPES = {'S': 'Spatial', 'T': 'Temporal'}
+SPATIAL_TYPES = {"latlng": "LatLng", "altitude": "Altitude"}
 
 TYPE_OF_ACTIVITY = (
     ("001", "Actor"),
@@ -305,6 +312,8 @@ TYPE_OF_ACTIVITY = (
     ("191", "Visual effects"),
     ("192", "Wardrobe supervisor"),
     ("193", "Wrangler"),
+    ("194", "Artistic validator"),
+    ("195", "Scientific validator"),
 )
 
 PROVIDER_SCHEMES = (("ISIL", "ISIL code"), ("ACRO", "Institution acronym"))
@@ -328,7 +337,7 @@ IDENTIFIER_SCHEMES = (
 
 VIDEO_SOUND = (("NO_SOUND", "Without sound"), ("WITH_SOUND", "With sound"))
 
-NON_AV_TYPES = (("image", "image"), ("text", "text"))
+NON_AV_TYPES = (("image", "image"), ("text", "text"), ("3d-model", "3d-model"))
 
 RIGHTS_STATUS = (
     ("01", "In copyright"),

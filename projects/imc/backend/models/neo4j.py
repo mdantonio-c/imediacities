@@ -258,6 +258,8 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
                         - format: RFC 2049 MIME types, e.g. "image/jpg", etc.
                         - resolution: The degree of sharpness of the digital
                                      object expressed in lines or pixel
+        3d_format       The description of the 3D model format with information such as:
+                        level of details, number of polygons/vertexes, software used, etc
         uri             An unambiguous URI to the resource within the IMC
                         context.
         item_type       "Text", "Image",  "Video", "3D-Model"
@@ -306,6 +308,20 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
     other_version = RelationshipTo(
         "Item", "OTHER_VERSION", cardinality=ZeroOrOne, show=True
     )
+    three_dim_format = RelationshipTo(
+        "ThreeDimFormat", "3D_FORMAT", cardinality=ZeroOrOne, show=True
+    )
+
+
+class ThreeDimFormat(StructuredNode):
+    """Technical information for 3D format (ONLY for 3d-model types)"""
+
+    level_of_details = StringProperty(show=True)
+    resolution = IntegerProperty(show=True)
+    resolution_type = StringProperty(choices=codelists.RESOLUTION_3D_TYPES, show=True)
+    software_used = ArrayProperty(StringProperty(), show=True)
+    materials = BooleanProperty(required=True, show=True)
+    item = RelationshipFrom("Item", "3D_FORMAT", cardinality=One)
 
 
 class ContributionRel(StructuredRel):
@@ -342,7 +358,9 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
         descriptions        Textual descriptions.
         languages           The languages of the spoken, sung or written
                             content.
-        coverages           The spatial or temporal topics of the creation
+        spatial_coverages   The spatial topics of the creation
+                            object.
+        temporal_coverages  The temporal topics of the creation
                             object.
         rights_status       Specifies the copyright status of the digital item.
         rightholders        Right holders.
@@ -366,8 +384,11 @@ class Creation(IdentifiedNode, HeritableStructuredNode):
     languages = RelationshipTo(
         "Language", "HAS_LANGUAGE", cardinality=ZeroOrMore, model=LanguageRel, show=True
     )
-    coverages = RelationshipTo(
-        "Coverage", "HAS_COVERAGE", cardinality=ZeroOrMore, show=True
+    spatial_coverages = RelationshipTo(
+        "SpatialCoverage", "HAS_SPATIAL_COVERAGE", cardinality=ZeroOrMore, show=True
+    )
+    temporal_coverages = RelationshipTo(
+        "TemporalCoverage", "HAS_TEMPORAL_COVERAGE", cardinality=ZeroOrMore, show=True
     )
     rights_status = StringProperty(
         choices=codelists.RIGHTS_STATUS, required=True, show=True
@@ -500,18 +521,41 @@ class Language(StructuredNode):
 
 class Coverage(StructuredNode):
     """
-    The spatial or temporal topic of the creation object.
+    Any coverage topic of the creation object.
+    This can be specialized by temporal or spatial coverage
 
     Attributes:
-        spatial     This may be a named place, a location, a spatial
-                    coordinate, a named administrative entity or an URI to a
-                    LOD-service.
-        temporal    This may be a period, date or range date.
+        value   The value of the coverage. This can be any string.
     """
 
-    spatial = ArrayProperty(StringProperty(), required=True, show=True)
-    temporal = ArrayProperty(StringProperty(), show=True)
-    creation = RelationshipFrom("Creation", "HAS_COVERAGE", cardinality=One, show=True)
+    __abstract_node__ = True
+    value = StringProperty(show=True)
+
+
+class SpatialCoverage(Coverage):
+    """
+    The spatial topic of the creation object.
+
+    Attributes:
+        value   This may be a named place, a location, a spatial
+                coordinate, a named administrative entity or an URI to a
+                LOD-service.
+        spatial_type    Type of the spatial coverage.
+    """
+
+    spatial_type = StringProperty(choices=codelists.SPATIAL_TYPES, show=True)
+    creation = RelationshipFrom("Creation", "HAS_SPATIAL_COVERAGE", cardinality=One)
+
+
+class TemporalCoverage(Coverage):
+    """
+    The temporal topic of the creation object.
+
+    Attributes:
+        value   his may be a period, date or range date.
+    """
+
+    creation = RelationshipFrom("Creation", "HAS_TEMPORAL_COVERAGE", cardinality=One)
 
 
 class Rightholder(IdentifiedNode):
@@ -741,9 +785,7 @@ class NonAVEntity(Creation):
     non_av_type = StringProperty(
         required=True, choices=codelists.NON_AV_TYPES, show=True
     )
-    specific_type = StringProperty(
-        required=True, choices=codelists.NON_AV_SPECIFIC_TYPES, show=True
-    )
+    specific_type = StringProperty(choices=codelists.NON_AV_SPECIFIC_TYPES, show=True)
     phisical_format_size = ArrayProperty(StringProperty(), show=True)
     colour = StringProperty(choices=codelists.COLOUR, show=True)
 

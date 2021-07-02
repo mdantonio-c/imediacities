@@ -38,20 +38,27 @@ class CreationRepository:
         )
         # connect to item
         item.creation.connect(entity)
+        # create/update digital_format in the item
+        item.digital_format = item.dimension = None
+        if digital_format := properties.get("digital_format"):
+            item.digital_format = [None for _ in range(4)]
+            item.digital_format[0] = digital_format.get("value")
+            item.dimension = digital_format.get("size")
+        item.save()
 
-        # add relatioships
+        # add relationships
         for r in relationships.keys():
             if r == "record_sources":
                 # connect to record sources
-                for item in relationships[r]:
-                    record_source = self.graph.RecordSource(**item[0]).save()
+                for rec_item in relationships[r]:
+                    record_source = self.graph.RecordSource(**rec_item[0]).save()
                     entity.record_sources.connect(record_source)
                     # look for existing content provider
                     provider = self.find_provider_by_identifier(
-                        item[1]["identifier"], item[1]["scheme"]
+                        rec_item[1]["identifier"], rec_item[1]["scheme"]
                     )
                     if provider is None:
-                        provider = self.graph.Provider(**item[1]).save()
+                        provider = self.graph.Provider(**rec_item[1]).save()
                     record_source.provider.connect(provider)
             elif r == "titles":
                 # connect to titles
@@ -77,10 +84,22 @@ class CreationRepository:
                         lang = self.graph.Language(code=lang_usage[0]).save()
                     entity.languages.connect(lang, {"usage": lang_usage[1]})
             elif r == "coverages":
-                for props in relationships[r]:
+                for key, values in relationships[r].items():
                     # connect to coverages
-                    coverage = self.graph.Coverage(**props).save()
-                    entity.coverages.connect(coverage)
+                    if key == "temporal":
+                        for props in values:
+                            temporal_coverage = self.graph.TemporalCoverage(
+                                **props
+                            ).save()
+                            entity.temporal_coverages.connect(temporal_coverage)
+                    elif key == "spatial":
+                        for props in values:
+                            spatial_coverage = self.graph.SpatialCoverage(
+                                **props
+                            ).save()
+                            entity.spatial_coverages.connect(spatial_coverage)
+                    else:
+                        log.warning(f"Coverage type <{key}> not managed")
             elif av and r == "production_countries":
                 for country_reference in relationships[r]:
                     country = self.graph.Country.nodes.get_or_none(
@@ -94,6 +113,9 @@ class CreationRepository:
             elif av and r == "video_format" and relationships[r] is not None:
                 video_format = self.graph.VideoFormat(**relationships[r]).save()
                 entity.video_format.connect(video_format)
+            elif not av and r == "3d-format" and relationships[r] is not None:
+                three_dim_format = self.graph.ThreeDimFormat(**relationships[r]).save()
+                item.three_dim_format.connect(three_dim_format)
             elif r == "agents":
                 for agent_activities in relationships[r]:
                     # look for existing agents
@@ -137,7 +159,9 @@ class CreationRepository:
             pass
         for keyword in node.keywords.all():
             keyword.delete()
-        for coverage in node.coverages:
+        for coverage in node.spatial_coverages:
+            coverage.delete()
+        for coverage in node.temporal_coverages:
             coverage.delete()
 
     def delete_av_entity(self, node):
@@ -154,6 +178,10 @@ class CreationRepository:
         self.__delete_entity(node)
         non_av_entity = node.downcast()
         uuid = non_av_entity.uuid
+        item = non_av_entity.item.single()
+        three_dim_format = item.three_dim_format.single()
+        if three_dim_format is not None:
+            three_dim_format.delete()
         non_av_entity.delete()
         log.debug("Delete NonAVEntity with uuid {}", uuid)
 

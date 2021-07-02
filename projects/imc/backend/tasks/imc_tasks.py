@@ -176,11 +176,11 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if out_folder == "":
             raise Exception("Failed to create out_folder")
 
-        log.info("Analize " + content_item)
+        log.info("Analyze " + content_item)
         if analize(content_item, creation.uuid, item_type, out_folder, fast):
-            log.info("Analize executed")
+            log.info("Analyze executed")
         else:
-            raise Exception("Analize terminated with errors")
+            raise Exception("Analyze terminated with errors")
 
         # analyze_path = '/uploads/Analize/' + \
         #     group.uuid + '/' + content_filename.split('.')[0] + '/'
@@ -711,7 +711,7 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
     if item_type == "Video":
         # parse AV_Entity
         creation = parser.parse_av_creation(record)
-    elif item_type == "Image":
+    elif item_type == "Image" or item_type == "3D-Model":
         # parse NON AV_Entity
         creation = parser.parse_non_av_creation(record)
     else:
@@ -813,7 +813,15 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
             + "x"
             + str(data["image"]["geometry"]["height"])
         )
-
+    elif item.item_type == "3D-Model":
+        item.uri = data["image"]["name"]
+        thumbnail_filename = "transcoded_small.jpg"
+        thumbnail_uri = os.path.join(
+            os.path.dirname(analyze_dir_path), thumbnail_filename
+        )
+        item.thumbnail = (
+            thumbnail_uri if os.path.exists(thumbnail_uri) else data["image"]["name"]
+        )
     else:
         log.warning(
             "Invalid type. Technical info CANNOT be extracted for "
