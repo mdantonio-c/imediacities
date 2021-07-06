@@ -5,8 +5,7 @@ services:
     volumes:
       - ${DATA_DIR}/imediastuff:/uploads
       - ${PROJECT_DIR}/scripts:/code/scripts
-    networks:
-      ftp_net:
+
     environment:
       CATALOG_TIME_RANGE_FROM: ${CATALOG_TIME_RANGE_FROM}
       CATALOG_TIME_RANGE_TO: ${CATALOG_TIME_RANGE_TO}
