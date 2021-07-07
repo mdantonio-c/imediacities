@@ -59,7 +59,6 @@ class EFG_XMLParser:
             type_el := root.find(
                 "./efg:nonavcreation/efg:nonAVManifestation/efg:type", self.ns
             )
-
         ) is not None and type_el.text:
             type_value = type_el.text.strip().title()
             creation_type = dict(codelists.CONTENT_TYPES)[type_value]
