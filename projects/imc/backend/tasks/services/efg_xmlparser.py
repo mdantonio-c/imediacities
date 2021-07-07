@@ -44,8 +44,8 @@ class EFG_XMLParser:
                 "./efg:nonavcreation/efg:nonAVManifestation/efg:type", self.ns
             )
         ) is not None:
-            creation_type = type_el.text.strip().title()
-            return dict(codelists.CONTENT_TYPES)[creation_type]  # type: ignore
+            creation_type = type_el.text.strip().title()  # type: ignore
+            return dict(codelists.CONTENT_TYPES)[creation_type]
 
     def get_av_creations(self, filepath):
         root = ET.parse(filepath)
