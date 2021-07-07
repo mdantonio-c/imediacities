@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from xml.dom import minidom
 from xml.etree import ElementTree as ET
 
@@ -45,7 +45,7 @@ class EFG_XMLParser:
             )
         ) is not None:
             creation_type = type_el.text.strip().title()
-            return dict(codelists.CONTENT_TYPES)[creation_type]
+            return dict(codelists.CONTENT_TYPES)[creation_type]  # type: ignore
 
     def get_av_creations(self, filepath):
         root = ET.parse(filepath)
@@ -673,7 +673,7 @@ class EFG_XMLParser:
 
     def parse_3d_format(self, record):
         """Extract 3D format info from 3d models."""
-        three_dim_format: Dict[str, Any] = None
+        three_dim_format: Optional[Dict[str, Any]] = None
         if _3d_format := record.find(
             "./efg:nonAVManifestation/efg:item/efg:_3DFormat", self.ns
         ):
