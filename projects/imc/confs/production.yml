@@ -1,1 +1,11 @@
 version: "3.8"
+
+services:
+  neo4j:
+    ports:
+      - ${NEO4J_EXPOSED_WEB_INTERFACE_PORT}:${NEO4J_WEB_INTERFACE_PORT}
+      - 7687:7687
+
+  rabbit:
+    ports:
+      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
