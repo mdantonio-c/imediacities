@@ -31,9 +31,10 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
   public isCollapsed = {
     title: true,
     description: false,
-    keyword: true,
+    keyword: false,
     prod_information: true,
-    copyright: true,
+    coverage: false,
+    copyright: false,
     owner: true,
     analogue: true,
     format: true,
@@ -215,6 +216,7 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit() {
+    console.log(this.info);
     this.user = this.AuthService.getUser();
     this.description_languages = new Map();
     this.keyword_languages = new Map();

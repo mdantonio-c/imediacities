@@ -181,7 +181,36 @@
           </ng-template>
         </app-expansion-panel>
 
-        <app-expansion-panel title="Copyright">
+        <app-expansion-panel
+          title="Coverage"
+          [panel_is_expanded]="isCollapsed.coverage"
+          *ngIf="info._spatial_coverages || info._temporal_coverages"
+        >
+          <div class="col-12" *ngIf="info._spatial_coverages">
+            <strong>Spatial:</strong>
+            <div
+              class="d-inline"
+              *ngFor="let sCoverage of info._spatial_coverages; last as last"
+            >
+              {{ sCoverage.value }}&nbsp;({{ sCoverage.spatial_type?.description
+              }}){{ last ? '' : ', '}}
+            </div>
+          </div>
+          <div class="col-12" *ngIf="info._temporal_coverages">
+            <strong>Temporal:</strong>
+            <div
+              class="d-inline"
+              *ngFor="let tCoverage of info._temporal_coverages; last as last"
+            >
+              {{ tCoverage.value }}{{ last ? '' : ', '}}
+            </div>
+          </div>
+        </app-expansion-panel>
+
+        <app-expansion-panel
+          title="Copyright"
+          [panel_is_expanded]="isCollapsed.copyright"
+        >
           <div class="col-12">
             <strong>Right Status: </strong>
             <span [innerHTML]="info.rights_status.description"></span>

@@ -10,8 +10,8 @@ export class AppExpansionPanelComponent implements OnInit {
   @Input() title: string;
   @Input() subtitle: string;
   @Input() allow_expansion: boolean = true;
+  @Input() panel_is_expanded: boolean = false;
 
-  panel_is_expanded: boolean = false;
   panel_id: string;
 
   constructor() {}
@@ -26,6 +26,7 @@ export class AppExpansionPanelComponent implements OnInit {
 
   ngOnInit() {
     this.panel_id = `panel_${AppExpansionPanelComponent._rnd()}${AppExpansionPanelComponent._rnd()}`;
+    // console.log(`Panel [${this.panel_id}] is expanded? ${this.panel_is_expanded}`)
     /*if (this.panel_is_expanded) {
             this.panel_expand();
         }*/
