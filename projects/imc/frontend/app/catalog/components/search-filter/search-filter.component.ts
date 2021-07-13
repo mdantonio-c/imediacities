@@ -70,7 +70,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
         ","
       );
     }
-    console.log(environment.CUSTOM.CATALOG_TIME_RANGE_TO);
   }
 
   ngOnInit() {
@@ -119,7 +118,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   }
 
   private toForm(filter: SearchFilter) {
-    console.log("filter", filter);
+    // console.log("filter", filter);
     let res = {
       searchTerm: filter.searchTerm,
       videoType:

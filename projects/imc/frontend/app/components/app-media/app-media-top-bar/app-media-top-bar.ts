@@ -10,6 +10,7 @@ import { AuthService } from "@rapydo/services/auth";
 export class AppMediaTopBarComponent implements OnInit, OnChanges {
   @Input() item_type: string;
   @Input() item_id: string;
+  @Input() is_3d_model: boolean = false;
   icon = "";
   label = "";
   user: any;
@@ -25,8 +26,8 @@ export class AppMediaTopBarComponent implements OnInit, OnChanges {
       this.icon = "videocam";
       this.label = "VIDEO";
     } else if (this.item_type === "image") {
-      this.icon = "image";
-      this.label = "PHOTO";
+      this.icon = this.is_3d_model ? "view_in_ar" : "image";
+      this.label = this.is_3d_model ? "3D MODEL" : "PHOTO";
     }
   }
 

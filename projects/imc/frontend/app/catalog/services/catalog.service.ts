@@ -132,7 +132,7 @@ export class CatalogService {
       data.match = { term: filter.searchTerm, fields: matchFields };
     }
     if (cached) this.cacheValues();
-    return this.api.post("search", data);
+    return this.api.post("/api/search", data);
   }
 
   /**
@@ -179,7 +179,7 @@ export class CatalogService {
       }
       data.filter.creation = creation;
     }
-    return this.api.post("annotations/search", data);
+    return this.api.post("/api/annotations/search", data);
   }
 
   /**
@@ -200,7 +200,7 @@ export class CatalogService {
       };
       data["relevant-list"].push(item);
     }
-    return this.api.post("search_place", data);
+    return this.api.post("/api/search_place", data);
   };
 
   getProviderPosition(provider: string) {
