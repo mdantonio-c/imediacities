@@ -33,16 +33,22 @@
         <app-expansion-panel title="Production information">
           <!-- Production Year -->
           <div class="col-3">
-            <strong>Year:</strong>
+            <strong>Year: </strong>
             <span *ngIf="info.production_years"
               >{{info.production_years[0]}}</span
             >
           </div>
+          <!-- Issued/Publication Date -->
+          <div class="col-4" *ngIf="info.date_issued">
+            <strong>Issued on: </strong>
+            <span>{{info.date_issued | date:'dd-MM-YYYY'}}</span>
+          </div>
+
           <!-- Production countries -->
           <!-- @NSI no production_countries for images -->
           <ng-template [ngIf]="info.type === 'aventity'">
             <div class="col-3">
-              <strong>Country:</strong>
+              <strong>Country: </strong>
               <span
                 *ngFor="let production_country of info._production_countries; last as last"
               >
