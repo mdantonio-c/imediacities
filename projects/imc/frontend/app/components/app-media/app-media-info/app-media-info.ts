@@ -43,6 +43,7 @@ export class AppMediaInfoComponent implements OnInit {
   descriptions: Description[] = [];
   scopes: Description[] = [];
   docs: Description[] = [];
+  agents: { [key: string]: string[] };
   user: any;
 
   constructor(
@@ -98,6 +99,22 @@ export class AppMediaInfoComponent implements OnInit {
       this.item = this.info._item[0]._other_version
         ? this.info._item[0]._other_version[0]
         : this.info._item[0];
+    }
+    if (this.info._contributors) {
+      let aMap = {};
+      aMap["Others"] = [];
+      this.info._contributors.forEach((c) => {
+        const name = c.names[0];
+        if (!c.activities) {
+          aMap["Others"].push(name);
+        } else {
+          c.activities.forEach((r) => {
+            aMap[r] = aMap[r] || [];
+            aMap[r].push(name);
+          });
+        }
+      });
+      this.agents = aMap;
     }
   }
 }

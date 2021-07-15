@@ -39,7 +39,7 @@
             >
           </div>
           <!-- Issued/Publication Date -->
-          <div class="col-4" *ngIf="info.date_issued">
+          <div class="col-9" *ngIf="info.date_issued">
             <strong>Issued on: </strong>
             <span>{{info.date_issued | date:'dd-MM-YYYY'}}</span>
           </div>
@@ -63,16 +63,16 @@
             </div>
             <div class="col-12">
               <ul>
-                <ng-template
-                  ngFor
-                  let-contributor
-                  [ngForOf]="info._contributors"
-                >
-                  <li *ngFor="let role of contributor.activities">
-                    {{ role }}:
-                    <span>{{contributor.names[0] | nocomma}}</span>
-                  </li>
-                </ng-template>
+                <li *ngFor="let item of agents | keyvalue">
+                  <ng-container *ngIf="item.value.length">
+                    <small class="text-muted mb-0 mt-2"
+                      ><u>{{item.key}}</u>:</small
+                    >
+                    <ng-container *ngFor="let n of item.value; last as last">
+                      {{n | nocomma}}{{last ? '' : ', '}}
+                    </ng-container>
+                  </ng-container>
+                </li>
               </ul>
             </div>
           </ng-template>
@@ -116,8 +116,8 @@
         </app-expansion-panel>
 
         <app-expansion-panel title="More information on film">
-          <h5 class="col-12">{{info._record_sources[0]._provider[0].name}}</h5>
           <div class="col-12"><strong>Contacts:</strong></div>
+          <h5 class="col-12">{{info._record_sources[0]._provider[0].name}}</h5>
           <div class="col-12">
             <ul>
               <li *ngIf="info._record_sources[0]._provider[0].address">
