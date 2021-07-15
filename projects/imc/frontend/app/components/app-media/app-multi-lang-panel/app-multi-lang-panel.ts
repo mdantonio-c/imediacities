@@ -28,7 +28,7 @@ export class AppMultiLangPanelComponent implements OnInit, AfterViewInit {
     if (this.userLanguage) {
       this.activeLang = this.userLanguage;
     }
-    if (this.data) {
+    if (this.data && this.data.length > 0) {
       this.getLanguages();
     }
   }

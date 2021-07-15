@@ -16,17 +16,25 @@
           </div>
         </app-expansion-panel>
 
-        <app-multi-lang-panel title="Intention of creation" [data]="scopes">
+        <app-multi-lang-panel
+          title="Intention of creation"
+          [data]="scopes"
+          *ngIf="scopes.length"
+        >
         </app-multi-lang-panel>
 
-        <app-multi-lang-panel title="Description" [data]="descriptions">
+        <app-multi-lang-panel
+          title="Description"
+          [data]="descriptions"
+          *ngIf="descriptions.length"
+        >
         </app-multi-lang-panel>
 
         <app-multi-lang-panel
           title="Keywords"
           [showType]="true"
           [typeAttr]="'keyword_type'"
-          [data]="this.info._keywords"
+          [data]="info._keywords"
         >
         </app-multi-lang-panel>
 
@@ -39,7 +47,7 @@
             >
           </div>
           <!-- Issued/Publication Date -->
-          <div class="col-9" *ngIf="info.date_issued">
+          <div class="col" *ngIf="info.date_issued">
             <strong>Issued on: </strong>
             <span>{{info.date_issued | date:'dd-MM-YYYY'}}</span>
           </div>
@@ -47,7 +55,7 @@
           <!-- Production countries -->
           <!-- @NSI no production_countries for images -->
           <ng-template [ngIf]="info.type === 'aventity'">
-            <div class="col-3">
+            <div class="col">
               <strong>Country: </strong>
               <span
                 *ngFor="let production_country of info._production_countries; last as last"
@@ -340,7 +348,8 @@
 
         <app-multi-lang-panel
           title="Techincal Documentation"
-          [data]="this.docs"
+          [data]="docs"
+          *ngIf="docs.length"
         >
         </app-multi-lang-panel>
       </div>
