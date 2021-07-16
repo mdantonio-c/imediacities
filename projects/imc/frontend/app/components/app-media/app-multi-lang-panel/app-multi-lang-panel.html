@@ -37,13 +37,13 @@
           <strong class="d-block" *ngIf="showType && typeAttr"
             >{{item[typeAttr].description}}</strong
           >
-          {{item.text || item.term}}
+          {{item[textAttr]}}
         </p>
         <p class="col-12" *ngIf="activeLang === 'n/a' && !item.language">
           <strong class="d-block" *ngIf="showType && typeAttr"
             >{{item[typeAttr].description}}</strong
           >
-          {{item.text || item.term}}
+          {{item[textAttr]}}
         </p>
       </ng-template>
     </div>

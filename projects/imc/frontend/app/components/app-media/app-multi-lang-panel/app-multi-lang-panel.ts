@@ -17,6 +17,8 @@ export class AppMultiLangPanelComponent implements OnInit, AfterViewInit {
   @Input() userLanguage: any;
   @Input() showType: boolean = false;
   @Input() typeAttr: string;
+  @Input() textAttr: string = "text";
+  @Input() groupByAttr: boolean = false;
   @ViewChild("languages_selector", { static: false })
   languages_selector: ElementRef;
 
@@ -29,6 +31,10 @@ export class AppMultiLangPanelComponent implements OnInit, AfterViewInit {
       this.activeLang = this.userLanguage;
     }
     if (this.data && this.data.length > 0) {
+      // at the moment used for keywords
+      if (this.typeAttr && this.groupByAttr) {
+        this.data = this.groupAttrs();
+      }
       this.getLanguages();
     }
   }
@@ -44,6 +50,39 @@ export class AppMultiLangPanelComponent implements OnInit, AfterViewInit {
 
   expandCard() {
     this.isCollapsed = !this.isCollapsed;
+  }
+
+  /**
+   * Group item of the same attribute type (e.g. every keyword terms of the same type).
+   * @private
+   */
+  private groupAttrs() {
+    let aMap: { [key: string]: string[] } = {};
+    aMap["Others"] = [];
+    let keyMap = new Map<string, string>();
+    keyMap.set("Others", "XX");
+    this.data.forEach((c) => {
+      const name = c.text || c.term;
+      if (!c[this.typeAttr]) {
+        aMap["Others"].push(name);
+      } else {
+        const attrValue = c[this.typeAttr]["description"];
+        keyMap.set(attrValue, c[this.typeAttr]["key"]);
+        aMap[attrValue] = aMap[attrValue] || [];
+        aMap[attrValue].push(name);
+      }
+    });
+    let data: any[] = [];
+    for (const [key, value] of Object.entries(aMap)) {
+      if (!value.length) {
+        continue;
+      }
+      let res = {};
+      res[this.typeAttr] = { key: keyMap.get(key), description: key };
+      res["term"] = value.join(", ");
+      data.push(res);
+    }
+    return data;
   }
 
   /**
