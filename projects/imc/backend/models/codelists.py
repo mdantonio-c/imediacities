@@ -1,17 +1,24 @@
-def fromDescription(descr, codelist):
+from typing import Iterable, Optional, Tuple
+
+
+def fromDescription(
+    desc: str, code_list: Iterable[Tuple[str, str]]
+) -> Optional[Tuple[str, str]]:
     """
-    Returns the matched element by description in the give codelist. None
+    Returns the matched element by description in the give code list. None
     otherwise.
     """
-    res = [item for item in codelist if item[1].lower() == descr.lower()]
+    res = [item for item in code_list if item[1].lower() == desc.lower()]
     return res[0] if res else None
 
 
-def fromCode(descr, codelist):
+def fromCode(
+    desc: str, code_list: Iterable[Tuple[str, str]]
+) -> Optional[Tuple[str, str]]:
     """
-    Returns the matched element by code in the give codelist. None otherwise.
+    Returns the matched element by code in the give code list. None otherwise.
     """
-    res = [item for item in codelist if item[0].lower() == descr.lower()]
+    res = [item for item in code_list if item[0].lower() == desc.lower()]
     return res[0] if res else None
 
 
@@ -116,7 +123,10 @@ AGENT_TYPES = (("P", "person"), ("C", "corporate"))
 SEXES = (("M", "Male"), ("F", "Female"))
 
 # COVERAGE_TYPES = {'S': 'Spatial', 'T': 'Temporal'}
-SPATIAL_TYPES = {"latlng": "LatLng", "altitude": "Altitude"}
+SPATIAL_TYPES = (
+    ("latlng", "LatLng"),
+    ("altitude", "Altitude"),
+)
 
 TYPE_OF_ACTIVITY = (
     ("001", "Actor"),
