@@ -1,195 +1,55 @@
-import {
-  Component,
-  Input,
-  ViewChild,
-  OnInit,
-  AfterViewInit,
-  ElementRef,
-} from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { AuthService } from "@rapydo/services/auth";
 import { AppMediaService } from "../../../services/app-media";
 import { is_item_owner } from "../../../decorators/app-item-owner";
+
+// exclude description types: Scope, Documentation
+const EXCLUDE_FROM_DESCRIPTIONS: string[] = ["08", "09"];
+
+interface KeyDescriptionPair {
+  key: string;
+  description: string;
+}
+
+interface Description {
+  description_type?: string;
+  text: string;
+  language?: KeyDescriptionPair;
+}
 
 @Component({
   selector: "app-media-info",
   templateUrl: "app-media-info.html",
 })
-export class AppMediaInfoComponent implements AfterViewInit, OnInit {
+export class AppMediaInfoComponent implements OnInit {
   @Input() info: any;
   @Input() user_language: any;
-  @ViewChild("description_languages_selector", { static: false })
-  description_languages_selector: ElementRef;
-  @ViewChild("keyword_languages_selector", { static: false })
-  keyword_languages_selector: ElementRef;
 
   @is_item_owner() is_item_owner;
 
-  public description_languages: any;
-  public description_active = null;
-  public keyword_languages: any;
-  public keyword_active = null;
   public isCollapsed = {
     title: true,
     description: false,
-    keyword: true,
+    scope: false,
+    keyword: false,
     prod_information: true,
-    copyright: true,
+    coverage: false,
+    copyright: false,
     owner: true,
     analogue: true,
     format: true,
   };
   item: any;
+  descriptions: Description[] = [];
+  scopes: Description[] = [];
+  docs: Description[] = [];
+  agents: { [key: string]: string[] };
   user: any;
 
   constructor(
     private AuthService: AuthService,
     private MediaService: AppMediaService
   ) {}
-
-  /**
-   * Imposta la lingua della description
-   * @param new_description_language
-   * @private
-   */
-  _description_language_set(new_description_language) {
-    this.description_active = new_description_language;
-  }
-
-  /**
-   * Imposta la lingua della keyword
-   * @param new_keyword_language
-   * @private
-   */
-  _keyword_language_set(new_keyword_language) {
-    this.keyword_active = new_keyword_language;
-  }
-
-  /**
-   * Cicla le descrizioni per estrarne le lingue
-   * se non è stata settata la lingua corrente la imposta alla prima
-   * @param dati
-   * @private
-   */
-  _descriptions_get_languages(dati) {
-    let force_user_language = true;
-    dati.forEach((d) => {
-      if (!d.language) {
-        // for missing language
-        this.description_languages.set("n/a", "n/a");
-        return;
-      }
-
-      if (!this.description_active) {
-        this._description_language_set(d.language.key);
-      }
-
-      if (force_user_language && d.language.key === this.description_active) {
-        force_user_language = false;
-      }
-
-      this.description_languages.set(d.language.key, d.language.description);
-    });
-
-    if (force_user_language) {
-      let lang = dati[0].language ? dati[0].language.key : "n/a";
-      this._description_language_set(lang);
-    }
-  }
-
-  /**
-   * Cicla le keyword per estrarne le lingue
-   * se non è stata settata la lingua corrente la imposta alla prima
-   * @param dati
-   * @private
-   */
-  _keywords_get_languages(dati) {
-    let force_user_language = true;
-    dati.forEach((d) => {
-      if (!d.language) {
-        // for missing language
-        this.keyword_languages.set("n/a", "n/a");
-        return;
-      }
-      if (!this.keyword_active) {
-        this._keyword_language_set(d.language.key);
-      }
-
-      if (force_user_language && d.language.key === this.keyword_active) {
-        force_user_language = false;
-      }
-      this.keyword_languages.set(d.language.key, d.language.description);
-    });
-    if (force_user_language) {
-      let lang = dati[0].language ? dati[0].language.key : "n/a";
-      this._keyword_language_set(lang);
-    }
-  }
-
-  /**
-   * Eventi per la gestione del cambio della lingua delle descrizioni
-   * @private
-   */
-  _description_languages_selector_events() {
-    //  Fermo propagazione evento in modo da non provocare l'attivazione dell'accordion al click sul selettore delle lingue
-    this.description_languages_selector.nativeElement.onclick = function (e) {
-      e.stopPropagation();
-    };
-
-    //  Evento sul change della lingua
-    this.description_languages_selector.nativeElement.onchange = () => {
-      this._description_language_set(
-        this.description_languages_selector.nativeElement.value
-      );
-    };
-  }
-
-  /**
-   * Eventi per la gestione del cambio della lingua delle keyword
-   * @private
-   */
-  _keyword_languages_selector_events() {
-    //  Fermo propagazione evento in modo da non provocare l'attivazione dell'accordion al click sul selettore delle lingue
-    this.keyword_languages_selector.nativeElement.onclick = function (e) {
-      e.stopPropagation();
-    };
-
-    //  Evento sul change della lingua
-    this.keyword_languages_selector.nativeElement.onchange = () => {
-      this._keyword_language_set(
-        this.keyword_languages_selector.nativeElement.value
-      );
-    };
-  }
-
-  /**
-   * Crea le opzioni per la gestione della lignua delle descrizioni
-   * @private
-   */
-  _description_languages_selector_set_options() {
-    this.description_languages.forEach((value, key, map) => {
-      const option = document.createElement("option");
-      option.innerText = value;
-      option.value = key;
-      option.selected = key === this.description_active;
-
-      this.description_languages_selector.nativeElement.appendChild(option);
-    });
-  }
-
-  /**
-   * Crea le opzioni per la gestione della lignua delle keyword
-   * @private
-   */
-  _keyword_languages_selector_set_options() {
-    this.keyword_languages.forEach((value, key, map) => {
-      const option = document.createElement("option");
-      option.innerText = value;
-      option.value = key;
-      option.selected = key === this.keyword_active;
-
-      this.keyword_languages_selector.nativeElement.appendChild(option);
-    });
-  }
 
   expandCard(card) {
     this.isCollapsed[card] = !this.isCollapsed[card];
@@ -211,42 +71,50 @@ export class AppMediaInfoComponent implements AfterViewInit, OnInit {
   printEncodingInfo() {
     // from ffprobe in the following long name form: H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
     // always print the first value
-    return this.item.digital_format[1].split("/")[0].trim();
+    const encoding = this.item.digital_format[1].split("/")[0].trim();
+    return encoding === "None" ? "n/a" : encoding;
   }
 
   ngOnInit() {
     this.user = this.AuthService.getUser();
-    this.description_languages = new Map();
-    this.keyword_languages = new Map();
-    if (this.user_language) {
-      this._description_language_set(this.user_language);
-      this._keyword_language_set(this.user_language);
-    }
     if (this.info._descriptions) {
-      this._descriptions_get_languages(this.info._descriptions);
-    }
-    if (this.info._keywords) {
-      this._keywords_get_languages(this.info._keywords);
+      // common descriptions
+      this.descriptions = this.info._descriptions.filter(
+        (d) =>
+          !d.description_type ||
+          !EXCLUDE_FROM_DESCRIPTIONS.includes(d.description_type.key)
+      );
+
+      // intention of creation
+      this.scopes = this.info._descriptions.filter(
+        (d) => d.description_type && d.description_type.key === "08"
+      );
+
+      // documentation
+      this.docs = this.info._descriptions.filter(
+        (d) => d.description_type && d.description_type.key === "09"
+      );
     }
     if (this.info._item) {
       this.item = this.info._item[0]._other_version
         ? this.info._item[0]._other_version[0]
         : this.info._item[0];
     }
-  }
-
-  ngAfterViewInit() {
-    if (this.description_languages.size > 1) {
-      //  Imposto eventi
-      this._description_languages_selector_events();
-      //  Popolo opzioni per il select di cambio lingua
-      this._description_languages_selector_set_options();
-    }
-    if (this.keyword_languages.size > 1) {
-      //  Imposto eventi
-      this._keyword_languages_selector_events();
-      //  Popolo opzioni per il select di cambio lingua
-      this._keyword_languages_selector_set_options();
+    if (this.info._contributors) {
+      let aMap = {};
+      aMap["Others"] = [];
+      this.info._contributors.forEach((c) => {
+        const name = c.names[0];
+        if (!c.activities) {
+          aMap["Others"].push(name);
+        } else {
+          c.activities.forEach((r) => {
+            aMap[r] = aMap[r] || [];
+            aMap[r].push(name);
+          });
+        }
+      });
+      this.agents = aMap;
     }
   }
 }

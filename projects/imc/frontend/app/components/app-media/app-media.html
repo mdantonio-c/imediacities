@@ -6,6 +6,7 @@ picture-->
   <app-media-top-bar
     [item_type]="media_type"
     [item_id]="media._item[0].id"
+    [is_3d_model]="is_3d_model"
   ></app-media-top-bar>
 
   <!-- MEDIA -->
@@ -22,7 +23,7 @@ picture-->
       </h2>
       <p
         class="col-12 col-sm-8 imc--flex--vertical-start"
-        style="margin-bottom: 0;"
+        style="margin-bottom: 0"
       >
         <a href="#" class="imc--icon-link" onclick="return false;"
           ><i class="material-icons">add_location</i></a
@@ -73,7 +74,7 @@ picture-->
 
         <ng-container *ngIf="show_only_public_domain() && !is_public_domain()">
           <div class="container-picture">
-            <p style="padding: 50px 40px; text-align: left !important;">
+            <p style="padding: 50px 40px; text-align: left !important">
               <i class="fa fa-ban"></i>
               <span
                 >We’re sorry, you do not have permission to view this
@@ -144,7 +145,12 @@ picture-->
                     aria-controls="pills-picture"
                     aria-selected="true"
                   >
-                    <i class="material-icons">crop_original</i>
+                    <i class="material-icons">
+                      <ng-container *ngIf="is_3d_model; else just_image"
+                        >view_in_ar</ng-container
+                      >
+                      <ng-template #just_image>crop_original</ng-template>
+                    </i>
                   </span>
                 </li>
               </ng-container>
@@ -277,7 +283,7 @@ picture-->
             </div>
           </ng-container>
         </div>
-        <!-- Questo footer nelle tab appare solamente se ci sono 1 o + elementi nelle tab (shots, segmenti, aree)-->
+        <!-- This tab footer only appears if there are one or more elements in the tabs (shots, segments, areas)-->
         <div
           class="tab-content--footer row no-gutters imc--flex--horizontal-end"
         >

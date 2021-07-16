@@ -1,3 +1,5 @@
+from datetime import date
+from datetime import datetime as dt
 from typing import Any, Dict, List, Optional
 from xml.dom import minidom
 from xml.etree import ElementTree as ET
@@ -74,7 +76,7 @@ class EFG_XMLParser:
         root = ET.parse(filepath)
         return root.findall("./efg:nonavcreation", self.ns)
 
-    def get_identifying_title(self, record):
+    def get_identifying_title(self, record: ET.Element):
         """
         Returns identifying_title, identifying_title_origin
         """
@@ -88,7 +90,7 @@ class EFG_XMLParser:
             raise ValueError("Identifying title is missing")
         return nodes[0].text.strip(), None
 
-    def get_production_years(self, record):
+    def get_production_years(self, record: ET.Element) -> List[str]:
         production_years = set()
         nodes = record.findall("./efg:productionYear", self.ns)
         if len(nodes) <= 0:
@@ -97,7 +99,19 @@ class EFG_XMLParser:
             production_years.add(n.text.strip())
         return list(production_years)
 
-    def get_rights_status(self, record, audio_visual=False):
+    def get_date_issued(self, record: ET.Element) -> Optional[date]:
+        node = record.find("./efg:date[@type='issued']", self.ns)
+        if node is not None:
+            try:
+                # expected YYYY-MM-DD
+                date_time_str = node.text.strip()
+                d = dt.strptime(date_time_str, "%Y-%m-%d")
+                # Convert datetime object to date object.
+                return d.date()
+            except ValueError as e:
+                self.warnings.append(f"Invalid date issued: {str(e)}")
+
+    def get_rights_status(self, record: ET.Element, audio_visual: bool = False):
         inpath = "efg:avManifestation" if audio_visual else "efg:nonAVManifestation"
         node = record.find("./" + inpath + "/efg:rightsStatus", self.ns)
         if node is None:
@@ -578,8 +592,8 @@ class EFG_XMLParser:
 
     def get_date_created(self, record):
         dates = []
-        for date in record.findall("efg:dateCreated", self.ns):
-            dates.append(date.text.strip())
+        for d in record.findall("efg:dateCreated", self.ns):
+            dates.append(d.text.strip())
         return dates
 
     def __parse_creation(self, record, audio_visual=False):
@@ -587,6 +601,7 @@ class EFG_XMLParser:
             "external_ids": self.parse_identifiers(record),
             "rights_status": self.get_rights_status(record, audio_visual),
             "collection_title": self.get_collection_title(record),
+            "date_issued": self.get_date_issued(record),
         }
         # provenance is determined by the group from IS_OWNED_BY relationship,
         # ignore it!

@@ -486,13 +486,13 @@ input[type="radio"] {
   box-shadow: $box-shadow-small-card;
   margin: 20px 30px;
 
-  &:first-child {
+  /*&:first-child {
     margin-top: 0;
   }
 
   &:last-child {
     margin-bottom: 0;
-  }
+  }*/
 
   .card-header {
     background: $white;

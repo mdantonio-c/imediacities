@@ -21,7 +21,7 @@ export class ListsService {
     if (includeNumberOfItems) {
       params["includeNumberOfItems"] = true;
     }
-    return this.api.get("lists", params);
+    return this.api.get("/api/lists", params);
   }
 
   parseLists(lists: any[]): UserList[] {
@@ -40,19 +40,19 @@ export class ListsService {
   }
 
   updateList(listId: string, data: any) {
-    return this.api.put(`lists/${listId}`, data);
+    return this.api.put(`/api/lists/${listId}`, data);
   }
 
   removeList(listId: string) {
-    return this.api.delete(`lists/${listId}`);
+    return this.api.delete(`/api/lists/${listId}`);
   }
 
   getListItems(listId: string): Observable<any[]> {
-    return this.api.get(`lists/${listId}/items`);
+    return this.api.get(`/api/lists/${listId}/items`);
   }
 
   addItemToList(item_type: string, item_id: string, listId: string) {
-    return this.api.post(`lists/${listId}/items`, {
+    return this.api.post(`/api/lists/${listId}/items`, {
       target: {
         type: item_type,
         id: item_id,
@@ -61,11 +61,11 @@ export class ListsService {
   }
 
   removeItemfromList(itemId: string, listId: string) {
-    return this.api.delete(`lists/${listId}/items/${itemId}`);
+    return this.api.delete(`/api/lists/${listId}/items/${itemId}`);
   }
 
   create(list: UserList) {
-    return this.api.post("lists", list as any);
+    return this.api.post("/api/lists", list as any);
   }
 
   selectList(list) {

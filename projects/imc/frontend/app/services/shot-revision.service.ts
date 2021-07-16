@@ -47,7 +47,7 @@ export class ShotRevisionService {
       return;
     }
 
-    this.api.delete("videos/" + videoId + "/shot-revision").subscribe(
+    this.api.delete(`/api/videos/${videoId}/shot-revision`).subscribe(
       (resp) => {
         console.log("video [" + videoId + "] exit from revision");
         cb();
@@ -64,7 +64,7 @@ export class ShotRevisionService {
       return;
     }
 
-    this.api.put("videos/" + videoId + "/shot-revision").subscribe(
+    this.api.put(`videos/${videoId}/shot-revision`).subscribe(
       (response) => {
         console.log("video [" + videoId + "] is now under revision");
         cb();
@@ -82,7 +82,7 @@ export class ShotRevisionService {
     }
 
     this.api
-      .post("videos/" + videoId + "/shot-revision", {
+      .post(`videos/${videoId}/shot-revision`, {
         shots: shots,
         exitRevision: exit,
       })

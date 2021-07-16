@@ -92,6 +92,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
   public media_class = "";
   public media_type = "";
+  public is_3d_model = false;
   public media_id = "";
   private _subscription;
 
@@ -436,11 +437,11 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Esegue le richieste del video e degli shot
+   * Launch video and shot requests
    */
   ngOnInit() {
     this.user = this.AuthService.getUser();
-    this.media_type_set(this.router.url);
+    //this.media_type_set(this.router.url);
 
     this._subscription = this.route.params.subscribe((params: Params) => {
       this.media_id = params["uuid"];
@@ -448,7 +449,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         this.router.url.indexOf("videos") != -1 ? "videos" : "images";
 
       this.MediaService.get(this.media_id, endpoint, (mediaEntity) => {
+        this.media_type_set(this.router.url);
         this.media = this.media_entity_normalize(mediaEntity);
+        // console.log(this.media);
+        this.is_3d_model =
+          this.media.non_av_type && this.media.non_av_type.key === "3d-model"
+            ? true
+            : false;
 
         // To be confirmed
         setTimeout(() => {
