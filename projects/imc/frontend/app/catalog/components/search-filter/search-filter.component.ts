@@ -117,18 +117,22 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     );
   }
 
+  private checkTypes(itemType: string | string[], check: string): boolean {
+    if (!itemType) return false;
+    return itemType === "all" ||
+      itemType === check ||
+      (itemType && itemType.includes(check))
+      ? true
+      : false;
+  }
+
   private toForm(filter: SearchFilter) {
-    // console.log("filter", filter);
+    console.log("filter", filter);
     let res = {
       searchTerm: filter.searchTerm,
-      videoType:
-        filter.itemType === "all" || filter.itemType === "video" ? true : false,
-      imageType:
-        filter.itemType === "all" || filter.itemType === "image" ? true : false,
-      model3DType:
-        filter.itemType === "all" || filter.itemType === "3d-model"
-          ? true
-          : false,
+      videoType: this.checkTypes(filter.itemType, "video"),
+      imageType: this.checkTypes(filter.itemType, "image"),
+      model3DType: this.checkTypes(filter.itemType, "3d-model"),
       term: "",
       city: SearchFilterComponent.providerToCity(filter.provider),
       productionYearFrom: filter.productionYearFrom,
@@ -143,6 +147,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     return res;
   }
 
+  /**
+   * Check that at least one button is active
+   * @param type
+   */
   verifyItemType(type) {
     // console.log(`verifyItemType: type=${type}`);
     const form = this.searchForm.value;
@@ -185,12 +193,18 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     // item type
     if (form.videoType && form.imageType && form.model3DType) {
       filter.itemType = "all";
-    } else if (form.videoType) {
-      filter.itemType = "video";
-    } else if (form.imageType) {
-      filter.itemType = "image";
-    } else if (form.model3DType) {
-      filter.itemType = "3d-model";
+    } else {
+      let itemTypes = [];
+      if (form.videoType) {
+        itemTypes.push("video");
+      }
+      if (form.imageType) {
+        itemTypes.push("image");
+      }
+      if (form.model3DType) {
+        itemTypes.push("3d-model");
+      }
+      filter.itemType = itemTypes;
     }
     for (let t of this.terms) {
       filter.terms.push({ iri: t.iri, label: t.name });

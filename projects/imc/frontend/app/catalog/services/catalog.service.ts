@@ -40,7 +40,7 @@ export const decades = (from: number = YEAR_FROM, to: number = YEAR_TO) => {
 
 export interface SearchFilter {
   searchTerm?: string;
-  itemType?: string;
+  itemType?: string | string[];
   terms?: SearchTerm[];
   provider?: string;
   city?: string;

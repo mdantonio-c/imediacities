@@ -3,10 +3,10 @@ Search endpoint
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Optional, Union
 
 from imc.endpoints import IMCEndpoint
-from imc.models import SearchCriteria, codelists
+from imc.models import SearchCriteria, allowed_item_types, codelists
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
@@ -33,7 +33,6 @@ class Search(IMCEndpoint):
     def post(
         self, match, filtering, get_total, page, size, sort_by, sort_order, input_filter
     ):
-
         self.graph = neo4j.get_instance()
 
         user = self.get_user()
@@ -47,24 +46,41 @@ class Search(IMCEndpoint):
         multi_match_query = ""
 
         # check request for filtering
-        filters = []
         # add filter for processed content with COMPLETE status
-        filters.append(
+        filters = [
             "MATCH (n)<-[:CREATION]-(:Item)-[:CONTENT_SOURCE]->(content:ContentStage) "
             + "WHERE content.status = 'COMPLETED'"
-        )
+        ]
+
         entity = "Creation"
         if filtering is not None:
             # check item type
-            item_type = filtering.get("type")
-
-            if item_type == "all":
+            item_type: Union[List[str], str] = filtering.get("type")
+            log.debug("ITEM TYPE(s): {}", item_type)
+            where_mixed_types = ""
+            if item_type and isinstance(item_type, str):
+                item_type = [item_type]
+            if "all" in item_type or set(item_type) == {
+                item for item in allowed_item_types if item != "all"
+            }:
                 entity = "Creation"
-            elif item_type == "video":
+            elif len(item_type) == 1 and "video" in item_type:
                 entity = "AVEntity"
-            elif item_type in ["image", "3d-model"]:
+            elif all(item in item_type for item in ["image", "3d-model"]):
                 entity = "NonAVEntity"
-                filters.append(f"MATCH (n) WHERE n.non_av_type = '{item_type}'")
+            elif len(item_type) == 1 and (
+                "image" in item_type or "3d-model" in item_type
+            ):
+                entity = "NonAVEntity"
+                where_mixed_types = f"WHERE n.non_av_type = '{item_type[0]}'"
+                filters.append(f"MATCH (n) {where_mixed_types}")
+            elif "video" in item_type and (
+                "image" in item_type or "3d-model" in item_type
+            ):
+                other_item_type = [i for i in item_type if i != "video"][0]
+                where_mixed_types = f"WHERE n:AVEntity or (n:NonAVEntity AND n.non_av_type='{other_item_type}')"
+                mixed_types = f"MATCH (n) {where_mixed_types}"
+                filters.append(mixed_types)
             else:
                 # should never be reached
                 raise ServerError("Unexpected item type")
@@ -201,9 +217,9 @@ class Search(IMCEndpoint):
                 CALL db.index.fulltext.queryNodes("titles", '{term}')
                 YIELD node, score
                 WITH node, score
-                MATCH (n:{entity})-[:{fields}]->(node)
+                MATCH (n:{entity})-[:{fields}]->(node) {where}
             """.format(
-                term=term, entity=entity, fields=term_fields
+                term=term, entity=entity, fields=term_fields, where=where_mixed_types
             )
             # RETURN node, n, score
 
@@ -261,7 +277,7 @@ class Search(IMCEndpoint):
 
         # return also the total number of elements
         meta_response["totalItems"] = numels
-        # log.debug(query)
+        log.debug(query)
 
         result = self.graph.cypher(query)
         api_url = get_backend_url()
