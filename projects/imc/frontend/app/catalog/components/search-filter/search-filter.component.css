@@ -53,11 +53,6 @@
   border-radius: 0 !important;
 }
 
-/*
-* modifiche cinzia
-*  fix search filter della pagina catalog
-*/
-
 .material-icons.button-filter {
   color: #eee;
 }
@@ -67,7 +62,7 @@
   border: 1px solid #53b8e2;
   border-radius: 5px !important;
   padding: 5px 10px 0px 10px !important;
-  margin-left: 2px;
+  margin-left: 2px !important;
   box-shadow: none;
 }
 
