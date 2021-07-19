@@ -38,12 +38,30 @@ class AnnotatedByCriteria(Schema):
     )
 
 
+class StrOrListField(fields.Field):
+    allowed_values = None
+
+    def __init__(self, *args, allowed_values=None, **kwargs):
+        self.allowed_values = allowed_values
+        super().__init__(*args, **kwargs)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if not isinstance(value, str) and not isinstance(value, list):
+            raise ValidationError("Field should be str or list")
+        if isinstance(value, str):
+            value = [value]
+        if isinstance(value, list):
+            for v in value:
+                if self.allowed_values and v not in self.allowed_values:
+                    raise ValidationError(
+                        f"Must be one or more of these: {', '.join(self.allowed_values)}."
+                    )
+            return value
+
+
 class SearchFilter(Schema):
 
-    type = fields.Str(
-        missing="all",
-        validate=validate.OneOf(allowed_item_types),
-    )
+    type = StrOrListField(missing="all", allowed_values=allowed_item_types)
     provider = fields.Str(allow_none=True)
     city = fields.Str(allow_none=True)
     country = fields.Str(description="production country, codelist iso3166-1")
