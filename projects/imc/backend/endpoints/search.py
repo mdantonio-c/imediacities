@@ -277,7 +277,7 @@ class Search(IMCEndpoint):
 
         # return also the total number of elements
         meta_response["totalItems"] = numels
-        log.debug(query)
+        # log.debug(query)
 
         result = self.graph.cypher(query)
         api_url = get_backend_url()
