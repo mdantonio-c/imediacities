@@ -3,11 +3,12 @@ Search endpoint for annotations
 """
 
 from imc.endpoints import IMCEndpoint
-from imc.models import AnnotationSearch, codelists
+from imc.models import AnnotationSearch, allowed_item_types, codelists
 from restapi import decorators
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, NotFound, ServerError
 from restapi.models import fields
+from restapi.utilities.logs import log
 
 
 class SearchAnnotations(IMCEndpoint):
@@ -133,14 +134,16 @@ class SearchAnnotations(IMCEndpoint):
 
                 c_filter = creation.get("filtering")
                 # TYPE
-                c_type = c_filter.get("type")
-
-                if c_type != "all":
-                    filters.append(
-                        "MATCH (i) WHERE i.item_type =~ '(?i){c_type}'".format(
-                            c_type=c_type
-                        )
-                    )
+                c_types = c_filter.get("type")
+                if c_types and isinstance(c_types, str):
+                    c_types = [c_types]
+                if "all" not in c_types or set(c_types) == {
+                    i for i in allowed_item_types if i != "all"
+                }:
+                    where_c_types = []
+                    for c_type in c_types:
+                        where_c_types.append(f"i.item_type =~ '(?i){c_type}'")
+                    filters.append(f"MATCH (i) WHERE {' or '.join(where_c_types)}")
                 # PROVIDER
                 c_provider = c_filter.get("provider")
                 if c_provider is not None:
@@ -167,14 +170,14 @@ class SearchAnnotations(IMCEndpoint):
                     c_year_from = "1890" if c_year_from is None else str(c_year_from)
                     c_year_to = "1999" if c_year_to is None else str(c_year_to)
                     date_clauses = []
-                    if c_type == "video" or c_type == "all":
+                    if "video" in c_types or "all" in c_types:
                         date_clauses.append(
                             "ANY(item IN creation.production_years WHERE item >= '{yfrom}') "
                             "AND ANY(item IN creation.production_years WHERE item <= '{yto}')".format(
                                 yfrom=c_year_from, yto=c_year_to
                             )
                         )
-                    if c_type == "image" or c_type == "text" or c_type == "all":
+                    if "image" in c_types or "3d-model" in c_types or "all" in c_types:
                         date_clauses.append(
                             "ANY(item IN creation.date_created WHERE substring(item, 0, 4) >= '{yfrom}') "
                             "AND ANY(item IN creation.date_created WHERE substring(item, 0 , 4) <= '{yto}')".format(
@@ -218,13 +221,18 @@ class SearchAnnotations(IMCEndpoint):
                 orderBy=order_by,
             )
         )
+        # log.debug(query)
         data = []
         result = self.graph.cypher(query)
         for row in result:
             # AD-HOC implementation at the moment
             body = self.graph.ResourceBody.inflate(row[0])
-            res = {"iri": body.iri, "name": body.name, "spatial": body.spatial}
-            res["sources"] = []
+            res = {
+                "iri": body.iri,
+                "name": body.name,
+                "spatial": body.spatial,
+                "sources": [],
+            }
             for source in row[1]:
                 creation = {
                     "uuid": source["uuid"],
