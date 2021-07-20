@@ -17,8 +17,85 @@ TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
 __author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
 
 
-class Lists(IMCEndpoint):
+class List(IMCEndpoint):
+    labels = ["list"]
 
+    @decorators.auth.require_all("Researcher")
+    @decorators.use_kwargs(
+        {
+            "r_uuid": fields.Str(
+                required=False,
+                data_key="researcher",
+                description="Researcher uuid",
+            ),
+            "belong_item": fields.Str(
+                required=False,
+                data_key="item",
+                description="Item uuid (used to check whether the item belongs to the list or not)",
+            ),
+            "nb_items": fields.Bool(
+                required=False,
+                missing=False,
+                data_key="includeNumberOfItems",
+            ),
+        },
+        location="query",
+    )
+    @decorators.endpoint(
+        path="/lists/<list_id>",
+        summary="Get a list of the researcher",
+        description="Returns all the list of a researcher.",
+        responses={
+            200: "The list of the researcher.",
+            403: "The user is not authorized to perform this operation.",
+            404: "The requested list does not exist.",
+        },
+    )
+    def get(self, list_id, r_uuid=None, belong_item=None, nb_items=False):
+        """Get a certain list for given id."""
+        graph = neo4j.get_instance()
+        user = self.get_user()
+        i_am_admin = self.auth.is_admin(user)
+        researcher = self.get_user() if not i_am_admin else None
+        if i_am_admin and r_uuid is not None:
+            researcher = graph.User.nodes.get_or_none(uuid=r_uuid)
+            if not researcher:
+                log.debug("Researcher with uuid {} does not exist", r_uuid)
+                raise NotFound("Please specify a valid researcher id")
+
+        res = graph.List.nodes.get_or_none(uuid=list_id)
+        if not res:
+            log.debug("List with uuid {} does not exist", list_id)
+            raise NotFound("Please specify a valid list id")
+
+        creator = res.creator.single()
+        if not i_am_admin and researcher.uuid != creator.uuid:
+            raise Forbidden(
+                "You are not allowed to get a list that does not belong to you",
+            )
+        user_list = self.getJsonResponse(res)
+        if i_am_admin and researcher is None:
+            user_list["creator"] = {
+                "uuid": creator.uuid,
+                "name": creator.name,
+                "surname": creator.surname,
+            }
+
+        if belong_item is not None:
+            found = False
+            for i in res.items.all():
+                if i.downcast().uuid == belong_item:
+                    found = True
+                    break
+            user_list["belong"] = found
+
+        if nb_items:
+            user_list["nb_frames"] = len(res.items)
+
+        return self.response(user_list)
+
+
+class Lists(IMCEndpoint):
     labels = ["list"]
 
     @decorators.auth.require_all("Researcher")
@@ -52,24 +129,14 @@ class Lists(IMCEndpoint):
             404: "The requested list does not exist.",
         },
     )
-    @decorators.endpoint(
-        path="/lists/<list_id>",
-        summary="Get a list of the researcher",
-        description="Returns all the list of a researcher.",
-        responses={
-            200: "The list of the researcher.",
-            403: "The user is not authorized to perform this operation.",
-            404: "The requested list does not exist.",
-        },
-    )
-    def get(self, list_id=None, r_uuid=None, belong_item=None, nb_items=False):
-        """ Get all the list of a user or a certain list if an id is provided."""
-        self.graph = neo4j.get_instance()
-
-        iamadmin = self.verify_admin()
-        researcher = self.get_user() if not iamadmin else None
-        if iamadmin and list_id is None and r_uuid is not None:
-            researcher = self.graph.User.nodes.get_or_none(uuid=r_uuid)
+    def get(self, r_uuid=None, belong_item=None, nb_items=False):
+        """Get all the list of a user."""
+        graph = neo4j.get_instance()
+        user = self.get_user()
+        i_am_admin = self.auth.is_admin(user)
+        researcher = self.get_user() if not i_am_admin else None
+        if i_am_admin and r_uuid is not None:
+            researcher = graph.User.nodes.get_or_none(uuid=r_uuid)
             if not researcher:
                 log.debug("Researcher with uuid {} does not exist", r_uuid)
                 raise NotFound("Please specify a valid researcher id")
@@ -87,38 +154,6 @@ class Lists(IMCEndpoint):
         if nb_items:
             optional_match = "OPTIONAL MATCH (n)-[r:LST_ITEM]->(:ListItem)"
 
-        if list_id:
-            res = self.graph.List.nodes.get_or_none(uuid=list_id)
-            if not res:
-                log.debug("List with uuid {} does not exist", list_id)
-                raise NotFound("Please specify a valid list id")
-
-            creator = res.creator.single()
-            if not iamadmin and researcher.uuid != creator.uuid:
-                raise Forbidden(
-                    "You are not allowed to get a list that does not belong to you",
-                )
-            user_list = self.getJsonResponse(res)
-            if iamadmin and researcher is None:
-                user_list["creator"] = {
-                    "uuid": creator.uuid,
-                    "name": creator.name,
-                    "surname": creator.surname,
-                }
-
-            if belong_item is not None:
-                found = False
-                for i in res.items.all():
-                    if i.downcast().uuid == belong_item:
-                        found = True
-                        break
-                user_list["belong"] = found
-
-            if nb_items:
-                user_list["nb_frames"] = len(res.items)
-
-            return self.response(user_list)
-
         count_items = ", count(r)" if nb_items else ""
         query = (
             "MATCH (n:List) "
@@ -131,17 +166,17 @@ class Lists(IMCEndpoint):
         log.debug("query: {}", query)
 
         # get total number of lists
-        # numels = [row[0] for row in self.graph.cypher(count)][0]
+        # numels = [row[0] for row in graph.cypher(count)][0]
         # log.debug("Total number of lists: {0}", numels)
 
         data = []
         # meta_response = {"totalItems": numels}
-        results = self.graph.cypher(query)
-        # for res in [self.graph.List.inflate(row[0]) for row in results]:
+        results = graph.cypher(query)
+        # for res in [graph.List.inflate(row[0]) for row in results]:
         for row in results:
-            res = self.graph.List.inflate(row[0])
+            res = graph.List.inflate(row[0])
             user_list = self.getJsonResponse(res)
-            if iamadmin and researcher is None:
+            if i_am_admin and researcher is None:
                 creator = res.creator.single()
                 user_list["creator"] = {
                     "uuid": creator.uuid,
@@ -184,26 +219,26 @@ class Lists(IMCEndpoint):
         """
         log.debug("create a new list")
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         user = self.get_user()
         # Can't happen since auth is required
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
         # check if there is already a list with the same name belonging to the user.
-        results = self.graph.cypher(
+        results = graph.cypher(
             "MATCH (l:List)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
             " WHERE l.name =~ '(?i){name}' return l".format(
-                user=user.uuid, name=self.graph.sanitize_input(name)
+                user=user.uuid, name=graph.sanitize_input(name)
             )
         )
-        duplicate = [self.graph.List.inflate(row[0]) for row in results]
+        duplicate = [graph.List.inflate(row[0]) for row in results]
         if duplicate:
             raise Conflict(
                 "There is already a list with the same name belonging to you"
             )
 
-        created_list = self.graph.List(name=name, description=description).save()
+        created_list = graph.List(name=name, description=description).save()
         # connect the creator
         created_list.creator.connect(user)
         log.debug("List created successfully. UUID {}", created_list.uuid)
@@ -227,10 +262,10 @@ class Lists(IMCEndpoint):
         },
     )
     def put(self, list_id, name, description):
-        """ Update a list. """
+        """Update a list."""
         log.debug("Update list with uuid: {}", list_id)
-        self.graph = neo4j.get_instance()
-        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        graph = neo4j.get_instance()
+        user_list = graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
             raise NotFound("Please specify a valid list id")
@@ -247,16 +282,16 @@ class Lists(IMCEndpoint):
             )
 
         # cannot update a list name if that name is already used for another list
-        results = self.graph.cypher(
+        results = graph.cypher(
             "MATCH (l:List) WHERE l.uuid <> '{uuid}'"
             " MATCH (l)-[:LST_BELONGS_TO]-(:User {{uuid:'{user}'}})"
             " WHERE l.name =~ '(?i){name}' return l".format(
                 uuid=list_id,
                 user=user.uuid,
-                name=self.graph.sanitize_input(name),
+                name=graph.sanitize_input(name),
             )
         )
-        duplicate = [self.graph.List.inflate(row[0]) for row in results]
+        duplicate = [graph.List.inflate(row[0]) for row in results]
         if duplicate:
             raise Conflict(f"You already have a list with this name: {name}")
         # update the list
@@ -279,27 +314,26 @@ class Lists(IMCEndpoint):
         },
     )
     def delete(self, list_id):
-        """ Delete a list. """
+        """Delete a list."""
         log.debug("delete list {}", list_id)
 
-        self.graph = neo4j.get_instance()
-        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        graph = neo4j.get_instance()
+        user_list = graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
             raise NotFound("Please specify a valid list id")
 
         user = self.get_user()
-
-        # Can't happen since auth is required
         if not user:  # pragma: no cover
+            # Can't happen since auth is required
             raise ServerError("User misconfiguration")
 
         log.debug("current user: {} - {}", user.email, user.uuid)
-        iamadmin = self.verify_admin()
-        log.debug("current user is admin? {0}", iamadmin)
+        i_am_admin = self.auth.is_admin(user)
+        log.debug("current user is admin? {0}", i_am_admin)
 
         creator = user_list.creator.single()
-        if user.uuid != creator.uuid and not iamadmin:
+        if user.uuid != creator.uuid and not i_am_admin:
             raise Forbidden(
                 "You cannot delete an user list that does not belong to you"
             )
@@ -311,9 +345,13 @@ class Lists(IMCEndpoint):
 
 
 class ListItems(IMCEndpoint):
-    """ List of items in a list. """
+    """List of items in a list."""
 
     labels = ["list_items"]
+
+    def __init__(self):
+        super().__init__()
+        self.graph = neo4j.get_instance()
 
     @decorators.auth.require_all("Researcher")
     @decorators.endpoint(
@@ -339,7 +377,6 @@ class ListItems(IMCEndpoint):
     def get(self, list_id, item_id=None):
         """Get all the items of a list or a certain item of that list if an
         item id is provided."""
-        self.graph = neo4j.get_instance()
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
@@ -351,9 +388,9 @@ class ListItems(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.auth.is_admin(user)
+        i_am_admin = self.auth.is_admin(user)
         creator = user_list.creator.single()
-        if user.uuid != creator.uuid and not iamadmin:
+        if user.uuid != creator.uuid and not i_am_admin:
             raise Forbidden(
                 "You are not allowed to get a list that does not belong to you",
             )
@@ -404,10 +441,9 @@ class ListItems(IMCEndpoint):
         },
     )
     def post(self, list_id, target):
-        """ Add an item to a list. """
+        """Add an item to a list."""
         log.debug("Add an item to list {} with target {}", list_id, target)
 
-        self.graph = neo4j.get_instance()
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -465,9 +501,7 @@ class ListItems(IMCEndpoint):
         },
     )
     def delete(self, list_id, item_id):
-        """ Delete an item from a list. """
-        self.graph = neo4j.get_instance()
-
+        """Delete an item from a list."""
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
@@ -481,13 +515,13 @@ class ListItems(IMCEndpoint):
         )
         # am I the creator of the list? (always allowed to admin)
         user = self.get_user()
-        # Can't happen since auth is required
         if not user:  # pragma: no cover
+            # Can't happen since auth is required
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.verify_admin()
+        i_am_admin = self.auth.is_admin(user)
         creator = user_list.creator.single()
-        if user.uuid != creator.uuid and not iamadmin:
+        if user.uuid != creator.uuid and not i_am_admin:
             raise Forbidden(
                 "You are not allowed to delete from a list that does not belong to you",
             )
