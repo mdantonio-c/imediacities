@@ -282,29 +282,35 @@
             </div>
           </app-expansion-panel>
 
-          <app-expansion-panel
-            title="Digital format"
-            *ngIf="info._item[0] && info._item[0]"
-          >
+          <app-expansion-panel title="Digital format" *ngIf="item">
             <div class="col-12">
               <ul class="list-space">
-                <li *ngIf="item && item.item_type">
+                <li *ngIf="item.item_type">
                   <strong>Item type: </strong>
                   <span>{{item.item_type.description}}</span>
                 </li>
 
-                <li *ngIf="item && item.dimension">
+                <li *ngIf="item.dimension">
                   <strong>Size: </strong>
                   <span>{{item.dimension | bytes:2}}</span>
                 </li>
 
-                <li *ngIf="item && item.digital_format.length >= 2">
+                <li
+                  *ngIf="item.digital_format && item.digital_format.length >= 1"
+                >
+                  <strong>Container: </strong>
+                  <span>{{printContainerInfo()}}</span>
+                </li>
+
+                <li
+                  *ngIf="item.digital_format && item.digital_format.length >= 2"
+                >
                   <strong>Encoding: </strong>
                   <span>{{printEncodingInfo()}}</span>
                 </li>
 
                 <li
-                  *ngIf="item && item.digital_format.length >= 4 && item.digital_format[3] != 'None'"
+                  *ngIf="item.digital_format.length >= 4 && item.digital_format[3] != 'None'"
                 >
                   <strong>Resolution: </strong>
                   <span>{{item.digital_format[3]}}</span>
