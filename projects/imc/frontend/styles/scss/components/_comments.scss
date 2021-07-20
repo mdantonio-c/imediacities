@@ -1,6 +1,4 @@
-@import "vars";
-
-// Sezioni commenti dell'item
+/* Comment section of the item */
 
 .imc--content-comments {
   margin-top: 27px;
@@ -18,7 +16,7 @@
 
 .profile-image {
   //background: $text-color;
-  background: url("../../assets/svg/user.svg") no-repeat center center
+  background: url("../../../assets/svg/user.svg") no-repeat center center
     lightsteelblue;
   border-radius: 100%;
   display: block;

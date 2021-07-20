@@ -1,6 +1,4 @@
-// Layout per il vocabolario
-
-@import "vars";
+/* Layout for the vocabulary */
 
 .imc--container-tree {
   width: 100%;
@@ -82,7 +80,8 @@
 
   // Lista secondaria
 
-  .term-list {
+  .term-list,
+  .child-list {
     li {
       display: table;
       background: $bg-light-grey;

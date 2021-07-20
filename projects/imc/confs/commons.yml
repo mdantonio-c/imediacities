@@ -39,7 +39,7 @@ services:
       # Used to manage analysis script on both prod and pre-prod
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
-  celeryui:
+  flower:
     volumes:
       - ${VANILLA_DIR}/data/imediastuff:/uploads
       - ${VANILLA_DIR}/scripts:/code/scripts

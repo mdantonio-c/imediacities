@@ -1,23 +1,22 @@
 /* add the bootstrap-slider style css */
-@import url("bootstrap-slider/dist/css/bootstrap-slider.min.css");
-@import url("material-icons/iconfont/material-icons.css");
-@import url("custom-slider.css");
+@import "bootstrap-slider/dist/css/bootstrap-slider.min";
+@import "material-icons/iconfont/material-icons";
+@import "./custom-slider";
 
 /* Include slick css */
-@import url("slick-carousel/slick/slick.css");
-@import url("/app/app/custom/css/slick-carousel/slick-theme.css");
+@import "slick-carousel/slick/slick";
+@import "./slick-carousel/slick-theme";
 
-@import url("/app/app/custom/css/scss/style.css");
-@import url("/app/app/custom/css/app-video-player.css");
+@import "./scss/main";
 
 /* top navbar: force bg-white */
-.navbar {
-  background-color: #f8f8f8 !important;
-  /*margin-bottom: 10px;*/
-  padding-bottom: 0px;
-  padding-top: 0px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
+// .navbar {
+//   background-color: #f8f8f8 !important;
+//   // margin-bottom: 10px;
+//   padding-bottom: 0px;
+//   padding-top: 0px;
+//   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+// }
 
 .no-padding {
   padding: 0 !important;

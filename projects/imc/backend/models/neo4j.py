@@ -260,7 +260,7 @@ class Item(TimestampedNode, AnnotationTarget, ListItem):
                                      object expressed in lines or pixel
         uri             An unambiguous URI to the resource within the IMC
                         context.
-        item_type       "Text", "Image" or "Video"
+        item_type       "Text", "Image",  "Video", "3D-Model"
         license         A reference to the license that applies to the digital
                         item.
         public_access   A flag that indicates whether or not the item is
@@ -724,8 +724,10 @@ class NonAVEntity(Creation):
                                 should be added to indicate that research
                                 regarding the production time has been
                                 unsuccessful.
+        date_issued             Date when the original analogue or born digital
+                                object was issued or published.
         non_av_type             The general type of the non-audiovisual
-                                manifestation ("image" or "text").
+                                manifestation ("image", "text", or "3d-model").
         specific_type           This element further specifies the type of the
                                 non-audiovisual entity.
         phisical_format_size    The dimensions of the physical object.
@@ -735,6 +737,7 @@ class NonAVEntity(Creation):
     """
 
     date_created = ArrayProperty(StringProperty(), show=True)
+    date_issued = DateProperty(show=True)
     non_av_type = StringProperty(
         required=True, choices=codelists.NON_AV_TYPES, show=True
     )
