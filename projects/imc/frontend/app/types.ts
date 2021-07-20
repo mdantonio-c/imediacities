@@ -2,6 +2,13 @@ export interface CustomUser {
   readonly declared_institution: string;
 }
 
+export interface FileBinding {
+  /** @nullable */
+  filename: string;
+  source_id?: string;
+  status: string;
+}
+
 export interface File {
   creation: number;
   modification: number;
@@ -9,11 +16,13 @@ export interface File {
   size: number;
   type: string;
   status: string;
+  /** @nullable */
   status_message?: string;
   /** @nullable */
   task_id?: string;
   /** @nullable */
-  warnings?: string;
+  warnings?: string[];
+  binding?: FileBinding;
 }
 
 export interface Files extends Array<File> {}

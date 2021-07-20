@@ -14,98 +14,38 @@ from restapi.services.authentication import Role
 from restapi.utilities.logs import log
 
 
-#####################################
-class Stage(IMCEndpoint):
+def lookup_content(path, source_id):
+    """
+    Look for a filename in the form of:
+    ARCHIVE_SOURCEID.[extension]
+    """
+    content_filename = None
+    files = [f for f in os.listdir(path) if not f.endswith(".xml")]
+    for f in files:
+        tokens = os.path.splitext(f)[0].split("_")
+        if len(tokens) == 0:
+            continue
+        if tokens[-1] == source_id:
+            log.info("Content file FOUND: {0}", f)
+            # content_path = os.path.join(path, f)
+            content_filename = f
+            break
+    return content_filename
 
-    labels = ["file"]
 
-    @staticmethod
-    def getType(filename):
-        name, file_extension = os.path.splitext(filename)
+def extract_creation_ref(path):
+    """Extract the source id reference from the XML file"""
+    parser = EFG_XMLParser()
+    return parser.get_creation_ref(path)
 
-        if file_extension is None:
-            return "unknown"
 
-        metadata_exts = [".xml", ".xls"]
-        if file_extension in metadata_exts:
-            return "metadata"
-
-        video_exts = [".mp4", ".ts", ".mpg", ".mpeg", ".mkv"]
-        if file_extension in video_exts:
-            return "video"
-
-        audio_exts = [".aac", ".mp2", ".mp3", ".wav"]
-        if file_extension in audio_exts:
-            return "audio"
-
-        image_exts = [".tif", ".jpg", ".tiff", ".jpeg"]
-        if file_extension in image_exts:
-            return "image"
-
-        text_exts = [".pdf", ".doc", ".docx"]
-        if file_extension in text_exts:
-            return "text"
-
-        return "unknown"
-
-    def lookup_content(self, path, source_id):
-        """
-        Look for a filename in the form of:
-        ARCHIVE_SOURCEID.[extension]
-        """
-        content_filename = None
-        files = [f for f in os.listdir(path) if not f.endswith(".xml")]
-        for f in files:
-            tokens = os.path.splitext(f)[0].split("_")
-            if len(tokens) == 0:
-                continue
-            if tokens[-1] == source_id:
-                log.info("Content file FOUND: {0}", f)
-                # content_path = os.path.join(path, f)
-                content_filename = f
-                break
-        return content_filename
-
-    def extract_creation_ref(self, path):
-        """
-        Extract the source id reference from the XML file
-        """
-        parser = EFG_XMLParser()
-        return parser.get_creation_ref(path)
-
-    @decorators.auth.require_any(
-        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
-    )
-    @decorators.get_pagination
-    @decorators.endpoint(
-        path="/stage",
-        summary="List of files contained in the stage area of the specified group",
-        responses={200: "List of files and directories successfully retrieved"},
-    )
-    @decorators.endpoint(
-        path="/stage/<group>",
-        summary="List of files contained in the stage area of the specified group",
-        responses={200: "List of files and directories successfully retrieved"},
-    )
-    def get(self, get_total, page, size, sort_by, sort_order, input_filter, group=None):
+class StageAbstract:
+    def __init__(self):
         self.graph = neo4j.get_instance()
 
-        if not self.verify_admin():
-            # Only admins can specify a different group to be inspected
-            group = None
-
-        if group is None:
-            user = self.get_user()
-            if user is None:  # pragma: no cover
-                raise BadRequest("No user defined")
-
-            group = user.belongs_to.single()
-        else:
-            group = self.graph.Group.nodes.get_or_none(uuid=group)
-
-        if group is None:
-            raise BadRequest("No group defined for this user")
-
+    def get_staged_data(
+        self, get_total, page, size, sort_by, sort_order, input_filter, group
+    ):
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
@@ -147,7 +87,6 @@ class Stage(IMCEndpoint):
         counter = 0
         data = []
         for f in dirs:
-
             path = os.path.join(upload_dir, f)
             if not os.path.isfile(path):
                 continue
@@ -156,22 +95,21 @@ class Stage(IMCEndpoint):
                 continue
 
             counter += 1
-
             if offset >= counter:
                 continue
-
             if offset + size < counter:
                 break
 
             stat = os.stat(path)
 
-            row: Dict[str, Any] = {}
-            row["name"] = f
-            row["size"] = stat.st_size
-            row["creation"] = stat.st_ctime
-            row["modification"] = stat.st_mtime
-            row["type"] = self.getType(f)
-            row["status"] = "-"
+            row: Dict[str, Any] = {
+                "name": f,
+                "size": stat.st_size,
+                "creation": stat.st_ctime,
+                "modification": stat.st_mtime,
+                "type": self.get_type(f),
+                "status": "-",
+            }
             res = self.graph.Stage.nodes.get_or_none(filename=f)
             if res is not None:
                 row["status"] = res.status
@@ -196,15 +134,96 @@ class Stage(IMCEndpoint):
                             binding["filename"] = content_stage.filename
                             binding["status"] = content_stage.status
                         else:
-                            binding["filename"] = self.lookup_content(
-                                upload_dir, source_id
-                            )
+                            binding["filename"] = lookup_content(upload_dir, source_id)
                             binding["status"] = "PENDING"
                         row["binding"] = binding
 
             data.append(row)
+        return data
 
-        return self.response(data)
+    @staticmethod
+    def get_type(filename):
+        name, file_extension = os.path.splitext(filename)
+
+        if file_extension is None:
+            return "unknown"
+
+        metadata_exts = [".xml", ".xls"]
+        if file_extension in metadata_exts:
+            return "metadata"
+
+        video_exts = [".mp4", ".ts", ".mpg", ".mpeg", ".mkv"]
+        if file_extension in video_exts:
+            return "video"
+
+        audio_exts = [".aac", ".mp2", ".mp3", ".wav"]
+        if file_extension in audio_exts:
+            return "audio"
+
+        image_exts = [".tif", ".jpg", ".tiff", ".jpeg"]
+        if file_extension in image_exts:
+            return "image"
+
+        text_exts = [".pdf", ".doc", ".docx"]
+        if file_extension in text_exts:
+            return "text"
+
+        return "unknown"
+
+
+class StageGroup(IMCEndpoint, StageAbstract):
+
+    labels = ["file"]
+
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+        StageAbstract.__init__(self)
+
+    @decorators.auth.require_any(Role.ADMIN)
+    @decorators.get_pagination
+    @decorators.endpoint(
+        path="/stage/<group>",
+        summary="List of files contained in the stage area of the specified group",
+        responses={200: "List of files and directories successfully retrieved"},
+    )
+    def get(self, get_total, page, size, sort_by, sort_order, input_filter, group):
+
+        group = self.graph.Group.nodes.get_or_none(uuid=group)
+        if group is None:
+            raise BadRequest("No group defined for this user")
+        res = self.get_staged_data(
+            get_total, page, size, sort_by, sort_order, input_filter, group
+        )
+        return self.response(res)
+
+
+class Stage(IMCEndpoint, StageAbstract):
+
+    labels = ["file"]
+
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+        StageAbstract.__init__(self)
+
+    @decorators.auth.require_any("Archive")
+    @decorators.get_pagination
+    @decorators.endpoint(
+        path="/stage",
+        summary="List of files contained in the stage area of the specified group",
+        responses={200: "List of files and directories successfully retrieved"},
+    )
+    def get(self, get_total, page, size, sort_by, sort_order, input_filter):
+
+        user = self.get_user()
+        if user is None:  # pragma: no cover
+            raise BadRequest("No user defined")
+        group = user.belongs_to.single()
+        if group is None:
+            raise BadRequest("No group defined for this user")
+        res = self.get_staged_data(
+            get_total, page, size, sort_by, sort_order, input_filter, group
+        )
+        return self.response(res)
 
     @decorators.auth.require_any(
         Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
@@ -279,7 +298,7 @@ class Stage(IMCEndpoint):
 
         # 1) estraggo il source id dal file dei metadati
         log.debug("Extracting source id from metadata file {}", filename)
-        source_id = self.extract_creation_ref(path)
+        source_id = extract_creation_ref(path)
         if source_id is None:
             log.debug("No source ID found in metadata file {}", path)
             raise Conflict(f"No source ID found in metadata file: {filename}")
@@ -462,7 +481,7 @@ class SortFunctions:
 
     @staticmethod
     def sort_by_type(t):
-        return Stage.getType(t)
+        return StageAbstract.get_type(t)
 
     @staticmethod
     def sort_by_size(t):
