@@ -30,7 +30,7 @@ TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
 BODY_PATTERN = re.compile("(resource|textual):.+")
 SELECTOR_PATTERN = re.compile(r"t=\d+,\d+")
 
-__author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+__author__ = "Giuseppe Trotta (g.trotta@cineca.it)"
 
 
 class AnnotationModel(Schema):
@@ -97,8 +97,91 @@ class AnnotationModel(Schema):
     """
 
 
-#####################################
-class Annotations(IMCEndpoint):
+class AnnotationAbstract:
+    def get_annotation_response(self, anno):
+        """
+        Utility method to build DTO for annotation model.
+        """
+        res = self.getJsonResponse(anno, max_relationship_depth=0)
+        if anno.creator is not None:
+            res["creator"] = self.getJsonResponse(
+                anno.creator.single(), max_relationship_depth=0
+            )
+
+        res["bodies"] = []
+        for b in anno.bodies.all():
+            anno_body = b.downcast()
+            body = self.getJsonResponse(anno_body, max_relationship_depth=0)
+            if anno.annotation_type == "TVS":
+                segments = []
+                for segment in anno_body.segments:
+                    # look at the most derivative class
+                    json_segment = self.getJsonResponse(
+                        segment.downcast(), max_relationship_depth=0
+                    )
+                    segments.append(json_segment)
+                body["segments"] = segments
+            res["bodies"].append(body)
+
+        res["targets"] = []
+        for t in anno.targets.all():
+            target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
+            res["targets"].append(target)
+
+        res["source"] = self.getJsonResponse(
+            anno.source_item.single(), max_relationship_depth=0
+        )
+        return res
+
+
+class Annotation(IMCEndpoint, AnnotationAbstract):
+    labels = ["annotation"]
+
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+        AnnotationAbstract.__init__(self)
+
+    # "schema": {"$ref": "#/definitions/Annotation"},
+    @decorators.auth.require()
+    @decorators.use_kwargs(
+        {
+            "anno_type": fields.Str(
+                required=False,
+                data_key="type",
+                description="filter by annotation type",
+            )
+        },
+        location="query",
+    )
+    @decorators.marshal_with(AnnotationModel(many=True), code=200)
+    @decorators.endpoint(
+        path="/annotations/<anno_id>",
+        summary="Get a single annotation",
+        description="Returns a single annotation for its uuid",
+        responses={200: "An annotation", 404: "Annotation does not exist."},
+    )
+    def get(self, anno_id):
+        """Get an annotation"""
+        graph = neo4j.get_instance()
+        user = self.get_user()
+        if anno_id is None and not self.auth.is_admin(user):
+            raise Unauthorized("You are not authorized: missing privileges")
+
+        anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        if not anno:
+            log.debug("Annotation with uuid {} does not exist", anno_id)
+            raise NotFound("Please specify a valid annotation id")
+        annotations = [anno]
+
+        # FIXME this should not be a list
+        data = []
+        for a in annotations:
+            data.append(self.get_annotation_response(a))
+
+        return self.response(data)
+
+
+class Annotations(IMCEndpoint, AnnotationAbstract):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
@@ -111,7 +194,11 @@ class Annotations(IMCEndpoint):
         "segmentation",
     )
 
-    labels = ["annotation"]
+    labels = ["annotations"]
+
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+        AnnotationAbstract.__init__(self)
 
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
@@ -132,27 +219,14 @@ class Annotations(IMCEndpoint):
         description="Returns a single annotation for its uuid",
         responses={200: "An annotation", 404: "Annotation does not exist."},
     )
-    @decorators.endpoint(
-        path="/annotations/<anno_id>",
-        summary="Get a single annotation",
-        description="Returns a single annotation for its uuid",
-        responses={200: "An annotation", 404: "Annotation does not exist."},
-    )
-    def get(self, anno_id=None, anno_type=None):
+    def get(self, anno_type=None):
         """Get an annotation if its id is passed as an argument."""
         graph = neo4j.get_instance()
         user = self.get_user()
-        if anno_id is None and not self.auth.is_admin(user):
+        if not self.auth.is_admin(user):
             raise Unauthorized("You are not authorized: missing privileges")
 
-        if anno_id:
-            # check if the video exists
-            anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
-            if not anno:
-                log.debug("Annotation with uuid {} does not exist", anno_id)
-                raise NotFound("Please specify a valid annotation id")
-            annotations = [anno]
-        elif anno_type:
+        if anno_type:
             annotations = graph.Annotation.nodes.filter(annotation_type=anno_type)
         else:
             annotations = graph.Annotation.nodes.all()
@@ -582,38 +656,3 @@ class Annotations(IMCEndpoint):
             updated_anno = self.get_annotation_response(anno)
 
             return self.response(updated_anno)
-
-    def get_annotation_response(self, anno):
-        """
-        Utility method to build DTO for annotation model.
-        """
-        res = self.getJsonResponse(anno, max_relationship_depth=0)
-        if anno.creator is not None:
-            res["creator"] = self.getJsonResponse(
-                anno.creator.single(), max_relationship_depth=0
-            )
-
-        res["bodies"] = []
-        for b in anno.bodies.all():
-            anno_body = b.downcast()
-            body = self.getJsonResponse(anno_body, max_relationship_depth=0)
-            if anno.annotation_type == "TVS":
-                segments = []
-                for segment in anno_body.segments:
-                    # look at the most derivative class
-                    json_segment = self.getJsonResponse(
-                        segment.downcast(), max_relationship_depth=0
-                    )
-                    segments.append(json_segment)
-                body["segments"] = segments
-            res["bodies"].append(body)
-
-        res["targets"] = []
-        for t in anno.targets.all():
-            target = self.getJsonResponse(t.downcast(), max_relationship_depth=0)
-            res["targets"].append(target)
-
-        res["source"] = self.getJsonResponse(
-            anno.source_item.single(), max_relationship_depth=0
-        )
-        return res
