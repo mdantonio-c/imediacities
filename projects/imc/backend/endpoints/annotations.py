@@ -139,23 +139,23 @@ class Annotations(IMCEndpoint):
         responses={200: "An annotation", 404: "Annotation does not exist."},
     )
     def get(self, anno_id=None, anno_type=None):
-        """ Get an annotation if its id is passed as an argument. """
-        self.graph = neo4j.get_instance()
-
-        if anno_id is None and not self.verify_admin():
+        """Get an annotation if its id is passed as an argument."""
+        graph = neo4j.get_instance()
+        user = self.get_user()
+        if anno_id is None and not self.auth.is_admin(user):
             raise Unauthorized("You are not authorized: missing privileges")
 
         if anno_id:
             # check if the video exists
-            anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+            anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
             if not anno:
                 log.debug("Annotation with uuid {} does not exist", anno_id)
                 raise NotFound("Please specify a valid annotation id")
             annotations = [anno]
         elif anno_type:
-            annotations = self.graph.Annotation.nodes.filter(annotation_type=anno_type)
+            annotations = graph.Annotation.nodes.filter(annotation_type=anno_type)
         else:
-            annotations = self.graph.Annotation.nodes.all()
+            annotations = graph.Annotation.nodes.all()
 
         data = []
         for a in annotations:
@@ -181,7 +181,7 @@ class Annotations(IMCEndpoint):
         },
     )
     def post(self, **data):
-        """ Create a new annotation. """
+        """Create a new annotation."""
         # TODO access control
         # annotation cannot be created by general user if not in public domain
         if len(data) == 0:
@@ -354,7 +354,7 @@ class Annotations(IMCEndpoint):
         },
     )
     def delete(self, anno_id, body_ref=None):
-        """ Deletes an annotation. """
+        """Deletes an annotation."""
 
         self.graph = neo4j.get_instance()
 
@@ -368,8 +368,8 @@ class Annotations(IMCEndpoint):
             raise ServerError("User misconfiguration")
 
         log.debug("current user: {email} - {uuid}", email=user.email, uuid=user.uuid)
-        iamadmin = self.verify_admin()
-        log.debug("current user is admin? {0}", iamadmin)
+        i_am_admin = self.auth.is_admin(user)
+        log.debug("current user is admin? {}", i_am_admin)
 
         creator = anno.creator.single()
         is_manual = True if creator is not None else False
@@ -380,7 +380,7 @@ class Annotations(IMCEndpoint):
                 id=anno.uuid,
             )
             raise NotFound("Annotation with no creator")
-        if is_manual and user.uuid != creator.uuid and not iamadmin:
+        if is_manual and user.uuid != creator.uuid and not i_am_admin:
             raise Forbidden(
                 "You cannot delete an annotation that does not belong to you"
             )
@@ -393,7 +393,7 @@ class Annotations(IMCEndpoint):
                     "Invalid Body format: textual:your_term or resource:your_iri"
                 )
             body_type, bid = body_ref.split(":", 1)
-            log.debug("[body type]: {0}, [body id]: {1}", body_type, bid)
+            log.debug("[body type]: {}, [body id]: {}", body_type, bid)
 
         repo = AnnotationRepository(self.graph)
         try:
