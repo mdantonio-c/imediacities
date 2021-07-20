@@ -344,208 +344,9 @@ class Lists(IMCEndpoint):
         return self.empty_response()
 
 
-class ListItems(IMCEndpoint):
-    """List of items in a list."""
-
-    labels = ["list_items"]
-
+class ListItemAbstract:
     def __init__(self):
-        super().__init__()
         self.graph = neo4j.get_instance()
-
-    @decorators.auth.require_all("Researcher")
-    @decorators.endpoint(
-        path="/lists/<list_id>/items/<item_id>",
-        summary="List of items in a list.",
-        description="Get all the items of a list. the result supports paging.",
-        responses={
-            200: "An list of items.",
-            403: "The user is not authorized to perform this operation.",
-            404: "List does not exist.",
-        },
-    )
-    @decorators.endpoint(
-        path="/lists/<list_id>/items",
-        summary="List of items in a list.",
-        description="Get all the items of a list. the result supports paging.",
-        responses={
-            200: "An list of items.",
-            403: "The user is not authorized to perform this operation.",
-            404: "List does not exist.",
-        },
-    )
-    def get(self, list_id, item_id=None):
-        """Get all the items of a list or a certain item of that list if an
-        item id is provided."""
-        try:
-            user_list = self.graph.List.nodes.get(uuid=list_id)
-        except self.graph.List.DoesNotExist:
-            log.debug("List with uuid {} does not exist", list_id)
-            raise NotFound("Please specify a valid list id")
-        # am I the owner of the list? (allowed also to admin)
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
-
-        i_am_admin = self.auth.is_admin(user)
-        creator = user_list.creator.single()
-        if user.uuid != creator.uuid and not i_am_admin:
-            raise Forbidden(
-                "You are not allowed to get a list that does not belong to you",
-            )
-        if item_id is not None:
-            log.debug(
-                "Get item <{}> of the list <{}, {}>".format(
-                    item_id, user_list.uuid, user_list.name
-                )
-            )
-            # Find item with uuid <item_id> in the user_list
-            # res = user_list.items.search(uuid=item_id)
-            results = self.graph.cypher(
-                "MATCH (l:List {{uuid:'{uuid}'}})"
-                " MATCH (l)-[:LST_ITEM]->(i:ListItem {{uuid:'{item}'}})"
-                " RETURN i"
-                "".format(uuid=list_id, item=item_id)
-            )
-            res = [self.graph.ListItem.inflate(row[0]) for row in results]
-            if not res:
-                raise NotFound(
-                    "Item <{}> is not connected to the list <{}, {}>".format(
-                        item_id, user_list.uuid, user_list.name
-                    )
-                )
-            return self.response(self.get_list_item_response(res[0]))
-
-        log.debug(
-            "Get all the items of the list <{}, {}>", user_list.uuid, user_list.name
-        )
-
-        data = []
-        for list_item in user_list.items.all():
-            data.append(self.get_list_item_response(list_item))
-        return self.response(data)
-
-    @decorators.auth.require_all("Researcher")
-    @decorators.database_transaction
-    @decorators.use_kwargs(Target)
-    @decorators.endpoint(
-        path="/lists/<list_id>/items",
-        summary="Add an item to a list.",
-        responses={
-            204: "Item added successfully.",
-            400: "Bad request body or target node does not exist.",
-            403: "The user is not authorized to perform this operation.",
-            404: "List does not exist.",
-            409: "The item is already connected to that list.",
-        },
-    )
-    def post(self, list_id, target):
-        """Add an item to a list."""
-        log.debug("Add an item to list {} with target {}", list_id, target)
-
-        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
-        if not user_list:
-            log.debug("List with uuid {} does not exist", list_id)
-            raise NotFound("Please specify a valid list id")
-
-        # am I the creator of the list?
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
-
-        creator = user_list.creator.single()
-        if user.uuid != creator.uuid:
-            raise Forbidden(
-                "You cannot add an item to a list that does not belong to you"
-            )
-
-        target_type = target.get("type")
-        target_id = target.get("id")
-
-        log.debug("target type: {}, target id: {}", target_type, target_id)
-        targetNode = None
-        if target_type == "item":
-            targetNode = self.graph.Item.nodes.get_or_none(uuid=target_id)
-        elif target_type == "shot":
-            targetNode = self.graph.Shot.nodes.get_or_none(uuid=target_id)
-
-        if targetNode is None:
-            raise BadRequest(f"Target [{target_type}:{target_id}] does not exist")
-        # check if the incoming target is already connected to the list
-        if targetNode.lists.is_connected(user_list):
-            raise Conflict(
-                f"The item is already connected to the list {list_id}, {user_list.name}"
-            )
-        # connect the target to the list
-        user_list.items.connect(targetNode)
-        log.debug(
-            "Item {} added successfully to list <{}, {}>",
-            target,
-            list_id,
-            user_list.name,
-        )
-        # 204: return empty response (?)
-        self.empty_response()
-
-    @decorators.auth.require_all("Researcher")
-    @decorators.database_transaction
-    @decorators.endpoint(
-        path="/lists/<list_id>/items/<item_id>",
-        summary="Delete an item from a list.",
-        responses={
-            204: "Item deleted successfully.",
-            403: "The user is not authorized to perform this operation.",
-            404: "List or item does not exist.",
-        },
-    )
-    def delete(self, list_id, item_id):
-        """Delete an item from a list."""
-        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
-        if not user_list:
-            log.debug("List with uuid {} does not exist", list_id)
-            raise NotFound("Please specify a valid list id")
-
-        log.debug(
-            "delete item <{}> from the list <{}, {}>",
-            item_id,
-            user_list.uuid,
-            user_list.name,
-        )
-        # am I the creator of the list? (always allowed to admin)
-        user = self.get_user()
-        if not user:  # pragma: no cover
-            # Can't happen since auth is required
-            raise ServerError("User misconfiguration")
-
-        i_am_admin = self.auth.is_admin(user)
-        creator = user_list.creator.single()
-        if user.uuid != creator.uuid and not i_am_admin:
-            raise Forbidden(
-                "You are not allowed to delete from a list that does not belong to you",
-            )
-
-        matched_item = None
-        for list_item in user_list.items.all():
-            item = list_item.downcast()
-            if item.uuid == item_id:
-                matched_item = item
-                break
-
-        if matched_item is None:
-            list_info = f"{user_list.uuid}, {user_list.name}"
-            raise NotFound(f"Item <{item_id}> does not belong the list {list_info}")
-
-        # disconnect the item
-        user_list.items.disconnect(matched_item)
-        log.debug(
-            "Item <{}> remeved from the list <{}, {}>successfully.",
-            item_id,
-            user_list.uuid,
-            user_list.name,
-        )
-        return self.empty_response()
 
     def get_list_item_response(self, list_item):
         # look at the most derivative class
@@ -674,3 +475,219 @@ class ListItems(IMCEndpoint):
         if not res["annotations"]:
             del res["annotations"]
         return res
+
+    def check_user_list(self, list_id):
+        try:
+            user_list = self.graph.List.nodes.get(uuid=list_id)
+        except self.graph.List.DoesNotExist:
+            log.debug("List with uuid {} does not exist", list_id)
+            raise NotFound("Please specify a valid list id")
+        # am I the owner of the list? (allowed also to admin)
+        user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
+        i_am_admin = self.auth.is_admin(user)
+        creator = user_list.creator.single()
+        if user.uuid != creator.uuid and not i_am_admin:
+            raise Forbidden(
+                "You are not allowed to get a list that does not belong to you",
+            )
+        return user_list
+
+
+class ListItem(IMCEndpoint, ListItemAbstract):
+    """Item in a user list."""
+
+    labels = ["list item"]
+
+    @decorators.auth.require_all("Researcher")
+    @decorators.endpoint(
+        path="/lists/<list_id>/items/<item_id>",
+        summary="List of items in a list.",
+        description="Get all the items of a list. the result supports paging.",
+        responses={
+            200: "An list of items.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+        },
+    )
+    def get(self, list_id, item_id):
+        """Get a certain item of a user list"""
+        user_list = self.check_user_list(list_id)
+        log.debug(
+            "Get item <{}> of the list <{}, {}>".format(
+                item_id, user_list.uuid, user_list.name
+            )
+        )
+        # Find item with uuid <item_id> in the user_list
+        # res = user_list.items.search(uuid=item_id)
+        results = self.graph.cypher(
+            "MATCH (l:List {{uuid:'{uuid}'}})"
+            " MATCH (l)-[:LST_ITEM]->(i:ListItem {{uuid:'{item}'}})"
+            " RETURN i"
+            "".format(uuid=list_id, item=item_id)
+        )
+        res = [self.graph.ListItem.inflate(row[0]) for row in results]
+        if not res:
+            raise NotFound(
+                "Item <{}> is not connected to the list <{}, {}>".format(
+                    item_id, user_list.uuid, user_list.name
+                )
+            )
+        return self.response(self.get_list_item_response(res[0]))
+
+
+class ListItems(IMCEndpoint, ListItemAbstract):
+    """List of items in a list."""
+
+    labels = ["list of items"]
+
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+        ListItemAbstract.__init__(self)
+
+    @decorators.auth.require_all("Researcher")
+    @decorators.endpoint(
+        path="/lists/<list_id>/items",
+        summary="List of items in a list.",
+        description="Get all the items of a list. the result supports paging.",
+        responses={
+            200: "An list of items.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+        },
+    )
+    def get(self, list_id, item_id=None):
+        """Get all the items of a user list"""
+        user_list = self.check_user_list(list_id)
+        log.debug(
+            "Get all the items of the list <{}, {}>", user_list.uuid, user_list.name
+        )
+
+        data = []
+        for list_item in user_list.items.all():
+            data.append(self.get_list_item_response(list_item))
+        return self.response(data)
+
+    @decorators.auth.require_all("Researcher")
+    @decorators.database_transaction
+    @decorators.use_kwargs(Target)
+    @decorators.endpoint(
+        path="/lists/<list_id>/items",
+        summary="Add an item to a list.",
+        responses={
+            204: "Item added successfully.",
+            400: "Bad request body or target node does not exist.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List does not exist.",
+            409: "The item is already connected to that list.",
+        },
+    )
+    def post(self, list_id, target):
+        """Add an item to a list."""
+        log.debug("Add an item to list {} with target {}", list_id, target)
+
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
+            log.debug("List with uuid {} does not exist", list_id)
+            raise NotFound("Please specify a valid list id")
+
+        # am I the creator of the list?
+        user = self.get_user()
+        # Can't happen since auth is required
+        if not user:  # pragma: no cover
+            raise ServerError("User misconfiguration")
+
+        creator = user_list.creator.single()
+        if user.uuid != creator.uuid:
+            raise Forbidden(
+                "You cannot add an item to a list that does not belong to you"
+            )
+
+        target_type = target.get("type")
+        target_id = target.get("id")
+
+        log.debug("target type: {}, target id: {}", target_type, target_id)
+        target_node = None
+        if target_type == "item":
+            target_node = self.graph.Item.nodes.get_or_none(uuid=target_id)
+        elif target_type == "shot":
+            target_node = self.graph.Shot.nodes.get_or_none(uuid=target_id)
+
+        if target_node is None:
+            raise BadRequest(f"Target [{target_type}:{target_id}] does not exist")
+        # check if the incoming target is already connected to the list
+        if target_node.lists.is_connected(user_list):
+            raise Conflict(
+                f"The item is already connected to the list {list_id}, {user_list.name}"
+            )
+        # connect the target to the list
+        user_list.items.connect(target_node)
+        log.debug(
+            "Item {} added successfully to list <{}, {}>",
+            target,
+            list_id,
+            user_list.name,
+        )
+        # 204: return empty response (?)
+        self.empty_response()
+
+    @decorators.auth.require_all("Researcher")
+    @decorators.database_transaction
+    @decorators.endpoint(
+        path="/lists/<list_id>/items/<item_id>",
+        summary="Delete an item from a list.",
+        responses={
+            204: "Item deleted successfully.",
+            403: "The user is not authorized to perform this operation.",
+            404: "List or item does not exist.",
+        },
+    )
+    def delete(self, list_id, item_id):
+        """Delete an item from a list."""
+        user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
+        if not user_list:
+            log.debug("List with uuid {} does not exist", list_id)
+            raise NotFound("Please specify a valid list id")
+
+        log.debug(
+            "delete item <{}> from the list <{}, {}>",
+            item_id,
+            user_list.uuid,
+            user_list.name,
+        )
+        # am I the creator of the list? (always allowed to admin)
+        user = self.get_user()
+        if not user:  # pragma: no cover
+            # Can't happen since auth is required
+            raise ServerError("User misconfiguration")
+
+        i_am_admin = self.auth.is_admin(user)
+        creator = user_list.creator.single()
+        if user.uuid != creator.uuid and not i_am_admin:
+            raise Forbidden(
+                "You are not allowed to delete from a list that does not belong to you",
+            )
+
+        matched_item = None
+        for list_item in user_list.items.all():
+            item = list_item.downcast()
+            if item.uuid == item_id:
+                matched_item = item
+                break
+
+        if matched_item is None:
+            list_info = f"{user_list.uuid}, {user_list.name}"
+            raise NotFound(f"Item <{item_id}> does not belong the list {list_info}")
+
+        # disconnect the item
+        user_list.items.disconnect(matched_item)
+        log.debug(
+            "Item <{}> remeved from the list <{}, {}>successfully.",
+            item_id,
+            user_list.uuid,
+            user_list.name,
+        )
+        return self.empty_response()
