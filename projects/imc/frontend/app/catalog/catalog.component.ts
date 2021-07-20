@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CatalogService, SearchFilter } from "./services/catalog.service";
 import { NotificationService } from "@rapydo/services/notification";
+import { SSRService } from "@rapydo/services/ssr";
 import { MediaEntity, Providers } from "./services/data";
 
 @Component({
@@ -27,7 +28,8 @@ export class CatalogComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private catalogService: CatalogService,
-    private notify: NotificationService
+    private notify: NotificationService,
+    private ssr: SSRService
   ) {}
 
   ngOnInit() {
@@ -75,6 +77,9 @@ export class CatalogComponent implements OnInit {
         this.calculateCountMissingDate();
         this.countByProviders = response.meta.countByProviders;
         this.loading = false;
+        if (this.ssr.isBrowser) {
+          window.scroll(0, 0);
+        }
       },
       (error) => {
         // if (error["filter"]) this.notify.showError(error["filter"]);

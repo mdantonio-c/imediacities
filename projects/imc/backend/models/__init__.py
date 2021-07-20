@@ -4,7 +4,7 @@ from restapi.models import PartialSchema, Schema, fields, validate
 
 allowed_term_fields = ("title", "description", "keyword")
 allowed_anno_types = ("TAG", "DSC", "LNK")
-allowed_item_types = ("all", "video", "image")
+allowed_item_types = ("all", "video", "image", "3d-model")
 DEFAULT_TIME_RANGE_FROM = Env.get_int("CATALOG_TIME_RANGE_FROM", 1890)
 DEFAULT_TIME_RANGE_TO = Env.get_int("CATALOG_TIME_RANGE_TO", 1999)
 

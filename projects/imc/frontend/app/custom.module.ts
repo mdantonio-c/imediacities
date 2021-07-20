@@ -50,6 +50,7 @@ import { AppVideoTagComponent } from "./components/app-media/app-video-tag/app-v
 import { AppVideoShotComponent } from "./components/app-media/app-video-shot/app-video-shot";
 import { AppMediaMapComponent } from "./components/app-media/app-media-map/app-media-map";
 import { AppMediaInfoComponent } from "./components/app-media/app-media-info/app-media-info";
+import { AppMultiLangPanelComponent } from "./components/app-media/app-multi-lang-panel/app-multi-lang-panel";
 import { AppMediaTagsComponent } from "./components/app-media/app-media-tags/app-media-tags";
 import { AppTreeViewComponent } from "./components/app-media/app-tree-view/app-tree-view";
 
@@ -201,6 +202,7 @@ const routes: Routes = [
     AppModalInsertTermtagComponent,
     AppModalListaShotsComponent,
     AppMediaInfoComponent,
+    AppMultiLangPanelComponent,
     AppMediaTagsComponent,
     AppTreeViewComponent,
     AppNoteComponent,

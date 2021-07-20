@@ -1,0 +1,52 @@
+<div class="card imc--expansion-panel" *ngIf="data">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <span
+        class="btn btn-link collapsed"
+        (click)="expandCard()"
+        [attr.aria-expanded]="!isCollapsed"
+      >
+        <div class="row">
+          <div class="col-8 col-sm-7">{{title}}</div>
+          <div class="col-12 col-sm-3 imc--flex--horizontal-end order-last-xs">
+            <!-- option dynamically loaded in AfterViewInit -->
+            <select
+              class="imc--input"
+              *ngIf="languagesMap.size > 1"
+              #languages_selector
+            ></select>
+          </div>
+          <div class="col-4 col-sm-2 imc--flex--horizontal-end">
+            <i *ngIf="isCollapsed" class="material-icons"
+              >keyboard_arrow_down</i
+            >
+            <i *ngIf="!isCollapsed" class="material-icons">keyboard_arrow_up</i>
+          </div>
+        </div>
+      </span>
+    </h5>
+  </div>
+  <div class="collapse" [ngbCollapse]="isCollapsed">
+    <div class="card-body row">
+      <ng-template ngFor let-item [ngForOf]="data">
+        <p
+          class="col-12"
+          *ngIf="item.language && item.language.key === activeLang; else missingLanguage"
+          [attr.data-languagekey]="item.language.key"
+        >
+          <strong class="d-block" *ngIf="showType && typeAttr"
+            >{{item[typeAttr].description}}</strong
+          >
+          {{item[textAttr]}}
+        </p>
+        <p class="col-12" *ngIf="activeLang === 'n/a' && !item.language">
+          <strong class="d-block" *ngIf="showType && typeAttr"
+            >{{item[typeAttr].description}}</strong
+          >
+          {{item[textAttr]}}
+        </p>
+      </ng-template>
+    </div>
+  </div>
+</div>
+<ng-template #missingLanguage></ng-template>

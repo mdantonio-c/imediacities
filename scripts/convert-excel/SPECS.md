@@ -4,6 +4,7 @@ efgEntity
 
 - avcreation
 - nonavcreation
+- nonavcreation
 
 ### avcreation
 
@@ -149,7 +150,12 @@ Occorrenze multiple separate dal ";"
 | testo in italiano | text in english |
 
 Consentite occorrenze multiple su più colonne.  
-L'attributo type non è al momento gestito. Viene ignorato e non mappato.
+E' possibile utilizzare l'attributo type per definire delle categorie in descrizione.
+La colonna nell'excel dovrà specificare il `type` nel seguente modo:
+
+- `description_01_en`
+
+dove `01` è il codice di riferimento per il tipo di descrizione.
 
 ---
 

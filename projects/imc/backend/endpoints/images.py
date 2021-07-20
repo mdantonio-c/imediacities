@@ -73,7 +73,11 @@ class Images(IMCEndpoint):
             image = self.getJsonResponse(
                 v,
                 max_relationship_depth=1,
-                relationships_expansion=["record_sources.provider", "item.ownership"],
+                relationships_expansion=[
+                    "record_sources.provider",
+                    "item.ownership",
+                    "item.three_dim_format",
+                ],
             )
             item = v.item.single()
             image_url = f"{host}/api/images/{v.uuid}/content?type=image"
@@ -316,7 +320,7 @@ class ImageContent(IMCEndpoint, Downloader):
 
         item = image.item.single()
         log.debug("item data: " + format(item))
-        if content_type == "image":
+        if content_type in ["image", "3d-model"]:
             # TODO manage here content access (see issue 190)
             # always return the other version if available
             image_uri = item.uri
