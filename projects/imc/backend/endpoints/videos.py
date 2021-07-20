@@ -51,11 +51,11 @@ class Videos(IMCEndpoint):
     def get(self, video_id):
         """Get the AVEntity passed as argument."""
         log.debug("getting AVEntity id: {}", video_id)
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
         try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+            v = graph.AVEntity.nodes.get(uuid=video_id)
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -97,16 +97,16 @@ class Videos(IMCEndpoint):
         Delete existing video description.
         """
         log.debug("deleting AVEntity id: {}", video_id)
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
         if video_id is None:
             raise BadRequest("Please specify a valid video id")
         try:
-            v = self.graph.AVEntity.nodes.get(uuid=video_id)
-            repo = CreationRepository(self.graph)
+            v = graph.AVEntity.nodes.get(uuid=video_id)
+            repo = CreationRepository(graph)
             repo.delete_av_entity(v)
             return self.empty_response()
-        except self.graph.AVEntity.DoesNotExist:
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -138,9 +138,9 @@ class VideoItem(IMCEndpoint):
         """
         log.debug("Update Item for AVEntity uuid: {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
+        if not (video := graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -152,7 +152,7 @@ class VideoItem(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        repo = CreationRepository(self.graph)
+        repo = CreationRepository(graph)
         if not repo.item_belongs_to_user(item, user):
             log.error("User {} not allowed to edit video {}", user.email, video_id)
             raise Forbidden(
@@ -197,13 +197,13 @@ class VideoAnnotations(IMCEndpoint):
     def get(self, video_id, anno_type=None, is_manual=False):
         log.debug("get annotations for AVEntity id: {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         data = []
 
         video = None
         try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+            video = graph.AVEntity.nodes.get(uuid=video_id)
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -332,13 +332,13 @@ class VideoShots(IMCEndpoint):
         if video_id is None:
             raise BadRequest("Please specify a video id")
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         data = []
 
         video = None
         try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+            video = graph.AVEntity.nodes.get(uuid=video_id)
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -359,13 +359,13 @@ class VideoShots(IMCEndpoint):
         )
 
         log.debug("Prefetching annotations...")
-        result = self.graph.cypher(annotations_query)
+        result = graph.cypher(annotations_query)
         for row in result:
             shot_uuid = row[0]
 
-            annotation = self.graph.Annotation.inflate(row[1])
+            annotation = graph.Annotation.inflate(row[1])
             if row[2] is not None:
-                creator = self.graph.User.inflate(row[2])
+                creator = graph.User.inflate(row[2])
             else:
                 creator = None
 
@@ -393,7 +393,7 @@ class VideoShots(IMCEndpoint):
             # attach bodies
             res["bodies"] = []
             for concept in row[3]:
-                b = self.graph.AnnotationBody.inflate(concept)
+                b = graph.AnnotationBody.inflate(concept)
                 b = b.downcast()  # most derivative body
                 b_data = self.getJsonResponse(b, max_relationship_depth=0)
                 res["bodies"].append(b_data)
@@ -412,20 +412,20 @@ class VideoShots(IMCEndpoint):
         """
             % video_id
         )
-        result = self.graph.cypher(query_auto_tags)
+        result = graph.cypher(query_auto_tags)
         for row in result:
             shot_uuid = row[0]
             if shot_uuid not in annotations:
                 annotations[shot_uuid] = []
 
-            auto_anno = self.graph.Annotation.inflate(row[1])
+            auto_anno = graph.Annotation.inflate(row[1])
             res = self.getJsonResponse(auto_anno, max_relationship_depth=0)
             # attach bodies
             res["bodies"] = []
             for concept in row[2]:
                 res["bodies"].append(
                     self.getJsonResponse(
-                        self.graph.ResourceBody.inflate(concept),
+                        graph.ResourceBody.inflate(concept),
                         max_relationship_depth=0,
                     )
                 )
@@ -443,46 +443,6 @@ class VideoShots(IMCEndpoint):
             data.append(shot)
 
         return self.response(data)
-
-
-class VideoSegments(IMCEndpoint):
-    """
-    Get the list of manual segments for a given video.
-    """
-
-    labels = ["video_segments", "video-segment"]
-
-    @decorators.auth.require()
-    @decorators.endpoint(
-        path="/videos/<video_id>/segments/<segment_id>",
-        summary="Gets all manual segments for a video.",
-        description="Returns a list of manual segments belonging to the given video item",
-        responses={200: "An list of manual segments.", 404: "Video does not exist."},
-    )
-    @decorators.endpoint(
-        path="/videos/<video_id>/segments",
-        summary="Gets all manual segments for a video.",
-        description="Returns a list of manual segments belonging to the given video item",
-        responses={200: "An list of manual segments.", 404: "Video does not exist."},
-    )
-    def get(self, video_id, segment_id):
-
-        log.debug("get all manual segments for AVEntity [uuid:{}]", video_id)
-
-        self.graph = neo4j.get_instance()
-
-        video = self.graph.AVEntity.nodes.get_or_None(uuid=video_id)
-        if not video:
-            log.debug("AVEntity with uuid {} does not exist", video_id)
-            raise NotFound("Please specify a valid video id")
-
-        # user = self.get_user()
-
-        item = video.item.single()
-        log.debug("get manual segments for Item [{}]", item.uuid)
-
-        # TODO
-        return self.response([])
 
 
 class VideoContent(IMCEndpoint, Downloader):
@@ -506,11 +466,11 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("get video content for id {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         video = None
         try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+            video = graph.AVEntity.nodes.get(uuid=video_id)
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -613,11 +573,11 @@ class VideoContent(IMCEndpoint, Downloader):
         """
         log.debug("check for video content existence with id {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         video = None
         try:
-            video = self.graph.AVEntity.nodes.get(uuid=video_id)
-        except self.graph.AVEntity.DoesNotExist:
+            video = graph.AVEntity.nodes.get(uuid=video_id)
+        except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -681,9 +641,9 @@ class VideoTools(IMCEndpoint):
 
         log.debug("launch automatic tool for video id: {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
+        if not (video := graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -693,10 +653,10 @@ class VideoTools(IMCEndpoint):
         if item.item_type != "Video":
             raise BadRequest("Content item is not a video. Use a valid video id")
 
-        repo = AnnotationRepository(self.graph)
+        repo = AnnotationRepository(graph)
 
-        OBJ_DETECTION = tool == "object-detection"
-        BUILDING_RECOGNITION = tool == "building-recognition"
+        is_obj_detection = tool == "object-detection"
+        is_building_recognition = tool == "building-recognition"
 
         if operation and operation == "delete":
             # get all automatic tags for selected tool
@@ -710,9 +670,9 @@ class VideoTools(IMCEndpoint):
 
                 labels = body.labels()
 
-                if OBJ_DETECTION and "ODBody" in labels and "BRBody" not in labels:
+                if is_obj_detection and "ODBody" in labels and "BRBody" not in labels:
                     to_be_deleted = True
-                elif BUILDING_RECOGNITION and "BRBody" in labels:
+                elif is_building_recognition and "BRBody" in labels:
                     to_be_deleted = True
                 else:
                     to_be_deleted = False
@@ -726,13 +686,13 @@ class VideoTools(IMCEndpoint):
                 f"Deleted {deleted}"
             )
 
-        if OBJ_DETECTION:
+        if is_obj_detection:
             # DO NOT re-import object detection twice for the same video!
             if repo.check_automatic_od(item.uuid):
                 raise Conflict(
                     "Object detection CANNOT be import twice for the same video"
                 )
-        elif BUILDING_RECOGNITION:
+        elif is_building_recognition:
 
             # DO NOT re-import building recognition twice for the same video!
             if repo.check_automatic_br(item.uuid):
@@ -793,11 +753,11 @@ class VideoShotRevision(IMCEndpoint):
     def get(self, input_assignee=None):
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         data = []
 
         # naive solution for getting VideoInRevision
-        items = self.graph.Item.nodes.has(revision=True)
+        items = graph.Item.nodes.has(revision=True)
         for i in items:
             creation = i.creation.single()
             video = creation.downcast()
@@ -849,8 +809,8 @@ class VideoShotRevision(IMCEndpoint):
         """Put a video under revision"""
         log.debug("Put video {} under revision", video_id)
 
-        self.graph = neo4j.get_instance()
-        if not (video := self.graph.AVEntity.nodes.get_or_none(uuid=video_id)):
+        graph = neo4j.get_instance()
+        if not (video := graph.AVEntity.nodes.get_or_none(uuid=video_id)):
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
 
@@ -865,7 +825,7 @@ class VideoShotRevision(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.auth.is_admin(user)
+        i_am_admin = self.auth.is_admin(user)
 
         log.debug(
             "Request for revision from user [{}, {} {}]",
@@ -876,8 +836,8 @@ class VideoShotRevision(IMCEndpoint):
         # Be sure user can revise this specific video
 
         # allow admin to pass the assignee
-        if iamadmin and assignee_uuid:
-            assignee = self.graph.User.nodes.get_or_none(uuid=assignee_uuid)
+        if i_am_admin and assignee_uuid:
+            assignee = graph.User.nodes.get_or_none(uuid=assignee_uuid)
         else:
             assignee = user
 
@@ -888,7 +848,7 @@ class VideoShotRevision(IMCEndpoint):
 
         log.debug("Assignee is admin? {}", assignee_is_admin)
 
-        repo = CreationRepository(self.graph)
+        repo = CreationRepository(graph)
 
         if not assignee_is_admin and not repo.item_belongs_to_user(item, assignee):
             raise Forbidden(
@@ -915,11 +875,11 @@ class VideoShotRevision(IMCEndpoint):
     )
     def post(self, video_id, shots, exitRevision):
         """Start a shot revision procedure"""
-        log.debug("Start shot revision for video {0}", video_id)
+        log.debug("Start shot revision for video {}", video_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
+        video = graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
@@ -930,7 +890,7 @@ class VideoShotRevision(IMCEndpoint):
                 "AVEntity not correctly imported: not ready for revision!",
             )
 
-        repo = CreationRepository(self.graph)
+        repo = CreationRepository(graph)
         # be sure video is under revision
         if not repo.is_video_under_revision(item):
             raise Conflict(
@@ -943,8 +903,8 @@ class VideoShotRevision(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.auth.is_admin(user)
-        if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
+        i_am_admin = self.auth.is_admin(user)
+        if not i_am_admin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden("You cannot revise a video that is not owned by you")
 
         revision = {
@@ -988,8 +948,8 @@ class VideoShotRevision(IMCEndpoint):
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
 
-        self.graph = neo4j.get_instance()
-        video = self.graph.AVEntity.nodes.get_or_none(uuid=video_id)
+        graph = neo4j.get_instance()
+        video = graph.AVEntity.nodes.get_or_none(uuid=video_id)
         if not video:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
@@ -998,7 +958,7 @@ class VideoShotRevision(IMCEndpoint):
             # 409: Video is not ready for revision. (should never be reached)
             raise Conflict("AVEntity not correctly imported: not ready for revision!")
 
-        repo = CreationRepository(self.graph)
+        repo = CreationRepository(graph)
         if not repo.is_video_under_revision(item):
             # 409: Video is already under revision.
             raise BadRequest(f"Video [{video.uuid}] is not under revision")
@@ -1008,8 +968,8 @@ class VideoShotRevision(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.auth.is_admin(user)
-        if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
+        i_am_admin = self.auth.is_admin(user)
+        if not i_am_admin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden(
                 f"User [{user.uuid}, {user.name} {user.surname}] cannot exit"
                 " revision for video that is not assigned to him/her",
