@@ -37,14 +37,8 @@ class VideoContentSchema(Schema):
 
 class Videos(IMCEndpoint):
 
-    """
-    Get an AVEntity if its id is passed as an argument.
-    Else return all AVEntities in the repository.
-    """
-
     labels = ["video"]
 
-    @decorators.auth.optional()
     @decorators.endpoint(
         path="/videos/<video_id>",
         summary="List of videos",
@@ -54,63 +48,42 @@ class Videos(IMCEndpoint):
             404: "The video does not exists.",
         },
     )
-    @decorators.endpoint(
-        path="/videos",
-        summary="List of videos",
-        description="Returns a list containing all videos",
-        responses={
-            200: "List of videos successfully retrieved",
-            403: "Operation not authorized",
-            404: "The video does not exists",
-        },
-    )
-    def get(self, video_id=None):
-
-        if video_id is None and not self.verify_admin():
-            raise Forbidden("You are not authorized")
-
+    def get(self, video_id):
+        """Get the AVEntity passed as argument."""
         log.debug("getting AVEntity id: {}", video_id)
         self.graph = neo4j.get_instance()
-        data = []
 
-        if video_id is not None:
-            # check if the video exists
-            try:
-                v = self.graph.AVEntity.nodes.get(uuid=video_id)
-            except self.graph.AVEntity.DoesNotExist:
-                log.debug("AVEntity with uuid {} does not exist", video_id)
-                raise NotFound("Please specify a valid video id")
-            videos = [v]
-        else:
-            videos = self.graph.AVEntity.nodes.all()
+        try:
+            v = self.graph.AVEntity.nodes.get(uuid=video_id)
+        except self.graph.AVEntity.DoesNotExist:
+            log.debug("AVEntity with uuid {} does not exist", video_id)
+            raise NotFound("Please specify a valid video id")
 
         api_url = get_backend_url()
-        for v in videos:
-            video = self.getJsonResponse(
-                v,
-                max_relationship_depth=1,
-                relationships_expansion=[
-                    "record_sources.provider",
-                    "item.ownership",
-                    "item.revision",
-                    "item.other_version",
-                ],
+        video = self.getJsonResponse(
+            v,
+            max_relationship_depth=1,
+            relationships_expansion=[
+                "record_sources.provider",
+                "item.ownership",
+                "item.revision",
+                "item.other_version",
+            ],
+        )
+        item = v.item.single()
+        video["links"] = {}
+        video["links"]["content"] = (
+            api_url + "/api/videos/" + v.uuid + "/content?type=video"
+        )
+        if item.thumbnail is not None:
+            video["links"]["thumbnail"] = (
+                api_url + "/api/videos/" + v.uuid + "/content?type=thumbnail"
             )
-            item = v.item.single()
-            video["links"] = {}
-            video["links"]["content"] = (
-                api_url + "/api/videos/" + v.uuid + "/content?type=video"
-            )
-            if item.thumbnail is not None:
-                video["links"]["thumbnail"] = (
-                    api_url + "/api/videos/" + v.uuid + "/content?type=thumbnail"
-                )
-            video["links"]["summary"] = (
-                api_url + "/api/videos/" + v.uuid + "/content?type=summary"
-            )
-            data.append(video)
+        video["links"]["summary"] = (
+            api_url + "/api/videos/" + v.uuid + "/content?type=summary"
+        )
 
-        return self.response(data)
+        return self.response(video)
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.database_transaction
@@ -578,7 +551,7 @@ class VideoContent(IMCEndpoint, Downloader):
             thumbnail_uri = item.thumbnail
             log.debug("thumbnail content uri: {}", thumbnail_uri)
 
-            # workaround when original thumnail is renamed by revision procedure
+            # workaround when original thumbnail is renamed by revision procedure
             if not thumbnail_size and not os.path.exists(thumbnail_uri):
                 log.debug("File {0} not found", thumbnail_uri)
                 thumbnail_filename = os.path.basename(thumbnail_uri)
@@ -965,7 +938,7 @@ class VideoShotRevision(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.verify_admin()
+        iamadmin = self.auth.is_admin(user)
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden("You cannot revise a video that is not owned by you")
 
@@ -1024,7 +997,7 @@ class VideoShotRevision(IMCEndpoint):
         if not user:  # pragma: no cover
             raise ServerError("User misconfiguration")
 
-        iamadmin = self.verify_admin()
+        iamadmin = self.auth.is_admin(user)
         if not iamadmin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden(
                 f"User [{user.uuid}, {user.name} {user.surname}] cannot exit"
