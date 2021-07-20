@@ -41,11 +41,11 @@ class Videos(IMCEndpoint):
 
     @decorators.endpoint(
         path="/videos/<video_id>",
-        summary="List of videos",
+        summary="Get video metadata",
         description="Returns the requested video",
         responses={
             200: "Video successfully retrieved",
-            404: "The video does not exists.",
+            404: "The video does not exist.",
         },
     )
     def get(self, video_id):

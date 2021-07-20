@@ -18,98 +18,51 @@ from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
 
-#####################################
 class Images(IMCEndpoint):
-
-    """
-    Get an NonAVEntity if its id is passed as an argument.
-    Else return all NonAVEntities in the repository.
-    """
 
     labels = ["image"]
 
-    @decorators.auth.optional()
     @decorators.endpoint(
         path="/images/<image_id>",
-        summary="List of images",
-        description="Returns a list containing all images. the list supports paging.",
+        summary="Get image metadata",
+        description="Returns the requested image",
         responses={
-            200: "List of images successfully retrieved",
-            404: "The image does not exists.",
+            200: "Image successfully retrieved",
+            404: "The image does not exist.",
         },
     )
-    @decorators.endpoint(
-        path="/images",
-        summary="List of images",
-        description="Returns a list containing all images. the list supports paging.",
-        responses={
-            200: "List of images successfully retrieved",
-            403: "Operation not authorized",
-            404: "The image does not exists",
-        },
-    )
-    def get(self, image_id=None):
-
-        if image_id is None and not self.verify_admin():
-            raise Forbidden("You are not authorized")
-
+    def get(self, image_id):
+        """Get the NonAVEntity passed as argument."""
         log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
-        data = []
 
-        if image_id is not None:
-            # check if the image exists
-            try:
-                v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-            except self.graph.NonAVEntity.DoesNotExist:
-                log.debug("NonAVEntity with uuid {} does not exist", image_id)
-                raise NotFound("Please specify a valid image id")
-            images = [v]
-        else:
-            images = self.graph.NonAVEntity.nodes.all()
+        try:
+            v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
+        except self.graph.NonAVEntity.DoesNotExist:
+            log.debug("NonAVEntity with uuid {} does not exist", image_id)
+            raise NotFound("Please specify a valid image id")
 
-        host = get_backend_url()
-        for v in images:
-            image = self.getJsonResponse(
-                v,
-                max_relationship_depth=1,
-                relationships_expansion=[
-                    "record_sources.provider",
-                    "item.ownership",
-                    "item.three_dim_format",
-                ],
-            )
-            item = v.item.single()
-            image_url = f"{host}/api/images/{v.uuid}/content?type=image"
-            image["links"] = {}
-            image["links"]["content"] = image_url
-            if item.thumbnail is not None:
-                thumbnail_url = f"{host}/api/images/{v.uuid}/content?type=thumbnail"
-                image["links"]["thumbnail"] = thumbnail_url
-            summary_url = f"{host}/api/images/{v.uuid}/content?type=summary"
-            image["links"]["summary"] = summary_url
-            data.append(image)
+        image = self.getJsonResponse(
+            v,
+            max_relationship_depth=1,
+            relationships_expansion=[
+                "record_sources.provider",
+                "item.ownership",
+                "item.three_dim_format",
+            ],
+        )
+        item = v.item.single()
+        api_url = get_backend_url()
+        image_url = f"{api_url}/api/images/{v.uuid}/content?type=image"
+        image["links"] = {}
+        image["links"]["content"] = image_url
+        if item.thumbnail is not None:
+            thumbnail_url = f"{api_url}/api/images/{v.uuid}/content?type=thumbnail"
+            image["links"]["thumbnail"] = thumbnail_url
+        summary_url = f"{api_url}/api/images/{v.uuid}/content?type=summary"
+        image["links"]["summary"] = summary_url
 
-        return self.response(data)
-
-    """
-    Create a new image description.
-    """
-
-    @decorators.auth.require_any(
-        Role.ADMIN, Role.USER, "Archive", "Reviser", "Researcher"
-    )
-    @decorators.database_transaction
-    @decorators.endpoint(
-        path="/images",
-        summary="Create a new image description",
-        description="Simple method to attach descriptive metadata to an image item",
-        responses={200: "Image description successfully created"},
-    )
-    def post(self):
-        self.graph = neo4j.get_instance()
-
-        return self.empty_response()
+        return self.response(image)
 
     @decorators.auth.require_all(Role.ADMIN)
     @decorators.database_transaction
@@ -119,9 +72,7 @@ class Images(IMCEndpoint):
         responses={200: "Image successfully deleted"},
     )
     def delete(self, image_id):
-        """
-        Delete existing image description.
-        """
+        """Delete existing image description."""
         log.debug("deliting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
 
@@ -160,9 +111,7 @@ class ImageItem(IMCEndpoint):
         },
     )
     def put(self, image_id, public_access):
-        """
-        Allow user to update item information.
-        """
+        """Allow user to update item information."""
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
 
         self.graph = neo4j.get_instance()
@@ -197,9 +146,7 @@ class ImageItem(IMCEndpoint):
 
 
 class ImageAnnotations(IMCEndpoint):
-    """
-    Get all image annotations for a given image.
-    """
+    """Get all image annotations for a given image."""
 
     labels = ["image_annotations"]
 
@@ -274,9 +221,7 @@ class ImageAnnotations(IMCEndpoint):
 
 
 class ImageContent(IMCEndpoint, Downloader):
-    """
-    Gets image content or thumbnail
-    """
+    """Gets image content or thumbnail"""
 
     labels = ["image"]
 
@@ -405,8 +350,8 @@ class ImageTools(IMCEndpoint):
 
         repo = AnnotationRepository(self.graph)
 
-        OBJ_DETECTION = tool == "object-detection"
-        BUILDING_RECOGNITION = tool == "building-recognition"
+        is_obj_detection = tool == "object-detection"
+        is_building_recognition = tool == "building-recognition"
 
         if operation and operation == "delete":
             # get all automatic tags for selected tool
@@ -420,9 +365,9 @@ class ImageTools(IMCEndpoint):
 
                 labels = body.labels()
 
-                if OBJ_DETECTION and "ODBody" in labels and "BRBody" not in labels:
+                if is_obj_detection and "ODBody" in labels and "BRBody" not in labels:
                     to_be_deleted = True
-                elif BUILDING_RECOGNITION and "BRBody" in labels:
+                elif is_building_recognition and "BRBody" in labels:
                     to_be_deleted = True
                 else:
                     to_be_deleted = False
@@ -436,14 +381,13 @@ class ImageTools(IMCEndpoint):
                 f"Deleted {deleted}",
             )
 
-        if OBJ_DETECTION:
-
+        if is_obj_detection:
             # DO NOT re-import object detection twice for the same image!
             if repo.check_automatic_od(item.uuid):
                 raise Conflict(
                     "Object detection CANNOT be import twice for the same image"
                 )
-        elif BUILDING_RECOGNITION:
+        elif is_building_recognition:
 
             # DO NOT re-import building recognition twice for the same image!
             if repo.check_automatic_br(item.uuid):

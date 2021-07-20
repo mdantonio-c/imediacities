@@ -23,7 +23,7 @@ export class AppMediaService {
 
     this.api.get(`/api/${endpoint}/${media_id}`).subscribe(
       (response) => {
-        this._media = response[0];
+        this._media = response;
         this._media_id = media_id;
         this._owner = this._media._item[0]._ownership[0];
 
