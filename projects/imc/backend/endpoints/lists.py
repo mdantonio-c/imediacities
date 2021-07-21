@@ -14,7 +14,7 @@ from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
 
-__author__ = "Giuseppe Trotta(g.trotta@cineca.it)"
+__author__ = "Giuseppe Trotta (g.trotta@cineca.it)"
 
 
 class List(IMCEndpoint):
@@ -59,9 +59,9 @@ class List(IMCEndpoint):
         researcher = self.get_user() if not i_am_admin else None
         if i_am_admin and r_uuid is not None:
             researcher = graph.User.nodes.get_or_none(uuid=r_uuid)
-            if not researcher:
-                log.debug("Researcher with uuid {} does not exist", r_uuid)
-                raise NotFound("Please specify a valid researcher id")
+        if not researcher:
+            log.debug("Researcher with uuid {} does not exist", r_uuid)
+            raise NotFound("Please specify a valid researcher id")
 
         res = graph.List.nodes.get_or_none(uuid=list_id)
         if not res:
@@ -133,6 +133,9 @@ class Lists(IMCEndpoint):
         """Get all the list of a user."""
         graph = neo4j.get_instance()
         user = self.get_user()
+        if not user:  # pragma: no cover
+            # Can't happen since auth is required
+            raise ServerError("User misconfiguration")
         i_am_admin = self.auth.is_admin(user)
         researcher = self.get_user() if not i_am_admin else None
         if i_am_admin and r_uuid is not None:
@@ -344,8 +347,9 @@ class Lists(IMCEndpoint):
         return self.empty_response()
 
 
-class ListItemAbstract:
+class ListItemAbstract(IMCEndpoint):
     def __init__(self):
+        IMCEndpoint.__init__(self)
         self.graph = neo4j.get_instance()
 
     def get_list_item_response(self, list_item):
@@ -497,10 +501,13 @@ class ListItemAbstract:
         return user_list
 
 
-class ListItem(IMCEndpoint, ListItemAbstract):
+class ListItem(ListItemAbstract):
     """Item in a user list."""
 
     labels = ["list item"]
+
+    def __init__(self):
+        ListItemAbstract.__init__(self)
 
     @decorators.auth.require_all("Researcher")
     @decorators.endpoint(
@@ -539,13 +546,12 @@ class ListItem(IMCEndpoint, ListItemAbstract):
         return self.response(self.get_list_item_response(res[0]))
 
 
-class ListItems(IMCEndpoint, ListItemAbstract):
+class ListItems(ListItemAbstract):
     """List of items in a list."""
 
     labels = ["list of items"]
 
     def __init__(self):
-        IMCEndpoint.__init__(self)
         ListItemAbstract.__init__(self)
 
     @decorators.auth.require_all("Researcher")
