@@ -97,7 +97,10 @@ class AnnotationModel(Schema):
     """
 
 
-class AnnotationAbstract:
+class AnnotationAbstract(IMCEndpoint):
+    def __init__(self):
+        IMCEndpoint.__init__(self)
+
     def get_annotation_response(self, anno):
         """
         Utility method to build DTO for annotation model.
@@ -134,11 +137,10 @@ class AnnotationAbstract:
         return res
 
 
-class Annotation(IMCEndpoint, AnnotationAbstract):
+class Annotation(AnnotationAbstract):
     labels = ["annotation"]
 
     def __init__(self):
-        IMCEndpoint.__init__(self)
         AnnotationAbstract.__init__(self)
 
     # "schema": {"$ref": "#/definitions/Annotation"},
@@ -181,7 +183,7 @@ class Annotation(IMCEndpoint, AnnotationAbstract):
         return self.response(data)
 
 
-class Annotations(IMCEndpoint, AnnotationAbstract):
+class Annotations(AnnotationAbstract):
 
     # the following list is a subset of the annotation_type list in neo4j
     # module
