@@ -6,27 +6,23 @@ enum AppInfoDefaulMessages {
 
 export function infoResult() {
   return function (target, key) {
-    target[key] = {
-      message: null,
-      status: null,
-      visible: false,
-      show: (status, message) => {
-        show.bind(target[key])(status, message);
-      },
-      hide: () => {
-        hide.bind(target[key])();
-      },
-    };
+    target[key] = new InfoResult();
     return target.key;
   };
 }
 
-function show(status, message = "") {
-  this.status = status;
-  this.message = message || AppInfoDefaulMessages[status];
-  this.visible = true;
-}
+class InfoResult {
+  message = null;
+  status = null;
+  visible = false;
 
-function hide() {
-  this.visible = false;
+  show(status, message = "") {
+    this.status = status;
+    this.message = message || AppInfoDefaulMessages[status];
+    this.visible = true;
+  }
+
+  hide() {
+    this.visible = false;
+  }
 }
