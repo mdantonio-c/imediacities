@@ -13,6 +13,8 @@ import { HttpClientJsonpModule } from "@angular/common/http";
 import { NguiMapModule, NgMapApiLoader } from "@ngui/map";
 import { NgxBootstrapSliderModule } from "ngx-bootstrap-slider";
 import { SlickCarouselModule } from "ngx-slick-carousel";
+import { LeafletModule } from "@asymmetrik/ngx-leaflet";
+import { LeafletMarkerClusterModule } from "@asymmetrik/ngx-leaflet-markercluster";
 import { ConfirmationPopoverModule } from "angular-confirmation-popover";
 import { LeafletModule } from "@asymmetrik/ngx-leaflet";
 import { LeafletMarkerClusterModule } from "@asymmetrik/ngx-leaflet-markercluster";
@@ -145,6 +147,8 @@ const routes: Routes = [
     NgxBootstrapSliderModule,
     //HolderJsModule,
     SlickCarouselModule,
+    LeafletModule,
+    LeafletMarkerClusterModule,
     ConfirmationPopoverModule.forRoot(
       // set defaults here
       {
