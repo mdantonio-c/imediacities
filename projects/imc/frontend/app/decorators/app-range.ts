@@ -5,12 +5,11 @@ export function rangePlayer() {
   };
 }
 
-function _RangePlayer() {
-  let _self = this;
+export class _RangePlayer {
+  _video = null;
+  _index = null;
 
-  this._video = null;
-
-  this._range = {
+  _range = {
     active: false,
     duration: 0,
     check: function (currentTime) {
@@ -24,9 +23,9 @@ function _RangePlayer() {
     timer: 100,
   };
 
-  this.set = (conf) => {
+  set(conf) {
     this._video = conf.video;
-    this.index = conf.index;
+    this._index = conf.index;
     this._range.start = (1 / this._video.fps) * conf.start;
     this._range.end = (1 / this._video.fps) * conf.end;
 
@@ -69,20 +68,20 @@ function _RangePlayer() {
         //this._video.video.currentTime = this._range.start;
       }
     }, this._range.timer);
-  };
+  }
 
-  this.is_active = function () {
+  is_active() {
     return this._range.active;
-  };
+  }
 
-  this.get = function () {
+  get() {
     return this._range;
-  };
+  }
 
-  this._unset = function () {
+  _unset() {
     this._video._emetti("onrange_end", this._range);
     this._video.restart_time = null;
     clearInterval(this._range.interval);
     this._range.interval = null;
-  };
+  }
 }
