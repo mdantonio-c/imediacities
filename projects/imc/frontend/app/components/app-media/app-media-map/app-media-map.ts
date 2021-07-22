@@ -20,7 +20,7 @@ import { ProviderToCityPipe } from "../../../pipes/ProviderToCity";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
 
 import * as L from "leaflet";
-import { LeafletEvent} from "leaflet";
+import { LeafletEvent } from "leaflet";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -31,7 +31,6 @@ import { AppMediaMapInfowindowComponent } from "../app-media-map-infowindow/app-
 interface LMarkerPlus extends L.Marker {
   properties: any;
 }
-
 
 @Component({
   selector: "app-media-map",
@@ -63,8 +62,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     private VideoService: AppVideoService,
     private catalogService: CatalogService,
     private modalService: NgbModal,
-    private spinner: NgxSpinnerService
-    // private mapApiLoader: CustomNgMapApiLoader
+    private spinner: NgxSpinnerService // private mapApiLoader: CustomNgMapApiLoader
   ) {
     //mapApiLoader.setUrl();
   }
@@ -101,19 +99,12 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   lastMouseLat: any;
   lastMouseLng: any;
 
-
-
   // Set the initial set of displayed layers
   options = {
     layers: [this.streetMaps],
     zoom: 4,
-    center: [0 ,0],
+    center: [0, 0],
   };
-
-
-
-
-
 
   public map_styles = [
     {
@@ -197,15 +188,13 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param event
    */
   marker_add(event, self) {
-
-    console.log('[Checkpoint marker_add] ', this, self, event);
+    console.log("[Checkpoint marker_add] ", this, self, event);
     // why??????
     // if (event instanceof MouseEvent) return;
 
-    
-
     if (
-      this.AuthzService && !this.AuthzService.hasPermission(
+      this.AuthzService &&
+      !this.AuthzService.hasPermission(
         this._current_user,
         this.MediaService.media(),
         Permission.CREATE_ANNOTATION
@@ -229,15 +218,16 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       return alert("No shot selected");
     }
     this.spinner.show();
-    const geocode =  this.nominatimOsmGeocoder.reverse(this.lastMouseLat, this.lastMouseLng).subscribe(result => {
-      this.spinner.hide();
-      if (result && result.display_name) {
-        this.marker_new_set(event, result, shots_idx);
-      }
-    });
+    const geocode = this.nominatimOsmGeocoder
+      .reverse(this.lastMouseLat, this.lastMouseLng)
+      .subscribe((result) => {
+        this.spinner.hide();
+        if (result && result.display_name) {
+          this.marker_new_set(event, result, shots_idx);
+        }
+      });
     this._subscription.add(geocode);
   }
-
 
   /**
    * Visulizza la InfoWindow al click su un marker
@@ -245,7 +235,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param pos
    */
   marker_click(event, pos_old, self) {
-
     if (!self.clickable_markers) {
       return;
     }
@@ -253,7 +242,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     let mkplus = event.target as LMarkerPlus;
     let pos = mkplus.properties;
 
-    console.log('[Checkpoint marker_click 2] - ', mkplus, self._markers);
+    console.log("[Checkpoint marker_click 2] - ", mkplus, self._markers);
     self.info_window_data = {
       annotations: [pos],
       shots: pos.shots_idx.reduce((acc, s) => {
@@ -276,8 +265,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     modalRef.componentInstance.popover = self.popover;
     modalRef.componentInstance.marker_edit = self.marker_edit;
     modalRef.componentInstance.info_window_data = self.info_window_data;
-    window.dispatchEvent(new Event('resize')); // this seems necessary since sometimes the popup does not show
-    
+    window.dispatchEvent(new Event("resize")); // this seems necessary since sometimes the popup does not show
+
     //event.target.nguiMapComponent.openInfoWindow("iw", event.target);
   }
 
@@ -322,11 +311,16 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * Controllo se il marker è stato salvato diversamente lo rimuovo dalla mappa
    */
   marker_edit_closeclick() {
-    if (this.marker_edit 
-     /* && this.marker_edit.state !== "saved" &&
+    if (
+      this.marker_edit
+      /* && this.marker_edit.state !== "saved" &&
       this.marker_edit.state !== "updating" */
     ) {
-      console.log('check marker_edit_closeclick', this.marker_edit, this.marker_edit.marker);
+      console.log(
+        "check marker_edit_closeclick",
+        this.marker_edit,
+        this.marker_edit.marker
+      );
       this.osmap.removeLayer(this.marker_edit.marker);
     }
   }
@@ -358,7 +352,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       );
     }
 
-    console.log("marker_edit_save - saving stuff with iri=", this.marker_edit.iri);
+    console.log(
+      "marker_edit_save - saving stuff with iri=",
+      this.marker_edit.iri
+    );
 
     let ret = this.AnnotationsService.create_tag(
       shots_idx.map((s) => s.id),
@@ -387,25 +384,20 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       }
     );
 
-    console.log('this.AnnotationsService.create_tag returned this: ', ret);
+    console.log("this.AnnotationsService.create_tag returned this: ", ret);
   }
-  
-  
-  
-
 
   marker_new_set(event, result, shots_idx) {
-
     let self = this;
     let greenIcon = L.icon({
-      iconUrl: '/app/custom/assets/images/marker-icon-green.png',
+      iconUrl: "/app/custom/assets/images/marker-icon-green.png",
       // shadowUrl: 'leaf-shadow.png',
 
-      iconSize:     [25, 41], // size of the icon
+      iconSize: [25, 41], // size of the icon
       //shadowSize:   [x, x], // size of the shadow
-      iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+      iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
       // shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+      popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
     });
 
     //  Verifico se esiste un marker precedente
@@ -414,23 +406,25 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       this.osmap.removeLayer(this.marker_edit.marker);
     }
 
-    // 
-    let m = L.marker([this.lastMouseLat, this.lastMouseLng], {icon: greenIcon}).addTo(this.osmap) as LMarkerPlus; // .on('click', ???);
+    //
+    let m = L.marker([this.lastMouseLat, this.lastMouseLng], {
+      icon: greenIcon,
+    }).addTo(this.osmap) as LMarkerPlus; // .on('click', ???);
 
     let formattedName = "";
-    if(result.address && result.address.amenity) {
+    if (result.address && result.address.amenity) {
       formattedName = result.address.amenity;
-      console.log('marker_new_set - using amenity name' , formattedName)
-    } else if(result.address.road) {
-        formattedName = result.address.road;
-        if(result.address && result.address.house_number) {
-          formattedName += " " + result.address.house_number;
-        }
+      console.log("marker_new_set - using amenity name", formattedName);
+    } else if (result.address.road) {
+      formattedName = result.address.road;
+      if (result.address && result.address.house_number) {
+        formattedName += " " + result.address.house_number;
+      }
     } else {
       formattedName = result.display_name;
     }
 
-    console.log('marker_new_set' , formattedName)
+    console.log("marker_new_set", formattedName);
 
     this.marker_edit = {
       marker: m,
@@ -444,13 +438,13 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       shots_idx: shots_idx,
       state: "saving",
     };
-/*
+    /*
     let mked = {
         description : "aaaaaaaaaaaaaaaaaa",
         address : "bbbbbbbbbbbb"
     };
 */
-    
+
     const modalRef = this.modalService.open(AppMediaMapInfowindowComponent, {
       size: "lg",
       centered: true,
@@ -459,7 +453,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     modalRef.componentInstance.popover = self.popover;
     modalRef.componentInstance.marker_edit = self.marker_edit;
     modalRef.componentInstance.info_window_data = self.info_window_data;
-    window.dispatchEvent(new Event('resize')); // this seems necessary since sometimes the popup does not show
+    window.dispatchEvent(new Event("resize")); // this seems necessary since sometimes the popup does not show
     /*
     // mi serve il place name di google da salvare dentro description
     //  dentro result non c'è, faccio una richiesta a google
@@ -551,9 +545,9 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param marker
    */
   marker_update(annotation, marker) {
-    console.log('[Checkpoint marker_update]');
+    console.log("[Checkpoint marker_update]");
 
-/* TODO TODO TODO 
+    /* TODO TODO TODO 
 
     this.marker_edit = {
       marker: marker,
@@ -605,23 +599,19 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     return shots_idx;
   }
 
-
   /**
    * Imposta la mappa in modo da visualizzare tutti i marker
    */
   fit_bounds() {
-
-    console.log('Checkpoint fit_bounds');
+    console.log("Checkpoint fit_bounds");
     var componentRef = this;
 
-
     let mIcon = L.icon({
-      iconUrl: '/app/custom/assets/images/marker-icon.png',
-      iconSize:     [25, 41], // size of the icon
-      iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
-      popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+      iconUrl: "/app/custom/assets/images/marker-icon.png",
+      iconSize: [25, 41], // size of the icon
+      iconAnchor: [12, 40], // point of the icon which will correspond to marker's location
+      popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
     });
-
 
     if (this.osmap) {
       if (this._markers.length) {
@@ -630,25 +620,29 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
           //check if mks already has a marker for this iri
           let found = false;
           let thisIri = l.iri;
-          for (var mi=0; mi<mks.length; mi++) {
-            if(mks[mi].properties.iri == thisIri) {
-              mks[mi].properties.shots_idx = mks[mi].properties.shots_idx.concat(l.shots_idx);
+          for (var mi = 0; mi < mks.length; mi++) {
+            if (mks[mi].properties.iri == thisIri) {
+              mks[mi].properties.shots_idx = mks[
+                mi
+              ].properties.shots_idx.concat(l.shots_idx);
               found = true;
               break;
             }
           }
-          if(!found) { 
-            let m = L.marker([l.spatial[0], l.spatial[1]], {icon: mIcon}).addTo(this.osmap).on('click', function(ev){componentRef.marker_click(ev, false, componentRef)}) as LMarkerPlus;
+          if (!found) {
+            let m = L.marker([l.spatial[0], l.spatial[1]], { icon: mIcon })
+              .addTo(this.osmap)
+              .on("click", function (ev) {
+                componentRef.marker_click(ev, false, componentRef);
+              }) as LMarkerPlus;
             m.properties = l;
             mks.push(m);
-            console.log('Checkpoint marker' , l);
+            console.log("Checkpoint marker", l);
           }
         });
 
-        
         var mkGroup = L.featureGroup(mks);
         this.osmap.fitBounds(mkGroup.getBounds().pad(0.5));
-
 
         /*    TODO TODO TODO 
         let bounds = new google.maps.LatLngBounds();
@@ -679,24 +673,25 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
    * @param map
    */
   onMapReady(map: L.Map) {
-
     console.log("Checkpoint  onMapReady ", map);
 
     this.osmap = map;
     var componentRef = this;
-    this.osmap.addEventListener('mousemove', function(ev) {
+    this.osmap.addEventListener("mousemove", function (ev) {
       //if(ev as LeafletEvent) {
       //  console.log('leafletevent has no latlng props', ev);
       //} else {
-        const evx : any = ev;
-        if('latlng' in evx) {
-          componentRef.lastMouseLat = evx.latlng.lat;
-          componentRef.lastMouseLng = evx.latlng.lng;
-        }
+      const evx: any = ev;
+      if ("latlng" in evx) {
+        componentRef.lastMouseLat = evx.latlng.lat;
+        componentRef.lastMouseLng = evx.latlng.lng;
+      }
       //}
-   });
+    });
 
-   this.osmap.addEventListener('click', function(ev) {componentRef.marker_add(ev, componentRef)});
+    this.osmap.addEventListener("click", function (ev) {
+      componentRef.marker_add(ev, componentRef);
+    });
 
     this.set_center_from_owner();
 
@@ -706,11 +701,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   set_center_from_owner() {
     const _media_owner = this.MediaService.owner();
 
-    if (_media_owner  /* && _media_owner.shortname */ ) {
-
+    if (_media_owner /* && _media_owner.shortname */) {
       let location_to_find = _media_owner.shortname;
-      if(!location_to_find) {
-            /*
+      if (!location_to_find) {
+        /*
             //  NSI: aggiunto il codice sottostante perchè l'immagine
             //        di prova aveva "test" come owner
             let location_to_find = null;
@@ -720,14 +714,13 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
                 location_to_find = 'ccb';
             }
             */
-        location_to_find = 'ccb';
+        location_to_find = "ccb";
       }
 
       // SPECIFICO PER DARE RAVENNA
-      this.centerCoords(44.420620, 12.209512);
+      this.centerCoords(44.42062, 12.209512);
 
-
-    /*       
+      /*       
       if (location_to_find) {
         this.centerCity(location_to_find.toUpperCase());
 /*
@@ -763,20 +756,20 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
   /**
    *  Center the map on the given coordinates
-   * 
+   *
    * @param llat guess what is it
    * @param llng guess also this
    */
-  centerCoords = function(llat, llng) {
+  centerCoords(llat, llng) {
     this.osmap.setView(new L.LatLng(llat, llng), 14);
     this.center = { lat: llat, lng: llng };
   }
 
-    /**
+  /**
    * Center the map on a given city.
    * @param city - Archive ID (e.g. CCB)
    */
-  centerCity = function (provider) {
+  centerCity(provider) {
     if (this.osmap === undefined) {
       console.warn("The center cannot be set because the map is undefined.");
       return;
@@ -785,8 +778,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     let cityPosition = this.catalogService.getProviderPosition(provider);
     this.osmap.setView(new L.LatLng(cityPosition[0], cityPosition[1]), 14);
     this.center = { lat: cityPosition[0], lng: cityPosition[1] };
-
-  };
+  }
 
   ngOnInit() {
     this.popover = this.AnnotationsService.popover();

@@ -284,7 +284,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
   }
 
-  onCenterChanged = function (event) {
+  onCenterChanged(event) {
     if (!this.osmap) {
       return;
     }
@@ -314,7 +314,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
         this.reloading = false;
       }
     }, 1000);
-  };
+  }
 
   private moving() {
     let latLng = this.osmap.getCenter();
