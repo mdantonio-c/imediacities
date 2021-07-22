@@ -153,17 +153,17 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
   }
 
-  centerEurope = function () {
+  centerEurope() {
     let pt = new google.maps.LatLng(europeCenter.lat, europeCenter.lng);
     this.map.setCenter(pt);
     this.map.setZoom(4);
-  };
+  }
 
   /**
    * Center the map on a given city.
    * @param city - Archive ID (e.g. CCB)
    */
-  centerCity = function (provider) {
+  centerCity(provider) {
     if (this.map === undefined) {
       console.warn("The center cannot be set because the map is undefined.");
       return;
@@ -173,11 +173,11 @@ export class SearchMapComponent implements OnInit, OnChanges {
     this.map.setCenter(pt);
     this.map.setZoom(14);
     this.center = { lat: cityPosition[0], lng: cityPosition[1] };
-  };
+  }
 
-  toggleBoundary = function () {
+  toggleBoundary() {
     this.showMapBoundary = !this.showMapBoundary;
-  };
+  }
 
   onMapReady(map) {
     // add custom controls

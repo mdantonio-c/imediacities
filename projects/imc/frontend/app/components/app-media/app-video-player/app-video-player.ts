@@ -10,7 +10,7 @@ import {
   EventEmitter,
   ChangeDetectorRef,
 } from "@angular/core";
-import { rangePlayer } from "../../../decorators/app-range";
+import { _RangePlayer, rangePlayer } from "../../../decorators/app-range";
 import { ShotRevisionService } from "../../../services/shot-revision.service";
 import { AuthService } from "@rapydo/services/auth";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -61,6 +61,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
   ) {}
 
   @rangePlayer() range;
+  // range = new _RangePlayer()
 
   _frame_set(f) {
     let fr = f.split("/");
@@ -71,8 +72,6 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
     } else {
       this.fps = Number(fr[0]);
     }
-    // sporchissimo :)
-    // this.fps = eval(f);
     this.frame_length = 1 / this.fps;
   }
 
@@ -265,7 +264,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
    * @param  {Number} frame - Frame number for conversion to it's equivalent SMPTE Time code.
    * @return {String} Returns a SMPTE Time code in HH:MM:SS:FF format
    */
-  toSMPTE = function (frame) {
+  toSMPTE(frame) {
     // if (!frame) { return this.toTime(this.video.currentTime); }
     var frameNumber = Number(frame);
     var fps = this.fps;
@@ -287,7 +286,7 @@ export class AppVideoPlayerComponent implements OnInit, AfterViewInit {
       ":" +
       wrap(frameNumber % fps);
     return SMPTE;
-  };
+  }
 
   /**
    * Returns the time in the video for a given frame number

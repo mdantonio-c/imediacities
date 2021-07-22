@@ -27,6 +27,6 @@ export class AppVideoControlRangeComponent extends AppVideoControlComponent {
   }
 
   range_save() {
-    alert("todo");
+    alert("not implemented");
   }
 }
