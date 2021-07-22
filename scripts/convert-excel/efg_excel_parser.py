@@ -159,8 +159,9 @@ def add_digital_format(row_idx, manifestation):
     ):
         digital_format_el = ET.SubElement(manifestation, "digitalFormat")
         digital_format_el.text = digital_format.strip()
-        if headers.get("digitalSize"):
-            digital_size = ws.cell(row=row_idx, column=headers["digitalSize"]).value
+        if headers.get("digitalSize") and not is_blank(
+            digital_size := ws.cell(row=row_idx, column=headers["digitalSize"]).value
+        ):
             if not isinstance(digital_size, int):
                 print(
                     f"WARNING - Digital size MUST be a valid number. Actual value: '{digital_size}'"
@@ -184,8 +185,11 @@ def add_3d_format(row_idx, item):
     format_fields = lookup_fields(row_idx, start_with="3DFormat")
     _3d_format_el = ET.SubElement(item, "_3DFormat")
     for key, val in format_fields.items():
+        _3d_format_mandatory = ["software", "materials"]
         if is_blank(val[0]):
             # no format info for this key
+            if key in _3d_format_mandatory:
+                raise ValueError(f"missing mandatory {key}")
             continue
         if key in ["level", "resolution", "software", "materials"]:
             # print(f"<{key}> {val[0]}")
@@ -479,14 +483,16 @@ def check_mandatory_columns():
             raise ValueError(f"Missing mandatory column <{col}>")
     if not [n for n in headers.keys() if n and n.startswith("title_text_")]:
         raise ValueError("Missing mandatory column <title_text>")
+    additional_mandatory_fields = []
     if ws.title == "Video":
-        for col in ["countryOfReference", "productionYear"]:
-            if col not in headers:
-                raise ValueError(f"Missing mandatory column <{col}>")
+        additional_mandatory_fields = ["countryOfReference", "productionYear"]
     elif ws.title == "Image":
-        for col in ["specificType"]:
-            if col not in headers:
-                raise ValueError(f"Missing mandatory column <{col}>")
+        additional_mandatory_fields = ["specificType"]
+    elif ws.title == "3D-Model":
+        additional_mandatory_fields = ["3DFormat_materials", "3DFormat_software"]
+    for col in additional_mandatory_fields:
+        if col not in headers:
+            raise ValueError(f"Missing mandatory column <{col}>")
 
 
 # iterate over worksheets
