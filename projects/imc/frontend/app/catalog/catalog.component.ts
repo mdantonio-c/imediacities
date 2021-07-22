@@ -126,7 +126,6 @@ export class CatalogComponent implements OnInit {
    * @param entityPlaceMap <Map> 'entity-id' => Array<place-id>.
    */
   loadMediaTags(entityPlaceMap) {
-    /*console.log(entityPlaceMap);*/
     this.loadingMapResults = true;
     this.catalogService.getRelevantCreations(entityPlaceMap).subscribe(
       (response) => {

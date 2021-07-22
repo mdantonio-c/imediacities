@@ -18,15 +18,12 @@ import { NominatimService } from "../../services/nominatim.service";
 import { NotificationService } from "@rapydo/services/notification";
 // import { CustomNgMapApiLoader } from "@app/services/ngmap-apiloader-service";
 
-import { MapInfowindowComponent } from "../map-infowindow/map-infowindow.component"
-
+import { MapInfowindowComponent } from "../map-infowindow/map-infowindow.component";
 
 import * as L from "leaflet";
 import "leaflet.markercluster";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-
-
 
 const europeCenter = { lat: 45, lng: 14 };
 /*
@@ -82,7 +79,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   @Input() filter: SearchFilter;
   @Output() onMapChange: EventEmitter<any> = new EventEmitter<string>();
 
-  private zoom : 4;
+  private zoom: 4;
   private center;
   private reloading: boolean = false;
   // mapStyle = mapStyles.hide;
@@ -122,8 +119,6 @@ export class SearchMapComponent implements OnInit, OnChanges {
     center: [europeCenter.lat, europeCenter.lng],
   };
 
-
-
   marker: any = {};
 
   constructor(
@@ -146,9 +141,12 @@ export class SearchMapComponent implements OnInit, OnChanges {
     if (!place || !place.geometry) {
       return;
     }
-    
-    console.warn('check placeChanged');
-    this.osmap.setView(new L.LatLng(place.geometry.location.lat, place.geometry.location.lng), 14);
+
+    console.warn("check placeChanged");
+    this.osmap.setView(
+      new L.LatLng(place.geometry.location.lat, place.geometry.location.lng),
+      14
+    );
 
     this.ref.detectChanges();
   }
@@ -187,16 +185,16 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
   }
 
-  centerEurope = function () {
+  centerEurope() {
     this.osmap.panTo(new L.LatLng(europeCenter.lat, europeCenter.lng));
     this.osmap.setZoom(4);
-  };
+  }
 
   /**
    * Center the map on a given city.
    * @param city - Archive ID (e.g. CCB)
    */
-  centerCity = function (provider) {
+  centerCity(provider) {
     if (this.osmap === undefined) {
       console.warn("The center cannot be set because the map is undefined.");
       return;
@@ -205,24 +203,23 @@ export class SearchMapComponent implements OnInit, OnChanges {
     let cityPosition = this.catalogService.getProviderPosition(provider);
     this.osmap.setView(new L.LatLng(cityPosition[0], cityPosition[1]), 14);
     this.center = { lat: cityPosition[0], lng: cityPosition[1] };
+  }
 
-  };
-
-  toggleBoundary = function () {
+  toggleBoundary() {
     this.showMapBoundary = !this.showMapBoundary;
-  };
+  }
 
   onMapReady(map: L.Map) {
     this.osmap = map;
 
     let self = this;
     //
-    this.osmap.on('moveend', function(e) {
+    this.osmap.on("moveend", function (e) {
       self.onCenterChanged(e);
     });
-    this.osmap.on('zoomend', function(e) {
+    this.osmap.on("zoomend", function (e) {
       self.onZoomChanged(e);
-    });  
+    });
     //
     /*
         // add custom controls
@@ -242,8 +239,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
 
     this.center = {
       lat: this.osmap.getCenter().lat,
-      lng: this.osmap.getCenter().lng
-    }
+      lng: this.osmap.getCenter().lng,
+    };
   }
 
   markerClusterReady(group: L.MarkerClusterGroup) {
@@ -262,35 +259,32 @@ export class SearchMapComponent implements OnInit, OnChanges {
       this.reloading = true;
     }
 
+    // zoom changed
+    /*console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);*/
 
-      // zoom changed
-      /*console.log('zoom changed from ' + oldZoom + ' to ' + newZoom);*/
+    let ne = this.osmap.getBounds().getNorthEast();
+    let sw = this.osmap.getBounds().getSouthWest();
+    let distance = ne.distanceTo(sw);
+    this.radius = distance / 2;
 
-      let ne = this.osmap.getBounds().getNorthEast();
-      let sw = this.osmap.getBounds().getSouthWest();
-      let distance = ne.distanceTo(sw);
-      this.radius = distance / 2;
+    console.log("onZoomChanged check ", ne, sw, distance, this.radius);
 
-      console.log('onZoomChanged check ',  ne, sw, distance, this.radius);
+    /*console.log('onZoomChanged: reloading geo-tags? ', this.reloading);*/
+    if (this.filter.provider !== null && this.reloading) {
+      let latLng = this.osmap.getCenter();
+      let pos = [latLng.lat, latLng.lng];
+      this.loadGeoTags(pos, this.radius);
+      this.reloading = false;
+    }
 
-
-      /*console.log('onZoomChanged: reloading geo-tags? ', this.reloading);*/
-      if (this.filter.provider !== null && this.reloading) {
-        let latLng = this.osmap.getCenter();
-        let pos = [latLng.lat, latLng.lng];
-        this.loadGeoTags(pos, this.radius);
-        this.reloading = false;
-      }
-
-      if (this.filter.provider === null) {
-        this.notify.showWarning(
-          "Select a city from the filter on the left in order to get geo-tags on the map"
-        );
-      }
-    
+    if (this.filter.provider === null) {
+      this.notify.showWarning(
+        "Select a city from the filter on the left in order to get geo-tags on the map"
+      );
+    }
   }
 
-  onCenterChanged = function(event) {
+  onCenterChanged = function (event) {
     if (!this.osmap) {
       return;
     }
@@ -320,7 +314,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
         this.reloading = false;
       }
     }, 1000);
-  }
+  };
 
   private moving() {
     let latLng = this.osmap.getCenter();
@@ -334,10 +328,18 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   private loadGeoTags(position: number[], distance: number) {
-    console.log('loading annotations on the map from center [' + position[0] + ', ' +
-      position[1] + '] within distance: ' + distance + ' (meters) - oh and of course filter', this.filter);
+    console.log(
+      "loading annotations on the map from center [" +
+        position[0] +
+        ", " +
+        position[1] +
+        "] within distance: " +
+        distance +
+        " (meters) - oh and of course filter",
+      this.filter
+    );
 
-    let self = this;  
+    let self = this;
 
     this.clearMarkers();
     this.catalogService
@@ -346,21 +348,21 @@ export class SearchMapComponent implements OnInit, OnChanges {
         (response) => {
           let mapTags = response;
 
-          console.log('mapTags = ', mapTags);
+          console.log("mapTags = ", mapTags);
 
           let relevantCreations = new Map();
           mapTags.forEach((tag) => {
-            let m = L.marker([tag.spatial[0], tag.spatial[1]]) as LMarkerPlus;// .addTo(this.osmap);
+            let m = L.marker([tag.spatial[0], tag.spatial[1]]) as LMarkerPlus; // .addTo(this.osmap);
             // let self = this;
             m.properties = {
-              "iri" : tag.iri,
-              "name" : tag.name,
-              "sources" : tag.sources,
-              "target" : self
+              iri: tag.iri,
+              name: tag.name,
+              sources: tag.sources,
+              target: self,
             };
 
             m.on("click", self.openInfoWindow.bind(self, m.properties));
-/*
+            /*
             m.on('click', function(e) {
 
               let target = m.properties.target;
@@ -410,8 +412,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
   }
 
   private openInfoWindow(props) {
-
-    console.log('openInfoWindow', props);
+    console.log("openInfoWindow", props);
     const modalRef = this.modalService.open(MapInfowindowComponent, {
       size: "l",
       centered: true,
@@ -423,54 +424,59 @@ export class SearchMapComponent implements OnInit, OnChanges {
     let target = props.target;
     let box = this.osmap.getBounds();
 
-    let boxStr =  box.getNorthEast().lng + ',' + box.getNorthEast().lat+ ',' + box.getSouthWest().lng + ',' + box.getSouthWest().lat;
+    let boxStr =
+      box.getNorthEast().lng +
+      "," +
+      box.getNorthEast().lat +
+      "," +
+      box.getSouthWest().lng +
+      "," +
+      box.getSouthWest().lat;
 
-    this.nominatimOsmGeocoder.addressLookup(props.name, boxStr).subscribe(results => {
-          // look outside in order to enrich details for that given place id
-          // console.log('Checkpoint Nominatim Results:', results);
-          if(results.length > 0 ) {
-            console.log('Checkpoint Nominatim Results ----- ', results); // , modalRef);
-            modalRef.componentInstance.address = results[0].display_name;
-          }
-          
-          //if (results[0]) {
-          //  target.marker.properties.address = results[0].formatted_address
-          //}
-        },
-        (error) => {
-          target.notify.showWarning(
-            "Unable to get info for place ID: " + props.iri
-          );
-          target.marker.set("address", "n/a");
+    this.nominatimOsmGeocoder.addressLookup(props.name, boxStr).subscribe(
+      (results) => {
+        // look outside in order to enrich details for that given place id
+        // console.log('Checkpoint Nominatim Results:', results);
+        if (results.length > 0) {
+          console.log("Checkpoint Nominatim Results ----- ", results); // , modalRef);
+          modalRef.componentInstance.address = results[0].display_name;
         }
-      );
- 
-    
+
+        //if (results[0]) {
+        //  target.marker.properties.address = results[0].formatted_address
+        //}
+      },
+      (error) => {
+        target.notify.showWarning(
+          "Unable to get info for place ID: " + props.iri
+        );
+        target.marker.set("address", "n/a");
+      }
+    );
+
     // need to trigger resize event
     window.dispatchEvent(new Event("resize"));
   }
 
-
   private clearMarkers() {
-    console.log('clear markers');
+    console.log("clear markers");
 
     for (let m of this.markers) {
       this.osmap.removeLayer(m);
     }
     this.markers = [];
     if (!!this.markerClusterer) {
-      this.osmap.removeLayer( this.markerClusterer);
+      this.osmap.removeLayer(this.markerClusterer);
       this.markerClusterer = false;
     }
   }
 
   private updateClusters() {
-
-    if(!this.markerClusterer ) {
+    if (!this.markerClusterer) {
       this.markerClusterer = L.markerClusterGroup({
         chunkedLoading: true,
         //singleMarkerMode: true,
-        spiderfyOnMaxZoom: false
+        spiderfyOnMaxZoom: false,
       });
       for (let mi = 0; mi < this.markers.length; mi++) {
         this.markerClusterer.addLayer(this.markers[mi]);
