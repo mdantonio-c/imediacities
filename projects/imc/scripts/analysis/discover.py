@@ -36,7 +36,7 @@ user_folders.sort()
 
 print("=== user folders: ===")
 for i, f in enumerate(user_folders):
-    print("{:3} {:}".format(i, os.path.basename(f)))
+    print(f"{i:3} {os.path.basename(f)}")
 print()
 
 # discover user movies

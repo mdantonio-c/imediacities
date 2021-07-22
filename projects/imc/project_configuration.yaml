@@ -1,8 +1,8 @@
 project:
   title: "DARE"
   description: "Urban Innovative Actions"
-  version: "1.9.3"
-  rapydo: "1.2"
+  version: "1.9.4"
+  rapydo: "2.0"
 
 variables:
   env:
@@ -16,8 +16,7 @@ variables:
 
     ACTIVATE_FTP: 1
     ACTIVATE_CELERY: 1
-    # Temporary fix
-    ACTIVATE_CELERYUI: 0
+    ACTIVATE_FLOWER: 1
     ACTIVATE_NEO4J: 1
     ACTIVATE_REDIS: 1
     ACTIVATE_RABBIT: 1

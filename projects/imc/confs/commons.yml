@@ -1,37 +1,28 @@
-# Customize this file to include compose configurations common to bluprints
-version: "3"
+version: "3.8"
 
 services:
   backend:
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
-      - ${VANILLA_DIR}/scripts:/code/scripts
-    networks:
-      ftp_net:
+      - ${DATA_DIR}/imediastuff:/uploads
+      - ${PROJECT_DIR}/scripts:/code/scripts
+
     environment:
       CATALOG_TIME_RANGE_FROM: ${CATALOG_TIME_RANGE_FROM}
       CATALOG_TIME_RANGE_TO: ${CATALOG_TIME_RANGE_TO}
 
   neo4j:
     volumes:
-      - ${VANILLA_DIR}/data/graphdata:/data
-    ports:
-      - 7687:7687
-      - 9090:${NEO4J_WEB_INTERFACE_PORT}
-
-  rabbit:
-    ports:
-      - ${RABBITMQ_MANAGEMENT_PORT}:${RABBITMQ_MANAGEMENT_PORT}
+      - ${DATA_DIR}/graphdata:/data
 
   celery:
-    build: ${BASE_PROJECT_DIR}/builds/celery
+    build: ${PROJECT_DIR}/builds/celery
     image: imediacities/celery:${RAPYDO_VERSION}
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
+      - ${DATA_DIR}/imediastuff:/uploads
       - ${SUBMODULE_DIR}/imedia-pipeline:/imedia-pipeline
       - /opt/idmt:/opt/idmt
-      - ${VANILLA_DIR}/scripts:/code/scripts
-      - ${VANILLA_DIR}/data/ssh:/home/developer/.ssh
+      - ${PROJECT_DIR}/scripts:/code/scripts
+      - ${DATA_DIR}/ssh:/home/developer/.ssh
 
     environment:
       # Used to manage analysis script on both prod and pre-prod
@@ -39,17 +30,17 @@ services:
 
   flower:
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/uploads
-      - ${VANILLA_DIR}/scripts:/code/scripts
-      - ${VANILLA_DIR}/data/flower_db:${CELERYUI_DBDIR}
+      - ${DATA_DIR}/imediastuff:/uploads
+      - ${PROJECT_DIR}/scripts:/code/scripts
+      - ${DATA_DIR}/flower_db:${FLOWER_DBDIR}
 
   ftp:
     ports:
       - "21:21"
       - "30000-30019:30000-30019"
     volumes:
-      - ${VANILLA_DIR}/data/imediastuff:/home/ftpusers/
-      - ${VANILLA_DIR}/data/ftp:/etc/pure-ftpd/passwd
+      - ${DATA_DIR}/imediastuff:/home/ftpusers/
+      - ${DATA_DIR}/ftp:/etc/pure-ftpd/passwd
 
   frontend:
     environment:

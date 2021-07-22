@@ -113,7 +113,12 @@ class Bulk(IMCEndpoint):
 
             task = self.celery_ext.celery_app.send_task(
                 "bulk_update",
-                args=[guid, upload_latest_dir, upload_dir, force_reprocessing],
+                args=(
+                    guid,
+                    upload_latest_dir,
+                    upload_dir,
+                    force_reprocessing,
+                ),
                 countdown=10,
             )
             log.debug("Task id={}", task.id)
@@ -214,7 +219,13 @@ class Bulk(IMCEndpoint):
                 log.debug("Metadata Resource created for {}", path)
 
             task = self.celery_ext.celery_app.send_task(
-                "import_file", args=[path, resource.uuid, mode], countdown=10
+                "import_file",
+                args=(
+                    path,
+                    resource.uuid,
+                    mode,
+                ),
+                countdown=10,
             )
 
             resource.status = "IMPORTING"
@@ -276,7 +287,13 @@ class Bulk(IMCEndpoint):
                 # launch here async task
                 path = os.path.join(upload_dir, f)
                 self.celery_ext.celery_app.send_task(
-                    "load_v2", args=[path, item.uuid, retry], countdown=10
+                    "load_v2",
+                    args=(
+                        path,
+                        item.uuid,
+                        retry,
+                    ),
+                    countdown=10,
                 )
                 imported += 1
 
