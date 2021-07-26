@@ -130,14 +130,18 @@ class Search(IMCEndpoint):
                     year_to = "1999" if year_to is None else str(year_to)
                     # FIXME: this DO NOT work with image
                     date_clauses = []
-                    if item_type == "video" or item_type == "all":
+                    if "video" in item_type or "all" in item_type:
                         date_clauses.append(
                             "ANY(item in n.production_years where item >= '{yfrom}') "
                             "and ANY(item in n.production_years where item <= '{yto}')".format(
                                 yfrom=year_from, yto=year_to
                             )
                         )
-                    if item_type == "image" or item_type == "all":
+                    if (
+                        "image" in item_type
+                        or "3d-model" in item_type
+                        or "all" in item_type
+                    ):
                         date_clauses.append(
                             "ANY(item in n.date_created where substring(item, 0, 4) >= '{yfrom}') "
                             "and ANY(item in n.date_created where substring(item, 0 , 4) <= '{yto}')".format(
