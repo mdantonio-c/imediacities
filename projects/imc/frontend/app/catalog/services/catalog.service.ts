@@ -186,7 +186,7 @@ export class CatalogService {
    * Retrieve a list of relevant creations for given creation uuids and related place ids.
    * @param relevantCreations
    */
-  getRelevantCreations = function (relevantCreations) {
+  getRelevantCreations(relevantCreations): Observable<any[]> {
     if (relevantCreations === undefined || relevantCreations.size === 0) {
       return of([]);
     }
@@ -201,7 +201,7 @@ export class CatalogService {
       data["relevant-list"].push(item);
     }
     return this.api.post("/api/search_place", data);
-  };
+  }
 
   getProviderPosition(provider: string) {
     for (let p of Providers) {
