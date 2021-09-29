@@ -26,16 +26,18 @@ class List(IMCEndpoint):
             "r_uuid": fields.Str(
                 required=False,
                 data_key="researcher",
-                description="Researcher uuid",
+                metadata={"description": "Researcher uuid"},
             ),
             "belong_item": fields.Str(
                 required=False,
                 data_key="item",
-                description="Item uuid (used to check whether the item belongs to the list or not)",
+                metadata={
+                    "description": "Item uuid (used to check whether the item belongs to the list or not)"
+                },
             ),
             "nb_items": fields.Bool(
                 required=False,
-                missing=False,
+                load_default=False,
                 data_key="includeNumberOfItems",
             ),
         },
@@ -104,16 +106,18 @@ class Lists(IMCEndpoint):
             "r_uuid": fields.Str(
                 required=False,
                 data_key="researcher",
-                description="Researcher uuid",
+                metadata={"description": "Researcher uuid"},
             ),
             "belong_item": fields.Str(
                 required=False,
                 data_key="item",
-                description="Item uuid (used to check whether the item belongs to the list or not)",
+                metadata={
+                    "description": "Item uuid (used to check whether the item belongs to the list or not)"
+                },
             ),
             "nb_items": fields.Bool(
                 required=False,
-                missing=False,
+                load_default=False,
                 data_key="includeNumberOfItems",
             ),
         },

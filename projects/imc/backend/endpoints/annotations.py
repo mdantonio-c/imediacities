@@ -150,7 +150,7 @@ class Annotation(AnnotationAbstract):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="filter by annotation type",
+                metadata={"description": "filter by annotation type"},
             )
         },
         location="query",
@@ -209,7 +209,7 @@ class Annotations(AnnotationAbstract):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="filter by annotation type",
+                metadata={"description": "filter by annotation type"},
             )
         },
         location="query",
@@ -413,7 +413,9 @@ class Annotations(AnnotationAbstract):
         {
             "body_ref": fields.Str(
                 required=False,
-                description="optional body reference for annotation with multiple bodies. This reference MUST be in the form 'textual:your_term_value' or 'resource:your_term_IRI'",
+                metadata={
+                    "description": "optional body reference for annotation with multiple bodies. This reference MUST be in the form 'textual:your_term_value' or 'resource:your_term_IRI'"
+                },
             )
         },
         location="query",

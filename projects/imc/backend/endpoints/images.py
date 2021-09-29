@@ -96,7 +96,9 @@ class ImageItem(IMCEndpoint):
         {
             "public_access": fields.Bool(
                 required=True,
-                description="Whether or not the item is accessible by a public user.",
+                metadata={
+                    "description": "Whether or not the item is accessible by a public user."
+                },
             )
         }
     )
@@ -155,7 +157,7 @@ class ImageAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG, DSC)",
+                metadata={"description": "Filter by annotation type (e.g. TAG, DSC)"},
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
@@ -231,13 +233,13 @@ class ImageContent(IMCEndpoint, Downloader):
             "content_type": fields.Str(
                 required=True,
                 data_key="type",
-                description="content type (e.g. image, thumbnail)",
+                metadata={"description": "content type (e.g. image, thumbnail)"},
                 validate=validate.OneOf(["image", "thumbnail"]),
             ),
             "thumbnail_size": fields.Str(
                 required=False,
                 data_key="size",
-                description="used to get large thumbnails",
+                metadata={"description": "used to get large thumbnails"},
                 validate=validate.OneOf(["large"]),
             ),
         },
@@ -311,12 +313,14 @@ class ImageTools(IMCEndpoint):
         {
             "tool": fields.String(
                 required=True,
-                description="Tool to be launched.",
+                metadata={"description": "Tool to be launched."},
                 validate=validate.OneOf(["object-detection", "building-recognition"]),
             ),
             "operation": fields.String(
                 required=False,
-                description="At the moment used only to delete automatic tags.",
+                metadata={
+                    "description": "At the moment used only to delete automatic tags."
+                },
                 validate=validate.OneOf(["delete"]),
             ),
         }

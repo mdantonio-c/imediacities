@@ -16,9 +16,13 @@ class Spatial(Schema):
 
 class GeoDistance(Schema):
     distance = fields.Int(
-        required=True, description="Distance in km", validate=validate.Range(min=1)
+        required=True,
+        metadata={"description": "Distance in km"},
+        validate=validate.Range(min=1),
     )
-    location = fields.Nested(Spatial, required=True, description="Pin location")
+    location = fields.Nested(
+        Spatial, required=True, metadata={"description": "Pin location"}
+    )
 
 
 class SearchMatch(Schema):
@@ -31,9 +35,9 @@ class SearchMatch(Schema):
 
 
 class AnnotatedByCriteria(Schema):
-    user = fields.Str(required=True, description="User's uuid")
+    user = fields.Str(required=True, metadata={"description": "User's uuid"})
     type = fields.Str(
-        missing="TAG",
+        load_default="TAG",
         validate=validate.OneOf(allowed_anno_types),
     )
 
@@ -61,24 +65,26 @@ class StrOrListField(fields.Field):
 
 class SearchFilter(Schema):
 
-    type = StrOrListField(missing="all", allowed_values=allowed_item_types)
+    type = StrOrListField(load_default="all", allowed_values=allowed_item_types)
     provider = fields.Str(allow_none=True)
     city = fields.Str(allow_none=True)
-    country = fields.Str(description="production country, codelist iso3166-1")
+    country = fields.Str(
+        metadata={"description": "production country, codelist iso3166-1"}
+    )
     # Default is True? Or False?
-    missingDate = fields.Bool(missing=True)
+    missingDate = fields.Bool(load_default=True)
     yearfrom = fields.Int(
         allow_none=True,
-        description="production year range: start year of the range",
+        metadata={"description": "production year range: start year of the range"},
         validate=validate.Range(min=DEFAULT_TIME_RANGE_FROM, max=DEFAULT_TIME_RANGE_TO),
     )
     yearto = fields.Int(
         allow_none=True,
-        description="production year range: end year of the range",
+        metadata={"description": "production year range: end year of the range"},
         validate=validate.Range(min=DEFAULT_TIME_RANGE_FROM, max=DEFAULT_TIME_RANGE_TO),
     )
     iprstatus = fields.Str(
-        description="IPR status",
+        metadata={"description": "IPR status"},
         allow_none=True,
         validate=validate.OneOf(
             # Should be extracted from codelist.RIGHTS_STATUS
@@ -108,19 +114,19 @@ class SearchCriteria(PartialSchema):
 # used by POST /bulk
 class BulkImportSchema(Schema):
     guid = fields.UUID(required=True)
-    mode = fields.Str(missing="skip")
-    update = fields.Bool(missing=False)
-    retry = fields.Bool(missing=False)
+    mode = fields.Str(load_default="skip")
+    update = fields.Bool(load_default=False)
+    retry = fields.Bool(load_default=False)
 
 
 class BulkUpdateSchema(Schema):
     guid = fields.UUID(required=True)
-    force_reprocessing = fields.Bool(missing=False)
+    force_reprocessing = fields.Bool(load_default=False)
 
 
 class BulkV2Schema(Schema):
     guid = fields.UUID(required=True)
-    retry = fields.Bool(missing=False)
+    retry = fields.Bool(load_default=False)
 
 
 class BulkDeleteSchema(Schema):
@@ -134,7 +140,7 @@ class BulkDeleteSchema(Schema):
         required=True, validate=validate.OneOf(["AVEntity", "NonAVEntity"])
     )
     uuids = fields.List(fields.UUID(), min_items=1)
-    delete_all = fields.Bool(missing=False)
+    delete_all = fields.Bool(load_default=False)
 
 
 class BulkSchema(Schema):
@@ -169,19 +175,20 @@ class PatchDocument(Schema):
     patch_op = fields.Str(
         required=True,
         data_key="op",
-        description="The operation to be performed",
+        metadata={"description": "The operation to be performed"},
         # validate=validate.OneOf(["add", "remove", "replace", "move", "copy", "test"])
         validate=validate.OneOf(["add", "remove"]),
     )
     path = fields.Str(
         required=True,
-        description="A JSON-Pointer",
+        metadata={"description": "A JSON-Pointer"},
         # Invalid path to patch segmentation
         validate=validate.OneOf(["/bodies/0/segments"]),
     )
 
     value = fields.Str(
-        required=True, description="The value to be used within the operations"
+        required=True,
+        metadata={"description": "The value to be used within the operations"},
     )
 
 
@@ -207,7 +214,7 @@ class SearchPlaceParameters(Schema):
                 "place-ids": fields.List(fields.Str(), required=True, min_items=1),
             },
         ),
-        description="Criteria for the search",
+        metadata={"description": "Criteria for the search"},
         required=True,
         data_key="relevant-list",
         min_items=1,
@@ -220,10 +227,13 @@ class SceneCut(Schema):
 
     shot_num = fields.Int(required=True, validate=validate.Range(min=0))
     cut = fields.Int(required=True, validate=validate.Range(min=0))
-    confirmed = fields.Bool(missing=False)
-    double_check = fields.Bool(missing=False)
+    confirmed = fields.Bool(load_default=False)
+    double_check = fields.Bool(load_default=False)
     annotations = fields.List(
-        fields.Str(), required=True, unique=True, description="Annotation's uuid"
+        fields.Str(),
+        required=True,
+        unique=True,
+        metadata={"description": "Annotation's uuid"},
     )
 
 
@@ -233,6 +243,6 @@ class ShotRevision(Schema):
         fields.Nested(SceneCut),
         required=True,
         min_items=1,
-        description="The new list of scene cuts",
+        metadata={"description": "The new list of scene cuts"},
     )
-    exitRevision = fields.Bool(missing=True)
+    exitRevision = fields.Bool(load_default=True)

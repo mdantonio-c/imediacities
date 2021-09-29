@@ -232,20 +232,22 @@ class Stage(IMCEndpoint, StageAbstract):
         {
             "filename": fields.Str(
                 required=True,
-                description="The metadata file to be imported",
+                metadata={"description": "The metadata file to be imported"},
             ),
             "mode": fields.Str(
-                missing="fast",
-                description="Different modes for pipeline execution",
+                load_default="fast",
+                metadata={"description": "Different modes for pipeline execution"},
                 validate=validate.OneOf(["fast", "clean", "skip"]),
             ),
             "update": fields.Bool(
-                missing=True,
-                description="only for metadata update",
+                load_default=True,
+                metadata={"description": "only for metadata update"},
             ),
             "force_reprocessing": fields.Bool(
-                missing=False,
-                description="Allow to force re-processing of COMPLETED contents",
+                load_default=False,
+                metadata={
+                    "description": "Allow to force re-processing of COMPLETED contents"
+                },
             ),
         }
     )

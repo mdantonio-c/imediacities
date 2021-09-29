@@ -40,8 +40,10 @@ class Customizer(BaseCustomizer):
         return {
             "declared_institution": fields.Str(
                 required=required,
-                description="",
-                label=label,
+                metadata={
+                    "label": label,
+                    "description": "",
+                },
                 validate=validate.OneOf(
                     choices=["archive", "university", "research_institution", "none"],
                     labels=[

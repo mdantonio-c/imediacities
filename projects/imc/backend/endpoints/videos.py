@@ -24,13 +24,13 @@ class VideoContentSchema(Schema):
     content_type = fields.Str(
         required=True,
         data_key="type",
-        description="content type (e.g. video, thumbnail, summary)",
+        metadata={"description": "content type (e.g. video, thumbnail, summary)"},
         validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
     )
     thumbnail_size = fields.Str(
         required=False,
         data_key="size",
-        description="used to get large thumbnails",
+        metadata={"description": "used to get large thumbnails"},
         validate=validate.OneOf(["large"]),
     )
 
@@ -118,7 +118,9 @@ class VideoItem(IMCEndpoint):
         {
             "public_access": fields.Bool(
                 required=True,
-                description="Whether or not the item is accessible by a public user.",
+                metadata={
+                    "description": "Whether or not the item is accessible by a public user."
+                },
             )
         }
     )
@@ -178,11 +180,11 @@ class VideoAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG)",
+                metadata={"description": "Filter by annotation type (e.g. TAG)"},
                 validate=validate.OneOf(["TAG", "DSC", "TVS"]),
             ),
             "is_manual": fields.Bool(
-                required=False, missing=False, data_key="onlyManual"
+                required=False, load_default=False, data_key="onlyManual"
             ),
         },
         location="query",
@@ -553,7 +555,9 @@ class VideoContent(IMCEndpoint, Downloader):
             "content_type": fields.Str(
                 required=True,
                 data_key="type",
-                description="content type (e.g. video, thumbnail, summary)",
+                metadata={
+                    "description": "content type (e.g. video, thumbnail, summary)"
+                },
                 validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
             )
         },
@@ -616,12 +620,14 @@ class VideoTools(IMCEndpoint):
         {
             "tool": fields.String(
                 required=True,
-                description="Tool to be launched.",
+                metadata={"description": "Tool to be launched."},
                 validate=validate.OneOf(["object-detection", "building-recognition"]),
             ),
             "operation": fields.String(
                 required=False,
-                description="At the moment used only to delete automatic tags.",
+                metadata={
+                    "description": "At the moment used only to delete automatic tags."
+                },
                 validate=validate.OneOf(["delete"]),
             ),
         }
@@ -724,13 +730,13 @@ class VideoShotRevision(IMCEndpoint):
     # },
 
     # This is the model semi-translated in marshmallow, to be completed:
-    # since = fields.fields.DateTime(required=True, description="Date of start of a revision.")
-    # video = fields.Nested( ..., required=True, description="Video under revision")
+    # since = fields.fields.DateTime(required=True, metadata={"description": "Date of start of a revision."})
+    # video = fields.Nested( ..., required=True, metadata={"description": "Video under revision"})
     #                       uuid = fields.UUID(required=True)
     #                       title = fields.Str(required=True)
-    # progress = fields.Int(required=True, description="Progress of the revision in percentange", validate = min 0 max 100)
-    # state = fields.Str(required=True, description="Revision status", validate = oneOf ["R", "W"]
-    # assignee = fields.Nested( ... , required=True, description="assignee of the revision")
+    # progress = fields.Int(required=True, metadata={"description": "Progress of the revision in percentange", validate = min 0 max 100})
+    # state = fields.Str(required=True, metadata={"description": "Revision status"}, validate = oneOf ["R", "W"]
+    # assignee = fields.Nested( ... , required=True, metadata={"description": "assignee of the revision"})
     #                           uuid = fields.UUID(required=True)
     #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
@@ -739,7 +745,7 @@ class VideoShotRevision(IMCEndpoint):
             "input_assignee": fields.Str(
                 required=False,
                 data_key="assignee",
-                description="Assignee's uuid of the revision",
+                metadata={"description": "Assignee's uuid of the revision"},
             )
         },
         location="query",
@@ -789,7 +795,9 @@ class VideoShotRevision(IMCEndpoint):
         {
             "assignee_uuid": fields.Str(
                 required=False,
-                description="UUID of the Reviser user to assign the revision",
+                metadata={
+                    "description": "UUID of the Reviser user to assign the revision"
+                },
                 data_key="assignee",
             )
         }

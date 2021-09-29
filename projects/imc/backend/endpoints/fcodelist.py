@@ -18,7 +18,9 @@ class Fcodelist(IMCEndpoint):
     @decorators.use_kwargs(
         {
             "lang": fields.Str(
-                required=False, missing="en", description="Language of the codelist"
+                required=False,
+                load_default="en",
+                metadata={"description": "Language of the codelist"},
             )
         },
         location="query",

@@ -81,7 +81,7 @@ class ShotAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG)",
+                metadata={"description": "Filter by annotation type (e.g. TAG)"},
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
