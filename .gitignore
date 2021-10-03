@@ -25,6 +25,7 @@ node_modules
 ##  Dynamically created file and folders  ##
 ############################################
 
+docker-compose.yml
 .env
 .rapydo
 .venv
