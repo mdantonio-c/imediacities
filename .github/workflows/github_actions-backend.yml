@@ -42,9 +42,6 @@ jobs:
           # This should fail if at least one container is in Exit status
           [[ ! $(LOGURU_LEVEL=WARNING rapydo list services | grep -E "Exit|Restarting|Created") ]]
 
-          docker cp ${PROJECT}_backend_1:/code/coverage.xml coverage.xml
-          bash <(curl -s https://codecov.io/bash)
-
       - name: Production mode
         run: |
           rapydo remove --all
@@ -61,8 +58,15 @@ jobs:
 
           LOGURU_LEVEL=WARNING rapydo list services
           # This should fail if at least one container is in Exit status
-          # Except for frontend that is expected to be exited in prod mode
+          # Except for frontend tht is expected to be exited in prod mode
           [[ ! $(LOGURU_LEVEL=WARNING rapydo list services | grep -v frontend | grep -E "Exit|Restarting|Created") ]]
+
+      - name: Coverage
+        uses: rapydo/actions/coverage@v1
+        with:
+          repository: .
+          project: ${PROJECT}
+          step: backend
 
       - name: Print Logs
         if: failure()
