@@ -45,7 +45,7 @@ jobs:
       - name: Coverage
         uses: rapydo/actions/coverage@v1
         with:
-          repository: .
+          repository: projects/${PROJECT}
           project: ${PROJECT}
           step: backend
 
