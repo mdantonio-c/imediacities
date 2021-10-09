@@ -19,7 +19,7 @@ from neomodel import UniqueIdProperty as originalUniqueIdProperty
 from neomodel.relationship_manager import RelationshipDefinition
 
 
-def RelationshipTo(cls_name, rel_type, show=None, is_restricted=False, *args, **kwargs):
+def RelationshipTo(cls_name, rel_type, show=False, *args, **kwargs):
     """
     Ovveride of the RelationshipTo function from neomodel
     It call the original function and save into the returned object
@@ -29,13 +29,10 @@ def RelationshipTo(cls_name, rel_type, show=None, is_restricted=False, *args, **
 
     rel = originalRelationshipTo(cls_name, rel_type, *args, **kwargs)
     rel.show = show
-    rel.is_restricted = is_restricted
     return rel
 
 
-def RelationshipFrom(
-    cls_name, rel_type, show=None, is_restricted=False, *args, **kwargs
-):
+def RelationshipFrom(cls_name, rel_type, show=False, *args, **kwargs):
     """
     Ovveride of the RelationshipFrom function from neomodel
     It call the original function and save into the returned object
@@ -45,7 +42,6 @@ def RelationshipFrom(
 
     rel = originalRelationshipFrom(cls_name, rel_type, *args, **kwargs)
     rel.show = show
-    rel.is_restricted = is_restricted
     return rel
 
 
@@ -58,130 +54,119 @@ class myAttribProperty:
     """
 
     show = False
-    is_restricted = False
 
-    def save_extra_info(self, show=None, is_restricted=False):
-
-        if show is not None:
-            self.show = show
-
-        if is_restricted is not None:
-            self.is_restricted = is_restricted
+    def save_extra_info(self, show=False):
+        self.show = show
 
 
-class StringProperty(originalStringProperty, myAttribProperty):
+class StringProperty(originalStringProperty, myAttribProperty):  # type: ignore
     """
     Customized version of StringProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class IntegerProperty(originalIntegerProperty, myAttribProperty):
+class IntegerProperty(originalIntegerProperty, myAttribProperty):  # type: ignore
     """
     Customized version of IntegerProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class FloatProperty(originalFloatProperty, myAttribProperty):
+class FloatProperty(originalFloatProperty, myAttribProperty):  # type: ignore
     """
     Customized version of FloatProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class BooleanProperty(originalBooleanProperty, myAttribProperty):
+class BooleanProperty(originalBooleanProperty, myAttribProperty):  # type: ignore
     """
     Customized version of BooleanProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class DateTimeProperty(originalDateTimeProperty, myAttribProperty):
+class DateTimeProperty(originalDateTimeProperty, myAttribProperty):  # type: ignore
     """
     Customized version of DateTimeProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class DateProperty(originalDateProperty, myAttribProperty):
+class DateProperty(originalDateProperty, myAttribProperty):  # type: ignore
     """
     Customized version of DateProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class ArrayProperty(originalArrayProperty, myAttribProperty):
+class ArrayProperty(originalArrayProperty, myAttribProperty):  # type: ignore
     """
     Customized version of ArrayProperty implemented in neomodel
     """
 
-    # BUG FIX: added base_property, as done in the original neomodel class
-    # with commit c4faec6 on 14 Mar 2017
-    # Releted issue: https://github.com/robinedwards/neomodel/issues/237
-    def __init__(
-        self, base_property=None, show=None, is_restricted=False, *args, **kwargs
-    ):
+    def __init__(self, base_property=None, show=False, *args, **kwargs):
 
-        self.save_extra_info(show, is_restricted)
+        self.save_extra_info(show)
         super().__init__(base_property, *args, **kwargs)
 
 
-class JSONProperty(originalJSONProperty, myAttribProperty):
+class JSONProperty(originalJSONProperty, myAttribProperty):  # type: ignore
     """
     Customized version of JSONProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class EmailProperty(originalEmailProperty, myAttribProperty):
+class EmailProperty(originalEmailProperty, myAttribProperty):  # type: ignore
     """
     Customized version of EmailProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class AliasProperty(originalAliasProperty, myAttribProperty):
+class AliasProperty(originalAliasProperty, myAttribProperty):  # type: ignore
     """
     Customized version of AliasProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
-class UniqueIdProperty(originalUniqueIdProperty, myAttribProperty):
+class UniqueIdProperty(originalUniqueIdProperty, myAttribProperty):  # type: ignore
     """
     Customized version of UniqueIdProperty implemented in neomodel
     """
 
-    def __init__(self, show=None, is_restricted=False, *args, **kwargs):
-        self.save_extra_info(show, is_restricted)
+    def __init__(self, show=False, *args, **kwargs):
+        self.save_extra_info(show)
         super().__init__(*args, **kwargs)
 
 
@@ -205,7 +190,7 @@ class StructuredRel(originalStructuredRel):
             for c in cls_name.__dict__:
                 attrib = getattr(cls, c)
                 # print("fields:", cls.__name__, attrib)
-                if not isinstance(attrib, myAttribProperty):
+                if not isinstance(attrib, myAttribProperty):  # type: ignore
                     continue
                 if not attrib.show:
                     continue
