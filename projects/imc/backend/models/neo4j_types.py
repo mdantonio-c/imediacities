@@ -170,7 +170,7 @@ class UniqueIdProperty(originalUniqueIdProperty, myAttribProperty):  # type: ign
         super().__init__(*args, **kwargs)
 
 
-class StructuredRel(originalStructuredRel):
+class StructuredRel(originalStructuredRel):  # type: ignore
     """
     Customized version of StructuredRel class implemented in neomodel
     This class exposes the show_fields method.
@@ -189,8 +189,7 @@ class StructuredRel(originalStructuredRel):
 
             for c in cls_name.__dict__:
                 attrib = getattr(cls, c)
-                # print("fields:", cls.__name__, attrib)
-                if not isinstance(attrib, myAttribProperty):  # type: ignore
+                if not isinstance(attrib, myAttribProperty):
                     continue
                 if not attrib.show:
                     continue
@@ -199,7 +198,7 @@ class StructuredRel(originalStructuredRel):
         return fields_to_show
 
 
-class StructuredNode(originalStructuredNode):
+class StructuredNode(originalStructuredNode):  # type: ignore
     """
     Customized version of StructuredNode class implemented in neomodel
     This class exposes the show_fields and follow_relationships methods.
