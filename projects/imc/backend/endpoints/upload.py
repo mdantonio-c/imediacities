@@ -1,19 +1,17 @@
 """
-Upload a file
+Archive management: upload and download files
 """
-
-from mimetypes import MimeTypes
 
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.config import UPLOAD_PATH
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
 from restapi.services.download import Downloader
 from restapi.services.uploader import Uploader
 from restapi.utilities.logs import log
-
-mime = MimeTypes()
 
 
 class Upload(Uploader, IMCEndpoint):
@@ -28,13 +26,11 @@ class Upload(Uploader, IMCEndpoint):
         summary="Initialize file upload",
         responses={200: "File upload successfully initialized"},
     )
-    def post(self, name, **kwargs):
+    def post(
+        self, name: str, mimeType: str, size: int, lastModified: int, user: User
+    ) -> Response:
 
         self.graph = neo4j.get_instance()
-
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
 
         group = user.belongs_to.single()
 
@@ -54,13 +50,9 @@ class Upload(Uploader, IMCEndpoint):
         summary="Upload a file into the stage area",
         responses={200: "File successfully uploaded"},
     )
-    def put(self, filename):
+    def put(self, filename: str, user: User) -> Response:
 
         self.graph = neo4j.get_instance()
-
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
 
         group = user.belongs_to.single()
 
@@ -85,16 +77,10 @@ class Upload(Uploader, IMCEndpoint):
             404: "The uploaded content does not exists",
         },
     )
-    def get(self, filename):
+    def get(self, filename: str, user: User) -> Response:
         log.info("get stage content for filename {}", filename)
-        if filename is None:
-            raise BadRequest("Please specify a stage filename")
 
         self.graph = neo4j.get_instance()
-
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
 
         group = user.belongs_to.single()
 
@@ -102,5 +88,4 @@ class Upload(Uploader, IMCEndpoint):
             raise BadRequest("No group defined for this user")
 
         upload_dir = UPLOAD_PATH.joinpath(group.uuid)
-
         return Downloader.download(filename, subfolder=upload_dir)
