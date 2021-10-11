@@ -2,7 +2,7 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
@@ -55,7 +55,7 @@ class StageAbstract:
         input_filter: str,
         # this should be neo4j.Group
         group: Any,
-    ) -> List[Dict[str, Any]]:
+    ) -> Union[Dict[str, int], List[Dict[str, Any]]]:
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)

@@ -1,9 +1,9 @@
 """
 Handle your video metadata
 """
+from pathlib import Path
 from typing import Optional
 
-from flask import send_file
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.config import get_backend_url
@@ -12,10 +12,10 @@ from restapi.exceptions import NotFound
 from restapi.models import fields, validate
 from restapi.rest.definition import Response
 from restapi.services.authentication import User
+from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
 
-#####################################
 class Shots(IMCEndpoint):
 
     labels = ["shot"]
@@ -48,7 +48,6 @@ class Shots(IMCEndpoint):
         self.graph = neo4j.get_instance()
 
         # check if the shot exists
-        node = None
         try:
             node = self.graph.Shot.nodes.get(uuid=shot_id)
         except self.graph.Shot.DoesNotExist:
@@ -60,7 +59,13 @@ class Shots(IMCEndpoint):
             log.debug("thumbnail content uri: {}", thumbnail_uri)
             if thumbnail_uri is None:
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.download(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                mime="image/jpeg",
+            )
 
         api_url = get_backend_url()
         shot = self.getJsonResponse(node)
