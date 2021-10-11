@@ -626,7 +626,7 @@ class ListItems(ListItemAbstract):
             user_list.name,
         )
         # 204: return empty response (?)
-        self.empty_response()
+        return self.empty_response()
 
     @decorators.auth.require_all("Researcher")
     @decorators.database_transaction

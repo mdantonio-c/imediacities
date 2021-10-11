@@ -23,9 +23,8 @@ class Vocabulary(IMCEndpoint):
         """Get the controlled vocabulary."""
         log.debug("Loading the controlled vocabulary")
         try:
-            f = open("../../scripts/convert-vocabulary/vocabulary.json")
+            open("../../scripts/convert-vocabulary/vocabulary.json")
         except FileNotFoundError:
             raise NotFound("Vocabulary not available")
 
-        # !?!?!?!?!?!?
-        return f
+        return self.response("not implemented yet")

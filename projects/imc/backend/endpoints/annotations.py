@@ -633,3 +633,6 @@ class Annotations(AnnotationAbstract):
             updated_anno = self.get_annotation_response(anno)
 
             return self.response(updated_anno)
+
+        # Should never be reached
+        raise BadRequest(f"Invalid patch operation: {patch_op}")  # pragma: no cover

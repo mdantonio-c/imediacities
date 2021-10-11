@@ -3,7 +3,7 @@ Search endpoint
 
 @author: Giuseppe Trotta <g.trotta@cineca.it>
 """
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 from imc.endpoints import IMCEndpoint
 from imc.models import SearchCriteria, allowed_item_types, codelists
@@ -65,7 +65,9 @@ class Search(IMCEndpoint):
         entity = "Creation"
         if filtering is not None:
             # check item type
-            item_type: Union[List[str], str] = filtering.get("type")
+            item_type: Union[List[str], str] = cast(
+                Union[List[str], str], filtering.get("type")
+            )
             log.debug("ITEM TYPE(s): {}", item_type)
             where_mixed_types = ""
             if item_type and isinstance(item_type, str):
@@ -217,7 +219,7 @@ class Search(IMCEndpoint):
         fulltext = None
         if (
             match is not None
-            and (term := self.graph.sanitize_input(match.get("term"))) != ""
+            and (term := self.graph.sanitize_input(cast(str, match.get("term")))) != ""
         ):
             term = self.graph.fuzzy_tokenize(term)
             fields = match.get("fields", ["Title"])

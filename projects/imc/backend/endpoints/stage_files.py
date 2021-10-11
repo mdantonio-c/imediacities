@@ -2,7 +2,7 @@
 List content from upload dir and import of data and metadata
 """
 import os
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
@@ -53,8 +53,9 @@ class StageAbstract:
         sort_by: str,
         sort_order: str,
         input_filter: str,
-        group: str,
-    ) -> Dict[str, Any]:
+        # this should be neo4j.Group
+        group: Any,
+    ) -> List[Dict[str, Any]]:
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
@@ -207,12 +208,12 @@ class StageGroup(IMCEndpoint, StageAbstract):
         user: User,
     ) -> Response:
 
-        group = self.graph.Group.nodes.get_or_none(uuid=group)
-        if group is None:
+        group_node = self.graph.Group.nodes.get_or_none(uuid=group)
+        if group_node is None:
             raise BadRequest("No group defined for this user")
 
         res = self.get_staged_data(
-            get_total, page, size, sort_by, sort_order, input_filter, group
+            get_total, page, size, sort_by, sort_order, input_filter, group_node
         )
         return self.response(res)
 
@@ -243,12 +244,12 @@ class Stage(IMCEndpoint, StageAbstract):
         user: User,
     ) -> Response:
 
-        group = user.belongs_to.single()
-        if group is None:
+        group_node = user.belongs_to.single()
+        if group_node is None:
             raise BadRequest("No group defined for this user")
 
         res = self.get_staged_data(
-            get_total, page, size, sort_by, sort_order, input_filter, group
+            get_total, page, size, sort_by, sort_order, input_filter, group_node
         )
         return self.response(res)
 
@@ -504,7 +505,7 @@ class Stage(IMCEndpoint, StageAbstract):
         if not path.is_file():
             raise BadRequest(f"File not found: {filename}")
 
-            path.unlink()
+        path.unlink()
         return self.empty_response()
 
 
