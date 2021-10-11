@@ -1,10 +1,10 @@
 """
 Handle your video entity
 """
-import os
+import os  # still a lot of os. to be replaced with Pathlib
+from pathlib import Path
 from typing import Any, Dict, List
 
-from flask import send_file
 from imc.endpoints import IMCEndpoint
 from imc.models import ShotRevision
 from imc.security import authz
@@ -447,7 +447,7 @@ class VideoShots(IMCEndpoint):
         return self.response(data)
 
 
-class VideoContent(IMCEndpoint, Downloader):
+class VideoContent(IMCEndpoint):
 
     labels = ["video"]
 
@@ -489,25 +489,25 @@ class VideoContent(IMCEndpoint, Downloader):
                 raise NotFound("Video not found")
             # all videos are converted to mp4
 
-            filename = os.path.basename(video_uri)
-            folder = os.path.dirname(video_uri)
-            # return self.send_file_partial(video_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
+            video_path = Path(video_uri)
+            # return Downloader.send_file_partial(video_uri, mime)
+            return Downloader.download(
+                filename=video_path.name, subfolder=video_path.parent, mime="video/mp4"
+            )
 
         if content_type == "orf":
-            # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
                 raise NotFound("Video ORF not found")
 
-            folder = os.path.dirname(item.uri)
+            folder = Path(item.uri).parent
             filename = "orf.mp4"
-            # orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
-            # if orf_uri is None or not os.path.exists(orf_uri):
-            if not os.path.exists(os.path.join(folder, filename)):
+            if not folder.joinpath(filename).exists():
                 raise NotFound("Video ORF not found")
 
-            # return self.send_file_partial(orf_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
+            # return Downloader.send_file_partial(orf_uri, mime)
+            return Downloader.download(
+                filename=filename, subfolder=folder, mime="video/mp4"
+            )
 
         if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
@@ -537,14 +537,26 @@ class VideoContent(IMCEndpoint, Downloader):
 
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.download(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                mime="image/jpeg",
+            )
 
         if content_type == "summary":
             summary_uri = item.summary
             log.debug("summary content uri: {}", summary_uri)
             if summary_uri is None:
                 raise NotFound("Summary not found")
-            return send_file(summary_uri, mimetype="image/jpeg")
+
+            summary_path = Path(summary_uri)
+            return Downloader.download(
+                filename=summary_path.name,
+                subfolder=summary_path.parent,
+                mime="image/jpeg",
+            )
 
         # it should never be reached
         raise BadRequest(f"Invalid content type: {content_type}")

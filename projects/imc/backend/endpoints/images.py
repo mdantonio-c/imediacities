@@ -1,9 +1,9 @@
 """
 Handle your image entity
 """
-import os
 
-from flask import send_file
+from pathlib import Path
+
 from imc.endpoints import IMCEndpoint
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
@@ -222,7 +222,7 @@ class ImageAnnotations(IMCEndpoint):
         return self.response(data)
 
 
-class ImageContent(IMCEndpoint, Downloader):
+class ImageContent(IMCEndpoint):
     """Gets image content or thumbnail"""
 
     labels = ["image"]
@@ -277,13 +277,16 @@ class ImageContent(IMCEndpoint, Downloader):
             log.debug("image content uri: {}", image_uri)
             if image_uri is None:
                 raise NotFound("Image not found")
-            filename = os.path.basename(image_uri)
-            folder = os.path.dirname(image_uri)
 
-            # image is always jpeg
+            image_path = Path(image_uri)
 
-            # return self.send_file_partial(image_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="image/jpeg")
+            # return Downloader.send_file_partial(image_uri, mime)
+            return Downloader.download(
+                filename=image_path.name,
+                subfolder=image_path.parent,
+                # image is always jpeg
+                mime="image/jpeg",
+            )
 
         if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
@@ -296,7 +299,14 @@ class ImageContent(IMCEndpoint, Downloader):
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
             if thumbnail_uri is None:
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.download(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                # image is always jpeg
+                mime="image/jpeg",
+            )
 
         # it should never be reached
         raise BadRequest(
