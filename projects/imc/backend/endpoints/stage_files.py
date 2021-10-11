@@ -7,10 +7,12 @@ from typing import Any, Dict
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
+from restapi.config import UPLOAD_PATH
 from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, Conflict, NotFound, ServerError
 from restapi.models import fields, validate
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.utilities.logs import log
 
 
@@ -44,8 +46,15 @@ class StageAbstract:
         self.graph = neo4j.get_instance()
 
     def get_staged_data(
-        self, get_total, page, size, sort_by, sort_order, input_filter, group
-    ):
+        self,
+        get_total: bool,
+        page: int,
+        size: int,
+        sort_by: str,
+        sort_order: str,
+        input_filter: str,
+        group: str,
+    ) -> Dict[str, Any]:
         upload_dir = os.path.join("/uploads", group.uuid)
         if not os.path.exists(upload_dir):
             os.mkdir(upload_dir)
@@ -186,11 +195,22 @@ class StageGroup(IMCEndpoint, StageAbstract):
         summary="List of files contained in the stage area of the specified group",
         responses={200: "List of files and directories successfully retrieved"},
     )
-    def get(self, get_total, page, size, sort_by, sort_order, input_filter, group):
+    def get(
+        self,
+        get_total: bool,
+        page: int,
+        size: int,
+        sort_by: str,
+        sort_order: str,
+        input_filter: str,
+        group: str,
+        user: User,
+    ) -> Response:
 
         group = self.graph.Group.nodes.get_or_none(uuid=group)
         if group is None:
             raise BadRequest("No group defined for this user")
+
         res = self.get_staged_data(
             get_total, page, size, sort_by, sort_order, input_filter, group
         )
@@ -212,14 +232,21 @@ class Stage(IMCEndpoint, StageAbstract):
         summary="List of files contained in the stage area of the specified group",
         responses={200: "List of files and directories successfully retrieved"},
     )
-    def get(self, get_total, page, size, sort_by, sort_order, input_filter):
+    def get(
+        self,
+        get_total: bool,
+        page: int,
+        size: int,
+        sort_by: str,
+        sort_order: str,
+        input_filter: str,
+        user: User,
+    ) -> Response:
 
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
         group = user.belongs_to.single()
         if group is None:
             raise BadRequest("No group defined for this user")
+
         res = self.get_staged_data(
             get_total, page, size, sort_by, sort_order, input_filter, group
         )
@@ -259,7 +286,14 @@ class Stage(IMCEndpoint, StageAbstract):
             409: "No source id found in metadata file.",
         },
     )
-    def post(self, filename, mode, update, force_reprocessing):
+    def post(
+        self,
+        filename: str,
+        mode: str,
+        update: bool,
+        force_reprocessing: bool,
+        user: User,
+    ) -> Response:
         """
         Start IMPORT
         1) estraggo il source id dal file dei metadati
@@ -280,10 +314,6 @@ class Stage(IMCEndpoint, StageAbstract):
 
         self.graph = neo4j.get_instance()
         celery_ext = celery.get_instance()
-
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
 
         group = user.belongs_to.single()
 
@@ -458,28 +488,23 @@ class Stage(IMCEndpoint, StageAbstract):
         summary="Delete a file from the stage area",
         responses={200: "File successfully deleted"},
     )
-    def delete(self, filename):
+    def delete(self, filename: str, user: User) -> Response:
 
         self.graph = neo4j.get_instance()
 
-        user = self.get_user()
-        if user is None:  # pragma: no cover
-            raise BadRequest("No user defined")
-
         group = user.belongs_to.single()
-
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = os.path.join("/uploads", group.uuid)
-        if not os.path.exists(upload_dir):
+        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        if not upload_dir.exists():
             raise BadRequest("Upload dir not found")
 
-        path = os.path.join(upload_dir, filename)
-        if not os.path.isfile(path):
+        path = upload_dir.joinpath(filename)
+        if not path.is_file():
             raise BadRequest(f"File not found: {filename}")
 
-        os.remove(path)
+            path.unlink()
         return self.empty_response()
 
 

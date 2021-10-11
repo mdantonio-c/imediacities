@@ -13,7 +13,7 @@ POST api/bulk
 import os
 import re
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import BulkSchema
@@ -21,7 +21,8 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, NotFound
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.utilities.logs import log
 
 
@@ -30,7 +31,7 @@ class Bulk(IMCEndpoint):
 
     labels = ["bulk"]
 
-    def lookup_latest_dir(self, path):
+    def lookup_latest_dir(self, path: str) -> Optional[str]:
         """
         Look for the sub-directory of path in the forms of:
         %Y-%m-%d (example 2018-04-19)
@@ -78,7 +79,7 @@ class Bulk(IMCEndpoint):
         description="The bulk api makes it possible to perform many operations in a single api call",
         responses={202: "Bulk action successfully accepted", 400: "Bad request."},
     )
-    def post(self, **req_action):
+    def post(self, user: User, **req_action: Any) -> Response:
 
         self.graph = neo4j.get_instance()
         self.celery_ext = celery.get_instance()

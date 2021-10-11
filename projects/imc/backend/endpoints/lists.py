@@ -2,14 +2,17 @@
 Manage the lists of the researcher
 """
 import re
+from typing import Dict, Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import Target
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot):([a-z0-9-])+")
@@ -53,12 +56,18 @@ class List(IMCEndpoint):
             404: "The requested list does not exist.",
         },
     )
-    def get(self, list_id, r_uuid=None, belong_item=None, nb_items=False):
+    def get(
+        self,
+        list_id: str,
+        user: User,
+        r_uuid: Optional[str] = None,
+        belong_item: Optional[str] = None,
+        nb_items: bool = False,
+    ) -> Response:
         """Get a certain list for given id."""
         graph = neo4j.get_instance()
-        user = self.get_user()
         i_am_admin = self.auth.is_admin(user)
-        researcher = self.get_user() if not i_am_admin else None
+        researcher = user if not i_am_admin else None
         if i_am_admin and r_uuid is not None:
             researcher = graph.User.nodes.get_or_none(uuid=r_uuid)
         if not researcher:
@@ -133,13 +142,16 @@ class Lists(IMCEndpoint):
             404: "The requested list does not exist.",
         },
     )
-    def get(self, r_uuid=None, belong_item=None, nb_items=False):
+    def get(
+        self,
+        user: User,
+        r_uuid: Optional[str] = None,
+        belong_item: Optional[str] = None,
+        nb_items: bool = False,
+    ) -> Response:
         """Get all the list of a user."""
         graph = neo4j.get_instance()
-        user = self.get_user()
-        if not user:  # pragma: no cover
-            # Can't happen since auth is required
-            raise ServerError("User misconfiguration")
+
         i_am_admin = self.auth.is_admin(user)
         researcher = self.get_user() if not i_am_admin else None
         if i_am_admin and r_uuid is not None:
@@ -217,7 +229,7 @@ class Lists(IMCEndpoint):
             409: "There is already a list with that name.",
         },
     )
-    def post(self, name, description):
+    def post(self, name: str, description: str, user: User) -> Response:
         """
         Create a new list.
 
@@ -227,10 +239,6 @@ class Lists(IMCEndpoint):
         log.debug("create a new list")
 
         graph = neo4j.get_instance()
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         # check if there is already a list with the same name belonging to the user.
         results = graph.cypher(
@@ -268,7 +276,7 @@ class Lists(IMCEndpoint):
             409: "There is already another list with the same name among your lists.",
         },
     )
-    def put(self, list_id, name, description):
+    def put(self, list_id: str, name: str, description: str, user: User) -> Response:
         """Update a list."""
         log.debug("Update list with uuid: {}", list_id)
         graph = neo4j.get_instance()
@@ -276,11 +284,6 @@ class Lists(IMCEndpoint):
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
             raise NotFound("Please specify a valid list id")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         creator = user_list.creator.single()
         if not user or user.uuid != creator.uuid:
@@ -320,7 +323,7 @@ class Lists(IMCEndpoint):
             404: "List does not exist.",
         },
     )
-    def delete(self, list_id):
+    def delete(self, list_id: str, user: User) -> Response:
         """Delete a list."""
         log.debug("delete list {}", list_id)
 
@@ -329,11 +332,6 @@ class Lists(IMCEndpoint):
         if not user_list:
             log.debug("List with uuid {} does not exist", list_id)
             raise NotFound("Please specify a valid list id")
-
-        user = self.get_user()
-        if not user:  # pragma: no cover
-            # Can't happen since auth is required
-            raise ServerError("User misconfiguration")
 
         log.debug("current user: {} - {}", user.email, user.uuid)
         i_am_admin = self.auth.is_admin(user)
@@ -484,18 +482,13 @@ class ListItemAbstract(IMCEndpoint):
             del res["annotations"]
         return res
 
-    def check_user_list(self, list_id):
+    def check_user_list(self, user, list_id):
         try:
             user_list = self.graph.List.nodes.get(uuid=list_id)
         except self.graph.List.DoesNotExist:
             log.debug("List with uuid {} does not exist", list_id)
             raise NotFound("Please specify a valid list id")
         # am I the owner of the list? (allowed also to admin)
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
-
         i_am_admin = self.auth.is_admin(user)
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not i_am_admin:
@@ -510,9 +503,6 @@ class ListItem(ListItemAbstract):
 
     labels = ["list item"]
 
-    def __init__(self):
-        ListItemAbstract.__init__(self)
-
     @decorators.auth.require_all("Researcher")
     @decorators.endpoint(
         path="/lists/<list_id>/items/<item_id>",
@@ -524,9 +514,9 @@ class ListItem(ListItemAbstract):
             404: "List does not exist.",
         },
     )
-    def get(self, list_id, item_id):
+    def get(self, list_id: str, item_id: str, user: User) -> Response:
         """Get a certain item of a user list"""
-        user_list = self.check_user_list(list_id)
+        user_list = self.check_user_list(user, list_id)
         log.debug(
             "Get item <{}> of the list <{}, {}>".format(
                 item_id, user_list.uuid, user_list.name
@@ -555,9 +545,6 @@ class ListItems(ListItemAbstract):
 
     labels = ["list of items"]
 
-    def __init__(self):
-        ListItemAbstract.__init__(self)
-
     @decorators.auth.require_all("Researcher")
     @decorators.endpoint(
         path="/lists/<list_id>/items",
@@ -569,9 +556,9 @@ class ListItems(ListItemAbstract):
             404: "List does not exist.",
         },
     )
-    def get(self, list_id, item_id=None):
+    def get(self, list_id: str, user: User) -> Response:
         """Get all the items of a user list"""
-        user_list = self.check_user_list(list_id)
+        user_list = self.check_user_list(user, list_id)
         log.debug(
             "Get all the items of the list <{}, {}>", user_list.uuid, user_list.name
         )
@@ -595,7 +582,9 @@ class ListItems(ListItemAbstract):
             409: "The item is already connected to that list.",
         },
     )
-    def post(self, list_id, target):
+    def post(
+        self, list_id: str, target: Dict[str, Dict[str, str]], user: User
+    ) -> Response:
         """Add an item to a list."""
         log.debug("Add an item to list {} with target {}", list_id, target)
 
@@ -605,11 +594,6 @@ class ListItems(ListItemAbstract):
             raise NotFound("Please specify a valid list id")
 
         # am I the creator of the list?
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
-
         creator = user_list.creator.single()
         if user.uuid != creator.uuid:
             raise Forbidden(
@@ -655,7 +639,7 @@ class ListItems(ListItemAbstract):
             404: "List or item does not exist.",
         },
     )
-    def delete(self, list_id, item_id):
+    def delete(self, list_id: str, item_id: str, user: User) -> Response:
         """Delete an item from a list."""
         user_list = self.graph.List.nodes.get_or_none(uuid=list_id)
         if not user_list:
@@ -669,11 +653,6 @@ class ListItems(ListItemAbstract):
             user_list.name,
         )
         # am I the creator of the list? (always allowed to admin)
-        user = self.get_user()
-        if not user:  # pragma: no cover
-            # Can't happen since auth is required
-            raise ServerError("User misconfiguration")
-
         i_am_admin = self.auth.is_admin(user)
         creator = user_list.creator.single()
         if user.uuid != creator.uuid and not i_am_admin:

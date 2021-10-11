@@ -11,6 +11,8 @@ from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, Forbidden, NotFound, ServerError
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
 from restapi.utilities.logs import log
 
 
@@ -31,11 +33,19 @@ class Search(IMCEndpoint):
         responses={200: "A list of videos matching search criteria."},
     )
     def post(
-        self, match, filtering, get_total, page, size, sort_by, sort_order, input_filter
-    ):
+        self,
+        match: Dict[str, Any],
+        filtering: Dict[str, Any],
+        get_total: bool,
+        page: int,
+        size: int,
+        sort_by: str,
+        sort_order: str,
+        input_filter: str,
+        user: Optional[User],
+    ) -> Response:
         self.graph = neo4j.get_instance()
 
-        user = self.get_user()
         page -= 1
         log.debug("paging: offset {}, limit {}", page, size)
 

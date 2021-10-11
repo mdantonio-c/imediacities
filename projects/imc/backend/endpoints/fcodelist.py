@@ -7,6 +7,8 @@ from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.exceptions import NotFound
 from restapi.models import fields
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
 from restapi.utilities.logs import log
 
 
@@ -31,7 +33,7 @@ class Fcodelist(IMCEndpoint):
         description="Returns a codelist",
         responses={200: "A codelist.", 404: "Codelist does not exist."},
     )
-    def get(self, codelist, lang):
+    def get(self, codelist: str, lang: str, user: User) -> Response:
         """Get the codelists."""
         log.debug("load the codelist: {}", codelist)
         filename = codelist + ".json"

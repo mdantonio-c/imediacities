@@ -3,6 +3,7 @@ Handle your image entity
 """
 
 from pathlib import Path
+from typing import Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.security import authz
@@ -11,9 +12,10 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields, validate
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
@@ -31,7 +33,7 @@ class Images(IMCEndpoint):
             404: "The image does not exist.",
         },
     )
-    def get(self, image_id):
+    def get(self, image_id: str) -> Response:
         """Get the NonAVEntity passed as argument."""
         log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
@@ -71,7 +73,7 @@ class Images(IMCEndpoint):
         summary="Delete a image description",
         responses={200: "Image successfully deleted"},
     )
-    def delete(self, image_id):
+    def delete(self, image_id: str, user: User) -> Response:
         """Delete existing image description."""
         log.debug("deliting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
@@ -112,7 +114,7 @@ class ImageItem(IMCEndpoint):
             404: "Image does not exist.",
         },
     )
-    def put(self, image_id, public_access):
+    def put(self, image_id: str, public_access: bool, user: User) -> Response:
         """Allow user to update item information."""
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
 
@@ -124,12 +126,6 @@ class ImageItem(IMCEndpoint):
 
         if not (item := image.item.single()):
             raise NotFound("NonAVEntity not correctly imported: item info not found")
-
-        user = self.get_user()
-
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
@@ -169,7 +165,7 @@ class ImageAnnotations(IMCEndpoint):
         description="Returns all the annotations targeting the given image item.",
         responses={200: "An annotation object", 404: "Image does not exist"},
     )
-    def get(self, image_id, anno_type=None):
+    def get(self, image_id: str, anno_type: Optional[str] = None) -> Response:
         log.debug("get annotations for NonAVEntity id: {}", image_id)
 
         self.graph = neo4j.get_instance()
@@ -180,6 +176,8 @@ class ImageAnnotations(IMCEndpoint):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
+        # ?????????????????????
+        # This endpoint does not have any authentication
         user = self.get_user()
 
         item = image.item.single()
@@ -245,6 +243,7 @@ class ImageContent(IMCEndpoint):
         },
         location="query",
     )
+    @decorators.preload(callback=authz.check_permissions)
     @decorators.endpoint(
         path="/images/<image_id>/content",
         summary="Gets the image content",
@@ -253,8 +252,13 @@ class ImageContent(IMCEndpoint):
             404: "The image content does not exists",
         },
     )
-    @authz.pre_authorize
-    def get(self, image_id, content_type, thumbnail_size=None):
+    def get(
+        self,
+        image_id: str,
+        content_type: str,
+        user: Optional[User],
+        thumbnail_size: Optional[str] = None,
+    ) -> Response:
         log.info("get image content for id {}", image_id)
 
         self.graph = neo4j.get_instance()
@@ -346,7 +350,9 @@ class ImageTools(IMCEndpoint):
             409: "Invalid state e.g. object detection results cannot be imported twice",
         },
     )
-    def post(self, image_id, tool, operation=None):
+    def post(
+        self, image_id: str, tool: str, user: User, operation: Optional[str] = None
+    ) -> Response:
 
         log.debug("launch automatic tool for image id: {}", image_id)
 
