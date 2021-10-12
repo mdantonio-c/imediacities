@@ -4,7 +4,7 @@ Archive management: upload and download files
 
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
-from restapi.config import UPLOAD_PATH
+from restapi.config import DATA_PATH
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest
 from restapi.rest.definition import Response
@@ -37,7 +37,7 @@ class Upload(Uploader, IMCEndpoint):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        upload_dir = DATA_PATH.joinpath(group.uuid)
         if not upload_dir.exists():
             upload_dir.mkdir()
 
@@ -59,7 +59,7 @@ class Upload(Uploader, IMCEndpoint):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        upload_dir = DATA_PATH.joinpath(group.uuid)
         if not upload_dir.exists():
             upload_dir.mkdir()
 
@@ -87,5 +87,5 @@ class Upload(Uploader, IMCEndpoint):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        upload_dir = DATA_PATH.joinpath(group.uuid)
         return Downloader.download(filename, subfolder=upload_dir)

@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Union
 from imc.endpoints import IMCEndpoint
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from restapi import decorators
-from restapi.config import UPLOAD_PATH
+from restapi.config import DATA_PATH
 from restapi.connectors import celery, neo4j
 from restapi.exceptions import BadRequest, Conflict, NotFound, ServerError
 from restapi.models import fields, validate
@@ -497,7 +497,7 @@ class Stage(IMCEndpoint, StageAbstract):
         if group is None:
             raise BadRequest("No group defined for this user")
 
-        upload_dir = UPLOAD_PATH.joinpath(group.uuid)
+        upload_dir = DATA_PATH.joinpath(group.uuid)
         if not upload_dir.exists():
             raise BadRequest("Upload dir not found")
 
