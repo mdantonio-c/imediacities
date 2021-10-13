@@ -161,7 +161,7 @@
 
   .modal--list-info {
     box-sizing: border-box;
-    padding: 0 15px 0 20px !important;
+    padding: 0 15px 0 10px !important;
   }
 
   p {
@@ -184,12 +184,13 @@
   span {
     background: $bg-dark;
     display: block;
-    min-height: 90px;
+    //min-height: 90px;
     width: 100%;
 
     img {
       height: auto;
       width: 100%;
+      object-fit: cover;
     }
   }
 }
