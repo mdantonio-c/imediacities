@@ -284,8 +284,7 @@ class ImageContent(IMCEndpoint):
 
             image_path = Path(image_uri)
 
-            # return Downloader.send_file_partial(image_uri, mime)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=image_path.name,
                 subfolder=image_path.parent,
                 # image is always jpeg
@@ -305,7 +304,7 @@ class ImageContent(IMCEndpoint):
                 raise NotFound("Thumbnail not found")
 
             thumbnail_path = Path(thumbnail_uri)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=thumbnail_path.name,
                 subfolder=thumbnail_path.parent,
                 # image is always jpeg

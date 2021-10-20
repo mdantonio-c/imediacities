@@ -492,7 +492,7 @@ class VideoContent(IMCEndpoint):
 
             video_path = Path(video_uri)
             # return Downloader.send_file_partial(video_uri, mime)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=video_path.name, subfolder=video_path.parent, mime="video/mp4"
             )
 
@@ -506,7 +506,7 @@ class VideoContent(IMCEndpoint):
                 raise NotFound("Video ORF not found")
 
             # return Downloader.send_file_partial(orf_uri, mime)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=filename, subfolder=folder, mime="video/mp4"
             )
 
@@ -540,7 +540,7 @@ class VideoContent(IMCEndpoint):
                 raise NotFound("Thumbnail not found")
 
             thumbnail_path = Path(thumbnail_uri)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=thumbnail_path.name,
                 subfolder=thumbnail_path.parent,
                 mime="image/jpeg",
@@ -553,7 +553,7 @@ class VideoContent(IMCEndpoint):
                 raise NotFound("Summary not found")
 
             summary_path = Path(summary_uri)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=summary_path.name,
                 subfolder=summary_path.parent,
                 mime="image/jpeg",

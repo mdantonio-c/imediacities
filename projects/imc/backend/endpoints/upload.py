@@ -88,4 +88,4 @@ class Upload(Uploader, IMCEndpoint):
             raise BadRequest("No group defined for this user")
 
         upload_dir = DATA_PATH.joinpath(group.uuid)
-        return Downloader.download(filename, subfolder=upload_dir)
+        return Downloader.send_file_content(filename, subfolder=upload_dir)

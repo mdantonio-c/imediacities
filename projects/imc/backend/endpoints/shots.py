@@ -61,7 +61,7 @@ class Shots(IMCEndpoint):
                 raise NotFound("Thumbnail not found")
 
             thumbnail_path = Path(thumbnail_uri)
-            return Downloader.download(
+            return Downloader.send_file_content(
                 filename=thumbnail_path.name,
                 subfolder=thumbnail_path.parent,
                 mime="image/jpeg",
