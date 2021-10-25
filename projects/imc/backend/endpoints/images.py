@@ -1,9 +1,10 @@
 """
 Handle your image entity
 """
-import os
 
-from flask import send_file
+from pathlib import Path
+from typing import Optional
+
 from imc.endpoints import IMCEndpoint
 from imc.security import authz
 from imc.tasks.services.annotation_repository import AnnotationRepository
@@ -11,9 +12,10 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import fields, validate
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
@@ -31,7 +33,7 @@ class Images(IMCEndpoint):
             404: "The image does not exist.",
         },
     )
-    def get(self, image_id):
+    def get(self, image_id: str) -> Response:
         """Get the NonAVEntity passed as argument."""
         log.debug("getting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
@@ -71,7 +73,7 @@ class Images(IMCEndpoint):
         summary="Delete a image description",
         responses={200: "Image successfully deleted"},
     )
-    def delete(self, image_id):
+    def delete(self, image_id: str, user: User) -> Response:
         """Delete existing image description."""
         log.debug("deliting NonAVEntity id: {}", image_id)
         self.graph = neo4j.get_instance()
@@ -96,7 +98,9 @@ class ImageItem(IMCEndpoint):
         {
             "public_access": fields.Bool(
                 required=True,
-                description="Whether or not the item is accessible by a public user.",
+                metadata={
+                    "description": "Whether or not the item is accessible by a public user."
+                },
             )
         }
     )
@@ -110,7 +114,7 @@ class ImageItem(IMCEndpoint):
             404: "Image does not exist.",
         },
     )
-    def put(self, image_id, public_access):
+    def put(self, image_id: str, public_access: bool, user: User) -> Response:
         """Allow user to update item information."""
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
 
@@ -122,12 +126,6 @@ class ImageItem(IMCEndpoint):
 
         if not (item := image.item.single()):
             raise NotFound("NonAVEntity not correctly imported: item info not found")
-
-        user = self.get_user()
-
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         repo = CreationRepository(self.graph)
         if not repo.item_belongs_to_user(item, user):
@@ -155,7 +153,7 @@ class ImageAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG, DSC)",
+                metadata={"description": "Filter by annotation type (e.g. TAG, DSC)"},
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
@@ -167,7 +165,7 @@ class ImageAnnotations(IMCEndpoint):
         description="Returns all the annotations targeting the given image item.",
         responses={200: "An annotation object", 404: "Image does not exist"},
     )
-    def get(self, image_id, anno_type=None):
+    def get(self, image_id: str, anno_type: Optional[str] = None) -> Response:
         log.debug("get annotations for NonAVEntity id: {}", image_id)
 
         self.graph = neo4j.get_instance()
@@ -178,6 +176,8 @@ class ImageAnnotations(IMCEndpoint):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
+        # ?????????????????????
+        # This endpoint does not have any authentication
         user = self.get_user()
 
         item = image.item.single()
@@ -220,7 +220,7 @@ class ImageAnnotations(IMCEndpoint):
         return self.response(data)
 
 
-class ImageContent(IMCEndpoint, Downloader):
+class ImageContent(IMCEndpoint):
     """Gets image content or thumbnail"""
 
     labels = ["image"]
@@ -231,18 +231,19 @@ class ImageContent(IMCEndpoint, Downloader):
             "content_type": fields.Str(
                 required=True,
                 data_key="type",
-                description="content type (e.g. image, thumbnail)",
+                metadata={"description": "content type (e.g. image, thumbnail)"},
                 validate=validate.OneOf(["image", "thumbnail"]),
             ),
             "thumbnail_size": fields.Str(
                 required=False,
                 data_key="size",
-                description="used to get large thumbnails",
+                metadata={"description": "used to get large thumbnails"},
                 validate=validate.OneOf(["large"]),
             ),
         },
         location="query",
     )
+    @decorators.preload(callback=authz.check_permissions)
     @decorators.endpoint(
         path="/images/<image_id>/content",
         summary="Gets the image content",
@@ -251,8 +252,13 @@ class ImageContent(IMCEndpoint, Downloader):
             404: "The image content does not exists",
         },
     )
-    @authz.pre_authorize
-    def get(self, image_id, content_type, thumbnail_size=None):
+    def get(
+        self,
+        image_id: str,
+        content_type: str,
+        user: Optional[User],
+        thumbnail_size: Optional[str] = None,
+    ) -> Response:
         log.info("get image content for id {}", image_id)
 
         self.graph = neo4j.get_instance()
@@ -275,13 +281,15 @@ class ImageContent(IMCEndpoint, Downloader):
             log.debug("image content uri: {}", image_uri)
             if image_uri is None:
                 raise NotFound("Image not found")
-            filename = os.path.basename(image_uri)
-            folder = os.path.dirname(image_uri)
 
-            # image is always jpeg
+            image_path = Path(image_uri)
 
-            # return self.send_file_partial(image_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="image/jpeg")
+            return Downloader.send_file_content(
+                filename=image_path.name,
+                subfolder=image_path.parent,
+                # image is always jpeg
+                mime="image/jpeg",
+            )
 
         if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
@@ -294,7 +302,14 @@ class ImageContent(IMCEndpoint, Downloader):
                 log.debug("request for large thumbnail: {}", thumbnail_uri)
             if thumbnail_uri is None:
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.send_file_content(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                # image is always jpeg
+                mime="image/jpeg",
+            )
 
         # it should never be reached
         raise BadRequest(
@@ -311,12 +326,14 @@ class ImageTools(IMCEndpoint):
         {
             "tool": fields.String(
                 required=True,
-                description="Tool to be launched.",
+                metadata={"description": "Tool to be launched."},
                 validate=validate.OneOf(["object-detection", "building-recognition"]),
             ),
             "operation": fields.String(
                 required=False,
-                description="At the moment used only to delete automatic tags.",
+                metadata={
+                    "description": "At the moment used only to delete automatic tags."
+                },
                 validate=validate.OneOf(["delete"]),
             ),
         }
@@ -332,7 +349,9 @@ class ImageTools(IMCEndpoint):
             409: "Invalid state e.g. object detection results cannot be imported twice",
         },
     )
-    def post(self, image_id, tool, operation=None):
+    def post(
+        self, image_id: str, tool: str, user: User, operation: Optional[str] = None
+    ) -> Response:
 
         log.debug("launch automatic tool for image id: {}", image_id)
 

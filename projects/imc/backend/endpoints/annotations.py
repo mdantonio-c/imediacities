@@ -4,6 +4,7 @@ Handle annotations
 
 import datetime
 import re
+from typing import Any, Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import PatchDocument
@@ -23,7 +24,8 @@ from restapi.exceptions import (
     Unauthorized,
 )
 from restapi.models import Schema, fields
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.utilities.logs import log
 
 TARGET_PATTERN = re.compile("(item|shot|anno):([a-z0-9-])+")
@@ -98,9 +100,6 @@ class AnnotationModel(Schema):
 
 
 class AnnotationAbstract(IMCEndpoint):
-    def __init__(self):
-        IMCEndpoint.__init__(self)
-
     def get_annotation_response(self, anno):
         """
         Utility method to build DTO for annotation model.
@@ -137,50 +136,46 @@ class AnnotationAbstract(IMCEndpoint):
         return res
 
 
-class Annotation(AnnotationAbstract):
-    labels = ["annotation"]
+# 2021-10-11: it seems to be unused... let's remove it
+# class Annotation(AnnotationAbstract):
+#     labels = ["annotation"]
 
-    def __init__(self):
-        AnnotationAbstract.__init__(self)
+#     # "schema": {"$ref": "#/definitions/Annotation"},
+#     @decorators.auth.require()
+#     @decorators.use_kwargs(
+#         {
+#             "anno_type": fields.Str(
+#                 required=False,
+#                 data_key="type",
+#                 metadata={"description": "filter by annotation type"},
+#             )
+#         },
+#         location="query",
+#     )
+#     @decorators.marshal_with(AnnotationModel(many=True), code=200)
+#     @decorators.endpoint(
+#         path="/annotations/<anno_id>",
+#         summary="Get a single annotation",
+#         description="Returns a single annotation for its uuid",
+#         responses={200: "An annotation", 404: "Annotation does not exist."},
+#     )
+#     def get(self, anno_id: str, user: User) -> Response:
+#         """Get an annotation"""
+#         graph = neo4j.get_instance()
+#         user = self.get_user()
+#         if anno_id is None and not self.auth.is_admin(user):
+#             raise Unauthorized("You are not authorized: missing privileges")
 
-    # "schema": {"$ref": "#/definitions/Annotation"},
-    @decorators.auth.require()
-    @decorators.use_kwargs(
-        {
-            "anno_type": fields.Str(
-                required=False,
-                data_key="type",
-                description="filter by annotation type",
-            )
-        },
-        location="query",
-    )
-    @decorators.marshal_with(AnnotationModel(many=True), code=200)
-    @decorators.endpoint(
-        path="/annotations/<anno_id>",
-        summary="Get a single annotation",
-        description="Returns a single annotation for its uuid",
-        responses={200: "An annotation", 404: "Annotation does not exist."},
-    )
-    def get(self, anno_id):
-        """Get an annotation"""
-        graph = neo4j.get_instance()
-        user = self.get_user()
-        if anno_id is None and not self.auth.is_admin(user):
-            raise Unauthorized("You are not authorized: missing privileges")
+#         anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
+#         if not anno:
+#             log.debug("Annotation with uuid {} does not exist", anno_id)
+#             raise NotFound("Please specify a valid annotation id")
 
-        anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
-        if not anno:
-            log.debug("Annotation with uuid {} does not exist", anno_id)
-            raise NotFound("Please specify a valid annotation id")
-        annotations = [anno]
+#         # FIXME this should not be a list
+#         data = []
+#         data.append(self.get_annotation_response(anno))
 
-        # FIXME this should not be a list
-        data = []
-        for a in annotations:
-            data.append(self.get_annotation_response(a))
-
-        return self.response(data)
+#         return self.response(data)
 
 
 class Annotations(AnnotationAbstract):
@@ -198,10 +193,6 @@ class Annotations(AnnotationAbstract):
 
     labels = ["annotations"]
 
-    def __init__(self):
-        IMCEndpoint.__init__(self)
-        AnnotationAbstract.__init__(self)
-
     # "schema": {"$ref": "#/definitions/Annotation"},
     @decorators.auth.require()
     @decorators.use_kwargs(
@@ -209,7 +200,7 @@ class Annotations(AnnotationAbstract):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="filter by annotation type",
+                metadata={"description": "filter by annotation type"},
             )
         },
         location="query",
@@ -221,10 +212,9 @@ class Annotations(AnnotationAbstract):
         description="Returns a single annotation for its uuid",
         responses={200: "An annotation", 404: "Annotation does not exist."},
     )
-    def get(self, anno_type=None):
+    def get(self, user: User, anno_type: Optional[str] = None) -> Response:
         """Get an annotation if its id is passed as an argument."""
         graph = neo4j.get_instance()
-        user = self.get_user()
         if not self.auth.is_admin(user):
             raise Unauthorized("You are not authorized: missing privileges")
 
@@ -256,7 +246,7 @@ class Annotations(AnnotationAbstract):
             400: "Annotation couldn't have been created.",
         },
     )
-    def post(self, **data):
+    def post(self, user: User, **data: Any) -> Response:
         """Create a new annotation."""
         # TODO access control
         # annotation cannot be created by general user if not in public domain
@@ -298,12 +288,6 @@ class Annotations(AnnotationAbstract):
         log.debug("target type: {}, target id: {}", target_type, tid)
 
         self.graph = neo4j.get_instance()
-
-        # check user
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         targetNode = None
         if target_type == "item":
@@ -413,7 +397,9 @@ class Annotations(AnnotationAbstract):
         {
             "body_ref": fields.Str(
                 required=False,
-                description="optional body reference for annotation with multiple bodies. This reference MUST be in the form 'textual:your_term_value' or 'resource:your_term_IRI'",
+                metadata={
+                    "description": "optional body reference for annotation with multiple bodies. This reference MUST be in the form 'textual:your_term_value' or 'resource:your_term_IRI'"
+                },
             )
         },
         location="query",
@@ -429,7 +415,9 @@ class Annotations(AnnotationAbstract):
             404: "Annotation does not exist.",
         },
     )
-    def delete(self, anno_id, body_ref=None):
+    def delete(
+        self, anno_id: str, user: User, body_ref: Optional[str] = None
+    ) -> Response:
         """Deletes an annotation."""
 
         self.graph = neo4j.get_instance()
@@ -437,11 +425,6 @@ class Annotations(AnnotationAbstract):
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
             raise NotFound("Annotation not found")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         log.debug("current user: {email} - {uuid}", email=user.email, uuid=user.uuid)
         i_am_admin = self.auth.is_admin(user)
@@ -504,7 +487,7 @@ class Annotations(AnnotationAbstract):
             404: "Annotation does not exist.",
         },
     )
-    def put(self, anno_id, **data):
+    def put(self, anno_id: str, user: User, **data: Any) -> Response:
         """
         Update an annotation.
 
@@ -519,11 +502,6 @@ class Annotations(AnnotationAbstract):
         anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
             raise NotFound("Annotation not found")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         creator = anno.creator.single()
         if creator is None:
@@ -601,7 +579,9 @@ class Annotations(AnnotationAbstract):
             404: "Annotation does not exist.",
         },
     )
-    def patch(self, anno_id, patch_op, path, value):
+    def patch(
+        self, anno_id: str, patch_op: str, path: str, value: str, user: User
+    ) -> Response:
 
         self.graph = neo4j.get_instance()
 
@@ -611,11 +591,6 @@ class Annotations(AnnotationAbstract):
 
         if not (creator := anno.creator.single()):
             raise NotFound("Annotation with no creator")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         if user.uuid != creator.uuid:
             raise Forbidden(
@@ -658,3 +633,6 @@ class Annotations(AnnotationAbstract):
             updated_anno = self.get_annotation_response(anno)
 
             return self.response(updated_anno)
+
+        # Should never be reached
+        raise BadRequest(f"Invalid patch operation: {patch_op}")  # pragma: no cover

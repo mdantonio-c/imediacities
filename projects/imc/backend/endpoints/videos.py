@@ -1,10 +1,10 @@
 """
 Handle your video entity
 """
-import os
-from typing import Any, Dict, List
+import os  # still a lot of os. to be replaced with Pathlib
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from flask import send_file
 from imc.endpoints import IMCEndpoint
 from imc.models import ShotRevision
 from imc.security import authz
@@ -13,9 +13,10 @@ from imc.tasks.services.creation_repository import CreationRepository
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import celery, neo4j
-from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound, ServerError
+from restapi.exceptions import BadRequest, Conflict, Forbidden, NotFound
 from restapi.models import Schema, fields, validate
-from restapi.services.authentication import Role
+from restapi.rest.definition import Response
+from restapi.services.authentication import Role, User
 from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
@@ -24,13 +25,13 @@ class VideoContentSchema(Schema):
     content_type = fields.Str(
         required=True,
         data_key="type",
-        description="content type (e.g. video, thumbnail, summary)",
+        metadata={"description": "content type (e.g. video, thumbnail, summary)"},
         validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
     )
     thumbnail_size = fields.Str(
         required=False,
         data_key="size",
-        description="used to get large thumbnails",
+        metadata={"description": "used to get large thumbnails"},
         validate=validate.OneOf(["large"]),
     )
 
@@ -48,7 +49,7 @@ class Videos(IMCEndpoint):
             404: "The video does not exist.",
         },
     )
-    def get(self, video_id):
+    def get(self, video_id: str) -> Response:
         """Get the AVEntity passed as argument."""
         log.debug("getting AVEntity id: {}", video_id)
         graph = neo4j.get_instance()
@@ -92,7 +93,7 @@ class Videos(IMCEndpoint):
         summary="Delete a video description",
         responses={200: "Video successfully deleted"},
     )
-    def delete(self, video_id):
+    def delete(self, video_id: str, user: User) -> Response:
         """
         Delete existing video description.
         """
@@ -118,7 +119,9 @@ class VideoItem(IMCEndpoint):
         {
             "public_access": fields.Bool(
                 required=True,
-                description="Whether or not the item is accessible by a public user.",
+                metadata={
+                    "description": "Whether or not the item is accessible by a public user."
+                },
             )
         }
     )
@@ -132,7 +135,7 @@ class VideoItem(IMCEndpoint):
             404: "Video does not exist.",
         },
     )
-    def put(self, video_id, public_access):
+    def put(self, video_id: str, public_access: bool, user: User) -> Response:
         """
         Allow user to update item information.
         """
@@ -146,11 +149,6 @@ class VideoItem(IMCEndpoint):
 
         if not (item := video.item.single()):
             raise NotFound("AVEntity not correctly imported: item info not found")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         repo = CreationRepository(graph)
         if not repo.item_belongs_to_user(item, user):
@@ -178,11 +176,11 @@ class VideoAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG)",
+                metadata={"description": "Filter by annotation type (e.g. TAG)"},
                 validate=validate.OneOf(["TAG", "DSC", "TVS"]),
             ),
             "is_manual": fields.Bool(
-                required=False, missing=False, data_key="onlyManual"
+                required=False, load_default=False, data_key="onlyManual"
             ),
         },
         location="query",
@@ -194,7 +192,13 @@ class VideoAnnotations(IMCEndpoint):
         description="Returns all the annotations targeting the given video item.",
         responses={200: "An annotation object.", 404: "Video does not exist."},
     )
-    def get(self, video_id, anno_type=None, is_manual=False):
+    def get(
+        self,
+        video_id: str,
+        user: User,
+        anno_type: Optional[str] = None,
+        is_manual: bool = False,
+    ) -> Response:
         log.debug("get annotations for AVEntity id: {}", video_id)
 
         graph = neo4j.get_instance()
@@ -206,11 +210,6 @@ class VideoAnnotations(IMCEndpoint):
         except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         item = video.item.single()
         for a in item.targeting_annotations:
@@ -327,7 +326,7 @@ class VideoShots(IMCEndpoint):
         description="Returns a list of shots belonging to the given video item.",
         responses={200: "An list of shots.", 404: "Video does not exist."},
     )
-    def get(self, video_id):
+    def get(self, video_id: str, user: Optional[User]) -> Response:
         log.debug("get shots for AVEntity id: {}", video_id)
         if video_id is None:
             raise BadRequest("Please specify a video id")
@@ -341,8 +340,6 @@ class VideoShots(IMCEndpoint):
         except graph.AVEntity.DoesNotExist:
             log.debug("AVEntity with uuid {} does not exist", video_id)
             raise NotFound("Please specify a valid video id")
-
-        user = self.get_user()
 
         item = video.item.single()
         api_url = get_backend_url()
@@ -445,12 +442,13 @@ class VideoShots(IMCEndpoint):
         return self.response(data)
 
 
-class VideoContent(IMCEndpoint, Downloader):
+class VideoContent(IMCEndpoint):
 
     labels = ["video"]
 
     @decorators.auth.optional()
     @decorators.use_kwargs(VideoContentSchema, location="query")
+    @decorators.preload(callback=authz.check_permissions)
     @decorators.endpoint(
         path="/videos/<video_id>/content",
         summary="Gets the video content",
@@ -459,8 +457,13 @@ class VideoContent(IMCEndpoint, Downloader):
             404: "The video content does not exists.",
         },
     )
-    @authz.pre_authorize
-    def get(self, video_id, content_type, thumbnail_size=None):
+    def get(
+        self,
+        video_id: str,
+        content_type: str,
+        user: Optional[User],
+        thumbnail_size: Optional[str] = None,
+    ) -> Response:
         """
         Gets video content such as video stream and thumbnail
         """
@@ -487,25 +490,25 @@ class VideoContent(IMCEndpoint, Downloader):
                 raise NotFound("Video not found")
             # all videos are converted to mp4
 
-            filename = os.path.basename(video_uri)
-            folder = os.path.dirname(video_uri)
-            # return self.send_file_partial(video_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
+            video_path = Path(video_uri)
+            # return Downloader.send_file_partial(video_uri, mime)
+            return Downloader.send_file_content(
+                filename=video_path.name, subfolder=video_path.parent, mime="video/mp4"
+            )
 
         if content_type == "orf":
-            # orf_uri = os.path.dirname(item.uri) + '/transcoded_orf.mp4'
             if item.uri is None:
                 raise NotFound("Video ORF not found")
 
-            folder = os.path.dirname(item.uri)
+            folder = Path(item.uri).parent
             filename = "orf.mp4"
-            # orf_uri = os.path.dirname(item.uri) + '/orf.mp4'
-            # if orf_uri is None or not os.path.exists(orf_uri):
-            if not os.path.exists(os.path.join(folder, filename)):
+            if not folder.joinpath(filename).exists():
                 raise NotFound("Video ORF not found")
 
-            # return self.send_file_partial(orf_uri, mime)
-            return self.download(filename=filename, subfolder=folder, mime="video/mp4")
+            # return Downloader.send_file_partial(orf_uri, mime)
+            return Downloader.send_file_content(
+                filename=filename, subfolder=folder, mime="video/mp4"
+            )
 
         if content_type == "thumbnail":
             thumbnail_uri = item.thumbnail
@@ -535,25 +538,38 @@ class VideoContent(IMCEndpoint, Downloader):
 
             if thumbnail_uri is None or not os.path.exists(thumbnail_uri):
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.send_file_content(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                mime="image/jpeg",
+            )
 
         if content_type == "summary":
             summary_uri = item.summary
             log.debug("summary content uri: {}", summary_uri)
             if summary_uri is None:
                 raise NotFound("Summary not found")
-            return send_file(summary_uri, mimetype="image/jpeg")
+
+            summary_path = Path(summary_uri)
+            return Downloader.send_file_content(
+                filename=summary_path.name,
+                subfolder=summary_path.parent,
+                mime="image/jpeg",
+            )
 
         # it should never be reached
         raise BadRequest(f"Invalid content type: {content_type}")
 
-    @decorators.database_transaction
     @decorators.use_kwargs(
         {
             "content_type": fields.Str(
                 required=True,
                 data_key="type",
-                description="content type (e.g. video, thumbnail, summary)",
+                metadata={
+                    "description": "content type (e.g. video, thumbnail, summary)"
+                },
                 validate=validate.OneOf(["video", "orf", "thumbnail", "summary"]),
             )
         },
@@ -567,7 +583,7 @@ class VideoContent(IMCEndpoint, Downloader):
             404: "The video content does not exists.",
         },
     )
-    def head(self, video_id, content_type):
+    def head(self, video_id: str, content_type: str) -> Response:
         """
         Check for video content existance.
         """
@@ -616,12 +632,14 @@ class VideoTools(IMCEndpoint):
         {
             "tool": fields.String(
                 required=True,
-                description="Tool to be launched.",
+                metadata={"description": "Tool to be launched."},
                 validate=validate.OneOf(["object-detection", "building-recognition"]),
             ),
             "operation": fields.String(
                 required=False,
-                description="At the moment used only to delete automatic tags.",
+                metadata={
+                    "description": "At the moment used only to delete automatic tags."
+                },
                 validate=validate.OneOf(["delete"]),
             ),
         }
@@ -637,7 +655,9 @@ class VideoTools(IMCEndpoint):
             409: "Invalid state. e.g. object detection results cannot be imported twice",
         },
     )
-    def post(self, video_id, tool, operation=None):
+    def post(
+        self, video_id: str, tool: str, user: User, operation: Optional[str] = None
+    ) -> Response:
 
         log.debug("launch automatic tool for video id: {}", video_id)
 
@@ -724,13 +744,13 @@ class VideoShotRevision(IMCEndpoint):
     # },
 
     # This is the model semi-translated in marshmallow, to be completed:
-    # since = fields.fields.DateTime(required=True, description="Date of start of a revision.")
-    # video = fields.Nested( ..., required=True, description="Video under revision")
+    # since = fields.fields.DateTime(required=True, metadata={"description": "Date of start of a revision."})
+    # video = fields.Nested( ..., required=True, metadata={"description": "Video under revision"})
     #                       uuid = fields.UUID(required=True)
     #                       title = fields.Str(required=True)
-    # progress = fields.Int(required=True, description="Progress of the revision in percentange", validate = min 0 max 100)
-    # state = fields.Str(required=True, description="Revision status", validate = oneOf ["R", "W"]
-    # assignee = fields.Nested( ... , required=True, description="assignee of the revision")
+    # progress = fields.Int(required=True, metadata={"description": "Progress of the revision in percentange", validate = min 0 max 100})
+    # state = fields.Str(required=True, metadata={"description": "Revision status"}, validate = oneOf ["R", "W"]
+    # assignee = fields.Nested( ... , required=True, metadata={"description": "assignee of the revision"})
     #                           uuid = fields.UUID(required=True)
     #                           name = fields.Str(required=True)
     @decorators.auth.require_any(Role.ADMIN, "Reviser")
@@ -739,7 +759,7 @@ class VideoShotRevision(IMCEndpoint):
             "input_assignee": fields.Str(
                 required=False,
                 data_key="assignee",
-                description="Assignee's uuid of the revision",
+                metadata={"description": "Assignee's uuid of the revision"},
             )
         },
         location="query",
@@ -750,7 +770,7 @@ class VideoShotRevision(IMCEndpoint):
         description="Returns a list of all videos under revision and their assignee",
         responses={200: "List of videos under revision successfully retrieved"},
     )
-    def get(self, input_assignee=None):
+    def get(self, user: User, input_assignee: Optional[str] = None) -> Response:
         """Get all videos under revision"""
         log.debug("Getting videos under revision.")
         graph = neo4j.get_instance()
@@ -789,7 +809,9 @@ class VideoShotRevision(IMCEndpoint):
         {
             "assignee_uuid": fields.Str(
                 required=False,
-                description="UUID of the Reviser user to assign the revision",
+                metadata={
+                    "description": "UUID of the Reviser user to assign the revision"
+                },
                 data_key="assignee",
             )
         }
@@ -805,7 +827,9 @@ class VideoShotRevision(IMCEndpoint):
             404: "Video does not exist.",
         },
     )
-    def put(self, video_id, assignee_uuid=None):
+    def put(
+        self, video_id: str, user: User, assignee_uuid: Optional[str] = None
+    ) -> Response:
         """Put a video under revision"""
         log.debug("Put video {} under revision", video_id)
 
@@ -819,11 +843,6 @@ class VideoShotRevision(IMCEndpoint):
                 "This AVEntity may not have been correctly imported. "
                 "Not ready for revision!",
             )
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         i_am_admin = self.auth.is_admin(user)
 
@@ -873,7 +892,9 @@ class VideoShotRevision(IMCEndpoint):
             409: "Invalid state for the video.",
         },
     )
-    def post(self, video_id, shots, exitRevision):
+    def post(
+        self, video_id: str, shots: List[Any], exitRevision: bool, user: User
+    ) -> Response:
         """Start a shot revision procedure"""
         log.debug("Start shot revision for video {}", video_id)
 
@@ -898,11 +919,6 @@ class VideoShotRevision(IMCEndpoint):
             )
 
         # ONLY the reviser and the administrator can provide a new list of cuts
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
-
         i_am_admin = self.auth.is_admin(user)
         if not i_am_admin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden("You cannot revise a video that is not owned by you")
@@ -944,7 +960,7 @@ class VideoShotRevision(IMCEndpoint):
             404: "Video not found.",
         },
     )
-    def delete(self, video_id):
+    def delete(self, video_id: str, user: User) -> Response:
         """Take off revision from a video"""
         log.debug("Exit revision for video {0}", video_id)
 
@@ -962,12 +978,8 @@ class VideoShotRevision(IMCEndpoint):
         if not repo.is_video_under_revision(item):
             # 409: Video is already under revision.
             raise BadRequest(f"Video [{video.uuid}] is not under revision")
-        # ONLY the reviser and the administrator can exit revision
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
+        # ONLY the reviser and the administrator can exit revision
         i_am_admin = self.auth.is_admin(user)
         if not i_am_admin and not repo.is_revision_assigned_to_user(item, user):
             raise Forbidden(

@@ -1,6 +1,7 @@
 """
 Search endpoint for annotations
 """
+from typing import Any, Optional
 
 from imc.endpoints import IMCEndpoint
 from imc.models import AnnotationSearch, allowed_item_types, codelists
@@ -8,7 +9,8 @@ from restapi import decorators
 from restapi.connectors import neo4j
 from restapi.exceptions import BadRequest, NotFound, ServerError
 from restapi.models import fields
-from restapi.utilities.logs import log
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
 
 
 class SearchAnnotations(IMCEndpoint):
@@ -22,7 +24,7 @@ class SearchAnnotations(IMCEndpoint):
         description="Search for annotations",
         responses={200: "A list of annotation matching search criteria."},
     )
-    def post(self, filtering=None):
+    def post(self, user: User, filtering: Optional[Any] = None) -> Response:
 
         self.graph = neo4j.get_instance()
 

@@ -1,8 +1,8 @@
 project:
   title: "DARE"
   description: "Urban Innovative Actions"
-  version: "1.9.4"
-  rapydo: "2.0"
+  version: "1.9.5"
+  rapydo: "2.1"
 
 variables:
   env:

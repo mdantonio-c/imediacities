@@ -25,6 +25,7 @@ node_modules
 ##  Dynamically created file and folders  ##
 ############################################
 
+docker-compose.yml
 .env
 .rapydo
 .venv
@@ -103,9 +104,10 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.cache_ggshield
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 
 # Translations
 *.mo

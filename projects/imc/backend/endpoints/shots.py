@@ -1,17 +1,21 @@
 """
 Handle your video metadata
 """
-from flask import send_file
+from pathlib import Path
+from typing import Optional
+
 from imc.endpoints import IMCEndpoint
 from restapi import decorators
 from restapi.config import get_backend_url
 from restapi.connectors import neo4j
-from restapi.exceptions import NotFound, ServerError
+from restapi.exceptions import NotFound
 from restapi.models import fields, validate
+from restapi.rest.definition import Response
+from restapi.services.authentication import User
+from restapi.services.download import Downloader
 from restapi.utilities.logs import log
 
 
-#####################################
 class Shots(IMCEndpoint):
 
     labels = ["shot"]
@@ -35,7 +39,7 @@ class Shots(IMCEndpoint):
             404: "The video does not exists.",
         },
     )
-    def get(self, shot_id, content_type=None):
+    def get(self, shot_id: str, content_type: Optional[str] = None) -> Response:
         """
         Get shot by id.
         """
@@ -44,7 +48,6 @@ class Shots(IMCEndpoint):
         self.graph = neo4j.get_instance()
 
         # check if the shot exists
-        node = None
         try:
             node = self.graph.Shot.nodes.get(uuid=shot_id)
         except self.graph.Shot.DoesNotExist:
@@ -56,7 +59,13 @@ class Shots(IMCEndpoint):
             log.debug("thumbnail content uri: {}", thumbnail_uri)
             if thumbnail_uri is None:
                 raise NotFound("Thumbnail not found")
-            return send_file(thumbnail_uri, mimetype="image/jpeg")
+
+            thumbnail_path = Path(thumbnail_uri)
+            return Downloader.send_file_content(
+                filename=thumbnail_path.name,
+                subfolder=thumbnail_path.parent,
+                mime="image/jpeg",
+            )
 
         api_url = get_backend_url()
         shot = self.getJsonResponse(node)
@@ -81,7 +90,7 @@ class ShotAnnotations(IMCEndpoint):
             "anno_type": fields.Str(
                 required=False,
                 data_key="type",
-                description="Filter by annotation type (e.g. TAG)",
+                metadata={"description": "Filter by annotation type (e.g. TAG)"},
                 validate=validate.OneOf(["TAG", "DSC"]),
             )
         },
@@ -93,7 +102,9 @@ class ShotAnnotations(IMCEndpoint):
         description="Returns all the annotations targeting the given shot.",
         responses={200: "List of annotations.", 404: "Shot does not exist."},
     )
-    def get(self, shot_id, anno_type=None):
+    def get(
+        self, shot_id: str, user: User, anno_type: Optional[str] = None
+    ) -> Response:
         log.info("get annotations for Shot id: {}", shot_id)
 
         self.graph = neo4j.get_instance()
@@ -103,11 +114,6 @@ class ShotAnnotations(IMCEndpoint):
         if not shot:
             log.debug("Shot with uuid {} does not exist", shot_id)
             raise NotFound("Please specify a valid shot id")
-
-        user = self.get_user()
-        # Can't happen since auth is required
-        if not user:  # pragma: no cover
-            raise ServerError("User misconfiguration")
 
         data = []
         for a in shot.annotation:
