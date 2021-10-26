@@ -136,7 +136,7 @@ export class SearchMapComponent implements OnInit, OnChanges {
     if (this.countByProviders === undefined) {
       return;
     }
-    /*console.log("countByProviders", this.countByProviders);*/
+    // console.log("countByProviders", this.countByProviders);
     for (let key of Object.keys(this.countByProviders)) {
       let city = this.catalogService.getProviderCity(key);
       if (!city) {
@@ -248,9 +248,8 @@ export class SearchMapComponent implements OnInit, OnChanges {
     }
 
     // reset the place-name control on the map
-    let inputPlaceControl = this.placeControl.nativeElement.querySelector(
-      "input"
-    );
+    let inputPlaceControl =
+      this.placeControl.nativeElement.querySelector("input");
     this.renderer.setProperty(inputPlaceControl, "value", "");
 
     setTimeout(() => {

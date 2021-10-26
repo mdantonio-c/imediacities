@@ -66,9 +66,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       iprstatus: [null],
     });
     if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
-      this.disabled_filters = environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(
-        ","
-      );
+      this.disabled_filters =
+        environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(",");
     }
   }
 
@@ -83,6 +82,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     }
     for (let i = 0; i < Providers.length; i++)
       this.cities.push(Providers[i].city.name);
+    // @ts-ignore
+    this.cities = [...new Set(this.cities)];
     this.cities = this.cities.sort();
     this.vocabularyService.get((vocabulary) => {
       this.vocabulary = vocabulary;
@@ -174,7 +175,6 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   applyFilter() {
     let form = this.searchForm.value;
-    /*console.log('Form', form);*/
     let filter: SearchFilter = {
       searchTerm: null,
       itemType: null,
@@ -298,6 +298,8 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
       c = "Vienna";
     } else if (provider === "SFI") {
       c = "Stockholm";
+    } else if (provider === "APA") {
+      c = "Bologna";
     }
     return c;
   }

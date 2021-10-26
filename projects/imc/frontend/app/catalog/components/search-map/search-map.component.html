@@ -56,23 +56,24 @@
           <i
             class="fa fa-spinner fa-spin"
             aria-hidden="true"
-            style="font-size: 12px;"
+            style="font-size: 12px"
           ></i>
         </span>
         <span id="place-address">{{ marker?.address }}</span>
       </div>
       <div class="place-item-list">
-        <div *ngFor="let source of marker.sources" style="display: list-item;">
+        <div *ngFor="let source of marker.sources" style="display: list-item">
           <i
             class="icon-only imc-icon fa fa-video grey bigger-110"
             [ngClass]="{
               'fa-video': source.type === 'Video',
-              'fa-image': source.type === 'Image'
+              'fa-image': source.type === 'Image',
+              'fa-cube': source.type === '3D-Model'
             }"
           ></i>
           <a
             [routerLink]="['images', source.uuid]"
-            *ngIf="source.type === 'Image'"
+            *ngIf="source.type === 'Image' || source.type == '3D-Model'"
             >{{ source?.title || "n/a" }}</a
           >
           <a

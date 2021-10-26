@@ -58,5 +58,9 @@
 
 .tag-activity .creator .time {
   color: #777;
-  padding-left: 18px;
+  display: inline-block;
+  /*padding-left: 18px;*/
+}
+.tag-activity .creator i {
+  margin-right: 5px !important;
 }

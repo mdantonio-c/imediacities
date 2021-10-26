@@ -58,6 +58,7 @@ export const IPRStatuses = [
   },
 ];
 
+// FIXME get providers and cities from API
 export const Providers = [
   {
     code: "CCB",
@@ -138,6 +139,24 @@ export const Providers = [
       // Athens, Greece
       position: [37.9838096, 23.727538800000048],
       name: "Athens",
+    },
+  },
+  {
+    code: "APA",
+    name: "APA Project",
+    city: {
+      // Bologna, Italy
+      position: [44.494887, 11.3426162],
+      name: "Bologna",
+    },
+  },
+  {
+    code: "IDEA",
+    name: "IDEA Project",
+    city: {
+      // Mantova, Italy
+      position: [45.16031, 10.79784],
+      name: "Mantova",
     },
   },
 ];

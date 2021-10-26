@@ -122,22 +122,25 @@ export class CatalogComponent implements OnInit {
   }
 
   /**
-   * Load relevant media entity for a list of geo tags.
+   * Load relevant media entities for a list of geo tags.
    * @param entityPlaceMap <Map> 'entity-id' => Array<place-id>.
    */
   loadMediaTags(entityPlaceMap) {
     this.loadingMapResults = true;
-    this.catalogService.getRelevantCreations(entityPlaceMap).subscribe(
-      (response) => {
-        this.mediaTags = response;
+    this.catalogService
+      .getRelevantCreations(entityPlaceMap)
+      .subscribe(
+        (response) => {
+          this.mediaTags = response;
+        },
+        (error) => {
+          this.notify.showError(
+            `Unable to retrieve relevant creations on the map: ${error}`
+          );
+        }
+      )
+      .add(() => {
         this.loadingMapResults = false;
-      },
-      (error) => {
-        this.notify.showError(
-          `Unable to retrieve relevant creations on the map: ${error}`
-        );
-        this.loadingMapResults = false;
-      }
-    );
+      });
   }
 }
