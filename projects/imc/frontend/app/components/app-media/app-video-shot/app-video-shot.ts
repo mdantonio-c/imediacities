@@ -15,14 +15,17 @@ import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
   selector: "app-video-shot",
   templateUrl: "app-video-shot.html",
 })
-export class AppVideoShotComponent extends AppVideoControlComponent
-  implements OnInit, OnChanges {
+export class AppVideoShotComponent
+  extends AppVideoControlComponent
+  implements OnInit, OnChanges
+{
   @Input() shot: any;
   @Input() multiSelection: boolean = false;
   @Input() user;
   @Input() media_type = "video";
   @Input() underRevision: boolean = false;
   @Input() canRevise: boolean = false;
+  @Input() showNumber: boolean = true;
 
   @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();
   @Output() is_selezionato: EventEmitter<any> = new EventEmitter<any>();
@@ -163,6 +166,10 @@ export class AppVideoShotComponent extends AppVideoControlComponent
 
   ngOnInit() {
     super.ngOnInit();
+    if (!this.showNumber) {
+      // it is supposed to hide the shot number in case of single shot
+      this.details_show();
+    }
   }
 
   ngOnChanges() {

@@ -88,7 +88,6 @@
       }
     }
   }
-
   .box-single-shot {
     &.active {
       background-color: rgba($theme-image-color, 0.2);
@@ -105,10 +104,25 @@
       }
     }
   }
-
   .box-single-shot {
     &.active {
       background-color: rgba($theme-video-color, 0.2);
+    }
+  }
+}
+
+.page-type-3d-model {
+  .tab-shots {
+    .nav-link {
+      &.active,
+      &.active i {
+        color: $theme-model-color;
+      }
+    }
+  }
+  .box-single-shot {
+    &.active {
+      background-color: rgba($theme-model-color, 0.2);
     }
   }
 }

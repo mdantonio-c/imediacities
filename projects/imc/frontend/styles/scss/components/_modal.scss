@@ -271,6 +271,12 @@
   }
 }
 
+.page-type-3d-model {
+  .modal--media-link {
+    background: rgba($theme-model-color, 0.2);
+  }
+}
+
 .modal-body-content {
   align-items: flex-start;
 }
@@ -390,6 +396,15 @@
   .modal--link-list {
     a {
       color: $theme-image-color;
+      font-weight: 500;
+    }
+  }
+}
+
+.page-type-3d-model {
+  .modal--link-list {
+    a {
+      color: $theme-model-color;
       font-weight: 500;
     }
   }

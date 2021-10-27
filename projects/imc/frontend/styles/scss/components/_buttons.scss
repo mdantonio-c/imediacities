@@ -65,6 +65,18 @@
   }
 }
 
+.page-type-3d-model {
+  .btn-accent {
+    background: $theme-model-color;
+    border: 1.5px solid $theme-model-color;
+
+    &:hover {
+      background: transparent;
+      color: $theme-model-color;
+    }
+  }
+}
+
 .btn-border-classic,
 .btn-icon-border-classic {
   color: $text-color;

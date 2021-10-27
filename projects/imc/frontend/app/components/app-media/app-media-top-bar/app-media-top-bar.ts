@@ -28,6 +28,9 @@ export class AppMediaTopBarComponent implements OnInit, OnChanges {
     } else if (this.item_type === "image") {
       this.icon = this.is_3d_model ? "view_in_ar" : "image";
       this.label = this.is_3d_model ? "3D MODEL" : "PHOTO";
+    } else if (this.item_type === "3d-model") {
+      this.icon = "view_in_ar";
+      this.label = "3D MODEL";
     }
   }
 

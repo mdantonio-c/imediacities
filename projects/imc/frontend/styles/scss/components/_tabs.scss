@@ -48,3 +48,13 @@
     }
   }
 }
+
+.page-type-3d-model {
+  .imc--tab {
+    .nav-link {
+      &.active {
+        border-bottom: 4px solid $theme-model-color;
+      }
+    }
+  }
+}
