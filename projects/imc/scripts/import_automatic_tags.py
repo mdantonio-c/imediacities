@@ -66,7 +66,7 @@ def import_automatic_tags(metadata_set, domain_name, token, tool):
             headers = {"Authorization": token}
             endpoint_type = "videos" if item.item_type == "Video" else "images"
             url = f"https://{domain_name}/api/{endpoint_type}/{uuid}/tools"
-            resp = requests.post(url, headers=headers, data=payload)
+            resp = requests.post(url, headers=headers, data=payload, timeout=30)
             try:
                 resp.raise_for_status()
             except requests.exceptions.HTTPError as http_error:

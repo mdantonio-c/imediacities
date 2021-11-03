@@ -53,7 +53,10 @@ def import_xml(metadata_set, domain_name, token):
             payload = {"filename": filename, "mode": "fast"}
             headers = {"Authorization": token}
             resp = requests.post(
-                f"https://{domain_name}/api/stage", headers=headers, data=payload
+                f"https://{domain_name}/api/stage",
+                headers=headers,
+                data=payload,
+                timeout=30,
             )
             try:
                 resp.raise_for_status()
