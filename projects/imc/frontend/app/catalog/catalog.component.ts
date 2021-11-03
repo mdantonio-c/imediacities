@@ -8,7 +8,7 @@ import { MediaEntity, Providers } from "./services/data";
 @Component({
   selector: "app-catalog",
   templateUrl: "./catalog.component.html",
-  styleUrls: ["./catalog.component.css"],
+  styleUrls: ["./catalog.component.scss"],
 })
 export class CatalogComponent implements OnInit {
   loading: boolean = false;
