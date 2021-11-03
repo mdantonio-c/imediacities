@@ -1,6 +1,6 @@
 FROM rapydo/backend:2.1
 
-RUN apt-get update && \
+RUN apt-get update -qq && \
     apt-get install --yes --no-install-recommends ffmpeg libavcodec-extra libv4l-0 libsm6 libxext6 imagemagick && \
     apt-get autoremove --yes && \
     apt-get clean && \
