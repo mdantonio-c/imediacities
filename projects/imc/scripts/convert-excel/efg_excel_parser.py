@@ -48,7 +48,7 @@ input_filename = args.input
 # check target directory
 target_dir = args.target_directory
 if target_dir and not os.path.isdir(target_dir):
-    exit(f"ERROR - Target director '{target_dir}' does NOT exist")
+    sys.exit(f"ERROR - Target director '{target_dir}' does NOT exist")
 
 wb = None
 try:

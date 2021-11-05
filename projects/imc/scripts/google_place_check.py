@@ -19,7 +19,7 @@ if len(results) > 0:
     for p in [graph.ResourceBody.inflate(row[0]) for row in results]:
         # placeid 'ChIJC8RR6ZjUf0cRQZSkWwF84aI'
         params = urlencode({"placeid": p.iri, "key": GOOGLE_API_KEY})
-        resp = requests.get(GOOGLE_MAPS_API_URL, params=params)
+        resp = requests.get(GOOGLE_MAPS_API_URL, params=params, timeout=30)
         # log.debug('request url %s' % resp.url)
         data = resp.json()
         # log.debug(data)
