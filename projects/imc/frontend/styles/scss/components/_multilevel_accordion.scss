@@ -60,6 +60,10 @@
       .page-type-image & {
         color: $theme-image-color;
       }
+
+      .page-type-3d-model & {
+        color: $theme-model-color;
+      }
     }
   }
 
@@ -122,6 +126,16 @@
     li .term {
       &:hover {
         background: rgba($theme-image-color, 0.3) !important;
+      }
+    }
+  }
+}
+
+.page-type-3d-model {
+  .child-list {
+    li .term {
+      &:hover {
+        background: rgba($theme-model-color, 0.3) !important;
       }
     }
   }

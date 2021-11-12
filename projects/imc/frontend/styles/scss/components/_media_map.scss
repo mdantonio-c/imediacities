@@ -87,6 +87,28 @@ $transition-map: all 0.4s ease-out;
   }
 }
 
+.page-type-3d-model {
+  .map--container {
+    .mappa {
+      border-bottom: 8px solid $theme-model-color !important;
+    }
+  }
+
+  .map--bar {
+    background: rgba($theme-model-color, 0.7);
+    border-bottom: 8px solid $theme-model-color;
+    transition: $transition-map;
+  }
+
+  .map {
+    &.expanded {
+      .map--bar {
+        background: $theme-model-color;
+      }
+    }
+  }
+}
+
 .map--local-tooltip {
   background: $white;
   box-shadow: $box-shadow-small-card;

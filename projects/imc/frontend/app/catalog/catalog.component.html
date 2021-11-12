@@ -19,7 +19,7 @@
             <div class="loader col" *ngIf="loading"></div>
             <!-- no results -->
             <div class="row" *ngIf="!loading && totalItems == 0">
-              <div class="col">
+              <div class="col px-0">
                 <div class="no-results">
                   <h2>No Results</h2>
                   <p>Your search returned no results</p>
@@ -28,7 +28,7 @@
             </div>
             <!-- view results -->
             <div class="row" *ngIf="!loading && totalItems > 0">
-              <div class="col">
+              <div class="col px-0">
                 <div
                   *ngIf="currentView == 'Grid'"
                   style="display: flex; flex-direction: row; flex-wrap: wrap"
@@ -48,10 +48,7 @@
                   <div class="space-8"></div>
                 </div>
                 <!-- pagination -->
-                <div
-                  class="search-pager row card pt-3"
-                  *ngIf="currentView != 'Map'"
-                >
+                <div class="search-pager pt-3" *ngIf="currentView != 'Map'">
                   <div class="d-flex justify-content-center">
                     <ngb-pagination
                       [collectionSize]="totalItems"
@@ -67,7 +64,7 @@
                 <div class="row" *ngIf="currentView == 'Map'">
                   <div class="col">
                     <div class="card">
-                      <div class="card-body">
+                      <div class="card-body p-0">
                         <div class="map-view">
                           <div class="view-header">
                             <!-- map -->

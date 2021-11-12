@@ -165,7 +165,7 @@ export class CatalogService {
         match: null,
         filter: {
           type: filter.itemType,
-          provider: filter.provider,
+          // provider: filter.provider,
           city: filter.city,
           terms: filter.terms,
           iprstatus: filter.iprstatus,
@@ -223,7 +223,7 @@ export class CatalogService {
     let c = null;
     if (provider === "TTE") {
       c = "Athens";
-    } else if (provider === "CCB") {
+    } else if (["CCB", "APA"].includes(provider)) {
       c = "Bologna";
     } else if (provider === "CRB") {
       c = "Brussels";
@@ -235,12 +235,12 @@ export class CatalogService {
       c = "Barcelona";
     } else if (provider === "MNC") {
       c = "Turin";
-    } else if (provider === "OFM") {
-      c = "Vienna";
-    } else if (provider === "WSTLA") {
+    } else if (["OFM", "WSTLA"].includes(provider)) {
       c = "Vienna";
     } else if (provider === "SFI") {
       c = "Stockholm";
+    } else if (provider === "IDEA") {
+      c = "Mantova";
     }
     return c;
   }

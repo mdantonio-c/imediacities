@@ -49,7 +49,9 @@ export class AppMediaService {
   }
 
   type() {
-    return this._media.type === "aventity" ? "video" : "image";
+    return this._media.type === "aventity"
+      ? "video"
+      : this._media.non_av_type.key;
   }
 
   revisionState(): string {

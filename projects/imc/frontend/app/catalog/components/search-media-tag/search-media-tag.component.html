@@ -7,19 +7,22 @@
           class="imc-icon fa light-blue"
           [ngClass]="{
             'fa-video': media.source.type === 'Video',
-            'fa-camera': media.source.type === 'Image'
+            'fa-camera': media.source.type === 'Image',
+            'fa-cube': media.source.type === '3D-Model'
           }"
         ></i>
         <a
           [routerLink]="['images', media.source.uuid]"
-          *ngIf="media.source.type == 'Image'"
-          class="blue"
+          *ngIf="
+            media.source.type == 'Image' || media.source.type == '3D-Model'
+          "
+          class="blue text"
           >{{ media.source.title }}</a
         >
         <a
           [routerLink]="['videos', media.source.uuid]"
           *ngIf="media.source.type == 'Video'"
-          class="blue"
+          class="blue text"
           >{{ media.source.title }}</a
         >
       </h4>
@@ -37,15 +40,16 @@
       <div class="media-image-wrapper">
         <img
           holderjs
+          alt="100%x150"
           [attr.data-src]="'holder.js/100px150?text=NO THUMBNAIL&?auto=yes'"
-          *ngIf="!media.source.links['thumbnail']"
+          *ngIf="!media.source.links || !media.source.links['thumbnail']"
         />
         <img
           (contextmenu)="disableSaveAs($event)"
           class="media-object"
           alt="100%x150"
           src="{{ media.source.links['thumbnail'] + '&size=large' }}"
-          *ngIf="media.source.links['thumbnail']"
+          *ngIf="media.source.links && media.source.links['thumbnail']"
         />
       </div>
       <div class="caption-wrapper">
@@ -73,7 +77,7 @@
         </div>
         <div class="widget-body">
           <div class="widget-main padding-8">
-            <div style="max-height: 200px; overflow: auto;">
+            <div style="max-height: 200px; overflow: auto">
               <div class="tag-activity" *ngFor="let anno of media.annotations">
                 <div class="annotation">
                   <b>{{ anno.body.name }}</b
@@ -85,7 +89,7 @@
                   >
                 </div>
                 <div class="creator">
-                  <i class="imc-icon fa fa-user fa-2x light-grey pull-left"></i>
+                  <i class="imc-icon fa fa-user light-grey pull-left"></i>
                   <span
                     >{{ anno.creator.name }} {{ anno.creator.surname }}</span
                   >
@@ -98,7 +102,7 @@
                 </div>
                 <div
                   class="space-4"
-                  style="height: 10%; position: absolute; bottom: 0px;"
+                  style="height: 10%; position: absolute; bottom: 0px"
                 ></div>
               </div>
             </div>
