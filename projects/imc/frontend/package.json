@@ -12,6 +12,8 @@
     "ngx-slick-carousel": "^0.5.1",
     "slick-carousel": "^1.8.1",
     "material-icons": "0.3.1",
-    "angular-confirmation-popover": "6.0.0"
+    "angular-confirmation-popover": "6.0.0",
+    "three": "^0.134.0",
+    "@types/three": "^0.133.1"
   }
 }
