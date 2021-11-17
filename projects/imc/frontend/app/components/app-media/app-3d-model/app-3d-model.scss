@@ -1,0 +1,75 @@
+.viewer {
+  .titlebar {
+    transition: opacity 0.25s ease-in-out;
+  }
+
+  .webgl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+
+    .canvas {
+      display: block;
+      width: calc(100% + 1px);
+      height: 100%;
+      cursor: -webkit-grab;
+      cursor: grab;
+      outline: none;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      min-width: 0;
+      padding: 10px;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+      height: 52px;
+
+      & > :not(.watermark):not(.no-fadeout) {
+        transition: opacity 0.25s ease-in-out;
+      }
+
+      .general-controls {
+        display: flex !important;
+        justify-content: flex-end;
+        flex: 0 0 auto;
+        font-size: 13px;
+        pointer-events: none;
+        align-items: center;
+        flex-flow: row nowrap !important;
+        margin-left: auto;
+        grid-column-gap: 4px;
+        -moz-column-gap: 4px;
+        column-gap: 4px;
+
+        .control {
+          position: relative;
+          width: 32px;
+          height: 32px;
+          margin: 0;
+          line-height: 24px;
+          text-align: center;
+          border-radius: 16px;
+          pointer-events: all;
+          cursor: pointer;
+          padding: 5px;
+          &:hover {
+            background: rgba(0, 0, 0, 0.25);
+          }
+          i {
+            color: #333;
+            font-size: 14px !important;
+          }
+        }
+      }
+    }
+  }
+}

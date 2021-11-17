@@ -1,2 +1,28 @@
-<h4 class="text-center">glTF Sample Preview</h4>
-<canvas #canvas id="canvas" style="height: 100%; width: 100%"></canvas>
+<div class="viewer">
+  <div class="titlebar">
+    <h4 class="text-center">glTF Sample Preview</h4>
+  </div>
+  <div class="webgl">
+    <canvas #canvas id="canvas" style="height: 100%; width: 100%"></canvas>
+    <div class="controls">
+      <div class="general-controls">
+        <!--<span class="control"
+          [ngbTooltip]="'Help'"
+          placement="top"
+        ><i class="fas fa-question"></i></span>
+        <span class="control"
+          [ngbTooltip]="'Settings'"
+          placement="top"
+        ><i class="fas fa-cog"></i></span>-->
+        <span
+          class="control"
+          [ngbTooltip]="'Fullscreen'"
+          placement="top"
+          container="body"
+          (click)="openFullscreen()"
+          ><i class="fas fa-expand-alt"></i
+        ></span>
+      </div>
+    </div>
+  </div>
+</div>

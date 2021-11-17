@@ -1,9 +1,11 @@
 import {
   Component,
   Input,
+  OnInit,
   AfterViewInit,
   ViewChild,
   ElementRef,
+  HostListener,
 } from "@angular/core";
 import { AuthService } from "@rapydo/services/auth";
 import * as THREE from "three";
@@ -13,9 +15,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 @Component({
   selector: "app-3d-model",
   templateUrl: "app-3d-model.html",
-  styleUrls: ["app-3d-model.css"],
+  styleUrls: ["app-3d-model.scss"],
 })
-export class App3dModelComponent implements AfterViewInit {
+export class App3dModelComponent implements OnInit, AfterViewInit {
   @Input() data;
 
   @Input() public cameraZ: number = 50;
@@ -31,8 +33,13 @@ export class App3dModelComponent implements AfterViewInit {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
+  private isFullScreen: boolean;
 
   constructor(private auth: AuthService) {}
+
+  ngOnInit() {
+    this.checkScreenMode();
+  }
 
   // @ts-ignore
   private get canvas(): HTMLCanvasElement {
@@ -128,5 +135,59 @@ export class App3dModelComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.createScene();
     this.render();
+  }
+
+  @HostListener("document:fullscreenchange", ["$event"])
+  @HostListener("document:webkitfullscreenchange", ["$event"])
+  @HostListener("document:mozfullscreenchange", ["$event"])
+  @HostListener("document:MSFullscreenChange", ["$event"])
+  fullscreenModes(event) {
+    this.checkScreenMode();
+  }
+
+  checkScreenMode(): void {
+    if (document.fullscreenElement) {
+      // fullscreen
+      this.isFullScreen = true;
+    } else {
+      // not in full screen
+      this.isFullScreen = false;
+    }
+  }
+
+  /**
+   * Open fullscreen
+   */
+  openFullscreen() {
+    if (this.canvasRef.nativeElement.requestFullscreen) {
+      this.canvasRef.nativeElement.requestFullscreen();
+    } else if (this.canvasRef.nativeElement.mozRequestFullScreen) {
+      /* Firefox */
+      this.canvasRef.nativeElement.mozRequestFullScreen();
+    } else if (this.canvasRef.nativeElement.webkitRequestFullscreen) {
+      /* Chrome, Safari and Opera */
+      this.canvasRef.nativeElement.webkitRequestFullscreen();
+    } else if (this.canvasRef.nativeElement.msRequestFullscreen) {
+      /* IE/Edge */
+      this.canvasRef.nativeElement.msRequestFullscreen();
+    }
+  }
+
+  /**
+   *  Close fullscreen
+   */
+  closeFullscreen() {
+    if (this.canvasRef.nativeElement.exitFullscreen) {
+      this.canvasRef.nativeElement.exitFullscreen();
+    } else if (this.canvasRef.nativeElement.mozCancelFullScreen) {
+      /* Firefox */
+      this.canvasRef.nativeElement.mozCancelFullScreen();
+    } else if (this.canvasRef.nativeElement.webkitExitFullscreen) {
+      /* Chrome, Safari and Opera */
+      this.canvasRef.nativeElement.webkitExitFullscreen();
+    } else if (this.canvasRef.nativeElement.msExitFullscreen) {
+      /* IE/Edge */
+      this.canvasRef.nativeElement.msExitFullscreen();
+    }
   }
 }
