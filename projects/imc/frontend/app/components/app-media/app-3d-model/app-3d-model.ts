@@ -33,7 +33,9 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
+
   private isFullScreen: boolean;
+  public showHelp: boolean = false;
 
   constructor(private auth: AuthService) {}
 
@@ -188,6 +190,17 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
     } else if (this.canvasRef.nativeElement.msExitFullscreen) {
       /* IE/Edge */
       this.canvasRef.nativeElement.msExitFullscreen();
+    }
+  }
+
+  help(event, op?: string) {
+    event.preventDefault();
+    switch (op) {
+      case "close":
+        this.showHelp = false;
+        break;
+      default:
+        this.showHelp = true;
     }
   }
 }

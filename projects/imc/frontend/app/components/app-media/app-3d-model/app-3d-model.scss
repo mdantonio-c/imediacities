@@ -3,6 +3,60 @@
     transition: opacity 0.25s ease-in-out;
   }
 
+  .overlays {
+    position: absolute;
+    inset: 0px;
+    z-index: 7;
+    pointer-events: none;
+    perspective: 1000px;
+    perspective-origin: 50% center;
+    transform-style: preserve-3d;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: auto;
+    display: initial;
+    width: 100%;
+    height: 100%;
+    overflow: initial;
+    pointer-events: all;
+    background: rgba(0, 0, 0, 0.8);
+    transition: all 0.25s ease-in-out 0s;
+
+    &.help {
+      i {
+        margin: 0px 0px 10px;
+        font-size: 28px;
+        color: rgb(255, 255, 255);
+      }
+      .tip {
+        font-size: 14px;
+        color: #cccccc;
+        text-align: center;
+      }
+    }
+
+    a {
+      outline: none;
+    }
+
+    .close {
+      position: absolute;
+      top: 17px;
+      right: 19px;
+      z-index: 2;
+      font-size: 16px;
+      color: rgb(255, 255, 255);
+    }
+    .viewer-icon-close::before,
+    .viewer-icon-times::before {
+      content: "x";
+    }
+  }
+
   .webgl {
     position: absolute;
     top: 0;
