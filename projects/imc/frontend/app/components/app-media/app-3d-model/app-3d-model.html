@@ -1,6 +1,6 @@
 <div class="viewer" id="hook">
   <div class="titlebar">
-    <h4 class="text-center">glTF Sample Preview</h4>
+    <!--<h4 class="text-center">glTF Sample Preview</h4>-->
   </div>
   <div class="overlays">
     <div class="overlay help" *ngIf="showHelp">
@@ -59,6 +59,13 @@
   <div class="webgl">
     <canvas #canvas id="canvas" style="height: 100%; width: 100%"></canvas>
     <div class="controls">
+      <div class="helper-controls" *ngIf="showHelpers">
+        <i class="fas fa-video mr-2"></i>
+        <span>
+          <b>x</b>:{{camera?.position.x}}, <b>y</b>:{{camera?.position.y}},
+          <b>z</b>:{{camera?.position.z}}
+        </span>
+      </div>
       <div class="general-controls">
         <span
           class="control"
@@ -66,6 +73,13 @@
           placement="top"
           (click)="help($event)"
           ><i class="fas fa-question"></i
+        ></span>
+        <span
+          class="control"
+          [ngbTooltip]="'Axes'"
+          placement="top"
+          (click)="toggleHelpers()"
+          ><i class="fas fa-eye"></i
         ></span>
         <!--
         <span class="control"

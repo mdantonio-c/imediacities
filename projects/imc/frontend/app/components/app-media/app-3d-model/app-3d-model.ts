@@ -20,7 +20,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 export class App3dModelComponent implements OnInit, AfterViewInit {
   @Input() data;
 
-  @Input() public cameraZ: number = 50;
+  @Input() public cameraZ: number = -100;
   @Input() public fieldOfView: number = 1;
   @Input("nearClipping") public nearClippingPlane: number = 1;
   @Input("farClipping") public farClippingPlane: number = 1000;
@@ -31,11 +31,15 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
   private gltfLoader: GLTFLoader = new GLTFLoader();
   private renderer!: THREE.WebGLRenderer;
   private scene!: THREE.Scene;
-  private camera!: THREE.PerspectiveCamera;
+  public camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
+  // Helpers
+  private axesHelper = new THREE.AxesHelper(5);
+  private dirLightHelper: THREE.DirectionalLightHelper;
 
   private isFullScreen: boolean;
   public showHelp: boolean = false;
+  public showHelpers: boolean = false;
 
   constructor(private auth: AuthService) {}
 
@@ -53,7 +57,9 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
    * @private
    */
   private loadGLTFModel() {
-    const path = "/app/custom/assets/models/gltf/porsche/scene.gltf";
+    // const path = "/app/custom/assets/models/gltf/porsche/scene.gltf";
+    const path =
+      "/app/custom/assets/models/gltf/bassorilievo/bassorilievo.gltf";
     this.gltfLoader.load(
       path,
       (gltf) => {
@@ -88,26 +94,38 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
       this.farClippingPlane
     );
     this.camera.position.z = this.cameraZ;
-    this.camera.position.set(200, 300, this.cameraZ);
+    // this.camera.position.set(1.4, 1, this.cameraZ);
 
     // setup light
+    const color = 0xffffff;
+    const intensity = 1;
     /*const skyColor = 0xB1E1FF;  // light blue
     const groundColor = 0xB97A20;  // brownish orange
-    const intensity = 1;
-    const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+    */
+
+    /*const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
     this.scene.add(light);*/
 
-    const color = 0xffffff;
-    const intensity = 3;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(1, 5, 2);
-    this.scene.add(light);
-    this.scene.add(light.target);
+    const dirLight = new THREE.DirectionalLight(color, intensity);
+    dirLight.position.set(2, 2, -5); // x, y, z
+    this.scene.add(dirLight);
+    // this.scene.add(light.target);
+
+    const ambientLight = new THREE.AmbientLight(color, intensity);
+    ambientLight.position.set(0, 0, 10);
+    this.scene.add(ambientLight);
 
     // controls
     this.controls = new OrbitControls(this.camera, this.canvas);
-    this.controls.target.set(0, 0, 0);
+    this.controls.target.set(0, 0.4, 0);
     this.controls.update();
+
+    // add helpers
+    this.dirLightHelper = new THREE.DirectionalLightHelper(dirLight, 5);
+    if (this.showHelpers) {
+      this.scene.add(this.axesHelper);
+      this.scene.add(this.dirLightHelper);
+    }
   }
 
   private getAspectRatio() {
@@ -120,7 +138,6 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
    * @memberof App3dModelComponent
    */
   private render() {
-    console.log("render");
     //* Renderer
     // Use canvas element in template
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
@@ -202,5 +219,13 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
       default:
         this.showHelp = true;
     }
+  }
+
+  toggleHelpers() {
+    this.showHelpers = !this.showHelpers;
+    this.showHelpers
+      ? (this.scene.add(this.axesHelper), this.scene.add(this.dirLightHelper))
+      : (this.scene.remove(this.axesHelper),
+        this.scene.remove(this.dirLightHelper));
   }
 }

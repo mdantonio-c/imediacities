@@ -91,6 +91,15 @@
         transition: opacity 0.25s ease-in-out;
       }
 
+      .helper-controls {
+        display: flex;
+        justify-content: flex-start;
+        min-width: 0px;
+        pointer-events: none;
+        align-items: center;
+        font-size: small;
+      }
+
       .general-controls {
         display: flex !important;
         justify-content: flex-end;
