@@ -44,6 +44,18 @@
     color: $theme-image-color;
   }
 }
+.page-type-3d-model {
+  .imc--link:hover,
+  .imc--icon-link:hover {
+    i {
+      color: $theme-model-color;
+    }
+  }
+
+  .font-media-color {
+    color: $theme-model-color;
+  }
+}
 
 .page-link:focus {
   box-shadow: none;
@@ -56,6 +68,10 @@
 
 .icon-video {
   color: $theme-video-color !important;
+}
+
+.icon-model {
+  color: $theme-model-color !important;
 }
 
 .click-event {
@@ -257,6 +273,20 @@ input[type="radio"] {
   }
 }
 
+.page-type-3d-model {
+  input[type="radio"]:checked {
+    & + .imc--radio-label {
+      &:before {
+        border: 2px solid $theme-model-color !important;
+        background: $white;
+      }
+      &:after {
+        background: $theme-model-color;
+      }
+    }
+  }
+}
+
 //Datepicker
 .imc--input-data {
   /*background: url("../../assets/svg/today.svg") no-repeat right;
@@ -375,6 +405,16 @@ input[type="radio"] {
   }
 }
 
+.page-type-3d-model {
+  .imc--input-checkbox {
+    // Box checked video
+    &:checked + label:before {
+      background: $theme-model-color;
+      border: 2px solid $theme-model-color;
+    }
+  }
+}
+
 // INPUT SWITCH (button slide toggle)
 
 // Switch
@@ -464,7 +504,7 @@ input[type="radio"] {
 }
 
 .box-media {
-  background: $bg-dark;
+  background: $bg-light-dark;
   /*min-height: 480px;*/
   align-self: stretch;
 }
@@ -612,6 +652,14 @@ input[type="radio"] {
   .imc--thumb {
     .shot-number {
       background: $theme-image-color;
+    }
+  }
+}
+
+.page-type-3d-model {
+  .imc--thumb {
+    .shot-number {
+      background: $theme-model-color;
     }
   }
 }

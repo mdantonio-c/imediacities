@@ -122,6 +122,9 @@ export class AppMediaComponent implements OnInit, OnDestroy {
       this.media_class = "page-type-image";
       this.media_type = "image";
       // this.type_shot = false;
+    } else if (url.indexOf("/model") !== -1) {
+      this.media_class = "page-type-3d-model";
+      this.media_type = "3d-model";
     }
   }
 
@@ -330,6 +333,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
    * @param componente Configurazione del componente daq visualizzare nella modale
    */
   modal_show(componente) {
+    console.log(componente);
     //  fermo il video principale
     if (this.appVideo) {
       this.appVideo.video.pause();
@@ -413,20 +417,19 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   }
 
   media_entity_normalize(mediaEntity) {
-    //  Normalizzo i dati delle immagini
-    if (this.media_type === "image") {
-      // anno di produzione
+    //  normalize the image data
+    if (mediaEntity.type === "nonaventity") {
+      // production year
       if (mediaEntity.date_created) {
         mediaEntity.production_years = mediaEntity.date_created;
       }
-      // titolo principale
-      mediaEntity.identifying_title = MediaUtilsService.getIdentifyingTitle(
-        mediaEntity
-      );
+      // main title
+      mediaEntity.identifying_title =
+        MediaUtilsService.getIdentifyingTitle(mediaEntity);
       this.locations = [];
     }
 
-    //  elimino i titoli aggiuntivi se sono identici a quello identificativo
+    //  delete the additional titles if they are identical to the identification one
     if (mediaEntity._titles.length) {
       mediaEntity._titles = mediaEntity._titles.filter(
         (t) => t.text !== mediaEntity.identifying_title
@@ -451,7 +454,6 @@ export class AppMediaComponent implements OnInit, OnDestroy {
       this.MediaService.get(this.media_id, endpoint, (mediaEntity) => {
         this.media_type_set(this.router.url);
         this.media = this.media_entity_normalize(mediaEntity);
-        // console.log(this.media);
         this.is_3d_model =
           this.media.non_av_type && this.media.non_av_type.key === "3d-model"
             ? true
@@ -459,9 +461,8 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
         // To be confirmed
         setTimeout(() => {
-          let tabs = this.Element.nativeElement.querySelector(
-            "#pills-tab > li"
-          );
+          let tabs =
+            this.Element.nativeElement.querySelector("#pills-tab > li");
           if (tabs) tabs.click();
         }, 100);
 
@@ -469,17 +470,16 @@ export class AppMediaComponent implements OnInit, OnDestroy {
           this.ShotsService.get(this.media_id, endpoint);
         }
 
-        if (this.media_type === "image") {
+        if (this.media_type === "image" || this.media_type === "3d-model") {
           this.AnnotationService.get(this.media_id, endpoint);
-          const annotations_subscription = this.AnnotationService.update.subscribe(
-            (annotations) => {
+          const annotations_subscription =
+            this.AnnotationService.update.subscribe((annotations) => {
               this.ShotsService.get(this.media_id, endpoint, {
                 annotations: annotations,
                 links: this.media.links,
                 item_id: this.media._item[0].id,
               });
-            }
-          );
+            });
           this._subscription.add(annotations_subscription);
         }
 

@@ -1,4 +1,4 @@
-<!-- Template per il singolo shot, da mettere in loop per la creazione di tutti gli shot o segmenti -->
+<!-- Single shot template, to be looped to create all shots or segments -->
 <div
   class="row no-gutters box-single-shot"
   *ngIf="shot"
@@ -55,7 +55,7 @@
           />
           <label
             for="cut-confimed-{{shot.shot_num}}"
-            style="margin: 0 !important;"
+            style="margin: 0 !important"
             ngbTooltip="confirmed"
             placement="bottom"
           ></label>
@@ -64,7 +64,7 @@
     </div>
   </span>
   <span class="col-1 container-checkbox" *ngIf="multiSelection">
-    <!-- Checkbox per la selezione multipla -->
+    <!-- Checkbox for multiple selection -->
     <div class="box-checkbox">
       <input
         class="imc--input-checkbox styled-checkbox"
@@ -77,18 +77,15 @@
     </div>
   </span>
   <span class="col-1 imc--flex--vertical-center box-single-shot--number">
-    <!-- Numero dello shot, da scambiare con l'icona dell'active -->
-    <span class="shot-number"
+    <!-- Shot number, to be exchanged with the icon of the active -->
+    <span class="shot-number" *ngIf="showNumber"
       ><strong [innerHTML]="shot.shot_num +1"></strong
     ></span>
-    <!-- Icona freccia azzurra per l'active sullo shot -->
+    <!-- Blue arrow icon for the active shot -->
     <i class="material-icons font-media-color" *ngIf="is_attivo">play_arrow</i>
   </span>
-  <span
-    class="col-3 imc--flex--vertical-center"
-    style="flex-direction: column;"
-  >
-    <!-- Anteprima dello shot del video -->
+  <span class="col-3 imc--flex--vertical-center" style="flex-direction: column">
+    <!-- Video shot preview -->
     <span
       class="anteprima-shot click-event"
       [ngClass]="{'click-event': media_type === 'video'}"
@@ -113,7 +110,7 @@
   <span
     [ngClass]="!multiSelection ? 'col-7' : 'col-6'"
     class="imc--flex--vertical-center row no-gutters anteprima-shot--info"
-    style="flex-direction: column; align-items: flex-start;"
+    style="flex-direction: column; align-items: flex-start"
   >
     <strong [innerHTML]="shot.timestamp || '&nbsp;'"></strong>
     <span *ngIf="media_type === 'video'">
@@ -174,7 +171,7 @@
       <ng-template #dropArrow>keyboard_arrow_up</ng-template></i
     >
   </span>
-  <!-- Dettagli del singolo shot -->
+  <!-- Details of the single shot -->
   <div class="collapse col-12" [id]="collapse_id" [ngbCollapse]="!details_open">
     <div class="content">
       <div>
@@ -197,7 +194,7 @@
         class="row no-gutters space-paragraph-20"
         *ngIf="user && !underRevision"
       >
-        <!-- modali -->
+        <!-- modals -->
         <div
           ngbDropdown
           ngbDropdownReposition
@@ -237,14 +234,14 @@
           </div>
         </div>
         <div class="col-7 col-lg-5 box-annotation-buttons">
-          <!-- bottone vedi tutte le annotazioni -->
+          <!-- button "see all annotations" -->
           <button
             class="btn btn-accent"
             (click)="modale_show($event, 'all-annotations')"
           >
             See All
           </button>
-          <!-- aggiungi a una lista -->
+          <!-- add to a list -->
           <button class="btn btn-icon-border-classic tmp_hidden">
             <i class="material-icons">playlist_add</i>
           </button>

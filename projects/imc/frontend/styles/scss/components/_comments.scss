@@ -104,3 +104,12 @@
     }
   }
 }
+
+.page-type-3d-model {
+  .box-comment--vote {
+    a:hover,
+    .material-icons:hover {
+      color: $theme-model-color;
+    }
+  }
+}

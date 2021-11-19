@@ -53,18 +53,23 @@
   &.search-term-type-vocabolary {
     .page-type-video & {
       color: $theme-video-color;
-
       &.active {
         color: #fff;
         background-color: $theme-video-color;
       }
     }
-
     .page-type-image & {
       color: $theme-image-color;
       &.active {
         color: #fff;
         background-color: $theme-image-color;
+      }
+    }
+    .page-type-3d-model & {
+      color: $theme-model-color;
+      &.active {
+        color: #fff;
+        background-color: $theme-model-color;
       }
     }
   }
@@ -101,6 +106,12 @@
     }
   }
 
+  .page-type-3d-model & strong {
+    &:before {
+      background-color: $theme-model-color;
+    }
+  }
+
   strong.lod {
     &:before {
       background-color: $termtag-color;
@@ -129,6 +140,10 @@
 
   .page-type-image & button {
     background-color: $theme-image-color;
+  }
+
+  .page-type-3d-model & button {
+    background-color: $theme-model-color;
   }
 
   .lod & button {

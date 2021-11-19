@@ -15,7 +15,7 @@
   }
 }
 
-// variazione per l'item video
+// variation for the video item
 .page-type-video {
   .imc--topbar--title,
   .imc--topbar--title .material-icons {
@@ -23,11 +23,19 @@
   }
 }
 
-// variazione per l'item immagine
+// variation for the image item
 .page-type-image {
   .imc--topbar--title,
   .imc--topbar--title .material-icons {
     color: $theme-image-color;
+  }
+}
+
+// variation for the model item
+.page-type-3d-model {
+  .imc--topbar--title,
+  .imc--topbar--title .material-icons {
+    color: $theme-model-color;
   }
 }
 

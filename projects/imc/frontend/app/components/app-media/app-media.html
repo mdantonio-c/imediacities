@@ -48,7 +48,13 @@ picture-->
 
     <!-- container video and shot -->
     <div
-      class="container-media--content row no-gutters col-12 justify-content-md-center"
+      class="
+        container-media--content
+        row
+        no-gutters
+        col-12
+        justify-content-md-center
+      "
     >
       <!-- box media -->
       <section class="box-media col-12 col-sm-7 col-lg-6">
@@ -60,6 +66,14 @@ picture-->
           >
             <app-picture [data]="media"></app-picture>
           </div>
+        </ng-container>
+        <!-- 3D MODEL -->
+        <ng-container *ngIf="media_type === '3d-model'">
+          <app-3d-model
+            [data]="media"
+            *ngIf="!show_only_public_domain() || is_public_domain()"
+          >
+          </app-3d-model>
         </ng-container>
         <!-- VIDEO PLAYER -->
         <ng-container *ngIf="media_type === 'video'">
@@ -100,24 +114,30 @@ picture-->
       >
         <div class="imc--toolbar row no-gutters">
           <span
-            class="col-5 col-lg-6 imc--flex--vertical-center"
+            class="col-5 col-lg-8 imc--flex--vertical-center"
             *ngIf="media_type === 'video'"
           >
             Shots
           </span>
           <span
-            class="col-5 col-lg-6 imc--flex--vertical-center"
+            class="col-5 col-lg-8 imc--flex--vertical-center"
             *ngIf="media_type === 'image'"
           >
             Whole Picture
           </span>
-          <span class="col-7 col-lg-6 imc--flex--horizontal-end">
+          <span
+            class="col-5 col-lg-8 imc--flex--vertical-center"
+            *ngIf="media_type === '3d-model'"
+          >
+            Whole 3D-Model
+          </span>
+          <span class="col-7 col-lg-4 imc--flex--horizontal-end">
             <ul
               class="nav nav-pills mb-3 tab-shots"
               id="pills-tab"
               role="tablist"
             >
-              <!--Tab per il video-->
+              <!-- Tab for video -->
               <ng-container *ngIf="media_type === 'video'">
                 <li class="nav-item">
                   <span
@@ -133,7 +153,7 @@ picture-->
                   </span>
                 </li>
               </ng-container>
-              <!--Tab per l'immagine-->
+              <!-- Tab for image -->
               <ng-container *ngIf="media_type === 'image'">
                 <li class="nav-item">
                   <span
@@ -154,11 +174,27 @@ picture-->
                   </span>
                 </li>
               </ng-container>
+              <!-- Tab for 3D model -->
+              <ng-container *ngIf="media_type === '3d-model'">
+                <li class="nav-item">
+                  <span
+                    class="nav-link active"
+                    id="model"
+                    data-toggle="pill"
+                    href="#pills-model"
+                    role="tab"
+                    aria-controls="pills-model"
+                    aria-selected="true"
+                  >
+                    <i class="material-icons">view_in_ar</i>
+                  </span>
+                </li>
+              </ng-container>
             </ul>
           </span>
         </div>
         <div class="tab-content" id="pills-tabContent">
-          <!-- Contenuto delle tab -->
+          <!-- tab content -->
           <ng-container *ngIf="media_type === 'video'">
             <div
               class="tab-pane fade show active"
@@ -192,15 +228,13 @@ picture-->
               role="tabpanel"
               aria-labelledby="segments"
             >
-              <!-- tab segmenti -->
-
+              <!-- tab segments -->
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
-              <!-- Blocco di codice se non ci sono elementi al suo interno-->
-
+              <!-- Code block if there are no elements in it -->
               <div class="container-info-element row no-gutters">
                 <div class="col-12"><p>no segments</p></div>
                 <span class="info-element-button col-12">
-                  <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                  <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
                   <button class="btn btn-border-classic">
                     Create Segment<!--Cancel-->
                   </button>
@@ -208,7 +242,6 @@ picture-->
               </div>
             </div>
           </ng-container>
-
           <ng-container *ngIf="media_type === 'image'">
             <div
               class="tab-pane fade show active"
@@ -217,10 +250,7 @@ picture-->
               aria-labelledby="picture"
             >
               <!-- tab picture -->
-
-              <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
-              <!-- Blocco di codice se non ci sono elementi al suo interno-->
-
+              <!-- Code block if there are no elements in it -->
               <div
                 class="container-info-element row no-gutters"
                 *ngIf="!shots || !shots.length"
@@ -228,13 +258,12 @@ picture-->
                 <div class="col-12"><p>no tags!</p></div>
               </div>
 
-              <div *ngIf="shots && shots.length">
+              <div *ngIf="shots && shots.length === 1">
                 <app-video-shot
-                  *ngFor="let shot of shots"
-                  [shot]="shot"
+                  [shot]="shots[0]"
                   [user]="user"
-                  [media_type]="'image'"
-                  [multiSelection]="multi_annotations_is_active"
+                  [media_type]="media_type"
+                  [showNumber]="false"
                   (modale_richiedi)="modal_show($event)"
                   (is_selezionato)="shot_selezionato($event)"
                 ></app-video-shot>
@@ -247,15 +276,14 @@ picture-->
               role="tabpanel"
               aria-labelledby="areas"
             >
-              <!-- tab aree automatiche -->
-
+              <!-- tab automatic areas -->
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
-              <!-- Blocco di codice se non ci sono elementi al suo interno-->
+              <!-- Code block if there are no elements in it -->
 
               <div class="container-info-element row no-gutters">
                 <div class="col-12"><p>no automatic areas</p></div>
                 <span class="info-element-button col-12">
-                  <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                  <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
                   <!--<button class="btn btn-border-classic">Create Segment&lt;!&ndash;Cancel&ndash;&gt;</button>-->
                 </span>
               </div>
@@ -266,19 +294,46 @@ picture-->
               role="tabpanel"
               aria-labelledby="myareas"
             >
-              <!-- tab segmenti -->
+              <!-- tab segments -->
 
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
-              <!-- Blocco di codice se non ci sono elementi al suo interno-->
+              <!-- Code block if there are no elements in it -->
 
               <div class="container-info-element row no-gutters">
                 <div class="col-12"><p>no personal areas</p></div>
                 <span class="info-element-button col-12">
-                  <!-- In questo bottone sraà da cambiare l'altezza del margin-bottom quando è presente il footer delle tab-->
+                  <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
                   <button class="btn btn-border-classic">
                     Create Area<!--Cancel-->
                   </button>
                 </span>
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="media_type === '3d-model'">
+            <div
+              class="tab-pane fade show active"
+              id="pills-model"
+              role="tabpanel"
+              aria-labelledby="model"
+            >
+              <!-- tab 3d-model -->
+              <div
+                class="container-info-element row no-gutters"
+                *ngIf="!shots || !shots.length"
+              >
+                <div class="col-12"><p>no tags!</p></div>
+              </div>
+              <!-- -->
+              <div *ngIf="shots && shots.length === 1">
+                <app-video-shot
+                  [shot]="shots[0]"
+                  [user]="user"
+                  [media_type]="media_type"
+                  [showNumber]="false"
+                  (modale_richiedi)="modal_show($event)"
+                  (is_selezionato)="shot_selezionato($event)"
+                ></app-video-shot>
               </div>
             </div>
           </ng-container>
@@ -301,7 +356,6 @@ picture-->
               >
                 Shot revision
               </button>
-              &nbsp;
               <button
                 class="btn btn-border-classic px-1"
                 (click)="multi_annotations_toggle()"
@@ -320,7 +374,6 @@ picture-->
               >
                 Cancel
               </button>
-              &nbsp;
               <button
                 class="btn btn-border-classic"
                 (click)="save_revised_shots()"
@@ -388,7 +441,7 @@ picture-->
   <!-- CONTAINER INFO -->
   <div class="container-fluid imc--container">
     <div class="row no-gutters">
-      <!-- corpo della pagina -->
+      <!-- body of the page -->
       <section class="col-12 col-lg-8">
         <!-- TABS INFO -->
         <app-media-info
@@ -396,12 +449,12 @@ picture-->
           [user_language]="user_language"
         ></app-media-info>
 
-        <!-- COMMENTI -->
+        <!-- COMMENTS -->
         <!-- comment out for the moment
                 <app-media-commenti></app-media-commenti> -->
       </section>
 
-      <!-- colonna destra -->
+      <!-- right col -->
       <section class="col-12 col-lg-4 imc--colonna-destra">
         <!-- MEDIA TAGS -->
         <app-media-tags
@@ -414,7 +467,7 @@ picture-->
         <!-- <app-media-related-items></app-media-related-items> -->
       </section>
 
-      <!-- COMMENTI
+      <!-- COMMENTS
             <section class="col-8 imc&#45;&#45;content-comments">
                 <app-media-commenti></app-media-commenti>
             </section>-->

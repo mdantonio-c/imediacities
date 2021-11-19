@@ -192,7 +192,7 @@ class Search(IMCEndpoint):
             annotated_by = filtering.get("annotated_by")
             # if no user ignore this filter
             if user and annotated_by:
-                # only annotated *BY ME* is autorized (except for the admin)
+                # only annotated *BY ME* is authorized (except for the admin)
                 anno_user_id = annotated_by.get("user")
                 iamadmin = self.auth.is_admin(user)
                 if user.uuid != anno_user_id and not iamadmin:

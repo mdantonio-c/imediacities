@@ -161,7 +161,7 @@
 
   .modal--list-info {
     box-sizing: border-box;
-    padding: 0 15px 0 20px !important;
+    padding: 0 15px 0 10px !important;
   }
 
   p {
@@ -184,12 +184,13 @@
   span {
     background: $bg-dark;
     display: block;
-    min-height: 90px;
+    //min-height: 90px;
     width: 100%;
 
     img {
       height: auto;
       width: 100%;
+      object-fit: cover;
     }
   }
 }
@@ -267,6 +268,12 @@
 .page-type-image {
   .modal--media-link {
     background: rgba($theme-image-color, 0.2);
+  }
+}
+
+.page-type-3d-model {
+  .modal--media-link {
+    background: rgba($theme-model-color, 0.2);
   }
 }
 
@@ -389,6 +396,15 @@
   .modal--link-list {
     a {
       color: $theme-image-color;
+      font-weight: 500;
+    }
+  }
+}
+
+.page-type-3d-model {
+  .modal--link-list {
+    a {
+      color: $theme-model-color;
       font-weight: 500;
     }
   }

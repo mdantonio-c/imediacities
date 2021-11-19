@@ -1,0 +1,100 @@
+<div class="viewer" id="hook">
+  <div class="titlebar">
+    <!--<h4 class="text-center">glTF Sample Preview</h4>-->
+  </div>
+  <div class="overlays">
+    <div class="overlay help" *ngIf="showHelp">
+      <a
+        href="#"
+        class="close viewer-icon-close"
+        aria-label="close"
+        (click)="help($event, 'close')"
+      ></a>
+      <div class="row h-100">
+        <div class="align-items-center col-4 d-flex">
+          <div class="tip w-100">
+            <div>
+              <i class="fas fa-sync-alt"></i>
+            </div>
+            <div>
+              <b>Orbit around</b>
+              <div>
+                Left click + drag or<br />
+                One finger drag (touch)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="align-items-center col-4 d-flex">
+          <div class="tip w-100">
+            <div>
+              <i class="fas fa-search-plus"></i>
+            </div>
+            <div>
+              <b>Zoom</b>
+              <div>
+                Scroll anywhere or<br />
+                Pinch (touch)
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="align-items-center col-4 d-flex">
+          <div class="tip w-100">
+            <div>
+              <i class="fas fa-arrows-alt"></i>
+            </div>
+            <div>
+              <b>Pan</b>
+              <div>
+                Right click + drag or<br />
+                Two fingers drag (touch)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="webgl">
+    <canvas #canvas id="canvas" style="height: 100%; width: 100%"></canvas>
+    <div class="controls">
+      <div class="helper-controls" *ngIf="showHelpers">
+        <i class="fas fa-video mr-2"></i>
+        <span>
+          <b>x</b>:{{camera?.position.x}}, <b>y</b>:{{camera?.position.y}},
+          <b>z</b>:{{camera?.position.z}}
+        </span>
+      </div>
+      <div class="general-controls">
+        <span
+          class="control"
+          [ngbTooltip]="'Help'"
+          placement="top"
+          (click)="help($event)"
+          ><i class="fas fa-question"></i
+        ></span>
+        <span
+          class="control"
+          [ngbTooltip]="'Axes'"
+          placement="top"
+          (click)="toggleHelpers()"
+          ><i class="fas fa-eye"></i
+        ></span>
+        <!--
+        <span class="control"
+          [ngbTooltip]="'Settings'"
+          placement="top"
+        ><i class="fas fa-cog"></i></span>-->
+        <span
+          class="control"
+          [ngbTooltip]="'Fullscreen'"
+          placement="top"
+          container="body"
+          (click)="openFullscreen()"
+          ><i class="fas fa-expand-alt"></i
+        ></span>
+      </div>
+    </div>
+  </div>
+</div>

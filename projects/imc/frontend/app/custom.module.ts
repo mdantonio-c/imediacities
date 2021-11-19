@@ -25,7 +25,7 @@ import { MultiItemCarouselComponent } from "./components/user-workspace/multi-it
 import { ItemDetailComponent } from "./components/user-workspace/item-detail/item-detail.component";
 
 import { CatalogComponent } from "./catalog/catalog.component";
-import { SearchResultComponent } from "@app/catalog/components/search-result.component";
+import { SearchResultComponent } from "./catalog/components/search-result.component";
 import { SearchFilterComponent } from "./catalog/components/search-filter/search-filter.component";
 import { SearchNavbarComponent } from "./catalog/components/search-navbar/search-navbar.component";
 import { SearchThumbnailComponent } from "./catalog/components/search-thumbnail/search-thumbnail.component";
@@ -46,6 +46,7 @@ import { AppMediaTopBarComponent } from "./components/app-media/app-media-top-ba
 import { AppAddToListComponent } from "./components/app-add-to-list/app-add-to-list";
 
 import { AppPictureComponent } from "./components/app-media/app-picture/app-picture";
+import { App3dModelComponent } from "./components/app-media/app-3d-model/app-3d-model";
 import { AppVideoTagComponent } from "./components/app-media/app-video-tag/app-video-tag";
 import { AppVideoShotComponent } from "./components/app-media/app-video-shot/app-video-shot";
 import { AppMediaMapComponent } from "./components/app-media/app-media-map/app-media-map";
@@ -126,11 +127,9 @@ const routes: Routes = [
   // { path: 'app/catalog', component: CatalogComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
   { path: "app/catalog", component: CatalogComponent },
 
-  // { path: 'app/catalog/images/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
   { path: "app/catalog/images/:uuid", component: AppMediaComponent },
-
-  // { path: 'app/catalog/videos/:uuid', component: AppMediaComponent, canActivate: [AuthGuard], runGuardsAndResolvers: 'always' },
   { path: "app/catalog/videos/:uuid", component: AppMediaComponent },
+  { path: "app/catalog/models/:uuid", component: AppMediaComponent },
 
   { path: "app", redirectTo: "/app/catalog", pathMatch: "full" },
   { path: "", redirectTo: "/app/catalog", pathMatch: "full" },
@@ -186,6 +185,7 @@ const routes: Routes = [
     AppMediaTopBarComponent,
     AppAddToListComponent,
     AppPictureComponent,
+    App3dModelComponent,
     AppShotReferenceComponent,
     AppVideoTagComponent,
     AppVideoShotComponent,
