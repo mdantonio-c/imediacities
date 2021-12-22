@@ -1,7 +1,7 @@
 <div class="row no-gutter">
   <div class="col-11">
-    <blockquote style="font-size: 12px;">
-      <p style="margin: 0 !important;">
+    <blockquote style="font-size: 12px">
+      <p style="margin: 0 !important">
         <ng-container
           *ngFor="let author of biblio.reference.authors; let last=last"
           >{{author}}{{last ? '' : ', '}}</ng-container
@@ -40,7 +40,8 @@
           ><br /><a
             href="{{biblio.reference.url}}"
             target="_blank"
-            style="font-size: 13px !important;"
+            rel="noopener noreferrer"
+            style="font-size: 13px !important"
             >{{biblio.reference.url}}</a
           ></ng-container
         >
@@ -51,7 +52,7 @@
     <div *ngIf="can_delete">
       <i
         class="material-icons click-event"
-        style="font-size: 1.3em !important;"
+        style="font-size: 1.3em !important"
         mwlConfirmationPopover
         [popoverTitle]="'Remove reference'"
         [popoverMessage]="'This operation cannot be undone. Do you wish to continue?'"

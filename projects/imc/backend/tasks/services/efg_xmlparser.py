@@ -528,7 +528,11 @@ class EFG_XMLParser:
 
         agents: Any = []
         for agent_node in nodes:
-            props = {"names": [agent_node.find("efg:name", self.ns).text.strip()]}
+            # find the first child with tag 'name'
+            agent_name = agent_node.find("efg:name", self.ns)
+            if agent_name is None:
+                raise ValueError("Mandatory name missing in agent node")
+            props = {"names": [agent_name.text.strip()]}
             activities = []
             rel_agent_type = agent_node.find("efg:type", self.ns)
             if rel_agent_type is not None and rel_agent_type.text.lower() != "n/a":
@@ -720,7 +724,8 @@ class EFG_XMLParser:
             log.warning("Creation parsed with {} warning(s)", len(self.warnings))
         return non_av_creation
 
-    def prettify(self, elem: ET.Element) -> Any:
+    @staticmethod
+    def prettify(elem: ET.Element) -> Any:
         """Return a pretty-printed XML string for the Element."""
         rough_string: str = ET.tostring(elem, "utf-8")
         re_parsed = minidom.parseString(rough_string)
