@@ -24,14 +24,12 @@ export class UploadComponent extends BasePaginationComponent<Data> {
   @ViewChild("dataSize", { static: false }) public dataSize: TemplateRef<any>;
   @ViewChild("dataUploadData", { static: false })
   public dataUploadData: TemplateRef<any>;
-  @ViewChild("dataStatus", { static: false }) public dataStatus: TemplateRef<
-    any
-  >;
+  @ViewChild("dataStatus", { static: false })
+  public dataStatus: TemplateRef<any>;
   @ViewChild("controlsCell", { static: false })
   public controlsCell: TemplateRef<any>;
-  @ViewChild("emptyHeader", { static: false }) public emptyHeader: TemplateRef<
-    any
-  >;
+  @ViewChild("emptyHeader", { static: false })
+  public emptyHeader: TemplateRef<any>;
 
   public upload_options: any;
   public upload_progress: any = {};
@@ -43,7 +41,7 @@ export class UploadComponent extends BasePaginationComponent<Data> {
     private stageService: StageService
   ) {
     super(injector);
-    this.init("file", "stage", null);
+    this.init("file", "/api/stage", null);
     this.initPaging(50, true);
     this.list();
   }
