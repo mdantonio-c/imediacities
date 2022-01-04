@@ -104,3 +104,11 @@ export interface VocabularyTerm {
   open?: boolean;
   selected?: boolean;
 }
+
+export interface ModalConfig {
+  modale: string;
+  titolo: string;
+  data: any;
+  classe?: string;
+  previous?: boolean;
+}
