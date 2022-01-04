@@ -142,7 +142,9 @@ export class AppAnnotationsService {
             this.get(annotation.source_uuid, "images");
           }
         },
-        (err) => {}
+        (err) => {
+          this.notify.showError(err);
+        }
       );
   }
   update_note_private(note, new_private) {
