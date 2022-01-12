@@ -12,13 +12,14 @@ from imc.tasks.services.creation_repository import CreationRepository
 from imc.tasks.services.efg_xmlparser import EFG_XMLParser
 from imc.tasks.services.od_concept_mapping import concept_mapping
 from imc.tasks.services.orf_xmlparser import ORF_XMLParser
+from restapi.config import CELERY_HOSTNAME, HOST_TYPE
 from restapi.connectors import neo4j, smtp
 from restapi.connectors.celery import CeleryExt
 from restapi.connectors.smtp.notifications import get_html_template
 from restapi.exceptions import NotFound, ServiceUnavailable
 from restapi.utilities.logs import log
 
-if os.environ.get("IS_CELERY_CONTAINER", "0") == "1":
+if HOST_TYPE == CELERY_HOSTNAME:
     try:
         # mypy: Cannot find implementation or library stub for
         # module named 'scripts.analysis.analyze'
