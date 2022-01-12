@@ -1,4 +1,4 @@
-FROM rapydo/backend:2.1
+FROM rapydo/backend:2.2
 
 RUN apt-get update -qq && \
     apt-get install --yes --no-install-recommends ffmpeg libavcodec-extra libv4l-0 libsm6 libxext6 imagemagick && \
