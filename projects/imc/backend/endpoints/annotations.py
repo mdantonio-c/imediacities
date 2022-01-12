@@ -136,48 +136,6 @@ class AnnotationAbstract(IMCEndpoint):
         return res
 
 
-# 2021-10-11: it seems to be unused... let's remove it
-# class Annotation(AnnotationAbstract):
-#     labels = ["annotation"]
-
-#     # "schema": {"$ref": "#/definitions/Annotation"},
-#     @decorators.auth.require()
-#     @decorators.use_kwargs(
-#         {
-#             "anno_type": fields.Str(
-#                 required=False,
-#                 data_key="type",
-#                 metadata={"description": "filter by annotation type"},
-#             )
-#         },
-#         location="query",
-#     )
-#     @decorators.marshal_with(AnnotationModel(many=True), code=200)
-#     @decorators.endpoint(
-#         path="/annotations/<anno_id>",
-#         summary="Get a single annotation",
-#         description="Returns a single annotation for its uuid",
-#         responses={200: "An annotation", 404: "Annotation does not exist."},
-#     )
-#     def get(self, anno_id: str, user: User) -> Response:
-#         """Get an annotation"""
-#         graph = neo4j.get_instance()
-#         user = self.get_user()
-#         if anno_id is None and not self.auth.is_admin(user):
-#             raise Unauthorized("You are not authorized: missing privileges")
-
-#         anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
-#         if not anno:
-#             log.debug("Annotation with uuid {} does not exist", anno_id)
-#             raise NotFound("Please specify a valid annotation id")
-
-#         # FIXME this should not be a list
-#         data = []
-#         data.append(self.get_annotation_response(anno))
-
-#         return self.response(data)
-
-
 class Annotations(AnnotationAbstract):
 
     # the following list is a subset of the annotation_type list in neo4j
@@ -287,20 +245,20 @@ class Annotations(AnnotationAbstract):
         target_type, tid = target.split(":")
         log.debug("target type: {}, target id: {}", target_type, tid)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        targetNode = None
+        target_node = None
         if target_type == "item":
-            targetNode = self.graph.Item.nodes.get_or_none(uuid=tid)
+            target_node = graph.Item.nodes.get_or_none(uuid=tid)
         elif target_type == "shot":
-            targetNode = self.graph.Shot.nodes.get_or_none(uuid=tid)
+            target_node = graph.Shot.nodes.get_or_none(uuid=tid)
         elif target_type == "anno":
-            targetNode = self.graph.Annotation.nodes.get_or_none(uuid=tid)
+            target_node = graph.Annotation.nodes.get_or_none(uuid=tid)
         else:
             # this should never be reached
             raise ServerError("Invalid target type")
 
-        if targetNode is None:
+        if target_node is None:
             raise BadRequest(f"Target [{target_type}][{tid}] does not exist")
 
         # check the selector
@@ -354,10 +312,10 @@ class Annotations(AnnotationAbstract):
                 raise BadRequest(f"Invalid body type for: {b_type}")
 
         # create manual annotation
-        repo = AnnotationRepository(self.graph)
+        repo = AnnotationRepository(graph)
         if motivation == "describing":
             created_anno = repo.create_dsc_annotation(
-                user, bodies, targetNode, selector, is_private, embargo_date
+                user, bodies, target_node, selector, is_private, embargo_date
             )
         elif motivation == "segmentation":
             if b_type != "TVSBody":
@@ -369,21 +327,21 @@ class Annotations(AnnotationAbstract):
                 raise BadRequest("Invalid target. Only item allowed.")
             try:
                 created_anno = repo.create_tvs_manual_annotation(
-                    user, bodies, targetNode, is_private, embargo_date
+                    user, bodies, target_node, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
                 raise Conflict(error.args[0])
         elif motivation == "linking":
             try:
                 created_anno = repo.create_link_annotation(
-                    user, bodies, targetNode, is_private, embargo_date
+                    user, bodies, target_node, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
                 raise Conflict(error.args[0])
         else:
             try:
                 created_anno = repo.create_tag_annotation(
-                    user, bodies, targetNode, selector, is_private, embargo_date
+                    user, bodies, target_node, selector, is_private, embargo_date
                 )
             except DuplicatedAnnotationError as error:
                 raise Conflict(error.args[0] + " " + "; ".join(error.args[1]))
@@ -418,18 +376,13 @@ class Annotations(AnnotationAbstract):
     def delete(
         self, anno_id: str, user: User, body_ref: Optional[str] = None
     ) -> Response:
-        """Deletes an annotation."""
-
-        self.graph = neo4j.get_instance()
-
-        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        """Delete an annotation."""
+        graph = neo4j.get_instance()
+        anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
             raise NotFound("Annotation not found")
 
         log.debug("current user: {email} - {uuid}", email=user.email, uuid=user.uuid)
-        i_am_admin = self.auth.is_admin(user)
-        log.debug("current user is admin? {}", i_am_admin)
-
         creator = anno.creator.single()
         is_manual = True if creator is not None else False
         if anno.generator is None and creator is None:
@@ -439,9 +392,21 @@ class Annotations(AnnotationAbstract):
                 id=anno.uuid,
             )
             raise NotFound("Annotation with no creator")
-        if is_manual and user.uuid != creator.uuid and not i_am_admin:
+        i_am_coordinator = self.auth.is_coordinator(user)
+        log.debug("current user is a coordinator? {}", i_am_coordinator)
+        source_item = anno.source_item.single()
+        user_group = user.belongs_to.single()
+        # ONLY allowed to creators and coordinators of the group to which the media item belongs.
+        if (
+            is_manual
+            and user.uuid != creator.uuid
+            and (
+                not i_am_coordinator
+                or not source_item.ownership.is_connected(user_group)
+            )
+        ):
             raise Forbidden(
-                "You cannot delete an annotation that does not belong to you"
+                "You cannot delete an annotation that does not belong to you or that you are not the coordinator of"
             )
 
         body_type = None
@@ -454,7 +419,7 @@ class Annotations(AnnotationAbstract):
             body_type, bid = body_ref.split(":", 1)
             log.debug("[body type]: {}, [body id]: {}", body_type, bid)
 
-        repo = AnnotationRepository(self.graph)
+        repo = AnnotationRepository(graph)
         try:
             if is_manual and anno.annotation_type != "TVS":
                 repo.delete_manual_annotation(anno, body_type, bid)
@@ -497,9 +462,9 @@ class Annotations(AnnotationAbstract):
         if anno_id is None:
             raise BadRequest("Please specify an annotation id")
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
             raise NotFound("Annotation not found")
 
@@ -583,9 +548,9 @@ class Annotations(AnnotationAbstract):
         self, anno_id: str, patch_op: str, path: str, value: str, user: User
     ) -> Response:
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        anno = self.graph.Annotation.nodes.get_or_none(uuid=anno_id)
+        anno = graph.Annotation.nodes.get_or_none(uuid=anno_id)
         if anno is None:
             raise NotFound("Annotation not found")
 
@@ -602,11 +567,11 @@ class Annotations(AnnotationAbstract):
                 f"Operation not allowed for annotation {anno.annotation_type}"
             )
 
-        repo = AnnotationRepository(self.graph)
+        repo = AnnotationRepository(graph)
 
         if patch_op == "remove":
             log.debug("remove a segment with uuid:{uuid}", uuid=value)
-            segment = self.graph.VideoSegment.nodes.get_or_none(uuid=value)
+            segment = graph.VideoSegment.nodes.get_or_none(uuid=value)
 
             if not segment:
                 raise NotFound(f"Segment with ID {value} not found.")

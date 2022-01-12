@@ -1,18 +1,14 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-} from "@angular/core";
+import { Component, ViewChild, ElementRef, AfterViewInit } from "@angular/core";
 import { AppVideoControlComponent } from "../app-video-control";
 
 @Component({
   selector: "app-video-control-volume",
   templateUrl: "app-video-control-volume.html",
 })
-export class AppVideoControlVolumeComponent extends AppVideoControlComponent
-  implements AfterViewInit {
+export class AppVideoControlVolumeComponent
+  extends AppVideoControlComponent
+  implements AfterViewInit
+{
   @ViewChild("ico_off", { static: false }) ico_off: ElementRef;
   @ViewChild("ico_mute", { static: false }) ico_mute: ElementRef;
   @ViewChild("ico_down", { static: false }) ico_down: ElementRef;
@@ -29,7 +25,6 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent
 
   constructor() {
     super();
-    // this._interfaccia();
   }
 
   ngOnInit() {
@@ -37,14 +32,16 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent
   }
 
   ngAfterViewInit() {
-    this.volume_last_value = this.video.volume;
-    this._interfaccia();
-    this._ico_events();
-    this.volume_set(this.video.volume);
-    this._volume_events();
-    this.volume.nativeElement.value = this.video.volume;
-    this._volume_slider_events();
-    this._interfaccia();
+    setTimeout(() => {
+      this.volume_last_value = this.video.volume;
+      this._interfaccia();
+      this._ico_events();
+      this.volume_set(this.video.volume);
+      this._volume_events();
+      this.volume.nativeElement.value = this.video.volume;
+      this._volume_slider_events();
+      this._interfaccia();
+    });
   }
 
   private _interfaccia() {
@@ -101,10 +98,10 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent
   }
 
   private _volume_gutter_set(ico) {
-    let copia = ico.nativeElement.cloneNode(true);
-    copia.classList.remove("display-none");
+    let copy = ico.nativeElement.cloneNode(true);
+    copy.classList.remove("display-none");
     this.volume_gutter.nativeElement.innerHTML = "";
-    this.volume_gutter.nativeElement.appendChild(copia);
+    this.volume_gutter.nativeElement.appendChild(copy);
   }
 
   private _volume_slider_events() {
@@ -121,8 +118,7 @@ export class AppVideoControlVolumeComponent extends AppVideoControlComponent
   }
 
   private _volume_slider_show(ico) {
-    let elemRect = ico.nativeElement.getBoundingClientRect();
-
+    // let elemRect = ico.nativeElement.getBoundingClientRect();
     this._volume_gutter_set(ico);
 
     //this.volume_slider.nativeElement.style = `top:${elemRect.top + elemRect.height}px;left:${elemRect.left}px;`;
