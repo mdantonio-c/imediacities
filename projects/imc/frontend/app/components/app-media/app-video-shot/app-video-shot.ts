@@ -10,6 +10,8 @@ import {
 } from "@angular/core";
 import { AppVideoControlComponent } from "../app-video-controls/app-video-control";
 import { is_annotation_owner } from "../../../decorators/app-annotation-owner";
+import { IMC_Annotation } from "../../../services/app-shots";
+import { ModalConfig } from "../../../types";
 
 @Component({
   selector: "app-video-shot",
@@ -22,12 +24,14 @@ export class AppVideoShotComponent
   @Input() shot: any;
   @Input() multiSelection: boolean = false;
   @Input() user;
+  @Input() readonly media_owner: string;
   @Input() media_type = "video";
   @Input() underRevision: boolean = false;
   @Input() canRevise: boolean = false;
   @Input() showNumber: boolean = true;
 
-  @Output() modale_richiedi: EventEmitter<any> = new EventEmitter<any>();
+  @Output() modale_richiedi: EventEmitter<ModalConfig> =
+    new EventEmitter<ModalConfig>();
   @Output() is_selezionato: EventEmitter<any> = new EventEmitter<any>();
   @Output() revise_shot: EventEmitter<any> = new EventEmitter<any>();
 
@@ -103,15 +107,15 @@ export class AppVideoShotComponent
     );
   }
 
-  tag_is_deletable(tag) {
+  tag_is_deletable(tag: IMC_Annotation) {
     return (
       !this.tag_is_automatic(tag) &&
-      this.is_annotation_owner(this.user, tag.creator) &&
+      this.is_annotation_owner(this.user, tag.creator, this.media_owner) &&
       !this.underRevision
     );
   }
 
-  tag_is_automatic(tag) {
+  tag_is_automatic(tag: IMC_Annotation) {
     return tag.creator ? false : true;
   }
 

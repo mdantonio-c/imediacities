@@ -45,6 +45,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   @Input() draggable_markers;
   @Input() clickable_markers;
   @Input() media_type;
+  @Input() media_owner;
 
   //@ViewChild(NguiMapComponent, { static: false }) ngMap: NguiMapComponent;
 
@@ -184,7 +185,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Aggiunge un marker sul click
+   * Add a marker on click
    * @param event
    */
   marker_add(event, self) {
@@ -204,7 +205,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
 
     let shots_idx = [];
 
-    //  Verifico shot corrente
+    //  check current shot
     if (this.media_type === "video" && this.current_shot_from_video) {
       if (this.VideoService.shot_current() === -1) {
         return alert("No shot selected");
@@ -230,7 +231,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Visulizza la InfoWindow al click su un marker
+   * Displays the InfoWindow when clicked on a marker
    * @param event
    * @param pos
    */
@@ -252,7 +253,11 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
         return acc;
       }, []),
       marker: mkplus,
-      owner: self.is_annotation_owner(self._current_user, pos.creator),
+      owner: self.is_annotation_owner(
+        self._current_user,
+        pos.creator,
+        this.media_owner
+      ),
     };
 
     const modalRef = self.modalService.open(AppMediaMapInfowindowComponent, {
@@ -271,7 +276,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Elimina l'annotazione collegata al marker
+   * Delete the annotation linked to the marker
    * @param marker
    */
   marker_delete(marker) {
@@ -281,7 +286,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Al termine del trascinamento di un marker mostra una InfoWindow con le opzioni possibili
+   * When you finish dragging a marker, it shows an InfoWindow with possible options
    * @param event
    * @param pos
    */
@@ -299,7 +304,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Chiude l'infowindow per la modifica / creazione del marker
+   * Closes the InfoWindow for marker modification / creation
    */
   marker_edit_close(remove_marker_from_map = true) {
     this.modalService.dismissAll();
@@ -307,8 +312,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Output emesso dal pulsante di chiusura standard della infoview
-   * Controllo se il marker è stato salvato diversamente lo rimuovo dalla mappa
+   * Output issued by the standard close button of the InfoView.
+   * Check if the marker has been saved. Otherwise I remove it from the map.
    */
   marker_edit_closeclick() {
     if (
@@ -326,10 +331,10 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Salvataggio marker
+   * Marker saving
    */
   marker_edit_save() {
-    //  Impostazione shot
+    //  shot setting
     let shots_idx = [];
 
     if (this.marker_edit.shots_idx) {
@@ -400,8 +405,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
     });
 
-    //  Verifico se esiste un marker precedente
-    //  ed eventualmente lo rimuovo
+    //  I check if there is a previous marker and eventually remove it
     if (this.marker_edit.marker && this.marker_edit.state !== "saved") {
       this.osmap.removeLayer(this.marker_edit.marker);
     }
@@ -438,12 +442,6 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       shots_idx: shots_idx,
       state: "saving",
     };
-    /*
-    let mked = {
-        description : "aaaaaaaaaaaaaaaaaa",
-        address : "bbbbbbbbbbbb"
-    };
-*/
 
     const modalRef = this.modalService.open(AppMediaMapInfowindowComponent, {
       size: "lg",
@@ -455,8 +453,8 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
     modalRef.componentInstance.info_window_data = self.info_window_data;
     window.dispatchEvent(new Event("resize")); // this seems necessary since sometimes the popup does not show
     /*
-    // mi serve il place name di google da salvare dentro description
-    //  dentro result non c'è, faccio una richiesta a google
+    // I need the google place name to save in description
+    // Can't find it into result. I make a request to google.
     const placeDetails = new google.maps.places.PlacesService(
       this.map
     ).getDetails(
@@ -483,7 +481,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Riporta il marker che è stato spostato alla posizione iniziale
+   * Returns the marker that has been moved to its starting position.
    */
   marker_position_reset() {
     this.marker_active.marker.setPosition(this.marker_active.position.original);
@@ -492,28 +490,28 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Aggiorna la posizione del marker attribuendo un nuovo titolo ottenuto dal servizio di geocoding
+   * Update the position of the marker by assigning a new title obtained from the geocoding service.
    */
   marker_position_update() {
     /* TODO TODO TODO
     new google.maps.Geocoder().geocode(
       { location: this.marker_active.position.updated },
       (results, status) => {
-        //  Aggiorno proprietà marker
-        let indirizzi = results[0].address_components;
-        let titolo;
+        //  Update marker properties
+        let addresses = results[0].address_components;
+        let title;
 
-        indirizzi.some((i) => {
+        addresses.some((i) => {
           if (i.types.indexOf("route") !== -1) {
-            titolo = i.long_name;
+            title = i.long_name;
             return true;
           }
         });
 
-        this.marker_active.marker.setTitle(titolo);
+        this.marker_active.marker.setTitle(title);
 
-        //  Aggiorno proprietà location
-        this.marker_active.location.name = titolo;
+        //  Update location property
+        this.marker_active.location.name = title;
         this.marker_active.location.spatial = [
           this.marker_active.position.updated.lat,
           this.marker_active.position.updated.lng,
@@ -528,7 +526,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Aggiunge un marker dall'esterno
+   * Add a marker from the outside
    * @param marker
    */
   marker_push(marker) {
@@ -540,7 +538,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Prepara un marker esistente per la modifica e visualizza la infowindow corrispondente
+   * Prepare an existing marker for editing and display the corresponding InfoWindow
    * @param annotation
    * @param marker
    */
@@ -571,17 +569,17 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Ottiene gli indici degli shot ai quali associare il marker da salvare
+   * Gets the indexes of the shots to which to associate the marker to be saved
    * @returns {any[]}
    */
-  _shots_get(elenco_shots = null) {
-    if (!elenco_shots || !Array.isArray(elenco_shots)) {
-      elenco_shots = [elenco_shots];
+  _shots_get(shotList = null) {
+    if (!shotList || !Array.isArray(shotList)) {
+      shotList = [shotList];
     }
 
     let shots_idx = [];
 
-    elenco_shots.forEach((e) => {
+    shotList.forEach((e) => {
       this.shots.forEach((s) => {
         if (s.shot_num === e) {
           shots_idx.push(s);
@@ -600,7 +598,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Imposta la mappa in modo da visualizzare tutti i marker
+   * Set the map to show all markers
    */
   fit_bounds() {
     console.log("Checkpoint fit_bounds");
@@ -668,8 +666,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   /**
-   * Evento ready della mappa
-   * imposta this.map
+   * Map ready event: setup this.map
    * @param map
    */
   onMapReady(map: L.Map) {
@@ -720,7 +717,7 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
       // SPECIFICO PER DARE RAVENNA
       this.centerCoords(44.42062, 12.209512);
 
-      /*       
+      /*
       if (location_to_find) {
         this.centerCity(location_to_find.toUpperCase());
 /*
@@ -789,13 +786,13 @@ export class AppMediaMapComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges() {
-    //  Elimino tutti i marker eventualmente residui
+    // Delete any markers that may be residual
     this._markers.forEach((m) => {
       if (m.hasOwnProperty("map")) {
         m.setMap(null);
       }
     });
-    //  Reimposto i marker
+    // Reset the markers
     if (this.markers && this.markers.length) {
       this._markers = this.markers.slice();
     }

@@ -12,6 +12,16 @@
     height: 1.5em;
     overflow: hidden;
     width: 90%;
+
+    .notes-header {
+      display: flex;
+      align-items: center;
+      height: 24px;
+
+      i {
+        font-size: 15px !important;
+      }
+    }
   }
 
   .notes-buttons {

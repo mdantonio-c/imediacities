@@ -210,6 +210,7 @@ picture-->
                   *ngFor="let shot of shots"
                   [shot]="shot"
                   [user]="user"
+                  [media_owner]="get_media_owner()"
                   [multiSelection]="multi_annotations_is_active"
                   [underRevision]="shot_revision_is_active"
                   [canRevise]="canRevise()"
@@ -436,6 +437,7 @@ picture-->
     [locations]="locations"
     [shots]="shots"
     [media_type]="media_type"
+    [media_owner]="get_media_owner()"
   ></app-media-map-wrapper>
 
   <!-- CONTAINER INFO -->
@@ -501,6 +503,7 @@ picture-->
       *ngIf="modale.type === 'insert-link'"
       [data]="modale.data"
       [media_type]="media_type"
+      [media_owner]="get_media_owner()"
       (shots_update)="shots_update($event)"
       modal-dialog
     ></app-modal-insert-link>
@@ -515,6 +518,7 @@ picture-->
       *ngIf="modale.type === 'all-annotations'"
       [data]="modale.data"
       [media_type]="media_type"
+      [media_owner]="get_media_owner()"
       modal-dialog
     ></app-modal-all-annotations>
     <app-modal-lista-shots

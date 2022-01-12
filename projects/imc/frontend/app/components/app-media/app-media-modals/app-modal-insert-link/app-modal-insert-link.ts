@@ -22,6 +22,7 @@ const url_protocol = /^https?:\/\//i;
 export class AppModalInsertLinkComponent implements OnChanges {
   @Input() data;
   @Input() media_type: string;
+  @Input() readonly media_owner: string;
   @is_annotation_owner() is_annotation_owner;
 
   @Output() shots_update: EventEmitter<any> = new EventEmitter();
@@ -129,7 +130,11 @@ export class AppModalInsertLinkComponent implements OnChanges {
   }
 
   canRemoveLink(link: IMC_Annotation) {
-    return this.is_annotation_owner(this._current_user, link.creator);
+    return this.is_annotation_owner(
+      this._current_user,
+      link.creator,
+      this.media_owner
+    );
   }
 
   ok() {
@@ -149,9 +154,9 @@ export class AppModalInsertLinkComponent implements OnChanges {
   private isValidURL(str) {
     var pattern = new RegExp(
       "^https?:\\/\\/" + // protocol
-      "(?:\\S+(?::\\S*)?@)?" + // authentication
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+        "(?:\\S+(?::\\S*)?@)?" + // authentication
+        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+        "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
         /*'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
             '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
             '(\\#[-a-z\\d_]*)?$' + // fragment locater*/

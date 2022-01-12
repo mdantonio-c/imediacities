@@ -77,8 +77,9 @@ export class AppShotsService {
     let found = 0;
     for (let key in shot.annotations) {
       if (shot.annotations[key].length) {
-        found += shot.annotations[key].filter((s) => s.id === annotation.id)
-          .length;
+        found += shot.annotations[key].filter(
+          (s) => s.id === annotation.id
+        ).length;
       }
     }
     return found > 0;
@@ -91,8 +92,9 @@ export class AppShotsService {
         if (tag.id != null) {
           found += shot.annotations[key].filter((s) => s.iri === tag.id).length;
         } else {
-          found += shot.annotations[key].filter((s) => s.name === tag.name)
-            .length;
+          found += shot.annotations[key].filter(
+            (s) => s.name === tag.name
+          ).length;
         }
       }
     }
@@ -330,7 +332,7 @@ export class AppShotsService {
     return language;
   }
   /**
-   * Crea un'annotazione riorganizzando i dati
+   * Create "flat" annotation model rearranging data
    * @param annotation
    * @param annotation_body
    * @param media_type
@@ -413,22 +415,26 @@ export class AppShotsService {
 }
 
 export interface IMC_Annotation {
+  // annotation
+  id: string;
+  type: string;
+  private: boolean;
+  embargo: Date;
   creation_date: Date;
+  // creator
   creator: string;
   creator_type: string;
-  embargo: Date;
+  // body
   group: string;
   body_id: string;
-  id: string;
   iri: string;
   name: string;
-  private: boolean;
   language: string;
   spatial: number[];
-  type: string;
+  reference?: BibliographicReference;
+  // source
   source: string;
   source_uuid: string;
-  reference?: BibliographicReference;
 }
 
 export interface IMC_Shot {

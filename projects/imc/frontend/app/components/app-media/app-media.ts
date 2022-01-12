@@ -4,10 +4,8 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
-  Renderer2,
-  DoCheck,
 } from "@angular/core";
-import { Router, Route, ActivatedRoute, Params } from "@angular/router";
+import { Router, ActivatedRoute, Params } from "@angular/router";
 import { AppShotsService } from "../../services/app-shots";
 import { AppMediaService } from "../../services/app-media";
 import { AppModaleComponent } from "../app-modale/app-modale";
@@ -21,8 +19,9 @@ import {
 } from "../../services/shot-revision.service";
 import { NotificationService } from "@rapydo/services/notification";
 import { MediaUtilsService } from "../../catalog/services/media-utils.service";
+import { ModalConfig } from "../../types";
 /**
- * Componente per la visualizzazione del media
+ * Component for viewing the media
  */
 @Component({
   selector: "app-media",
@@ -30,30 +29,18 @@ import { MediaUtilsService } from "../../catalog/services/media-utils.service";
   providers: [ShotRevisionService],
 })
 export class AppMediaComponent implements OnInit, OnDestroy {
-  /**
-   * Riferimento al componente AppModale
-   */
+  /** Reference to the AppModale component */
   @ViewChild("appModale", { static: false }) appModale: AppModaleComponent;
-  /**
-   * Riferimento al componente AppVideoPlayer
-   */
+  /** Reference to the AppVideoPlayer component */
   @ViewChild("appVideo", { static: false }) appVideo: AppVideoPlayerComponent;
-  /**
-   * Conteggio annotazioni
-   * @type {number}
-   */
-  public annotations_count = 0;
-  /**
-   * Consente di visualizzare lo strumento per la shot revision
-   */
+  /** Count of annotations */
+  public annotations_count: number = 0;
+  /** Show the shot revision tool */
   shot_revision_is_active: boolean = false;
   shot_revision_state: string = "";
   private shots_to_restore: any[] = [];
-  /**
-   * Consente di visualizzare lo strumento per la selezione multipla degli shot
-   */
+  /** Show the multiple shot selection tool */
   public multi_annotations_is_active: boolean = false;
-
   /**
    * Riceve i risultati della chiamata al servizio media
    */
@@ -63,18 +50,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
    * @type {{type: string; data: {}}}
    */
   public modale = {
-    /**
-     * Nome del componente da visualizzare
-     */
+    /** Name of the component to display */
     type: "",
-    /**
-     * Dati da passare al componente
-     */
+    /** Data to pass to the component */
     data: {},
   };
-  /**
-   * Elenco delle location da passare alla mappa
-   */
+  /** List of locations to pass to the map */
   public locations;
   /**
    * Riceve i risultati della chiamata al servizio shots
@@ -99,12 +80,12 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private AuthService: AuthService,
-    private Element: ElementRef,
-    private AnnotationService: AppAnnotationsService,
-    private MediaService: AppMediaService,
-    private ShotsService: AppShotsService,
-    private VideoService: AppVideoService,
+    private authService: AuthService,
+    private element: ElementRef,
+    private annotationsService: AppAnnotationsService,
+    private mediaService: AppMediaService,
+    private shotsService: AppShotsService,
+    private videoService: AppVideoService,
     private shotRevisionService: ShotRevisionService,
     private notify: NotificationService
   ) {
@@ -146,35 +127,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     // Others only see public domain
     return true;
   }
-  /*
-    is_public_domain() {
-        let k = this.media.rights_status.key;
 
-        // EU Orphan Work
-        if (k == "02") return true;
-
-        // In copyright - Non-commercial use permitted
-        if (k == "04") return true;
-
-        // Public Domain
-        if (k == "05") return true;
-
-        // No Copyright - Contractual Restrictions
-        if (k == "06") return true;
-
-        // No Copyright - Non-Commercial Use Only
-        if (k == "07") return true;
-
-        // No Copyright - Other Known Legal Restrictions
-        if (k == "08") return true;
-
-        // No Copyright - United States
-        if (k == "09") return true;
-
-        return false;
-    }*/
   is_public_domain() {
     return this.media._item[0].public_access;
+  }
+
+  get_media_owner() {
+    return this.media._item[0]._ownership[0].id;
   }
 
   start_shot_revision() {
@@ -206,7 +165,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   private under_revision() {
     console.log("Revision mode activated");
     this.shot_revision_is_active = true;
-    this.shot_revision_state = this.MediaService.revisionState();
+    this.shot_revision_state = this.mediaService.revisionState();
     // create a copy from the actual shot list (DEEP CLONE)
     // this.shots_to_restore = $.extend(true, {}, this.shots);
     this.shots_to_restore = JSON.parse(JSON.stringify(this.shots));
@@ -313,15 +272,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Modifica la visibilità dello strumento per la shot revision
+   * Change the visibility of the shot revision tool.
    */
   shot_revision_toggle() {
     this.shot_revision_is_active = !this.shot_revision_is_active;
   }
 
   /**
-   * Modifica la visibilità dello strumento per la selezione multipla degli shot
-   * e ne resetta lo stato deselezionando tutti
+   * Changes the visibility of the multiple shot selection tool and resets its status by deselecting all shots.
    */
   multi_annotations_toggle() {
     this.multi_annotations_is_active = !this.multi_annotations_is_active;
@@ -329,26 +287,26 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Apre una modale visualizzando al suo interno il compontente coi dati ricevuti
-   * @param componente Configurazione del componente daq visualizzare nella modale
+   * Open a modal displaying the component with the received data inside.
+   * @param component Configuration of the component to be displayed in the modal
    */
-  modal_show(componente) {
-    console.log(componente);
-    //  fermo il video principale
+  modal_show(component: ModalConfig) {
+    // console.log(component);
+    //  stop the main video
     if (this.appVideo) {
       this.appVideo.video.pause();
     }
-    this.modale.type = componente.modale;
-    if (componente.previous) {
+    this.modale.type = component.modale;
+    if (component.previous) {
       // use the previous flag to add the previous shot to the list
-      let previous_shot_num = componente.data.shots.slice(-1)[0].shot_num - 1;
-      componente.data.shots.unshift(this.shots[previous_shot_num]);
+      let previous_shot_num = component.data.shots.slice(-1)[0].shot_num - 1;
+      component.data.shots.unshift(this.shots[previous_shot_num]);
     }
-    this.modale.data = componente.data;
+    this.modale.data = component.data;
     this.appModale.open(
-      componente.titolo,
-      this.MediaService.type(),
-      componente.classe
+      component.titolo,
+      this.mediaService.type(),
+      component.classe
     );
   }
 
@@ -368,7 +326,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     //console.log('modal_show_multi: data=',data);
     if (!data.length) return;
 
-    let comp = {
+    let comp: ModalConfig = {
       modale: componente,
       data: {
         shots: data,
@@ -406,14 +364,14 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
   shots_update(evento) {
     if (this.media_type === "video") {
-      this.ShotsService.get();
+      this.shotsService.get();
     } else if (this.media_type === "image") {
-      this.AnnotationService.get(this.media_id, "images");
+      this.annotationsService.get(this.media_id, "images");
     }
   }
 
   video_player_set(event) {
-    this.VideoService.video_set(event);
+    this.videoService.video_set(event);
   }
 
   media_entity_normalize(mediaEntity) {
@@ -443,7 +401,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
    * Launch video and shot requests
    */
   ngOnInit() {
-    this.user = this.AuthService.getUser();
+    this.user = this.authService.getUser();
     //this.media_type_set(this.router.url);
 
     this._subscription = this.route.params.subscribe((params: Params) => {
@@ -451,7 +409,7 @@ export class AppMediaComponent implements OnInit, OnDestroy {
       let endpoint =
         this.router.url.indexOf("videos") != -1 ? "videos" : "images";
 
-      this.MediaService.get(this.media_id, endpoint, (mediaEntity) => {
+      this.mediaService.get(this.media_id, endpoint, (mediaEntity) => {
         this.media_type_set(this.router.url);
         this.media = this.media_entity_normalize(mediaEntity);
         this.is_3d_model =
@@ -462,19 +420,19 @@ export class AppMediaComponent implements OnInit, OnDestroy {
         // To be confirmed
         setTimeout(() => {
           let tabs =
-            this.Element.nativeElement.querySelector("#pills-tab > li");
+            this.element.nativeElement.querySelector("#pills-tab > li");
           if (tabs) tabs.click();
         }, 100);
 
         if (this.media_type === "video") {
-          this.ShotsService.get(this.media_id, endpoint);
+          this.shotsService.get(this.media_id, endpoint);
         }
 
         if (this.media_type === "image" || this.media_type === "3d-model") {
-          this.AnnotationService.get(this.media_id, endpoint);
+          this.annotationsService.get(this.media_id, endpoint);
           const annotations_subscription =
-            this.AnnotationService.update.subscribe((annotations) => {
-              this.ShotsService.get(this.media_id, endpoint, {
+            this.annotationsService.update.subscribe((annotations) => {
+              this.shotsService.get(this.media_id, endpoint, {
                 annotations: annotations,
                 links: this.media.links,
                 item_id: this.media._item[0].id,
@@ -483,10 +441,10 @@ export class AppMediaComponent implements OnInit, OnDestroy {
           this._subscription.add(annotations_subscription);
         }
 
-        const shots_subscription = this.ShotsService.update.subscribe(
+        const shots_subscription = this.shotsService.update.subscribe(
           (shots) => {
             this.shots_init(shots);
-            const annotations = this.ShotsService.annotations();
+            const annotations = this.shotsService.annotations();
             this.annotations_count = annotations.length;
             if (this.user !== null) {
               this.locations = annotations.filter(

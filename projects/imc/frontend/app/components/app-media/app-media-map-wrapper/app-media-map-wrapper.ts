@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { AppMediaMapComponent } from "../app-media-map/app-media-map";
 
 @Component({
   selector: "app-media-map-wrapper",
@@ -8,6 +7,7 @@ import { AppMediaMapComponent } from "../app-media-map/app-media-map";
 export class AppMediaMapWrapperComponent implements OnInit {
   @Input() locations;
   @Input() media_type;
+  @Input() media_owner;
   @Input() shots;
 
   static map_expanded_label = "Close the map";
@@ -19,7 +19,7 @@ export class AppMediaMapWrapperComponent implements OnInit {
   constructor() {}
 
   /**
-   * Gestisce la visualizzazione della mappa
+   * Manage the map display
    */
   map_extend() {
     this.map_is_expanded = !this.map_is_expanded;

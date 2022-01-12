@@ -10,12 +10,12 @@ export class AppModaleComponent implements OnInit {
 
   public titolo = "";
 
-  constructor(private ModalService: AppModaleService) {}
+  constructor(private modalService: AppModaleService) {}
 
-  open(title, media_type, classi = "") {
+  open(title: string, media_type: string, classes = "") {
     this.title_set(title);
-    this.ModalService.open(this.content, {
-      windowClass: `imc--modal page-type-${media_type} ${classi}`,
+    this.modalService.open(this.content, {
+      windowClass: `imc--modal page-type-${media_type} ${classes}`,
     });
   }
 
