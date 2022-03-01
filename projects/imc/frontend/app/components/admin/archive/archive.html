@@ -16,9 +16,7 @@
         let-curPage="curPage"
         let-offset="offset"
       >
-        <div class="col-3">
-          {{dataLength}} total
-        </div>
+        <div class="col-3">{{dataLength}} total</div>
         <div class="col-9">
           <div class="float-right">
             <ngb-pagination
@@ -65,8 +63,6 @@
         {{row.status}}
       </p>
     </span>
-    <ng-template #noMessage>
-      {{row.status}}
-    </ng-template>
+    <ng-template #noMessage> {{row.status}} </ng-template>
   </ng-template>
 </div>

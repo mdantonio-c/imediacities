@@ -3,9 +3,9 @@ import { AbstractControl, ValidatorFn } from "@angular/forms";
 const isbn10Maybe = /^(?:[0-9]{9}X|[0-9]{10})$/,
   isbn13Maybe = /^(?:[0-9]{13})$/;
 
-export function IsbnValidator(
-  control: AbstractControl
-): { [key: string]: any } {
+export function IsbnValidator(control: AbstractControl): {
+  [key: string]: any;
+} {
   if (!control.value) {
     return null;
   }

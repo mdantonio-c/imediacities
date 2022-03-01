@@ -11,8 +11,10 @@ import { AppVideoControlComponent } from "../app-video-control";
   selector: "app-video-control-fps",
   templateUrl: "app-video-control-fps.html",
 })
-export class AppVideoControlFpsComponent extends AppVideoControlComponent
-  implements AfterViewInit {
+export class AppVideoControlFpsComponent
+  extends AppVideoControlComponent
+  implements AfterViewInit
+{
   @ViewChild("fps", { static: false }) fps: ElementRef;
 
   constructor() {

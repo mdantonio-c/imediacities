@@ -16,7 +16,8 @@ import { Subscription } from "rxjs";
   templateUrl: "app-modal-move-cut.html",
 })
 export class AppModalMoveCutComponent
-  implements AfterViewInit, OnChanges, OnDestroy {
+  implements AfterViewInit, OnChanges, OnDestroy
+{
   @Input() data: any;
   @Input() current_cut: number;
 

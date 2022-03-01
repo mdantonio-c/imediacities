@@ -15,8 +15,10 @@ import { AppShotsService } from "../../../services/app-shots";
   selector: "app-video-tag",
   templateUrl: "app-video-tag.html",
 })
-export class AppVideoTagComponent extends AppVideoControlComponent
-  implements AfterViewInit, DoCheck {
+export class AppVideoTagComponent
+  extends AppVideoControlComponent
+  implements AfterViewInit, DoCheck
+{
   @Input() data;
   @ViewChild("termtag_slider", { static: false }) termtag_slider: ElementRef;
   @ViewChild("geotag_slider", { static: false }) geotag_slider: ElementRef;

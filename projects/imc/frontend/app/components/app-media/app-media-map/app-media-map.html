@@ -21,7 +21,7 @@
         [modal]="true"
         [show_title]="true"
       ></app-modal-lista-shots>
-      <div style="text-align: right;" *ngIf="info_window_data.owner">
+      <div style="text-align: right" *ngIf="info_window_data.owner">
         <span
           class="material-icons click-event"
           mwlConfirmationPopover
@@ -52,7 +52,7 @@
   <info-window id="edit" (closeclick)="marker_edit_closeclick()">
     <div>
       <div><h6>Geotag</h6></div>
-      <div style="width: 95%; padding: 5px; margin: 5px;">
+      <div style="width: 95%; padding: 5px; margin: 5px">
         <span>
           <span
             name="marker_edit"
@@ -75,7 +75,7 @@
         <br />&nbsp;
       </div>
 
-      <div style="text-align: right;">
+      <div style="text-align: right">
         <span class="btn btn-border-classic" (click)="marker_edit_close()"
           >Cancel</span
         >

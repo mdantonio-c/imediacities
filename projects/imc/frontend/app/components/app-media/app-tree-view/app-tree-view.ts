@@ -14,9 +14,8 @@ export class AppTreeViewComponent implements OnInit {
   @Output() updateTerms: EventEmitter<Annotation[]> = new EventEmitter<
     Annotation[]
   >();
-  @Output() updateVocabulary: EventEmitter<Vocabulary> = new EventEmitter<
-    Vocabulary
-  >();
+  @Output() updateVocabulary: EventEmitter<Vocabulary> =
+    new EventEmitter<Vocabulary>();
 
   constructor(private vocabularyService: AppVocabularyService) {}
 

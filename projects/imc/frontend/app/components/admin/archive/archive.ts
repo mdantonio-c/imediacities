@@ -24,9 +24,8 @@ export class ArchiveComponent implements OnInit {
   @ViewChild("dataSize", { static: false }) public dataSize: TemplateRef<any>;
   @ViewChild("dataModification", { static: false })
   public dataModification: TemplateRef<any>;
-  @ViewChild("dataStatus", { static: false }) public dataStatus: TemplateRef<
-    any
-  >;
+  @ViewChild("dataStatus", { static: false })
+  public dataStatus: TemplateRef<any>;
 
   private data: Array<File> = [];
   private numPages: number = 1;
