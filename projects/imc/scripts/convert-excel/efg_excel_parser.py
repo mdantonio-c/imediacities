@@ -99,17 +99,17 @@ def lookup_fields(row_idx, start_with, next_col=None):
 
 
 def parse_related_entities(row_idx, el_name, parent):
-    agents = ws.cell(row=row_idx, column=headers[el_name]).value
-    if agents is None:
+    entities = ws.cell(row=row_idx, column=headers[el_name]).value
+    if entities is None:
         return
-    for agent in agents.split(sep=";"):
-        if is_blank(agent):
+    for entity in entities.split(sep=";"):
+        if is_blank(entity):
             continue
-        agent = agent.strip()
+        entity = entity.strip()
         rel_agent = ET.SubElement(parent, el_name)
         agent_id, agent_name, agent_type = None, None, None
         try:
-            tokens = agent.strip().split(":", 2)
+            tokens = entity.strip().split(":", 2)
             agent_id = tokens[0]
             agent_name = tokens[1]
             agent_type = tokens[2]
@@ -118,10 +118,11 @@ def parse_related_entities(row_idx, el_name, parent):
         ET.SubElement(rel_agent, "identifier").text = agent_id.strip()
         if not agent_name:
             print(
-                f"WARNING - Record[{row_idx}]. Expected name in form of 'identifier:name:?type'. Invalid value for '{agent}'"
+                f"WARNING - Record[{row_idx}]. Expected name in form of 'identifier:name:?type'. Invalid value for '{entity}'"
             )
             continue
-        ET.SubElement(rel_agent, "name").text = agent_name.strip()
+        name_title = "title" if el_name == "relCollection" else "name"
+        ET.SubElement(rel_agent, name_title).text = agent_name.strip()
         if agent_type:
             ET.SubElement(rel_agent, "type").text = agent_type.strip()
 
