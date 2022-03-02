@@ -50,7 +50,8 @@ def check_item_type_coherence(resource, standard_path):
     return item_node, coherent
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def bulk_update(self, guid, upload_dir, target_dir, force_reprocessing=False):
     log.info(f"Bulk update: processing files from dir {upload_dir}")
 

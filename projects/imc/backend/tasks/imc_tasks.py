@@ -49,7 +49,8 @@ def progress(self, state, info):
     self.update_state(state=state)
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def update_metadata(self, path, resource_id):
 
     log.debug("Starting task update_metadata for resource_id {}", resource_id)
@@ -58,7 +59,7 @@ def update_metadata(self, path, resource_id):
 
     xml_resource = None
     try:
-        metadata_update = True  # voglio proprio fare l'aggiornamento dei metadati!
+        metadata_update = True  # I just want to do the metadata update!
         xml_resource, group, source_id, item_type, item_node = update_meta_stage(
             self, resource_id, path, metadata_update
         )
@@ -73,7 +74,8 @@ def update_metadata(self, path, resource_id):
     return 1
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def import_file(self, path, resource_id, mode, metadata_update=True):
 
     progress(self, "Starting import", path)
@@ -334,7 +336,8 @@ def arrange_manual_annotations(self, item, new_shot_list, old_fps):
         log.debug("-----------------------------------------------------")
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def launch_tool(self, tool_name, item_id):
     log.debug("launch tool {0} for item {1}", tool_name, item_id)
     if tool_name not in ["object-detection", "building-recognition"]:
@@ -372,7 +375,8 @@ def create_symbolic_link(target_path, other_version):
         print("failed to create v2 link")
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def load_v2(self, other_version, item_id, retry=False):
     log.debug("load v2 {0} for item {1}", other_version, item_id)
 
@@ -469,7 +473,8 @@ def get_analyze_path(item):
     return analyze_path
 
 
-@CeleryExt.task()
+# TODO idempotent: to be checked
+@CeleryExt.task(idempotent=False)
 def shot_revision(self, revision, item_id):
     log.info("Start shot revision task for video item [{0}]", item_id)
     self.graph = neo4j.get_instance()
