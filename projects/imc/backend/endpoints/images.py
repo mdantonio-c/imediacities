@@ -36,11 +36,11 @@ class Images(IMCEndpoint):
     def get(self, image_id: str) -> Response:
         """Get the NonAVEntity passed as argument."""
         log.debug("getting NonAVEntity id: {}", image_id)
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
         try:
-            v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-        except self.graph.NonAVEntity.DoesNotExist:
+            v = graph.NonAVEntity.nodes.get(uuid=image_id)
+        except graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
@@ -76,17 +76,17 @@ class Images(IMCEndpoint):
     def delete(self, image_id: str, user: User) -> Response:
         """Delete existing image description."""
         log.debug("deliting NonAVEntity id: {}", image_id)
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
         if image_id is None:
             raise BadRequest("Please specify a valid image id")
 
         try:
-            v = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-            repo = CreationRepository(self.graph)
+            v = graph.NonAVEntity.nodes.get(uuid=image_id)
+            repo = CreationRepository(graph)
             repo.delete_non_av_entity(v)
             return self.empty_response()
-        except self.graph.NonAVEntity.DoesNotExist:
+        except graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
@@ -118,16 +118,16 @@ class ImageItem(IMCEndpoint):
         """Allow user to update item information."""
         log.debug("Update Item for NonAVEntity uuid: {}", image_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
 
-        if not (image := self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
+        if not (image := graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
         if not (item := image.item.single()):
             raise NotFound("NonAVEntity not correctly imported: item info not found")
 
-        repo = CreationRepository(self.graph)
+        repo = CreationRepository(graph)
         if not repo.item_belongs_to_user(item, user):
             log.error("User {} not allowed to edit image {}", user.email, image_id)
             raise Forbidden(
@@ -168,10 +168,10 @@ class ImageAnnotations(IMCEndpoint):
     def get(self, image_id: str, anno_type: Optional[str] = None) -> Response:
         log.debug("get annotations for NonAVEntity id: {}", image_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         data = []
 
-        image = self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)
+        image = graph.NonAVEntity.nodes.get_or_none(uuid=image_id)
         if not image:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
@@ -261,11 +261,11 @@ class ImageContent(IMCEndpoint):
     ) -> Response:
         log.info("get image content for id {}", image_id)
 
-        self.graph = neo4j.get_instance()
+        graph = neo4j.get_instance()
         image = None
         try:
-            image = self.graph.NonAVEntity.nodes.get(uuid=image_id)
-        except self.graph.NonAVEntity.DoesNotExist:
+            image = graph.NonAVEntity.nodes.get(uuid=image_id)
+        except graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
 
@@ -354,10 +354,9 @@ class ImageTools(IMCEndpoint):
     ) -> Response:
 
         log.debug("launch automatic tool for image id: {}", image_id)
+        graph = neo4j.get_instance()
 
-        self.graph = neo4j.get_instance()
-
-        if not (image := self.graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
+        if not (image := graph.NonAVEntity.nodes.get_or_none(uuid=image_id)):
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id.")
 
@@ -367,7 +366,7 @@ class ImageTools(IMCEndpoint):
         if item.item_type != "Image":
             raise BadRequest("Content item is not a image. Use a valid image id.")
 
-        repo = AnnotationRepository(self.graph)
+        repo = AnnotationRepository(graph)
 
         is_obj_detection = tool == "object-detection"
         is_building_recognition = tool == "building-recognition"
