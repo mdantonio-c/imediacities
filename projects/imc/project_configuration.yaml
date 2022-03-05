@@ -2,7 +2,7 @@ project:
   title: "DARE"
   description: "Urban Innovative Actions"
   version: "1.9.5"
-  rapydo: "2.1"
+  rapydo: "2.2"
 
 variables:
   env:
@@ -49,37 +49,18 @@ variables:
     CATALOG_TIME_RANGE_TO: "1999"
 
   roles:
-    normal_user: User
-    staff_user: Staff
-    # group_coordinator: Coordinator
-    admin_root: Admin
     Archive: Archive
     Reviser: Reviser
     Researcher: Researcher
     read_only: ReadOnly
-    # default: normal_user
-    # allowed_roles:
-    #   - Researcher
-    #   - Archive
-    #   - Reviser
-    #   - normal_user
+
+  roles_descriptions:
+    Archive: User from an archive authorized to upload contents
+    Reviser: User authorized to start revisions
+    Researcher: Researcher authorized to curate contents
+    read_only: User with read-only access
 
 tags:
   file: "All endpoints to handle files"
   admin: "Operations only allowed for admin users"
   miscellaneous: "Endpoints not classified in other specific sections"
-
-controller:
-  commands:
-    ftp-useradd:
-      description: Create FTP credentials
-      name: ftp
-      command: echo 'Not implemented -> pure-pw useradd user@email.org -f /etc/pure-ftpd/passwd/pureftpd.passwd -m -u ftpuser -d /home/ftpusers/group-uuid'
-      service: ftp
-      user: root
-    ftp-userdel:
-      description: Delete FTP credentials
-      name: ftp
-      command: echo 'Not implemented -> pure-pw userdel user@email.org -f /etc/pure-ftpd/passwd/pureftpd.passwd -m'
-      service: ftp
-      user: root

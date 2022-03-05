@@ -86,6 +86,13 @@
               </ul>
             </div>
           </ng-template>
+          <!-- Collection -->
+          <ng-template [ngIf]="info.collection_title">
+            <div class="col-12 space-paragraph-10">
+              <strong>Collection:</strong>
+            </div>
+            <div class="col-12">{{info.collection_title}}</div>
+          </ng-template>
         </app-expansion-panel>
 
         <app-expansion-panel

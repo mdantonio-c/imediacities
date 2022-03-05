@@ -19,7 +19,8 @@ import { AppVideoPlayerComponent } from "../app-video-player/app-video-player";
   templateUrl: "app-media-modal.html",
 })
 export class AppMediaModal
-  implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
   @Input() data: any;
   @Input() media_type: string;
   @Input() revision: boolean = false;

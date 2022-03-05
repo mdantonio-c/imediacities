@@ -70,9 +70,8 @@ export class UserWorkspaceComponent implements OnInit {
       this.counters.LIST_ITEMS = undefined;
     });
     if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
-      const disabledFilters = environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(
-        ","
-      );
+      const disabledFilters =
+        environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(",");
       this.cityFilterDisabled = disabledFilters.includes("city");
     }
   }

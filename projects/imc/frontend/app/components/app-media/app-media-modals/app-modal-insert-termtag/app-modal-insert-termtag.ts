@@ -25,7 +25,8 @@ import { Annotation } from "../../../../types";
   templateUrl: "app-modal-insert-termtag.html",
 })
 export class AppModalInsertTermtagComponent
-  implements OnInit, OnChanges, AfterViewInit {
+  implements OnInit, OnChanges, AfterViewInit
+{
   @Input() data: any;
   @Input() media_type: string;
   @ViewChild("p", { static: false }) p;

@@ -24,9 +24,8 @@ export class ArchiveComponent implements OnInit {
   @ViewChild("dataSize", { static: false }) public dataSize: TemplateRef<any>;
   @ViewChild("dataModification", { static: false })
   public dataModification: TemplateRef<any>;
-  @ViewChild("dataStatus", { static: false }) public dataStatus: TemplateRef<
-    any
-  >;
+  @ViewChild("dataStatus", { static: false })
+  public dataStatus: TemplateRef<any>;
 
   private data: Array<File> = [];
   private numPages: number = 1;
@@ -67,7 +66,7 @@ export class ArchiveComponent implements OnInit {
       size: 100,
     };
     this.api
-      .get<File[]>(`stage/${this.group.uuid}`, data, {
+      .get<File[]>(`/api/stage/${this.group.uuid}`, data, {
         validationSchema: "Files",
       })
       .subscribe(

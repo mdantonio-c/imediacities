@@ -13,7 +13,8 @@ import { AppVideoControlComponent } from "../app-video-control";
 })
 export class AppVideoControlTimeMarkersComponent
   extends AppVideoControlComponent
-  implements OnChanges {
+  implements OnChanges
+{
   @ViewChild("smtpe_mark", { static: false }) smtpe_mark;
   float_mark = "0000.0000";
   frame_mark = "00000";
