@@ -59,7 +59,8 @@ jobs:
           rapydo start
           sleep 60
           rapydo logs
-          curl --insecure -X GET --max-time 5 https://localhost/api/status
+          curl --insecure -X GET --max-time 5 https://localhost/api/status || true
+          rapydo logs
           curl --insecure -X GET --max-time 5 https://localhost/api/status | grep "Server is alive"
           rapydo logs --tail 20 proxy
           rapydo logs --tail 20 backend
