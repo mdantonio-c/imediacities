@@ -57,9 +57,8 @@ jobs:
           rapydo pull --quiet
           rapydo ssl --volatile
           rapydo start
-          sleep 60
-          rapydo logs
-          curl --insecure -X GET --max-time 5 https://localhost/api/status || true
+          # Increased in 2.3 due to slower neo4j startup
+          sleep 90
           rapydo logs
           curl --insecure -X GET --max-time 5 https://localhost/api/status | grep "Server is alive"
           rapydo logs --tail 20 proxy
