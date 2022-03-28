@@ -28,12 +28,6 @@ services:
       # Used to manage analysis script on both prod and pre-prod
       PROJECT_DOMAIN: ${PROJECT_DOMAIN}
 
-  flower:
-    volumes:
-      - ${DATA_DIR}/imediastuff:/uploads
-      - ${PROJECT_DIR}/scripts:/code/scripts
-      # - ${DATA_DIR}/flower_db:${FLOWER_DBDIR}
-
   ftp:
     ports:
       - "21:21"

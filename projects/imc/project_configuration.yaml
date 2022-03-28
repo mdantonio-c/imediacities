@@ -17,10 +17,9 @@ variables:
 
     ACTIVATE_FTP: 1
     ACTIVATE_CELERY: 1
-    ACTIVATE_FLOWER: 1
+    # ACTIVATE_FLOWER: 1
     ACTIVATE_NEO4J: 1
     ACTIVATE_REDIS: 1
-    ACTIVATE_RABBIT: 1
     CELERY_ENABLE_CONNECTOR: 1
 
     ALLOW_ACCESS_TOKEN_PARAMETER: 1
@@ -32,11 +31,6 @@ variables:
     GRAPHDB_PASSWORD: "**PLACEHOLDER**"
     GMAP_KEY: "**PLACEHOLDER**"
     VIRTUAL_GALLERY_URL: "**PLACEHOLDER**"
-    SMTP_ADMIN: "**PLACEHOLDER**"
-    SMTP_NOREPLY: "**PLACEHOLDER**"
-    SMTP_HOST: "**PLACEHOLDER**"
-
-    CELERY_BACKEND: REDIS
 
     SET_CSP_SCRIPT_SRC: "https://www.wikidata.org"
     SET_CSP_IMG_SRC: "https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org"
