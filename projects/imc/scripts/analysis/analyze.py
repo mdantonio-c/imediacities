@@ -2,10 +2,10 @@ import datetime
 import glob
 import json
 import os
-import os.path
 import shutil
 import sys
 from subprocess import Popen
+from typing import Optional, TextIO
 from xml.etree import ElementTree as ET
 
 from PIL import Image
@@ -29,7 +29,7 @@ default_filename = os.path.join(stage_area, default_media)
 default_mediatype = "Video"  # 'Image'
 default_uuid = "000"
 
-logfile = None
+logfile: Optional[TextIO] = None
 
 
 # -----------------------------------------------------
@@ -45,7 +45,7 @@ def log(msg):
         logfile.write(time + msg + "\n")
         logfile.flush()
     except BaseException:
-        print("warning -- write to log file failed -- logfile closed ?")
+        print("warning -- write to log file failed -- logfile closed?")
         sys.stdout.flush()
 
 
@@ -85,7 +85,7 @@ def frame_to_timecode(f, fps):
 # -----------------------------------------------------
 # make movie_analize_folder as :  analize_area / user_folder_name / movie_name
 # and link the given filename as  movie_analize_folder/origin + movie_ext
-def make_movie_analize_folder(filename, clean=False):  # , temporary=False):
+def make_movie_analize_folder(filename, clean=False):
 
     if not mkdir(analize_area, False):
         return ""
@@ -108,7 +108,7 @@ def make_movie_analize_folder(filename, clean=False):  # , temporary=False):
         os.unlink(origin_link_name)
     try:
         os.symlink(origin_link_target, origin_link_name)
-    except BaseException:
+    except OSError:
         print("failed to create origin link")
 
     global logfile
@@ -154,29 +154,23 @@ def run(cmd, out_folder, out_name, err_name, cmd_name=None):
         return False
 
 
-# -----------------------------------------------------
 def get_framerate(filename):
     out_file = open(filename)
-    if out_file is None:
-        log("cant open " + filename)
-        return 0
-
     data = json.load(out_file)
     for s in data["streams"]:
         if s["codec_type"] == "video":
             if "r_frame_rate" not in s:
-                log("r_frame_rate not found in: " + filename)
+                log(f"r_frame_rate not found in: {filename}")
                 return 0
             value = int(s["r_frame_rate"].split("/")[0])
             if value < 1 or value > 100:
-                log("bad framerate:" + str(value) + "in:" + filename)
+                log(f"bad framerate:{str(value)} in:{filename}")
                 return 0
             return value
-    log("framerate not found in: " + filename)
+    log(f"framerate not found in: {filename}")
     return 0
 
 
-# -----------------------------------------------------
 def origin_tech_info(filename, out_folder):
     global TRANSCODED_FRAMERATE
 
@@ -196,7 +190,6 @@ def origin_tech_info(filename, out_folder):
     return res
 
 
-# -----------------------------------------------------
 def image_origin_tech_info(filename, out_folder):
     cmd_list = [
         "/usr/bin/convert",
@@ -209,7 +202,6 @@ def image_origin_tech_info(filename, out_folder):
     return res
 
 
-# -----------------------------------------------------
 def transcoded_tech_info(filename, out_folder, v2=""):
     cmd_list = [
         "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams",
@@ -227,7 +219,6 @@ def transcoded_tech_info(filename, out_folder, v2=""):
     return res
 
 
-# -----------------------------------------------------
 def image_transcoded_tech_info(filename, out_folder, v2=""):
     cmd_list = [
         "/usr/bin/convert",
@@ -246,7 +237,6 @@ def image_transcoded_tech_info(filename, out_folder, v2=""):
     return res
 
 
-# -----------------------------------------------------
 def transcoded_num_frames(out_folder, v2=""):
     out_filename = os.path.join(out_folder, v2 + "transcoded_info.json")
     out_file = open(out_filename)
@@ -256,7 +246,6 @@ def transcoded_num_frames(out_folder, v2=""):
             return int(s["nb_frames"])
 
 
-# -----------------------------------------------------
 def lookup_v2(filename):
     dirname = os.path.dirname(filename)
     other_filename = os.path.join(dirname, "v2_" + os.path.basename(filename))
@@ -267,7 +256,6 @@ def lookup_v2(filename):
         return other_filename
 
 
-# -----------------------------------------------------
 def transcode(filename, out_folder, fps, prefix=""):
 
     out_filename = os.path.join(out_folder, prefix + "transcoded.mp4")
@@ -310,7 +298,6 @@ def transcode(filename, out_folder, fps, prefix=""):
     # ffmpeg -v error -i input -f null - 2> error.log
 
 
-# -----------------------------------------------------
 def v2_image_transcode(filename, out_folder):
     out_filename = os.path.join(out_folder, "v2_transcoded.jpg")
     if filename.lower().endswith((".tif",)):
@@ -324,7 +311,6 @@ def v2_image_transcode(filename, out_folder):
         return False
 
 
-# -----------------------------------------------------
 def image_transcode(filename, out_folder, watermark):
     """transcode an image to jpg, with a compression quality of 95
     rescale the image keeping the aspect ratio so that it is smaller then 800x600 and save it as transcoded.jpg
@@ -439,7 +425,6 @@ def image_transcode(filename, out_folder, watermark):
     return os.path.exists(out_filename)
 
 
-# -----------------------------------------------------
 def tvs(filename, out_folder):
 
     prg_filename = os.path.join(idmt_bin, "idmtvideoanalysis")
@@ -465,7 +450,6 @@ def tvs(filename, out_folder):
     return os.path.exists(out_filename)
 
 
-# -----------------------------------------------------
 def quality(filename, out_folder):
 
     prg_filename = os.path.join(idmt_bin, "idmtvideoanalysis")
@@ -487,7 +471,6 @@ def quality(filename, out_folder):
     return os.path.exists(out_filename)
 
 
-# -----------------------------------------------------
 def vimotion(filename, out_folder):
 
     prg_filename = os.path.join(idmt_bin, "idmtvideoanalysis")
@@ -510,7 +493,6 @@ def vimotion(filename, out_folder):
     return os.path.exists(out_filename)
 
 
-# -----------------------------------------------------
 def summary(filename, out_folder):
 
     scr_filename = os.path.join(
@@ -536,7 +518,6 @@ def summary(filename, out_folder):
     return os.path.exists(out_filename)
 
 
-# -----------------------------------------------------
 def submit_orf(media, mtype, uuid, out_folder):
 
     cmd_filename = os.path.join(out_folder, "submit_orf.sh")
@@ -561,12 +542,11 @@ def submit_orf(media, mtype, uuid, out_folder):
     return True
 
 
-# -----------------------------------------------------
 def thumbs_index_storyboard(filename, out_folder, num_frames):
 
     movie_name = os.path.basename(out_folder)
 
-    # framenumber in shot filenames may be 5 or 6 digit long
+    # frame number in shot filenames may be 5 or 6 digit long
     # force them to 6 digit, so that the following filenames.sort
     # will work as expected
     lst = glob.glob(out_folder + "/tvs_s_*.jpg")
@@ -611,9 +591,7 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     if not mkdir(sb_folder, True):
         return False
 
-    sb = {}
-    sb["movie"] = movie_name
-    sb["shots"] = []
+    sb = {"movie": movie_name, "shots": []}
 
     for i, fn in enumerate(lst):
 
@@ -633,13 +611,14 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
         shot_len = (nextframe - frame + 1) / TRANSCODED_FRAMERATE
         shot_len = round(shot_len, 2)
 
-        d = {}
-        d["shot_num"] = i
-        d["first_frame"] = frame
-        d["last_frame"] = nextframe
-        d["timecode"] = frame_to_timecode(frame, TRANSCODED_FRAMERATE)
-        d["len_seconds"] = shot_len
-        d["img"] = im_name
+        d = {
+            "shot_num": i,
+            "first_frame": frame,
+            "last_frame": nextframe,
+            "timecode": frame_to_timecode(frame, TRANSCODED_FRAMERATE),
+            "len_seconds": shot_len,
+            "img": im_name,
+        }
         sb["shots"].append(d)
 
     # insert vim
@@ -654,7 +633,6 @@ def thumbs_index_storyboard(filename, out_folder, num_frames):
     return True
 
 
-# -----------------------------------------------------
 def insert_vim_in_storyboard(out_folder, sb):
 
     # retrieve last_frame_number
@@ -684,7 +662,7 @@ def insert_vim_in_storyboard(out_folder, sb):
         f0 = shot["first_frame"]
         f1 = shot["last_frame"]
 
-        # ---- output come dizionario
+        # ---- output as dictionary
         shot_vim_dic = {}
         for n in vim_names:
             values = vim[n][f0:f1]
@@ -697,8 +675,7 @@ def insert_vim_in_storyboard(out_folder, sb):
             shot_vim_dic[n] = (round(avg_value, 3), round(max_value, 3))
         shot["motions_dict"] = shot_vim_dic
 
-        # --- output come lista sortata sulla probabilita
-
+        # --- output as sorted list on probability
         shot_vim = []
         for n in vim_names:
             values = vim[n][f0:f1]
@@ -713,20 +690,9 @@ def insert_vim_in_storyboard(out_folder, sb):
         shot["estimated_motions"] = shot_vim
 
 
-# -----------------------------------------------------
-def revert_to_origin_framerate(filename):
-
-    out_folder = make_movie_analize_folder(filename, True, True)
-    if out_folder == "":
-        return False
-    log("out_folder=" + out_folder)
-    if not analize_movie(filename, out_folder, False):
-        return False
-    # if all ok swap the two out_folders
-
-
-# -----------------------------------------------------
-def analize_movie(filename, out_folder, muuid, fast=False):
+def analyze_movie(
+    filename: str, out_folder: str, muuid: str, fast: bool = False
+) -> bool:
 
     log("origin_tech_info -------- begin")
     if not origin_tech_info(filename, out_folder):
@@ -849,10 +815,9 @@ def analize_movie(filename, out_folder, muuid, fast=False):
     return True
 
 
-# -----------------------------------------------------
-
-
-def analize_image(filename, out_folder, muuid, fast=False):
+def analyze_image(
+    filename: str, out_folder: str, muuid: str, fast: bool = False
+) -> bool:
 
     log("image_origin_tech_info --- begin")
     if not image_origin_tech_info(filename, out_folder):
@@ -934,21 +899,41 @@ def analize_image(filename, out_folder, muuid, fast=False):
     return True
 
 
-# -----------------------------------------------------
-def analize(filename, uuid, item_type, out_folder, fast=False):
-    """Item type: "Video" or "Image"."""
+def analyze_3d_model(
+    content_path: str, out_folder: str, uuid: str, fast: bool = False
+) -> bool:
+    print(f"logfile: {logfile}")
+    log("Analyze 3D Model ----------- begin")
+    log(f"content path: {content_path}")
+    log(f"UUID: {uuid}")
+
+    if os.path.isdir(content_path):
+        # TODO
+        raise NotImplementedError("Content directory not managed yet")
+    else:
+        # already have a symbolic link to the original content from function 'make_movie_analize_folder'
+        log("nothing to do")
+        pass
+    log("Analyze 3D Model ----------- end")
+    return True
+
+
+def analize(
+    filename: str, uuid: str, item_type: str, out_folder: str, fast: bool = False
+) -> bool:
+    """Item types currently managed are: 'Video', 'Image' and '3D-Model'."""
 
     if item_type == "Video":
-        return analize_movie(filename, out_folder, uuid, fast)
+        return analyze_movie(filename, out_folder, uuid, fast)
+    elif item_type == "Image":
+        return analyze_image(filename, out_folder, uuid, fast)
+    elif item_type == "3D-Model":
+        return analyze_3d_model(filename, out_folder, uuid, fast)
 
-    if item_type in ["Image", "3D-Model"]:
-        return analize_image(filename, out_folder, uuid, fast)
-
-    print("analize error: bad item_type :", item_type)
+    print(f"Analyze error. Bad item_type: {item_type}")
     return False
 
 
-# -----------------------------------------------------
 def update_storyboard(revised_cuts, out_folder):
 
     # check out_folder ( must be an absolute path )
@@ -975,7 +960,7 @@ def update_storyboard(revised_cuts, out_folder):
     # check movie
     movie = os.path.join(out_folder, "transcoded.mp4")
     if not os.path.exists(movie):
-        log("no movie:", movie)
+        log(f"NOT FOUND movie: {movie}")
         return False
 
     # retrieve last_frame_number
@@ -1105,10 +1090,10 @@ def update_storyboard(revised_cuts, out_folder):
 
 
 # -----------------------------------------------------
-help = """ usage:  python3 analyze.py [options] [filename]
+help_usage = """ usage:  python3 analyze.py [options] [filename]
 options:
 [-fast  ]       skip transcoding, tvs, quality, vimotion and summary if their output files already exists.
-[-clean ]       clean any previous data before analize
+[-clean ]       clean any previous data before analyze
 [-image ]       indicate that filename is an image ( not a movie)
 [filename ]     if omitted use the default movie
 """
@@ -1131,7 +1116,7 @@ def main(args):
     # num_args = len(args)
     for i, a in enumerate(args):
         if a == "--help" or a == "-help" or a == "-h":
-            print(help)
+            print(help_usage)
             return
         elif a == "-clean":
             clean = True
@@ -1158,15 +1143,12 @@ def main(args):
         return
 
     logfile = open(os.path.join(out_folder, "log.txt"), "w")
-    log("Analize " + media)
+    log(f"Analyze {media}")
 
     if analize(filename, muuid, mtype, out_folder, fast):
-        log("Analize done")
+        log("Analyze done")
     else:
-        log("Analize terminated with errors")
-
-
-# -----------------------------------------------------
+        log("Analyze terminated with errors")
 
 
 if __name__ == "__main__":

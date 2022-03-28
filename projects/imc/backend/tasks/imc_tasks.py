@@ -116,7 +116,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if content_path is not None:
             # Create content resource
             properties = {"filename": content_filename, "path": content_path}
-
             try:
                 # This is a task restart? What to do in this case?
                 content_node = self.graph.ContentStage.nodes.get(**properties)
@@ -131,9 +130,8 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         fast = False
         if mode is not None:
             mode = mode.lower()
-
             if mode == "skip":
-                log.info("Analyze skipped for source id: " + source_id)
+                log.info("Analyze skipped for source id: {}", source_id)
                 return 1
             fast = mode == "fast"
 
@@ -148,7 +146,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         content_node.status = "IMPORTING"
         content_node.save()
 
-        # EXECUTE AUTOMATC TOOLS
+        # EXECUTE AUTOMATIC TOOLS
 
         # Before starting I want to be sure that no automatic annotations
         # exist. It is dangerous re-processing in case of different fps.
@@ -179,7 +177,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if out_folder == "":
             raise Exception("Failed to create out_folder")
 
-        log.info("Analyze " + content_item)
+        log.info("Analyze {}", content_item)
         if analize(content_item, creation.uuid, item_type, out_folder, fast):
             log.info("Analyze executed")
         else:
@@ -581,11 +579,10 @@ def lookup_content(self, path, source_id):
     ARCHIVE_SOURCEID.[extension]
     """
 
-    # nel source_id i caratteri che non sono lettere
-    # o numeri vanno sostituiti con trattino per la ricerca
-    # del file del contenuto
+    # in the source_id characters that are not letters or numbers must be replaced with a hyphen
+    # to search for the content file
     source_id_encoded = re.sub(r"[\W_]+", "-", source_id)
-    log.debug("source_id_encoded: " + source_id_encoded)
+    log.debug("source_id_encoded: {}", source_id_encoded)
 
     content_filenames = []
     files = [f for f in os.listdir(path) if not f.endswith(".xml")]
