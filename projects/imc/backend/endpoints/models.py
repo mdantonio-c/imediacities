@@ -290,22 +290,22 @@ class ModelContent(IMCEndpoint):
             )
 
         if content_type == "thumbnail":
-            thumbnail_uri = item.thumbnail
-            log.debug("thumbnail content uri: {}", thumbnail_uri)
-            # if thumbnail_size and thumbnail_size== "large":
-            # large is the only allowed size at the moment
-            if thumbnail_size:
-                # load large image file as the original (i.e. transcoded.jpg)
-                thumbnail_uri = item.uri
-                log.debug("request for large thumbnail: {}", thumbnail_uri)
-            if thumbnail_uri is None:
+            log.debug("thumbnail content uri: {}", item.thumbnail)
+            if item.thumbnail is None or not Path(item.thumbnail).exists():
                 raise NotFound("Thumbnail not found")
-
-            thumbnail_path = Path(thumbnail_uri)
+            thumbnail_uri = Path(item.thumbnail)
+            if (
+                thumbnail_size
+                and (
+                    thumbnail_large := Path(thumbnail_uri.parent, "thumbnail_large.jpg")
+                ).exists()
+            ):
+                # load large thumbnail file if available
+                log.debug("load large thumbnail: {}", thumbnail_large)
+                thumbnail_uri = thumbnail_large
             return Downloader.send_file_content(
-                filename=thumbnail_path.name,
-                subfolder=thumbnail_path.parent,
-                # thumbnail is always jpeg
+                filename=thumbnail_uri.name,
+                subfolder=thumbnail_uri.parent,
                 mime="image/jpeg",
             )
 

@@ -327,9 +327,9 @@ class Search(IMCEndpoint):
                 video["links"]["summary"] = video_url + "/content?type=summary"
                 data.append(video)
             elif isinstance(v, self.graph.NonAVEntity):
-                # image
-                image_url = api_url + "/api/images/" + v.uuid
-                image = self.getJsonResponse(
+                # image or 3d-model
+                non_av_url = f"{api_url}/api/{v.non_av_type.split('-')[-1]}s/{v.uuid}"
+                non_av = self.getJsonResponse(
                     v,
                     max_relationship_depth=1,
                     relationships_expansion=[
@@ -340,12 +340,14 @@ class Search(IMCEndpoint):
                         # 'descriptions.creation',
                     ],
                 )
-                image["links"] = {}
-                image["links"]["content"] = image_url + "/content?type=image"
+                non_av["links"] = {}
+                non_av["links"]["content"] = non_av_url + "/content?type=image"
                 if item.thumbnail is not None:
-                    image["links"]["thumbnail"] = image_url + "/content?type=thumbnail"
-                image["links"]["summary"] = image_url + "/content?type=summary"
-                data.append(image)
+                    non_av["links"]["thumbnail"] = (
+                        non_av_url + "/content?type=thumbnail"
+                    )
+                non_av["links"]["summary"] = non_av_url + "/content?type=summary"
+                data.append(non_av)
 
         # count result by provider if provider == null
         if provider is None:

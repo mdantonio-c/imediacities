@@ -808,7 +808,7 @@ def extract_tech_info(
             thumbnail_uri if os.path.exists(thumbnail_uri) else data["image"]["name"]
         )
 
-        # filesize MUST be an Iteger of bytes (not e.g. 4.1KB)
+        # filesize MUST be an Integer of bytes (not e.g. 4.1KB)
         item.dimension = os.path.getsize(item.uri)
 
         # format
@@ -827,11 +827,8 @@ def extract_tech_info(
         )
     elif item.item_type == "3D-Model":
         item.uri = data["uri"].removeprefix("file://")
-        thumbnail_path = os.path.join(
-            os.path.dirname(analyze_dir_path), "thumbnail_small.jpg"
-        )
-        if os.path.exists(thumbnail_path):
-            item.thumbnail = thumbnail_path
+        thumbnail_path = os.path.join(analyze_dir_path, "thumbnail_small.jpg")
+        item.thumbnail = thumbnail_path
     else:
         raise PipelineException(
             "Invalid type. Technical info CANNOT be extracted for "
