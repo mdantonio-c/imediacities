@@ -10,6 +10,9 @@ from xml.etree import ElementTree as ET
 
 from PIL import Image
 
+# from loguru import logger
+
+
 os.umask(int("007", 8))
 
 TRANSCODED_FRAMERATE = 24  # now used as a default
@@ -30,9 +33,9 @@ default_mediatype = "Video"  # 'Image'
 default_uuid = "000"
 
 logfile: Optional[TextIO] = None
+# logger.add("log.txt", format="{time} {level} {message}", level="INFO")
 
 
-# -----------------------------------------------------
 def log(msg):
     global logfile
     print(msg)
@@ -47,6 +50,7 @@ def log(msg):
     except BaseException:
         print("warning -- write to log file failed -- logfile closed?")
         sys.stdout.flush()
+    # logger.info(msg)
 
 
 # -----------------------------------------------------
@@ -117,13 +121,17 @@ def make_movie_analize_folder(filename, clean=False):
     return movie_analize_folder
 
 
-# -----------------------------------------------------
 def init_child_proc():
     os.umask(0)
 
 
-# -----------------------------------------------------
-def run(cmd, out_folder, out_name, err_name, cmd_name=None):
+def run(
+    cmd: str,
+    out_folder: str,
+    out_name: str,
+    err_name: str,
+    cmd_name: Optional[str] = None,
+) -> bool:
     if cmd_name:
         cmd_filename = os.path.join(out_folder, cmd_name)
         cmd_file = open(cmd_filename, "w")
@@ -190,51 +198,56 @@ def origin_tech_info(filename, out_folder):
     return res
 
 
-def image_origin_tech_info(filename, out_folder):
+def image_origin_tech_info(filename: str, out_folder: str) -> bool:
     cmd_list = [
         "/usr/bin/convert",
         filename,
         os.path.join(out_folder, "origin_info.json"),
     ]
     cmd = " \\\n".join(cmd_list) + "\n"
-
-    res = run(cmd, out_folder, "origin_info.out", "origin_info.err", "origin_info.sh")
-    return res
+    return run(cmd, out_folder, "origin_info.out", "origin_info.err", "origin_info.sh")
 
 
-def transcoded_tech_info(filename, out_folder, v2=""):
+def model_origin_tech_info(content_path: str, out_folder: str) -> bool:
+    cmd_list = [
+        "/usr/bin/gltf_validator",
+        "-po",
+        content_path,
+        f"> {os.path.join(out_folder, 'origin_info.json')}",
+    ]
+    cmd = " \\\n".join(cmd_list) + "\n"
+    return run(cmd, out_folder, "origin_info.out", "origin_info.err", "origin_info.sh")
+
+
+def transcoded_tech_info(filename: str, out_folder: str, v2: str = "") -> bool:
     cmd_list = [
         "/usr/bin/ffprobe -v quiet -print_format json -show_format -show_streams",
         filename,
     ]
     cmd = " \\\n".join(cmd_list) + "\n"
-
-    res = run(
+    return run(
         cmd,
         out_folder,
         v2 + "transcoded_info.json",
         v2 + "transcoded_info.err",
         v2 + "transcoded_info.sh",
     )
-    return res
 
 
-def image_transcoded_tech_info(filename, out_folder, v2=""):
+def image_transcoded_tech_info(filename: str, out_folder: str, v2: str = "") -> bool:
     cmd_list = [
         "/usr/bin/convert",
         filename,
         os.path.join(out_folder, v2 + "transcoded_info.json"),
     ]
     cmd = " \\\n".join(cmd_list) + "\n"
-
-    res = run(
+    return run(
         cmd,
         out_folder,
         v2 + "transcoded_info.out",
         v2 + "transcoded_info.err",
         v2 + "transcoded_info.sh",
     )
-    return res
 
 
 def transcoded_num_frames(out_folder, v2=""):
@@ -902,19 +915,15 @@ def analyze_image(
 def analyze_3d_model(
     content_path: str, out_folder: str, uuid: str, fast: bool = False
 ) -> bool:
-    print(f"logfile: {logfile}")
-    log("Analyze 3D Model ----------- begin")
-    log(f"content path: {content_path}")
-    log(f"UUID: {uuid}")
-
     if os.path.isdir(content_path):
         # TODO
         raise NotImplementedError("Content directory not managed yet")
     else:
         # already have a symbolic link to the original content from function 'make_movie_analize_folder'
-        log("nothing to do")
-        pass
-    log("Analyze 3D Model ----------- end")
+        log("model_origin_tech_info --- begin")
+        if not model_origin_tech_info(content_path, out_folder):
+            return False
+        log("model_origin_tech_info --- ok ")
     return True
 
 
@@ -922,16 +931,17 @@ def analize(
     filename: str, uuid: str, item_type: str, out_folder: str, fast: bool = False
 ) -> bool:
     """Item types currently managed are: 'Video', 'Image' and '3D-Model'."""
-
+    res: bool = False
     if item_type == "Video":
-        return analyze_movie(filename, out_folder, uuid, fast)
+        res = analyze_movie(filename, out_folder, uuid, fast)
     elif item_type == "Image":
-        return analyze_image(filename, out_folder, uuid, fast)
+        res = analyze_image(filename, out_folder, uuid, fast)
     elif item_type == "3D-Model":
-        return analyze_3d_model(filename, out_folder, uuid, fast)
+        res = analyze_3d_model(filename, out_folder, uuid, fast)
+    logfile.close()
 
     print(f"Analyze error. Bad item_type: {item_type}")
-    return False
+    return res
 
 
 def update_storyboard(revised_cuts, out_folder):
@@ -1054,9 +1064,7 @@ def update_storyboard(revised_cuts, out_folder):
         im_small.save(im_name, quality=90)
 
     # make storyboard
-    sb = {}
-    sb["movie"] = os.path.basename(out_folder)
-    sb["shots"] = []
+    sb = {"movie": os.path.basename(out_folder), "shots": []}
 
     for i in range(len(revised_cuts) - 1):
 
@@ -1149,6 +1157,7 @@ def main(args):
         log("Analyze done")
     else:
         log("Analyze terminated with errors")
+    logfile.close()
 
 
 if __name__ == "__main__":
