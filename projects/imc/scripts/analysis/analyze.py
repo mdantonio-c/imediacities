@@ -938,9 +938,10 @@ def analize(
         res = analyze_image(filename, out_folder, uuid, fast)
     elif item_type == "3D-Model":
         res = analyze_3d_model(filename, out_folder, uuid, fast)
-    logfile.close()
+    else:
+        print(f"Analyze error. Bad item_type: {item_type}")
 
-    print(f"Analyze error. Bad item_type: {item_type}")
+    logfile.close()
     return res
 
 
