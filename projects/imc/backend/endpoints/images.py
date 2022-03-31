@@ -34,12 +34,12 @@ class Images(IMCEndpoint):
         },
     )
     def get(self, image_id: str) -> Response:
-        """Get the NonAVEntity passed as argument."""
+        """Get the NonAVEntity Image passed as argument."""
         log.debug("getting NonAVEntity id: {}", image_id)
         graph = neo4j.get_instance()
 
         try:
-            v = graph.NonAVEntity.nodes.get(uuid=image_id)
+            v = graph.NonAVEntity.nodes.get(uuid=image_id, non_av_type="image")
         except graph.NonAVEntity.DoesNotExist:
             log.debug("NonAVEntity with uuid {} does not exist", image_id)
             raise NotFound("Please specify a valid image id")
@@ -50,7 +50,6 @@ class Images(IMCEndpoint):
             relationships_expansion=[
                 "record_sources.provider",
                 "item.ownership",
-                "item.three_dim_format",
             ],
         )
         item = v.item.single()
@@ -116,7 +115,7 @@ class ImageItem(IMCEndpoint):
     )
     def put(self, image_id: str, public_access: bool, user: User) -> Response:
         """Allow user to update item information."""
-        log.debug("Update Item for NonAVEntity uuid: {}", image_id)
+        log.debug("Update Item for NonAVEntity image uuid: {}", image_id)
 
         graph = neo4j.get_instance()
 
@@ -271,7 +270,7 @@ class ImageContent(IMCEndpoint):
 
         item = image.item.single()
         log.debug("item data: " + format(item))
-        if content_type in ["image", "3d-model"]:
+        if content_type == "image":
             # TODO manage here content access (see issue 190)
             # always return the other version if available
             image_uri = item.uri

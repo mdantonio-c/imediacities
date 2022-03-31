@@ -61,8 +61,9 @@ export class AppMediaService {
   }
 
   updatePublicAccess(newVal: boolean) {
+    const endpoint = this.type().split("-").pop();
     this.api
-      .put("/api/" + this.type() + "s/" + this.media_id() + "/item", {
+      .put(`/api/${endpoint}s/${this.media_id()}/item`, {
         public_access: newVal,
       })
       .subscribe(

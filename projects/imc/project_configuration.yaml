@@ -34,6 +34,7 @@ variables:
 
     SET_CSP_SCRIPT_SRC: "https://maps.google.com https://maps.googleapis.com https://www.wikidata.org"
     SET_CSP_IMG_SRC: "https://maps.google.com https://maps.gstatic.com"
+    SET_CSP_CONNECT_SRC: "https://maps.googleapis.com blob:"
 
     FRONTEND_LANG: "en"
     FRONTEND_DISABLED_FILTERS: ""

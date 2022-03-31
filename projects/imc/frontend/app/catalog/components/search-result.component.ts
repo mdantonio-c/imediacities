@@ -41,9 +41,11 @@ export class SearchResultComponent implements OnInit, OnChanges {
     return false;
   }
 
-  route(mediaId, mediaType) {
+  route(mediaId: string, mediaType: string) {
     if (mediaType === "nonaventity") {
-      this.router.navigate(["/app/catalog/images", mediaId]);
+      const non_av_type =
+        this.media.non_av_type.key === "3d-model" ? "models" : "images";
+      this.router.navigate([`/app/catalog/${non_av_type}`, mediaId]);
     } else {
       this.router.navigate(["/app/catalog/videos", mediaId]);
     }

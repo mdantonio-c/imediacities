@@ -5,6 +5,7 @@ import re
 from operator import itemgetter
 from typing import Any, Dict, Set
 
+from imc.exceptions import PipelineException
 from imc.models import codelists
 from imc.tasks.services.annotation_repository import AnnotationRepository
 from imc.tasks.services.building_mapping import building_mapping
@@ -116,7 +117,6 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if content_path is not None:
             # Create content resource
             properties = {"filename": content_filename, "path": content_path}
-
             try:
                 # This is a task restart? What to do in this case?
                 content_node = self.graph.ContentStage.nodes.get(**properties)
@@ -131,14 +131,13 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         fast = False
         if mode is not None:
             mode = mode.lower()
-
             if mode == "skip":
-                log.info("Analyze skipped for source id: " + source_id)
+                log.info("Analyze skipped for source id: {}", source_id)
                 return 1
             fast = mode == "fast"
 
         if content_node is None:
-            raise Exception(
+            raise PipelineException(
                 "Pipeline cannot be started: "
                 + "content does not exist in the path {} for source ID {}".format(
                     basedir, source_id
@@ -148,7 +147,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         content_node.status = "IMPORTING"
         content_node.save()
 
-        # EXECUTE AUTOMATC TOOLS
+        # EXECUTE AUTOMATIC TOOLS
 
         # Before starting I want to be sure that no automatic annotations
         # exist. It is dangerous re-processing in case of different fps.
@@ -164,7 +163,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
         content_item = os.path.join("/uploads", content_path)
         if not os.path.exists(content_item):
-            raise Exception("Bad input file", content_item)
+            raise PipelineException("Bad input file", content_item)
 
         creation = item_node.creation.single()
         if not creation:
@@ -177,13 +176,13 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
             content_item, (mode is not None and mode == "clean")
         )
         if out_folder == "":
-            raise Exception("Failed to create out_folder")
+            raise PipelineException("Failed to create out_folder")
 
-        log.info("Analyze " + content_item)
+        log.info("Analyze {}", content_item)
         if analize(content_item, creation.uuid, item_type, out_folder, fast):
             log.info("Analyze executed")
         else:
-            raise Exception("Analyze terminated with errors")
+            raise PipelineException("Analyze terminated with errors")
 
         # analyze_path = '/uploads/Analize/' + \
         #     group.uuid + '/' + content_filename.split('.')[0] + '/'
@@ -196,7 +195,12 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
 
         # take the previous fps apart
         old_fps = item_node.framerate
-        extract_tech_info(self, item_node, analyze_path, "transcoded_info.json")
+        tech_filename = (
+            "origin_info.json"
+            if item_node.item_type == "3D-Model"
+            else "transcoded_info.json"
+        )
+        extract_tech_info(self, item_node, analyze_path, tech_filename)
 
         # bind other version
         v2_ext = ".mp4" if item_type == "Video" else ".jpg"
@@ -204,8 +208,7 @@ def import_file(self, path, resource_id, mode, metadata_update=True):
         if os.path.exists(other_version_uri):
             other_item = item_node.other_version.single()
             if other_item is None:
-                other_item_properties = {}
-                other_item_properties["item_type"] = item_type
+                other_item_properties = {"item_type": item_type}
                 other_item = self.graph.Item(**other_item_properties).save()
                 item_node.other_version.connect(other_item)
             extract_tech_info(self, other_item, analyze_path, "v2_transcoded_info.json")
@@ -351,7 +354,7 @@ def launch_tool(self, tool_name, item_id):
     # if detect_objects(movie, analyze_path):
     #     log.info('Object detection executed')
     # else:
-    #     raise Exception('Object detection terminated with errors')
+    #     raise PipelineException('Object detection terminated with errors')
     if tool_name == "object-detection":
         # here we expect object detection results in orf.xml
         extract_od_annotations(self, item, analyze_path)
@@ -371,7 +374,7 @@ def create_symbolic_link(target_path, other_version):
         os.unlink(v2_link_name)
     try:
         os.symlink(v2_link_target, v2_link_name)
-    except BaseException:
+    except PipelineException:
         print("failed to create v2 link")
 
 
@@ -400,15 +403,15 @@ def load_v2(self, other_version, item_id, retry=False):
             # we need to get the origin fps
             fps = get_framerate(os.path.join(analyze_path, "origin_info.json"))
             if fps is None:
-                raise Exception("Cannot get origin fps")
+                raise PipelineException("Cannot get origin fps")
             log.debug("origin fps: {}", fps)
             if not transcode(other_version, analyze_path, fps=str(fps), prefix="v2_"):
-                raise Exception("transcoding for v2 failed!")
+                raise PipelineException("transcoding for v2 failed!")
             log.info("transcode v2 ------------ ok")
 
         log.info("v2_transcoded_info ------ begin")
         if not transcoded_tech_info(v2_movie, analyze_path, "v2_"):
-            raise Exception("tech info for v2 failed!")
+            raise PipelineException("tech info for v2 failed!")
         log.info("v2_transcoded_info ------ ok")
 
         v2_nf = transcoded_num_frames(analyze_path, "v2_")
@@ -435,7 +438,7 @@ def load_v2(self, other_version, item_id, retry=False):
 
         log.info("v2_image_transcoded_info - begin")
         if not image_transcoded_tech_info(v2_image, analyze_path, "v2_"):
-            raise Exception("tech info for v2 failed!")
+            raise PipelineException("tech info for v2 failed!")
         log.info("v2_image_transcoded_info - end")
 
     else:
@@ -446,11 +449,10 @@ def load_v2(self, other_version, item_id, retry=False):
 
     other_version_uri = os.path.join(analyze_path, "v2_transcoded." + ext)
     if not os.path.exists(other_version_uri):
-        raise Exception(f"Unable to find transcoded v2 at {other_version_uri}")
+        raise PipelineException(f"Unable to find transcoded v2 at {other_version_uri}")
     other_item = item.other_version.single()
     if other_item is None:
-        other_item_properties = {}
-        other_item_properties["item_type"] = item.item_type
+        other_item_properties = {"item_type": item.item_type}
         other_item = self.graph.Item(**other_item_properties).save()
         item.other_version.connect(other_item)
     extract_tech_info(self, other_item, analyze_path, "v2_transcoded_info.json")
@@ -480,7 +482,7 @@ def shot_revision(self, revision, item_id):
     self.graph = neo4j.get_instance()
     # get reviser
     reviser = self.graph.User.nodes.get_or_none(uuid=revision["reviser"])
-    exitRevision = (
+    exit_revision = (
         True if "exitRevision" in revision and revision["exitRevision"] else False
     )
     item = self.graph.Item.nodes.get_or_none(uuid=item_id)
@@ -547,7 +549,7 @@ def shot_revision(self, revision, item_id):
         )
         raise
     finally:
-        if exitRevision:
+        if exit_revision:
             item.revision.disconnect_all()
         else:
             assignee = item.revision.single()
@@ -555,7 +557,7 @@ def shot_revision(self, revision, item_id):
             rel.state = "W"
             rel.save()
 
-    log.info("Shot revision task completed successfully (exit: {})", exitRevision)
+    log.info("Shot revision task completed successfully (exit: {})", exit_revision)
     return 1
 
 
@@ -581,11 +583,10 @@ def lookup_content(self, path, source_id):
     ARCHIVE_SOURCEID.[extension]
     """
 
-    # nel source_id i caratteri che non sono lettere
-    # o numeri vanno sostituiti con trattino per la ricerca
-    # del file del contenuto
+    # in the source_id characters that are not letters or numbers must be replaced with a hyphen
+    # to search for the content file
     source_id_encoded = re.sub(r"[\W_]+", "-", source_id)
-    log.debug("source_id_encoded: " + source_id_encoded)
+    log.debug("source_id_encoded: {}", source_id_encoded)
 
     content_filenames = []
     files = [f for f in os.listdir(path) if not f.endswith(".xml")]
@@ -606,7 +607,7 @@ def lookup_content(self, path, source_id):
 
     # Multiple contents found => error
     if len(content_filenames) > 1:
-        raise Exception(f"Multiple content FOUND: {content_filenames}")
+        raise PipelineException(f"Multiple content FOUND: {content_filenames}")
 
     # Normal condition: a single content found
     content_filename = content_filenames[0]
@@ -634,11 +635,13 @@ def update_meta_stage(self, resource_id, path, metadata_update):
 
             source_id = extract_creation_ref(self, path)
             if source_id is None:
-                raise Exception(f"No source ID found importing metadata file {path}")
+                raise PipelineException(
+                    f"No source ID found importing metadata file {path}"
+                )
 
             item_type = extract_item_type(self, path)
             if codelists.fromCode(item_type, codelists.CONTENT_TYPES) is None:
-                raise Exception("Invalid content type for: " + item_type)
+                raise PipelineException("Invalid content type for: " + item_type)
             log.info("Content source ID: {0}; TYPE: {1}", source_id, item_type)
 
             # check for existing item
@@ -722,13 +725,17 @@ def extract_descriptive_metadata(self, path, item_type, item_node):
         creation = parser.parse_non_av_creation(record)
     else:
         # should never be reached
-        raise Exception(f"Extracting metadata for type {item_type} not yet implemented")
+        raise PipelineException(
+            f"Extracting metadata for type {item_type} not yet implemented"
+        )
     # log.debug(creation['properties'])
     repo.create_entity(creation["properties"], item_node, creation["relationships"], av)
     return parser.warnings
 
 
-def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
+def extract_tech_info(
+    self, item, analyze_dir_path, tech_info_filename="transcoded_info.json"
+):
     """
     Extract technical information about the given content from the given result
     file tech_info_filename and save them as Item properties in the database.
@@ -739,10 +746,9 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
     # check for info result
     tech_info_path = os.path.join(analyze_dir_path, tech_info_filename)
     if not os.path.exists(tech_info_path):
-        log.warning(
-            "Technical info CANNOT be extracted: [{}] does not exist", tech_info_path
+        raise PipelineException(
+            f"Technical info CANNOT be extracted: [{tech_info_path}] does not exist"
         )
-        return
 
     # load info from json
     with open(tech_info_path, encoding="utf-8", errors="ignore") as data_file:
@@ -802,7 +808,7 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
             thumbnail_uri if os.path.exists(thumbnail_uri) else data["image"]["name"]
         )
 
-        # filesize MUST be an Iteger of bytes (not e.g. 4.1KB)
+        # filesize MUST be an Integer of bytes (not e.g. 4.1KB)
         item.dimension = os.path.getsize(item.uri)
 
         # format
@@ -820,25 +826,19 @@ def extract_tech_info(self, item, analyze_dir_path, tech_info_filename):
             + str(data["image"]["geometry"]["height"])
         )
     elif item.item_type == "3D-Model":
-        item.uri = data["image"]["name"]
-        thumbnail_filename = "transcoded_small.jpg"
-        thumbnail_uri = os.path.join(
-            os.path.dirname(analyze_dir_path), thumbnail_filename
-        )
-        item.thumbnail = (
-            thumbnail_uri if os.path.exists(thumbnail_uri) else data["image"]["name"]
-        )
+        item.uri = data["uri"].removeprefix("file://")
+        thumbnail_path = os.path.join(analyze_dir_path, "thumbnail_small.jpg")
+        item.thumbnail = thumbnail_path
     else:
-        log.warning(
+        raise PipelineException(
             "Invalid type. Technical info CANNOT be extracted for "
             "Item[{uuid}] with type {type}",
             uuid=item.uuid,
             type=item.item_type,
         )
-        return
 
     item.save()
-    log.info("Extraction of techincal info completed [{}]", tech_info_filename)
+    log.info(f"Extraction of technical info completed [{tech_info_filename}]")
 
 
 def get_thumbnail(path):
@@ -906,7 +906,7 @@ def extract_tvs_vim_results(self, item, analyze_dir_path):
 def extract_br_annotations(self, item, analyze_dir_path):
     """
     Extract building recognition results given by automatic analysis tool and
-    ingest valueable annotations as 'automatic' TAGs.
+    ingest valuable annotations as 'automatic' TAGs.
     """
     brf_results_filename = "brf.xml"
     brf_results_path = os.path.join(analyze_dir_path, brf_results_filename)
@@ -1032,8 +1032,12 @@ def extract_br_annotations(self, item, analyze_dir_path):
 
         # save annotation
         bodies = []
-        br_body = {"type": "BRBody", "object_id": br_id, "confidence": avg_confidence}
-        br_body["concept"] = {"type": "ResourceBody", "source": concept}
+        br_body = {
+            "type": "BRBody",
+            "object_id": br_id,
+            "confidence": avg_confidence,
+            "concept": {"type": "ResourceBody", "source": concept},
+        }
         bodies.append(br_body)
         try:
             from neomodel import db as transaction
@@ -1060,7 +1064,7 @@ def extract_br_annotations(self, item, analyze_dir_path):
 def extract_od_annotations(self, item, analyze_dir_path):
     """
     Extract object detection results given by automatic analysis tool and
-    ingest valueable annotations as 'automatic' TAGs.
+    ingest valuable annotations as 'automatic' TAGs.
     """
     orf_results_filename = "orf.xml"
     orf_results_path = os.path.join(analyze_dir_path, orf_results_filename)
@@ -1159,7 +1163,7 @@ def extract_od_annotations(self, item, analyze_dir_path):
 
         # save annotation
         bodies = []
-        # warkaround for very huge area sequence!
+        # workaround for very huge area sequence!
         if len(region_sequence) > 1000:
             huge_size = len(region_sequence)
             region_sequence = []
@@ -1174,8 +1178,8 @@ def extract_od_annotations(self, item, analyze_dir_path):
             "object_id": key[0],
             "confidence": avg_confidence,
             "region_sequence": region_sequence,
+            "concept": {"type": "ResourceBody", "source": concept},
         }
-        od_body["concept"] = {"type": "ResourceBody", "source": concept}
         bodies.append(od_body)
         try:
             from neomodel import db as transaction
@@ -1190,13 +1194,13 @@ def extract_od_annotations(self, item, analyze_dir_path):
                 log.warning("Exception raised during rollback: {}", rollback_exp)
             raise e
         counter += 1
-    log.info("Number of saved automatic annotations: {counter}", counter=counter)
+    log.info(f"Number of saved automatic annotations: {counter}")
     log.info("-----------------------------------------------------")
 
 
 def shot_lookup(self, shots, timestamp):
     for s in shots:
-        if timestamp >= s.start_frame_idx and timestamp <= s.end_frame_idx:
+        if s.start_frame_idx <= timestamp <= s.end_frame_idx:
             return s.uuid, s.shot_num
 
 
