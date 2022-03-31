@@ -131,6 +131,7 @@ def run(
     out_name: str,
     err_name: str,
     cmd_name: Optional[str] = None,
+    ignore: bool = False,
 ) -> bool:
     if cmd_name:
         cmd_filename = os.path.join(out_folder, cmd_name)
@@ -159,7 +160,7 @@ def run(
     if res == 0:
         return True
     else:
-        return False
+        return ignore
 
 
 def get_framerate(filename):
@@ -216,7 +217,14 @@ def model_origin_tech_info(content_path: str, out_folder: str) -> bool:
         f"> {os.path.join(out_folder, 'origin_info.json')}",
     ]
     cmd = " \\\n".join(cmd_list) + "\n"
-    return run(cmd, out_folder, "origin_info.out", "origin_info.err", "origin_info.sh")
+    return run(
+        cmd,
+        out_folder,
+        "origin_info.out",
+        "origin_info.err",
+        "origin_info.sh",
+        ignore=True,
+    )
 
 
 def transcoded_tech_info(filename: str, out_folder: str, v2: str = "") -> bool:
