@@ -21,7 +21,7 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
   @Input() data;
 
   @Input() public cameraZ: number = -100;
-  @Input() public fieldOfView: number = 1;
+  @Input() public fieldOfView: number = 20;
   @Input("nearClipping") public nearClippingPlane: number = 1;
   @Input("farClipping") public farClippingPlane: number = 1000;
 
@@ -53,13 +53,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Load a glTF resource.
+   * Load a glTF/glb resource.
    * @private
    */
   private loadGLTFModel() {
-    // const path = "/app/custom/assets/models/gltf/porsche/scene.gltf";
-    const path =
-      "/app/custom/assets/models/gltf/bassorilievo/bassorilievo.gltf";
+    // const path = "/app/custom/assets/models/gltf/bassorilievo/bassorilievo.glb";
+    const path = this.data.links.content;
     this.gltfLoader.load(
       path,
       (gltf) => {
@@ -98,7 +97,7 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
 
     // setup light
     const color = 0xffffff;
-    const intensity = 1;
+    const intensity = 0.8;
     /*const skyColor = 0xB1E1FF;  // light blue
     const groundColor = 0xB97A20;  // brownish orange
     */
