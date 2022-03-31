@@ -20,6 +20,9 @@ import {
 import { NotificationService } from "@rapydo/services/notification";
 import { MediaUtilsService } from "../../catalog/services/media-utils.service";
 import { ModalConfig } from "../../types";
+
+const ENDPOINTS: string[] = ["videos", "images", "models"];
+
 /**
  * Component for viewing the media
  */
@@ -95,15 +98,15 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   }
 
   media_type_set(url) {
-    if (url.indexOf("/video") !== -1) {
+    if (url.indexOf("/videos") !== -1) {
       this.media_class = "page-type-video";
       this.media_type = "video";
       // this.type_shot = true;
-    } else if (url.indexOf("/image") !== -1) {
+    } else if (url.indexOf("/images") !== -1) {
       this.media_class = "page-type-image";
       this.media_type = "image";
       // this.type_shot = false;
-    } else if (url.indexOf("/model") !== -1) {
+    } else if (url.indexOf("/models") !== -1) {
       this.media_class = "page-type-3d-model";
       this.media_type = "3d-model";
     }
@@ -406,8 +409,13 @@ export class AppMediaComponent implements OnInit, OnDestroy {
 
     this._subscription = this.route.params.subscribe((params: Params) => {
       this.media_id = params["uuid"];
-      let endpoint =
-        this.router.url.indexOf("videos") != -1 ? "videos" : "images";
+      let endpoint: string;
+      for (let i = 0; i < ENDPOINTS.length; i++) {
+        if (this.router.url.indexOf(ENDPOINTS[i]) != -1) {
+          endpoint = ENDPOINTS[i];
+          break;
+        }
+      }
 
       this.mediaService.get(this.media_id, endpoint, (mediaEntity) => {
         this.media_type_set(this.router.url);
