@@ -65,7 +65,7 @@ class TestApp(BaseTests):
             # con mode=skip fa solo il caricamento dei metadati
             # lancio import con mode=clean così elabora il video e crea gli shot
             post_data = {"filename": filename, "mode": "clean"}
-            res = client.post("/api/stage", headers=headers, data=json.dumps(post_data))
+            res = client.post("/api/stage", headers=headers, json=post_data)
             assert res.status_code == 200
             # log.debug("*** Response of post stage: "+json.dumps(contents))
         log.debug(
@@ -81,7 +81,7 @@ class TestApp(BaseTests):
             log.info("*** Testing DELETE file")
             post_data_delete = {"filename": "to_del.txt"}
             res5 = client.delete(
-                "/api/stage", headers=headers, data=json.dumps(post_data_delete)
+                "/api/stage", headers=headers, json=post_data_delete
             )
             assert res5.status_code == 204
             # log.debug("*** Deleted file: to_del.txt")

@@ -68,7 +68,7 @@ class TestApp(BaseTests):
             "roles": roles,
         }
         res_put = client.put(
-            "/api/admin/users/" + user_id, headers=headers, data=json.dumps(put_data)
+            "/api/admin/users/" + user_id, headers=headers, json=put_data
         )
         assert res_put.status_code == 204
 
@@ -85,7 +85,7 @@ class TestApp(BaseTests):
             "/api/upload",
             headers=headers,
             content_type="multipart/form-data",
-            data=post_md_data,
+            json=post_md_data,
         )
         assert res.status_code == 202
         json.loads(res.data.decode("utf-8"))
@@ -104,7 +104,7 @@ class TestApp(BaseTests):
             "/api/upload",
             headers=headers,
             content_type="multipart/form-data",
-            data=post_video_data,
+            json=post_video_data,
         )
         assert res2.status_code == 202
         json.loads(res2.data.decode("utf-8"))
@@ -120,7 +120,7 @@ class TestApp(BaseTests):
             "/api/upload",
             headers=headers,
             content_type="multipart/form-data",
-            data=post_filetodel_data,
+            json=post_filetodel_data,
         )
         assert res3.status_code == 202
         json.loads(res3.data.decode("utf-8"))

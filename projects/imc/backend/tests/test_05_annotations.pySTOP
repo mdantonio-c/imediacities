@@ -82,11 +82,11 @@ class TestApp(BaseTests):
         }
         post_data = {"target": target_data, "body": body_data}
         # POST: try without log in
-        res = client.post("/api/annotations", headers=None, data=json.dumps(post_data))
+        res = client.post("/api/annotations", headers=None, json=post_data)
         assert res.status_code == 401
         # POST: create a new annotation
         res = client.post(
-            "/api/annotations", headers=headers, data=json.dumps(post_data)
+            "/api/annotations", headers=headers, json=post_data
         )
         assert res.status_code == 201
         data = json.loads(res.data.decode("utf-8"))
@@ -107,7 +107,7 @@ class TestApp(BaseTests):
             }
             post_data2 = {"target": target_data2, "body": body_data2}
             res2 = client.post(
-                "/api/annotations", headers=headers, data=json.dumps(post_data2)
+                "/api/annotations", headers=headers, json=post_data2
             )
             assert res2.status_code == 201
             anno_id2 = json.loads(res2.data.decode("utf-8"))
@@ -150,7 +150,7 @@ class TestApp(BaseTests):
                     res3 = client.post(
                         "/api/annotations",
                         headers=headers,
-                        data=json.dumps(post_data3),
+                        json=post_data3,
                     )
                     assert res3.status_code == 201
                     anno_id3 = json.loads(res3.data.decode("utf-8"))
