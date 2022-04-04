@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  OnDestroy,
 } from "@angular/core";
 import { AuthService } from "@rapydo/services/auth";
 import * as THREE from "three";
@@ -17,7 +18,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
   templateUrl: "app-3d-model.html",
   styleUrls: ["app-3d-model.scss"],
 })
-export class App3dModelComponent implements OnInit, AfterViewInit {
+export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() data;
 
   @Input() public cameraZ: number = -100;
@@ -226,5 +227,45 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
       ? (this.scene.add(this.axesHelper), this.scene.add(this.dirLightHelper))
       : (this.scene.remove(this.axesHelper),
         this.scene.remove(this.dirLightHelper));
+  }
+
+  ngOnDestroy() {
+    if (this.controls) {
+      this.controls.dispose();
+    }
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.forceContextLoss();
+      this.renderer.setAnimationLoop(null);
+      // this.renderer.context = null;
+      // this.renderer.domElement = null;
+      // this.renderer = null;
+    }
+    this.axesHelper.dispose();
+    if (this.dirLightHelper) {
+      this.dirLightHelper.dispose();
+    }
+    this.clearScene(this.scene);
+  }
+
+  private clearScene(obj) {
+    while (obj.children.length > 0) {
+      this.clearScene(obj.children[0]);
+      obj.remove(obj.children[0]);
+    }
+    if (obj.geometry) obj.geometry.dispose();
+
+    if (obj.material) {
+      // in case of map, bumpMap, normalMap, envMap ...
+      Object.keys(obj.material).forEach((prop) => {
+        if (!obj.material[prop]) return;
+        if (
+          obj.material[prop] !== null &&
+          typeof obj.material[prop].dispose === "function"
+        )
+          obj.material[prop].dispose();
+      });
+      obj.material.dispose();
+    }
   }
 }
