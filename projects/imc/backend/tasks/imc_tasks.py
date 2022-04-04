@@ -831,10 +831,7 @@ def extract_tech_info(
         item.thumbnail = thumbnail_path
     else:
         raise PipelineException(
-            "Invalid type. Technical info CANNOT be extracted for "
-            "Item[{uuid}] with type {type}",
-            uuid=item.uuid,
-            type=item.item_type,
+            f"Invalid type. Technical info CANNOT be extracted for Item[{item.uuid}] with type {item.uuid}"
         )
 
     item.save()

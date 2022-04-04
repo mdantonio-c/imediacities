@@ -73,8 +73,19 @@
           </span>
         </div>
       </ng-template>
-      <ng-template [ngIf]="media_type !== 'video'">
-        <img [src]="mediaData.links.content" class="img-fluid" />
+      <ng-template [ngIf]="media_type === 'image'">
+        <img
+          alt="image content"
+          [src]="mediaData.links.content"
+          class="img-fluid"
+        />
+      </ng-template>
+      <ng-template [ngIf]="media_type === '3d-model'">
+        <img
+          alt="thumbnail 3d-model"
+          src="{{mediaData.links.thumbnail + '&size=large'}}"
+          class="img-fluid"
+        />
       </ng-template>
     </div>
 
