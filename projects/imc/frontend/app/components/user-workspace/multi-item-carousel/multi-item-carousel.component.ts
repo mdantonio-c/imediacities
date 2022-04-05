@@ -174,6 +174,7 @@ export class MultiItemCarouselComponent implements OnChanges {
                 title: media.title,
                 description: media.description,
                 type: mediaType,
+                specificType: media.item_type.key,
                 thumbnail: media.links["thumbnail"],
                 listItem: true,
                 listId: this.listId,
@@ -210,6 +211,7 @@ export class MultiItemCarouselComponent implements OnChanges {
                     title: MediaUtilsService.getIdentifyingTitle(media),
                     description: MediaUtilsService.getDescription(media),
                     type: media.type,
+                    specificType: media._item[0].item_type.key,
                     thumbnail: media.links["thumbnail"],
                   };
                   if (media.type === "aventity")
