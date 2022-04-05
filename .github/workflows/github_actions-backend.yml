@@ -10,10 +10,10 @@ env:
   PROJECT: imc
 
 jobs:
-  backend-tests:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 45
+  runs-on: ubuntu-20.04
+  timeout-minutes: 30
 
+  dev:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -48,6 +48,25 @@ jobs:
           repository: projects/${PROJECT}
           project: ${PROJECT}
           step: backend
+
+      - name: Print Logs
+        if: failure()
+        run: tail -100 data/logs/backend-server.log
+
+      - name: Docker Logs
+        if: failure()
+        run: |
+          rapydo logs
+  prod:
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - uses: rapydo/actions/install@v1
+        with:
+          project: ${PROJECT}
 
       - name: Production Mode
         run: |
