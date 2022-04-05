@@ -53,8 +53,10 @@
         <i
           class="fa fa-stack-1x light-blue"
           [ngClass]="{
-            'fa-video': media.type === 'aventity',
-            'fa-camera': media.type === 'nonaventity'
+            'fa-video': media.specificType === 'Video',
+            'fa-camera': media.specificType === 'Image',
+            'fa-cube': media.specificType === '3D-Model',
+            'fa-align-left': media.specificType === 'Text'
           }"
         ></i>
       </span>
@@ -64,12 +66,14 @@
       [attr.data-src]="'holder.js/146x110?text=NO THUMBNAIL'"
       *ngIf="!media.thumbnail"
       (contextmenu)="disableSaveAs($event)"
+      alt="no thumbnail"
     />
     <img
       (contextmenu)="disableSaveAs($event)"
       src="{{ media.thumbnail }}"
       *ngIf="media.thumbnail"
       class="img-fluid"
+      alt="thumbnail"
     />
     <span
       *ngIf="media.type === 'aventity'"

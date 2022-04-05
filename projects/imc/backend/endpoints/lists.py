@@ -376,7 +376,7 @@ class ListItemAbstract(IMCEndpoint):
         if isinstance(mdo, self.graph.Item):
             # always consider v2 properties if exists
             v2 = item.other_version.single()
-            content_type = "videos" if item.item_type == "Video" else "images"
+            content_type = f"{item.item_type.split('-')[-1].lower()}s"
             res["links"][
                 "content"
             ] = f"{api_url}/api/{content_type}/{creation.uuid}/content?type={content_type[:-1]}"
@@ -456,6 +456,20 @@ class ListItemAbstract(IMCEndpoint):
                 res["video_format"] = self.getJsonResponse(
                     video_format, max_relationship_depth=0
                 )
+        # add spatial coverage
+        res["spatial_coverages"] = []
+        for spatial_coverage in creation.spatial_coverages.all():
+            res["spatial_coverages"].append(
+                {"value": spatial_coverage.value, "type": spatial_coverage.spatial_type}
+            )
+        if len(res["spatial_coverages"]) == 0:
+            del res["spatial_coverages"]
+        # add temporal coverage
+        res["temporal_coverages"] = []
+        for temporal_coverage in creation.temporal_coverages.all():
+            res["temporal_coverages"].append(temporal_coverage.value)
+        if len(res["temporal_coverages"]) == 0:
+            del res["temporal_coverages"]
         # add notes and links
         res["annotations"] = {}
         notes = mdo.annotation.search(annotation_type="DSC", private=False)
