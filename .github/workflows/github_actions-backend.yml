@@ -10,10 +10,9 @@ env:
   PROJECT: imc
 
 jobs:
-  backend-tests:
+  Development-mode:
     runs-on: ubuntu-20.04
-    timeout-minutes: 45
-
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -49,12 +48,35 @@ jobs:
           project: ${PROJECT}
           step: backend
 
+      - name: Print Logs
+        if: failure()
+        run: tail -100 data/logs/backend-server.log
+
+      - name: Docker Logs
+        if: failure()
+        run: |
+          rapydo logs
+  Production-mode:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - uses: rapydo/actions/install@v1
+        with:
+          project: ${PROJECT}
+
       - name: Production Mode
         run: |
-          rapydo remove --all
-          rm -rf data/graphdata/*
+
           rapydo --testing --prod init --force
+          sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
+
           rapydo pull --quiet
+          rapydo build --force
           rapydo ssl --volatile
           rapydo start
           # Increased in 2.3 due to slower neo4j startup
