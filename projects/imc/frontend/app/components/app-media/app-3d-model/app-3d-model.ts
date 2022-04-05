@@ -146,7 +146,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let component: App3dModelComponent = this;
     (function render() {
-      requestAnimationFrame(render);
+      const handle = requestAnimationFrame(render);
+      // FIXME requires further investigation
+      if (!component.renderer) {
+        cancelAnimationFrame(handle);
+        return;
+      }
       component.renderer.render(component.scene, component.camera);
     })();
   }
@@ -239,7 +244,7 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
       this.renderer.setAnimationLoop(null);
       // this.renderer.context = null;
       // this.renderer.domElement = null;
-      // this.renderer = null;
+      this.renderer = null;
     }
     this.axesHelper.dispose();
     if (this.dirLightHelper) {
