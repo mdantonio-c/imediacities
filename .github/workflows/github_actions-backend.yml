@@ -10,7 +10,7 @@ env:
   PROJECT: imc
 
 jobs:
-  dev:
+  Development-mode:
     runs-on: ubuntu-20.04
     timeout-minutes: 30
     steps:
@@ -56,7 +56,7 @@ jobs:
         if: failure()
         run: |
           rapydo logs
-  prod:
+  Production-mode:
     runs-on: ubuntu-20.04
     timeout-minutes: 30
     steps:
@@ -71,10 +71,12 @@ jobs:
 
       - name: Production Mode
         run: |
-          rapydo remove --all
-          rm -rf data/graphdata/*
+
           rapydo --testing --prod init --force
+          sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
+
           rapydo pull --quiet
+          rapydo build --force
           rapydo ssl --volatile
           rapydo start
           # Increased in 2.3 due to slower neo4j startup
