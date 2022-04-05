@@ -61,6 +61,8 @@ jobs:
       - name: Production mode
         run: |
           rapydo --testing --prod init --force
+          sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
+
           rapydo pull --quiet frontend proxy
 
           rapydo start frontend proxy
