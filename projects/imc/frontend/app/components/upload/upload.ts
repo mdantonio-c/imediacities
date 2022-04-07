@@ -12,7 +12,6 @@ import { FormlyService } from "@rapydo/services/formly";
 import { BasePaginationComponent } from "@rapydo/components/base.pagination.component";
 
 import { environment } from "@rapydo/../environments/environment";
-import { StageService } from "../../services/stage.service";
 
 export interface Data {}
 
@@ -35,10 +34,11 @@ export class UploadComponent extends BasePaginationComponent<Data> {
   public upload_progress: any = {};
   public upload_endpoint: string;
 
+  private uploader$;
+
   constructor(
     protected injector: Injector,
-    private uploadService: UploadxService,
-    private stageService: StageService
+    private uploadService: UploadxService
   ) {
     super(injector);
     this.init("file", "/api/stage", null);
@@ -58,21 +58,23 @@ export class UploadComponent extends BasePaginationComponent<Data> {
       autoUpload: true,
     };
 
-    this.uploadService.connect(this.upload_options).subscribe((response) => {
-      if (response && response.length > 0) {
-        // Show Error from last response
-        let resp = response[response.length - 1];
-        if (resp.response) {
-          if (resp.responseStatus == 200) {
-            this.notify.showSuccess(
-              "Upload completed: " + resp.response.filename
-            );
-          } else {
-            this.notify.showError(resp.response);
+    this.uploader$ = this.uploadService
+      .connect(this.upload_options)
+      .subscribe((response) => {
+        if (response && response.length > 0) {
+          // Show Error from last response
+          let resp = response[response.length - 1];
+          if (resp.response) {
+            if (resp.responseStatus == 200) {
+              this.notify.showSuccess(
+                "Upload completed: " + resp.response.filename
+              );
+            } else {
+              this.notify.showError(resp.response);
+            }
           }
         }
-      }
-    });
+      });
   }
 
   public ngAfterViewInit(): void {
@@ -151,14 +153,23 @@ export class UploadComponent extends BasePaginationComponent<Data> {
   }
 
   stage(filename) {
-    this.stageService.stage(filename).subscribe(
-      (resp) => {
-        console.log(resp);
-        this.notify.showSuccess("File staged successfully");
-      },
-      (error) => {
-        this.notify.showCritical(error, `Unable to stage file ${filename}`);
-      }
-    );
+    this.api
+      .post("/api/stage", {
+        filename: filename,
+        mode: "fast",
+      })
+      .subscribe(
+        (resp) => {
+          console.log(resp);
+          this.notify.showSuccess("File staged successfully");
+        },
+        (error) => {
+          this.notify.showCritical(error, `Unable to stage file ${filename}`);
+        }
+      );
+  }
+
+  ngOnDestroy() {
+    this.uploader$.unsubscribe();
   }
 }

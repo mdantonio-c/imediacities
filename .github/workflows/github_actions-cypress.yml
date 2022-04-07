@@ -10,7 +10,7 @@ env:
   PROJECT: imc
 
 jobs:
-  integration-tests:
+  Cypress:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
 

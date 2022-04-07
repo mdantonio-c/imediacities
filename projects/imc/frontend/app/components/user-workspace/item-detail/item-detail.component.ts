@@ -9,7 +9,8 @@ import { environment } from "@rapydo/../environments/environment";
 export interface ItemDetail {
   id: string;
   title: string;
-  type?: string;
+  type: string; // e.g. list, aventity etc
+  specificType?: string;
   description?: string;
   thumbnail?: string;
   focus?: boolean;
@@ -54,22 +55,18 @@ export class ItemDetailComponent implements OnInit {
     if (this.media.listItem) {
       // here media.id is item UUID
       // list item conveys with creation model in ref
-      let media = this.media.ref;
-      if (media.type === "shot" || media.item_type["key"] === "Video") {
-        this.router.navigate(["/app/catalog/videos", media.creation_id]);
-      } else {
-        this.router.navigate(["/app/catalog/images", media.creation_id]);
-      }
+      const mediaPath = `/app/catalog/${this.media.ref.item_type["key"]
+        .split("-")
+        .at(-1)
+        .toLowerCase()}s`;
+      this.router.navigate([mediaPath, this.media.ref.creation_id]);
     } else {
       // here media.id is aventity/nonaventity UUID
-      switch (this.media.type) {
-        case "nonaventity":
-          this.router.navigate(["/app/catalog/images", this.media.id]);
-          break;
-        case "aventity":
-          this.router.navigate(["/app/catalog/videos", this.media.id]);
-          break;
-      }
+      const mediaPath = `/app/catalog/${this.media.specificType
+        .split("-")
+        .at(-1)
+        .toLowerCase()}s`;
+      this.router.navigate([mediaPath, this.media.id]);
     }
   }
 
