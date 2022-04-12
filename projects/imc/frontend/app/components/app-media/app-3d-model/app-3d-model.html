@@ -58,6 +58,21 @@
   </div>
   <div class="webgl">
     <canvas #canvas id="canvas" style="height: 100%; width: 100%"></canvas>
+    <div class="loading-container" *ngIf="!modelLoaded">
+      <div class="main-progress">
+        <div class="main-progress-wrapper">
+          <p>Loading 3D model</p>
+          <div class="main-progress-display">
+            <ngb-progressbar
+              height="10px"
+              type="warning"
+              [value]="progressValue"
+              >{{progressValue}}</ngb-progressbar
+            >
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="controls">
       <div class="helper-controls" *ngIf="showHelpers">
         <i class="fas fa-video mr-2"></i>
