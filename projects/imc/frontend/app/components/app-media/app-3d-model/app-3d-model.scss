@@ -69,8 +69,8 @@
 
     .canvas {
       display: block;
-      width: calc(100% + 1px);
-      height: 100%;
+      width: calc(100% + 1px) !important;
+      height: 100% !important;
       cursor: -webkit-grab;
       cursor: grab;
       outline: none;

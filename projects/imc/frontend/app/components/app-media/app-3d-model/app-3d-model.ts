@@ -136,6 +136,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.canvas.clientWidth / this.canvas.clientHeight;
   }
 
+  @HostListener("window:resize", ["$event"])
+  private onResize(event) {
+    this.camera.aspect = this.getAspectRatio();
+    this.camera.updateProjectionMatrix();
+  }
+
   /**
    * Start the rendering loop
    * @private
