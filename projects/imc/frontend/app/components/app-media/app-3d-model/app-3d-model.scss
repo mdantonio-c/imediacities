@@ -1,3 +1,4 @@
+$breakpoint-sm: 576px;
 .viewer {
   .titlebar {
     transition: opacity 0.25s ease-in-out;
@@ -60,9 +61,12 @@
   }
 
   .webgl {
-    position: absolute;
-    top: 0;
-    left: 0;
+    @media (min-width: $breakpoint-sm) {
+      position: absolute;
+    }
+    //position: absolute;
+    //top: 0;
+    //left: 0;
     z-index: 0;
     width: 100%;
     height: 100%;
