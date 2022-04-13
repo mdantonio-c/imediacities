@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   AfterViewInit,
   Output,
   EventEmitter,
@@ -16,8 +17,13 @@ import {
 } from "../../services/catalog.service";
 import { IPRStatuses, Providers } from "../../services/data";
 import { AppVocabularyService } from "../../../services/app-vocabulary";
-import { Observable, combineLatest } from "rxjs";
-import { debounceTime, distinctUntilChanged, map } from "rxjs/operators";
+import { Observable, Subject, combineLatest } from "rxjs";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  takeUntil,
+} from "rxjs/operators";
 import { environment } from "@rapydo/../environments/environment";
 
 // const SLIDER_TICKS = [1890, 1917, 1945, 1972, 1999];
@@ -29,7 +35,7 @@ const SLIDER_TICKS = chunkBy(YEAR_FROM, YEAR_TO);
   styleUrls: ["./search-filter.component.css"],
   encapsulation: ViewEncapsulation.None,
 })
-export class SearchFilterComponent implements OnInit, AfterViewInit {
+export class SearchFilterComponent implements OnInit, OnDestroy, AfterViewInit {
   searchForm: FormGroup;
   vocabulary;
   terms = [];
@@ -45,6 +51,7 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
   prodDateTooltip: string = this.enableProdDateText;
   readonly lang = environment.CUSTOM.FRONTEND_LANG || "en";
   readonly disabled_filters = [];
+  private destroy$: Subject<void> = new Subject<void>();
 
   @Output()
   onFilterChange: EventEmitter<SearchFilter> = new EventEmitter<SearchFilter>();
@@ -93,22 +100,22 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
     });
     this.searchForm.setValue(this.toForm(this.catalogService.filter));
 
-    combineLatest(
-      this.searchForm.get("productionYearFrom").valueChanges
-    ).subscribe(([productionYearFrom = YEAR_FROM]) => {
-      this.setSliderTo(
-        productionYearFrom,
-        this.searchForm.get("productionYearTo").value
-      );
-    });
-    combineLatest(
-      this.searchForm.get("productionYearTo").valueChanges
-    ).subscribe(([productionYearTo = YEAR_TO]) => {
-      this.setSliderTo(
-        this.searchForm.get("productionYearFrom").value,
-        productionYearTo
-      );
-    });
+    combineLatest(this.searchForm.get("productionYearFrom").valueChanges)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([productionYearFrom = YEAR_FROM]) => {
+        this.setSliderTo(
+          productionYearFrom,
+          this.searchForm.get("productionYearTo").value
+        );
+      });
+    combineLatest(this.searchForm.get("productionYearTo").valueChanges)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([productionYearTo = YEAR_TO]) => {
+        this.setSliderTo(
+          this.searchForm.get("productionYearFrom").value,
+          productionYearTo
+        );
+      });
   }
 
   ngAfterViewInit() {
@@ -388,5 +395,10 @@ export class SearchFilterComponent implements OnInit, AfterViewInit {
 
   setSliderTo(from, to) {
     this.rangeValue = [from, to];
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

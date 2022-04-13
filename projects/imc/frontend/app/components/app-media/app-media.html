@@ -203,7 +203,6 @@ picture-->
               aria-labelledby="shots"
             >
               <!-- tab shots -->
-
               <div class="loader col mt-2" *ngIf="shots && !shots.length"></div>
               <div *ngIf="shots && shots.length">
                 <app-video-shot
@@ -258,7 +257,6 @@ picture-->
               >
                 <div class="col-12"><p>no tags!</p></div>
               </div>
-
               <div *ngIf="shots && shots.length === 1">
                 <app-video-shot
                   [shot]="shots[0]"
@@ -304,9 +302,7 @@ picture-->
                 <div class="col-12"><p>no personal areas</p></div>
                 <span class="info-element-button col-12">
                   <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
-                  <button class="btn btn-border-classic">
-                    Create Area<!--Cancel-->
-                  </button>
+                  <button class="btn btn-border-classic">Create Area</button>
                 </span>
               </div>
             </div>
@@ -325,7 +321,6 @@ picture-->
               >
                 <div class="col-12"><p>no tags!</p></div>
               </div>
-              <!-- -->
               <div *ngIf="shots && shots.length === 1">
                 <app-video-shot
                   [shot]="shots[0]"
@@ -351,7 +346,7 @@ picture-->
                 class="btn btn-border-classic px-1"
                 mwlConfirmationPopover
                 [popoverTitle]="'Start Shot Revision'"
-                [popoverMessage]="'Starting the revision mode some funcationalities will be disabled.<br/>Do you wish to continue?'"
+                [popoverMessage]="'Starting the revision mode some functionalities will be disabled.<br/>Do you wish to continue?'"
                 (confirm)="start_shot_revision()"
                 *ngIf="user?.roles.hasOwnProperty('Reviser')"
               >
@@ -452,8 +447,7 @@ picture-->
         ></app-media-info>
 
         <!-- COMMENTS -->
-        <!-- comment out for the moment
-                <app-media-commenti></app-media-commenti> -->
+        <!-- <app-media-commenti></app-media-commenti> -->
       </section>
 
       <!-- right col -->
@@ -469,10 +463,12 @@ picture-->
         <!-- <app-media-related-items></app-media-related-items> -->
       </section>
 
-      <!-- COMMENTS
-            <section class="col-8 imc&#45;&#45;content-comments">
-                <app-media-commenti></app-media-commenti>
-            </section>-->
+      <!-- COMMENTS -->
+      <!--
+      <section class="col-8 imc&#45;&#45;content-comments">
+        <app-media-commenti></app-media-commenti>
+      </section>
+      -->
     </div>
   </div>
 
