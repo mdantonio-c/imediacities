@@ -22,6 +22,7 @@ jobs:
       - uses: rapydo/actions/install@v1
         with:
           project: ${PROJECT}
+          extra_options: "-e FRONTEND_FRAMEWORK=nofrontend"
 
       - name: Run Pytest
         run: |
@@ -73,7 +74,7 @@ jobs:
       - name: Production Mode
         run: |
 
-          rapydo --testing --prod init --force
+          rapydo --testing --prod -e FRONTEND_FRAMEWORK=nofrontend init --force
           sed -i 's/\*\*PLACEHOLDER\*\*//g' projects/${PROJECT}/project_configuration.yaml
 
           rapydo pull --quiet
