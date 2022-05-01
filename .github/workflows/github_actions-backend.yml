@@ -57,7 +57,7 @@ jobs:
           rapydo pull --quiet
           rapydo ssl --volatile
           rapydo start
-          sleep 60
+          sleep 70
           rapydo logs
           curl --insecure -X GET --max-time 5 https://localhost/api/status | grep "Server is alive"
           rapydo logs --tail 20 proxy
