@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, OnDestroy, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { AuthService } from "@rapydo/services/auth";
 import { NotificationService } from "@rapydo/services/notification";
@@ -12,13 +12,15 @@ import { NgbDropdown } from "@ng-bootstrap/ng-bootstrap";
 import { MultiItemCarouselComponent } from "./multi-item-carousel/multi-item-carousel.component";
 import { ItemDetail } from "./item-detail/item-detail.component";
 import { environment } from "@rapydo/../environments/environment";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: "user-workspace",
   templateUrl: "user-workspace.html",
   styleUrls: ["./user-workspace.css"],
 })
-export class UserWorkspaceComponent implements OnInit {
+export class UserWorkspaceComponent implements OnInit, OnDestroy {
   cities: string[] = [];
   selectedCity: string = "";
   cityFilter: SearchFilter = {};
@@ -53,6 +55,7 @@ export class UserWorkspaceComponent implements OnInit {
    */
   @ViewChild("listItems", { static: false })
   listItemsComp: MultiItemCarouselComponent;
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(
     private authService: AuthService,
@@ -65,10 +68,12 @@ export class UserWorkspaceComponent implements OnInit {
       name: ["", Validators.required],
       description: ["", Validators.required],
     });
-    listsService.listSelected$.subscribe((list) => {
-      this.selectedList = list;
-      this.counters.LIST_ITEMS = undefined;
-    });
+    listsService.listSelected$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((list) => {
+        this.selectedList = list;
+        this.counters.LIST_ITEMS = undefined;
+      });
     if (environment.CUSTOM.FRONTEND_DISABLED_FILTERS) {
       const disabledFilters =
         environment.CUSTOM.FRONTEND_DISABLED_FILTERS.split(",");
@@ -132,5 +137,10 @@ export class UserWorkspaceComponent implements OnInit {
 
   private resetForm() {
     this.listForm.reset({ name: "", description: "" });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
