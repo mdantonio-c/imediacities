@@ -1,9 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { CatalogService, SearchFilter } from "./services/catalog.service";
 import { NotificationService } from "@rapydo/services/notification";
 import { SSRService } from "@rapydo/services/ssr";
 import { MediaEntity, Providers } from "./services/data";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
   selector: "app-catalog",
@@ -23,6 +25,7 @@ export class CatalogComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 12;
   mediaTags: any[];
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -33,31 +36,33 @@ export class CatalogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
-      let preset = false;
-      if (params["city"]) {
-        // preset filter with city value if valid
-        let cityCode = params["city"].toUpperCase();
-        let p = Providers.filter((provider) => provider.code === cityCode);
-        if (p && p.length) {
-          this.catalogService.reset(cityCode);
-          preset = true;
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        let preset = false;
+        if (params["city"]) {
+          // preset filter with city value if valid
+          let cityCode = params["city"].toUpperCase();
+          let p = Providers.filter((provider) => provider.code === cityCode);
+          if (p && p.length) {
+            this.catalogService.reset(cityCode);
+            preset = true;
+          }
+          // clean the url from the query parameter
+          this.router.navigate([], {
+            queryParams: { city: null },
+            queryParamsHandling: "merge",
+          });
         }
-        // clean the url from the query parameter
-        this.router.navigate([], {
-          queryParams: { city: null },
-          queryParamsHandling: "merge",
-        });
-      }
 
-      if (!preset) {
-        this.catalogService.init();
-      }
-      this.changeFilter(this.catalogService.filter);
-      if ("page" in this.catalogService.filter) {
-        this.currentPage = this.catalogService.filter["page"];
-      }
-    });
+        if (!preset) {
+          this.catalogService.init();
+        }
+        this.changeFilter(this.catalogService.filter);
+        if ("page" in this.catalogService.filter) {
+          this.currentPage = this.catalogService.filter["page"];
+        }
+      });
   }
 
   load() {
@@ -142,5 +147,10 @@ export class CatalogComponent implements OnInit {
       .add(() => {
         this.loadingMapResults = false;
       });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

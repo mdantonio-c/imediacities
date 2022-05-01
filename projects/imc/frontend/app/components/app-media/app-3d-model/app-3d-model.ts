@@ -41,6 +41,8 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
   private isFullScreen: boolean;
   public showHelp: boolean = false;
   public showHelpers: boolean = false;
+  public modelLoaded: boolean = false;
+  public progressValue: number = 0;
 
   constructor(private auth: AuthService) {}
 
@@ -58,20 +60,22 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
    * @private
    */
   private loadGLTFModel() {
-    // const path = "/app/custom/assets/models/gltf/bassorilievo/bassorilievo.glb";
     const path = this.data.links.content;
     this.gltfLoader.load(
       path,
       (gltf) => {
         this.scene.add(gltf.scene);
         console.log("gltf model added to the scene");
+        this.modelLoaded = true;
       },
       (xhr) => {
         // Progress Event
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        this.progressValue = (xhr.loaded / xhr.total) * 100;
+        // console.log(`${this.progressValue}% loaded`);
       },
       (error) => {
         console.error("Error", error, error.message);
+        this.modelLoaded = true;
       }
     );
   }
@@ -130,6 +134,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getAspectRatio() {
     return this.canvas.clientWidth / this.canvas.clientHeight;
+  }
+
+  @HostListener("window:resize", ["$event"])
+  private onResize(event) {
+    this.camera.aspect = this.getAspectRatio();
+    this.camera.updateProjectionMatrix();
   }
 
   /**
