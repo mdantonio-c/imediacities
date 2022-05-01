@@ -6,6 +6,7 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  OnDestroy,
 } from "@angular/core";
 import { AuthService } from "@rapydo/services/auth";
 import * as THREE from "three";
@@ -17,7 +18,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
   templateUrl: "app-3d-model.html",
   styleUrls: ["app-3d-model.scss"],
 })
-export class App3dModelComponent implements OnInit, AfterViewInit {
+export class App3dModelComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() data;
 
   @Input() public cameraZ: number = -100;
@@ -40,6 +41,8 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
   private isFullScreen: boolean;
   public showHelp: boolean = false;
   public showHelpers: boolean = false;
+  public modelLoaded: boolean = false;
+  public progressValue: number = 0;
 
   constructor(private auth: AuthService) {}
 
@@ -57,20 +60,22 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
    * @private
    */
   private loadGLTFModel() {
-    // const path = "/app/custom/assets/models/gltf/bassorilievo/bassorilievo.glb";
     const path = this.data.links.content;
     this.gltfLoader.load(
       path,
       (gltf) => {
         this.scene.add(gltf.scene);
         console.log("gltf model added to the scene");
+        this.modelLoaded = true;
       },
       (xhr) => {
         // Progress Event
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        this.progressValue = (xhr.loaded / xhr.total) * 100;
+        // console.log(`${this.progressValue}% loaded`);
       },
       (error) => {
         console.error("Error", error, error.message);
+        this.modelLoaded = true;
       }
     );
   }
@@ -131,6 +136,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
     return this.canvas.clientWidth / this.canvas.clientHeight;
   }
 
+  @HostListener("window:resize", ["$event"])
+  private onResize(event) {
+    this.camera.aspect = this.getAspectRatio();
+    this.camera.updateProjectionMatrix();
+  }
+
   /**
    * Start the rendering loop
    * @private
@@ -145,7 +156,12 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
 
     let component: App3dModelComponent = this;
     (function render() {
-      requestAnimationFrame(render);
+      const handle = requestAnimationFrame(render);
+      // FIXME requires further investigation
+      if (!component.renderer) {
+        cancelAnimationFrame(handle);
+        return;
+      }
       component.renderer.render(component.scene, component.camera);
     })();
   }
@@ -226,5 +242,45 @@ export class App3dModelComponent implements OnInit, AfterViewInit {
       ? (this.scene.add(this.axesHelper), this.scene.add(this.dirLightHelper))
       : (this.scene.remove(this.axesHelper),
         this.scene.remove(this.dirLightHelper));
+  }
+
+  ngOnDestroy() {
+    if (this.controls) {
+      this.controls.dispose();
+    }
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.forceContextLoss();
+      this.renderer.setAnimationLoop(null);
+      // this.renderer.context = null;
+      // this.renderer.domElement = null;
+      this.renderer = null;
+    }
+    this.axesHelper.dispose();
+    if (this.dirLightHelper) {
+      this.dirLightHelper.dispose();
+    }
+    this.clearScene(this.scene);
+  }
+
+  private clearScene(obj) {
+    while (obj.children.length > 0) {
+      this.clearScene(obj.children[0]);
+      obj.remove(obj.children[0]);
+    }
+    if (obj.geometry) obj.geometry.dispose();
+
+    if (obj.material) {
+      // in case of map, bumpMap, normalMap, envMap ...
+      Object.keys(obj.material).forEach((prop) => {
+        if (!obj.material[prop]) return;
+        if (
+          obj.material[prop] !== null &&
+          typeof obj.material[prop].dispose === "function"
+        )
+          obj.material[prop].dispose();
+      });
+      obj.material.dispose();
+    }
   }
 }

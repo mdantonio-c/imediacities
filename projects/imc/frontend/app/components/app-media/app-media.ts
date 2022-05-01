@@ -20,6 +20,8 @@ import {
 import { NotificationService } from "@rapydo/services/notification";
 import { MediaUtilsService } from "../../catalog/services/media-utils.service";
 import { ModalConfig } from "../../types";
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 const ENDPOINTS: string[] = ["videos", "images", "models"];
 
@@ -44,12 +46,10 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   private shots_to_restore: any[] = [];
   /** Show the multiple shot selection tool */
   public multi_annotations_is_active: boolean = false;
-  /**
-   * Riceve i risultati della chiamata al servizio media
-   */
+  /** Receives the results of the call to the media service */
   public media: any;
   /**
-   * Oggetto da visualizzare nel corpo della modale
+   * Object to display in the body of the modal
    * @type {{type: string; data: {}}}
    */
   public modale = {
@@ -61,24 +61,23 @@ export class AppMediaComponent implements OnInit, OnDestroy {
   /** List of locations to pass to the map */
   public locations;
   /**
-   * Riceve i risultati della chiamata al servizio shots
+   * Receives the results of the call to the shots service
    * @type {any[]}
    */
   public shots = [];
   public shots_attivi = [];
   /**
-   * Lingua dell'utente da legare in futuro all'utente loggato
+   * User language to be linked in the future to the logged in user
    * @type {string}
    */
   public user_language = "it";
   public user: any = {};
-  //public type_shot: boolean;
 
   public media_class = "";
   public media_type = "";
   public is_3d_model = false;
   public media_id = "";
-  private _subscription;
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -92,9 +91,11 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     private shotRevisionService: ShotRevisionService,
     private notify: NotificationService
   ) {
-    shotRevisionService.cutAdded$.subscribe((shots) => {
-      this.split_shot(shots);
-    });
+    shotRevisionService.cutAdded$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((shots) => {
+        this.split_shot(shots);
+      });
   }
 
   media_type_set(url) {
@@ -407,69 +408,72 @@ export class AppMediaComponent implements OnInit, OnDestroy {
     this.user = this.authService.getUser();
     //this.media_type_set(this.router.url);
 
-    this._subscription = this.route.params.subscribe((params: Params) => {
-      this.media_id = params["uuid"];
-      let endpoint: string;
-      for (let i = 0; i < ENDPOINTS.length; i++) {
-        if (this.router.url.indexOf(ENDPOINTS[i]) != -1) {
-          endpoint = ENDPOINTS[i];
-          break;
-        }
-      }
-
-      this.mediaService.get(this.media_id, endpoint, (mediaEntity) => {
-        this.media_type_set(this.router.url);
-        this.media = this.media_entity_normalize(mediaEntity);
-        this.is_3d_model =
-          this.media.non_av_type && this.media.non_av_type.key === "3d-model"
-            ? true
-            : false;
-
-        // To be confirmed
-        setTimeout(() => {
-          let tabs =
-            this.element.nativeElement.querySelector("#pills-tab > li");
-          if (tabs) tabs.click();
-        }, 100);
-
-        if (this.media_type === "video") {
-          this.shotsService.get(this.media_id, endpoint);
-        }
-
-        if (this.media_type === "image" || this.media_type === "3d-model") {
-          this.annotationsService.get(this.media_id, endpoint);
-          const annotations_subscription =
-            this.annotationsService.update.subscribe((annotations) => {
-              this.shotsService.get(this.media_id, endpoint, {
-                annotations: annotations,
-                links: this.media.links,
-                item_id: this.media._item[0].id,
-              });
-            });
-          this._subscription.add(annotations_subscription);
-        }
-
-        const shots_subscription = this.shotsService.update.subscribe(
-          (shots) => {
-            this.shots_init(shots);
-            const annotations = this.shotsService.annotations();
-            this.annotations_count = annotations.length;
-            if (this.user !== null) {
-              this.locations = annotations.filter(
-                (a) => a.group === "location"
-              );
-            }
-            if (this.media._item[0]._revision) {
-              this.under_revision();
-            }
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params: Params) => {
+        this.media_id = params["uuid"];
+        let endpoint: string;
+        for (let i = 0; i < ENDPOINTS.length; i++) {
+          if (this.router.url.indexOf(ENDPOINTS[i]) != -1) {
+            endpoint = ENDPOINTS[i];
+            break;
           }
-        );
-        this._subscription.add(shots_subscription);
+        }
+
+        this.mediaService.get(this.media_id, endpoint, (mediaEntity) => {
+          this.media_type_set(this.router.url);
+          this.media = this.media_entity_normalize(mediaEntity);
+          this.is_3d_model =
+            this.media.non_av_type && this.media.non_av_type.key === "3d-model"
+              ? true
+              : false;
+
+          // To be confirmed
+          setTimeout(() => {
+            let tabs =
+              this.element.nativeElement.querySelector("#pills-tab > li");
+            if (tabs) tabs.click();
+          }, 100);
+
+          if (this.media_type === "video") {
+            this.shotsService.get(this.media_id, endpoint);
+          }
+
+          if (this.media_type === "image" || this.media_type === "3d-model") {
+            this.annotationsService.get(this.media_id, endpoint);
+            const annotations_subscription = this.annotationsService.update
+              .pipe(takeUntil(this.destroy$))
+              .subscribe((annotations) => {
+                this.shotsService.get(this.media_id, endpoint, {
+                  annotations: annotations,
+                  links: this.media.links,
+                  item_id: this.media._item[0].id,
+                });
+              });
+            // this._subscription.add(annotations_subscription);
+          }
+
+          this.shotsService.update
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((shots) => {
+              this.shots_init(shots);
+              const annotations = this.shotsService.annotations();
+              this.annotations_count = annotations.length;
+              if (this.user !== null) {
+                this.locations = annotations.filter(
+                  (a) => a.group === "location"
+                );
+              }
+              if (this.media._item[0]._revision) {
+                this.under_revision();
+              }
+            });
+        });
       });
-    });
   }
 
   ngOnDestroy() {
-    this._subscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
