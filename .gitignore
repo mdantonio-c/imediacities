@@ -37,6 +37,7 @@ docker-compose.yml
 scripts/rapydo
 
 *.log
+*.bak
 
 # notebooks
 .ipynb_checkpoint

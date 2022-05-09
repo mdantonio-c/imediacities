@@ -6,7 +6,10 @@
           <h4><i class="fa fa-file-zipper"></i> Data archive</h4>
         </div>
         <div class="card-body">
-          <ngx-spinner [fullScreen]="false"></ngx-spinner>
+          <ngx-spinner
+            [fullScreen]="false"
+            type="ball-scale-multiple"
+          ></ngx-spinner>
           <ngb-accordion close-others="true">
             <ngb-panel *ngFor="let group of groups | keyvalue">
               <ng-template ngbPanelTitle>
