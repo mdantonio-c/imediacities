@@ -32,7 +32,7 @@ const SLIDER_TICKS = chunkBy(YEAR_FROM, YEAR_TO);
 @Component({
   selector: "search-filter",
   templateUrl: "./search-filter.component.html",
-  styleUrls: ["./search-filter.component.css"],
+  styleUrls: ["./search-filter.component.scss"],
   encapsulation: ViewEncapsulation.None,
 })
 export class SearchFilterComponent implements OnInit, OnDestroy, AfterViewInit {
