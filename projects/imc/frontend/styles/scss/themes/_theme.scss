@@ -304,7 +304,7 @@ input[type="radio"] {
   padding-right: 30px;*/
   width: 80%;
 
-  /* & + .input-group-append {
+  /* & + .imc--input-append {
     align-items: center;
     border-bottom: 1px solid $text-color;
     justify-content: flex-end;
@@ -320,7 +320,7 @@ input[type="radio"] {
   }*/
 }
 
-.input-group-append {
+.imc--input-append {
   align-items: center;
   border-bottom: 1px solid $text-color;
   justify-content: flex-end;
