@@ -1,13 +1,7 @@
-<!-- Modale per l'iserimento di nuove note -->
+<!-- Modal for inserting new notes -->
 <app-media-modal [data]="data" [media_type]="media_type">
   <div
-    class="
-      col-12 col-sm-7
-      row
-      no-gutters
-      justify-content-between
-      space-paragraph-xs-20
-    "
+    class="col-12 col-sm-7 row g-0 justify-content-between space-paragraph-xs-20"
     modal-col
   >
     <form [formGroup]="referenceForm" class="w-100">
@@ -209,7 +203,7 @@
   >
     Save
   </button>
-  <!--esito-->
+  <!-- outcome -->
   <app-info
     modal-button
     [message]="save_result.message"

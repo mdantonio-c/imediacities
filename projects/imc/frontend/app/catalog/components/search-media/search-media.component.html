@@ -1,12 +1,13 @@
 <div class="media search-media">
   <div class="media-left">
-    <span class="badge badge-warning revision" *ngIf="underRevision()">
+    <span class="badge bg-warning revision" *ngIf="underRevision()">
       <i class="fa fa-wrench"></i>
     </span>
     <img
       (contextmenu)="disableSaveAs($event)"
       src="{{ media.links['thumbnail'] }}"
       *ngIf="media.links['thumbnail']"
+      alt="thumbnail"
     />
     <img
       alt="no thumbnail"
@@ -62,7 +63,7 @@
         <i class="imc-icon fa fa-clock"></i>
         <span class="blue">{{ media._item[0].duration | duration }}</span>
       </div>
-      <span class="badge badge-primary label-city">{{
+      <span class="badge bg-primary label-city">{{
         (media._record_sources[0]._provider[0].identifier | providerToCity) ||
           "n/a"
       }}</span>

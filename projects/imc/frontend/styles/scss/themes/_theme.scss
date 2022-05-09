@@ -19,7 +19,7 @@
   white-space: nowrap;
 }
 
-// Link video/immagine
+// Link video/image
 .page-type-video {
   .imc--link:hover,
   .imc--icon-link:hover {
@@ -78,9 +78,9 @@
   cursor: pointer;
 }
 
-// Layout customizzato (regole flexbox)
+// Layout customized (flexbox rules)
 
-// - per il contenitore
+// - for the container
 .imc--flex--vertical-start {
   align-items: flex-start;
   display: flex;
@@ -106,7 +106,7 @@
   display: flex;
 }
 
-// - per gli item
+// - for the items
 .imc--flex--item-end {
   display: flex;
   margin-left: auto;
@@ -120,7 +120,7 @@
   }
 }
 
-// Spazi tra gli elementi
+// Spaces between elements
 .space-paragraph-10 {
   margin-top: 10px;
 }
@@ -149,7 +149,7 @@
   margin: 0 !important;
 }
 
-// Campi di input
+// Input fields
 .imc--input,
 .imc--input--no-line {
   background: transparent;
@@ -162,7 +162,18 @@
   width: 100%;
 }
 
-//dropdown bootstrap
+.imc--input.form-control {
+  border-radius: 0;
+}
+
+.imc--input.form-control:focus {
+  outline: 0px !important;
+  -webkit-appearance: none;
+  box-shadow: none !important;
+  border-color: inherit;
+}
+
+// dropdown bootstrap
 .imc--input--dropdown {
   margin-top: 8px;
 
@@ -287,7 +298,7 @@ input[type="radio"] {
   }
 }
 
-//Datepicker
+// Datepicker
 .imc--input-data {
   /*background: url("../../assets/svg/today.svg") no-repeat right;
   padding-right: 30px;*/
@@ -348,7 +359,7 @@ input[type="radio"] {
     margin: 6px 0 0 12px;
   }
 
-  //box
+  // box
   & + label:before {
     content: "";
     margin-right: 10px;
@@ -594,7 +605,7 @@ input[type="radio"] {
   padding: $padding-card;
 }
 
-//Thumb
+// Thumb
 .imc--thumb {
   background: $bg-dark;
   margin-right: 10px;
@@ -682,7 +693,7 @@ input[type="radio"] {
   }
 }
 
-// Colonna destra
+// Right column
 .imc--colonna-destra {
   box-sizing: border-box;
   padding-left: $padding-card !important;

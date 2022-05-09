@@ -18,7 +18,7 @@
   </div>
   <div class="container-workspace">
     <!-- SEARCH RESULTS -->
-    <div class="row no-gutters mx-3" *ngIf="!cityFilterDisabled">
+    <div class="row g-0 mx-3" *ngIf="!cityFilterDisabled">
       <div class="col-12 my-2">
         <span class="imc--flex--vertical-center">
           <i class="material-icons">location_city</i>&nbsp;<strong
@@ -27,32 +27,29 @@
         </span>
       </div>
     </div>
-    <div class="row no-gutters mx-3">
-      <div class="col-12" *ngIf="!cityFilterDisabled">
-        <div class="form-row align-items-center">
-          <div class="col-auto">
-            <select
-              [(ngModel)]="selectedCity"
-              (ngModelChange)="onCityChange($event)"
-              class="form-control"
-              style="max-width: 160px"
-            >
-              <option value=""></option>
-              <option *ngFor="let c of cities; let i = index" [value]="c">
-                {{c}}
-              </option>
-            </select>
-          </div>
-          <!-- <div class="col-1" style="max-width: 40px !important;">
-			      <i class="material-icons">star_rate</i>
-			    </div> -->
-          <div class="col-auto">
-            <span *ngIf="counters.BY_CITIES !== undefined"
-              >{{counters.BY_CITIES}} contents</span
-            >
-          </div>
+    <div class="row g-0 mx-3 align-items-center">
+      <ng-container *ngIf="!cityFilterDisabled">
+        <div class="col-auto">
+          <select
+            [(ngModel)]="selectedCity"
+            (ngModelChange)="onCityChange($event)"
+            class="form-select"
+            style="max-width: 160px"
+          >
+            <option value=""></option>
+            <option *ngFor="let c of cities; let i = index" [value]="c">
+              {{c}}
+            </option>
+          </select>
         </div>
-      </div>
+        <div class="col-auto ps-2">
+          <span *ngIf="counters.BY_CITIES !== undefined"
+            >{{counters.BY_CITIES}} contents</span
+          >
+        </div>
+      </ng-container>
+    </div>
+    <div class="row g-0 mx-3">
       <div class="col-12 mt-2" style="min-height: 268px">
         <multi-item-carousel
           [filter]="cityFilter"
@@ -65,7 +62,7 @@
     </div>
 
     <!-- VIRTUAL EXHIBITOR -->
-    <!-- <div class="row no-gutters mx-3">
+    <!-- <div class="row g-0 mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--flex--vertical-center">
 					<i class="material-icons">collections</i>&nbsp;<strong>My Virtual Exhibitions (5)</strong>
@@ -75,7 +72,7 @@
 		<div class="row"><div class="col-12"><hr></div></div> -->
 
     <!-- MY LISTS -->
-    <div class="row no-gutters mx-3">
+    <div class="row g-0 mx-3">
       <div class="col-12 mt-2">
         <div style="display: flex; flex-wrap: wrap">
           <span class="imc--flex--vertical-center">
@@ -86,7 +83,7 @@
           <span class="imc--flex--vertical-center">
             <div
               ngbDropdown
-              class="d-inline-block ml-5"
+              class="d-inline-block ms-5"
               placement="bottom-left"
               autoClose="outside"
               #newListDrop="ngbDropdown"
@@ -97,7 +94,7 @@
                 ngbDropdownToggle
                 (click)="openListCreation()"
               >
-                <i class="fa fa-plus-square"></i> Create a new list
+                <i class="fa fa-square-plus"></i> Create a new list
               </button>
               <div
                 ngbDropdownMenu
@@ -110,55 +107,55 @@
                   [formGroup]="listForm"
                   (ngSubmit)="createList()"
                 >
-                  <div class="input-group">
-                    <div class="form-header">
-                      <button
-                        type="button"
-                        class="close"
-                        aria-label="Close"
-                        (click)="newListDrop.close()"
-                      >
-                        <span
-                          aria-hidden="true"
-                          class="material-icons mr-0"
-                          style="color: #707070"
-                          >close</span
-                        >
-                      </button>
-                    </div>
+                  <div class="form-header">
+                    <button
+                      type="button"
+                      class="btn-close"
+                      aria-label="Close"
+                      (click)="newListDrop.close()"
+                    ></button>
+                  </div>
+                  <div class="form-floating mb-3">
                     <input
                       type="text"
-                      class="imc--input"
+                      class="form-control imc--input"
+                      id="floatingInput"
                       placeholder="Enter name"
                       formControlName="name"
                       autofocus
                     />
+                    <label for="floatingInput">Enter name</label>
                     <div
                       class="invalid-feedback d-block mt-0"
                       *ngIf="listForm.get('name').touched && listForm.get('name').invalid"
                     >
                       Name is required
                     </div>
+                  </div>
+                  <div class="form-floating">
                     <textarea
-                      class="imc--input mt-3"
+                      class="form-control imc--input"
                       placeholder="Enter notes"
                       formControlName="description"
+                      id="floatingTextarea"
+                      style="height: 100px"
                     ></textarea>
+                    <label for="floatingTextarea">Enter notes</label>
                     <div
                       class="invalid-feedback d-block mt-0"
                       *ngIf="listForm.get('description').touched && listForm.get('description').invalid"
                     >
                       Description is required
                     </div>
-                    <div class="form-footer mt-2">
-                      <button
-                        type="submit"
-                        class="btn btn-border-classic"
-                        [disabled]="listForm.invalid"
-                      >
-                        Create
-                      </button>
-                    </div>
+                  </div>
+                  <div class="form-footer mt-2">
+                    <button
+                      type="submit"
+                      class="btn btn-border-classic"
+                      [disabled]="listForm.invalid"
+                    >
+                      Create
+                    </button>
                   </div>
                 </form>
               </div>
@@ -197,7 +194,7 @@
     </div>
 
     <!-- MY EMBARGOES -->
-    <!-- <div class="row no-gutters mx-3">
+    <!-- <div class="row g-0 mx-3">
 			<div class="col-12 mt-2">
 				<span class="imc--flex--vertical-center">
 					<i class="material-icons">lock</i>&nbsp;<strong>My Embargoes (43)</strong>
@@ -207,7 +204,7 @@
 		<div class="row"><div class="col-12"><hr></div></div> -->
 
     <!-- ANNOTATED BY ME -->
-    <div class="row no-gutters mx-3">
+    <div class="row g-0 mx-3">
       <div class="col-12 mt-2">
         <span class="imc--flex--vertical-center">
           <i class="material-icons">bookmark</i>&nbsp;<strong
@@ -225,7 +222,7 @@
     </div>
 
     <!-- WITH MY NOTES -->
-    <div class="row no-gutters mx-3">
+    <div class="row g-0 mx-3">
       <div class="col-12 mt-2">
         <span class="imc--flex--vertical-center">
           <i class="material-icons">speaker_notes</i>&nbsp;<strong

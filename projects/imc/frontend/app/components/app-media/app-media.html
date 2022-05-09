@@ -10,15 +10,15 @@ picture-->
   ></app-media-top-bar>
 
   <!-- MEDIA -->
-  <div class="container-media row no-gutters justify-content-md-center">
+  <div class="container-media row g-0 justify-content-md-center">
     <!-- TITLE MEDIA -->
-    <div class="box-title-media col-12 col-lg-6 row no-gutters">
+    <div class="box-title-media col-12 col-lg-6 row g-0">
       <h2 class="imc--title-bold col-12">
         {{media.identifying_title}}<span
           *ngIf="shot_revision_is_active"
           class="badge badge-geotag"
           >under revision
-          <i class="fa fa-cogs" *ngIf="shot_revision_state == 'R'"></i>
+          <i class="fa fa-gears" *ngIf="shot_revision_state == 'R'"></i>
         </span>
       </h2>
       <p
@@ -40,7 +40,7 @@ picture-->
         ></span>
       </p>
       <!-- <span class="col-6 col-sm-2">1.000 views</span> -->
-      <span class="col-12 col-sm-4 text-right" *ngIf="annotations_count"
+      <span class="col-12 col-sm-4 text-end" *ngIf="annotations_count"
         >{{annotations_count}} annotations</span
       >
     </div>
@@ -48,13 +48,7 @@ picture-->
 
     <!-- container video and shot -->
     <div
-      class="
-        container-media--content
-        row
-        no-gutters
-        col-12
-        justify-content-md-center
-      "
+      class="container-media--content row g-0 col-12 justify-content-md-center"
     >
       <!-- box media -->
       <section class="box-media col-12 col-sm-7 col-lg-6">
@@ -112,7 +106,7 @@ picture-->
         class="col-12 col-sm-5 col-lg-3 box-shots"
         *ngIf="!show_only_public_domain() || is_public_domain()"
       >
-        <div class="imc--toolbar row no-gutters">
+        <div class="imc--toolbar row g-0">
           <span
             class="col-5 col-lg-8 imc--flex--vertical-center"
             *ngIf="media_type === 'video'"
@@ -232,7 +226,7 @@ picture-->
               <!-- tab segments -->
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
               <!-- Code block if there are no elements in it -->
-              <div class="container-info-element row no-gutters">
+              <div class="container-info-element row g-0">
                 <div class="col-12"><p>no segments</p></div>
                 <span class="info-element-button col-12">
                   <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
@@ -253,7 +247,7 @@ picture-->
               <!-- tab picture -->
               <!-- Code block if there are no elements in it -->
               <div
-                class="container-info-element row no-gutters"
+                class="container-info-element row g-0"
                 *ngIf="!shots || !shots.length"
               >
                 <div class="col-12"><p>no tags!</p></div>
@@ -281,7 +275,7 @@ picture-->
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
               <!-- Code block if there are no elements in it -->
 
-              <div class="container-info-element row no-gutters">
+              <div class="container-info-element row g-0">
                 <div class="col-12"><p>no automatic areas</p></div>
                 <span class="info-element-button col-12">
                   <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
@@ -300,7 +294,7 @@ picture-->
               <!--<app-video-shot [multiSelection]="multi_annotations_is_active"></app-video-shot>-->
               <!-- Code block if there are no elements in it -->
 
-              <div class="container-info-element row no-gutters">
+              <div class="container-info-element row g-0">
                 <div class="col-12"><p>no personal areas</p></div>
                 <span class="info-element-button col-12">
                   <!-- TODO In this button it will be necessary to change the height of the margin-bottom when the footer of the tabs is present -->
@@ -320,7 +314,7 @@ picture-->
             >
               <!-- tab 3d-model -->
               <div
-                class="container-info-element row no-gutters"
+                class="container-info-element row g-0"
                 *ngIf="!shots || !shots.length"
               >
                 <div class="col-12"><p>no tags!</p></div>
@@ -340,9 +334,7 @@ picture-->
           </ng-container>
         </div>
         <!-- This tab footer only appears if there are one or more elements in the tabs (shots, segments, areas)-->
-        <div
-          class="tab-content--footer row no-gutters imc--flex--horizontal-end"
-        >
+        <div class="tab-content--footer row g-0 imc--flex--horizontal-end">
           <ng-container *ngIf="media_type === 'video' && shots.length > 0">
             <ng-container
               *ngIf="user && !shot_revision_is_active && !multi_annotations_is_active"
@@ -442,7 +434,7 @@ picture-->
 
   <!-- CONTAINER INFO -->
   <div class="container-fluid imc--container">
-    <div class="row no-gutters">
+    <div class="row g-0">
       <!-- body of the page -->
       <section class="col-12 col-lg-8">
         <!-- TABS INFO -->

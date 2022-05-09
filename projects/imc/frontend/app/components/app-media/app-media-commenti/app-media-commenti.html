@@ -3,7 +3,7 @@
 <div class="imc--content-comments">
   <h3 class="imc--title-bold">2 Comments</h3>
 
-  <div class="row box-add-comment no-gutters">
+  <div class="row box-add-comment g-0">
     <div class="col-2 col-sm-1">
       <span class="profile-image">
         <!-- @NSI se l'immagine del profilo non esiste, appare in background l'icona utente generale, su invision c'è l'iniziale del
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div class="row no-gutters box-comment">
+  <div class="row g-0 box-comment">
     <!-- @NSI esempio di primo commento -->
     <div class="col-2 col-sm-1">
       <span class="profile-image"></span>
@@ -65,7 +65,7 @@
       ></textarea>
 
       <!-- Risposte ai commenti -->
-      <div class="row no-gutters">
+      <div class="row g-0">
         <!-- @NSI label che mostra e nasconde le risposte al commento principale -->
         <h5
           *ngIf="!reply"
@@ -81,7 +81,7 @@
         >
           Hide replies <i class="material-icons"> keyboard_arrow_up</i>
         </h5>
-        <div *ngIf="reply" class="col-12 row no-gutters">
+        <div *ngIf="reply" class="col-12 row g-0">
           <div class="col-2 col-sm-1"><span class="profile-image"></span></div>
           <div class="col-10 col-sm-11">
             <div>

@@ -4,6 +4,6 @@ import { SearchResultComponent } from "../search-result.component";
 @Component({
   selector: "search-media",
   templateUrl: "./search-media.component.html",
-  styleUrls: ["./search-media.component.css"],
+  styleUrls: ["./search-media.component.scss"],
 })
 export class SearchMediaComponent extends SearchResultComponent {}

@@ -1,5 +1,5 @@
 <div class="media-thumbnail search-thumbnail map-result">
-  <div class="row no-gutters">
+  <div class="row g-0">
     <div class="col">
       <div class="space-4"></div>
       <h4 class="search-title">
@@ -29,14 +29,14 @@
       <span *ngIf="media?.source?.year">
         <i>({{ media.source.year | slice: 0:4 }})</i>
       </span>
-      <span class="badge badge-warning revision" *ngIf="underRevision()">
+      <span class="badge bg-warning revision" *ngIf="underRevision()">
         <i class="fa fa-wrench"></i>
       </span>
       <div class="space-4"></div>
     </div>
   </div>
-  <div class="row no-gutters">
-    <div class="col-sm-4 pr-1">
+  <div class="row g-0">
+    <div class="col-sm-4 pe-1">
       <div class="media-image-wrapper">
         <img
           holderjs
@@ -55,10 +55,10 @@
       <div class="caption-wrapper">
         <div class="caption">
           <div class="clearfix">
-            <span class="float-right badge badge-primary label-city"
+            <span class="float-end badge bg-primary label-city"
               >{{ (media.source.provider | providerToCity) || "n/a" }}
             </span>
-            <!-- <div class="float-left bigger-110">
+            <!-- <div class="float-start bigger-110">
 							<i class="imc-icon fa fa-eye light-blue"></i>
 							<i class="imc-icon fa fa-asterisk light-blue"></i>
 							<i class="imc-icon fa fa-heart light-blue"></i>
@@ -67,11 +67,11 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-8 pl-0">
+    <div class="col-sm-8 pe-0">
       <div class="widget-box transparent">
         <div class="widget-header mb-2">
           <h4 class="smaller">
-            <i class="fa fa-map-marker orange bigger-110"></i>
+            <i class="fa fa-location-pin orange bigger-110"></i>
             Geo Annotations
           </h4>
         </div>
@@ -89,7 +89,7 @@
                   >
                 </div>
                 <div class="creator">
-                  <i class="imc-icon fa fa-user light-grey pull-left"></i>
+                  <i class="imc-icon fa fa-user light-grey"></i>
                   <span
                     >{{ anno.creator.name }} {{ anno.creator.surname }}</span
                   >

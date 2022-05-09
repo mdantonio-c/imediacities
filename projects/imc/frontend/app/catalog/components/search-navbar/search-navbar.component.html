@@ -1,5 +1,5 @@
-<div class="search-nav row card mb-4 py-2 px-3" style="height: 58px">
-  <div class="mr-auto">
+<div class="search-nav card mb-2 py-2 px-3">
+  <div class="me-auto">
     <b style="position: absolute; top: 50%; height: 38px; margin-top: -11px">
       <span *ngIf="!loading">{{ totalItems }}</span>
       <span *ngIf="loading">
@@ -12,7 +12,7 @@
       results</b
     >
   </div>
-  <div class="ml-auto" *ngIf="totalItems > 0">
+  <div class="ms-auto" *ngIf="totalItems > 0">
     <b>Display</b>
     &nbsp;
     <div

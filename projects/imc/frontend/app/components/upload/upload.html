@@ -2,11 +2,9 @@
   <div class="row justify-content-md-center">
     <div class="col-12">
       <div class="card mb-5">
-        <div class="card-header">
-          <h4 class="panel-title">
-            <i class="fa fa-cloud-upload-alt"></i> Upload new content
-          </h4>
-        </div>
+        <h4 class="card-header">
+          <i class="fa fa-cloud-arrow-up"></i> Upload new content
+        </h4>
         <div class="card-body">
           <div class="row">
             <div class="col-md-12">
@@ -46,22 +44,17 @@
 
       <div class="card mb-2">
         <div class="card-header">
-          <h4 class="panel-title d-inline">
-            <i class="fa fa-file"></i> Your files
-          </h4>
-          <div class="btn-group btn-group-sm float-right" role="group">
-            <button
-              class="btn btn-secondary btn-sm float-right"
-              (click)="list()"
-            >
-              <i class="fa fa-sync"></i>
+          <h4 class="d-inline"><i class="fa fa-file"></i> Your files</h4>
+          <div class="btn-group btn-group-sm float-end" role="group">
+            <button class="btn btn-secondary btn-sm float-end" (click)="list()">
+              <i class="fa fa-arrows-rotate"></i>
             </button>
           </div>
         </div>
 
         <div class="card-body">
-          <div class="table-responsive">
-            <div class="row no-gutters">
+          <div class="table-responsive" #tableWrapper>
+            <div class="row g-0">
               <div class="col-6">
                 <input
                   type="text"
@@ -71,26 +64,23 @@
                 />
               </div>
             </div>
-
-            <div class="table-wrapper" #tableWrapper>
-              <ngx-spinner [fullScreen]="false"></ngx-spinner>
-              <ngx-datatable
-                class="bootstrap"
-                [rows]="data"
-                [columns]="columns"
-                [columnMode]="ColumnMode.flex"
-                [headerHeight]="40"
-                [footerHeight]="40"
-                [externalPaging]="true"
-                [count]="paging.dataLength"
-                [limit]="paging.itemsPerPage"
-                [offset]="paging.page"
-                (page)="serverSidePagination($event)"
-                (sort)="updateSort($event)"
-                [rowHeight]="'auto'"
-              >
-              </ngx-datatable>
-            </div>
+            <ngx-spinner [fullScreen]="false"></ngx-spinner>
+            <ngx-datatable
+              class="bootstrap"
+              [rows]="data"
+              [columns]="columns"
+              [columnMode]="ColumnMode.flex"
+              [headerHeight]="40"
+              [footerHeight]="40"
+              [externalPaging]="true"
+              [count]="paging.dataLength"
+              [limit]="paging.itemsPerPage"
+              [offset]="paging.page"
+              (page)="serverSidePagination($event)"
+              (sort)="updateSort($event)"
+              [rowHeight]="'auto'"
+            >
+            </ngx-datatable>
           </div>
           <ng-template #dataSize let-row="row" let-value="value" let-i="index">
             {{ value | bytes }}
@@ -115,7 +105,7 @@
           >
             <span
               *ngIf="row.status_message; else noStatus"
-              class="badge badge-secondary imc--badge"
+              class="badge bg-secondary imc--badge"
               [ngClass]="{
 	            'badge-success': row.status == 'COMPLETED',
 	            'badge-danger': row.status == 'ERROR',
@@ -124,8 +114,8 @@
               ngbTooltip="{{ row.status_message }}"
             >
               {{ value }}
-              <span class="badge badge-warning" *ngIf="row.warnings">
-                <i class="imc-icon fa fa-exclamation-triangle"></i>
+              <span class="badge bg-warning" *ngIf="row.warnings">
+                <i class="imc-icon fa fa-triangle-exclamation"></i>
               </span>
             </span>
 
@@ -141,15 +131,15 @@
             let-i="index"
           >
             <div class="btn-toolbar justify-content-end" role="toolbar">
-              <div class="btn-group mr-1" role="group">
+              <div class="btn-group me-1" role="group">
                 <button
-                  class="btn p-0 mr-1"
+                  class="btn p-0 me-1"
                   *ngIf="row.type === 'metadata' && row.status != 'COMPLETED'"
                   (click)="stage(row.name)"
                 >
-                  <i class="fas fa-cogs"></i>
+                  <i class="fas fa-gears"></i>
                 </button>
-                <button class="btn p-0 mr-1" (click)="download(row.name)">
+                <button class="btn p-0 me-1" (click)="download(row.name)">
                   <i class="fa fa-download"></i>
                 </button>
 
