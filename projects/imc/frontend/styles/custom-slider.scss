@@ -1,0 +1,111 @@
+/* add custom styles for slider */
+
+.imc-slider {
+  .slider {
+    width: 100% !important;
+    &.slider-horizontal {
+      .slider-tick-label-container {
+        .slider-tick-label {
+          white-space: nowrap;
+          text-align: center;
+          font-size: 9px;
+          line-height: 9px;
+          color: #999;
+        }
+      }
+      .tooltip {
+        &.tooltip-main {
+          opacity: 1 !important;
+          &.top {
+            .tooltip-arrow:after {
+              content: "";
+              width: 0;
+              height: 0;
+              position: absolute;
+              bottom: -10px;
+              border: transparent 5px solid;
+              //border-top: #000 5px solid;
+              left: 40%;
+              border-top: #17a2b8 5px solid;
+            }
+          }
+        }
+      }
+    }
+    .tooltip-inner {
+      color: #fff;
+      font-size: 11px;
+      line-height: 1.333;
+      text-shadow: none;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #17a2b8;
+    }
+    .tooltip {
+      &.top {
+        margin-top: -23px;
+        &.tooltip-min .tooltip-inner,
+        &.tooltip-max .tooltip-inner {
+          color: #999;
+          background: #e1e4e9;
+        }
+      }
+      .tooltip-arrow {
+        position: unset;
+        height: 0;
+      }
+    }
+  }
+  .slider-selection {
+    background: #17a2b8;
+  }
+  .slider-track-high {
+    background: #e1e4e9;
+  }
+  .slider-handle {
+    background: #f8f8f8;
+    border: 1px solid;
+    cursor: pointer;
+    width: 1.45em;
+    height: 1.45em;
+    position: absolute;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0;
+    line-height: 2.2em;
+    text-align: center;
+    border-color: #4aa4ce !important;
+    outline: 0 !important;
+
+    &:after,
+    &:before {
+      display: block;
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: 7px;
+      width: 4px;
+      height: 8px;
+      border: 1px solid;
+      border-width: 0 1px;
+      border-color: inherit;
+    }
+    &:after {
+      left: 10px;
+      border-width: 0 1px 0 0;
+    }
+    &:hover {
+      background-color: #fff;
+    }
+    &:active,
+    &:focus,
+    &:hover {
+      outline: 0;
+      -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
+      box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.3);
+    }
+  }
+  .slider-tick {
+    display: none;
+  }
+}
