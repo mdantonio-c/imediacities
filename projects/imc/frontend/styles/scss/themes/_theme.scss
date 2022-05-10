@@ -237,6 +237,25 @@ input[type="radio"] {
   outline: none;
 }
 
+.custom-control {
+  position: relative;
+  &:before {
+    position: absolute;
+    content: "";
+    border-radius: 50%;
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+  }
+  &:after {
+    position: absolute;
+    content: "";
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+  }
+}
+
 .imc--radio-label {
   font-weight: 400;
   margin-left: 15px;
@@ -258,6 +277,7 @@ input[type="radio"] {
 
 .page-type-video {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-video-color !important;
@@ -272,13 +292,14 @@ input[type="radio"] {
 
 .page-type-image {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-image-color !important;
         background: $white;
       }
       &:after {
-        background: $theme-image-color;
+        background: $theme-image-color !important;
       }
     }
   }
@@ -286,6 +307,7 @@ input[type="radio"] {
 
 .page-type-3d-model {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-model-color !important;
