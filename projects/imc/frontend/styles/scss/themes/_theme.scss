@@ -554,6 +554,10 @@ input[type="radio"] {
   padding: $padding-card 0;
 }
 
+.btn-link {
+  text-decoration: none;
+}
+
 .imc--expansion-panel {
   border-radius: 0;
   box-shadow: $box-shadow-small-card;

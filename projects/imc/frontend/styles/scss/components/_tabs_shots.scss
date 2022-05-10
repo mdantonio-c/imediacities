@@ -42,6 +42,18 @@
     text-align: right;
     margin-top: auto;
     align-self: flex-end;
+    .col {
+      display: flex;
+      justify-content: flex-end;
+    }
+    button {
+      padding: 5px;
+      margin-left: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 2.3vmin;
+    }
   }
 
   .imc--toolbar,
@@ -217,6 +229,7 @@
     font-size: 12px;
     margin: 0;
     padding: 0;
+    width: auto;
 
     li {
       display: table-cell;
