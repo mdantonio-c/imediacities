@@ -60,18 +60,18 @@ $breakpoint-sm: 576px;
       outline: none;
     }
 
-    .close {
+    .viewer-icon-close {
       position: absolute;
       top: 17px;
       right: 19px;
       z-index: 2;
       font-size: 16px;
       color: rgb(255, 255, 255);
-    }
-
-    .viewer-icon-close::before,
-    .viewer-icon-times::before {
-      content: "x";
+      text-decoration: none;
+      font-size: x-large !important;
+      &:before {
+        content: "x";
+      }
     }
   }
 
