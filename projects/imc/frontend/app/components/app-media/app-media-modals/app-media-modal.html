@@ -1,6 +1,6 @@
 <div class="modal-body">
-  <div class="row no-gutters">
-    <div class="mr-auto">
+  <div class="row g-0">
+    <div class="me-auto">
       <h4 *ngIf="media_type === 'video'">
         Shot: {{shot_corrente.shot_num+1}}
         <ng-container *ngIf="revision"
@@ -8,7 +8,7 @@
         >
       </h4>
     </div>
-    <div class="ml-auto">
+    <div class="ms-auto">
       <app-add-to-list
         [item_id]="data.shots[0].id"
         [item_type]="(media_type === 'video') ? 'shot' : 'item'"
@@ -20,11 +20,11 @@
 
   <div class="row modal-body-content">
     <!-- Video preview -->
-    <div class="col-12 col-sm-5 col-lg-5 no-gutters modal-media--info">
+    <div class="col-12 col-sm-5 col-lg-5 g-0 modal-media--info">
       <ng-template [ngIf]="media_type === 'video'">
         <ng-container *ngIf="!revision">
           <div class="row">
-            <span class="col-12 col-lg-3 pr-0"
+            <span class="col-12 col-lg-3 pe-0"
               ><strong [innerHTML]="shot_corrente.timestamp"></strong
             ></span>
             <span class="col-6 col-lg-7 imc--flex--horizontal-center"
@@ -54,7 +54,7 @@
 
         <!-- Previews of other shots after multiple selection -->
         <div
-          class="col-12 row no-gutters mt-2"
+          class="col-12 row g-0 mt-2"
           *ngIf="!revision && data.shots.length > 1"
         >
           <span

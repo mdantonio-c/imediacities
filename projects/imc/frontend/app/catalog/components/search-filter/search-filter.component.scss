@@ -18,6 +18,21 @@
   padding: 12px;
   background-color: #fff;
   border: 1px solid #c9dde7;
+  .date-range {
+    flex-wrap: nowrap;
+    justify-content: center;
+    .input-group-text {
+      background-color: #e9ecef;
+    }
+    .input-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      input {
+        min-width: 78px;
+        flex: 1;
+      }
+    }
+  }
 }
 
 .type-selector {
@@ -30,23 +45,6 @@
 	margin-top: -1px;
 	margin-left: -1px
 }*/
-
-.search-filter-element .date-range {
-  /*margin: 0 auto;
-    width: 15.4em;*/
-  /*margin-left: 10%;*/
-  flex-wrap: nowrap;
-  justify-content: center;
-}
-
-.search-filter-element .date-range .input-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-}
-.search-filter-element .date-range .input-wrapper input {
-  min-width: 78px;
-  flex: 1;
-}
 
 .search-filter-element .date-range .input-wrapper input,
 .search-filter-element .date-range .input-group-prepend {

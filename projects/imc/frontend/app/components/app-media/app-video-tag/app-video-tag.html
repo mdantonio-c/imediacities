@@ -1,8 +1,8 @@
 <!-- Tags bar sotto al player -->
 
-<div class="imc--video-tag row no-gutters">
+<div class="imc--video-tag row g-0">
   <div class="col-1 imc--video-tag--button">
-    <img src="/app/custom/assets/svg/tag.svg" />
+    <img src="/app/custom/assets/svg/tag.svg" alt="term tag" />
   </div>
   <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
     <div #termtag_slider *ngIf="min_detected">
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="col-1 imc--video-tag--button">
-    <img src="/app/custom/assets/svg/geotag.svg" />
+    <img src="/app/custom/assets/svg/geotag.svg" alt="geo tag" />
   </div>
   <div class="col-11 imc--video-tag-bar imc--flex--vertical-center">
     <div #geotag_slider *ngIf="min_detected">

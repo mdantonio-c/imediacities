@@ -362,13 +362,13 @@
         border: 1px solid $theme-video-color;
         border-right: none;
 
-        & + .input-group-append {
+        & + .imc--input-append {
           border: 1px solid $theme-video-color;
           border-left: none;
         }
       }
     }
-    .input-group-append {
+    .imc--input-append {
       width: 10%;
       justify-content: space-between;
       padding: 0 10px;

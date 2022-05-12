@@ -1,4 +1,4 @@
-<div class="container-search row no-gutters justify-content-md-center mt-3">
+<div class="container-search row gx-1 mt-3">
   <div class="col">
     <div class="row">
       <search-filter
@@ -17,6 +17,7 @@
               (onViewChange)="changeView($event)"
             ></search-navbar>
             <div class="loader col" *ngIf="loading"></div>
+
             <!-- no results -->
             <div class="row" *ngIf="!loading && totalItems == 0">
               <div class="col px-0">
@@ -27,8 +28,8 @@
               </div>
             </div>
             <!-- view results -->
-            <div class="row" *ngIf="!loading && totalItems > 0">
-              <div class="col px-0">
+            <div *ngIf="!loading && totalItems > 0">
+              <div class="px-0">
                 <div
                   *ngIf="currentView == 'Grid'"
                   style="display: flex; flex-direction: row; flex-wrap: wrap"

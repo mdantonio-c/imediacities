@@ -228,8 +228,8 @@ button:focus {
   white-space: normal;
   margin-bottom: 2px;
 }*/
-.badge-warning,
-.badge.badge-warning {
+.bg-warning,
+.badge.bg-warning {
   background-color: #f89406;
 }
 .label-location,
@@ -253,6 +253,9 @@ button:focus {
 .search-thumbnail .search-title {
   margin-top: 10px;
   overflow-wrap: break-word;
+  a {
+    text-decoration: none;
+  }
 }
 
 .media .media-content {
@@ -354,6 +357,9 @@ search-thumbnail div .media-image-wrapper {
   /*margin-top: 0;
     margin-bottom: 5px;*/
   display: inline;
+  a {
+    text-decoration: none;
+  }
 }
 
 .media-thumbnail .text .imc-icon:first-child,

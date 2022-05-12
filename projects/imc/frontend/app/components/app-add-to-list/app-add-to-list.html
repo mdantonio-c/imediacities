@@ -18,19 +18,15 @@
     attr.aria-labelledby="dropdownAddToList-{{item_id}}"
     class="dropdown-menu-right"
   >
-    <div class="row no-gutters">
-      <div class="mr-auto">
-        <h6 class="dropdown-header px-3">Add to...</h6>
-      </div>
-      <div class="ml-auto">
+    <div class="row g-0">
+      <div class="col mb-2">
+        <h6 class="dropdown-header d-inline">Add to...</h6>
         <button
           type="button"
-          class="close"
+          class="btn-close float-end me-3"
           aria-label="Close"
           (click)="$event.stopPropagation(); myDrop.close();"
-        >
-          <span aria-hidden="true" class="material-icons gray">close</span>
-        </button>
+        ></button>
       </div>
     </div>
     <div class="px-3 py-1">
@@ -56,7 +52,7 @@
     <div class="dropdown-divider"></div>
     <form class="px-3 py-1" [formGroup]="listForm" (ngSubmit)="createList()">
       <div class="input-group" *ngIf="!listCreation">
-        <div class="input-group-prepend">
+        <div>
           <button
             class="btn-reset"
             type="button"
@@ -77,41 +73,46 @@
         </div>
         <h6 class="dropdown-header py-0 px-2">Create new list</h6>
       </div>
-      <div class="input-group" *ngIf="listCreation">
+      <ng-container *ngIf="listCreation">
         <div class="form-header">
           <button
             type="button"
-            class="close"
+            class="btn-close"
             aria-label="Close"
             (click)="listCreationToggle()"
+          ></button>
+        </div>
+        <div class="form-floating mb-3">
+          <input
+            id="floatingInput"
+            type="text"
+            class="form-control imc--input"
+            placeholder="Enter name"
+            formControlName="name"
+          />
+          <label for="floatingInput">Enter name</label>
+          <div
+            class="invalid-feedback d-block mt-0"
+            *ngIf="listForm.get('name').touched && listForm.get('name').invalid"
           >
-            <span aria-hidden="true" class="material-icons mr-0 gray"
-              >close</span
-            >
-          </button>
+            Name is required
+          </div>
         </div>
-        <input
-          type="text"
-          class="imc--input"
-          placeholder="Enter name"
-          formControlName="name"
-        />
-        <div
-          class="invalid-feedback d-block mt-0"
-          *ngIf="listForm.get('name').touched && listForm.get('name').invalid"
-        >
-          Name is required
-        </div>
-        <textarea
-          class="imc--input mt-3"
-          placeholder="Enter notes"
-          formControlName="description"
-        ></textarea>
-        <div
-          class="invalid-feedback d-block mt-0"
-          *ngIf="listForm.get('description').touched && listForm.get('description').invalid"
-        >
-          Description is required
+        <div class="form-floating">
+          <textarea
+            id="floatingTextarea"
+            style="height: 100px"
+            class="form-control imc--input"
+            placeholder="Enter notes"
+            formControlName="description"
+          ></textarea>
+          <label for="floatingTextarea">Enter notes</label>
+          <div
+            class="invalid-feedback d-block mt-0"
+            *ngIf="listForm.get('description').touched && listForm.get('description').invalid"
+          >
+            Description is required
+          </div>
         </div>
         <div class="form-footer mt-2">
           <button
@@ -122,7 +123,7 @@
             Create
           </button>
         </div>
-      </div>
+      </ng-container>
     </form>
   </div>
 </div>

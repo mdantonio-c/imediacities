@@ -1,12 +1,12 @@
 <app-media-modal [data]="data" [media_type]="'video'" [revision]="true">
   <!-- The two shots -->
-  <div class="col-12 col-sm-7 row no-gutters space-paragraph-xs-20" modal-col>
+  <div class="col-12 col-sm-7 row g-0 space-paragraph-xs-20" modal-col>
     <div
-      class="row no-gutters box-single-shot w-100 mb-1"
+      class="row g-0 box-single-shot w-100 mb-1"
       *ngFor="let shot of shots; let i = index"
     >
       <div class="col-12">
-        <div class="row no-gutters">
+        <div class="row g-0">
           <div class="col-1 imc--flex--vertical-center box-single-shot--number">
             <span class="shot-number"
               ><strong>{{shot.shot_num +1}}</strong></span
@@ -16,30 +16,25 @@
             class="col-3 imc--flex--vertical-center"
             style="flex-direction: column"
           >
-            <!-- Anteprima dello shot del video -->
+            <!-- Video shot preview  -->
             <span class="anteprima-shot">
               <img
                 [src]="shot.links.thumbnail"
-                alt=""
+                alt="video shot preview"
                 *ngIf="shot.links && shot.links.thumbnail; else no_thumbnail"
               />
               <ng-template #no_thumbnail>
                 <img
                   holderjs
                   [attr.data-src]="'holder.js/135x102?bg=707070&text=NO THUMBNAIL&?auto=yes'"
+                  alt="no thumbnail"
                 />
               </ng-template>
               <span>{{shot.duration | number:'2.2'}}</span>
             </span>
           </div>
           <div
-            class="
-              col-8
-              imc--flex--vertical-center
-              row
-              no-gutters
-              anteprima-shot--info
-            "
+            class="col-8 imc--flex--vertical-center row g-0 anteprima-shot--info"
             style="flex-direction: column; align-items: flex-start"
           >
             <strong [innerHTML]="shot.timestamp || '&nbsp;'"></strong>

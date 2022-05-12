@@ -12,16 +12,10 @@
 
   <!-- RICERCA MANUALE DEI TAG -->
   <div
-    class="
-      col-12 col-sm-3 col-lg-4
-      row
-      no-gutters
-      space-paragraph-xs-20
-      popover-no-arrow popover-left
-    "
+    class="col-12 col-sm-3 col-lg-4 row g-0 space-paragraph-xs-20 popover-no-arrow popover-left"
     modal-col
   >
-    <div class="row no-gutters imc--flex--vertical-end" *ngIf="vocabolario">
+    <div class="row g-0 imc--flex--vertical-end" *ngIf="vocabolario">
       <span class="col-12 col-lg-7">
         <!--<input type="text" class="imc&#45;&#45;input imc&#45;&#45;input-search" placeholder="Search here" aria-label="Tag"
                        (keyup)="search_vocabulary_and_lods($event)" [(ngModel)]="ricerca_model"
@@ -81,14 +75,7 @@
 
     <!-- Attivazione della data di pubblicazione -->
     <div
-      class="
-        col-12
-        new-badge
-        space-paragraph-10
-        row
-        no-gutters
-        imc--flex--vertical-center
-      "
+      class="col-12 new-badge space-paragraph-10 row g-0 imc--flex--vertical-center"
     >
       <div class="col-12 col-lg-10 box-checkbox imc--flex--vertical-center">
         <!--@NSI Attiva il campo date sotto -->
@@ -115,7 +102,7 @@
               [disabled]="!embargo_enable"
               #d="ngbDatepicker"
             />
-            <div class="input-group-append">
+            <div class="imc--input-append">
               <button
                 class="btn-reset"
                 type="button"
@@ -244,7 +231,7 @@
               href="{{term.iri}}"
               target="#"
               title="open a new window with more info about the this item"
-              >{{term.iri}}&nbsp;<i class="fa fa-external-link-alt blue"></i
+              >{{term.iri}}&nbsp;<i class="fa fa-up-right-from-square blue"></i
             ></a>
           </div>
           <div *ngIf="!results.lods.length" class="search-term-no-results">

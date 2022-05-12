@@ -3,7 +3,7 @@
     <li class="timeline-item" *ngIf="countMissingDate > 0">
       <div class="timeline-badge info">
         <i class="imc-icon fas fa-circle"></i>
-        <span class="text-primary font-weight-bold small">????</span>
+        <span class="text-primary fw-bold small">????</span>
       </div>
       <div class="timeline-panel">
         <div class="timeline-body">
@@ -15,7 +15,7 @@
     <li class="timeline-item" *ngFor="let decade of timelineRange">
       <div class="timeline-badge info">
         <i class="imc-icon fas fa-circle"></i>
-        <time class="text-primary font-weight-bold small" [dateTime]="decade">{{
+        <time class="text-primary fw-bold small" [dateTime]="decade">{{
           decade
         }}</time>
       </div>

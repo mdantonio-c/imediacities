@@ -17,7 +17,7 @@
               placeholder="Search in title, keyword, description"
               style="width: 80%"
             />
-            <div class="input-group-append">
+            <div class="imc--input-append">
               <ng-template #tipContent>
                 By default, the terms in box search are linked by OR. AND typed
                 (in capital letters) between two terms limits the results to the
@@ -53,13 +53,18 @@
         </h4>
         <div class="row">
           <div class="col col-sm-11 col-md-10">
-            <div class="btn-group btn-group-toggle">
+            <div class="btn-group">
               <label
                 class="btn-basic imc-search-filter"
                 ngbButtonLabel
                 (click)="verifyItemType('video')"
               >
-                <input type="checkbox" formControlName="videoType" ngbButton />
+                <input
+                  type="checkbox"
+                  class="btn-check"
+                  formControlName="videoType"
+                  ngbButton
+                />
                 <i class="material-icons button-filter">videocam</i>
               </label>
               <label
@@ -67,7 +72,12 @@
                 ngbButtonLabel
                 (click)="verifyItemType('image')"
               >
-                <input type="checkbox" formControlName="imageType" ngbButton />
+                <input
+                  type="checkbox"
+                  class="btn-check"
+                  formControlName="imageType"
+                  ngbButton
+                />
                 <i class="material-icons button-filter">photo_camera</i>
               </label>
               <label
@@ -77,6 +87,7 @@
               >
                 <input
                   type="checkbox"
+                  class="btn-check"
                   formControlName="model3DType"
                   ngbButton
                 />
@@ -92,41 +103,39 @@
           <i class="fa fa-tags"></i>
           Terms
         </h4>
-        <div class="row no-gutters imc--flex--vertical-end">
-          <div class="col-12">
-            <div class="form-group">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="imc--input"
-                  placeholder="Search by term"
-                  aria-label="Tag"
-                  formControlName="term"
-                  [ngbTypeahead]="searchByTerm"
-                  [inputFormatter]="formatter"
-                  [resultTemplate]="rt"
-                  (selectItem)="selectTerm($event)"
-                  (keydown.enter)="$event.preventDefault()"
-                  style="width: 80%"
-                />
-                <div class="input-group-append">
-                  <button
-                    class="btn-reset"
-                    type="button"
-                    (click)="addTerm(searchForm.get('term').value)"
+        <div class="row g-0 imc--flex--vertical-end">
+          <div class="col-12 mb-3">
+            <div class="input-group">
+              <input
+                type="text"
+                class="imc--input"
+                placeholder="Search by term"
+                aria-label="Tag"
+                formControlName="term"
+                [ngbTypeahead]="searchByTerm"
+                [inputFormatter]="formatter"
+                [resultTemplate]="rt"
+                (selectItem)="selectTerm($event)"
+                (keydown.enter)="$event.preventDefault()"
+                style="width: 80%"
+              />
+              <div class="imc--input-append">
+                <button
+                  class="btn-reset"
+                  type="button"
+                  (click)="addTerm(searchForm.get('term').value)"
+                >
+                  <i
+                    class="material-icons"
+                    style="width: 1.2rem; height: 1rem; cursor: pointer"
+                    >add_box</i
                   >
-                    <i
-                      class="material-icons"
-                      style="width: 1.2rem; height: 1rem; cursor: pointer"
-                      >add_box</i
-                    >
-                  </button>
-                </div>
+                </button>
               </div>
-              <ng-template #rt let-r="result" let-t="term">
-                {{ r.name }}
-              </ng-template>
             </div>
+            <ng-template #rt let-r="result" let-t="term">
+              {{ r.name }}
+            </ng-template>
           </div>
           <!-- just inserted tags -->
           <div class="col-12 new-badge mb-2">
@@ -152,7 +161,7 @@
       </ng-container>
       <ng-container *ngIf="!disabled_filters.includes('city')">
         <h4 class="smaller">
-          <i class="fa fa-map-marker light-orange bigger-110"></i>
+          <i class="fa fa-location-pin light-orange bigger-110"></i>
           City
         </h4>
         <div>
@@ -186,45 +195,41 @@
           class="search-filter-element"
           [ngClass]="{ 'date-div-disabled': missingDateParam }"
         >
-          <div class="form-group">
-            <div class="input-group date-range">
-              <div class="input-group-prepend">
-                <span class="input-group-text">Year range</span>
-              </div>
-              <div class="input-wrapper">
-                <input
-                  type="number"
-                  class="form-control"
-                  formControlName="productionYearFrom"
-                  name="productionYearFrom"
-                  [min]="minProductionYear"
-                  [max]="maxProductionYear"
-                />
-                <input
-                  type="number"
-                  class="form-control"
-                  formControlName="productionYearTo"
-                  name="productionYearTo"
-                  [min]="minProductionYear"
-                  [max]="maxProductionYear"
-                />
-              </div>
-            </div>
-            <div class="space-4"></div>
-            <div class="mx-2 mt-4">
-              <mv-slider
-                #rangeSlider
-                id="imc-slider"
-                [range]="true"
-                [(value)]="rangeValue"
+          <div class="input-group date-range">
+            <span class="input-group-text">Year range</span>
+            <div class="input-wrapper">
+              <input
+                type="number"
+                class="form-control"
+                formControlName="productionYearFrom"
+                name="productionYearFrom"
                 [min]="minProductionYear"
                 [max]="maxProductionYear"
-                [step]="1"
-                [ticks]="sliderTicks"
-                [ticksLabels]="sliderTicks"
-                (change)="updateSlider($event.newValue)"
-              ></mv-slider>
+              />
+              <input
+                type="number"
+                class="form-control"
+                formControlName="productionYearTo"
+                name="productionYearTo"
+                [min]="minProductionYear"
+                [max]="maxProductionYear"
+              />
             </div>
+          </div>
+          <div class="space-4"></div>
+          <div class="mx-2 mt-4">
+            <mv-slider
+              #rangeSlider
+              class="imc-slider"
+              [range]="true"
+              [(value)]="rangeValue"
+              [min]="minProductionYear"
+              [max]="maxProductionYear"
+              [step]="1"
+              [ticks]="sliderTicks"
+              [ticksLabels]="sliderTicks"
+              (change)="updateSlider($event.newValue)"
+            ></mv-slider>
           </div>
         </div>
         <div class="hr hr-dotted"></div>
@@ -257,7 +262,7 @@
           Reset
         </button>
         <button type="submit" class="btn btn-accent">
-          <i class="imc-icon fa fa-sync-alt"></i>
+          <i class="imc-icon fa fa-rotate"></i>
           Update
         </button>
       </div>

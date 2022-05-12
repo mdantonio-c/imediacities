@@ -1,13 +1,13 @@
 <!-- Single shot template, to be looped to create all shots or segments -->
 <div
-  class="row no-gutters box-single-shot"
+  class="row g-0 box-single-shot"
   *ngIf="shot"
   [ngClass]="{'active': is_attivo}"
 >
   <span class="col-12" *ngIf="canRevise && shot.shot_num > 0">
-    <div class="row no-gutters">
+    <div class="row g-0">
       <div class="col-11 revision-tool-div">
-        <div class="box-checkbox float-left ml-2">
+        <div class="box-checkbox float-start ms-2">
           <span class="click-event" (click)="doubleCheck()">
             <i
               class="fa fa-thumbtack revision-tool-icon"
@@ -27,7 +27,7 @@
           </span>
         </div>
         <ng-container *ngIf="!shot.revision_confirmed">
-          <div class="d-inline mr-1">
+          <div class="d-inline me-1">
             <i
               class="material-icons revision-tool-icon"
               mwlConfirmationPopover
@@ -37,7 +37,7 @@
               >delete</i
             >
           </div>
-          <div class="d-inline mr-1">
+          <div class="d-inline me-1">
             <i
               class="material-icons revision-tool-icon"
               (click)="modale_show({target: {innerText: 'Move Cut'}, previous: true}, 'move-cut')"
@@ -45,7 +45,7 @@
             >
           </div>
         </ng-container>
-        <div class="box-checkbox float-right">
+        <div class="box-checkbox float-end">
           <input
             class="imc--input-checkbox styled-checkbox"
             id="cut-confimed-{{shot.shot_num}}"
@@ -100,7 +100,7 @@
     </span>
     <span *ngIf="canRevise && is_attivo">
       <i
-        class="fa fa-cut revision-tool-icon"
+        class="fa fa-scissors revision-tool-icon"
         ngbTooltip="Split shot"
         placement="bottom"
         (click)="modale_show({target: {innerText: 'Add Cut'}, previous: false}, 'move-cut')"
@@ -109,7 +109,7 @@
   </span>
   <span
     [ngClass]="!multiSelection ? 'col-7' : 'col-6'"
-    class="imc--flex--vertical-center row no-gutters anteprima-shot--info"
+    class="imc--flex--vertical-center row g-0 anteprima-shot--info"
     style="flex-direction: column; align-items: flex-start"
   >
     <strong [innerHTML]="shot.timestamp || '&nbsp;'"></strong>
@@ -190,10 +190,7 @@
           ></app-media-annotation>
         </ng-template>
       </div>
-      <div
-        class="row no-gutters space-paragraph-20"
-        *ngIf="user && !underRevision"
-      >
+      <div class="row g-0 space-paragraph-20" *ngIf="user && !underRevision">
         <!-- modals -->
         <div
           ngbDropdown
