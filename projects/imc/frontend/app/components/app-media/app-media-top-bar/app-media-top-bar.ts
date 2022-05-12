@@ -5,7 +5,7 @@ import { AuthService } from "@rapydo/services/auth";
 @Component({
   selector: "app-media-top-bar",
   templateUrl: "app-media-top-bar.html",
-  styleUrls: ["./app-media-top-bar.css"],
+  styleUrls: ["./app-media-top-bar.scss"],
 })
 export class AppMediaTopBarComponent implements OnInit, OnChanges {
   @Input() item_type: string;
