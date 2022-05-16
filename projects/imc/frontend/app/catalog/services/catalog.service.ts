@@ -69,7 +69,7 @@ export class CatalogService {
   private _data: MediaEntity[] = [];
   private _countByYears: any;
   private _countByProviders: any;
-  private _filter: SearchFilter;
+  protected _filter: SearchFilter;
 
   constructor(
     private api: ApiService,
