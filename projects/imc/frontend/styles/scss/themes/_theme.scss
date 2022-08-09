@@ -152,7 +152,6 @@
 // Input fields
 .imc--input,
 .imc--input--no-line {
-  background: transparent;
   border: none;
   border-bottom: 1px solid $text-color;
   color: $text-color;
@@ -162,11 +161,29 @@
   width: 100%;
 }
 
-.imc--input.form-control {
-  border-radius: 0;
+.imc--input:not(.form-select),
+.imc--input--no-line {
+  background: transparent;
 }
 
-.imc--input.form-control:focus {
+.imc--input.form-control,
+.imc--input.form-select {
+  border-radius: 0;
+}
+.imc--input.disabled,
+.imc--input.disabled + .imc--input-append {
+  opacity: 0.5;
+}
+.form-floating {
+  .imc--input.form-control,
+  .imc--input.form-select {
+    padding-left: 0px;
+    padding-bottom: 0px;
+  }
+}
+
+.imc--input.form-control:focus,
+.imc--input.form-select:focus {
   outline: 0px !important;
   -webkit-appearance: none;
   box-shadow: none !important;
@@ -237,6 +254,25 @@ input[type="radio"] {
   outline: none;
 }
 
+.custom-control {
+  position: relative;
+  &:before {
+    position: absolute;
+    content: "";
+    border-radius: 50%;
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+  }
+  &:after {
+    position: absolute;
+    content: "";
+    top: 0.25rem;
+    left: -1.5rem;
+    display: block;
+  }
+}
+
 .imc--radio-label {
   font-weight: 400;
   margin-left: 15px;
@@ -258,6 +294,7 @@ input[type="radio"] {
 
 .page-type-video {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-video-color !important;
@@ -272,13 +309,14 @@ input[type="radio"] {
 
 .page-type-image {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-image-color !important;
         background: $white;
       }
       &:after {
-        background: $theme-image-color;
+        background: $theme-image-color !important;
       }
     }
   }
@@ -286,6 +324,7 @@ input[type="radio"] {
 
 .page-type-3d-model {
   input[type="radio"]:checked {
+    display: none;
     & + .imc--radio-label {
       &:before {
         border: 2px solid $theme-model-color !important;
@@ -530,6 +569,10 @@ input[type="radio"] {
 .imc--accordion {
   background: $bg-light-grey;
   padding: $padding-card 0;
+}
+
+.btn-link {
+  text-decoration: none;
 }
 
 .imc--expansion-panel {

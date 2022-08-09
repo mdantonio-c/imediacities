@@ -1,156 +1,153 @@
 <!-- Modal for inserting new notes -->
 <app-media-modal [data]="data" [media_type]="media_type">
-  <div
-    class="col-12 col-sm-7 row g-0 justify-content-between space-paragraph-xs-20"
-    modal-col
-  >
+  <div class="col-12 col-sm-7" modal-col>
     <form [formGroup]="referenceForm" class="w-100">
-      <div class="form-group">
-        <label for="authors" class="small mb-0">Author(s)*</label>
+      <div class="form-floating mb-2">
         <input
           id="authors"
           type="text"
-          class="imc--input"
-          aria-label="authors"
+          class="form-control imc--input"
           formControlName="authors"
+          placeholder="Surname Name"
           required
         />
+        <label for="authors" class="px-0">Author(s)*</label>
         <div
-          class="invalid-feedback d-block"
+          class="invalid-feedback d-block mt-0"
           *ngIf="referenceForm.get('authors').touched && referenceForm.get('authors').invalid"
         >
           At least one author is required
         </div>
       </div>
-      <div class="form-group">
-        <label for="bookTitle" class="small mb-0">Book title</label>
+      <div class="form-floating mb-2">
         <input
           id="bookTitle"
           type="text"
-          class="imc--input"
-          aria-label="booktitle"
+          class="form-control imc--input"
           formControlName="book_title"
+          placeholder="Book Title"
         />
+        <label for="bookTitle" class="px-0">Book title</label>
       </div>
-      <div class="form-group">
-        <label for="_title" class="small mb-0">Title*</label>
+      <div class="form-floating mb-2">
         <input
           id="_title"
           type="text"
-          class="imc--input"
-          aria-label="title"
+          class="form-control imc--input"
           formControlName="title"
+          placeholder="Title"
           required
         />
+        <label for="_title" class="px-0">Title*</label>
         <div
-          class="invalid-feedback d-block"
+          class="invalid-feedback d-block mt-0"
           *ngIf="referenceForm.get('title').touched && referenceForm.get('title').invalid"
         >
           Title is required
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label for="journal" class="small mb-0">Journal</label>
+      <div class="row g-0">
+        <div class="form-floating mb-2 col-5">
           <input
             id="Journal"
             type="text"
-            class="imc--input"
-            aria-label="journal"
+            class="form-control imc--input"
             formControlName="journal"
+            placeholder="Journal"
           />
+          <label for="journal" class="px-0">Journal</label>
         </div>
-        <div class="form-group offset-2 col-5">
-          <label for="volume" class="small mb-0">Volume</label>
+        <div class="form-floating mb-2 offset-2 col-5">
           <input
             id="volume"
             type="text"
-            class="imc--input"
-            aria-label="volume"
+            class="form-control imc--input"
             formControlName="volume"
+            placeholder="Volume"
           />
+          <label for="volume" class="px-0">Volume</label>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label for="number" class="small mb-0">Number</label>
+      <div class="row g-0">
+        <div class="form-floating mb-2 col-5">
           <input
             id="number"
             type="text"
-            class="imc--input"
-            aria-label="number"
+            class="form-control imc--input"
             formControlName="number"
+            placeholder="Number"
           />
+          <label for="number" class="px-0">Number</label>
         </div>
-        <div class="form-group offset-2 col-5">
-          <label for="year" class="small mb-0">Year</label>
+        <div class="form-floating mb-2 offset-2 col-5">
           <input
             id="year"
             type="number"
-            class="imc--input"
-            aria-label="year"
+            class="form-control imc--input"
             formControlName="year"
+            placeholder="Year"
           />
+          <label for="year" class="px-0">Year</label>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label for="month" class="small mb-0">Month</label>
+      <div class="row g-0">
+        <div class="form-floating mb-2 col-5">
           <select
             id="month"
-            class="imc--input"
+            class="form-select imc--input"
             id="month"
-            aria-label="month"
             formControlName="month"
+            placeholder="month"
           >
             <option value=""></option>
             <option *ngFor="let m of months" [value]="m.value">
               {{m.key}}
             </option>
           </select>
+          <label for="month" class="px-0">Month</label>
         </div>
-        <div class="form-group offset-2 col-5">
-          <label for="editor" class="small mb-0">Editor</label>
+        <div class="form-floating mb-2 offset-2 col-5">
           <input
             id="editor"
             type="text"
-            class="imc--input"
-            aria-label="editor"
+            class="form-control imc--input"
             formControlName="editor"
+            placeholder="Editor"
           />
+          <label for="editor" class="px-0">Editor</label>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label for="publisher" class="small mb-0">Publisher</label>
+      <div class="row g-0">
+        <div class="form-floating mb-2 col-5">
           <input
             id="publisher"
             type="text"
-            class="imc--input"
-            aria-label="publisher"
+            class="form-control imc--input"
             formControlName="publisher"
+            placeholder="Publisher"
           />
+          <label for="publisher" class="px-0">Publisher</label>
         </div>
-        <div class="form-group offset-2 col-5">
-          <label for="address" class="small mb-0">Address</label>
+        <div class="form-floating mb-2 offset-2 col-5">
           <input
             id="address"
             type="text"
-            class="imc--input"
-            aria-label="address"
+            class="form-control imc--input"
             formControlName="address"
+            placeholder="Address"
           />
+          <label for="address" class="px-0">Address</label>
         </div>
       </div>
-      <div class="form-group">
-        <label for="url" class="small mb-0">URL</label>
+      <div class="form-floating mb-2">
         <input
           id="url"
           type="text"
-          class="imc--input"
-          aria-label="url"
+          class="form-control imc--input"
           formControlName="url"
+          placeholder="url"
         />
+        <label for="url" class="px-0">URL</label>
         <div
           class="invalid-feedback d-block"
           *ngIf="referenceForm.get('url').dirty && referenceForm.get('url').invalid"
@@ -158,16 +155,16 @@
           Please provide a valid URL
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label for="isbn" class="small mb-0">ISBN</label>
+      <div class="row g-0">
+        <div class="form-floating mb-2 col-5">
           <input
             id="isbn"
             type="text"
-            class="imc--input"
-            aria-label="isbn"
+            class="form-control imc--input"
             formControlName="isbn"
+            placeholder="ISBN"
           />
+          <label for="isbn" class="px-0">ISBN</label>
           <div
             class="invalid-feedback d-block"
             *ngIf="referenceForm.get('isbn').dirty && referenceForm.get('isbn').invalid"
@@ -175,15 +172,15 @@
             Please provide a valid ISBN
           </div>
         </div>
-        <div class="form-group offset-2 col-5">
-          <label for="doi" class="small mb-0">DOI</label>
+        <div class="form-floating mb-2 offset-2 col-5">
           <input
             id="doi"
             type="text"
-            class="imc--input imc--flex--item-end"
-            aria-label="doi"
+            class="form-control imc--input imc--flex--item-end"
             formControlName="doi"
+            placeholder="DOI"
           />
+          <label for="doi" class="px-0">DOI</label>
           <div
             class="invalid-feedback d-block"
             *ngIf="referenceForm.get('doi').dirty && referenceForm.get('doi').invalid"

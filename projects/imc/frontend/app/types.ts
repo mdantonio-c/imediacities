@@ -48,8 +48,8 @@ export interface SearchResponse {
 
 export interface MetaSearchResponse {
   totalItems: number;
-  countByProviders: number;
-  countByYears: number;
+  countByProviders: Record<string, number>;
+  countByYears: Record<string, number>;
 }
 
 export interface GeoTag {

@@ -58,31 +58,26 @@
       </div>
 
       <div class="col-12 col-sm-7 space-paragraph-10">
-        <div class="form-group">
-          <div class="input-group">
-            <input
-              class="imc--input imc--input-data"
-              placeholder="yyyy-mm-dd"
-              name="dp"
-              [(ngModel)]="embargo_model"
-              ngbDatepicker
+        <div class="input-group">
+          <input
+            class="imc--input imc--input-data"
+            [ngClass]="{'disabled': !embargo_enable}"
+            placeholder="yyyy-mm-dd"
+            name="dp"
+            [(ngModel)]="embargo_model"
+            ngbDatepicker
+            [disabled]="!embargo_enable"
+            #d="ngbDatepicker"
+          />
+          <div class="imc--input-append">
+            <button
+              class="btn btn-reset"
+              type="button"
               [disabled]="!embargo_enable"
-              #d="ngbDatepicker"
-            />
-            <div class="imc--input-append">
-              <button
-                class="btn-reset"
-                type="button"
-                [disabled]="!embargo_enable"
-                (click)="d.toggle()"
-              >
-                <i
-                  class="material-icons"
-                  style="width: 1.2rem; height: 1rem; cursor: pointer"
-                  >today</i
-                >
-              </button>
-            </div>
+              (click)="d.toggle()"
+            >
+              <i class="material-icons">today</i>
+            </button>
           </div>
         </div>
       </div>

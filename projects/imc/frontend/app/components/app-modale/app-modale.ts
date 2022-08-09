@@ -5,23 +5,21 @@ import { AppModaleService } from "../../services/app-modale";
   selector: "app-modale",
   templateUrl: "app-modale.html",
 })
-export class AppModaleComponent implements OnInit {
+export class AppModaleComponent {
   @ViewChild("content", { static: false }) content;
 
-  public titolo = "";
+  title = "";
 
   constructor(private modalService: AppModaleService) {}
 
-  open(title: string, media_type: string, classes = "") {
+  open(title: string, mediaType: string, classes = "") {
     this.title_set(title);
     this.modalService.open(this.content, {
-      windowClass: `imc--modal page-type-${media_type} ${classes}`,
+      windowClass: `imc--modal page-type-${mediaType} ${classes}`,
     });
   }
 
-  title_set(title) {
-    this.titolo = title;
+  title_set(title: string) {
+    this.title = title;
   }
-
-  ngOnInit() {}
 }

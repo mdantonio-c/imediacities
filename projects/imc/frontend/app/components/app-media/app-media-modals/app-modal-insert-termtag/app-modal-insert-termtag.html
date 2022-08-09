@@ -10,7 +10,7 @@
     ></app-tree-view>
   </div>
 
-  <!-- RICERCA MANUALE DEI TAG -->
+  <!-- MANUAL TAG SEARCH -->
   <div
     class="col-12 col-sm-3 col-lg-4 row g-0 space-paragraph-xs-20 popover-no-arrow popover-left"
     modal-col
@@ -50,7 +50,7 @@
       </span>
     </div>
 
-    <!--Tag duplicati-->
+    <!-- Duplicate tags -->
     <div class="col-12 mt-2" *ngIf="add_tag.visible">
       <app-info
         [message]="add_tag.message"
@@ -60,7 +60,7 @@
       ></app-info>
     </div>
 
-    <!-- Tag appena inseriti -->
+    <!-- Newly inserted tags -->
     <div class="col-12 new-badge space-paragraph-25">
       <h5 *ngIf="terms.length">Tags to be added</h5>
       <ng-template ngFor let-term [ngForOf]="terms">
@@ -73,12 +73,12 @@
       </ng-template>
     </div>
 
-    <!-- Attivazione della data di pubblicazione -->
+    <!-- Activation of the publication date -->
     <div
       class="col-12 new-badge space-paragraph-10 row g-0 imc--flex--vertical-center"
     >
       <div class="col-12 col-lg-10 box-checkbox imc--flex--vertical-center">
-        <!--@NSI Attiva il campo date sotto -->
+        <!-- Activate the date field below -->
         <input
           class="imc--input-checkbox styled-checkbox"
           id="multi-annotation"
@@ -90,32 +90,26 @@
       </div>
 
       <div class="col-12 col-lg-10 space-paragraph-10">
-        <!-- datapicker di boostrap -->
-        <div class="form-group">
-          <div class="input-group">
-            <input
-              class="imc--input imc--input-data"
-              placeholder="yyyy-mm-dd"
-              name="dp"
-              [(ngModel)]="embargo_model"
-              ngbDatepicker
+        <div class="input-group">
+          <input
+            class="imc--input imc--input-data"
+            [ngClass]="{'disabled': !embargo_enable}"
+            placeholder="yyyy-mm-dd"
+            name="dp"
+            [(ngModel)]="embargo_model"
+            ngbDatepicker
+            [disabled]="!embargo_enable"
+            #d="ngbDatepicker"
+          />
+          <div class="imc--input-append">
+            <button
+              class="btn btn-reset"
+              type="button"
               [disabled]="!embargo_enable"
-              #d="ngbDatepicker"
-            />
-            <div class="imc--input-append">
-              <button
-                class="btn-reset"
-                type="button"
-                [disabled]="!embargo_enable"
-                (click)="d.toggle()"
-              >
-                <i
-                  class="material-icons"
-                  style="width: 1.2rem; height: 1rem; cursor: pointer"
-                  >today</i
-                >
-              </button>
-            </div>
+              (click)="d.toggle()"
+            >
+              <i class="material-icons">today</i>
+            </button>
           </div>
         </div>
       </div>
@@ -128,13 +122,13 @@
       </ng-template>
     </div>
 
-    <!--Risultati ricerca-->
+    <!-- search results -->
     <ng-template #popContent>
       <div class="search-term-results">
         <div class="search-term-header" [ngClass]="{lod: results.show === 'l'}">
-          <!--switch risultati-->
+          <!-- switch results -->
           <span
-            class="search-term-label search-term-type-vocabolary click-event"
+            class="search-term-label search-term-type-vocabulary click-event"
             tabindex="0"
             [ngClass]="{'active': results.show === 'v'}"
             (keydown.enter)="show_results('v')"
@@ -163,7 +157,7 @@
             <i class="material-icons click-event" (click)="p.close()">close</i>
           </span>
         </div>
-        <!--risultati dal vocabolario-->
+        <!-- results from the dictionary -->
         <div [ngStyle]="{display: results.show === 'v' ? 'block' : 'none'}">
           <div
             class="search-term-result click-event"
@@ -185,9 +179,9 @@
           >
             no results
           </div>
-          <!--navigazione-->
+          <!-- browsing -->
           <div class="search-term-footer">
-            <div class="search-terms-nav search-term-type-vocabolary">
+            <div class="search-terms-nav search-term-type-vocabulary">
               <button
                 class="btn btn-sm"
                 tabindex="0"
@@ -209,7 +203,7 @@
             </div>
           </div>
         </div>
-        <!--risultati dai lods-->
+        <!-- results from LODs -->
         <div [ngStyle]="{display: results.show === 'l' ? 'block' : 'none'}">
           <div
             class="search-term-result"
@@ -237,7 +231,7 @@
           <div *ngIf="!results.lods.length" class="search-term-no-results">
             no results
           </div>
-          <!--navigazione-->
+          <!-- browsing -->
           <div class="search-term-footer lod">
             <div class="search-terms-nav search-term-type-lod">
               <button
@@ -274,7 +268,7 @@
   >
     Save
   </button>
-  <!--esito-->
+  <!-- outcome -->
   <app-info
     modal-button
     [message]="save_result.message"

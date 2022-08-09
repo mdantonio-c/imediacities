@@ -1,8 +1,8 @@
 <!-- Modal for inserting links -->
 <app-media-modal [data]="data" [media_type]="media_type">
-  <div class="col-12 col-sm-7 row g-0 space-paragraph-xs-20" modal-col>
+  <div class="col-12 col-sm-7 row space-paragraph-xs-20" modal-col>
     <span class="col-11">
-      <div class="custom-control custom-radio custom-control-inline">
+      <div class="form-check">
         <input
           type="radio"
           id="insertUrl"
@@ -10,21 +10,24 @@
           [(ngModel)]="options"
           [value]="true"
           [checked]="options"
-          class="custom-control-input"
+          class="form-check-input"
         />
-        <label class="custom-control-label imc--radio-label" for="insertUrl"
+        <label
+          class="form-check-label custom-control imc--radio-label"
+          for="insertUrl"
           >Insert URL</label
         >
       </div>
-      <!-- <div class="custom-control custom-radio custom-control-inline">
+      <!--
+      <div class="form-check">
         <input type="radio"
         id="insertLink"
         name="insertLink"
         [(ngModel)]="options"
         [value]="false"
         [checked]="!options"
-        class="custom-control-input">
-        <label class="custom-control-label imc--radio-label" for="insertLink">Search in IMC</label>
+        class="form-check-input">
+        <label class="form-check-label imc--radio-label" for="insertLink">Search in IMC</label>
       </div> -->
     </span>
     <span
@@ -98,7 +101,7 @@
         <button class="btn btn-accent">Search</button>
       </span>
       <div class="col-12 space-paragraph-20 box-checkbox-group">
-        <!-- @NSI checkbox per filtrare i media da linkare -->
+        <!-- checkbox to filter the media to be linked -->
         <span *ngFor="let opt of optionsCheckbox; let i = index">
           <input
             class="imc--input-checkbox styled-checkbox"
@@ -115,10 +118,10 @@
           <span class="col imc--thumb"></span>
           <div class="col modal--media-link--info">
             <span>
-              <!-- @NSI cambia l'icona in base a che media o elemento si sta cercando -->
+              <!-- change the icon based on what media or element you are looking for -->
               <!--<i class="material-icons icon-foto">insert_photo</i>-->
-              <!-- (per le note) <i class="material-icons">speaker_notes</i> -->
-              <!-- (per le referenze) <i class="material-icons">library_books</i> -->
+              <!-- (for the notes) <i class="material-icons">speaker_notes</i> -->
+              <!-- (for the references) <i class="material-icons">library_books</i> -->
               <i class="material-icons icon-video">videocam</i> shot 7
             </span>
             <p>Attentato terroristico alla stazione di Bologna</p>
@@ -164,7 +167,7 @@
     </span>
   </div>
   <!-- <button type="button" class="btn btn-accent" modal-button (click)="ok()">Ok</button> -->
-  <!--esito-->
+  <!-- outcome -->
   <app-info
     modal-button
     [message]="save_result.message"
@@ -202,25 +205,25 @@
       &lt;!&ndash; Aggiunta della nota &ndash;&gt;
       <div class="col-7 row g-0">
         <span class="col-11">
-          <div class="custom-control custom-radio custom-control-inline">
+          <div class="form-check">
             <input type="radio"
             id="insertUrl"
             name="insertUrl"
             [(ngModel)]="options"
             [value]="true"
             [checked]="options"
-            class="custom-control-input">
-            <label class="custom-control-label imc&#45;&#45;radio-label" for="insertUrl">Insert URL</label>
+            class="form-check-input">
+            <label class="form-check-label imc&#45;&#45;radio-label" for="insertUrl">Insert URL</label>
           </div>
-          <div class="custom-control custom-radio custom-control-inline">
+          <div class="form-check">
             <input type="radio"
             id="insertLink"
             name="insertLink"
             [(ngModel)]="options"
             [value]="false"
             [checked]="!options"
-            class="custom-control-input">
-            <label class="custom-control-label imc&#45;&#45;radio-label" for="insertLink">Search in IMC</label>
+            class="form-check-input">
+            <label class="form-check-label imc&#45;&#45;radio-label" for="insertLink">Search in IMC</label>
           </div>
         </span>
         <span *ngIf="options" class="col-11 row imc&#45;&#45;flex&#45;&#45;vertical-center space-paragraph-20">
