@@ -33,8 +33,7 @@ export class CustomBrandComponent {
   // public image = "IMC-Logo-transp.png";
   // public alt = "I-MediaCities logo";
 
-  public url =
-    "https://www.ra.cna.it/fileadmin/user_upload/download/news/2020/2020_01_27_DARE_intro.pdf";
+  public url = "https://www.darsenaravenna.it";
   public image = "DR_logo_04.png";
   public alt = "DARE logo";
 
