@@ -5,6 +5,7 @@
     width: 100% !important;
     &.slider-horizontal {
       .slider-tick-label-container {
+        //margin-top: auto !important;
         .slider-tick-label {
           white-space: nowrap;
           text-align: center;
@@ -14,21 +15,31 @@
         }
       }
       .tooltip {
+        transform: none;
+        -webkit-transform: none;
+        margin: auto;
+        width: fit-content;
+        text-align: center;
+
         &.tooltip-main {
           opacity: 1 !important;
+          width: fit-content;
           &.top {
             .tooltip-arrow:after {
               content: "";
               width: 0;
               height: 0;
               position: absolute;
-              bottom: -10px;
+              top: 17px;
+              left: 30px;
               border: transparent 5px solid;
               //border-top: #000 5px solid;
-              left: 40%;
               border-top: #17a2b8 5px solid;
             }
           }
+        }
+        &.tooltip-max {
+          display: none;
         }
       }
     }
@@ -43,7 +54,7 @@
     }
     .tooltip {
       &.top {
-        margin-top: -23px;
+        margin-top: -30px;
         &.tooltip-min .tooltip-inner,
         &.tooltip-max .tooltip-inner {
           color: #999;
@@ -51,7 +62,7 @@
         }
       }
       .tooltip-arrow {
-        position: unset;
+        position: relative;
         height: 0;
       }
     }
