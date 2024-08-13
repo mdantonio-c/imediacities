@@ -55,7 +55,8 @@
           <div class="col col-sm-11 col-md-10">
             <div class="btn-group">
               <label
-                class="btn-basic imc-search-filter"
+                class="btn imc-search-filter"
+                [class.active]="searchForm.get('videoType').value"
                 ngbButtonLabel
                 (click)="verifyItemType('video')"
               >
@@ -68,7 +69,8 @@
                 <i class="material-icons button-filter">videocam</i>
               </label>
               <label
-                class="btn-basic imc-search-filter"
+                class="btn imc-search-filter"
+                [class.active]="searchForm.get('imageType').value"
                 ngbButtonLabel
                 (click)="verifyItemType('image')"
               >
@@ -81,7 +83,8 @@
                 <i class="material-icons button-filter">photo_camera</i>
               </label>
               <label
-                class="btn-basic imc-search-filter"
+                class="btn imc-search-filter"
+                [class.active]="searchForm.get('model3DType').value"
                 ngbButtonLabel
                 (click)="verifyItemType('3d-model')"
               >
@@ -165,7 +168,7 @@
           City
         </h4>
         <div>
-          <select formControlName="city" class="form-control">
+          <select formControlName="city" class="form-select">
             <option value=""></option>
             <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
           </select>
@@ -240,7 +243,7 @@
           Rights Status
         </h4>
         <div>
-          <select formControlName="iprstatus" class="form-control down-arrow">
+          <select formControlName="iprstatus" class="form-select down-arrow">
             <option value=""></option>
             <option
               *ngFor="let iprstatus of iprstatuses"

@@ -33,7 +33,7 @@ class Bulk(IMCEndpoint):
 
     def lookup_latest_dir(self, path: str) -> Optional[str]:
         """
-        Look for the sub-directory of path in the forms of:
+        Look for the subdirectory of path in the forms of:
         %Y-%m-%d (example 2018-04-19)
         %Y-%m-%dT%H:%M:%S.%fZ (example 2018-04-19T11:22:12.0Z)
         which name is the most recent date
@@ -47,15 +47,15 @@ class Bulk(IMCEndpoint):
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for d in dirs:
             parsed_date: Optional[datetime] = None
-            for format in POSSIBLE_FORMATS:
+            for f in POSSIBLE_FORMATS:
                 try:
-                    parsed_date = datetime.strptime(d, format)
+                    parsed_date = datetime.strptime(d, f)
                     break
-                except Exception:
-                    # il nome della dir non e' nel formato
+                except ValueError:
+                    # the dir name is not in the format
                     pass
             if parsed_date is not None:
-                # all'inizio found_dir e' vuoto
+                # initially found_dir is empty
                 if found_date is None:
                     found_date = parsed_date
                     found_dir = d
@@ -76,7 +76,8 @@ class Bulk(IMCEndpoint):
     @decorators.endpoint(
         path="/bulk",
         summary="Perform many operations such as import, update, delete etc.",
-        description="The bulk api makes it possible to perform many operations in a single api call",
+        description="The bulk api makes it possible to perform many operations in a "
+        "single api call",
         responses={202: "Bulk action successfully accepted", 400: "Bad request."},
     )
     def post(self, user: User, **req_action: Any) -> Response:

@@ -1,4 +1,4 @@
-FROM rapydo/backend:2.3
+FROM rapydo/backend:2.4
 
 
 RUN apt-get update -qq && \
